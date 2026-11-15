@@ -35,10 +35,10 @@ void func_L16_0041CB30(char *object)
     case 0:
         *(float *)(object+0x18)+=0.57f;
         qcopy(state,(object+0x10));
-        ((float *)&local.beam)[0]=func_00283180(func_00283B98(*(float *)(object+0xf8),1.570796490f))*9.5f;
-        ((float *)&local.beam)[1]=func_00283198(func_00283B98(*(float *)(object+0xf8),1.570796490f))*9.5f;
+        ((float *)&local.beam)[0]=func_00283180(FastAddRotations(*(float *)(object+0xf8),1.570796490f))*9.5f;
+        ((float *)&local.beam)[1]=func_00283198(FastAddRotations(*(float *)(object+0xf8),1.570796490f))*9.5f;
         ((float *)&local.beam)[2]=0.0f;
-        func_00282CC0(state+0x10,((float *)&local.beam),object+0x10);
+        FastVecAdd(state+0x10,((float *)&local.beam),object+0x10);
         *(int *)(state+0x24)=-1;
         *(int *)(state+0x28)=-1;
         func_002A7750((unsigned char *)object,1,-1);
@@ -47,23 +47,23 @@ void func_L16_0041CB30(char *object)
         sound4=D_00188660+0x70**(int *)(state+0x24);
         if((*(char **)(sound4+0x88))!=object || (*(unsigned char *)(sound4+0x74))==0) *(int *)(state+0x24)=func_002E5DA0(0,4,object,0x113a);
         func_002AA458(object+0x10,state+0x10,state+0x20,0.001111111138f,0.002222222276f,0.06666667014f);
-        if(func_00282E80(object+0x10,state+0x10)<0.03333333507f) func_002A7750((unsigned char *)object,2,-1);
+        if(vec_distance_xy(object+0x10,state+0x10)<0.03333333507f) func_002A7750((unsigned char *)object,2,-1);
         break;
     case 2:
         sound2=D_00188660+0x70**(int *)(state+0x24);
         if((*(char **)(sound2+0x88))!=object || (*(unsigned char *)(sound2+0x74))==0) *(int *)(state+0x24)=func_002E5DA0(0,4,object,0x113a);
         func_002AA458(object+0x10,state,state+0x20,0.001111111138f,0.002222222276f,0.06666667014f);
-        if(func_00282E80(object+0x10,state)<0.03333333507f) func_002A7750((unsigned char *)object,1,-1);
+        if(vec_distance_xy(object+0x10,state)<0.03333333507f) func_002A7750((unsigned char *)object,1,-1);
         break;
     }
-    func_L00_002E6CF0(func_L16_0041CF80,object);
-    func_002A8C00((char *)&local.request,(int)object,1,4.0f,&D_L16_001A8F20);
+    func_L00_002E6CF0(DrawBeamQuads,object);
+    make_hit_descriptor((char *)&local.request,(int)object,1,4.0f,&D_L16_001A8F20);
     local.request.id=*(unsigned short *)(object+0xaa);
     ((float *)&local.beam)[0]=func_00283180(*(float *)(object+0xf8))*25.0f;
     ((float *)&local.beam)[1]=func_00283198(*(float *)(object+0xf8))*25.0f;
     ((float *)&local.beam)[2]=0.0f;
-    func_00282CC0(((float *)&local.beam),object+0x10,((float *)&local.beam));
-    if(func_002761F8(object+0x10,((float *)&local.beam),0,object,&local.request)!=0 && D_L16_001BFF58==D_0018C0B0) {
+    FastVecAdd(((float *)&local.beam),object+0x10,((float *)&local.beam));
+    if(CollLine(object+0x10,((float *)&local.beam),0,object,&local.request)!=0 && D_L16_001BFF58==D_0018C0B0) {
         handle=*(int *)(state+0x28);
         if(handle!=-1) {
             sound=D_00188660+handle*0x70;
@@ -76,7 +76,7 @@ sound_ready:
     if(target==0) target=D_L16_001B0F80;
     if(target!=0) {
         func_L01_00311C18(&local.closest,object+0x10,((float *)&local.beam),target+0x10);
-        if(func_00282E80(&local.closest,target+0x10)<0.15f) {
+        if(vec_distance_xy(&local.closest,target+0x10)<0.15f) {
             if(*(short *)(target+0xaa)==0xb58) {
                 if(*(unsigned char *)(target+0x20)!=5) func_L00_003DF6B0(1,2);
             } else if(*(unsigned char *)(target+0x20)!=5) func_L00_004028C0((char *)1,2);

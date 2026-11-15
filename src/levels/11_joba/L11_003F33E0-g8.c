@@ -83,8 +83,8 @@ void func_L11_003F33E0(u8 *object) {
                 if (func_L11_003F3258(object,data+0x210+i*16,data+0x1F0+i*16))
                     ((PathState *)data)->repeat[i]=D_L11_001B059C;
             } else {
-                t=func_00283CE0(((PathState *)data)->timer[i]);
-                t/=func_00283CE0(D_L11_001B05A4);
+                t=IntToFloat(((PathState *)data)->timer[i]);
+                t/=IntToFloat(D_L11_001B05A4);
                 ((PathState *)data)->scale[i]=t;
             }
             break;
@@ -93,20 +93,20 @@ void func_L11_003F33E0(u8 *object) {
             if (((PathState *)data)->timer[i]<=D_L11_001B05A8) {
                 u8 *path;
                 s32 off;
-                t=func_00283CE0(((PathState *)data)->timer[i]);
-                t/=func_00283CE0(D_L11_001B05A8);
+                t=IntToFloat(((PathState *)data)->timer[i]);
+                t/=IntToFloat(D_L11_001B05A8);
                 off=i*0xA0;
                 path=data+0xA0+off;
                 F(data+off,0xB0)=((PathState *)data)->origin[i].x+(((PathState *)data)->target[i].x-((PathState *)data)->origin[i].x)*t;
                 F(data+off,0xB4)=((PathState *)data)->origin[i].y+(((PathState *)data)->target[i].y-((PathState *)data)->origin[i].y)*t;
                 F(data+off,0xB8)=((PathState *)data)->origin[i].z+(((PathState *)data)->target[i].z-((PathState *)data)->origin[i].z)*t;
-                func_00282CF0(delta,path+0x10,path);
-                func_00282F20(delta,delta,0.03333333507180214f);
-                func_002A8C00(&query,object,0x210001,delta,data[0x34]);
+                FastVecSub(delta,path+0x10,path);
+                vec_scale_to_length(delta,delta,0.03333333507180214f);
+                make_hit_descriptor(&query,object,0x210001,delta,data[0x34]);
                 query.kind=5;
                 query.flags=3;
                 query.id=U(object,0xAA);
-                if (func_002761F8(path,path+0x10,0,object,&query)) {
+                if (CollLine(path,path+0x10,0,object,&query)) {
                     u8 *hit=D_L11_001C0D00.hit;
                     if (hit && H(hit,0xAA)!=0xC7D) {
                         u8 *snapshot;
@@ -132,9 +132,9 @@ void func_L11_003F33E0(u8 *object) {
             u8 *hit;
             if (((PathState *)data)->timer[i]<=D_L11_001B05AC && (hit=((PathState *)data)->hit[i]) && hit[0x20]!=0xFE && hit[0x20]!=0xFD) {
                 u8 *end;
-                func_00282CF0(delta,hit+0x10,data+0x230+i*16);
+                FastVecSub(delta,hit+0x10,data+0x230+i*16);
                 end=data+i*0xA0+0xB0;
-                func_00282CC0(end,end,delta);
+                FastVecAdd(end,end,delta);
                 qcopy(data+0x230+i*16,((PathState *)data)->hit[i]+0x10);
                 if ((D_L11_001B30C8&15)==(((s32)object>>8)&15)) func_L11_003F4A58(end,1);
             } else {
@@ -147,8 +147,8 @@ void func_L11_003F33E0(u8 *object) {
         }
         case 4:
             if (((PathState *)data)->timer[i]<D_L11_001B05B0) {
-                t=func_00283CE0(((PathState *)data)->timer[i]);
-                t/=func_00283CE0(D_L11_001B05B0);
+                t=IntToFloat(((PathState *)data)->timer[i]);
+                t/=IntToFloat(D_L11_001B05B0);
                 F(data+i*0xA0,0xA0)=((PathState *)data)->origin[i].x+(((PathState *)data)->target[i].x-((PathState *)data)->origin[i].x)*t;
                 F(data+i*0xA0,0xA4)=((PathState *)data)->origin[i].y+(((PathState *)data)->target[i].y-((PathState *)data)->origin[i].y)*t;
                 F(data+i*0xA0,0xA8)=((PathState *)data)->origin[i].z+(((PathState *)data)->target[i].z-((PathState *)data)->origin[i].z)*t;
@@ -183,5 +183,5 @@ void func_L11_003F33E0(u8 *object) {
             break;
         }
     }
-    func_L11_003F4060(object);
+    UpdateTwinRecordAnglesAndPositions(object);
 }

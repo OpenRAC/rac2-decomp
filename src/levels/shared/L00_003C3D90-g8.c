@@ -111,14 +111,14 @@ void func_L00_003C3D90(Moby *self)
     func_L00_0037E640();
     if(!D_L00_001A8F00) {
         if(!func_002E59B0(self,ctx->sound))
-            ctx->sound=func_002E5CF8(3,4,self);
+            ctx->sound=PlayMobySound(3,4,self);
     } else if(func_002E59B0(self,ctx->sound)) clearSound(self,ctx);
     if(D_L00_00262570[D_00139568[0x2d]].active && self->oclass==0xa5c) {
         int saved=D_L00_001AFF98;
         D_L00_001AFF98=0;
-        if(func_L00_003C3A70(1)) {
+        if(CreateTrailOwnerMoby(1)) {
             clearSound(self,ctx);
-            func_002E5CF8(2,0,self);
+            PlayMobySound(2,0,self);
             D_L00_001AFF98=0;
             func_0029F338(self);
             return;
@@ -130,22 +130,22 @@ void func_L00_003C3D90(Moby *self)
         clearSound(self,ctx);
         D_L00_001AFF44=0;
         func_L00_0037E698();
-        func_002E5CF8(2,0,self);
+        PlayMobySound(2,0,self);
         D_L00_001AFF98=0;
         func_0029F338(self);
         return;
     }
     if(value!=ctx->value) {
-        D_00139868.changed+=func_00283CF0(func_00282C48(ctx->value-value));
+        D_00139868.changed+=FloatToInt(func_00282C48(ctx->value-value));
         ctx->value=value;
         ctx->timer=D_L00_001AFF90;
     }
-    ratio=func_00283CE0(ctx->timer)/func_00283CE0(D_L00_001AFF90);
-    if(self->oclass==0xa5c) ctx->colour=func_00283D38(ratio,D_L00_001AFF10,D_L00_001AFF14);
-    else ctx->colour=func_00283D38(ratio,D_L00_001AFF18,D_L00_001AFF1C);
-    func_00282978(&ctx->timer);
-    func_00282D30(offset,D_00189E20_13.moby+0xe0,0.75f);
-    func_00282CC0(&self->x,D_00189E20_13.position,offset);
+    ratio=IntToFloat(ctx->timer)/IntToFloat(D_L00_001AFF90);
+    if(self->oclass==0xa5c) ctx->colour=FastTweenColor(ratio,D_L00_001AFF10,D_L00_001AFF14);
+    else ctx->colour=FastTweenColor(ratio,D_L00_001AFF18,D_L00_001AFF1C);
+    FastDecTimer(&ctx->timer);
+    FastVecScale(offset,D_00189E20_13.moby+0xe0,0.75f);
+    FastVecAdd(&self->x,D_00189E20_13.position,offset);
     func_0029FCC0(D_00189E20_13.moby,10,origin);
     for(i=0;i<8;i++) {
         if(!D_L00_001B2950[i]) {
@@ -154,7 +154,7 @@ void func_L00_003C3D90(Moby *self)
             value=func_002A7940();
             ratio=func_002A7940();
             func_002AF000(position,D_L00_001AFF4C,value,ratio);
-            func_00282CC0(position,position,origin);
+            FastVecAdd(position,position,origin);
             effect=(Particle *)(D_L00_001B2950[i]=(int)func_002C36D0(position,id,2,1));
             if(effect) {
                 ParticleOwner *sub=&effect->owner;
@@ -184,7 +184,7 @@ void func_L00_003C3D90(Moby *self)
     func_00282948(&ctx->lock);
     {
     int t;
-    for(t=0;t<4;t++) if(func_00282978(&ctx->timers[t])) {
+    for(t=0;t<4;t++) if(FastDecTimer(&ctx->timers[t])) {
         ctx->targets[t]=0;
         slot=t;
     }
@@ -211,14 +211,14 @@ void func_L00_003C3D90(Moby *self)
                 health=func_002AB1F0(object);
                 if(health) {
                     if(health[0]<=0) continue;
-                    func_00282D30(scaled,self->forward,health[4]);
-                    func_00282CC0(position,&object->x,scaled);
+                    FastVecScale(scaled,self->forward,health[4]);
+                    FastVecAdd(position,&object->x,scaled);
                 } else qcopy(position,&object->x);
-                func_00282CF0(&packet,position,&self->x);
-                func_00282F20(&packet,&packet,1.0f);
-                func_002A8E20(object,&packet);
-                func_00282D30(scaled,&packet,D_L00_001AFF2C*0.3f);
-                func_00282CC0(output,&self->x,scaled);
+                FastVecSub(&packet,position,&self->x);
+                vec_scale_to_length(&packet,&packet,1.0f);
+                QueueMobyImpact(object,&packet);
+                FastVecScale(scaled,&packet,D_L00_001AFF2C*0.3f);
+                FastVecAdd(output,&self->x,scaled);
                 func_L00_003C58E8(output,ctx->colour);
                 ctx->cooldown=0.5f;
             }
@@ -247,7 +247,7 @@ void func_L00_003C3D90(Moby *self)
                 if(effect) {
                     effect->source=self;
                     D_L00_001AFF44++;
-                    func_002E5CF8(5,0,self);
+                    PlayMobySound(5,0,self);
                     ctx->timers[slot]=func_002A7820(20,60);
                 }
                 break;
@@ -258,7 +258,7 @@ void func_L00_003C3D90(Moby *self)
     {
     int r;
     for(r=0;r<5;r++) {
-        if(func_00282978(&D_L00_001B2990[r])) D_L00_001B2990[r]=0;
+        if(FastDecTimer(&D_L00_001B2990[r])) D_L00_001B2990[r]=0;
         if(!D_L00_001B2990[r]) {
             float velocity[4],scaled[4];
             int id=func_002A7820(3,45);
@@ -273,10 +273,10 @@ void func_L00_003C3D90(Moby *self)
             int n;
             for(n=1;n<10;n++) {
                 float width=0.04f;
-                func_00282CF0(scaled,D_L00_00240080_1[r][n-1].v,D_L00_001B8DC0);
+                FastVecSub(scaled,D_L00_00240080_1[r][n-1].v,D_L00_001B8DC0);
                 func_002ACEC0(velocity,velocity,scaled,func_002A7878(0.0872664749622345f,1.3089970350265503f)*sign);
                 sign=-sign;
-                func_00282CC0(D_L00_00240080[r][n].v,D_L00_00240080_1[r][n-1].v,velocity);
+                FastVecAdd(D_L00_00240080[r][n].v,D_L00_00240080_1[r][n-1].v,velocity);
                 D_L00_00240080[r][n].v[3]=width;
             }
             }

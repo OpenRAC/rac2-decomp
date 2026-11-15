@@ -60,6 +60,6 @@ void func_002F5E20(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4)
     D_001B2210 = arg2;
     D_001B2214 = arg3;
     D_001B2218 = arg4;
-    func_0027D330(4);
+    FadeToBlack(4);
     func_00288EA0();
 }

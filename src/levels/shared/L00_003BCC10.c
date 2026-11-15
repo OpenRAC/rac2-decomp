@@ -55,21 +55,21 @@ void func_L00_003BCC10(Moby3BCC10 *self) {
     for (i = 0; i < 16; i++) {
         e = &tab[i];
         if (e->owner == self) {
-            e->a[0] = func_00283B98(e->a[0], e->da[0]);
-            e->a[1] = func_00283B98(e->a[1], e->da[1]);
-            e->a[2] = func_00283B98(e->a[2], e->da[2]);
-            e->b[0] = func_00283B98(e->b[0], e->db[0]);
-            e->b[1] = func_00283B98(e->b[1], e->db[1]);
-            e->b[2] = func_00283B98(e->b[2], e->db[2]);
+            e->a[0] = FastAddRotations(e->a[0], e->da[0]);
+            e->a[1] = FastAddRotations(e->a[1], e->da[1]);
+            e->a[2] = FastAddRotations(e->a[2], e->da[2]);
+            e->b[0] = FastAddRotations(e->b[0], e->db[0]);
+            e->b[1] = FastAddRotations(e->b[1], e->db[1]);
+            e->b[2] = FastAddRotations(e->b[2], e->db[2]);
             e->v0[0] = func_00283180(e->a[0]) * e->ra[0];
             e->v0[1] = func_00283198(e->a[1]) * e->ra[1];
             e->v0[2] = -func_00283198(e->a[2]) * e->ra[2];
             e->v1[0] = func_00283180(e->b[0]) * e->rb[0];
             e->v1[1] = func_00283198(e->b[1]) * e->rb[1];
             e->v1[2] = -func_00283198(e->b[2]) * e->rb[2];
-            func_00283098(tmp, e->off, self->mtx);
+            matrix_mul_vec3(tmp, e->off, self->mtx);
             qcopy(e->at, pos);
-            func_00282CC0(e->out, tmp, pos);
+            FastVecAdd(e->out, tmp, pos);
             if (func_00282948(&e->timer)) {
                 e->owner = 0;
                 vars->count--;

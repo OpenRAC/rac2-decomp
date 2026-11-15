@@ -122,17 +122,17 @@ void func_L20_0039BB18(void *arg0)
     if (*(u16 *)(*(u32 *)((u32)arg0 + 0xB8) + 0x34) & 1)
         goto pathA;
 check:
-    if (func_00282E80((void *)((u32)arg0 + 0x10),
+    if (vec_distance_xy((void *)((u32)arg0 + 0x10),
                       (void *)(*(u32 *)((u32)arg0 + 0xB8) + 0x10)) > 0.1f) {
 pathA:
         zero_arg = 0.0f;
-        func_002AA2E8((float *)s0, zero_arg, 0.016666667f);
+        ApproachValue((float *)s0, zero_arg, 0.016666667f);
         if (*(float *)s0 == 0.0f) {
             func_0029F338(arg0);
             goto end;
         }
     } else {
-        func_002AA2E8((float *)s0, 1.0f, 0.016666667f);
+        ApproachValue((float *)s0, 1.0f, 0.016666667f);
     }
 
     g = D_L20_001AEC68;
@@ -167,7 +167,7 @@ skip:
     } else {
         vel.f[2] = rr2;
     }
-    func_00282CC0(&vel, &vel, arg0 + 0x10);
+    FastVecAdd(&vel, &vel, arg0 + 0x10);
     {
         u8 particle_count = m;
         r = func_002A77E0(255);
@@ -197,7 +197,7 @@ void func_L20_00310E38(void *incoming)
             if (object && *(s16 *)(object+0xAA) == 0xE29)
                 *(u16 *)(object+0x34) |= 0x800;
             if (*(s16 *)(object+0xAA) == 0xD54)
-                func_002E64A0(object);
+                UpdateEquipmentPieces(object);
             if (object && *(s16 *)(object+0xAA) == 0xFA0 && *(void **)(object+0x68))
                 func_L00_00326048((char *)object,(float *)(*(u8 **)(object+0x68)+0xC),
                                   0x80AAAAD2,0x80396464,0.06108653545f);
@@ -233,23 +233,23 @@ void func_L20_00310E38(void *incoming)
                     }
                     if (lower < D_L20_001BDCC0.state && D_L20_001BDCC0.state < upper) {
                         func_0029FC20(target,0,matrix);
-                        func_00283678(D_0018A550,matrix);
+                        copy_matrix3x4(D_0018A550,matrix);
                         value = camera->scale;
                         value += (12.0f-value)*0.07f;
                         camera->scale = value;
                         func_0029FCC0(target,0,camera);
-                        func_00282F20(&camera->point,D_0018A550,camera->scale);
-                        func_00282CC0(&camera->point,camera,&camera->point);
-                        func_0030CAD0(target);
+                        vec_scale_to_length(&camera->point,D_0018A550,camera->scale);
+                        FastVecAdd(&camera->point,camera,&camera->point);
+                        InitializeBoltPointChain(target);
                         func_0030CCD0(target);
                         func_L00_002E6EF8(func_0030D430,target);
                         if (D_L20_001BDCC0.mode == 5 && D_L20_001BDCC0.state == upper-1) {
                             offset.q = 0;
                             offset.f[0] = 18.0f; offset.f[1] = -2.5f; offset.f[2] = 1.0f;
-                            func_00283098(&offset,&offset,D_L20_001BA1F0);
-                            func_00282CC0(&offset,&offset,D_L20_001BA1F0-0x230);
-                            func_00282CF0(&work,D_L20_001BA1F0-0x230,&offset);
-                            func_00282F20(&work,&work,1.0f);
+                            matrix_mul_vec3(&offset,&offset,D_L20_001BA1F0);
+                            FastVecAdd(&offset,&offset,D_L20_001BA1F0-0x230);
+                            FastVecSub(&work,D_L20_001BA1F0-0x230,&offset);
+                            vec_scale_to_length(&work,&work,1.0f);
                             func_0032DA58(*(void **)(D_0018A550-0x170),&offset,&work,0.0f);
                         }
                     } else D_00189E20.owner = 0;
@@ -269,13 +269,13 @@ void func_L20_00310E38(void *incoming)
                     *(u16 *)(object+0x7C) = word = (s16)word == 0xD0F ? 15 : 0x3FF;
                 }
                 if (*(s16 *)(object+0xAA) == 0xCE0 && (D_L20_001BDCC0.mode != 3 || D_L20_001BDCC0.state < D_L20_001A9430))
-                    func_L03_00326458(object);
+                    EmitScaledObjectParticles(object);
             }
         }
         if (D_L20_001BDCC0.mode == 3 && D_L20_001BDCC0.state == D_L20_001A9430) {
             qcopy(matrix,(u8 *)D_L20_001BDCC0.refs.named.target+0x10);
-            func_00282CC0(matrix,matrix,&D_L20_001A9420);
-            func_0032C700(matrix,0,0x19,0x14,0x14,0x14,0x2D,1,1.0f,20.0f,1,1,0,0);
+            FastVecAdd(matrix,matrix,&D_L20_001A9420);
+            SpawnExplosion(matrix,0,0x19,0x14,0x14,0x14,0x2D,1,1.0f,20.0f,1,1,0,0);
             {
                 YeedilEffectPrefix *effect = &D_L20_001B9E80;
                 effect->scale1 = 0.09f;
@@ -337,7 +337,7 @@ void func_L20_00310E38(void *incoming)
  *     changes nothing.
  * Needs from the g8 file: u32/u64, qcopy, SDATA/NOT_SDA, and the existing
  *   externs func_002A7878(float,float) and func_002A7940(void).
- * FastTweenColor (func_00283D38) prototype (int from, int to, float t) is
+ * FastTweenColor (FastTweenColor) prototype (int from, int to, float t) is
  *   what fixes loop-1 s6/s7/fp; D_L20_001AECD8 as incomplete sda array
  *   (indices 1..3 become unsplit CONST lui/lw loads) plus a SDATA view
  *   for index 0 reproduces the colour-argument loads.
@@ -378,9 +378,9 @@ void func_L20_0039BEC8(void *arg)
     float *vars = *(float **)(object + 0x68);
 
     u32 color;
-    func_00283658(matrix, object + 0xc0);
+    copy_matrix_rotation(matrix, object + 0xc0);
     qcopy(matrix + 12, object + 0x10);
-    packet.descriptor[1] = func_0027C878(D_L20_001AEC6C);
+    packet.descriptor[1] = GetEffectTextureDescriptor(D_L20_001AEC6C);
     packet.descriptor[0] = 0;
     packet.descriptor[2] = 0xff9000000260ULL;
     packet.descriptor[3] = 0x8000000048ULL;
@@ -392,7 +392,7 @@ void func_L20_0039BEC8(void *arg)
             packet.uv[i].y = D_L20_001AEC84[i * 2];
             color = D_L20_001AEC70[(i & 1) ? 0 : 1];
             packet.color[i] = color;
-            packet.color[i] = func_00283D38(color & 0xffffff, color, vars[0]);
+            packet.color[i] = FastTweenColor(color & 0xffffff, color, vars[0]);
             func_00282C90(&packet.position[i]);
             packet.position[i].f[0] = D_L20_001AEC7C;
             if ((i & 1) == 0) packet.position[i].f[2] = D_L20_001AEC78;
@@ -401,9 +401,9 @@ void func_L20_0039BEC8(void *arg)
     }
     *(Quad *)(rotated + 12) = 0;
     rotated[14] = 0.19634954631328583f;
-    func_002833F0(rotated, rotated + 12);
+    euler_rotation_basis(rotated, rotated + 12);
     func_L01_002E1510(&packet, 1, rotated, 32, matrix);
-    func_00282CF0(&direction, D_L20_001B9FC0, object + 0x10);
+    FastVecSub(&direction, D_L20_001B9FC0, object + 0x10);
     func_002AFDD8(object, (char *)&direction, (char *)&direction, 0);
     normal.q = 0;
     normal.f[0] = direction.f[1];
@@ -411,7 +411,7 @@ void func_L20_0039BEC8(void *arg)
     normal.f[3] = 1.0f;
     tangent.q = normal.q;
     direction.f[2] = 0.0f;
-    packet.descriptor[1] = func_0027C878(D_L20_001AECA0);
+    packet.descriptor[1] = GetEffectTextureDescriptor(D_L20_001AECA0);
     {
         int i;
         for (i = 0; i < 4; i++) {
@@ -421,31 +421,31 @@ void func_L20_0039BEC8(void *arg)
             packet.uv[i].y = D_L20_001AECBC[i * 2];
             color = D_L20_001AECA8[(i & 1) ? 0 : 1];
             packet.color[i] = color;
-            packet.color[i] = func_00283D38(color & 0xffffff, color, vars[0]);
+            packet.color[i] = FastTweenColor(color & 0xffffff, color, vars[0]);
             width = i > 1 ? D_L20_001AECB4 : D_L20_001AEC7C;
-            func_00282F20(&packet.position[i], &tangent, width);
+            vec_scale_to_length(&packet.position[i], &tangent, width);
             if ((i & 1) == 0) packet.position[i].f[2] = D_L20_001AEC78;
             else packet.position[i].f[2] = 0.0f;
         }
     }
-    func_00280B90(&packet, matrix, 0);
+    draw_world_quad(&packet, matrix, 0);
     {
         int i;
         for (i = 0; i < 4; i++) {
             float width = -(i > 1 ? D_L20_001AECB4 : D_L20_001AEC7C);
-            func_00282F20(&packet.position[i], &tangent, width);
+            vec_scale_to_length(&packet.position[i], &tangent, width);
             if ((i & 1) == 0) packet.position[i].f[2] = D_L20_001AEC78;
             else packet.position[i].f[2] = 0.0f;
         }
     }
-    func_00280B90(&packet, matrix, 0);
+    draw_world_quad(&packet, matrix, 0);
     qcopy(&normal, object + 0x10);
     normal.f[2] += 0.333f;
-    color = func_00283D38(D_L20_001AECD8_gp, D_L20_001AECD8[1], func_002A7878(0.0f,1.0f));
-    color = func_00283D38(color & 0xffffff, color, vars[0]);
+    color = FastTweenColor(D_L20_001AECD8_gp, D_L20_001AECD8[1], func_002A7878(0.0f,1.0f));
+    color = FastTweenColor(color & 0xffffff, color, vars[0]);
     func_00281EB8(&normal, 11, color, 1, D_L20_001AECE8, 0.0f, func_002A7940());
-    color = func_00283D38(D_L20_001AECD8[2], D_L20_001AECD8[3], func_002A7878(0.0f,1.0f));
-    color = func_00283D38(color & 0xffffff, color, vars[0]);
+    color = FastTweenColor(D_L20_001AECD8[2], D_L20_001AECD8[3], func_002A7878(0.0f,1.0f));
+    color = FastTweenColor(color & 0xffffff, color, vars[0]);
     func_00281EB8(&normal, 11, color, 1, D_L20_001AECEC, 0.0f, func_002A7940());
     func_00281EB8(object + 0x10, 49, color, 1, D_L20_001AECEC, 0.0f, func_002A7940());
 }

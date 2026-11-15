@@ -127,7 +127,7 @@ void func_002F53C8(int n)
     index = func_002EF010(n);
     if (index < 0)
         return;
-    func_002B72E8(0);
+    music_Pause(0);
     func_002B7CE0(0);
     func_00282A60(&D_001B8840, 0, 0x1D0);
     func_00282A60(D_001B1450, 0, 0x40);
@@ -186,7 +186,7 @@ void func_002F53C8(int n)
     D_001A63A8.id = D_001B8840.id;
     D_001A63A8.flag = 0;
     while (D_001A63A8.state != 3 || D_001A63A8.timer >= 6000) {
-        func_002E4AC8();
+        UpdateSoundVoices();
         func_001261F0(0);
     }
     {
@@ -215,7 +215,7 @@ void func_002F57A8(void)
     if ((unsigned short)(D_001A63A8.state - 6) >= 2)
         D_001A63A8.state = 5;
     func_002FC138();
-    func_0027D330(6);
+    FadeToBlack(6);
     D_001B15A8 = 0;
     D_001B15AC = 0;
     D_001B15A4 = 0;
@@ -223,7 +223,7 @@ void func_002F57A8(void)
     func_00272198(6.0f);
     func_002F5220();
     D_001B9040.fov = 0.62f;
-    func_0027AB40();
+    UpdateViewContext();
     for (i = 0; i < D_001B8840.count; i++) {
         CutsceneMoby *m = D_001B8840.mobys[i];
         if (m) {
@@ -267,7 +267,7 @@ void func_002F57A8(void)
         D_001B178C.data = 0;
         func_002B8108(moby, data, 1);
     }
-    func_002B7340(30);
+    music_set_active_track_value(30);
     if (D_001A8C80 && !D_001BAD78[0] && D_001A8BB8 != 2 && D_001A8BB8 != 1) {
         D_001A8C80(D_001A8C84);
         D_001A8C80 = 0;

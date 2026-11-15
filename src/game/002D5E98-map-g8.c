@@ -170,7 +170,7 @@ back_done:
             func_00295788(n, 0);
             if (!slot) slot = n;
         }
-        func_0029D4D0(D_001C4FA0.slots[slot], D_001C4FA0.header);
+        fast_decompress(D_001C4FA0.slots[slot], D_001C4FA0.header);
         hdr = D_001C4FA0.header;
         pix = (char *)hdr + hdr->pixels;
         pal = (char *)hdr + hdr->palette;
@@ -179,23 +179,23 @@ back_done:
             base = (char *)D_001C4FA0.header;
             a = base + hdr->mask + 8;
             if (D_001C4FA0.level == D_001A79F0)
-                func_00295BE8(pal, pix, pal, D_001C4FA0.mask);
+                compose_bitmap_from_mask(pal, pix, pal, D_001C4FA0.mask);
             else {
                 if (D_001A7BE8[D_001C4FA0.level])
                     func_00297730(buf, D_0018D278 + (D_001C4FA0.level << 11), base + hdr->chunks);
                 else
                     func_00297400(buf, a, a);
-                func_00295BE8(pal, pix, pal, (void *)buf);
+                compose_bitmap_from_mask(pal, pix, pal, (void *)buf);
             }
         }
         tbase = (char *)D_001C4FA0.header;
         tex = tbase + hdr->texture;
         b = tbase + hdr->layer1 + 0x420;
         c = tbase + hdr->layer2 + 0x420;
-        D_001C4FA0.texture[0] = func_00294D80(7, 7, tex + 32, tex + 0x420, D_001C4FA0.clut_vram, D_001C4FA0.texture_vram[0]);
-        D_001C4FA0.texture[1] = func_00294D80(7, 7, tex + 32, b, D_001C4FA0.clut_vram, D_001C4FA0.texture_vram[1]);
-        D_001C4FA0.texture[2] = func_00294D80(7, 7, tex + 32, c, D_001C4FA0.clut_vram, D_001C4FA0.texture_vram[2]);
-        if (buf) func_00294D80(9, 9, pal, pal, 0x3FF000, D_001C4FA0.image_vram);
+        D_001C4FA0.texture[0] = register_8bit_texture(7, 7, tex + 32, tex + 0x420, D_001C4FA0.clut_vram, D_001C4FA0.texture_vram[0]);
+        D_001C4FA0.texture[1] = register_8bit_texture(7, 7, tex + 32, b, D_001C4FA0.clut_vram, D_001C4FA0.texture_vram[1]);
+        D_001C4FA0.texture[2] = register_8bit_texture(7, 7, tex + 32, c, D_001C4FA0.clut_vram, D_001C4FA0.texture_vram[2]);
+        if (buf) register_8bit_texture(9, 9, pal, pal, 0x3FF000, D_001C4FA0.image_vram);
         func_0029D0E0();
         if (buf) func_002DE618(buf);
         D_001C4FA0.slots[0] = (int)pix;
@@ -211,7 +211,7 @@ back_done:
     if (D_001C4FA0.stream && !D_001A63A8.mode) {
         pick = func_002956E8();
         if (pick != -1) {
-            next = func_002958B8();
+            next = PickNextMap();
             if (next != -1) {
                 k = (D_001A79F0 + D_001C4FA0.source_level == 0) ? 0 : 256;
                 if (k == next) {

@@ -314,7 +314,7 @@ void func_L00_002FC7A0(void)
 void func_L00_002FD308(unsigned long long argument)
 {
     func_00291788(argument);
-    func_00291640(argument);
+    CreatePointLight(argument);
 }
 
 /* walks the eight thirty-two-byte entries: for the ones with both flags set it
@@ -411,7 +411,7 @@ void func_L00_002FF6A8(ObjectRenderClass_FF6A8 *render_class, ResidentRenderText
     D_L00_00226A00[class_id] = D_L00_001B2510;
     D_L00_00226700[D_L00_001B2510] = render_class;
     render_class->class_slot = D_L00_001B2510;
-    fixed_threshold = func_00283CF0(render_class->scale * 1024.0f);
+    fixed_threshold = FloatToInt(render_class->scale * 1024.0f);
     slot = D_L00_001B2510;
     D_L00_001B2510 = slot + 1;
     D_L00_0022DA00[slot] = fixed_threshold;
@@ -454,8 +454,8 @@ void func_L00_002FF6A8(ObjectRenderClass_FF6A8 *render_class, ResidentRenderText
             width_units_128 = width_bits >> 23;
             if (width_units_64 <= 0) width_units_64 = 1;
             if (width_units_128 <= 0) width_units_128 = 1;
-            width_log2 = func_00282A18(width_bits >> 16);
-            height_log2 = func_00282A18(texture->height);
+            width_log2 = log2dim(width_bits >> 16);
+            height_log2 = log2dim(texture->height);
             gs_block_base = D_001A72F4 >> 8;
             mip_block_1 = texture->mip_block_offset_1 + gs_block_base;
             mip_block_0 = texture->mip_block_offset_0 + gs_block_base;
@@ -504,7 +504,7 @@ void func_L00_002FFAB8(ShrubRenderClass_04340 *render_class, ResidentRenderTextu
     D_L00_0021EB20[D_L00_001B23F0] = class_id;
     D_L00_0021EA20[D_L00_001B23F0] = render_class;
     render_class->class_slot = D_L00_001B23F0;
-    fixed_threshold = func_00283CF0(render_class->scale * 1024.0f);
+    fixed_threshold = FloatToInt(render_class->scale * 1024.0f);
     D_L00_002203A0[D_L00_001B23F0] = fixed_threshold;
     D_L00_001B23F0++;
     render_class->first_instance = 0;
@@ -549,8 +549,8 @@ void func_L00_002FFAB8(ShrubRenderClass_04340 *render_class, ResidentRenderTextu
                 }
             }
 
-            width_log2 = func_00282A18(mip_texture->width);
-            height_log2 = func_00282A18(mip_texture->height);
+            width_log2 = log2dim(mip_texture->width);
+            height_log2 = log2dim(mip_texture->height);
             draw_control_count = mip_texture->draw_control_count;
             texture_block = mip_texture->texture_block_offset;
             gs_block_base = D_001A72F4 >> 8;
@@ -631,8 +631,8 @@ void func_L00_002FFAB8(ShrubRenderClass_04340 *render_class, ResidentRenderTextu
                 if (width_units_128 <= 0) {
                     width_units_128 = 1;
                 }
-                width_log2 = func_00282A18(width_bits >> 16);
-                height_log2 = func_00282A18(texture->height);
+                width_log2 = log2dim(width_bits >> 16);
+                height_log2 = log2dim(texture->height);
                 gs_block_base = D_001A72F4 >> 8;
                 draw_control_count = texture->draw_control_count;
                 width_bits = texture->clut_block_offset + gs_block_base;
@@ -718,7 +718,7 @@ void func_L00_00300438(int *records, int count, int end)
     {
         int j;
         for (j = 0; j < n; j++)
-            func_0026FEB8(D_L00_001A95A0, func_00283CF0(values[j].id), func_001234F0(values[j].weight));
+            STUB_printf(D_L00_001A95A0, FloatToInt(values[j].id), func_001234F0(values[j].weight));
     }
 }
 
@@ -865,7 +865,7 @@ int func_L00_00308700(int key)
                 Ent_308700 *e;
                 Ent_308700 *e0;
                 int off = best << 4;
-                func_00297550(*(unsigned char **)((char *)dp + off), key, D_L00_001C93A0.base, c->info);
+                decode_map_rle_row(*(unsigned char **)((char *)dp + off), key, D_L00_001C93A0.base, c->info);
                 e0 = c->e;
                 e = (Ent_308700 *)((char *)e0 + off);
                 e->s.key = key;
@@ -1005,7 +1005,7 @@ int func_L00_0030D240(int argument)
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        return func_003489E8(value + 0x39140, argument);
+        return UpdateMenuChoiceListWidgets(value + 0x39140, argument);
     return 0;
 }
 
@@ -1034,7 +1034,7 @@ int func_L00_0030D2E0(int argument)
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        return func_00346C60(value + 0x39590, argument);
+        return UpdateItemGridMenu(value + 0x39590, argument);
     return 0;
 }
 
@@ -1254,7 +1254,7 @@ int func_L00_0030D7C8(int argument)
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        return func_0033C590(value + 0x3D060, argument);
+        return UpdateFourOptionMenuInput(value + 0x3D060, argument);
     return 0;
 }
 

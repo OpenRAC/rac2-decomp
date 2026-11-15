@@ -59,7 +59,7 @@ void func_0030ECC8(u8 *object)
     u8 *state = *(u8 **)(object+0x68);
     func_00282948((s32 *)(state+0x20));
     if (object[0x20] == 1 || object[0x20] == 4 || object[0x20] == 3) {
-        if (func_00282DF0(state+0x10) != 0.0f) {
+        if (FastVecLength(state+0x10) != 0.0f) {
             qcopy(start, object+0x10);
             start[2] += 0.5f;
             if (func_00277258(start,2,0,0.4f)) {
@@ -68,11 +68,11 @@ void func_0030ECC8(u8 *object)
             }
         }
         EF(state,0x18) -= 0.0013611112f;
-        func_00282CC0(next,object+0x10,state+0x10);
+        FastVecAdd(next,object+0x10,state+0x10);
         EF(state,0x18) -= 0.0013611112f;
         qcopy(start,object+0x10);
         start[2] += 0.1f;
-        if (func_002761F8(start,next,2,0,0)) {
+        if (CollLine(start,next,2,0,0)) {
             func_00282C88(state+0x10);
             qcopy(object+0x10,D_001BAFA0);
         } else qcopy(object+0x10,next);
@@ -88,13 +88,13 @@ void func_0030ECC8(u8 *object)
         s32 eligible, old, current, difference, item, sound_item, sound;
         s32 elapsed;
         alpha = (f32)object[0x23];
-        func_002AA2E8(&alpha,128.0f,4.0f);
-        object[0x23] = func_00283CF0(alpha);
+        ApproachValue(&alpha,128.0f,4.0f);
+        object[0x23] = FloatToInt(alpha);
         if (EI(state,0x20)>0) break;
-        if (func_00282DF0(state+0x10) != 0.0f) break;
+        if (FastVecLength(state+0x10) != 0.0f) break;
         eligible=1;
         if (func_00282C48(EF(object,0x18)-D_00189E20.position[2]) > D_00189E20.reach_height) eligible=0;
-        else if (func_00282E80(object+0x10,D_00189E20.position)>D_00189E20.reach_distance) eligible=0;
+        else if (vec_distance_xy(object+0x10,D_00189E20.position)>D_00189E20.reach_distance) eligible=0;
         item=EI(state,8);
         mapping=D_00139568;
         counts=D_00139688;
@@ -119,7 +119,7 @@ void func_0030ECC8(u8 *object)
             func_00282C88(state+0x10);
             elapsed=D_001B1688[0]-D_001B24A8[0];
             EF(state,0x24)=0.13333334f;
-            if (func_00282C30(elapsed)>=11) {
+            if (subtract_integer_with_clamp(elapsed)>=11) {
                 func_002E5DA0(0,0,object,0xD5);
                 /* Last pickup-sound frame. */
                 D_001B24A8_gp=D_001B1688[0];
@@ -135,18 +135,18 @@ void func_0030ECC8(u8 *object)
     }
     case 2: {
         f32 speed, f;
-        func_002AA2E8((f32 *)(state+0x24),0.0f,0.006666667f);
+        ApproachValue((f32 *)(state+0x24),0.0f,0.006666667f);
         EF(object,0x18)+=EF(state,0x24);
-        speed=func_00282DF0(state+0x10);
-        func_002AA2E8(&speed,1.0666667f,0.006666667f);
-        func_00282CF0(state+0x10,D_00189E20.pickup_target,object+0x10);
-        if (EF(object,0x2C)==0.0f || func_00282DF0(state+0x10)<speed) { func_0029F338(object); break; }
-        func_00282F20(state+0x10,state+0x10,speed);
-        func_00282CC0(object+0x10,object+0x10,state+0x10);
-        f=func_00282E48(object+0x10,D_00189E20.pickup_target)/(speed*30.0f+0.01f);
+        speed=FastVecLength(state+0x10);
+        ApproachValue(&speed,1.0666667f,0.006666667f);
+        FastVecSub(state+0x10,D_00189E20.pickup_target,object+0x10);
+        if (EF(object,0x2C)==0.0f || FastVecLength(state+0x10)<speed) { func_0029F338(object); break; }
+        vec_scale_to_length(state+0x10,state+0x10,speed);
+        FastVecAdd(object+0x10,object+0x10,state+0x10);
+        f=fast_vec_dist(object+0x10,D_00189E20.pickup_target)/(speed*30.0f+0.01f);
         if (f>1.0f) f=1.0f;
         else if (f<0.3f) f=0.3f;
-        func_002AA2E8((f32 *)(object+0x2C),EF(*(u8 **)(object+0x24),0x24)*f,EF(*(u8 **)(object+0x24),0x24)*0.1f);
+        ApproachValue((f32 *)(object+0x2C),EF(*(u8 **)(object+0x24),0x24)*f,EF(*(u8 **)(object+0x24),0x24)*0.1f);
         break;
     }
     case 3: {
@@ -158,9 +158,9 @@ void func_0030ECC8(u8 *object)
         phase = D_001B1688[0]%60;
         alpha=(f32)object[0x23];
         f=func_00283180((f32)phase*0.104719676f-3.1415901f);
-        pulse=func_00283CF0(f*5.0f+5.0f)+10;
-        func_002AA2E8(&alpha,(f32)pulse,4.0f);
-        object[0x23]=func_00283CF0(alpha);
+        pulse=FloatToInt(f*5.0f+5.0f)+10;
+        ApproachValue(&alpha,(f32)pulse,4.0f);
+        object[0x23]=FloatToInt(alpha);
         if (func_002A0558(object,D_0018C0B0)>=0.0f) goto reactivate;
         item=EI(state,8);
         mapping=D_00139568;

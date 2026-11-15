@@ -29,20 +29,20 @@ void func_L02_002EFB60(void *owner, void *from, void *to, int count, int *colour
     if (colour) rgb = colour;
     for (i = 0; i < count; i++) {
         brightness = func_002A7878(0.7f, 1.3f);
-        r = func_00283CF0((float)rgb[0] * brightness);
-        g = func_00283CF0((float)rgb[1] * brightness);
-        b = func_00283CF0((float)rgb[2] * brightness);
-        func_00282D08(&direction, from, to, func_002A7878(0.0f, 1.0f));
+        r = FloatToInt((float)rgb[0] * brightness);
+        g = FloatToInt((float)rgb[1] * brightness);
+        b = FloatToInt((float)rgb[2] * brightness);
+        lerp_vector(&direction, from, to, func_002A7878(0.0f, 1.0f));
         qcopy(&position, &direction);
         position.f[3] = func_002A7878(D_L02_001A8D78[0], D_L02_001A8D7C);
         func_00282C88(&velocity);
         velocity.f[2] = -gravity * (float)(r + g + b);
-        func_00282CC0(&velocity, &velocity, &direction);
+        FastVecAdd(&velocity, &velocity, &direction);
         velocity.f[3] = position.f[3];
         t = func_002A7878(0.0f, 1.0f);
-        first = func_00283D38(D_L02_001A8D58, D_L02_001A8D5C, t);
+        first = FastTweenColor(D_L02_001A8D58, D_L02_001A8D5C, t);
         t = func_002A7878(0.0f, 1.0f);
-        second = func_00283D38(D_L02_001A8D60, D_L02_001A8D64, t);
+        second = FastTweenColor(D_L02_001A8D60, D_L02_001A8D64, t);
         func_002BAA28(owner, &position, &velocity, first, second, r, g, b, D_L02_001A8D50);
     }
 }

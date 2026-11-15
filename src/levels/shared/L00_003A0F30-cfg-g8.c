@@ -34,7 +34,7 @@ void func_L00_003A7AF0(char *object)
     else
         *(int *)(state + 52) = D_L00_001AF6CC;
     *(unsigned int *)(object + 0x78) = 0xFF0020FF;
-    index = func_L00_00329E90(object, 0, local);
+    index = AcquireEntitySlot(object, 0, local);
     *(short *)(state + 18) = index;
     if (local[0] == 0) {
         table = (int *)func_L00_0032A088(*(short *)(object + 0xAA), (short)index);

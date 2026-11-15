@@ -1,5 +1,5 @@
 /* func_0034F048, RAC1's read_mpeg. In its own unit because it is in the boot and the 27 levels,
- * and func_0034F3D8 and func_0034F7A8 (defined in 0034CEA0.c) are only in the boot's catalogue. */
+ * and func_0034F3D8 and proceedAudio (defined in 0034CEA0.c) are only in the boot's catalogue. */
 #include "common.h"
 
 extern char *D_001B23CC[] __attribute__((sda));
@@ -53,7 +53,7 @@ int func_0034F048(char *vd, char *rb, int *file) {
     func_0011AEA0(2);
     func_001261F0(0);
 
-    while (left >= 5 && func_003518D8(vd) != 3) {
+    while (left >= 5 && videoDecGetState(vd) != 3) {
         int hit = 0;
 
         func_002B9000();
@@ -75,24 +75,24 @@ int func_0034F048(char *vd, char *rb, int *file) {
             aborted = 1;
             func_003518C8(D_001B23CC[0] + 0xD9048);
         }
-        n = func_003505B0((u8 *)rb, &put);
+        n = readBufBeginPut((u8 *)rb, &put);
         if (toread > 0 && n > 0xFFFF) {
             got = func_003506B0(file, put, 0x10000, 0);
-            func_003505E0(rb, got);
+            readBufEndPut(rb, got);
             toread -= got;
         }
-        func_0034F7A8();
+        proceedAudio();
         func_0034F3B8();
-        avail = func_00350628((u8 *)rb, &get);
+        avail = readBufBeginGet((u8 *)rb, &get);
         if (avail > 0) {
             int size = *(int *)(rb + 0x50008);
 
             used = func_0012EB30(vd, get, avail, rb, size);
-            func_00350670((u8 *)rb, used);
+            readBufEndGet((u8 *)rb, used);
             left -= used;
         }
-        func_0034F7A8();
-        if (!started && func_00351E58(D_001B23CC[0] + 0xD9168) && func_0034F3D8()) {
+        proceedAudio();
+        if (!started && voBufIsFull(D_001B23CC[0] + 0xD9168) && func_0034F3D8()) {
             started = 1;
             func_003501E0(1);
             func_0034F8C0((u8 *)(D_001B23CC[0] + 0xD9100));
@@ -100,17 +100,17 @@ int func_0034F048(char *vd, char *rb, int *file) {
     }
 
     func_00132888(5, 0);
-    func_00132028();
+    snd_Pump();
     while (!func_00351960(vd)) {
-        func_0034F7A8();
+        proceedAudio();
         func_0034F3B8();
     }
-    while (!func_00351A38(vd) && func_003518D8(vd) != 3 && !func_00351F28(D_001B23CC[0] + 0xD9168)) {
+    while (!func_00351A38(vd) && videoDecGetState(vd) != 3 && !func_00351F28(D_001B23CC[0] + 0xD9168)) {
         func_0034F3B8();
     }
     func_00350230();
     func_0034F918((u8 *)(D_001B23CC[0] + 0xD9100));
     func_00132888(5, D_00188660.f5C);
-    func_00132028();
+    snd_Pump();
     return aborted;
 }

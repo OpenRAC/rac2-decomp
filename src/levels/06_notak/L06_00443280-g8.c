@@ -117,7 +117,7 @@ void func_L06_00443280(char *obj)
             F(st,0x2F0) = func_00283180(angle)*speed;
             F(st,0x2F4) = func_00283198(angle)*speed;
             F(st,0x2F8) = 0;
-            func_00282CC0(st+0x2F0,st+0x2F0,st+0x2E0);
+            FastVecAdd(st+0x2F0,st+0x2F0,st+0x2E0);
         }
         func_L06_00443DE0(obj,st+0x2F0,0);
         if (U(obj,0x96)>30 && (F(st,0x1CC)<=0.5f || U(obj,0x96)>180)) func_002A7750(obj,1,-1);
@@ -158,7 +158,7 @@ void func_L06_00443280(char *obj)
             if (B(obj,0x43)!=10) func_002A7470(obj,10,0,5);
             I(st,0x1BC) = D_L06_001B2348;
         }
-        func_00282F20(tmp,st+0x1A0,1.0f);
+        vec_scale_to_length(tmp,st+0x1A0,1.0f);
         func_L06_00443DE0(obj,tmp,0);
         if (F(st,0x190)>=F(obj,0x18)) {
             func_002A7750(obj,5,2);

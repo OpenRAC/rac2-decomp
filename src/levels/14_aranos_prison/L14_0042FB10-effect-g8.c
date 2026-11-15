@@ -35,8 +35,8 @@ void func_L14_0042FB10(unsigned char *object)
 
     if (!state)
         return;
-    *(float *)(state + 8) = func_00283B98(*(float *)(state + 8), 0.10471977293491364f);
-    value = func_00283CF0((func_00283198(*(float *)(state + 8)) * 4.0f - 3.0f) * 128.0f);
+    *(float *)(state + 8) = FastAddRotations(*(float *)(state + 8), 0.10471977293491364f);
+    value = FloatToInt((func_00283198(*(float *)(state + 8)) * 4.0f - 3.0f) * 128.0f);
     if (value > 128)
         value = 128;
     else if (value < 32)
@@ -49,9 +49,9 @@ void func_L14_0042FB10(unsigned char *object)
     } else if (object[0x20] == 1) {
         first = D_00188660 + *(int *)(state + 0x14) * 112;
         if (*(void **)(first + 0x88) != object || !first[0x74])
-            *(int *)(state + 0x14) = func_002E5CF8(1, 4, object);
+            *(int *)(state + 0x14) = PlayMobySound(1, 4, object);
         func_0029FCC0(object, 0, pos);
-        distance = func_00282E80(D_00189E20.pos, pos);
+        distance = vec_distance_xy(D_00189E20.pos, pos);
         *(int *)(state + 0xC) = 0;
         if (D_00189E20.owner == object && D_00189E20.active && distance < 0.5f) {
             func_002A7750(object, 2, -1);
@@ -62,8 +62,8 @@ void func_L14_0042FB10(unsigned char *object)
                     func_002E59F8(id);
             }
             *(int *)(state + 0x14) = -1;
-            func_002E5CF8(0, 0, object);
-            func_002E5CF8(2, 0, object);
+            PlayMobySound(0, 0, object);
+            PlayMobySound(2, 0, object);
             D_001395E3 = 1;
             if (*(int *)state != -1) {
                 func_L00_003294F0(D_L14_001B259C + (*(int *)state << 8), 1);

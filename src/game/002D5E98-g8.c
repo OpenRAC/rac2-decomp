@@ -7,10 +7,10 @@ extern int D_001AA43C __attribute__((sda));
 
 void func_002D9CF8(int x, int y, int show)
 {
-    func_0028FC48(x - 5, y - 5, x + 5, y + 5, 0x80FFA888UL, 0);
-    func_0028FC48(x - 4, y - 4, x + 4, y + 4, D_001AA43C, 0);
+    AppendScreenRectPacket(x - 5, y - 5, x + 5, y + 5, 0x80FFA888UL, 0);
+    AppendScreenRectPacket(x - 4, y - 4, x + 4, y + 4, D_001AA43C, 0);
     if (show)
-        func_0028E868(func_0028E588(0xE99D, 1), x - 13, y - 18, 30, 30, 128);
+        func_0028E868(GetIconFrame(0xE99D, 1), x - 13, y - 18, 30, 30, 128);
 }
 
 extern int ref_L00_002D68D8_00 __attribute__((sda));
@@ -27,7 +27,7 @@ int func_002D68D8(int start, int first, int second)
         fraction = 1.0f - (float)(count - start) / (float)count;
     else
         fraction = 1.0f;
-    return func_00283D38(first, second, fraction);
+    return FastTweenColor(first, second, fraction);
 }
 
 extern int func_002DE3A0(int);
@@ -70,12 +70,12 @@ int func_002DAE90(char *object)
     if (*(int *)(object + 0x44) < 4)
         return 0;
     color = 0x60A09080ULL;
-    func_0027C540(0);
-    packet = func_00294C40(*(int *)(object + 0x48));
-    func_0027E018(D_001ABB48, D_001ABB4C, D_001ABB50, D_001ABB54, 0, 0, 0x100, 0x100, color, packet);
-    packet = func_00294C40(*(int *)(object + 0x4C));
-    func_0027E018(D_001ABB58, D_001ABB5C, D_001ABB60, D_001ABB64, 0, 0, 0x100, 0x100, color, packet);
-    func_0027C660();
+    SetupGifPaging(0);
+    packet = load_texture_file(*(int *)(object + 0x48));
+    DrawTexturedQuad(D_001ABB48, D_001ABB4C, D_001ABB50, D_001ABB54, 0, 0, 0x100, 0x100, color, packet);
+    packet = load_texture_file(*(int *)(object + 0x4C));
+    DrawTexturedQuad(D_001ABB58, D_001ABB5C, D_001ABB60, D_001ABB64, 0, 0, 0x100, 0x100, color, packet);
+    DoGifPaging();
     return 8;
 }
 
@@ -141,8 +141,8 @@ int func_002DDA10(char *menu)
         return 2;
 
     y = *(int *)(menu + 0x1C);
-    func_0027C540(0);
-    func_0028E868(func_0028E588(0xEAA9, 0), D_001ABC10, D_001ABC14[0], D_001ABC18, D_001ABC1C[0], D_001ABC20);
+    SetupGifPaging(0);
+    func_0028E868(GetIconFrame(0xEAA9, 0), D_001ABC10, D_001ABC14[0], D_001ABC18, D_001ABC1C[0], D_001ABC20);
 
     for (i = 0; i < 4; i++) {
         record = &D_00139410[i];
@@ -152,7 +152,7 @@ int func_002DDA10(char *menu)
         } else if (record->state == -1) {
             y += D_001ABBF0;
             func_0027FB40(*(int *)(menu + 0x18) + *(int *)(menu + 0x20) / 2, y + D_001ABC08, 0x80F0F0F0UL,
-                          func_00288FB8(0x2F14), -1);
+                          GetLocalizedString(0x2F14), -1);
             y += D_001ABBF0;
             y += D_001ABBF0;
         } else {
@@ -166,13 +166,13 @@ int func_002DDA10(char *menu)
                 minutes = 59;
             }
             func_00115DA8(text, D_001ABC28, hours, minutes);
-            func_0028E868(func_0028E588(0xE99D, 3), D_001ABC04 + 4, y + D_001ABC08, D_001ABBF8, D_001ABBFC, 128);
+            func_0028E868(GetIconFrame(0xE99D, 3), D_001ABC04 + 4, y + D_001ABC08, D_001ABBF8, D_001ABBFC, 128);
             func_0027F5B8(D_001ABC04 + (long)(D_001ABBFC + 6), y + D_001ABC08, color, text, -1);
 
             if (record->extra) {
                 int iconRight, extraX;
 
-                func_0028E868(func_0028E588(0xE99D, 4), D_001ABC04 + D_001ABC00, y + D_001ABC08, D_001ABBF8,
+                func_0028E868(GetIconFrame(0xE99D, 4), D_001ABC04 + D_001ABC00, y + D_001ABC08, D_001ABBF8,
                               D_001ABBFC, 128);
                 extra = record->extra;
                 if (extra > 99)
@@ -193,18 +193,18 @@ int func_002DDA10(char *menu)
                 func_00115DA8(text, D_001ABB20, score / 1000, score % 1000);
             else
                 func_00115DA8(text, D_001ABC38, score / 1000000, (score % 1000000) / 1000, score % 1000);
-            func_0028E868(func_0028E588(0x7567, 0), D_001ABC04 + 4, y + D_001ABC08, D_001ABBF8, D_001ABBFC, 128);
+            func_0028E868(GetIconFrame(0x7567, 0), D_001ABC04 + 4, y + D_001ABC08, D_001ABBF8, D_001ABBFC, 128);
             func_0027F5B8(D_001ABC04 + (long)(D_001ABBFC + 6), y + D_001ABC08, color, text, -1);
             y += D_001ABBF0;
 
             func_00115DA8(text, D_001ABC48, record->date[2], record->date[1], record->date[3]);
-            func_0028E868(func_0028E588(0xE99D, 2), D_001ABC04 + 4, y + D_001ABC08, D_001ABBF8, D_001ABBFC, 128);
+            func_0028E868(GetIconFrame(0xE99D, 2), D_001ABC04 + 4, y + D_001ABC08, D_001ABBF8, D_001ABBFC, 128);
             func_0027F5B8(D_001ABC04 + (long)(D_001ABBFC + 6), y + D_001ABC08, color, text, -1);
             y += D_001ABBF0;
         }
         y += D_001ABBF4;
     }
-    func_0027C660();
+    DoGifPaging();
     return 2;
 }
 

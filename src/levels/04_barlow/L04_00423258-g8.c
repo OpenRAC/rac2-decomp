@@ -125,7 +125,7 @@ void func_L04_00423258(u8 *object) {
                 func_002A0430(channel);
             func_002DF3F8(&((Hero *)D_00189E20)->q[0x80 / 16], &((Hero *)D_00189E20)->q[0x90 / 16]);
         } else {
-            func_0029B3E0(0, -1);
+            MemcardSave(0, -1);
         }
         func_0029F338(object);
         return;
@@ -134,7 +134,7 @@ void func_L04_00423258(u8 *object) {
 stateDone:
     if (object[0x20] != 0) {
         if (object[0x43] == 0 && func_00282948((int *)(data + 0x11C))) {
-            *(int *)(data + 0x11C) = func_00283CF0(func_002A7878(1200.0f, 2400.0f));
+            *(int *)(data + 0x11C) = FloatToInt(func_002A7878(1200.0f, 2400.0f));
         } else if ((object[0x60] & 2) && object[0x43] != 0) {
             func_002A7470(object, 0, 0, 10);
         }
@@ -143,9 +143,9 @@ stateDone:
     look = 0;
     if (object[0x43] == 0) {
         look = 1;
-        if (func_00282E80(object + 0x10, &((Hero *)D_00189E20)->q[0x80 / 16]) < 8.0f &&
-            func_00283C80(*(f32 *)(object + 0xF8), func_00283248(((Hero *)D_00189E20)->f[0xE0 / 4] - *(f32 *)(object + 0x10), ((Hero *)D_00189E20)->f[0xE4 / 4] - *(f32 *)(object + 0x14))) < 1.5707964897155762f) {
-            if (func_00282DF0(&((Hero *)D_00189E20)->f[0x110 / 4]) > 0.01f)
+        if (vec_distance_xy(object + 0x10, &((Hero *)D_00189E20)->q[0x80 / 16]) < 8.0f &&
+            FastDiffRots(*(f32 *)(object + 0xF8), func_00283248(((Hero *)D_00189E20)->f[0xE0 / 4] - *(f32 *)(object + 0x10), ((Hero *)D_00189E20)->f[0xE4 / 4] - *(f32 *)(object + 0x14))) < 1.5707964897155762f) {
+            if (FastVecLength(&((Hero *)D_00189E20)->f[0x110 / 4]) > 0.01f)
                 *(int *)(data + 0x114) = 120;
             else
                 func_00282948((int *)(data + 0x114));
@@ -154,11 +154,11 @@ stateDone:
             qcopy((data + 0x100), &((Hero *)D_00189E20)->q[0xE0 / 16]);
         }
         if (func_00282948((int *)(data + 0x118))) {
-            *(int *)(data + 0x118) = func_00283CF0(func_002A7878(180.0f, 300.0f));
-            heading = func_00283B98(*(f32 *)(object + 0xF8), func_002A7878(-90.0f, 90.0f) * 0.01745329424738884f);
+            *(int *)(data + 0x118) = FloatToInt(func_002A7878(180.0f, 300.0f));
+            heading = FastAddRotations(*(f32 *)(object + 0xF8), func_002A7878(-90.0f, 90.0f) * 0.01745329424738884f);
             pitch = func_002A7878(0.0f, 30.0f) * 0.01745329424738884f;
             func_002AF000(data + 0x100, 6.0f, heading, pitch);
-            func_00282CC0(data + 0x100, data + 0x100, object + 0x10);
+            FastVecAdd(data + 0x100, data + 0x100, object + 0x10);
         }
         if (*(int *)(data + 0x114)) {
             qcopy(&target, &((Hero *)D_00189E20)->q[0xE0 / 16]);
@@ -170,9 +170,9 @@ stateDone:
     if (look) {
         qcopy(&origin, (object + 0x10));
         origin.f[2] += 2.0f;
-        func_00282CF0(&delta, &target, &origin);
-        yaw = func_00283BE0(func_00283248(delta.f[0], delta.f[1]), *(f32 *)(object + 0xF8));
-        pitch = -func_00283248(func_00282E20(&delta), delta.f[2]);
+        FastVecSub(&delta, &target, &origin);
+        yaw = fast_subtract_rotations(func_00283248(delta.f[0], delta.f[1]), *(f32 *)(object + 0xF8));
+        pitch = -func_00283248(vec_length_xy(&delta), delta.f[2]);
         if (yaw > 1.5707964897155762f)
             yaw = 1.5707964897155762f;
         else if (yaw < -1.5707964897155762f)

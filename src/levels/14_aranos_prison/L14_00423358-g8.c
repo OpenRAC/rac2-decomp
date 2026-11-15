@@ -142,7 +142,7 @@ void func_L14_00423358(char *self)
                     func_002A7470(self, func_002A77E0(2) + 14, 0, 10);
             } else if (*(unsigned char *)(self + 0xBC) == 1) {
                 qcopy(state + 0x700, D_00189EA0);
-                if (func_00282E80(self + 0x10, state + 0x700) < *(float *)(state + 0x74C) && *(unsigned char *)(self + 0x31)) {
+                if (vec_distance_xy(self + 0x10, state + 0x700) < *(float *)(state + 0x74C) && *(unsigned char *)(self + 0x31)) {
                     *(unsigned char *)(self + 0xBC) = 2;
                     if (*(unsigned char *)(self + 0x43) != func_002A77E0(2) + 12)
                         func_002A7470(self, func_002A77E0(2) + 12, 0, 10);
@@ -157,17 +157,17 @@ void func_L14_00423358(char *self)
             if (*(unsigned char *)(self + 0x43) != func_002A77E0(2) + 14)
                 func_002A7470(self, func_002A77E0(2) + 14, 0, 10);
         }
-        func_L02_0032E998(self + 0x10, state + 0x710, state + 0x768, state + 0x200,
+        ComputeRegionRouteHeading(self + 0x10, state + 0x710, state + 0x768, state + 0x200,
             *(int *)(state + 0x750), state + 0x75C, state + 0x760, 0.0f, 0.4f);
         qcopy(state + 0x700, state + 0x710);
         *(short *)(state + 0x77A) = 1;
-        if (func_00282E80(self + 0x10, state + 0x710) < 0.2f)
+        if (vec_distance_xy(self + 0x10, state + 0x710) < 0.2f)
             func_002A7750(self, 1, 1);
         break;
     case 8:
         flags = func_002B1C20(self, state + 0x60);
         if ((*(unsigned char *)(self + 0x42) == 0x12 && func_002A77E0(30) == 0) || ((flags & 1UL) == 1UL)) {
-            func_002A6C58(self, 0, 3);
+            SetDeathBits(self, 0, 3);
             func_0029F338(self);
         } else if ((flags & 2UL) == 2UL) {
             func_002A7750(self, *(unsigned char *)(self + 0x94), 2);

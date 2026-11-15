@@ -11,7 +11,7 @@ extern char D_L30_001B3D30[16] MACRO_ADDR;
    16-entry tables */
 char *func_L30_00413490(char *owner)
 {
-    char *o = func_0029EFD0(0x118A);
+    char *o = CreateMoby(0x118A);
     int i;
 
     if (o != 0) {

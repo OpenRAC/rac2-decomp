@@ -55,8 +55,8 @@ void func_L05_004170C8(u8 *actor)
         qcopy(actor + 0x10, path + 0x10);
         *(int *)(state + 0x1BC) = 2;
         func_002EE920(actor, path + 0x20);
-        func_00282CF0(movement + 0x90, movement + 0x60, actor + 0x10);
-        func_00282F20(movement + 0x90, movement + 0x90, 1.0f);
+        FastVecSub(movement + 0x90, movement + 0x60, actor + 0x10);
+        vec_scale_to_length(movement + 0x90, movement + 0x90, 1.0f);
         *(int *)(movement + 0x130) = 2000000;
     } else if (func_002EEB00(actor) != 0) {
         int next = *(int *)(state + 0x1BC);
@@ -79,20 +79,20 @@ void func_L05_004170C8(u8 *actor)
             ((Movement *)movement)->mode = mode;
             other = (u8 *)D_L05_001B251C + (*(int *)(state + 0x1B0) << 8);
             *(u8 **)(movement + 0x120) = other;
-            if (func_00282E48(other + 0x10, actor + 0x10) < 15.0f) {
+            if (fast_vec_dist(other + 0x10, actor + 0x10) < 15.0f) {
                 float alignment;
-                func_00282CF0(&direction, actor + 0x10, *(u8 **)(movement + 0x120) + 0x10);
-                func_00282F20(&direction, &direction, 1.0f);
-                func_00282F20(&facing, *(u8 **)(movement + 0x120) + 0xC0, 1.0f);
-                alignment = func_00282DB0(&facing, &direction);
+                FastVecSub(&direction, actor + 0x10, *(u8 **)(movement + 0x120) + 0x10);
+                vec_scale_to_length(&direction, &direction, 1.0f);
+                vec_scale_to_length(&facing, *(u8 **)(movement + 0x120) + 0xC0, 1.0f);
+                alignment = FastVecDot(&facing, &direction);
                 if (alignment > 0.4f) {
                     if (func_00282948(state + 0x1C8) != 0) {
                         *(int *)(state + 0x1C4) = func_002E5DA0(14, 0, actor, 0xFBF);
-                        *(int *)(state + 0x1C8) = func_00283CF0(func_002A7878(180.0f, 240.0f));
+                        *(int *)(state + 0x1C8) = FloatToInt(func_002A7878(180.0f, 240.0f));
                     }
                 } else if (alignment < -0.4f && func_00282948(state + 0x1C8) != 0) {
                     func_002E5DA0(11, 0, actor, 0xFBF);
-                    *(int *)(state + 0x1C8) = func_00283CF0(func_002A7878(180.0f, 240.0f));
+                    *(int *)(state + 0x1C8) = FloatToInt(func_002A7878(180.0f, 240.0f));
                 }
             }
         }

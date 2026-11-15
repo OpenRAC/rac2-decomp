@@ -3,7 +3,7 @@
  * the shift first in the addu, a direct argument keeps the global first.
  * D_L02_001A8F20 goes through the assembler's address macro (MACRO_ADDR). Its unsplit la is
  * one insn shorter in flow, so the launch-vector pseudo outranks state for $s2 in global-alloc.
- * func_0032C700 and func_002B0A68 use integer/FP interleavings: each register bank, stack
+ * SpawnExplosion and func_002B0A68 use integer/FP interleavings: each register bank, stack
  * argument and return contract is that of their definitions, and the declared order sets the
  * argument setup order (see AGENTS.md).
  */
@@ -149,7 +149,7 @@ void func_L02_003D7C20(Actor *self)
     if (state->target) {
         qcopy(target, state->target->position);
     }
-    distance = func_00282E80(self->position, target);
+    distance = vec_distance_xy(self->position, target);
     yaw = func_00283248(target[0] - self->position[0], target[1] - self->position[1]);
     frame = func_0029F530(self);
     damageKind = 0;
@@ -184,10 +184,10 @@ void func_L02_003D7C20(Actor *self)
                 func_002A7470(PROXY, 6, 0, 10);
             }
             self->position[2] = func_002A89A8(self->position, 0, 10.0f);
-            func_00282CF0(direction, func_L02_003FC098(self->parent), self->position);
+            FastVecSub(direction, func_L02_003FC098(self->parent), self->position);
             direction[2] = 0.0f;
-            func_00282F20(direction, direction, 30.0f);
-            func_00282CC0(direction, direction, self->position);
+            vec_scale_to_length(direction, direction, 30.0f);
+            FastVecAdd(direction, direction, self->position);
             direction[2] = func_L02_003FC098(self->parent)[2];
             func_L02_003329C8(self, direction, 0.33333334f, state->x7C);
             break;
@@ -220,7 +220,7 @@ void func_L02_003D7C20(Actor *self)
             value = func_0029F530(self);
             if (value > 2.0f && !state->x292) {
                 state->x292 = 1;
-                func_002E5CF8(0, 0, self);
+                PlayMobySound(0, 0, self);
             }
             if (self->x60 & 2) {
                 EFFECT->amount = 0.35f;
@@ -234,7 +234,7 @@ void func_L02_003D7C20(Actor *self)
                     func_002A7470(PROXY, 0, 0, 0);
                 }
                 func_002A7750(self, 5, 1);
-                state->timer = func_00283CF0(func_002A7878(600.0f, 1200.0f));
+                state->timer = FloatToInt(func_002A7878(600.0f, 1200.0f));
             }
         }
         break;
@@ -253,7 +253,7 @@ void func_L02_003D7C20(Actor *self)
             break;
         }
         if (self->phase == 0) {
-            value = func_00282E80(self->position, state->home);
+            value = vec_distance_xy(self->position, state->home);
             if (value < 0.01f) {
                 self->phase = 1;
                 if (self->anim != 3) {
@@ -278,7 +278,7 @@ void func_L02_003D7C20(Actor *self)
                 break;
             }
         } else if (self->phase == 2) {
-            value = func_00282E48(self->position, D_L02_001B03F0);
+            value = fast_vec_dist(self->position, D_L02_001B03F0);
             if (!(value < 1.0f) && self->stateTime < 301) {
                 break;
             }
@@ -304,7 +304,7 @@ void func_L02_003D7C20(Actor *self)
             }
         }
         func_L02_00321C30(self->position, D_L02_001B03F0, 0.16666667f);
-        if (state->x280 == 1 && func_00282E80(self->position, D_L02_001B03F0) < 0.001f) {
+        if (state->x280 == 1 && vec_distance_xy(self->position, D_L02_001B03F0) < 0.001f) {
             func_002A7750(self, 2, 1);
         }
         break;
@@ -318,7 +318,7 @@ void func_L02_003D7C20(Actor *self)
             }
             self->phase = 1;
         }
-        facing = func_00283C80(yaw, self->rot[2]);
+        facing = FastDiffRots(yaw, self->rot[2]);
         if (self->phase == 1 && facing > 0.78539824f) {
             self->phase = 2;
             if (self->anim != 2) {
@@ -352,8 +352,8 @@ void func_L02_003D7C20(Actor *self)
         if (RESIDENT->damage) {
             func_L02_003DB2F0(self);
         }
-        if (func_00282978(&state->timer)) {
-            state->timer = func_00283CF0(func_002A7878(600.0f, 1200.0f));
+        if (FastDecTimer(&state->timer)) {
+            state->timer = FloatToInt(func_002A7878(600.0f, 1200.0f));
             func_002A7750(self, 6, -1);
         }
         if (func_L02_003DB950(self)) {
@@ -391,11 +391,11 @@ void func_L02_003D7C20(Actor *self)
             state->x30 = 1.5f;
             self->flags |= 0x1000;
             if (!func_002E59B0(self, state->sound)) {
-                state->sound = func_002E5CF8(6, 4, self);
+                state->sound = PlayMobySound(6, 4, self);
             }
         } else if (self->phase == 1) {
             self->x9C = 1;
-            if (func_00282978(&state->timer) || func_L02_003DB950(self)) {
+            if (FastDecTimer(&state->timer) || func_L02_003DB950(self)) {
                 if (self->anim != 8) {
                     func_002A7470(self, 8, 0, 0);
                 }
@@ -414,7 +414,7 @@ void func_L02_003D7C20(Actor *self)
             state->x30 = 11.0f;
             self->x9C = 0;
             self->flags |= 0x1000;
-            state->timer = func_00283CF0(func_002A7878(600.0f, 1200.0f));
+            state->timer = FloatToInt(func_002A7878(600.0f, 1200.0f));
             func_002A7750(self, 5, -1);
             sound = state->sound;
             if (sound != -1) {
@@ -518,8 +518,8 @@ void func_L02_003D7C20(Actor *self)
             self->x48 = 0.0f;
             PROXY->x48 = 0.0f;
             self->stateTime = 0;
-            func_00282CF0(direction, D_L02_001BA500, PROXY->position);
-            func_00282F20(direction, direction, func_002A7878(0.083333336f, 0.116666675f));
+            FastVecSub(direction, D_L02_001BA500, PROXY->position);
+            vec_scale_to_length(direction, direction, func_002A7878(0.083333336f, 0.116666675f));
             direction[2] += 0.06666667f;
             if (self->state->launcher) {
                 func_L02_0032B468(self->state->launcher, 0xA4C, self->state->launcher->position, self->state->launcher->rot, 300, 0, direction,
@@ -534,7 +534,7 @@ void func_L02_003D7C20(Actor *self)
             state->scale[0] = state->scale[1] = state->scale[2] = 2.0f;
             self->flags &= 0xEFFF;
         }
-        value = func_00283CE0(self->stateTime) * -0.0111110555f + 2.0f;
+        value = IntToFloat(self->stateTime) * -0.0111110555f + 2.0f;
         if (value < 0.0f) {
             value = 0.0f;
         }
@@ -542,15 +542,15 @@ void func_L02_003D7C20(Actor *self)
         if (self->stateTime > 180) {
             self->x48 = 1.0f;
             PROXY->x48 = 1.0f;
-            func_0032C700(self->position, 1, 25, 2.0f, 20, 30, 40, 45, 1, 20.0f, 0, 1, 0, 0);
+            SpawnExplosion(self->position, 1, 25, 2.0f, 20, 30, 40, 45, 1, 20.0f, 0, 1, 0, 0);
             func_0029FCC0(self, 2, direction);
-            func_0032C700(self->position, 0, 10, 0.7f, 5, 10, 5, 20, 1, 20.0f, 0, 0, 0, 0);
+            SpawnExplosion(self->position, 0, 10, 0.7f, 5, 10, 5, 20, 1, 20.0f, 0, 0, 0, 0);
             func_0029FCC0(self, 6, direction);
-            func_0032C700(self->position, 0, 0, 0.7f, 10, 20, 15, 45, 1, 20.0f, 0, 0, 0, 0);
+            SpawnExplosion(self->position, 0, 0, 0.7f, 10, 20, 15, 45, 1, 20.0f, 0, 0, 0, 0);
             func_0029FCC0(self, 4, direction);
-            func_0032C700(self->position, 0, 20, 0.7f, 0, 15, 10, 30, 1, 20.0f, 0, 0, 0, 0);
+            SpawnExplosion(self->position, 0, 20, 0.7f, 0, 15, 10, 30, 1, 20.0f, 0, 0, 0, 0);
             func_0029FCC0(self, 8, direction);
-            func_0032C700(self->position, 0, 5, 0.7f, 15, 5, 25, 25, 1, 20.0f, 0, 0, 0, 0);
+            SpawnExplosion(self->position, 0, 5, 0.7f, 15, 5, 25, 25, 1, 20.0f, 0, 0, 0, 0);
             func_002A7A00(curve, 0.10000001f, 0.20000002f);
             func_002B0A68(self, 0xFFF, curve, 3.0f, 6.0f, 3.0f, 6.0f, 255);
             func_002A7A00(curve, 0.13333334f, 0.26666668f);

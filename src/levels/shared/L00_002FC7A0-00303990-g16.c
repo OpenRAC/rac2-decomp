@@ -154,9 +154,9 @@ int func_L00_00303990(int load, int resume)
         ((Blk *)&D_L00_001C9340)->i[0] = 0;
         func_00282B50(h, (char *)(f[2] + (int)f), f[3]);
         func_00282AB0(D_L00_001B1CE0, D_0019B2E8 + D_001A79F0 * 16, 16);
-        func_00293000((char *)(f[4] + (int)f), h->i[0], h->i[0x84 / 4], (char *)h + h->i[1]);
+        UploadTextureImages((char *)(f[4] + (int)f), h->i[0], h->i[0x84 / 4], (char *)h + h->i[1]);
         func_0011AEA0(0);
-        used = func_0029D4D0((char *)(f[0x12] + (int)f), base);
+        used = fast_decompress((char *)(f[0x12] + (int)f), base);
         ((Blk *)&D_L00_001BF140)->p[0x2C / 4] = base + h->i[0x60 / 4];
         fx = D_001A72F4;
         fy = D_001A7304;
@@ -172,11 +172,11 @@ int func_L00_00303990(int load, int resume)
         t1 = (TexRef *)((char *)h + h->i[0x34 / 4]);
         D_L00_001B24D8 = h->i[0x30 / 4];
         for (c1 = 0; c1 < D_L00_001B24D8; c1++)
-            D_L00_00225900[c1] = ((Blk *)&D_L00_001BF140)->i[0x2C / 4] + t1[c1].offset + (func_00282A18(t1[c1].kind) << 28);
+            D_L00_00225900[c1] = ((Blk *)&D_L00_001BF140)->i[0x2C / 4] + t1[c1].offset + (log2dim(t1[c1].kind) << 28);
         tex = (TexRef *)((char *)h + h->i[0x3C / 4]);
         D_L00_001B1E8C = h->i[0x38 / 4];
         for (c2 = 0; c2 < D_L00_001B1E8C; c2++) {
-            int value = ((Blk *)&D_L00_001BF140)->i[0x2C / 4] + tex[c2].offset + (func_00282A18(tex[c2].kind) << 28);
+            int value = ((Blk *)&D_L00_001BF140)->i[0x2C / 4] + tex[c2].offset + (log2dim(tex[c2].kind) << 28);
             D_L00_001DC980[c2] = value;
         }
         qcopy(&D_00152CD0, &tex[h->i[0x80 / 4]]);
@@ -184,17 +184,17 @@ int func_L00_00303990(int load, int resume)
         t3 = (TexRef *)((char *)h + h->i[0x44 / 4]);
         D_L00_001B2550 = h->i[0x40 / 4];
         for (c3 = 0; c3 < D_L00_001B2550; c3++) {
-            int value = ((Blk *)&D_L00_001BF140)->i[0x2C / 4] + t3[c3].offset + (func_00282A18(t3[c3].kind) << 28);
+            int value = ((Blk *)&D_L00_001BF140)->i[0x2C / 4] + t3[c3].offset + (log2dim(t3[c3].kind) << 28);
             D_L00_0022D200[c3] = value;
         }
         t4 = (TexRef *)((char *)h + h->i[0x4C / 4]);
         D_L00_001B2410 = h->i[0x48 / 4];
         for (c4 = 0; c4 < D_L00_001B2410; c4++) {
-            int value = ((Blk *)&D_L00_001BF140)->i[0x2C / 4] + t4[c4].offset + (func_00282A18(t4[c4].kind) << 28);
+            int value = ((Blk *)&D_L00_001BF140)->i[0x2C / 4] + t4[c4].offset + (log2dim(t4[c4].kind) << 28);
             D_L00_0021FBA0[c4] = value;
         }
         ((Blk *)&D_L00_001BF140)->p[0x1C / 4] = base + h->i[0x8 / 4];
-        func_L00_00300090(((Blk *)&D_L00_001BF140)->p[0x1C / 4], (char *)h + h->i[0x34 / 4]);
+        initialize_tfrag_render_data(((Blk *)&D_L00_001BF140)->p[0x1C / 4], (char *)h + h->i[0x34 / 4]);
         ((Blk *)&D_L00_001C9340)->p[0x8 / 4] = ((Blk *)&D_L00_001BF140)->p[0x1C / 4];
         if (h->i[0xC / 4] != 0) {
             char *p = base + h->i[0xC / 4];
@@ -207,7 +207,7 @@ int func_L00_00303990(int load, int resume)
         if (h->i[0x10 / 4] != 0) {
             char *p = base + h->i[0x10 / 4];
             ((Blk *)&D_L00_001BF140)->p[0x24 / 4] = p;
-            func_00291EC0(p);
+            RelocateSkyDefinition(p);
         } else {
             D_L00_001B2420 = 0;
             ((Blk *)&D_L00_001BF140)->p[0x24 / 4] = 0;
@@ -231,7 +231,7 @@ int func_L00_00303990(int load, int resume)
             }
         }
         ((Blk *)&D_L00_001BF140)->p[0x38 / 4] = (char *)D_L00_001D9F00[0];
-        func_L00_00300438((char *)h + h->i[0x1C / 4], h->i[0x18 / 4], (char *)h + h->i[0x24 / 4]);
+        PrintMobyClassSizes((char *)h + h->i[0x1C / 4], h->i[0x18 / 4], (char *)h + h->i[0x24 / 4]);
         {
             int count = D_L00_001B1E80;
             D_00152C00.i[0x1C / 4] = count++;
@@ -279,17 +279,17 @@ int func_L00_00303990(int load, int resume)
         for (sq = 0, p = (char *)h + h->i[0x78 / 4]; sq < D_L00_001D9F00[0]->bC; sq++, p += 4) {
             if (*(int *)p != 0) {
                 D_L00_001D9F00[0]->f48[sq] = (int)(base + *(int *)p);
-                func_00293260(D_L00_001D9F00[0], sq);
+                relocate_asset_entry_pointers(D_L00_001D9F00[0], sq);
             }
         }
         ((Blk *)&D_L00_001BF140)->i[0x44 / 4] = D_L00_001D9F00[0]->f48[0];
         for (i = 0, q2 = (char *)h + h->i[0x24 / 4]; i < h->i[0x20 / 4]; i++, q2 += 0x20)
-            func_L00_002FF6A8(base + *(int *)q2, (char *)h + h->i[0x44 / 4], q2 + 0x10, *(int *)(q2 + 4));
+            RegisterObjectRenderClass(base + *(int *)q2, (char *)h + h->i[0x44 / 4], q2 + 0x10, *(int *)(q2 + 4));
         if (D_L00_00226700[0] != 0)
             ((Blk *)&D_L00_001BF140)->i[0x3C / 4] = D_L00_00226700[0];
         ref_L00_00303990_00((char *)h + h->i[0x24 / 4], h->i[0x20 / 4]);
         for (i = 0, q2 = (char *)h + h->i[0x2C / 4]; i < h->i[0x28 / 4]; i++, q2 += 0x30)
-            func_L00_002FFAB8(base + *(int *)q2, (char *)h + h->i[0x4C / 4], q2 + 0x10, q2 + 0x20, *(int *)(q2 + 4));
+            RegisterShrubRenderClass(base + *(int *)q2, (char *)h + h->i[0x4C / 4], q2 + 0x10, q2 + 0x20, *(int *)(q2 + 4));
         if (D_L00_0021EA20[0] != 0)
             ((Blk *)&D_L00_001BF140)->i[0x40 / 4] = D_L00_0021EA20[0];
         {
@@ -350,7 +350,7 @@ int func_L00_00303990(int load, int resume)
         e = tab + span->off;
         for (a3 = 0; a3 < D_L00_001B19E8; a3++) {
             if (D_L00_001B19EC[a3].h1A >= span->count) {
-                func_0026FEB8(D_L00_001A95B8);
+                STUB_printf(D_L00_001A95B8);
                 D_L00_001B19EC[a3].h1A = -1;
             } else {
                 D_L00_001B19EC[a3].h1A = *(unsigned short *)(e + D_L00_001B19EC[a3].h1A * 4);
@@ -363,7 +363,7 @@ int func_L00_00303990(int load, int resume)
             int cls = D_L00_001DA860[*(int *)(q + 4)];
             if (D_L00_001DA680[cls] == *(int *)(q + 4)) {
                 if ((span->count != 0 || D_L00_001D9F00[cls]->bD != 0) && span->count - 1 != D_L00_001D9F00[cls]->bD)
-                    func_0026FEB8(D_L00_001A95D8, D_L00_001DA680[cls], span->count - 1, D_L00_001D9F00[cls]->bD);
+                    STUB_printf(D_L00_001A95D8, D_L00_001DA680[cls], span->count - 1, D_L00_001D9F00[cls]->bD);
                 {
                     int first;
                     e = tab + span->off;
@@ -379,7 +379,7 @@ int func_L00_00303990(int load, int resume)
         base = (char *)((unsigned int)end & ~0x3F);
         ((Blk *)&D_L00_001BF140)->p[0x48 / 4] = base;
     }
-    ((Blk *)&D_L00_001BF140)->i[0x68 / 4] = func_L00_00300618(load);
+    ((Blk *)&D_L00_001BF140)->i[0x68 / 4] = LoadLevelData(load);
     if (load)
         D_00152CE4[0] = -1;
     if (((Blk *)&D_L00_001C9340)->i[0xC / 4] != 0) {
@@ -388,7 +388,7 @@ int func_L00_00303990(int load, int resume)
         func_L00_00303418(((Blk *)&D_L00_001C9340)->i[0]);
     }
     if (resume)
-        func_L00_00358B30();
+        RestoreSavedHeroState();
     else
         func_L00_003588A8();
     D_L00_001B1AD0.f8 = 0;

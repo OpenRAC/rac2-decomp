@@ -36,13 +36,13 @@ void func_L05_00398A38(char *obj, int count, Vec98A *points, int n)
 
     if (*(int *)(data + 0x24))
         color = 0x800040ff;
-    inner.texture = func_0027C878(43);
+    inner.texture = GetEffectTextureDescriptor(43);
     inner.mode = 0xff9000000260ULL;
     inner.primitive = ((u64)count << 32) | 0x68;
     inner.color[1] = 0x7fffffff;
     inner.color[0] = 0x7fffffff;
     inner.zero = 0;
-    outer.texture = func_0027C878(43);
+    outer.texture = GetEffectTextureDescriptor(43);
     outer.mode = 0xff9000000260ULL;
     outer.zero = 0;
     outer.primitive = ((u64)(count / 3) << 32) | 0x68;
@@ -73,21 +73,21 @@ void func_L05_00398A38(char *obj, int count, Vec98A *points, int n)
     outer.uv[5] = 0;
     outer.uv[6] = 0.33f;
     outer.uv[7] = 1;
-    func_00282CF0(&tangent, points + 1, points);
-    func_00282F20(&tangent, &tangent, 1.0f);
-    func_00282CF0(&view, D_L05_001B96C0, points);
-    func_00282DD8(&right, &view, &tangent);
-    func_00282F20(&right, &right, 1.0f);
-    func_00282DD8(&view, &tangent, &right);
+    FastVecSub(&tangent, points + 1, points);
+    vec_scale_to_length(&tangent, &tangent, 1.0f);
+    FastVecSub(&view, D_L05_001B96C0, points);
+    FastVecCross(&right, &view, &tangent);
+    vec_scale_to_length(&right, &right, 1.0f);
+    FastVecCross(&view, &tangent, &right);
     qcopy(&pos, points);
     qcopy(&inner.p[0], &thin);
-    func_00282D30(&inner.p[1], &inner.p[0], -1.0f);
-    func_002830C0(&inner.p[0], &inner.p[0], &tangent);
-    func_002830C0(&inner.p[1], &inner.p[1], &tangent);
+    FastVecScale(&inner.p[1], &inner.p[0], -1.0f);
+    transform_vector(&inner.p[0], &inner.p[0], &tangent);
+    transform_vector(&inner.p[1], &inner.p[1], &tangent);
     qcopy(&outer.p[0], &wide);
-    func_00282D30(&outer.p[1], &outer.p[0], -1.0f);
-    func_002830C0(&outer.p[0], &outer.p[0], &tangent);
-    func_002830C0(&outer.p[1], &outer.p[1], &tangent);
+    FastVecScale(&outer.p[1], &outer.p[0], -1.0f);
+    transform_vector(&outer.p[0], &outer.p[0], &tangent);
+    transform_vector(&outer.p[1], &outer.p[1], &tangent);
     {
         int i;
 
@@ -96,27 +96,27 @@ void func_L05_00398A38(char *obj, int count, Vec98A *points, int n)
             Vec98A *current = points + i;
 
             qcopy(&inner.p[2], &thin);
-            func_00282D30(&inner.p[3], &inner.p[2], -1.0f);
+            FastVecScale(&inner.p[3], &inner.p[2], -1.0f);
             qcopy(&outer.p[2], &wide);
-            func_00282D30(&outer.p[3], &outer.p[2], -1.0f);
-            func_00282CF0(&tangent, following, current);
-            func_00282F20(&tangent, &tangent, 1.0f);
-            func_00282CF0(&view, D_L05_001B96C0, current);
-            func_00282DD8(&right, &view, &tangent);
-            func_00282F20(&right, &right, 1.0f);
-            func_00282DD8(&view, &tangent, &right);
+            FastVecScale(&outer.p[3], &outer.p[2], -1.0f);
+            FastVecSub(&tangent, following, current);
+            vec_scale_to_length(&tangent, &tangent, 1.0f);
+            FastVecSub(&view, D_L05_001B96C0, current);
+            FastVecCross(&right, &view, &tangent);
+            vec_scale_to_length(&right, &right, 1.0f);
+            FastVecCross(&view, &tangent, &right);
             qcopy(&pos, current);
-            func_002830C0(&inner.p[2], &inner.p[2], &tangent);
-            func_002830C0(&inner.p[3], &inner.p[3], &tangent);
-            func_002830C0(&outer.p[2], &outer.p[2], &tangent);
-            func_002830C0(&outer.p[3], &outer.p[3], &tangent);
+            transform_vector(&inner.p[2], &inner.p[2], &tangent);
+            transform_vector(&inner.p[3], &inner.p[3], &tangent);
+            transform_vector(&outer.p[2], &outer.p[2], &tangent);
+            transform_vector(&outer.p[3], &outer.p[3], &tangent);
             inner.color[3] = 0x7f7f7f7f;
             inner.color[2] = 0x7f7f7f7f;
             outer.color[3] = color;
             outer.color[2] = color;
-            func_00280B90(&inner, 0, 0);
-            func_00280B90(&outer, 0, 0);
-            u = func_00283CE0(i) * 0.33f;
+            draw_world_quad(&inner, 0, 0);
+            draw_world_quad(&outer, 0, 0);
+            u = IntToFloat(i) * 0.33f;
             v = u + 0.33f;
             if (u >= 1.0f) {
                 u -= 1.0f;

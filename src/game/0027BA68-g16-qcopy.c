@@ -60,7 +60,7 @@ void func_0027BA68(void)
         float saved_scale;
         void *scene;
         int i;
-        func_002A0250();
+        DrawMobysSetup();
         func_002A01C8();
         func_002A01F0();
         scene = (void *)D_001B1B58[1];
@@ -87,11 +87,11 @@ void func_0027BA68(void)
         qcopy(D_001C2AC0 + 0x30, &D_001A8850);
         func_002A0300(moby, 1); func_0027BA48();
         D_001B9040.scale = saved_scale;
-        func_0027AB40();
+        UpdateViewContext();
         func_00282B50(view_matrix, saved_matrix, 0x40);
         qcopy(view_position, &saved_position);
         func_00279D18();
-        func_002FC560(0x42, 0x8000000044UL); func_002FC560(8, 5);
+        VU1_addGSregister(0x42, 0x8000000044UL); VU1_addGSregister(8, 5);
         func_002FC748(); func_002A0220(); func_002A0380();
         quad.state[1] = D_001A7470[0];
         quad.state[2] = 0xFF9000000260UL;
@@ -103,6 +103,6 @@ void func_0027BA68(void)
             quad.uv[i][1] = object->height * D_001A8808[i] + 0.5f;
             qcopy(&quad.vertices[i], &object->vertices[i]);
         }
-        func_00280B90(&quad, 0, 0);
+        draw_world_quad(&quad, 0, 0);
     } else func_002A03C0();
 }

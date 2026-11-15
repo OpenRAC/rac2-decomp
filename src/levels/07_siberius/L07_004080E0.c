@@ -41,9 +41,9 @@ void func_L07_004080E0(u8 *obj)
                 if (*(u8 **)(hit + 0x20)) {
                     qcopy(b, *(u8 **)(hit + 0x20) + 0x10);
                     b[2] += 0.5f;
-                    if (func_00282E48(b, a) < 64.0f) {
+                    if (fast_vec_dist(b, a) < 64.0f) {
                         blocked = 0;
-                        if (!func_002761F8(b, a, 2, obj, 0)) blocked = 1;
+                        if (!CollLine(b, a, 2, obj, 0)) blocked = 1;
                     }
                 }
                 if (blocked) func_002A7750(obj, 2, -1);
@@ -52,7 +52,7 @@ void func_L07_004080E0(u8 *obj)
         obj[0xA8] = 0xFF;
         break;
     case 2:
-        func_002E5CF8(0, 0, obj);
+        PlayMobySound(0, 0, obj);
         func_L00_0032A258(obj, D_L07_001B1540, D_L07_001B1538, D_L07_001B1530, 0xFFF, -1, D_L07_001B1560, 16, 0xFFFF, 0xFF, 0);
         func_L07_00408338(obj);
         *(s32 *)(state + 4) = 480;

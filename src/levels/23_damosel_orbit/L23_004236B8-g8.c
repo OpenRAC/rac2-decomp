@@ -65,10 +65,10 @@ void func_L23_004236B8(unsigned char *obj)
                 D_L23_001A8AC0[0].enabled=1;
                 D_L23_001A8AC0[0].color=0xFFFF00;
             }
-            charge=func_00283CE0(++state->charge)*0.033333335f;
+            charge=IntToFloat(++state->charge)*0.033333335f;
             if (charge>1.0f) charge=1.0f;
             charge *= charge * (state->kind ? 10.0f : 5.0f);
-            for (j=0;j<func_00283CF0(charge);j++) {
+            for (j=0;j<FloatToInt(charge);j++) {
                 int loop_r,loop_g,loop_b;
                 frame.random.q=0;
                 frame.random.f.x=func_002A7878(-1.0f,1.0f);
@@ -81,8 +81,8 @@ void func_L23_004236B8(unsigned char *obj)
                 loop_b=func_002A7820(loop_r,loop_b);
                 if (loop_b>255) loop_b=255;
                 if (loop_g>255) loop_g=255;
-                func_00282F20(&frame.velocity,&frame.velocity,func_002A7878(15.0f,30.0f));
-                func_00282CD8(&frame.random,&frame.velocity,obj+0x10);
+                vec_scale_to_length(&frame.velocity,&frame.velocity,func_002A7878(15.0f,30.0f));
+                add_vectors(&frame.random,&frame.velocity,obj+0x10);
                 {
                     int high=(loop_g<<8)|0x7F000000;
                     func_L22_003398B8((loop_b<<16)|high|loop_r,&frame.velocity,obj);
@@ -104,8 +104,8 @@ void func_L23_004236B8(unsigned char *obj)
                 { int n=state->charge;
                 if (n>50) n=50;
                 if (n<0) n=0;
-                D_L23_001C87C0[state->light].position.f.w=func_00283CE0(n)*0.14f; }
-                light_charge=func_00283CE0(state->charge)*0.033333335f;
+                D_L23_001C87C0[state->light].position.f.w=IntToFloat(n)*0.14f; }
+                light_charge=IntToFloat(state->charge)*0.033333335f;
                 if (light_charge>1) light_charge=1;
                 func_L22_00334F78(&D_L23_001C87C0[state->light].position,
                     func_002A7820(15,47)&255,func_002A7820(47,63)&255,func_002A7820(63,127)&255,20,light_charge*840000.0f,0.0f);
@@ -138,7 +138,7 @@ void func_L23_004236B8(unsigned char *obj)
                 obj[0x20]=1;
                 state->age=0;
             } else {
-                func_00282D30(state,obj+0xC0,2.0f);
+                FastVecScale(state,obj+0xC0,2.0f);
                 obj[0x20]=1;
                 state->age=0;
             }
@@ -147,24 +147,24 @@ void func_L23_004236B8(unsigned char *obj)
     }
     case 1: {
         float extra = 3.5f;
-        radius=func_00283CE0(state->age)*0.33333334f+1.3f;
+        radius=IntToFloat(state->age)*0.33333334f+1.3f;
         ++state->age;
         func_002AFFD8(obj+0x10,&frame.position,1);
         spread=radius+extra;
-        if (state->kind) func_00282F20(&frame.scaled,obj+0xC0,2.0f);
-        else func_00282F20(&frame.scaled,obj+0xC0,extra);
-        func_00282F20(&frame.normalized,&frame.position,1.0f);
-        func_00282DD8(&frame.rotation,obj+0xE0,&frame.normalized);
+        if (state->kind) vec_scale_to_length(&frame.scaled,obj+0xC0,2.0f);
+        else vec_scale_to_length(&frame.scaled,obj+0xC0,extra);
+        vec_scale_to_length(&frame.normalized,&frame.position,1.0f);
+        FastVecCross(&frame.rotation,obj+0xE0,&frame.normalized);
         if (state->kind) factor=D_L23_001B1938; else factor=D_L23_001B1934;
-        func_00282D30(&frame.rotation,&frame.rotation,factor);
-        fade=func_00282DF0(&frame.rotation);
-        frame.rotation.f.w=-func_00282C10(1.0f-fade*fade);
-        func_00283958(&frame.rotation,frame.matrix);
-        func_00283738(obj+0xC0,frame.matrix,obj+0xC0);
+        FastVecScale(&frame.rotation,&frame.rotation,factor);
+        fade=FastVecLength(&frame.rotation);
+        frame.rotation.f.w=-square_root(1.0f-fade*fade);
+        quaternion_to_rotation_basis(&frame.rotation,frame.matrix);
+        multiply_matrix3x3(obj+0xC0,frame.matrix,obj+0xC0);
         if (state->override) {
-            if (state->kind) func_00282D30(&frame.scaled,&state->direction,0.6666667f);
-            else func_00282D30(&frame.scaled,&state->direction,1.0f);
-            func_00282F20(&frame.temp,&frame.scaled,1.0f);
+            if (state->kind) FastVecScale(&frame.scaled,&state->direction,0.6666667f);
+            else FastVecScale(&frame.scaled,&state->direction,1.0f);
+            vec_scale_to_length(&frame.temp,&frame.scaled,1.0f);
             qcopy(obj+0xC0, &frame.temp);
         }
         state->velocity.q=frame.scaled.q;
@@ -184,7 +184,7 @@ void func_L23_004236B8(unsigned char *obj)
             *handle=0;
             return;
         } else {
-            func_00282CD8(&frame.position,obj+0x10,state);
+            add_vectors(&frame.position,obj+0x10,state);
             if (*(float *)(obj+0x10)<2 || *(float *)(obj+0x10)>1021 ||
                 *(float *)(obj+0x14)<2 || *(float *)(obj+0x14)>1021 ||
                 *(float *)(obj+0x18)<2 || *(float *)(obj+0x18)>1021) {
@@ -198,7 +198,7 @@ void func_L23_004236B8(unsigned char *obj)
                 hit=func_00277F48(obj+0x10,16,obj,0,radius);
                 frame.position.q=((V413 *)(obj+0x10))->q;
                 func_002A9850(obj,&frame.position,D_L23_001C4B00,hit,0,0x8B0000,2,1,D_L23_001B3704,1.0f,1.0f);
-                if (hit) func_0032C700(obj+0x10,0,25,20,20,20,45,1,1,0,0,0,1.0f,20.0f);
+                if (hit) SpawnExplosion(obj+0x10,0,25,20,20,20,45,1,1,0,0,0,1.0f,20.0f);
                 {
                 /* Block scopes keep these local to one basic block, as retail allocates them. */
                 float effect=spread*105000.0f, diameter;
@@ -210,7 +210,7 @@ void func_L23_004236B8(unsigned char *obj)
                 int g=func_002A7820(47,63);
                 int r=func_002A7820(15,47);
                 int high=(g<<8)|0x4F000000;
-                func_L04_00358868(obj,(b<<16)|high|r,count,-1,effect);
+                SpawnJointFollowParticle(obj,(b<<16)|high|r,count,-1,effect);
                 }
                 func_002A7988(&frame.velocity,spread*0.016666668f,diameter*0.016666668f);
                 {
@@ -225,7 +225,7 @@ void func_L23_004236B8(unsigned char *obj)
                 do {
                     func_002A7988(&frame.velocity,spread*0.016666668f,(spread+spread)*0.016666668f);
                     func_002A7988(&frame.random,0.0f,spread*0.5f);
-                    func_00282CD8(&frame.position,&frame.random,obj+0x10);
+                    add_vectors(&frame.position,&frame.random,obj+0x10);
                     particle=func_L08_0034A078(&frame.random,&frame.velocity,127,obj);
                     /* reorg merges the two decrements into the test's delay slot. */
                     if(particle) {
@@ -241,7 +241,7 @@ void func_L23_004236B8(unsigned char *obj)
                         else *(float *)(particle+12)=func_002A7878(80000,120000);
                         *(short *)(particle+10)=2;
                         *(float *)(particle+12)*=spread;
-                        fade=func_00283CE0(2);
+                        fade=IntToFloat(2);
                         color=0x7F7F7F;
                         *(short *)(sub+0x16)=3;
                         *(int *)(sub+0x18)=color;
@@ -252,7 +252,7 @@ void func_L23_004236B8(unsigned char *obj)
                 hit=func_00277F48(obj+0x10,16,*(void **)(obj+0xB8),0,radius);
                 frame.position.q=((V413 *)(obj+0x10))->q;
                 func_002A9850(obj,&frame.position,D_L23_001C4B00,hit,0,0x8B0007,2,1,D_L23_001B3704,1,1);
-                if(hit) func_0032C700(obj+0x10,0,25,20,20,20,45,1,1,0,0,0,1,20);
+                if(hit) SpawnExplosion(obj+0x10,0,25,20,20,20,45,1,1,0,0,0,1,20);
                 {
                 float effect=spread*105000.0f;
                 int count=50-state->age;
@@ -262,7 +262,7 @@ void func_L23_004236B8(unsigned char *obj)
                 int g=func_002A7820(47,63);
                 int b=func_002A7820(63,127);
                 int high=(g<<8)|0x4F000000;
-                func_L04_00358868(obj,(r<<16)|high|b,count,-1,effect);
+                SpawnJointFollowParticle(obj,(r<<16)|high|b,count,-1,effect);
                 }
                 }
                 func_002A7988(&frame.velocity,spread*0.016666668f,(spread+spread)*0.016666668f);

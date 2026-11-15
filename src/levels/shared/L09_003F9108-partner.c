@@ -39,12 +39,12 @@ void func_L09_003F9108(char *object)
     if ((unsigned)(B(object,0x20)-1)<3 || B(object,0x20)==16) func_L09_003F7840(object);
     if (I(data,0x204)==1 && !B(data,0x30F)) {
         func_0029FCC0(P(data,0x2F8),4,v);
-        func_00282CF0(v,data+0x1F0,v);
-        angle=func_00282E20(v);
+        FastVecSub(v,data+0x1F0,v);
+        angle=vec_length_xy(v);
         angle=-func_00283248(angle,v[2]);
-        F(data,0x274)=func_00283BE0(angle,F(P(data,0x2F8),0xF4));
+        F(data,0x274)=fast_subtract_rotations(angle,F(P(data,0x2F8),0xF4));
         angle=func_00283248(v[0],v[1]);
-        F(data,0x278)=func_00283BE0(angle,F(P(data,0x2F8),0xF8));
+        F(data,0x278)=fast_subtract_rotations(angle,F(P(data,0x2F8),0xF8));
     }
     func_002AEC48(P(data,0x2F8),data+0x210,3,0.02f,0.3f);
     if (!B(data,0x30F) && (unsigned)B(P(data,0x2F8),0x42)>=8 && (unsigned)B(P(data,0x2F8),0x42)<11) {
@@ -52,11 +52,11 @@ void func_L09_003F9108(char *object)
             char *part=data+i*0x80;
             if ((*(unsigned short *)(P(data,0x2F8)+0x7C)>>(i+4))&1) {
                 func_0029FCC0(P(data,0x2F8),i,v);
-                func_00282CF0(v,data+0x1F0,v);
-                angle=func_00282E20(v);
+                FastVecSub(v,data+0x1F0,v);
+                angle=vec_length_xy(v);
                 F(part,0x384)=-func_00283248(angle,v[2]);
                 angle=func_00283248(v[0],v[1]);
-                F(part,0x388)=func_00283BE0(angle,F(P(data,0x2F8),0xF8));
+                F(part,0x388)=fast_subtract_rotations(angle,F(P(data,0x2F8),0xF8));
                 if (i) {
                     if (F(part, 0x388) > 0.087266475f)
                         F(part, 0x388) = 0.087266475f;

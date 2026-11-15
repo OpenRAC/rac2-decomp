@@ -40,7 +40,7 @@ s32 func_002D1E70(void) {
     f32 z;
     s32 r;
 
-    func_0027C540(0);
+    SetupGifPaging(0);
     z = 0.0f;
     r = func_00336D50(D_001A8CFC + 0x8710, 0xDE);
     func_00300A00(r, 0x60442D00, (f32)(D_001A7340 / 2), (f32)g_001ABA5C, 1.0f, D_001B23A8, z);
@@ -48,8 +48,8 @@ s32 func_002D1E70(void) {
     func_00300A00(r, 0x60241700, (f32)(D_001A7340 / 2), (f32)g_001ABA5C, 1.0f, D_001B23A8, z);
     r = func_00336D50(D_001A8CFC + 0x8710, 0xE0);
     func_00300A00(r, 0x55F0C070, (f32)(D_001A7340 / 2), (f32)g_001ABA5C, 1.0f, D_001B23A8, z);
-    func_002CE5D0(g_001ABA58 != 0, g_001ABA58 != 0x11);
-    func_0027FAA8(0x1B0, 0x177, (u64)0x80F0F0F0, func_00288FB8(0x2D4F), -1);
-    func_0027C660();
+    DrawMenuNavigationFramesAndLabels(g_001ABA58 != 0, g_001ABA58 != 0x11);
+    func_0027FAA8(0x1B0, 0x177, (u64)0x80F0F0F0, GetLocalizedString(0x2D4F), -1);
+    DoGifPaging();
     return 0;
 }

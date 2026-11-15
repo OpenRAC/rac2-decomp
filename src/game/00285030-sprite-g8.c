@@ -52,7 +52,7 @@ void func_00285030(s32 tw, s32 th, s32 tbp, s32 mode) {
     p = (u8 *)D_001B22A8[0];
     q = (long *)(p + 0x10);
     D_001B22A8[0] = (s32)q;
-    func_00125F20(q, s->h164, s->h160, s->h162, 3, 0);
+    sceGsSetDefDrawEnv(q, s->h164, s->h160, s->h162, 3, 0);
     ((TexBits *)(p + 0x10))->lo = s->h166;
     if (mode == 0) {
         q[2] = s->h16E | ((long)(s->h16C & 0xF) << 24);

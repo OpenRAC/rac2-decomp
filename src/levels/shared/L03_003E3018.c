@@ -52,25 +52,25 @@ void func_L03_003E3018(u8 *p) {
     f32 best, x, y;
     int i, n;
 
-    func_00283098(&v, &D_L03_0029BBF0[q->current], p + 0xC0);
-    func_00282D30(&neg, &D_L03_001B9BB0[0], angle);
+    matrix_mul_vec3(&v, &D_L03_0029BBF0[q->current], p + 0xC0);
+    FastVecScale(&neg, &D_L03_001B9BB0[0], angle);
     best = angle;
-    func_00282DD8(&axis, &v, &neg);
-    axis.w = func_00282DB0(&v, &neg);
-    angle = func_00283248(axis.w, func_00282DF0(&axis)) * 0.5f;
-    func_00282F20(&axis, &axis, func_00283198(angle));
+    FastVecCross(&axis, &v, &neg);
+    axis.w = FastVecDot(&v, &neg);
+    angle = func_00283248(axis.w, FastVecLength(&axis)) * 0.5f;
+    vec_scale_to_length(&axis, &axis, func_00283198(angle));
     axis.w = func_00283180(angle);
-    func_00283958(&axis, matrix);
-    func_00283738(p + 0xC0, matrix, p + 0xC0);
+    quaternion_to_rotation_basis(&axis, matrix);
+    multiply_matrix3x3(p + 0xC0, matrix, p + 0xC0);
 
     if (q->facing[q->length] == 255) {
         i = 0;
         do {
             n = D_0024A7B0[q->current][i];
             if (n != -1) {
-                func_00283098(&test, &D_L03_0029BBF0[n], p + 0xC0);
-                x = func_00282DB0(&test, &D_L03_001B9BB0[2]);
-                y = func_00282DB0(&test, &D_L03_001B9BB0[1]);
+                matrix_mul_vec3(&test, &D_L03_0029BBF0[n], p + 0xC0);
+                x = FastVecDot(&test, &D_L03_001B9BB0[2]);
+                y = FastVecDot(&test, &D_L03_001B9BB0[1]);
                 if (x > best) {
                     func_00283248(x, y);
                     best = x;
@@ -80,13 +80,13 @@ void func_L03_003E3018(u8 *p) {
         } while (++i < 6);
     }
 
-    func_00283098(&test, &D_L03_0029BBF0[q->facing[q->length]], p + 0xC0);
-    x = func_00282DB0(&test, &D_L03_001B9BB0[2]);
-    y = func_00282DB0(&test, &D_L03_001B9BB0[1]);
+    matrix_mul_vec3(&test, &D_L03_0029BBF0[q->facing[q->length]], p + 0xC0);
+    x = FastVecDot(&test, &D_L03_001B9BB0[2]);
+    y = FastVecDot(&test, &D_L03_001B9BB0[1]);
     angle = func_00283248(x, y) * 0.5f;
-    func_00282F20(&turn, &neg, func_00283198(angle));
+    vec_scale_to_length(&turn, &neg, func_00283198(angle));
     turn.w = func_00283180(angle);
-    func_002837D0(&D_L03_001B36C0, &D_L03_001B36B0, &axis);
-    func_002837D0(&D_L03_001B36C0, &D_L03_001B36C0, &turn);
-    func_00283958(&D_L03_001B36B0, p + 0xC0);
+    multiply_quaternions(&D_L03_001B36C0, &D_L03_001B36B0, &axis);
+    multiply_quaternions(&D_L03_001B36C0, &D_L03_001B36C0, &turn);
+    quaternion_to_rotation_basis(&D_L03_001B36B0, p + 0xC0);
 }

@@ -171,7 +171,7 @@ void func_L00_003A2BB8(char *p, int v, char *a, char *b)
 
     f = *(float *)(p + 44) * 0.0009765625f;
     w = v;
-    func_002A3F10(p, 1, &w, out0);
+    get_moby_joint_matrices(p, 1, &w, out0);
     func_00282D30_3(a, out48, f);
     func_00282CC0_4(a, a, b);
     func_00283098_2(a, a, p + 192);
@@ -199,22 +199,22 @@ void func_L00_003A41F0(char *moby)
     firstStyle = 8;
     firstKind = 2;
     firstAlpha = 127;
-    func_00282D30(position, moby + 0xD0, 0.1f);
-    func_00282CC0(position, position, moby + 0x10);
-    func_00282D30(offset, moby + 0xC0, 0.275f);
-    func_00282CC0(position, position, offset);
-    func_00282D30(velocity, moby + 0xD0, 0.1000000089f);
+    FastVecScale(position, moby + 0xD0, 0.1f);
+    FastVecAdd(position, position, moby + 0x10);
+    FastVecScale(offset, moby + 0xC0, 0.275f);
+    FastVecAdd(position, position, offset);
+    FastVecScale(velocity, moby + 0xD0, 0.1000000089f);
     for (count = 3; count >= 0; count--) {
         char *particle;
         rotation = func_002A77E0(16);
         if (func_002A77E0(2))
             rotation = -rotation;
-        particle = func_002BDCE8(0.04f, position, 1.0f, 0.9f, rotation, velocity, 52500.0f, 0x7F204080, 0);
+        particle = SpawnSpinningSparkParticle(0.04f, position, 1.0f, 0.9f, rotation, velocity, 52500.0f, 0x7F204080, 0);
         if (particle) {
             char *sub;
             sub = particle + 0x20;
             *(short *)(particle + 10) = firstStyle;
-            *(unsigned char *)(particle + 9) = ((*(short *)(moby + 0x32) >> 5) << 4) + func_00283CF0(4.0f);
+            *(unsigned char *)(particle + 9) = ((*(short *)(moby + 0x32) >> 5) << 4) + FloatToInt(4.0f);
             *(int *)(sub + 4) = firstKind;
             *(unsigned char *)(sub + 10) = firstAlpha;
             *(unsigned char *)(sub + 11) = *(unsigned char *)(particle + 10);
@@ -226,12 +226,12 @@ void func_L00_003A41F0(char *moby)
     secondKind = 2;
     secondAlpha = 127;
     for (count = 2; count >= 0; count--) {
-        char *particle = func_002BDCE8(0.02f, position, 1.0f, 1.0f, rotation, velocity, size, 0x7FFFFFFF, 0);
+        char *particle = SpawnSpinningSparkParticle(0.02f, position, 1.0f, 1.0f, rotation, velocity, size, 0x7FFFFFFF, 0);
         if (particle) {
             char *sub;
             int brightness;
             sub = particle + 0x20;
-            brightness = ((*(short *)(moby + 0x32) >> 5) << 4) + func_00283CF0(4.0f);
+            brightness = ((*(short *)(moby + 0x32) >> 5) << 4) + FloatToInt(4.0f);
             *(short *)(particle + 10) = style;
             *(unsigned char *)(particle + 9) = brightness;
             *(unsigned char *)(particle + 8) = func_002A77E0(255);
@@ -278,11 +278,11 @@ void func_L00_003A78B0(char *moby)
     point[1] = state[1];
     point[2] = state[2];
     point[3] = 0.0f;
-    func_00282D30(offset, moby + 0xD0, -0.1f);
-    func_00282CC0(point, point, offset);
-    func_00282D30(step, moby + 0xE0, 0.15f);
-    func_00282CC0(point, point, step);
-    func_00282D30(step, moby + 0xE0, -0.03333333507f);
+    FastVecScale(offset, moby + 0xD0, -0.1f);
+    FastVecAdd(point, point, offset);
+    FastVecScale(step, moby + 0xE0, 0.15f);
+    FastVecAdd(point, point, step);
+    FastVecScale(step, moby + 0xE0, -0.03333333507f);
     for (i = 8; i >= 0; i--) {
         char *particle;
         int rotation;
@@ -296,7 +296,7 @@ void func_L00_003A78B0(char *moby)
                                  262500.0f, 262500.0f, 0.0f, 1);
         if (particle)
             *(unsigned char *)(particle + 2) = *D_L00_001FE940.material;
-        func_00282CC0(point, point, step);
+        FastVecAdd(point, point, step);
     }
 }
 
@@ -312,9 +312,9 @@ void func_L00_003A8060(char *obj, char *arg)
     float one = 1.0f;
 
     func_00282F20_1(base, (char *)(*(int *)(obj + 104)), one);
-    func_00282DD8(other, base, arg);
+    FastVecCross(other, base, arg);
     func_00282F20_1(other, other, one);
-    func_00282DD8(obj + 224, other, base);
+    FastVecCross(obj + 224, other, base);
 }
 
 

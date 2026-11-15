@@ -25,7 +25,7 @@ char *func_L00_002AE888(void *axis, int type, int occlusion, float range,
     float score, bestScore = 100000000.0f;
 
     if (D_00189E20_26[0x22c3])
-        func_00283698(matrix, D_L00_001B8FF0);
+        matrix_from_basis_rows(matrix, D_L00_001B8FF0);
 
     for (index = 0; (object = D_L00_001FACE0[index]) != 0; index++) {
         if (type != -1 && *(short *)(*(char **)(object + 0x24) + 0x46) != type)
@@ -47,9 +47,9 @@ char *func_L00_002AE888(void *axis, int type, int occlusion, float range,
 
         if (occlusion) {
             qcopy_nc(start, D_00189E20_26 + 0xe0);
-            func_00282F20(end, object + 0xe0, 1.0f);
-            func_00282CC0(end, end, object + 0x10);
-            if (func_002761F8(start, end, 2, 0, 0))
+            vec_scale_to_length(end, object + 0xe0, 1.0f);
+            FastVecAdd(end, end, object + 0x10);
+            if (CollLine(start, end, 2, 0, 0))
                 continue;
         }
         bestScore = score;

@@ -70,20 +70,20 @@ void func_L05_0042BDB0(u8 *actor)
         ((Fields *)actor)->f[0x2C / 4] = *(float *)(*(char **)(actor + 0x24) + 0x24) * D_L05_001B1738;
         ((Fields *)actor)->f[0x18 / 4] = ((Fields *)state)->f[0x18 / 4] + D_L05_001B173C +
                                   D_L05_001B1740 * func_00283198(((Fields *)actor)->f[0xFC / 4]);
-        ((Fields *)actor)->f[0xF0 / 4] = func_00283B98(((Fields *)actor)->f[0xF0 / 4], D_L05_001B1748 * 0.00029088825f);
-        ((Fields *)actor)->f[0xF4 / 4] = func_00283B98(((Fields *)actor)->f[0xF4 / 4], D_L05_001B174C * 0.00029088825f);
-        ((Fields *)actor)->f[0xF8 / 4] = func_00283B98(((Fields *)actor)->f[0xF8 / 4], D_L05_001B1750 * 0.00029088825f);
-        ((Fields *)actor)->f[0xFC / 4] = func_00283B98(((Fields *)actor)->f[0xFC / 4], D_L05_001B1754 * 0.00029088825f);
+        ((Fields *)actor)->f[0xF0 / 4] = FastAddRotations(((Fields *)actor)->f[0xF0 / 4], D_L05_001B1748 * 0.00029088825f);
+        ((Fields *)actor)->f[0xF4 / 4] = FastAddRotations(((Fields *)actor)->f[0xF4 / 4], D_L05_001B174C * 0.00029088825f);
+        ((Fields *)actor)->f[0xF8 / 4] = FastAddRotations(((Fields *)actor)->f[0xF8 / 4], D_L05_001B1750 * 0.00029088825f);
+        ((Fields *)actor)->f[0xFC / 4] = FastAddRotations(((Fields *)actor)->f[0xFC / 4], D_L05_001B1754 * 0.00029088825f);
         func_L01_00397A28(actor);
         if (func_002A77E0(D_L05_001B1778) == 0)
             func_L01_00417090(actor);
-        if (func_00282E48(D_L05_001B1780 + 0x10, actor + 0x10) < 1.5f) {
+        if (fast_vec_dist(D_L05_001B1780 + 0x10, actor + 0x10) < 1.5f) {
             D_L05_001B2170 = 180;
             func_002B0A18(0x124B, -1);
             D_0019B278[((Fields *)state)->i[0] + (D_001A79F0 << 2)] = 1;
             D_L05_001B177C++;
-            func_0029B3E0(0, -1);
-            func_002E5CF8(1, 0, actor);
+            MemcardSave(0, -1);
+            PlayMobySound(1, 0, actor);
             func_0029F338(actor);
         }
         return;
@@ -107,7 +107,7 @@ void func_L05_0042BDB0(u8 *actor)
         }
         hero = D_00189E20;
         if (*(int *)(hero + 0xC28) & 2)
-            func_L00_002D2168(0, 0, 30.0f);
+            set_hero_animation(0, 0, 30.0f);
         if (actor[0x42] == 0 && func_00282948(state + 0x6C) != 0) {
             D_L05_001B2170 = 180;
             func_002B0A18(0x1234, -1);
@@ -116,7 +116,7 @@ void func_L05_0042BDB0(u8 *actor)
             D_L05_001B1F68 = 0;
             func_L00_002B9D60(hero + 0x80, hero + 0x90, 0, 0);
             func_003355A8(0);
-            func_0029B3E0(0, -1);
+            MemcardSave(0, -1);
             func_0029F338(actor);
         }
         break;

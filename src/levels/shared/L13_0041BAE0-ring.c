@@ -29,9 +29,9 @@ void func_L13_0041BAE0(void *opaque) {
     int j;
     int next;
     RingVertex *vertex;
-    func_00283658(matrix, object + 0xC0);
+    copy_matrix_rotation(matrix, object + 0xC0);
     qcopy(matrix + 12, object + 0x10);
-    packet.state[1] = func_0027C878(D_L13_001B16F8);
+    packet.state[1] = GetEffectTextureDescriptor(D_L13_001B16F8);
     {
         long long state = D_L13_001B16E8[0];
         state |= (long long)D_L13_001B16E8[1] << 2;
@@ -74,6 +74,6 @@ void func_L13_0041BAE0(void *opaque) {
             vertex->z = (j & 1) ? D_L13_001B1720 + thickness : D_L13_001B1720 - thickness;
             vertex->w = 1.0f;
         }
-        func_00280B90(&packet, matrix, 0);
+        draw_world_quad(&packet, matrix, 0);
     }
 }

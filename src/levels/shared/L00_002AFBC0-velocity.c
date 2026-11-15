@@ -69,8 +69,8 @@ void func_L00_002B6198(float rate)
         v[1] = func_00283198(angle) * speed;
         v[2] = D_00189E20.velocity[2];
         dot = -(D_00189E20.velocity[0] * v[0] + D_00189E20.velocity[1] * v[1]);
-        len = func_00282E20(v);
-        velLen = func_00282E20(D_00189E20.velocity);
+        len = vec_length_xy(v);
+        velLen = vec_length_xy(D_00189E20.velocity);
         if (len == 0.0f || velLen == 0.0f) {
             dot = 0.0f;
         } else {
@@ -84,10 +84,10 @@ void func_L00_002B6198(float rate)
         if (dot < 1.0f)
             dot = 1.0f;
         rate *= dot;
-        func_00282CF0(v, v, D_00189E20.velocity);
-        if (func_00282E20(v) > rate)
+        FastVecSub(v, v, D_00189E20.velocity);
+        if (vec_length_xy(v) > rate)
             func_00282F70(v, v, rate);
-        func_00282CC0(D_00189E20.velocity, D_00189E20.velocity, v);
+        FastVecAdd(D_00189E20.velocity, D_00189E20.velocity, v);
         qcopy(D_00189E20.lastVelocity, D_00189E20.velocity);
         *(Quad *)t = *(Quad *)D_00189E20.vecA60;
         D_00189E20.f1B4 = D_00189E20.f178 - func_L00_002B5590(t);
@@ -99,9 +99,9 @@ void func_L00_002B6198(float rate)
         *(Quad *)t = *(Quad *)D_00189E20.targetDir;
         speed = D_00189E20.inputSpeed;
         func_L00_002D3B58(v, t, 0.0f);
-        func_00282F20(v, v, speed);
+        vec_scale_to_length(v, v, speed);
         func_L00_002D3B58(u, D_00189E20.velocity, 0.0f);
-        dot = -func_00282DB0(u, v);
+        dot = -FastVecDot(u, v);
         len = func_L00_002D3A58(v);
         velLen = func_L00_002D3A58(D_00189E20.velocity);
         if (len == 0.0f || velLen == 0.0f) {
@@ -117,11 +117,11 @@ void func_L00_002B6198(float rate)
         if (dot < 1.0f)
             dot = 1.0f;
         rate *= dot;
-        func_00282CF0(v, v, D_00189E20.velocity);
+        FastVecSub(v, v, D_00189E20.velocity);
         func_L00_002D3B58(v, v, 0.0f);
         if (func_L00_002D3A58(v) > rate)
             func_L00_002D3BD8(v, v, rate);
-        func_00282CC0(D_00189E20.velocity, D_00189E20.velocity, v);
+        FastVecAdd(D_00189E20.velocity, D_00189E20.velocity, v);
         D_00189E20.f1B4 = D_00189E20.f178;
         if (D_00189E20.f1454)
             D_00189E20.f1B4 = D_00189E20.f174;

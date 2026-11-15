@@ -65,12 +65,12 @@ void func_L13_0041AD00(char *m) {
     Beam *src = d;
     int corners = 4;
 
-    func_00283410(M1, (char *)d + 0x650);
-    func_00283698(M2, M1);
+    euler_to_matrix(M1, (char *)d + 0x650);
+    matrix_from_basis_rows(M2, M1);
     qcopy_nc(&M1[12], m + 0x10);
-    func_00282CF0(v230, D_L13_001B98C0, m + 0x10);
-    func_00283098(v230, v230, M2);
-    tex = func_0027C878(D_L13_001B163C);
+    FastVecSub(v230, D_L13_001B98C0, m + 0x10);
+    matrix_mul_vec3(v230, v230, M2);
+    tex = GetEffectTextureDescriptor(D_L13_001B163C);
     flags = (long)D_L13_001B1640;
     flags |= (long)D_L13_001B1644 << 2;
     flags |= (long)D_L13_001B1648 << 4;
@@ -108,10 +108,10 @@ void func_L13_0041AD00(char *m) {
         for (i = 0; i < segs; i++) {
             qcopy(v240, v250);
             if (i < last) {
-                func_00282CF0(v270, path->pts[i], ahead->pts[i + 2]);
-                func_00282CF0(v260, mid->pts[i + 1], v230);
-                func_00282DD8(v250, v260, v270);
-                func_00282F20(v250, v250, 0.1f);
+                FastVecSub(v270, path->pts[i], ahead->pts[i + 2]);
+                FastVecSub(v260, mid->pts[i + 1], v230);
+                FastVecCross(v250, v260, v270);
+                vec_scale_to_length(v250, v250, 0.1f);
             } else {
                 func_00282C88(v250);
             }
@@ -119,19 +119,19 @@ void func_L13_0041AD00(char *m) {
                 if (k < kh) {
                     qcopy(P[0].corner[k], near->pts[i]);
                     if (k & odd)
-                        func_00282CC0(P[0].corner[k], P[0].corner[k], v240);
+                        FastVecAdd(P[0].corner[k], P[0].corner[k], v240);
                     else
-                        func_00282CF0(P[0].corner[k], P[0].corner[k], v240);
+                        FastVecSub(P[0].corner[k], P[0].corner[k], v240);
                 } else {
                     qcopy(P[0].corner[k], far->pts[i + 1]);
                     if (k & odd2)
-                        func_00282CC0(P[0].corner[k], P[0].corner[k], v250);
+                        FastVecAdd(P[0].corner[k], P[0].corner[k], v250);
                     else
-                        func_00282CF0(P[0].corner[k], P[0].corner[k], v250);
+                        FastVecSub(P[0].corner[k], P[0].corner[k], v250);
                 }
-                P[0].uv[k][0] = D_L13_001B1660[k][0] + func_00283CE0(i - i / 4 * 4) * 0.25f;
+                P[0].uv[k][0] = D_L13_001B1660[k][0] + IntToFloat(i - i / 4 * 4) * 0.25f;
             }
-            func_00280B90(&P[0], M1, mode);
+            draw_world_quad(&P[0], M1, mode);
         }
     }
     {
@@ -158,10 +158,10 @@ void func_L13_0041AD00(char *m) {
             for (n = 0; n < 3; n++) {
                 qcopy(v240, v250);
                 if (n < rlast) {
-                    func_00282CF0(v270, seg->seg[n][j], ahead2->seg[n + 2][j]);
-                    func_00282CF0(v260, mid2->seg[n + 1][j], v230);
-                    func_00282DD8(v250, v260, v270);
-                    func_00282F20(v250, v250, 0.1f);
+                    FastVecSub(v270, seg->seg[n][j], ahead2->seg[n + 2][j]);
+                    FastVecSub(v260, mid2->seg[n + 1][j], v230);
+                    FastVecCross(v250, v260, v270);
+                    vec_scale_to_length(v250, v250, 0.1f);
                 } else {
                     func_00282C88(v250);
                 }
@@ -171,19 +171,19 @@ void func_L13_0041AD00(char *m) {
                     if (k < kh2) {
                         qcopy(P[0].corner[k], near2->seg[n][j]);
                         if (k & odd3)
-                            func_00282CC0(P[0].corner[k], P[0].corner[k], v240);
+                            FastVecAdd(P[0].corner[k], P[0].corner[k], v240);
                         else
-                            func_00282CF0(P[0].corner[k], P[0].corner[k], v240);
+                            FastVecSub(P[0].corner[k], P[0].corner[k], v240);
                     } else {
                         qcopy(P[0].corner[k], d->seg[n + 1][j]);
                         if (k & odd4)
-                            func_00282CC0(P[0].corner[k], P[0].corner[k], v250);
+                            FastVecAdd(P[0].corner[k], P[0].corner[k], v250);
                         else
-                            func_00282CF0(P[0].corner[k], P[0].corner[k], v250);
+                            FastVecSub(P[0].corner[k], P[0].corner[k], v250);
                     }
-                    P[0].uv[k][0] = D_L13_001B1660[k][0] + func_00283CE0(n - n / 4 * 4) * 0.25f;
+                    P[0].uv[k][0] = D_L13_001B1660[k][0] + IntToFloat(n - n / 4 * 4) * 0.25f;
                 }
-                func_00280B90(&P[0], M1, mode2);
+                draw_world_quad(&P[0], M1, mode2);
             }
         }
     }

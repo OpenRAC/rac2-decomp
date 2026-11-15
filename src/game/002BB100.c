@@ -44,7 +44,7 @@ extern float D_001BAFC0[];
 static __inline__ int frac_byte(float value, float scale)
 {
     float scaled = value * scale;
-    int result = func_00283CF0(scaled);
+    int result = FloatToInt(scaled);
 
     if (result != 0)
         scaled = scale;
@@ -67,17 +67,17 @@ void func_002BB100(Particle_BB100 *p)
     z = p->position[2]+q->velocity[2];
     next[0]=x; next[1]=y; next[2]=z;
     cfg = q->config;
-    if ((cfg->flags&1) && func_002761F8(p->position,next,4,p,0)) {
+    if ((cfg->flags&1) && CollLine(p->position,next,4,p,0)) {
         velocity[0]=q->velocity[0]; velocity[1]=q->velocity[1]; velocity[2]=q->velocity[2];
         func_002AB168(temp,velocity,D_001BAFC0,cfg->bounce);
         q->velocity[0]=temp[0]; q->velocity[1]=temp[1]; q->velocity[2]=temp[2];
-        func_00282F20(offset,D_001BAFC0,0.055f);
-        func_00282CC0((char *)p->position,(char *)(D_001BAFC0-8),(char *)offset);
+        vec_scale_to_length(offset,D_001BAFC0,0.055f);
+        FastVecAdd((char *)p->position,(char *)(D_001BAFC0-8),(char *)offset);
     } else *(Quad_BB100 *)p->position=*(Quad_BB100 *)next;
     if (cfg->flags&2) {
         r=Fe617c30b_FUN_00283CE0((PB(p,4)<<8)|q->fractional[0])* (1.0f/65535.0f);
-        g=func_00283CF0((float)((p->color&0xff00)|q->fractional[1]))*(1.0f/65535.0f);
-        b=func_00283CF0((float)(int)(((u32)p->color>>8 &0xff00)|q->fractional[2]))*(1.0f/65535.0f);
+        g=FloatToInt((float)((p->color&0xff00)|q->fractional[1]))*(1.0f/65535.0f);
+        b=FloatToInt((float)(int)(((u32)p->color>>8 &0xff00)|q->fractional[2]))*(1.0f/65535.0f);
         if(q->direction&16) r-=cfg->colorStep[0]; else r+=cfg->colorStep[0];
         if(q->direction&32) g-=cfg->colorStep[1]; else g+=cfg->colorStep[1];
         if(q->direction&64) b-=cfg->colorStep[2]; else b+=cfg->colorStep[2];
@@ -88,31 +88,31 @@ void func_002BB100(Particle_BB100 *p)
         if(b>cfg->colorMax[2]) {b=cfg->colorMax[2];if(cfg->flags&0x400)q->direction^=64;}
         if(b<cfg->colorMin[2]) {b=cfg->colorMin[2];if(cfg->flags&0x40)q->direction^=64;}
         q->fractional[0]=frac_byte(r,65535.0f);
-        q->fractional[1]=func_00283CF0(g*65535.0f);
-        q->fractional[2]=func_00283CF0(b*65535.0f);
-        ri=func_00283CF0(r*255.0f);
-        gi=func_00283CF0(g*255.0f);
-        bi=func_00283CF0(b*255.0f);
-        ai=func_00283CF0(q->alpha*255.0f);
+        q->fractional[1]=FloatToInt(g*65535.0f);
+        q->fractional[2]=FloatToInt(b*65535.0f);
+        ri=FloatToInt(r*255.0f);
+        gi=FloatToInt(g*255.0f);
+        bi=FloatToInt(b*255.0f);
+        ai=FloatToInt(q->alpha*255.0f);
         packed=ri&255;
         packed|=(gi&255)<<8;
         packed|=(bi&255)<<16;
         packed|=ai<<24;
         p->color=packed;
-    } else if(cfg->flags&4) p->color=(p->color&0xffffff)|(func_00283CF0(q->alpha*255.0f)<<24);
+    } else if(cfg->flags&4) p->color=(p->color&0xffffff)|(FloatToInt(q->alpha*255.0f)<<24);
     if(cfg->flags&4) {
         if(q->direction&128) q->alpha-=cfg->alphaStep; else q->alpha+=cfg->alphaStep;
         if(q->alpha>cfg->alphaMax) {q->alpha=cfg->alphaMax;if(cfg->flags&0x800)q->direction^=128;}
         if(q->alpha<cfg->alphaMin) {q->alpha=cfg->alphaMin;if(cfg->flags&0x80)q->direction^=128;}
     }
-    p->spin=func_00283CF0(q->spin*255.0f);
+    p->spin=FloatToInt(q->spin*255.0f);
     if(cfg->flags&8) {
         next[0]=q->velocity[0];next[1]=q->velocity[1];next[2]=q->velocity[2];
         if(cfg->flags&0x8000) {
-            func_00283410(matrix,cfg->owner+0xf0);
-            func_002830C0(temp,cfg,matrix);
+            euler_to_matrix(matrix,cfg->owner+0xf0);
+            transform_vector(temp,cfg,matrix);
         } else *(Quad_BB100 *)temp=*(Quad_BB100 *)cfg;
-        func_00282CC0((char *)next,(char *)next,(char *)temp);
+        FastVecAdd((char *)next,(char *)next,(char *)temp);
         func_00282FB8(next,next,cfg->damping);
         q->velocity[0]=next[0];q->velocity[1]=next[1];q->velocity[2]=next[2];
     }
@@ -120,7 +120,7 @@ void func_002BB100(Particle_BB100 *p)
     if(p->size<cfg->sizeMin)p->size=cfg->sizeMin;
     if(p->size>cfg->sizeMax)p->size=cfg->sizeMax;
     q->spin+=cfg->spinStep;
-    if(q->alpha<=0.0f || func_00282978(&p->life) || p->position[0]<cfg->minimum[0] || p->position[1]<cfg->minimum[1] || p->position[2]<cfg->minimum[2] || p->position[0]>cfg->maximum[0] || p->position[1]>cfg->maximum[1] || p->position[2]>cfg->maximum[2]) func_002B9180((char *)p);
+    if(q->alpha<=0.0f || FastDecTimer(&p->life) || p->position[0]<cfg->minimum[0] || p->position[1]<cfg->minimum[1] || p->position[2]<cfg->minimum[2] || p->position[0]>cfg->maximum[0] || p->position[1]>cfg->maximum[1] || p->position[2]>cfg->maximum[2]) func_002B9180((char *)p);
 }
 #undef PF
 #undef PI

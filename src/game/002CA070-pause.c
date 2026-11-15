@@ -192,7 +192,7 @@ void func_002CA070(void)
         D_00210A40.b = 0x18;
         D_00210A40.c = D_00258D70;
         D_00210A40.upd = func_002CB648;
-        D_00210A40.init = func_002CB510;
+        D_00210A40.init = RebuildLevelSelectAvailability;
         D_00210A40.init(0);
         func_002C9AD8(&D_00210A40);
         break;
@@ -213,7 +213,7 @@ void func_002CA070(void)
 
     {
         u8 *r = D_001C2AD0;
-        func_00282D30(r, D_001AA490, 1.0f);
+        FastVecScale(r, D_001AA490, 1.0f);
         qcopy(r - 0x10, D_001AA4A0);
         r += 0x20;
         qzero_nc(r);
@@ -232,7 +232,7 @@ void func_002CA070(void)
         D_001B9040.i22C = 0;
         D_001B9040.i218 = 0;
     }
-    func_0027AB40();
+    UpdateViewContext();
     func_002C9C90();
     func_00279D18();
     func_002FC3C0(1);
@@ -279,9 +279,9 @@ void func_002CA070(void)
     }
     func_0028AFE8(0);
     if (queued) {
-        func_0028ACB0(1);
+        LoadStashedHudBanks(1);
     } else {
-        func_0028ACB0(0);
+        LoadStashedHudBanks(0);
     }
     if (D_001F2840.unkD0 == 0) {
         func_002FC8D0(D_001F2840.unk20, D_001A72D8[1], D_001A7340[1] << 11);
@@ -310,7 +310,7 @@ void func_002CA070(void)
             p--;
         }
     }
-    func_0028B338(1);
+    select_moby_context(1);
     for (k = 0; k < 4; k++) {
         D_001F2840.unk40[k] = D_001A7398[k];
         D_001F2840.unk30[k] = D_001A7398[k];

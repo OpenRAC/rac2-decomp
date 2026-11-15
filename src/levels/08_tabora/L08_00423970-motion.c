@@ -24,31 +24,31 @@ void func_L08_004262C0(char *actor) {
     float distance;
     qcopy(origin, p + 0x120);
     origin[2] = func_002A89A8(origin, 6.0f, 0) + 0.6f;
-    desired[0] = func_00283180(func_00283B98(*(float *)(p + 0x208), *(float *)(p + 0x1F4))) * 8.0f;
-    desired[1] = func_00283198(func_00283B98(*(float *)(p + 0x208), *(float *)(p + 0x1F4))) * 8.0f;
+    desired[0] = func_00283180(FastAddRotations(*(float *)(p + 0x208), *(float *)(p + 0x1F4))) * 8.0f;
+    desired[1] = func_00283198(FastAddRotations(*(float *)(p + 0x208), *(float *)(p + 0x1F4))) * 8.0f;
     desired[2] = 0.0f;
-    func_00282CC0(desired, desired, actor + 0x10);
+    FastVecAdd(desired, desired, actor + 0x10);
     desired[2] = func_002A89A8(desired, 0.5f, 0) + 0.6f;
     if (*(s16 *)(p + 0x1B8)) *(float *)(p + 0x1CC) += 0.05f;
     else *(float *)(p + 0x1CC) -= 0.05f;
     if (*(float *)(p + 0x1CC) > 1.0f) *(float *)(p + 0x1CC) = 1.0f;
     else if (*(float *)(p + 0x1CC) < 0.0f) *(float *)(p + 0x1CC) = 0.0f;
-    func_00282D30(desired, desired, 1.0f - *(float *)(p + 0x1CC));
-    func_00282D30(origin, origin, *(float *)(p + 0x1CC));
-    func_00282CC0(target, desired, origin);
+    FastVecScale(desired, desired, 1.0f - *(float *)(p + 0x1CC));
+    FastVecScale(origin, origin, *(float *)(p + 0x1CC));
+    FastVecAdd(target, desired, origin);
     func_0029FC20(actor, 4, matrix);
-    func_00282F20(origin, matrix, 0.7f);
-    func_00282CC0(matrix + 12, matrix + 12, origin);
+    vec_scale_to_length(origin, matrix, 0.7f);
+    FastVecAdd(matrix + 12, matrix + 12, origin);
     target[2] = *(float *)(p + 0x148);
-    func_00282CF0(origin, target, matrix + 12);
+    FastVecSub(origin, target, matrix + 12);
     origin[2] = 0.0f;
-    func_00282F20(origin, origin, speed);
-    func_00282CC0(desired, origin, matrix + 12);
+    vec_scale_to_length(origin, origin, speed);
+    FastVecAdd(desired, origin, matrix + 12);
     desired[2] = *(float *)(p + 0x148);
-    func_00282CF0(desired, desired, matrix + 12);
-    func_00282F20(desired, desired, speed);
-    func_00282CC0(desired, desired, matrix + 12);
-    distance = func_00282E80(p + 0x120, matrix + 12);
+    FastVecSub(desired, desired, matrix + 12);
+    vec_scale_to_length(desired, desired, speed);
+    FastVecAdd(desired, desired, matrix + 12);
+    distance = vec_distance_xy(p + 0x120, matrix + 12);
     if (distance < speed) {
         *(char **)(hit + 16) = actor;
         *(int *)(hit + 20) = 1;
@@ -61,21 +61,21 @@ void func_L08_004262C0(char *actor) {
         *(float *)(hit + 12) = 5627.9248046875f;
         *(float *)(hit + 8) = 1.0f;
         *(u8 *)(hit + 24) = 0;
-        func_00282F20(start, origin, distance - 1.0f);
-        func_00282CC0(start, start, matrix + 12);
-        func_00282F20(end, origin, distance + 1.0f);
-        func_00282CC0(end, end, matrix + 12);
+        vec_scale_to_length(start, origin, distance - 1.0f);
+        FastVecAdd(start, start, matrix + 12);
+        vec_scale_to_length(end, origin, distance + 1.0f);
+        FastVecAdd(end, end, matrix + 12);
         if (D_00189E20.state != 0x31)
             end[2] = start[2] = func_002A89A8(p + 0x140, 0.5f, 0) + D_L08_001B1D24[0];
         else
             end[2] = start[2] = func_002A89A8(D_00189E20.object + 0x10, 0.5f, 0) + D_L08_001B1D24[0];
         if (D_00189E20.object && D_L08_001BFF58 == D_00189E20.object)
             end[2] = start[2] = *(float *)(D_L08_001BFF58 + 0x18) + D_L08_001B1D24[0];
-        if (!func_002761F8(start, end, 0, actor, hit)) {
+        if (!CollLine(start, end, 0, actor, hit)) {
             start[2] -= 0.5f;
             end[2] -= 0.5f;
-            func_002761F8(start, end, 0, actor, hit);
+            CollLine(start, end, 0, actor, hit);
         }
     }
-    func_L08_004294A0(actor, matrix, desired);
+    TransitionTaboraSlot(actor, matrix, desired);
 }

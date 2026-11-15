@@ -27,16 +27,16 @@ void func_L01_00416C08(char *m) {
     float *phase, *speed, *size;
     int *timer;
     if (*(unsigned char *)(m + 0x20) == 1)
-        func_00282D30(b, m, 0.0009765625f);
+        FastVecScale(b, m, 0.0009765625f);
     else {
         func_0029FCC0(m, 0, b);
         scale = (160.0f - func_0029F530(m)) * 0.1f;
         if (scale > 1.0f) scale = 1.0f;
     }
-    func_00282CF0(a, D_L01_001B94C0, b);
-    func_00282F20(a, a, -0.3f);
-    func_00282F20(c, a, 0.1f);
-    func_00282CC0(a, a, b);
+    FastVecSub(a, D_L01_001B94C0, b);
+    vec_scale_to_length(a, a, -0.3f);
+    vec_scale_to_length(c, a, 0.1f);
+    FastVecAdd(a, a, b);
     phase = (float *)(d + 0x20);
     speed = (float *)(d + 0x30);
     timer = (int *)(d + 0x40);
@@ -49,11 +49,11 @@ void func_L01_00416C08(char *m) {
         if (255.0f <= value) phase[i] = value - 255.0f;
         else if (value <= 0.0f) phase[i] = value + 255.0f;
         if (func_00282948((int *)(d + 0x40) + i)) timer[i] = 255;
-        t = func_00283CE0(255 - timer[i]) * 0.003921568859368563f;
-        color = func_00283D38(ref_L01_00416C08_00, ref_L01_00416C08_01,
+        t = IntToFloat(255 - timer[i]) * 0.003921568859368563f;
+        color = FastTweenColor(ref_L01_00416C08_00, ref_L01_00416C08_01,
             func_00282C48(0.5f - t));
-        func_002C2FD8(a, color, (unsigned char)func_00283CF0(phase[i]), ref_L01_00416C08_03,
+        func_002C2FD8(a, color, (unsigned char)FloatToInt(phase[i]), ref_L01_00416C08_03,
             ref_L01_00416C08_02, 2, 0, size[i] * scale);
-        func_00282CC0(a, a, c);
+        FastVecAdd(a, a, c);
     }
 }

@@ -110,7 +110,7 @@ void func_L11_00440360(u8 *object)
         weights += countTerm;
     }
     F32(state,0x14c) = energy*0.2f + weights + motion * -2.0f;
-    if (func_00282978((short *)(state+0x1ee))) {
+    if (FastDecTimer((short *)(state+0x1ee))) {
         S16(state,0x1ec) = (short)(U16(state,0x1ec)+1)%4;
         ((struct StateHistory *)state)->history[S16(state,0x1ec)].count=0;
         ((struct StateHistory *)state)->history[S16(state,0x1ec)].energy=0;

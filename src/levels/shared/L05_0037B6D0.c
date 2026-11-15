@@ -163,21 +163,21 @@ void func_L05_0037B948(char *obj, int check, float range)
     limit = 0.7068582773f;
     if (D_L05_00221D3C == 1)
         return;
-    if (func_00282E48(*(char **)(s + 0x120) + 0x10, obj + 0x10) > range)
+    if (fast_vec_dist(*(char **)(s + 0x120) + 0x10, obj + 0x10) > range)
         return;
-    if (func_002761F8(obj + 0x10, *(char **)(s + 0x120) + 0x10, 0, obj, 0)) {
+    if (CollLine(obj + 0x10, *(char **)(s + 0x120) + 0x10, 0, obj, 0)) {
         if (!D_L05_001BFB18)
             return;
         if (*(short *)(D_L05_001BFB18 + 0xAA) != *(short *)(*(char **)(s + 0x120) + 0xAA))
             return;
     }
-    func_00283658(matrix, obj + 0xC0);
+    copy_matrix_rotation(matrix, obj + 0xC0);
     func_002AB6D8(matrix, angles);
-    angle = func_00283C80(func_00283248(
+    angle = FastDiffRots(func_00283248(
         *(float *)(*(char **)(s + 0x120) + 0x10) - *(float *)(obj + 0x10),
         *(float *)(*(char **)(s + 0x120) + 0x14) - *(float *)(obj + 0x14)), angles[2]);
-    elevation = func_00282E80(*(char **)(s + 0x120) + 0x10, obj + 0x10);
-    elevation = func_00283C80(func_00283248(elevation,
+    elevation = vec_distance_xy(*(char **)(s + 0x120) + 0x10, obj + 0x10);
+    elevation = FastDiffRots(func_00283248(elevation,
         *(float *)(*(char **)(s + 0x120) + 0x18) - *(float *)(obj + 0x18)), 0.0f);
     if (angle <= limit && elevation <= limit)
         *(int *)(s + 0x104) = 1;
@@ -317,8 +317,8 @@ void func_L05_0037DA58(float *position, int count, int color, int duration)
     *(Quad37DA58 *)axis = 0;
     axis[2] = 1.0f;
     axis[3] = 1.0f;
-    func_00282CF0(direction, D_L05_001B96C0, position);
-    func_00282F20(half, direction, 0.5f);
+    FastVecSub(direction, D_L05_001B96C0, position);
+    vec_scale_to_length(half, direction, 0.5f);
     direction[2] = 0;
     for (i = 0; i < count; i++) {
         size = func_002A7878(0.5f, 2.0f);
@@ -326,21 +326,21 @@ void func_L05_0037DA58(float *position, int count, int color, int duration)
         if (!sign) --sign;
         angle = func_002A7878(-1.0471977f, 1.0471977f);
         func_002ACEC0(velocity, direction, axis, angle);
-        func_00282F20(velocity, velocity, func_002A7878(0.05f, 3.0f) * (1.0f/60.0f));
+        vec_scale_to_length(velocity, velocity, func_002A7878(0.05f, 3.0f) * (1.0f/60.0f));
         velocity[2] = func_002A7878(1.0f, 5.0f) * (1.0f/60.0f);
-        func_00282CC0(point, position, half);
+        FastVecAdd(point, position, half);
         position[0] += func_002A78D8(0, 0.15f);
         position[1] += func_002A78D8(0, 0.15f);
         position[2] += func_002A78D8(0, 0.15f);
         particle = func_002C2210(position, duration, size * 0.1f, size, color, 0, sign, velocity, 0, 0.002f);
         if (particle) {
             particle[2] = D_L05_001FF240[0x61][6];
-            particle[9] = func_00283CF0(4.0f) + 0x70;
+            particle[9] = FloatToInt(4.0f) + 0x70;
         }
         particle = func_002C2210(position, duration, size * 0.07f, size * 0.7f, 0x7f7f7f7f, 1, -sign, velocity, 0, 0.002f);
         if (particle) {
             particle[2] = D_L05_001FF240[0x61][6];
-            particle[9] = func_00283CF0(4.0f) + 0x70;
+            particle[9] = FloatToInt(4.0f) + 0x70;
         }
     }
 }
@@ -388,23 +388,23 @@ void func_L05_00398618(char *obj)
             p->f[8] += func_002A7878(-0.1f, 0.1f);
             p->f[9] += func_002A7878(-0.1f, 0.1f);
             p->f[10] += func_002A7878(-0.1f, 0.1f);
-            func_00282CF0(delta, end, pos);
+            FastVecSub(delta, end, pos);
             qcopy(pos, obj + 0x10);
-            func_00282CC0(end, pos, delta);
+            FastVecAdd(end, pos, delta);
             if (p->active) {
-                p->f[20] = func_00283B98(p->f[20], p->f[23] * 100.0f);
-                p->f[21] = func_00283B98(p->f[21], p->f[24] * 100.0f);
-                p->f[22] = func_00283B98(p->f[22], p->f[25] * 100.0f);
-                p->f[29] = func_00283B98(p->f[29], p->f[32] * 100.0f);
-                p->f[30] = func_00283B98(p->f[30], p->f[33] * 100.0f);
-                p->f[31] = func_00283B98(p->f[31], p->f[34] * 100.0f);
+                p->f[20] = FastAddRotations(p->f[20], p->f[23] * 100.0f);
+                p->f[21] = FastAddRotations(p->f[21], p->f[24] * 100.0f);
+                p->f[22] = FastAddRotations(p->f[22], p->f[25] * 100.0f);
+                p->f[29] = FastAddRotations(p->f[29], p->f[32] * 100.0f);
+                p->f[30] = FastAddRotations(p->f[30], p->f[33] * 100.0f);
+                p->f[31] = FastAddRotations(p->f[31], p->f[34] * 100.0f);
             } else {
-                p->f[20] = func_00283B98(p->f[20], p->f[23] * 50.0f);
-                p->f[21] = func_00283B98(p->f[21], p->f[24] * 50.0f);
-                p->f[22] = func_00283B98(p->f[22], p->f[25] * 50.0f);
-                p->f[29] = func_00283B98(p->f[29], p->f[32] * 50.0f);
-                p->f[30] = func_00283B98(p->f[30], p->f[33] * 50.0f);
-                p->f[31] = func_00283B98(p->f[31], p->f[34] * 50.0f);
+                p->f[20] = FastAddRotations(p->f[20], p->f[23] * 50.0f);
+                p->f[21] = FastAddRotations(p->f[21], p->f[24] * 50.0f);
+                p->f[22] = FastAddRotations(p->f[22], p->f[25] * 50.0f);
+                p->f[29] = FastAddRotations(p->f[29], p->f[32] * 50.0f);
+                p->f[30] = FastAddRotations(p->f[30], p->f[33] * 50.0f);
+                p->f[31] = FastAddRotations(p->f[31], p->f[34] * 50.0f);
             }
             p->f[0] = func_00283180(p->f[20]) * p->f[26];
             p->f[1] = func_00283198(p->f[21]) * p->f[27];
@@ -413,9 +413,9 @@ void func_L05_00398618(char *obj)
             p->f[5] = func_00283198(p->f[30]) * p->f[36];
             p->f[6] = -func_00283198(p->f[31]) * p->f[37];
             if (*(int *)(state + 0x24))
-                func_00282D08(&p->f[12], &p->f[8], &p->f[16], 0.55f);
+                lerp_vector(&p->f[12], &p->f[8], &p->f[16], 0.55f);
             else
-                func_00282D08(&p->f[12], &p->f[8], &p->f[16], 0.4f);
+                lerp_vector(&p->f[12], &p->f[8], &p->f[16], 0.4f);
             if (func_00282948(&p->active)) {
                 if (p->dying == 0) p->dying = 1;
                 if (func_00282948(&p->timer)) p->owner = 0;
@@ -638,8 +638,8 @@ void func_L05_003D1058(char *a0, char *a1, char *a2, char *a3, float f0, float f
         return;
     func_002AFFD8(a0, (char *)v0, 1);
     p = func_002AB1F0(a2);
-    func_00282D30(v1, v0, *(float *)((char *)p + 0x10));
-    func_00282CC0(v2, (float *)(a2 + 0x10), v1);
+    FastVecScale(v1, v0, *(float *)((char *)p + 0x10));
+    FastVecAdd(v2, (float *)(a2 + 0x10), v1);
     func_L05_003D1148(a0, a1, v2, a3, f0, f1, f2, v0);
 }
 
@@ -684,28 +684,28 @@ void func_L05_003D1148(void *a0, void *a1, void *a2, void *a3,
     float diff;
     float r;
 
-    func_00282CF0(v0, a2, a0);
-    len = func_00282DF0(v0);
+    FastVecSub(v0, a2, a0);
+    len = FastVecLength(v0);
     if (len == 0.0f)
         return;
     if (len < 1.5f) {
         func_002ACF68(a1, a1, v0, 0, 0.5f);
         return;
     }
-    func_00282DD8(v1, v0, a1);
-    dot = func_00282DB0(a1, v0);
-    prod = func_00282DF0(a1) * func_00282DF0(v0);
+    FastVecCross(v1, v0, a1);
+    dot = FastVecDot(a1, v0);
+    prod = FastVecLength(a1) * FastVecLength(v0);
     if (prod == 0.0f)
         return;
     ang = func_002831B0(dot / prod);
     diff = 1.5707964f - ang;
     if (func_00282C48(diff) > 2.879793643951416f) {
-        func_00282DD8(v2, a1, a4);
-        func_00282DD8(v1, v2, a1);
+        FastVecCross(v2, a1, a4);
+        FastVecCross(v1, v2, a1);
     }
-    func_00282F20(v1, v1, 1.0f);
+    vec_scale_to_length(v1, v1, 1.0f);
     r = func_002703B0(a3, 0.0f, diff * 0.5f, f0, f1, f2);
-    func_00282D30(v1, v1, func_00283198(r));
+    FastVecScale(v1, v1, func_00283198(r));
     v1[3] = func_00283180(r);
     func_002ACDE8(a1, a1, v1);
 }

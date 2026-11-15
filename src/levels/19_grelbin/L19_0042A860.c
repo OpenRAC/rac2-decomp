@@ -67,7 +67,7 @@ void func_L19_0042A8B8(void)
             continue;
         if (D_L19_001B22E0[1] != 0)
             continue;
-        func_0029F978((u8 *)e, 0, D_L19_001B22E0);
+        AttachManipulator((u8 *)e, 0, D_L19_001B22E0);
         D_L19_001B2300[0] = 1.9f;
         D_L19_001B2300[1] = 1.9f;
         D_L19_001B2300[2] = 1.9f;
@@ -91,7 +91,7 @@ void func_L19_0042AF70(L19Thing *a0)
             continue;
         if (D_L19_001B22E0[1] != 0)
             continue;
-        func_0029F978((u8 *)e, 0, D_L19_001B22E0);
+        AttachManipulator((u8 *)e, 0, D_L19_001B22E0);
         D_L19_001B2300[0] = 1.9f;
         D_L19_001B2300[1] = 1.9f;
         D_L19_001B2300[2] = 1.9f;
@@ -191,7 +191,7 @@ void func_L19_0042B058(u8 *self)
                 func_0029F338(D_L19_001B2A1C + I(data, 0x80) * 0x100);
                 I(data, 0x80) = -1;
             }
-            func_0029B3E0(0, -1);
+            MemcardSave(0, -1);
             if ((u32)QUANTITY <= PRICE_B)
                 func_002A7750(self, 4, -1);
             else
@@ -243,7 +243,7 @@ void func_L19_0042B058(u8 *self)
                 func_00288E18(0xA0F, 0x66);
             else
                 func_00288E18(0xA10, 0x67);
-            func_0029B3E0(0, -1);
+            MemcardSave(0, -1);
             if (QUANTITY < 1)
                 func_002A7750(self, 7, -1);
             else

@@ -82,19 +82,19 @@ s32 func_L11_004530E0(AimObject *obj)
             return 0;
         if (!func_L02_003D7300(e))
             continue;
-        if (!(func_00282E80(obj->position, e->position) < D_L11_001B1D28))
+        if (!(vec_distance_xy(obj->position, e->position) < D_L11_001B1D28))
             continue;
         a = func_00283248(e->position[0] - obj->position[0], e->position[1] - obj->position[1]);
-        if (!(func_00283C80(obj->heading, a) < D_L11_001B1D2C * 0.017453294f))
+        if (!(FastDiffRots(obj->heading, a) < D_L11_001B1D2C * 0.017453294f))
             continue;
         if (p == 0)
             return 0;
-        func_00282CF0(vec, obj->position, e->position);
+        FastVecSub(vec, obj->position, e->position);
         b = D_L11_001B1D30 * 0.017453294f;
         a = func_00283248(e->position[0] - obj->position[0], e->position[1] - obj->position[1]);
         func_002ACEC0(vec, vec, obj->orientation,
-                      func_00283BE0(obj->heading, a) >= 0.0f ? -b : b);
-        func_00282CC0(vec, vec, e->position);
+                      fast_subtract_rotations(obj->heading, a) >= 0.0f ? -b : b);
+        FastVecAdd(vec, vec, e->position);
         saved = state->f134;
         state->f134 = 0.0001f;
         func_L01_00321178(obj, vec);

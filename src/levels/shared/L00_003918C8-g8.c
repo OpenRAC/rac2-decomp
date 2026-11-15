@@ -90,7 +90,7 @@ void func_L00_003918C8(Moby *actor) {
     blast.quad = 0; blastNormal.quad = 0;
     blast.f[2] = 0.13333334f; blastNormal.f[2] = 1;
     D_L00_001B1A4C = 1; D_L00_001B1994 = 1;
-    func_L00_002F46C8(); D_L00_001B1BE8 = 1; func_002B0CE0(6, 0, 1);
+    func_L00_002F46C8(); D_L00_001B1BE8 = 1; ForceClaimNotice(6, 0, 1);
     timer = --state->timer;
     if (timer < -99 || ((Hero *)D_00189E20)->i[0x2294 / 4] == 0x16 || ((Hero *)D_00189E20)->i[0x2294 / 4] == 0x39 || ((Hero *)D_00189E20)->i[0x2294 / 4] == 0x6F ||
         ((Hero *)D_00189E20)->i[0x229C / 4] == 2 || ((Hero *)D_00189E20)->i[0x229C / 4] == 4 || ((Hero *)D_00189E20)->i[0x229C / 4] == 3 || ((Hero *)D_00189E20)->i[0x229C / 4] > 12 ||
@@ -109,7 +109,7 @@ void func_L00_003918C8(Moby *actor) {
     state->targetSpeed += (desiredSpeed - state->targetSpeed) * D_L00_001AF0EC;
     state->speed += (state->targetSpeed - state->speed) * D_L00_001AF0F0;
     if (state->speed > D_L00_001AF0E8 * 0.016666668f) state->speed = D_L00_001AF0E8 * 0.016666668f;
-    func_002E5F40(state->sound, func_00283CF0((state->targetSpeed - (D_L00_001AF0E4 * 0.016666668f) /
+    func_002E5F40(state->sound, FloatToInt((state->targetSpeed - (D_L00_001AF0E4 * 0.016666668f) /
                       (D_L00_001AF0E8 * 0.016666668f - D_L00_001AF0E4 * 0.016666668f)) * D_L00_001AF0E0));
     if ((u32)(state->timer - 1) < 0xBB2) {
         float stickX = ((Hero *)D_00189E20)->f[0x1FB0 / 4], stickY = ((Hero *)D_00189E20)->f[0x1FB4 / 4];
@@ -134,23 +134,23 @@ void func_L00_003918C8(Moby *actor) {
             func_002FEE70(state->camera, &actor->right, 0);
         } else {
             actor->pitch += (state->inputX - actor->pitch) * 0.06f;
-            angle = func_00283BE0(actor->yaw, state->inputY * 0.012271847f);
+            angle = fast_subtract_rotations(actor->yaw, state->inputY * 0.012271847f);
             actor->yaw = angle;
             if (angle >= 1.5707964f) actor->yaw = 1.5697963f;
             else if (angle <= -1.5707964f) actor->yaw = -1.5697963f;
-            actor->roll = func_00283BE0(actor->roll, state->inputX * 0.012271847f);
+            actor->roll = fast_subtract_rotations(actor->roll, state->inputX * 0.012271847f);
             func_002A9288(actor, 0.2f);
         }
     }
-    if (D_L00_001A8FF0) func_00282D30(&velocity, &actor->right, state->speed);
+    if (D_L00_001A8FF0) FastVecScale(&velocity, &actor->right, state->speed);
     else func_002AF000(velocity.f, state->speed, actor->roll, -actor->yaw);
     qcopy(&previous, &actor->position);
-    func_00282CC0(&actor->position, &actor->position, velocity.f); func_00300190(&actor->position, &actor->position);
+    FastVecAdd(&actor->position, &actor->position, velocity.f); func_00300190(&actor->position, &actor->position);
     if (state->timer >= 0xB7D) {
         height = func_002A89A8(&actor->position, 0, 0.5f) + state->hover;
         if (actor->position.f[2] < height && (!D_L00_001BF200.hit ||
             (D_L00_001BF200.hit->owner && D_L00_001BF200.hit->owner->kind == 5))) {
-            turn = func_00283248(state->speed, func_002AA2E8(&actor->position.f[2], height, 0.10000001f));
+            turn = func_00283248(state->speed, ApproachValue(&actor->position.f[2], height, 0.10000001f));
             if (turn > 0.026179943f) turn = 0.026179943f;
             actor->yaw -= turn;
         }
@@ -160,11 +160,11 @@ void func_L00_003918C8(Moby *actor) {
         func_L00_00391310(actor, state); return;
     }
     func_L00_00391398(actor, state);
-    func_00283898(&state->leftFin->position, 1,
+    build_axis_rotation_quaternion(&state->leftFin->position, 1,
                   -(state->inputY * 0.5f + func_00282C48(state->inputX * 0.33333334f) + (state->inputX - actor->pitch) * 1.1f) * 0.7f);
     fin = &state->rightFin->position;
     roll = (state->inputY * 0.5f + func_00282C48(state->inputX * 0.33333334f));
-    func_00283898(fin, 1, ((state->inputX - actor->pitch) * 1.1f - roll) * 0.7f);
+    build_axis_rotation_quaternion(fin, 1, ((state->inputX - actor->pitch) * 1.1f - roll) * 0.7f);
     damage.flags = 0x830000; damage.direction.quad = velocity.quad; damage.owner = actor;
     damage.mode = 1; damage.power = (D_L00_00262570 + D_00139568[0xE])->power;
     func_00282F70(&damage.direction, &damage.direction, 1);
@@ -176,24 +176,24 @@ void func_L00_003918C8(Moby *actor) {
         actor->hit = 2;
         qcopy(&contactEdge, &D_L00_001B8FF0);
         scratch.quad = 0; scratch.f[2] = 1; scratch.f[3] = 1;
-        func_00283028(&blast, &velocity, &scratch); func_00282F20(&blast, &blast, 0.033333335f);
-        func_00282F20(&blastNormal, &scratch, 1);
+        func_00283028(&blast, &velocity, &scratch); vec_scale_to_length(&blast, &blast, 0.033333335f);
+        vec_scale_to_length(&blastNormal, &scratch, 1);
         if (state->sound != -1) {
             sound = D_00188660 + state->sound * 0x70;
             if (*(Moby **)(sound + 0x88) == actor && sound[0x74]) func_002E59F8(state->sound);
         }
         state->sound = -1;
-    } else if (func_002761F8(&previous, &actor->position, 0, ignore, &damage)) {
+    } else if (CollLine(&previous, &actor->position, 0, ignore, &damage)) {
         CollisionResult *col = &D_L00_001BF200;
         Moby *hit = col->hit;
         if (hit) {
             if (hit == ((Hero *)D_00189E20)->ptr[0x2290 / 4]) playerHit = 1;
             actor->hit = 2;
             qcopy(&actor->position, &col->position);
-            func_00282CF0(&contactEdge, &col->edgeStart, &col->edgeEnd);
-            func_00282F20(&contactEdge, &contactEdge, 1);
-            func_00283028(&blast, &velocity, &col->normal); func_00282F20(&blast, &blast, 0.033333335f);
-            func_00282F20(&blastNormal, &col->normal, 1);
+            FastVecSub(&contactEdge, &col->edgeStart, &col->edgeEnd);
+            vec_scale_to_length(&contactEdge, &contactEdge, 1);
+            func_00283028(&blast, &velocity, &col->normal); vec_scale_to_length(&blast, &blast, 0.033333335f);
+            vec_scale_to_length(&blastNormal, &col->normal, 1);
             if (state->sound != -1) {
                 sound = D_00188660 + state->sound * 0x70;
                 if (*(Moby **)(sound + 0x88) == actor && sound[0x74]) func_002E59F8(state->sound);
@@ -201,10 +201,10 @@ void func_L00_003918C8(Moby *actor) {
             state->sound = -1;
         } else if (col->mesh > 0) {
             actor->hit = 1; qcopy(&actor->position, &col->position);
-            func_00282CF0(&contactEdge, &col->edgeStart, &col->edgeEnd);
-            func_00282F20(&contactEdge, &contactEdge, 1);
-            func_00283028(&blast, &velocity, &col->normal); func_00282F20(&blast, &blast, 0.033333335f);
-            func_00282F20(&blastNormal, &col->normal, 1);
+            FastVecSub(&contactEdge, &col->edgeStart, &col->edgeEnd);
+            vec_scale_to_length(&contactEdge, &contactEdge, 1);
+            func_00283028(&blast, &velocity, &col->normal); vec_scale_to_length(&blast, &blast, 0.033333335f);
+            vec_scale_to_length(&blastNormal, &col->normal, 1);
             if (state->sound != -1) {
                 sound = D_00188660 + state->sound * 0x70;
                 if (*(Moby **)(sound + 0x88) == actor && sound[0x74]) func_002E59F8(state->sound);
@@ -223,7 +223,7 @@ after_rebound:
     }
     if (actor->hit) {
         if (!playerHit) {
-            func_002ABBB8(actor, &blast, 0, 0, 0, 10, 3, 16, 4, 2, 0, 1, 1, 20, 1, 1, -1, 0, 0x810001);
+            SpawnExplosionEffects(actor, &blast, 0, 0, 0, 10, 3, 16, 4, 2, 0, 1, 1, 20, 1, 1, -1, 0, 0x810001);
             hits = func_00277F48(4, &actor->position, 16, actor, 0);
             scratch.quad = actor->position.quad;
             func_002A9850(actor, &scratch, D_L00_001C3280, hits, 0, 0x830000, 3, 2,
@@ -243,7 +243,7 @@ after_rebound:
     if (state->attached) func_L00_00428000(state->attached, actor);
     if (!D_L00_001A8FF0) return;
     func_002AFFD8(&actor->position, &actor->forward, 1);
-    func_00282DD8(&scratch, &actor->right, &actor->forward); func_00282F20(&actor->up, &scratch, 1);
-    func_00282DD8(&actor->forward, &actor->up, &actor->right);
+    FastVecCross(&scratch, &actor->right, &actor->forward); vec_scale_to_length(&actor->up, &scratch, 1);
+    FastVecCross(&actor->forward, &actor->up, &actor->right);
     actor->right.f[3] = actor->up.f[3] = actor->forward.f[3] = 0;
 }

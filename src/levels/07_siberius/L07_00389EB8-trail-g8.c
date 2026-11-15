@@ -50,39 +50,39 @@ void func_L07_003F3E80(u8 *object)
     switch (object[0x20]) {
     case 0:
         func_00282C98(&up);
-        if (trail->attachment) func_00283098(&direction, trail->direction, trail->attachment + 0xC0);
+        if (trail->attachment) matrix_mul_vec3(&direction, trail->direction, trail->attachment + 0xC0);
         else qcopy(&direction, trail->direction);
-        func_00282DD8(&axis, &up, &direction);
+        FastVecCross(&axis, &up, &direction);
         func_002ACE78(&axis, &axis, D_L07_001B0E3C * 0.00029088825f);
-        func_00283958(&axis, rotation);
-        func_00283738(object + 0xC0, rotation, object + 0xC0);
+        quaternion_to_rotation_basis(&axis, rotation);
+        multiply_matrix3x3(object + 0xC0, rotation, object + 0xC0);
         qcopy(&previous, object + 0x10);
         trail->direction[2] -= trail->direction[3];
         if (trail->attachment) {
-            func_00282CC0(trail->position, trail->position, trail->direction);
-            func_00283098(object + 0x10, trail->position, trail->attachment + 0xC0);
-            func_00282CC0(object + 0x10, object + 0x10, trail->attachment + 0x10);
-            func_00283098(&displacement, trail->direction, trail->attachment + 0xC0);
-            func_00282CF0(&origin, object + 0x10, &displacement);
+            FastVecAdd(trail->position, trail->position, trail->direction);
+            matrix_mul_vec3(object + 0x10, trail->position, trail->attachment + 0xC0);
+            FastVecAdd(object + 0x10, object + 0x10, trail->attachment + 0x10);
+            matrix_mul_vec3(&displacement, trail->direction, trail->attachment + 0xC0);
+            FastVecSub(&origin, object + 0x10, &displacement);
         } else {
-            func_00282CC0(object + 0x10, object + 0x10, trail->direction);
+            FastVecAdd(object + 0x10, object + 0x10, trail->direction);
             qcopy(&displacement, trail->direction);
             qcopy(&origin, &previous);
         }
-        magnitude = func_00282DF0(&displacement);
+        magnitude = FastVecLength(&displacement);
         for (i = 0; i < D_L07_001B0E50; i++) {
             size = func_002A7820(D_L07_001B0E70_gp, D_L07_001B0E70[1]);
-            count = func_00283CF0(func_002A78D8(1.0f, 2.0f));
+            count = FloatToInt(func_002A78D8(1.0f, 2.0f));
             life = func_002A7878(D_L07_001B0E78_gp, D_L07_001B0E78[1]) * 210000.0f;
             speed.f[0] = magnitude;
-            func_002AA2E8(speed.f, 0.0f, func_002A7878(2.0f, 6.0f) * (1.0f / 60.0f));
-            func_00282F20(&velocity, &displacement, speed.f[0]);
-            func_00282D08(&point, object + 0x10, &origin, func_002A7878(0.0f, 1.0f));
+            ApproachValue(speed.f, 0.0f, func_002A7878(2.0f, 6.0f) * (1.0f / 60.0f));
+            vec_scale_to_length(&velocity, &displacement, speed.f[0]);
+            lerp_vector(&point, object + 0x10, &origin, func_002A7878(0.0f, 1.0f));
             color = D_L07_001B0E58;
             func_002C16C0(&point, &velocity, size, (s32)color >> 24, color & 0xFFFFFF, count,
                          life, 500.0f, 1.0f, 0.0f, 1.0f);
         }
-        if (func_002761F8(&previous, object + 0x10, 2, object, 0)) {
+        if (CollLine(&previous, object + 0x10, 2, object, 0)) {
             qcopy(object + 0x10, D_L07_001BF660);
             func_002A7750(object, 1, -1);
         } else {
@@ -109,13 +109,13 @@ void func_L07_003F3E80(u8 *object)
             func_002AD0E0(object, trail->attachment, object + 0x10, object + 0xF0, object + 0x10, object + 0xF0);
         trail->growth += D_L07_001B0E40 * (1.0f / 60.0f);
         if (trail->growth >= D_L07_001B0E44) {
-            func_002AA2E8(&trail->strength, 0.0f, D_L07_001B0E48 * (1.0f / 60.0f));
+            ApproachValue(&trail->strength, 0.0f, D_L07_001B0E48 * (1.0f / 60.0f));
             if (trail->strength <= 0.0f) { func_0029F338((int)object); return; }
         }
         trail->phase += trail->phase_step;
         if (trail->phase > 1.0f) trail->phase -= 1.0f;
         else if (trail->phase < 0.0f) trail->phase += 1.0f;
-        func_L00_002E6CF0(func_L07_003F4578, object);
+        func_L00_002E6CF0(UpdateCollisionRing, object);
         break;
     }
 }

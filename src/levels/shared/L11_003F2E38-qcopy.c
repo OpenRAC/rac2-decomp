@@ -19,8 +19,8 @@ void func_L11_003F2E38(u8 *object, float *target, float *distance, float *height
         qcopy(target, state + 0x80);
     else
         qcopy(target, D_00189EA0);
-    func_00282CF0(offset, target, object + 0x10);
+    FastVecSub(offset, target, object + 0x10);
     *heading = func_002B04E0(object, offset, 0);
-    *distance = func_00282E48(object + 0x10, target);
-    *height = func_00282E80(object + 0x10, target);
+    *distance = fast_vec_dist(object + 0x10, target);
+    *height = vec_distance_xy(object + 0x10, target);
 }

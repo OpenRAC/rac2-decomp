@@ -19,8 +19,8 @@ void func_L03_0041DAD0(u8 *self) {
     u8 *st = *(u8 **)(self + 0x68);
 
     if (self[0x20] == 0) {
-        st[0x48] = func_00283CF0(20.0f);
-        st[0x4A] = func_00283CF0(14.399999618530273f);
+        st[0x48] = FloatToInt(20.0f);
+        st[0x4A] = FloatToInt(14.399999618530273f);
         st[0x60] = 7;
         *(f32 *)(st + 0x8C) = 0.4000000059604645f;
         *(s32 *)(st + 0x98) = 3;
@@ -47,7 +47,7 @@ void func_L03_0041DAD0(u8 *self) {
             func_002A7470(self, 0, 0, 0);
     }
     if (self[0x31] != 0) {
-        if (func_00282E48(self + 0x10, D_L03_001B9980) < 48.0f) {
+        if (fast_vec_dist(self + 0x10, D_L03_001B9980) < 48.0f) {
             func_002A93B0(self);
             self[0x6F] = 0x2D;
         }

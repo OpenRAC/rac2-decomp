@@ -84,8 +84,8 @@ void func_L08_004207D0(u8 *object)
     func_00300A00(second, 0x60241700, D_L08_001B1B84 + 4.0f, (f32)label_y(first, D_L08_001B1B88 + 4.0f, D_L08_001B3244, 0.5f, 1), 0.8f, -0.8f, 0.0f);
     func_00300A00(third, 0x55F0C070, D_L08_001B1B84 + 4.0f, (f32)label_y(third, D_L08_001B1B88 + 4.0f, D_L08_001B3244, half, 1), 0.8f, -0.8f, 0.0f);
     y = (f32)label_y(object, D_L08_001B1B88, D_L08_001B3244, 0.5f, 1);
-    texture = func_0027C878(D_L08_001B1BA0);
-    func_L05_003008C0(D_L08_001B1B84, y, D_L08_001B1B8C, D_L08_001B1B90,
+    texture = GetEffectTextureDescriptor(D_L08_001B1BA0);
+    AppendSubpixelTexturedScreenQuad(D_L08_001B1B84, y, D_L08_001B1B8C, D_L08_001B1B90,
                      0, 0, D_L08_001B1B94, D_L08_001B1B98, 0x80808080UL, texture);
     func_L08_003000C0();
     anchor = *(u8 **)(state + 0x1B0);
@@ -96,27 +96,27 @@ void func_L08_004207D0(u8 *object)
     do {
         entry = D_L08_001B29DC + ((*p & 0x7FFF) << 8);
         if (!entry || entry[0x20] == 0xFE || entry[0x20] == 0xFD || *(s16 *)(entry + 0xAA) == 0x96A) continue;
-        distance = func_00282E48(object + 0x10, entry + 0x10);
+        distance = fast_vec_dist(object + 0x10, entry + 0x10);
         if (distance <= D_L08_001B1BA4) {
             y = distance / D_L08_001B1BA4;
             y *= D_L08_001B1B9C;
             euler.q = 0;
             euler.f[2] = 1.5707964f;
-            func_002833F0(rotation, &euler);
-            func_00282CF0(&difference, entry + 0x10, object + 0x10);
-            func_00282F20(&difference, &difference, y);
+            euler_rotation_basis(rotation, &euler);
+            FastVecSub(&difference, entry + 0x10, object + 0x10);
+            vec_scale_to_length(&difference, &difference, y);
             func_002836E8(inverse, D_L08_001B9D30);
-            func_00283098(&difference, &difference, inverse);
-            func_00283098(&difference, &difference, rotation);
-            alpha = func_00283CF0((1.0f - distance / D_L08_001B1BA4) * 128.0f);
+            matrix_mul_vec3(&difference, &difference, inverse);
+            matrix_mul_vec3(&difference, &difference, rotation);
+            alpha = FloatToInt((1.0f - distance / D_L08_001B1BA4) * 128.0f);
             size = difference.f[2] * 0.125f + D_L08_001B1B8C * 0.5f;
             if (size > D_L08_001B1B8C + D_L08_001B1B8C) size = D_L08_001B1B8C + D_L08_001B1B8C;
             else if (size < 0.0f) size = 0.0f;
             x = difference.f[0] + D_L08_001B1B84;
             y = (f32)hud_coord(D_L08_001B1B88 - difference.f[1], D_L08_001B3244, 0.5f);
             color = (s32)(D_L08_001B1BA8 | ((u32)alpha << 24));
-            texture = func_0027C878(D_L08_001B1BA0);
-            func_L05_003008C0(x, y, size, size, 0, 0, D_L08_001B1B94, D_L08_001B1B98, color, texture);
+            texture = GetEffectTextureDescriptor(D_L08_001B1BA0);
+            AppendSubpixelTexturedScreenQuad(x, y, size, size, 0, 0, D_L08_001B1B94, D_L08_001B1B98, color, texture);
         }
     } while ((s16)*p++ >= 0);
 }

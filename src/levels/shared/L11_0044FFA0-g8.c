@@ -35,10 +35,10 @@ void func_L11_0044FFA0(u8 *object) {
     }
     switch (object[0x20]) {
     case 0:
-        func_00282CC0(&destination, object + 0x10, data);
-        func_002A8C00((char *)&filter, (int)object, 1, *(float *)(data + 0x14), (Quad16 *)data);
+        FastVecAdd(&destination, object + 0x10, data);
+        make_hit_descriptor((char *)&filter, (int)object, 1, *(float *)(data + 0x14), (Quad16 *)data);
         filter.objectType = *(u16 *)(object + 0xAA);
-        if (func_002761F8(object + 0x10, &destination, 0, object, &filter) || func_00277258(object + 0x10, 0, object, 0.3f)) {
+        if (CollLine(object + 0x10, &destination, 0, object, &filter) || func_00277258(object + 0x10, 0, object, 0.3f)) {
             if (!D_L11_001C0D18 || D_L11_001C0D18 != *(char **)(data + 0x10)) {
                 func_002A8C28(object, 0.6f, (float *)(object + 0x10), 0x10001, *(float *)(data + 0x14), 0.0f, 0, 1, 0);
                 func_002A7750(object, 1, -1);
@@ -46,22 +46,22 @@ void func_L11_0044FFA0(u8 *object) {
             }
         }
         qcopy(object + 0x10, &destination);
-        func_00282D30(&backward, data, -0.5f);
+        FastVecScale(&backward, data, -0.5f);
         if (D_L11_001B1CE4) {
-            func_00282F20(&light, data, 0.5f);
-            func_00282CC0(&light, object + 0x10, &light);
+            vec_scale_to_length(&light, data, 0.5f);
+            FastVecAdd(&light, object + 0x10, &light);
             size = func_002A7878(1.2f, 1.45f) * 210000.0f;
             growth = func_002A7878(0.1f, 0.2f);
             func_002C65A0(&light, &backward, 2, D_L11_001B1CE0, 3, 127, 47, size, growth * 210000.0f, 0.0f, 0);
-            func_00282F20(&light, data, -0.03f);
-            func_00282CC0(&light, object + 0x10, &light);
+            vec_scale_to_length(&light, data, -0.03f);
+            FastVecAdd(&light, object + 0x10, &light);
             size2 = func_002A7878(0.7f, 0.9f) * 210000.0f;
             growth2 = func_002A7878(0.1f, 0.3f);
             func_002C65A0(&light, &backward, 2, D_L11_001B1CE0, 7, 127, 47, size2, growth2 * 210000.0f, 0.0f, 0);
         }
         break;
     case 1:
-        func_0032C700(object + 0x10, 0, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0.25f, 20.0f);
+        SpawnExplosion(object + 0x10, 0, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0.25f, 20.0f);
         func_0029F338(object);
         return;
     }

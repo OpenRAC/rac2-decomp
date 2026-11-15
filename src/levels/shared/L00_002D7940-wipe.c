@@ -19,7 +19,7 @@ extern void func_0027DDC0(int,int,int,int);
 void func_L00_002E2958(void) {
  int i; float alpha;
  if(D_L00_001BC200.active) {
-  func_0027C540(0);
+  SetupGifPaging(0);
   func_002FCB00((int)((char *)D_L00_001BC200.buffers[(short)(D_L00_001BC200.buffer^1)]+16),D_001A72DC,512,416);
   func_L00_002E3520();
   switch(D_L00_001BC588[D_L00_001BC200.index].mode) {
@@ -42,7 +42,7 @@ void func_L00_002E2958(void) {
    }
    break;
   }
-  func_0027C660();
+  DoGifPaging();
  }
- func_0027DDC0(0,0,0,func_00283CF0(ref_L00_001B18E0_00*128.0f));
+ func_0027DDC0(0,0,0,FloatToInt(ref_L00_001B18E0_00*128.0f));
 }

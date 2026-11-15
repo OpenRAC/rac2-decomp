@@ -60,7 +60,7 @@ extern u8 D_L10_001C7800[];
 /* First call: resets the D_L10_001B13A4 block, marks every class-0xF85 moby, spawns 75
    objects and the effect box. Then, until the 0xF85 moby reports done, each timer expiry
    either closes the D_L10_001B1444 sequence (with D_L10_001B1390 raised around the
-   func_0029B3E0 call, which returns an int) or restarts state 0 through func_L10_00423DC8. */
+   MemcardSave call, which returns an int) or restarts state 0 through func_L10_00423DC8. */
 void func_L10_00424028(char *object)
 {
     char **all;
@@ -75,7 +75,7 @@ void func_L10_00424028(char *object)
         D_L10_001B13A4 = 1;
         D_L10_001B13F8 = 0;
         D_L10_001B13FC = 0;
-        func_002B7320();
+        music_Unpause();
         func_L05_0037B210();
         func_L05_00379F18(0);
         all = func_L05_00379EB8();
@@ -88,7 +88,7 @@ void func_L10_00424028(char *object)
         av.q = 0; bv.q = 0;
         av.f[0] = 469.63f; av.f[1] = 407.93f; av.f[2] = 502.79f;
         bv.f[0] = 476.13f; bv.f[1] = 415.41f; bv.f[2] = 502.79f;
-        func_L10_0039D5E0(&av,&bv,1,2000000,0x7F7F7F,0xFF1010,70,70,0.5f,0.2f,0.402f,1.12225f);
+        CreateEnergyStrip(&av,&bv,1,2000000,0x7F7F7F,0xFF1010,70,70,0.5f,0.2f,0.402f,1.12225f);
     }
     p = func_L05_00379ED0(0xF85);
     result = p ? func_L10_0037D200(p) : 0;
@@ -99,7 +99,7 @@ void func_L10_00424028(char *object)
                 *(int *)(st + 0x58) = 10;
                 D_L10_001B1390++;
                 func_L10_00425888();
-                func_0029B3E0(0,-1);
+                MemcardSave(0,-1);
                 D_L10_001B1390--;
                 func_L00_003294F0(D_L10_001B251C + *(int *)(st + 0x2C) * 256,1);
                 D_L10_001B1424 = 0;
@@ -126,7 +126,7 @@ void func_L10_00424290(u8 *a0) {
     if (D_L10_001B13A4 == 0) {
         D_L10_001B13A4 = 1;
         D_L10_00221CD0.f2C = 0;
-        func_002B7320();
+        music_Unpause();
         func_L05_0037B210();
         func_L05_00379F18(0);
         p = func_L05_00379EB8();
@@ -154,7 +154,7 @@ void func_L10_00424290(u8 *a0) {
         func_L10_00423DC8(a0, 1);
     }
     if (func_L05_0037B3A0(func_L05_00379ED0(0xCBE)) == 0) {
-        func_0027D330(0x1E);
+        FadeToBlack(0x1E);
         func_L05_00379F48(0);
         func_L10_00423500(a0);
     }
@@ -206,5 +206,5 @@ void func_L10_0042BEE0(u8 *object)
     func_00281EB8(object, 0xB, (func_002A7820(0, 0x80) << 24) | 0x804040, 1,
                   func_002A7878(8.0f, 17.0f), 0.05f, func_002A7940());
     entry = D_L10_001C7800 + (D_L10_001B1648 << 5);
-    *(f32 *)(entry + 0x1C) = func_00283CE0(alpha >> 24) * 0.5f;
+    *(f32 *)(entry + 0x1C) = IntToFloat(alpha >> 24) * 0.5f;
 }

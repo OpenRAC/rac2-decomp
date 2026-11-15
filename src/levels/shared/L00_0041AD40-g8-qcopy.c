@@ -18,12 +18,12 @@ void func_L00_0041AD40(char *self, void *position, Quad *src)
     int *selected;
 
     temp.local = *src;
-    func_00282F20(&temp.local, &temp.local, 0.05f);
+    vec_scale_to_length(&temp.local, &temp.local, 0.05f);
     temp.choices = D_L00_001B1458[0];
     selected = temp.choices.values;
     size = func_002A7878(0.05f, 0.1f);
     selected += D_L00_001B1464 % 2;
-    func_L00_003411A0(position, &temp.local, *selected,
+    CreateType6DObject(position, &temp.local, *selected,
                        size * *(float *)(state + 0x50) * 0.1f);
     D_L00_001B1464 += 1;
 }

@@ -58,7 +58,7 @@ void func_L06_004573E8(unsigned char *obj)
         if (func_002B3868((char *)obj)) {
             func_L06_00457920((char *)obj);
             *(float *)(obj + 0x2C) *= .9f;
-            func_002A0488((char *)obj, 255, 127, 127);
+            set_moby_color((char *)obj, 255, 127, 127);
             *(unsigned short *)(obj + 0x34) |= 0x200;
             *(int *)(d + 0x130) = 180;
             D_L06_001B9700.speed = .02f;
@@ -66,7 +66,7 @@ void func_L06_004573E8(unsigned char *obj)
             D_L06_001B9700.scale = .4f;
             D_L06_001B9700.duration = 120;
             D_L06_001B9700.timer = 0;
-            func_002E5CF8(0, 0, (char *)obj);
+            PlayMobySound(0, 0, (char *)obj);
         }
         func_L06_004577B0((char *)obj);
         if (D_L06_001B375C < 127) ++D_L06_001B375C;
@@ -74,7 +74,7 @@ void func_L06_004573E8(unsigned char *obj)
         break;
     case 4:
         if (func_002B3868((char *)obj)) {
-            func_002E5CF8(1, 0, (char *)obj);
+            PlayMobySound(1, 0, (char *)obj);
             if (!D_001A7A60[17]) {
                 D_001A7A60[17] = 1;
                 func_002E5E58(1, 0, 0);

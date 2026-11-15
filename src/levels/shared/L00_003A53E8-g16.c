@@ -98,8 +98,8 @@ void func_L00_003A53E8(char *moby)
         *(short *)(state + 8) = 0;
         *(short *)(state + 10) = 0;
     }
-    if (*(u8 *)(moby + 0x20) == 6 && func_00282978(state + 4)) {
-        func_002E5CF8(2,0,moby);
+    if (*(u8 *)(moby + 0x20) == 6 && FastDecTimer(state + 4)) {
+        PlayMobySound(2,0,moby);
         *(u8 *)(moby + 0x20) = 1;
     }
     if (*(u8 *)(moby + 0x42) == *(u8 *)(moby + 0x43)) {
@@ -112,7 +112,7 @@ void func_L00_003A53E8(char *moby)
     func_002829D8(state);
     if (D_00189E20.c0b4 == 29) {
         unsigned int color;
-        if (*(float *)state > 0.0f && func_L00_002D4040(-1))
+        if (*(float *)state > 0.0f && get_ammo(-1))
             color = 0x600000FF;
         else
             color = 0x600FFF0F;
@@ -150,38 +150,38 @@ void func_L00_003A53E8(char *moby)
                     *(short *)(state + 10) = cooldown;
                     *(int *)(state + 0x48) = 0;
                 }
-                func_L00_002AF568();
+                start_equipped_item_animation();
                 *(int *)(state + 0x4C) = func_L00_002D6998(D_L00_00294900);
                 *(u8 *)(moby + 0x20) = 2;
                 *(float *)(state + 0xC) = func_002A7940();
                 func_002A7470(moby,2,0,0);
-                *(float *)(state + 0x20) = 1.0f / func_00283CE0(*(short *)(state + 8));
-                *(float *)(state + 0x24) = 1.0f / func_00283CE0(*(short *)(state + 10));
+                *(float *)(state + 0x20) = 1.0f / IntToFloat(*(short *)(state + 8));
+                *(float *)(state + 0x24) = 1.0f / IntToFloat(*(short *)(state + 10));
                 *(float *)(state + 0x28) = func_002A7940();
                 {
                     float phase = func_002A7940();
                     int t = D_L00_001AF6B4;
                     *(float *)(state + 0x2C) = phase;
                     *(int *)(state + 0x40) = t;
-                    *(float *)(state + 0x44) = 1.0f / func_00283CE0(t);
+                    *(float *)(state + 0x44) = 1.0f / IntToFloat(t);
                 }
             } else if (D_00138180.b324 & D_00189E20.b050) {
-                func_002E5CF8(4,0,moby);
+                PlayMobySound(4,0,moby);
             }
-            if (!((D_00138180.b320 & D_00189E20.b050) && func_L00_002D4040(-1) && D_00189E20.c0d8) &&
+            if (!((D_00138180.b320 & D_00189E20.b050) && get_ammo(-1) && D_00189E20.c0d8) &&
                 *(int *)(state + 0x4C) >= 0) {
                 func_L00_002D6B70(*(int *)(state + 0x4C));
                 *(int *)(state + 0x4C) = -1;
             }
         }
         if (*(short *)(state + 6) == 0) {
-            func_00282978(state + 10);
-            func_00282978(state + 8);
+            FastDecTimer(state + 10);
+            FastDecTimer(state + 8);
             func_00282948(state + 0x40);
             if (*(unsigned long *)(state + 8) & 0xFFFFFFFF)
                 ref_L00_003A53E8_00(func_L00_003A6538,moby);
         }
-        if ((unsigned int)(*(u8 *)(moby + 0x20) - 2) >= 2 || !func_00282978(state + 6))
+        if ((unsigned int)(*(u8 *)(moby + 0x20) - 2) >= 2 || !FastDecTimer(state + 6))
             return;
         self = owner;
         if (D_00189E20.aa18) {
@@ -191,10 +191,10 @@ void func_L00_003A53E8(char *moby)
         if (*(u8 *)(moby + 0x20) == 2) {
             *(u8 *)(moby + 0x20) = 3;
             func_0029FCC0(moby,0,state + 0x10);
-            func_L00_003A5FC0(moby,state + 0x10);
+            SpawnLayeredParticleBurst(moby,state + 0x10);
             qcopy(state + 0x30, D_00189E20.a580);
             ref_L00_003A53E8_00(func_L00_003A6538,moby);
-            func_002E5CF8(0,0,moby);
+            PlayMobySound(0,0,moby);
             if (*(int *)(state + 0x48))
                 SetCameraPulse(&D_L00_001B8C80, 0.12f, 30);
             else
@@ -215,32 +215,32 @@ void func_L00_003A53E8(char *moby)
         *(float *)(damage + 0x1C) = power;
         *(char **)(damage + 0x10) = moby;
         }
-        func_00282D30(probe,moby + 0xD0,-1.35f);
-        func_00282CC0(probe,probe,moby + 0x10);
-        func_00282D30(side,self + 0xC0,0.275f);
-        func_00282CC0(probe,probe,side);
+        FastVecScale(probe,moby + 0xD0,-1.35f);
+        FastVecAdd(probe,probe,moby + 0x10);
+        FastVecScale(side,self + 0xC0,0.275f);
+        FastVecAdd(probe,probe,side);
         count = func_00277F48(1.5f,probe,1,D_00189E20.c0b0,0);
         for (i = 0; i < count; i++) {
             if (D_L00_001C3280[i] != D_00189E20.c0b0) {
-                func_00282D30(damage,moby + 0xD0,-1.5f);
+                FastVecScale(damage,moby + 0xD0,-1.5f);
                 *(float *)(damage + 0xC) = 5627.9248046875f;
-                func_002A8E20(D_L00_001C3280[i],damage);
-                func_0032D758(D_L00_001C3280[i],26,moby);
+                QueueMobyImpact(D_L00_001C3280[i],damage);
+                StartAttachedEffect(D_L00_001C3280[i],26,moby);
             }
         }
-        func_00283410(matrix,D_L00_001AF670);
-        func_00283678(orientation,matrix);
+        euler_to_matrix(matrix,D_L00_001AF670);
+        copy_matrix3x4(orientation,matrix);
         func_0029FCC0(moby,0,(char *)origin);
         if (D_00189E20.c30c == 1) {
-            func_00282D30(forward,moby + 0xD0,-1.0f);
-            func_00282D30(up,self + 0xC0,-1.0f);
-            func_00282D30(bias,moby + 0xE0,0.1f);
-            func_00283738(frame,self + 0xC0,orientation);
+            FastVecScale(forward,moby + 0xD0,-1.0f);
+            FastVecScale(up,self + 0xC0,-1.0f);
+            FastVecScale(bias,moby + 0xE0,0.1f);
+            multiply_matrix3x3(frame,self + 0xC0,orientation);
         } else {
             qcopy(forward, D_00189E20.a550);
             qcopy(up, D_00189E20.a560);
-            func_00282D30(bias,D_00189E20.a570,-0.1f);
-            func_00283738(frame,D_00189E20.a550,orientation);
+            FastVecScale(bias,D_00189E20.a570,-0.1f);
+            multiply_matrix3x3(frame,D_00189E20.a550,orientation);
         }
         qcopy(state + 0x30, forward);
         {
@@ -258,13 +258,13 @@ void func_L00_003A53E8(char *moby)
                 func_002AB668(rotation,(int)up,spread);
                 func_002ACDE8(ray,forward,rotation);
                 func_002ACDE8(rotatedBias,bias,rotation);
-                angle = func_00283B98(func_002A7878(step * 0.5f,step * 1.5f),angle);
+                angle = FastAddRotations(func_002A7878(step * 0.5f,step * 1.5f),angle);
                 func_002AB668(rotation,(int)forward,angle);
                 func_002ACDE8(ray,ray,rotation);
                 func_002ACDE8(rotatedBias,rotatedBias,rotation);
-                func_00282D30(ray,ray,32.0f);
-                func_00282CC0(start,origin,rotatedBias);
-                func_00282CC0(end,start,ray);
+                FastVecScale(ray,ray,32.0f);
+                FastVecAdd(start,origin,rotatedBias);
+                FastVecAdd(end,start,ray);
                 hit = func_L00_003A5DC0(moby,start,end,damage);
                 if (hit) {
                     masks[rayCount] = *(int *)(hit + 0x98);

@@ -28,8 +28,8 @@ void func_00304AD0(void *obj)
     TI128 local;
 
     *(TI128 *)&local = *(TI128 *)s0;
-    func_00282CC0(s0, s0, s1);
+    FastVecAdd(s0, s0, s1);
     func_002FE880(s0, s1, D_001AEBF0 * 2.7777778e-05f);
-    if (func_002761F8(&local, s0, 0x10, s2, 0) != 0)
+    if (CollLine(&local, s0, 0x10, s2, 0) != 0)
         *(unsigned char *)((char *)s2 + 0x20) = 8;
 }

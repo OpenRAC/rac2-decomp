@@ -22,17 +22,17 @@ float func_002AA548(float *value, float *velocity, float target,
                 magnitude = func_00282C48(diff);
                 magnitude += func_00282C48(*velocity);
                 if (stopping < magnitude)
-                    func_002AA2E8(velocity, 0.0f, acceleration);
+                    ApproachValue(velocity, 0.0f, acceleration);
                 else
-                    func_002AA2E8(velocity, 0.0f, acceleration * 1.1f);
+                    ApproachValue(velocity, 0.0f, acceleration * 1.1f);
             } else {
-                desired = func_00282C10((acceleration + acceleration) * diff);
+                desired = square_root((acceleration + acceleration) * diff);
                 if (maximum < desired)
                     desired = maximum;
                 if (diff < 0.0f)
-                    func_002AA2E8(velocity, -desired, step);
+                    ApproachValue(velocity, -desired, step);
                 else
-                    func_002AA2E8(velocity, desired, step);
+                    ApproachValue(velocity, desired, step);
             }
             magnitude = func_00282C48(diff);
             if (func_00282C48(*velocity) < magnitude) {

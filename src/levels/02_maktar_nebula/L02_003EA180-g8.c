@@ -35,8 +35,8 @@ void func_L02_003EA180(char *actor) {
         vector = 0;
         ((float *)&vector)[1] = -1.25f;
         ((float *)&vector)[2] = -2.0f;
-        s->angle = func_00283B98(s->angle, 0.05235988646745682f);
-        color = func_00283CF0((func_00283198(s->angle) * 4.0f - 3.0f) * 208.0f);
+        s->angle = FastAddRotations(s->angle, 0.05235988646745682f);
+        color = FloatToInt((func_00283198(s->angle) * 4.0f - 3.0f) * 208.0f);
         if (color > 208) color = 208;
         else if (color < 80) color = 80;
         if (D_0018A15C[0] != 0 && *(short *)(D_0018A15C[0] + 0xAA) == 0xA61 && color >= 101) {
@@ -45,7 +45,7 @@ void func_L02_003EA180(char *actor) {
         }
         ((ActorA180 *)actor)->color = color | 0x800C0C00;
         if (func_002B38B8(actor)) {
-            func_002E5CF8(0, 0, actor);
+            PlayMobySound(0, 0, actor);
             func_002A7750(actor, 2, -1);
         }
         break;
@@ -69,8 +69,8 @@ void func_L02_003EA180(char *actor) {
         }
         direction = -1.0f;
         if (*(short *)(actor + 0xAA) == 0xAAC) direction = 1.0f;
-        func_00282F20(actor + 0x10, actor + 0xC0, direction * s->position);
-        func_00282CC0(actor + 0x10, actor + 0x10, s);
+        vec_scale_to_length(actor + 0x10, actor + 0xC0, direction * s->position);
+        FastVecAdd(actor + 0x10, actor + 0x10, s);
         break;
     }
     }

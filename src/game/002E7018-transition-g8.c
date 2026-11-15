@@ -107,7 +107,7 @@ int func_002E8368(void)
         n = D_00152C00.index;
         func_00132A10(D_001B2130[n], 0, 0x400, 0, 0, 0, 0, (int)D_001886D0 + n * 0x70);
         func_00133230();
-        func_00132028();
+        snd_Pump();
     }
     if (D_001B8840.frame < D_001B8840.duration) {
         goto running;
@@ -131,7 +131,7 @@ int func_002E8368(void)
     if (D_00152C00.phase < 2) {
         if (D_00152C00.index != 2) {
             func_00132AC8();
-            while (func_00132028() != 0)
+            while (snd_Pump() != 0)
                 ;
         }
         if (D_00152C00.phase == 0) {
@@ -144,7 +144,7 @@ int func_002E8368(void)
             func_00132858(D_001B2130[1]);
             func_00132858(D_001B2130[3]);
             func_00133230();
-            while (func_00132028() != 0)
+            while (snd_Pump() != 0)
                 ;
             func_00132828();
             D_001A7280_block[1] = 0;
@@ -192,14 +192,14 @@ after:
         if (current < t)
             D_001B9040.fov = t;
     }
-    func_0027AB40();
+    UpdateViewContext();
     f20 = 1.0f;
     if (D_00152C00.index == 4) {
         f20 = (float)(D_001B8840.duration - D_001B8840.frame) / (float)D_001B8840.duration;
-        func_00282D30(sp0, D_001AC120, f20);
-        func_00282CC0(D_001AC0D0, D_001AC0D0, sp0);
+        FastVecScale(sp0, D_001AC120, f20);
+        FastVecAdd(D_001AC0D0, D_001AC0D0, sp0);
     }
-    func_00282D30(&D_001B20D0, D_00261F30 + D_00152C00.index * 16, (float)(D_001B8840.frame - 0x78) * (f20 * 20.0f));
+    FastVecScale(&D_001B20D0, D_00261F30 + D_00152C00.index * 16, (float)(D_001B8840.frame - 0x78) * (f20 * 20.0f));
     D_001ABDD4 = D_001AC150[D_00152C00.index];
     for (i = 0; i < D_001B8840.count; i = fp) {
         TransitionActor *o;
@@ -209,13 +209,13 @@ after:
         s1 = D_001B8840.tick >> 1;
         o = (TransitionActor *)D_001B8840.objects[i];
         fp = i + 1;
-        r = func_00283CE0(D_001B8840.tick & 1);
+        r = IntToFloat(D_001B8840.tick & 1);
         s2 = s1 + 1;
         o->blend = r * 0.5f;
         s0m = (char *)o->keys;
-        func_00282D30(sp0, s0m + s1 * 16, 1.0f - o->blend);
-        func_00282D30(sp10, s0m + s2 * 16, o->blend);
-        func_00282CC0(o->position, sp0, sp10);
+        FastVecScale(sp0, s0m + s1 * 16, 1.0f - o->blend);
+        FastVecScale(sp10, s0m + s2 * 16, o->blend);
+        FastVecAdd(o->position, sp0, sp10);
         {
             char *d = (char *)o->definition;
             o->current_anim = B(d, 0xC) - 1;
@@ -223,7 +223,7 @@ after:
             o->key = s1;
             o->next_key = s2;
         }
-        func_0029F390(o);
+        update_moby_animation_state(o);
         o->draw_flags = 0x1FF;
         if (o->type == 0xD54) {
             if (D_001B2148_first[0] != 0) {
@@ -249,7 +249,7 @@ after:
                     }
                 }
             } else {
-                func_002E64A0(D_001B8840.id);
+                UpdateEquipmentPieces(D_001B8840.id);
             }
             o->opacity = 0xE8;
         }

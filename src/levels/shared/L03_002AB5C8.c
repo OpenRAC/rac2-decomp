@@ -224,11 +224,11 @@ void func_L03_002B8D10(void) {
         *(int *)(D_L03_00189E20 + 0x22B0) == 0x12 ||
         (!D_L03_00189E20[0x22B4] && *(float *)(D_L03_00189E20 + 0x254) < 0.53f) ||
         *(int *)(D_L03_00189E20 + 0x229C) == 0x11 || D_L03_00189E20[0x1494] ||
-        func_00282E80(D_L03_00189E20 + 0x240, D_L03_00189E20 + 0x80) > *(float *)(D_L03_00189E20 + 0x264) * 0.5f) {
+        vec_distance_xy(D_L03_00189E20 + 0x240, D_L03_00189E20 + 0x80) > *(float *)(D_L03_00189E20 + 0x264) * 0.5f) {
         float *p = (float *)(D_L03_00189E20 + 0x250);
         unsigned char *g = D_L03_00189E20;
-        func_002AA2E8(p, *(float *)(g + 0x258), 0.02f);
-        func_002AA2E8(p + 1, *(float *)(g + 0x25C), 0.02f);
+        ApproachValue(p, *(float *)(g + 0x258), 0.02f);
+        ApproachValue(p + 1, *(float *)(g + 0x25C), 0.02f);
         func_002AA3A8(p + 5, p + 6, *(float *)(g + 0x260), 0.02f, 0.3f, 0.06666667f);
     }
 }
@@ -247,7 +247,7 @@ void func_L03_002BC430(void) {
 
     if (HOP_PLAYER.state == 0x10) {
         if (HOP_PLAYER.state_time > 0x36)
-            func_002AA2E8(&HOP_PLAYER.field_520, 0.0069444444961845875f, 0.0019444444915279746f);
+            ApproachValue(&HOP_PLAYER.field_520, 0.0069444444961845875f, 0.0019444444915279746f);
         if (HOP_PLAYER.state_time <= 0x36)
             HOP_PLAYER.field_1B0 = HOP_PLAYER.field_454;
         else
@@ -265,28 +265,28 @@ void func_L03_002BC430(void) {
         }
         if (HOP_PLAYER.anim_time >= 13.0f && HOP_PLAYER.anim_time <= 30.0f) {
             if (HOP_PLAYER.anim_time > 27.0f)
-                func_002AA2E8(&HOP_PLAYER.field_4BC, 0.0f, 0.002222222276031971f);
+                ApproachValue(&HOP_PLAYER.field_4BC, 0.0f, 0.002222222276031971f);
             else
-                func_002AA2E8(&HOP_PLAYER.field_4BC, 0.03333333507180214f, 0.002222222276031971f);
+                ApproachValue(&HOP_PLAYER.field_4BC, 0.03333333507180214f, 0.002222222276031971f);
         }
         temp.f.x = HOP_PLAYER.field_4BC;
         temp.f.y = 0.0f;
-        temp.f.z = func_00282DB0(&HOP_PLAYER.vel_x, &HOP_PLAYER.field_20);
-        func_00283098(&HOP_PLAYER.vel_x, &temp, &HOP_PLAYER);
+        temp.f.z = FastVecDot(&HOP_PLAYER.vel_x, &HOP_PLAYER.field_20);
+        matrix_mul_vec3(&HOP_PLAYER.vel_x, &temp, &HOP_PLAYER);
         return;
     }
 
     if (HOP_PLAYER.state == 0x48) {
         if (HOP_PLAYER.anim_time >= 5.0f && HOP_PLAYER.anim_time <= 18.0f) {
             if (HOP_PLAYER.anim_time > 15.0f)
-                func_002AA2E8(&HOP_PLAYER.field_4BC, 0.0f, 0.002222222276031971f);
+                ApproachValue(&HOP_PLAYER.field_4BC, 0.0f, 0.002222222276031971f);
             else
-                func_002AA2E8(&HOP_PLAYER.field_4BC, 0.02083333395421505f, 0.002222222276031971f);
+                ApproachValue(&HOP_PLAYER.field_4BC, 0.02083333395421505f, 0.002222222276031971f);
         }
         temp.f.x = HOP_PLAYER.field_4BC;
         temp.f.y = 0.0f;
-        temp.f.z = func_00282DB0(&HOP_PLAYER.vel_x, &HOP_PLAYER.field_20);
-        func_00283098(&HOP_PLAYER.vel_x, &temp, &HOP_PLAYER);
+        temp.f.z = FastVecDot(&HOP_PLAYER.vel_x, &HOP_PLAYER.field_20);
+        matrix_mul_vec3(&HOP_PLAYER.vel_x, &temp, &HOP_PLAYER);
         return;
     }
 
@@ -302,13 +302,13 @@ void func_L03_002BC430(void) {
             step = HOP_PLAYER.field_24B8 * 0.0833333358168602f;
             if (step < 0.03333333507180214f)
                 step = 0.03333333507180214f;
-            func_002AA2E8(&HOP_PLAYER.field_4DC, step, 0.010277777910232544f);
+            ApproachValue(&HOP_PLAYER.field_4DC, step, 0.010277777910232544f);
             HOP_PLAYER.field_1B4 = HOP_PLAYER.field_174;
         } else {
             if (HOP_PLAYER.field_49E && HOP_PLAYER.field_4AE <= 11)
-                func_002AA2E8(&HOP_PLAYER.field_4DC, 0.0f, 0.002222222276031971f);
+                ApproachValue(&HOP_PLAYER.field_4DC, 0.0f, 0.002222222276031971f);
             else
-                func_002AA2E8(&HOP_PLAYER.field_4DC, 0.07f, 0.002222222276031971f);
+                ApproachValue(&HOP_PLAYER.field_4DC, 0.07f, 0.002222222276031971f);
         }
         if (!HOP_PLAYER.field_22C3) {
             HOP_PLAYER.vel_x = func_00283180(HOP_PLAYER.field_4C0);
@@ -319,10 +319,10 @@ void func_L03_002BC430(void) {
             func_L00_002D3BD8(HOP_PLAYER.field_4DC, &temp, &HOP_PLAYER.field_470);
             func_L00_002D3B58(0.0f, &temp, &temp);
             func_L00_002D3BD8(0.0f, &HOP_PLAYER.vel_x, &HOP_PLAYER.vel_x);
-            func_00282CC0(&HOP_PLAYER.vel_x, &HOP_PLAYER.vel_x, &temp);
+            FastVecAdd(&HOP_PLAYER.vel_x, &HOP_PLAYER.vel_x, &temp);
         }
         if (!HOP_PLAYER.field_22C3 && !HOP_PLAYER.field_52D) {
-            scale = HOP_PLAYER.field_4D8 * func_00283198(func_00283C80(HOP_PLAYER.field_4C4, HOP_PLAYER.field_4C0));
+            scale = HOP_PLAYER.field_4D8 * func_00283198(FastDiffRots(HOP_PLAYER.field_4C4, HOP_PLAYER.field_4C0));
             HOP_PLAYER.vel_x += func_00283180(HOP_PLAYER.field_4C4) * scale;
             HOP_PLAYER.vel_y += func_00283198(HOP_PLAYER.field_4C4) * scale;
         }
@@ -342,8 +342,8 @@ void func_L03_002BC430(void) {
                 HOP_PLAYER.vel_y = func_00283198(HOP_PLAYER.facing_angle) * 0.08166667073965073f;
             } else {
                 func_L00_002D3BD8(0.0f, &HOP_PLAYER.vel_x, &HOP_PLAYER.vel_x);
-                func_00282F20(&temp, &HOP_PLAYER.field_190, 0.08166667073965073f);
-                func_00282CC0(&HOP_PLAYER.vel_x, &HOP_PLAYER.vel_x, &temp);
+                vec_scale_to_length(&temp, &HOP_PLAYER.field_190, 0.08166667073965073f);
+                FastVecAdd(&HOP_PLAYER.vel_x, &HOP_PLAYER.vel_x, &temp);
             }
         }
         HOP_PLAYER.field_1B4 = HOP_PLAYER.field_174;
@@ -362,7 +362,7 @@ void func_L03_002BC430(void) {
 
         HOP_PLAYER.field_1A8 = func_002AA898(&angle, &HOP_PLAYER.field_1A4, 0, HOP_PLAYER.facing_angle,
                                              0.017999999225139618f, 0.2f, 0.12217307090759277f);
-        delta = func_00283BE0(angle, HOP_PLAYER.rot_z);
+        delta = fast_subtract_rotations(angle, HOP_PLAYER.rot_z);
         func_L00_002AA0F0(0.0f, 0.0f, delta);
     } else {
         float oldAngle = HOP_PLAYER.facing_angle;
@@ -390,7 +390,7 @@ void func_L03_002BC430(void) {
             float brake = HOP_PLAYER.field_A84;
             float angle = func_L00_002D3A58(&HOP_PLAYER.vel_x);
 
-            func_002AA2E8(&angle, 0.0f, brake);
+            ApproachValue(&angle, 0.0f, brake);
             func_L00_002D3BD8(angle, &HOP_PLAYER.vel_x, &HOP_PLAYER.vel_x);
             return;
         }
@@ -438,12 +438,12 @@ void func_L03_00326458(Moby *object)
         return;
 
     func_0029FC20(object, 0, matrix);
-    weight = func_00282DF0(matrix) * 0.9746588468551636f;
+    weight = FastVecLength(matrix) * 0.9746588468551636f;
     if (weight > 1.0f)
         weight = 1.0f;
     energy = weight * 44000.0f + 6000.0f;
     radius = weight * 0.02f + 0.01f;
-    func_00282F20(velocity, matrix + 8, weight * -0.025f + -0.025f);
+    vec_scale_to_length(velocity, matrix + 8, weight * -0.025f + -0.025f);
 
     /* Larger smoke puffs with random spin. */
     {
@@ -455,7 +455,7 @@ void func_L03_00326458(Moby *object)
         duration = 6;
         mode = 2;
         alpha = 0x50;
-        func_00282CC0(point, matrix + 12, velocity);
+        FastVecAdd(point, matrix + 12, velocity);
         i = 1;
         do {
             Particle *particle;
@@ -464,7 +464,7 @@ void func_L03_00326458(Moby *object)
             spin = func_002A77E0(16);
             if (func_002A77E0(2))
                 spin = -spin;
-            particle = func_002BDCE8(point, radius, 1.0f, 0.75f, spin, D_L03_001A8F20, energy, 0x503030FF, 0);
+            particle = SpawnSpinningSparkParticle(point, radius, 1.0f, 0.75f, spin, D_L03_001A8F20, energy, 0x503030FF, 0);
             if (particle != 0) {
                 ParticlePayload *payload = &particle->payload;
 
@@ -479,7 +479,7 @@ void func_L03_00326458(Moby *object)
 
     energy = weight * 25000.0f + 5000.0f;
     radius = weight * 0.015000000596046448f + 0.01f;
-    func_00282F20(velocity, matrix + 8, weight * -0.015000000596046448f + -0.01f);
+    vec_scale_to_length(velocity, matrix + 8, weight * -0.015000000596046448f + -0.01f);
 
     /* Smaller, short-lived sparks. */
     {
@@ -490,7 +490,7 @@ void func_L03_00326458(Moby *object)
         duration = 2;
         mode = 2;
         alpha = 0x7F;
-        func_00282CC0(point, matrix + 12, velocity);
+        FastVecAdd(point, matrix + 12, velocity);
         {
             int j;
 
@@ -498,7 +498,7 @@ void func_L03_00326458(Moby *object)
             do {
                 Particle *particle;
 
-                particle = func_002BDCE8(point, radius, 1.0f, 1.0f, 16, D_L03_001A8F20, energy, 0x7FFFFFFF, 0);
+                particle = SpawnSpinningSparkParticle(point, radius, 1.0f, 1.0f, 16, D_L03_001A8F20, energy, 0x7FFFFFFF, 0);
                 if (particle != 0) {
                     ParticlePayload *payload = &particle->payload;
 
@@ -582,8 +582,8 @@ void func_L03_0038B408(Moby *object)
         if (vertices != 0) {
             func_L03_0038B2E8(center, vertices, state->count);
             for (j = 0; j < state->count; j++) {
-                func_00282CF0(vertices + j + 1, vertices + j + 1, center);
-                func_00282CC0(vertices + j + 1, vertices + j + 1, state->offset);
+                FastVecSub(vertices + j + 1, vertices + j + 1, center);
+                FastVecAdd(vertices + j + 1, vertices + j + 1, state->offset);
             }
         }
     }
@@ -740,7 +740,7 @@ unsigned char *func_L03_003C4D40(unsigned char *a0) {
                 if (*(short *)(*(unsigned char **)(e + 0x24) + 0x46) == 5) {
                     if (func_00282C48(*(float *)(a0 + 0x18) - *(float *)(e + 0x18)) < 1.5f) {
                         if (func_L03_00419BD8(o->ref220, a0 + 0x10, e + 0x10)) {
-                            d = func_00282E80(a0 + 0x10, e + 0x10);
+                            d = vec_distance_xy(a0 + 0x10, e + 0x10);
                             if (d < bestd) {
                                 bestd = d;
                                 best = e;
@@ -776,7 +776,7 @@ unsigned char *func_L03_003C4F58(unsigned char *a0) {
             if (*(short *)(e + 0xAA) == 0xEF9) {
                 if (func_L03_004197A8(e)) {
                     if (func_L03_00419BD8(o->ref220, a0 + 0x10, e + 0x10)) {
-                        d = func_00282E80(a0 + 0x10, e + 0x10);
+                        d = vec_distance_xy(a0 + 0x10, e + 0x10);
                         if (d < bestd) {
                             bestd = d;
                             best = e;
@@ -845,7 +845,7 @@ unsigned char *func_L03_003C52D0(unsigned char *a0) {
                 break;
             if (*(unsigned short *)(e + 0xAA) == 0xE87 || *(unsigned short *)(e + 0xAA) == 0xE88) {
                 if (func_L03_003CA138(e)) {
-                    d = func_00282E80(a0 + 0x10, e + 0x10);
+                    d = vec_distance_xy(a0 + 0x10, e + 0x10);
                     if (d < bestd) {
                         bestd = d;
                         best = e;
@@ -890,7 +890,7 @@ unsigned char *func_L03_003C5488(unsigned char *a0) {
             if (c == 0xB10 || c == 0xF4D) {
                 if (c == 0xF4D && func_L03_003CA280(e) == 0)
                     continue;
-                d = func_00282E80(a0 + 0x10, e + 0x10);
+                d = vec_distance_xy(a0 + 0x10, e + 0x10);
                 if (d < bestd) {
                     bestd = d;
                     best = e;
@@ -930,7 +930,7 @@ void func_L03_003C5668(unsigned char *a0, float *a1, float *a2) {
     int r;
     int i;
 
-    bestd = func_00282E48(a0 + 0x10, o->target + 0x10);
+    bestd = fast_vec_dist(a0 + 0x10, o->target + 0x10);
     cand = o->target;
     if (func_L03_00419BD8(o->ref220, a0 + 0x10, cand + 0x10))
         best = o->target;
@@ -945,7 +945,7 @@ void func_L03_003C5668(unsigned char *a0, float *a1, float *a2) {
             if (e == 0)
                 break;
             if (*(short *)(e + 0xAA) == 0x972) {
-                d = func_00282E80(a0 + 0x10, e + 0x10);
+                d = vec_distance_xy(a0 + 0x10, e + 0x10);
                 if (d < bestd) {
                     qcopy(vec, e + 0x10);
                     vec[2] += 1.0f;

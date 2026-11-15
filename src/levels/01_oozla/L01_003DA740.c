@@ -75,19 +75,19 @@ void func_L01_003DC078(u8 *obj, s32 skip) {
     f32 angle, yaw, distance, height;
     u8 *particle;
 
-    distance = func_00282E80(obj + 0x10, *(u8 **)(state + 0x2F0) + 0x10);
+    distance = vec_distance_xy(obj + 0x10, *(u8 **)(state + 0x2F0) + 0x10);
     height = *(f32 *)(*(u8 **)(state + 0x2F0) + 0x18) - *(f32 *)(obj + 0x18);
-    angle = func_00283BE0(func_00283248(distance, height), *(f32 *)(obj + 0xF4));
+    angle = fast_subtract_rotations(func_00283248(distance, height), *(f32 *)(obj + 0xF4));
     if (angle > 0.3490659f) angle = 0.3490659f;
     else if (angle < -0.3490659f) angle = -0.3490659f;
-    angle = func_00283B98(angle, *(f32 *)(obj + 0xF4));
+    angle = FastAddRotations(angle, *(f32 *)(obj + 0xF4));
     yaw = *(f32 *)(obj + 0xF8);
 
     func_0029FCC0(obj, 0, pos);
-    func_00282F20(tmp, obj + 0xC0, -0.4f);
-    func_00282CC0(pos, pos, tmp);
-    func_00282F20(tmp, obj + 0xE0, 0.3f);
-    func_00282CC0(pos, pos, tmp);
+    vec_scale_to_length(tmp, obj + 0xC0, -0.4f);
+    FastVecAdd(pos, pos, tmp);
+    vec_scale_to_length(tmp, obj + 0xE0, 0.3f);
+    FastVecAdd(pos, pos, tmp);
 
     if (*(s16 *)(*(u8 **)(state + 0x2F0) + 0xAA) == 0xB1A) {
         func_002A8C28(obj, pos, 1.0f, 0x4000001, (f32)state[0x34], 1.0f, 0, 1, 0);
@@ -97,14 +97,14 @@ void func_L01_003DC078(u8 *obj, s32 skip) {
     particle = *(u8 **)(state + 0x3F0);
     if (particle) {
         if (particle[0] == 2 && particle[1] != 0x80) {
-            distance = func_00282E80(pos, particle + 0x10);
+            distance = vec_distance_xy(pos, particle + 0x10);
             if (*(f32 *)(state + 0x3F4) < distance) *(f32 *)(state + 0x3F4) = distance;
         } else {
             *(u8 **)(state + 0x3F0) = 0;
             *(f32 *)(state + 0x3F4) = 3.0f;
         }
         func_002AF000(end, *(f32 *)(state + 0x3F4), yaw, angle);
-        func_00282CC0(end, end, pos);
+        FastVecAdd(end, end, pos);
         func_L01_003120A8(obj, pos, end, (f32)state[0x34], 0x4000001, 1.0f, 0, 1, 0);
         func_002A8C28(obj, end, 0.3f, 0x4000001, (f32)state[0x34], 1.0f, 0, 1, 0);
     }
@@ -132,11 +132,11 @@ void func_L01_003DC078(u8 *obj, s32 skip) {
             func_002AF000(velocity, 0.15f, yaw, angle);
             velocity[2] += func_002A7878(0.0075000003f, 0.009166667f);
             func_002AF000(acceleration, 0.008333334f,
-                          func_00283B98(yaw, func_002A7878(-9.0f, 9.0f) * 0.017453294f), angle);
+                          FastAddRotations(yaw, func_002A7878(-9.0f, 9.0f) * 0.017453294f), angle);
             acceleration[2] += func_002A7878(-0.030000001f, -0.03666667f);
-            life = func_00283CF0(func_002A7878(2.0f, 4.0f));
-            size = func_00283CF0(func_002A7878(20.0f, 24.0f));
-            duration = func_00283CF0(func_002A7878(30.0f, 36.0f));
+            life = FloatToInt(func_002A7878(2.0f, 4.0f));
+            size = FloatToInt(func_002A7878(20.0f, 24.0f));
+            duration = FloatToInt(func_002A7878(30.0f, 36.0f));
             spawned = func_002BAA28(particlePos, velocity, acceleration, color1, color2,
                                     life, size, duration, -1);
             if (spawned) {
@@ -165,14 +165,14 @@ void func_L01_003DC078(u8 *obj, s32 skip) {
             particlePos[1] += func_002A7878(-0.24f, 0.24f);
             particlePos[2] += func_002A7878(-0.24f, 0.24f);
             func_002AF000(velocity, 0.16666667f,
-                          func_00283B98(yaw, func_002A7878(-18.0f, 18.0f) * 0.017453294f), angle);
+                          FastAddRotations(yaw, func_002A7878(-18.0f, 18.0f) * 0.017453294f), angle);
             velocity[2] += func_002A7878(0.0058333334f, 0.012500001f);
             func_002AF000(acceleration, 0.008333334f,
-                          func_00283B98(yaw, func_002A7878(-4.0f, 4.0f) * 0.017453294f), angle);
+                          FastAddRotations(yaw, func_002A7878(-4.0f, 4.0f) * 0.017453294f), angle);
             acceleration[2] += func_002A7878(-0.014f, -0.030000001f);
-            life = func_00283CF0(func_002A7878(2.0f, 4.0f));
-            size = func_00283CF0(func_002A7878(20.0f, 24.0f));
-            duration = func_00283CF0(func_002A7878(100.0f, 120.00001f));
+            life = FloatToInt(func_002A7878(2.0f, 4.0f));
+            size = FloatToInt(func_002A7878(20.0f, 24.0f));
+            duration = FloatToInt(func_002A7878(100.0f, 120.00001f));
             spawned = func_002BAA28(particlePos, velocity, acceleration, color1, color2,
                                     life, size, duration, -1);
             if (spawned && variant) spawned[3] = 0x48;
@@ -189,7 +189,7 @@ void func_L01_003DC8B8(u8 *a0, void *a1, void *a2) {
     u32 **out = a1;
     s32 *count = a2;
 
-    func_00115484(out, 0, 4);
+    memset(out, 0, 4);
     *count = 0;
     n = func_00277F48(3.0f, a0 + 0x10, 1, a0, 0);
     if (n <= 0)
@@ -231,34 +231,34 @@ void func_L01_003DC9E0(void *arg, void *fallback) {
         target = (u8 *)&D_L01_001B255C[index];
         if (!target) return;
         if (*(s16 *)(target+0xAA) == 0xA56) {
-            if (func_00282E80(obj+0x10,target+0x10)>1.0f) {
-                func_00282CF0(delta,obj+0x10,target+0x10);
-                func_00282F20(delta,delta,1.0f);
-                func_00282CC0(pos,target+0x10,delta);
+            if (vec_distance_xy(obj+0x10,target+0x10)>1.0f) {
+                FastVecSub(delta,obj+0x10,target+0x10);
+                vec_scale_to_length(delta,delta,1.0f);
+                FastVecAdd(pos,target+0x10,delta);
             } else qcopy(pos,obj+0x10);
             if (pos[2] < *(f32 *)(target+0x18)+0.01f)
                 pos[2] = *(f32 *)(target+0x18)+0.011f;
         } else if (*(s16 *)(target+0xAA) == 0xA53) {
-            func_00283698(matrix,target+0xC0);
-            func_00282CF0(delta,obj+0x10,target+0x10);
-            func_002830C0(delta,delta,matrix);
+            matrix_from_basis_rows(matrix,target+0xC0);
+            FastVecSub(delta,obj+0x10,target+0x10);
+            transform_vector(delta,delta,matrix);
             if (delta[0]>2.0f) delta[0]=2.0f;
             else if (delta[0]<-2.0f) delta[0]=-2.0f;
             if (delta[1]>5.0f) delta[1]=5.0f;
             else if(delta[1]<-5.0f) delta[1]=-5.0f;
             if (delta[2]<0.01f) delta[2]=0.01f;
-            func_00283098(delta,delta,target+0xC0);
-            func_00282CC0(pos,target+0x10,delta);
+            matrix_mul_vec3(delta,delta,target+0xC0);
+            FastVecAdd(pos,target+0x10,delta);
         } else qcopy(pos,obj+0x10);
-        func_00282CF0(delta,pos,obj+0x10);
+        FastVecSub(delta,pos,obj+0x10);
         func_00282FB8(delta,delta,0.10000000894069671631f);
-        func_00282CC0(obj+0x10,obj+0x10,delta);
+        FastVecAdd(obj+0x10,obj+0x10,delta);
         if (*(f32 *)(obj+0x18)<pos[2]) *(f32 *)(obj+0x18)=pos[2]+0.001f;
     } else {
         s32 pathIndex=*(s32 *)(state+0x1FC);
         if(pathIndex!=-1) {
             path=D_L01_001FE180[pathIndex];
-            if(path && !func_002A8AF0(obj+0x10,path+0x10,*(s32 *)path)) qcopy(obj+0x10,fallback);
+            if(path && !point_in_path_xy(obj+0x10,path+0x10,*(s32 *)path)) qcopy(obj+0x10,fallback);
         }
         {
             u8 *other = *(u8 **)(state + 0x248);
@@ -295,9 +295,9 @@ void func_L01_003DD6A8(u8 *a0)
     if (v <= 0xFFFE) {
         *(u16 *)(a0 + 0x96) = v + 1;
     }
-    func_00282978(p + 0x3D8);
+    FastDecTimer(p + 0x3D8);
     func_00282948(p + 0x404);
-    func_00282978(p + 0x3D6);
+    FastDecTimer(p + 0x3D6);
     v = *(s16 *)(p + 0x3DA);
     if (v != 0) {
         *(u16 *)(p + 0x3D6) = 0x168;
@@ -379,7 +379,7 @@ void func_L01_003EC0C0(PoseMoby *m)
         break;
     case 1:
         if (m->command) {
-            p->sound = func_002E5CF8(0, 4, m);
+            p->sound = PlayMobySound(0, 4, m);
             func_002A7750(m, 2, -1);
         }
         m->hit_slot = 255;
@@ -388,9 +388,9 @@ void func_L01_003EC0C0(PoseMoby *m)
         p->t += 1.0f / p->duration;
         if (p->t > 1.0f) p->t = 1.0f;
         blend = (1.0f - func_00283180(p->t * 3.1415927f)) * 0.5f;
-        func_00282CF0(delta, D_L01_001B264C[p->index].position, p->start_position);
-        func_00282D30(delta, delta, blend);
-        func_00282CC0(m->position, p->start_position, delta);
+        FastVecSub(delta, D_L01_001B264C[p->index].position, p->start_position);
+        FastVecScale(delta, delta, blend);
+        FastVecAdd(m->position, p->start_position, delta);
         m->rotation[2] = func_002AA150(p->start_rotation[2], D_L01_001B264C[p->index].rotation[2], blend);
         m->rotation[1] = func_002AA150(p->start_rotation[1], D_L01_001B264C[p->index].rotation[1], blend);
         m->rotation[0] = func_002AA150(p->start_rotation[0], D_L01_001B264C[p->index].rotation[0], blend);
@@ -402,13 +402,13 @@ void func_L01_003EC0C0(PoseMoby *m)
                     func_002E59F8(handle);
                 p->sound = -1;
             }
-            func_002E5CF8(1, 0, m);
+            PlayMobySound(1, 0, m);
             func_002A7750(m, 3, -1);
         }
         break;
     }
     if (m->state < 3) {
-        func_00282CF0(delta, m->position, position);
+        FastVecSub(delta, m->position, position);
         func_002AD6F0(p->track, delta, rotation, m->rotation);
     }
 }
@@ -437,10 +437,10 @@ void func_L01_003ECCF8(u8 *obj) {
     u16 id;
     u32 color;
     if (!state) return;
-    *(f32 *)(state + 4) = func_00283B98(*(f32 *)(state + 4), 0.10471977293491364f);
+    *(f32 *)(state + 4) = FastAddRotations(*(f32 *)(state + 4), 0.10471977293491364f);
     if (obj[0x20] == 0) {
         func_0029FCC0(obj, 0, pos);
-        dist = func_00282E80(D_00189E20.pos, pos);
+        dist = vec_distance_xy(D_00189E20.pos, pos);
         *(s32 *)(state + 8) = 0;
         if (D_00189E20.object == obj && D_00189E20.active && dist < 0.5f) {
             u16 objectId;
@@ -465,7 +465,7 @@ activate:
                 if (*(s32 *)state != -1) D_L01_001B255C[*(s32 *)state].data[0xBC] = 1;
             }
         }
-        shade = func_00283CF0((func_00283198(*(f32 *)(state + 4)) * 4.0f - 3.0f) * 128.0f);
+        shade = FloatToInt((func_00283198(*(f32 *)(state + 4)) * 4.0f - 3.0f) * 128.0f);
         if (shade > 128) shade = 128;
         else if (shade < 32) shade = 32;
         color = (shade << 8) | 0x80000000;

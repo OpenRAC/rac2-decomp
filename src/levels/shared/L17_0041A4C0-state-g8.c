@@ -39,7 +39,7 @@ void func_L17_0041A4C0(char *obj)
     case 2:
         func_L00_0032A258(obj, &D_L17_001B1EF0, &D_L17_001B1EE8, &D_L17_001B1EE0, 0xFFFF, 0, D_L17_001B1F10, 0, 0xFFFF, 0xFF, 0);
         func_L00_00324F18(obj, &v, 0.0f, 0.0f, 20.0f);
-        func_0032C700(&v, 0, 0xC, 0xA, *(float *)(obj + 0x2C) * 10.0f, 20.0f, 0xA, 0xA, 0, 0, 1, 0, 0, 0);
+        SpawnExplosion(&v, 0, 0xC, 0xA, *(float *)(obj + 0x2C) * 10.0f, 20.0f, 0xA, 0xA, 0, 0, 1, 0, 0, 0);
         func_0029F338(obj);
         return;
     }

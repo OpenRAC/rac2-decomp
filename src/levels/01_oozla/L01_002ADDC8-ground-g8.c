@@ -140,28 +140,28 @@ void func_L01_002B5218(void)
         height = D_00189E20.capsuleRadius * 2.9f;
     if (func_L00_002ADF80())
         height = 0.0f;
-    func_L00_002B47A8(&rayStart, &rayEnd, alongGravity, height, -48.0f);
-    if (func_002761F8(&rayStart, &rayEnd, 2, D_00189E20.moby, 0) == 0)
+    BuildOffsetVectorPair(&rayStart, &rayEnd, alongGravity, height, -48.0f);
+    if (CollLine(&rayStart, &rayEnd, 2, D_00189E20.moby, 0) == 0)
         goto probed;
     D_00189E20.groundSoundClass = func_L00_002E2048();
     if (D_L01_001BF900.moby != 0)
         D_00189E20.groundSoundClass = 0;
     if (D_001A79F0 == 7 && D_L01_001BF900.moby != 0)
         D_00189E20.groundSoundClass = 1;
-    D_00189E20.groundType = func_00278E78();
+    D_00189E20.groundType = GetCollHitMaterial();
     if (D_00189E20.groundType == 0) {
         /* Water: note the surface, then look for the floor below it. */
         D_00189E20.waterSurfaceZ = func_002A90F8(&D_L01_001BF900.point, &D_00189E20.waterNormal);
         if (D_00189E20.position.f[2] < D_00189E20.waterSurfaceZ && D_00189E20.inWaterFrames <= 0)
             D_00189E20.inWaterFrames = 1;
-        if (func_002761F8(&rayStart, &rayEnd, 0x24, D_00189E20.moby, 0) == 0)
+        if (CollLine(&rayStart, &rayEnd, 0x24, D_00189E20.moby, 0) == 0)
             goto probed;
         D_00189E20.groundSoundClass = func_L00_002E2048();
     }
     if (D_00189E20.groundType == 3) {
         D_00189E20.sinkSurfaceZ = D_L01_001BF900.point.f[2];
         rayStart.f[2] = D_L01_001BF900.point.f[2] - 0.01f;
-        if (func_002761F8(&rayStart, &rayEnd, 4, D_00189E20.moby, 0) == 0)
+        if (CollLine(&rayStart, &rayEnd, 4, D_00189E20.moby, 0) == 0)
             goto probed;
     }
     if (D_00189E20.groundType == 0xB) {
@@ -183,13 +183,13 @@ void func_L01_002B5218(void)
         D_00189E20.groundZ.f = D_L01_001BF900.point.f[2];
         if (D_L01_001A9030)
             D_00189E20.groundZ.f = func_002B0360(&D_L01_001BF900.point);
-        D_00189E20.groundDistance = func_00282E48(&D_00189E20.position, &D_00189E20.groundPoint);
+        D_00189E20.groundDistance = fast_vec_dist(&D_00189E20.position, &D_00189E20.groundPoint);
         D_00189E20.groundMoby = D_L01_001BF900.moby;
         func_001290E0(&D_00189E20.groundNormal, &D_L01_001BF900.normal);
         D_00189E20.groundSlope.f = func_L00_002D3EA8(&D_L01_001BF900.normal);
         D_00189E20.downhillYaw = func_00283248(D_L01_001BF900.normal.f[0], D_L01_001BF900.normal.f[1]);
-        func_00282CF0(&work, &D_00189E20.groundPoint, &D_00189E20.position);
-        if (0.0f < func_00282DB0(&work, &D_00189E20.groundNormal))
+        FastVecSub(&work, &D_00189E20.groundPoint, &D_00189E20.position);
+        if (0.0f < FastVecDot(&work, &D_00189E20.groundNormal))
             D_00189E20.groundDistance = -D_00189E20.groundDistance;
         if (D_00189E20.groundDistance < 0.02f) {
             D_00189E20.framesOffGround.s = 0;
@@ -221,19 +221,19 @@ probed:
         if (D_L01_001A9034) {
             func_002AFF60(&D_00189E20.position, &D_00189E20.gravityDir, 0);
         } else if (D_00189E20.gravityOverride.f[3] != 0.0f) {
-            func_002AA2E8(&D_00189E20.gravityOverride.f[3], 0.0f, 1.0f);
+            ApproachValue(&D_00189E20.gravityOverride.f[3], 0.0f, 1.0f);
             qcopy(&D_00189E20.gravityDir, &D_00189E20.gravityOverride);
         } else {
             qcopy(&D_00189E20.gravityDir, &D_00189E20.groundNormal);
-            func_00282D30(&D_00189E20.gravityDir, &D_00189E20.gravityDir, -1.0f);
+            FastVecScale(&D_00189E20.gravityDir, &D_00189E20.gravityDir, -1.0f);
         }
         break;
     case 2:
         sign = -1.0f;
         if (D_00189E20.gravityPoint.f[3] > 0.0f)
             sign = 1.0f;
-        func_00282CF0(&D_00189E20.gravityDir, &D_00189E20.gravityPoint, &D_00189E20.position);
-        func_00282F20(&D_00189E20.gravityDir, &D_00189E20.gravityDir, sign);
+        FastVecSub(&D_00189E20.gravityDir, &D_00189E20.gravityPoint, &D_00189E20.position);
+        vec_scale_to_length(&D_00189E20.gravityDir, &D_00189E20.gravityDir, sign);
         break;
     }
 
@@ -264,7 +264,7 @@ probed:
             angle = -angle;
         func_L00_002D3638(&sideStart, 0.2f, angle, 0.45f, 1);
         func_L00_002D3638(&sideEnd, 0.2f, angle, -0.45f, 1);
-        if (func_002761F8(&sideStart, &sideEnd, 0x22, D_00189E20.moby, 0)) {
+        if (CollLine(&sideStart, &sideEnd, 0x22, D_00189E20.moby, 0)) {
             if (D_L01_001A9030)
                 D_00189E20.sideHeight.f[side] = func_002B0360(&D_L01_001BF900.point) -
                                                 func_002B0360(&D_00189E20.groundPoint);

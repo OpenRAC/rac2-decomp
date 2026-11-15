@@ -98,9 +98,9 @@ void func_L08_003D39F0(u8 *object)
 
     switch (object[0x20]) {
     case 0:
-        func_00115484(&D_L08_001B3490[0], 0, 48);
-        func_00115484(&D_L08_001B3490[1], 0, 48);
-        func_00115484(&D_L08_001B3490[2], 0, 48);
+        memset(&D_L08_001B3490[0], 0, 48);
+        memset(&D_L08_001B3490[1], 0, 48);
+        memset(&D_L08_001B3490[2], 0, 48);
         D_L08_001B3490[0].dist = 100000.0f;
         D_L08_001B3490[0].unk18 = 65535;
         D_L08_001B3490[1].dist = 100000.0f;
@@ -115,11 +115,11 @@ void func_L08_003D39F0(u8 *object)
     default:
         return;
     }
-    if (*data != -1 && func_002ACBC8(&D_L08_001B9B00, *data))
+    if (*data != -1 && IsPointInCuboid(&D_L08_001B9B00, *data))
         D_L08_001B258C = 2;
     if (D_00189E20.mode == 0x31 && (vehicle = D_00189E20.vehicle) != 0) {
         func_002AF000(offset, D_L08_001B0300, *(float *)(vehicle + 0xF8), -*(float *)(vehicle + 0xF4) * 0.5f);
-        func_00282CC0(&D_L08_001B3490[0].pos, offset, D_00189E20.vehicle + 0x10);
+        FastVecAdd(&D_L08_001B3490[0].pos, offset, D_00189E20.vehicle + 0x10);
         if (D_L08_001B0318 == 0) {
             D_L08_001B0318 = func_L00_002D70A0(5);
             if (D_L08_001B0318 == 0)
@@ -135,7 +135,7 @@ void func_L08_003D39F0(u8 *object)
             D_L08_001B0318->x8 = D_L08_001B0314;
         }
         D_L08_001B0318->x1F = 1;
-        func_00282CF0(D_L08_001B0318->pos, &D_L08_001B3490[0].pos, &D_L08_001B9B00);
+        FastVecSub(D_L08_001B0318->pos, &D_L08_001B3490[0].pos, &D_L08_001B9B00);
         goto shift;
     }
     if (D_L08_001B3490[2].owner == D_L08_001B3490[1].owner)
@@ -161,14 +161,14 @@ void func_L08_003D39F0(u8 *object)
         }
         D_L08_001B0318->x0 = 7.0f;
         D_L08_001B0318->x1F = 1;
-        func_00282CF0(D_L08_001B0318->pos, &D_L08_001B3490[0].pos, &D_L08_001B9B00);
+        FastVecSub(D_L08_001B0318->pos, &D_L08_001B3490[0].pos, &D_L08_001B9B00);
     } else if (D_L08_001B0318 != 0) {
         func_L00_002D7140(D_L08_001B0318);
         D_L08_001B0318 = 0;
     }
 shift:
     CopyTarget(&D_L08_001B3490[2], &D_L08_001B3490[1]);
-    func_00115484(&D_L08_001B3490[1], 0, 48);
+    memset(&D_L08_001B3490[1], 0, 48);
     D_L08_001B3490[1].unk18 = 65535;
     D_L08_001B3490[1].dist = 100000.0f;
     D_L08_001B3490[0].valid = 0;

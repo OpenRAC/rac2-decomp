@@ -65,11 +65,11 @@ void func_L08_003D9F68(u8 *object)
         switch(B(state,0x40D)) {
         case 0:
             if(!func_002A77E0(7))
-                {trigger=func_L08_0032F898(object,state+0x210,(float)S(state,0x408),0,I(state,0x410),I(state,0x418),I(state,0x414),-1)^2; goto trigger_test;}
+                {trigger=SelectNearestListedMoby(object,state+0x210,(float)S(state,0x408),0,I(state,0x410),I(state,0x418),I(state,0x414),-1)^2; goto trigger_test;}
             break;
         case 1:
             if(I(state,0x400)!=-1) ready=func_L08_003D8918(I(state,0x400))!=0;
-            else {func_0026FEB8(D_L08_002B5270,S(object,0xAA),S(object,0xB2)); B(state,0x40D)=0;}
+            else {STUB_printf(D_L08_002B5270,S(object,0xAA),S(object,0xB2)); B(state,0x40D)=0;}
             break;
         case 2: trigger=B(object,0xBC);goto trigger_test;
         case 3: ready=func_L08_003D8990(I(state,0x468))!=0;break;
@@ -113,15 +113,15 @@ void func_L08_003D9F68(u8 *object)
     case 4: {
         u8 *collisionMoby;
         GroundMoby *ground=(GroundMoby *)object;
-        qcopy_nc(old,object+0x10);func_00282CC0(object+0x10,object+0x10,state+0xD0);
+        qcopy_nc(old,object+0x10);FastVecAdd(object+0x10,object+0x10,state+0xD0);
         F(state,0xD8)-=0.0027222223579883575f;F(object,0x18)+=1.5f;
-        if(func_002761F8(old,object+0x10,0,object,0)) {
+        if(CollLine(old,object+0x10,0,object,0)) {
             u8 *hitMoby=D_L08_001BFF40.moby;
             if(hitMoby) {
                 if(S(hitMoby,0xAA)==0x945 || S(hitMoby,0xAA)==0x9C6) goto no_ray_response;
             }
-            func_00282CF0(delta,old,D_L08_001BFF40.point);
-            func_00282F20(delta,delta,1.5f);func_00282CC0(object+0x10,object+0x10,delta);
+            FastVecSub(delta,old,D_L08_001BFF40.point);
+            vec_scale_to_length(delta,delta,1.5f);FastVecAdd(object+0x10,object+0x10,delta);
         }
         no_ray_response:
         if(func_00277258(object+0x10,0,object,1.5f)) {
@@ -140,7 +140,7 @@ void func_L08_003D9F68(u8 *object)
             }
             qcopy_nc(object+0x10,D_L08_001BFF40.adjusted);
             func_00283028(state+0xD0,state+0xD0,D_L08_001BFF40.normal);
-            func_00282D30(state+0xD0,state+0xD0,0.8f);
+            FastVecScale(state+0xD0,state+0xD0,0.8f);
         }
         no_overlap_response:
         F(object,0x18)-=1.5f; F(state,0xD8)-=0.0027222223579883575f;
@@ -182,7 +182,7 @@ void func_L08_003D9F68(u8 *object)
             break;
         }
         if(func_002A77E0(7)) break;
-        if(I(state,0x448) || func_L08_0032F898(object,state+0x210,(float)S(object,0x32),(float)S(state,0x40E),I(state,0x41C),I(state,0x424),I(state,0x420),-1)!=2) {
+        if(I(state,0x448) || SelectNearestListedMoby(object,state+0x210,(float)S(object,0x32),(float)S(state,0x40E),I(state,0x41C),I(state,0x424),I(state,0x420),-1)!=2) {
             if(I(state,0x428)!=-1) {u8 *e=D_L08_001FE7C0[I(state,0x428)];func_L01_00337A60(state+0x210,state+0x210,e+0x10,I(e,0));}
             if(B(state,0x40C)==3) {
                 I(state,0x48C)=600;I(state,0x15C)=I(state,0x428);B(state,0x40C)=1;
@@ -223,7 +223,7 @@ void func_L08_003D9F68(u8 *object)
         break; } }
         if(func_002A77E0(7))break;
         if(!I(state,0x48C)) {
-            result=func_L08_0032F898(object,state+0x210,(float)S(object,0x32),(float)S(state,0x40E),I(state,0x41C),I(state,0x424),I(state,0x420),-1);
+            result=SelectNearestListedMoby(object,state+0x210,(float)S(object,0x32),(float)S(state,0x40E),I(state,0x41C),I(state,0x424),I(state,0x420),-1);
             if(result==2 || D_0018C0B4[0]==49) {
                 I(state,0x254)=2;
                 if(!func_002A77E0(4)) {
@@ -237,7 +237,7 @@ void func_L08_003D9F68(u8 *object)
                 break;
             }
         }
-        if(!I(state,0x44C) && (func_00282E80(object+0x10,state+0x230)<12 || I(state,0x48C))) {
+        if(!I(state,0x44C) && (vec_distance_xy(object+0x10,state+0x230)<12 || I(state,0x48C))) {
             qcopy_nc(state+0x3F0,state+0x230);
             if(B(object,0x43)!=9)func_002A7470(object,9,0,func_002A7820(3,6));
             func_002A7750(object,8,0);I(state,0x480)=0;
@@ -250,19 +250,19 @@ void func_L08_003D9F68(u8 *object)
         case 0:
             if(func_L08_003D9038(object,360,180,180,16,0.2f,4,0.5f))I(state,0x480)++;
             if(I(state,0x480)>60) {
-                if(func_00282E80(object+0x10,state+0x230)<6 && func_00283C80(F(object,0xF8),func_00283248(F(state,0x230)-F(object,0x10),F(state,0x234)-F(object,0x14)))<1.5707964897155762f) {
+                if(vec_distance_xy(object+0x10,state+0x230)<6 && FastDiffRots(F(object,0xF8),func_00283248(F(state,0x230)-F(object,0x10),F(state,0x234)-F(object,0x14)))<1.5707964897155762f) {
                     if(B(object,0x43)!=6)func_002A7470(object,6,0,func_002A7820(3,6));
                     func_002A7750(object,8,1);
                 } else { I(state,0x480)=0; blocked=1; }
             }
-            if(func_00282E80(object+0x10,state+0x230)<4.2f) {
-                if(func_00283C80(F(object,0xF8),func_00283248(F(state,0x230)-F(object,0x10),F(state,0x234)-F(object,0x14)))<1.5707964897155762f) {
+            if(vec_distance_xy(object+0x10,state+0x230)<4.2f) {
+                if(FastDiffRots(F(object,0xF8),func_00283248(F(state,0x230)-F(object,0x10),F(state,0x234)-F(object,0x14)))<1.5707964897155762f) {
                     if(B(object,0x43)!=6)func_002A7470(object,6,0,func_002A7820(3,6));
                     func_002A7750(object,8,1);
                 }
             }
             if(!I(state,0x48C)) {
-                if(blocked || func_L08_0032F898(object,state+0x210,(float)S(object,0x32),(float)S(state,0x40E),I(state,0x41C),I(state,0x424),I(state,0x420),-1)==2) {
+                if(blocked || SelectNearestListedMoby(object,state+0x210,(float)S(object,0x32),(float)S(state,0x40E),I(state,0x41C),I(state,0x424),I(state,0x420),-1)==2) {
                     if(!I(state,0x448)) {
                         I(state,0x440)=0;
                         if(B(object,0x43)!=(func_001163B0()&1))func_002A7470(object,func_001163B0()&1,0,10);
@@ -329,8 +329,8 @@ void func_L08_003D9F68(u8 *object)
         int index;
         u8 idx;
         func_L08_003D7E68(object);func_L08_003D7FB8(object,D_L08_001A8F20);
-        func_002ABBB8(object,D_L08_001A8F20,0,0,0,4,0,0,2,1,9,1,-1,0,0,0,-1,1,0x810001);
-        func_002A6C58(object,0,3);
+        SpawnExplosionEffects(object,D_L08_001A8F20,0,0,0,4,0,0,2,1,9,1,-1,0,0,0,-1,1,0x810001);
+        SetDeathBits(object,0,3);
         D_L08_0021DE80.flags[S(object,0xB2)]=B(object,0xB0)+2;
         index=B(object,0xB0);
         if(index==0xFF || (idx=index, !(D_L08_001B2840[idx]&0x80) && (D_0019B2E8[idx+(D_001A79F0<<4)]&0x80)))

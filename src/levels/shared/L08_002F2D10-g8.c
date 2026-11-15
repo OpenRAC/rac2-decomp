@@ -19,7 +19,7 @@ s32 func_L08_003000C0(void) {
     if (D_L08_001A9050 == 0)
         return 0;
     D_L08_001BE0B0 = D_L08_001A9054;
-    func_0027AB40();
+    UpdateViewContext();
     D_L08_001A9050 = 0;
     return 1;
 }
@@ -63,17 +63,17 @@ void func_L08_003CD488(s32 *counter, u8 *arg) {
     }
 
     func_L00_00424A88(D_L08_001B00F0, D_L08_001B00F4, D_L08_001B00F8);
-    func_L00_00424A08(0, D_L08_001B00E4, D_L08_001B00E0);
+    follow_camera_set_distance(0, D_L08_001B00E4, D_L08_001B00E0);
 
     if (*(s32 *)((u8 *)owner + 0xC8) >= 0 &&
-        func_002ACBC8(D_00189EA0, *(s32 *)((u8 *)owner + 0xC8)) != 0) {
+        IsPointInCuboid(D_00189EA0, *(s32 *)((u8 *)owner + 0xC8)) != 0) {
         func_L00_00424B20(0.52359885f);
     }
 
-    func_L00_00424A50(D_L08_001B00E8, 0.003f);
+    follow_camera_set_height(D_L08_001B00E8, 0.003f);
     func_L00_00424C28();
 
-    t = func_00283CE0(*counter) / func_00283CE0(0x5A);
+    t = IntToFloat(*counter) / IntToFloat(0x5A);
     if (t > 1.0f)
         t = 1.0f;
 

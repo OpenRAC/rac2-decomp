@@ -55,7 +55,7 @@ void func_L23_0041CD58(char *object) {
             if (*slot && *(float *)(state + 0x20) > 0.0f) {
                 char *hero = D_00189E20;
 
-                if ((*(unsigned char **)(hero + 0x2290))[0x43] != 6 && func_00282E48(*slot + 0x10, hero + 0x80) < 12.0f) {
+                if ((*(unsigned char **)(hero + 0x2290))[0x43] != 6 && fast_vec_dist(*slot + 0x10, hero + 0x80) < 12.0f) {
                     if (func_L23_0041D1F0(object, (int)*slot, group, 1)) {
                         if (((unsigned char *)*slot)[0x20] == 0) {
                             func_002A7750((unsigned char *)*slot, 16, 0);
@@ -88,12 +88,12 @@ void func_L23_0041CD58(char *object) {
             next = spawnGroup + 1;
             remaining = 49;
             do {
-                if (*spawnSlot && func_00282E48(*spawnSlot + 16, (char *)&loc[0]) < 4.0f) {
+                if (*spawnSlot && fast_vec_dist(*spawnSlot + 16, (char *)&loc[0]) < 4.0f) {
                     axis = *spawnSlot + (func_002A77E0(2) * 16 + 0xC0);
                     if (func_002A77E0(2)) scale = D_L23_001B1414;
                     else scale = -D_L23_001B1414;
-                    func_00282D30((char *)offset, axis, scale);
-                    func_00282CC0((char *)&loc[0], (char *)&loc[0], (char *)offset);
+                    FastVecScale((char *)offset, axis, scale);
+                    FastVecAdd((char *)&loc[0], (char *)&loc[0], (char *)offset);
                     func_L23_00418650((char *)&loc[0], 0.0f);
                 }
                 remaining--;
@@ -103,7 +103,7 @@ void func_L23_0041CD58(char *object) {
         } while (spawnGroup < 3);
         *offset = loc[0];
         func_L23_00418650((char *)offset, 3.0f);
-        if (func_002761F8(offset, &loc[0], 18, 0, 0))
+        if (CollLine(offset, &loc[0], 18, 0, 0))
             loc[0] = D_L23_001C0AA0;
         func_L23_0041C7D8(&loc[0], 0);
     }

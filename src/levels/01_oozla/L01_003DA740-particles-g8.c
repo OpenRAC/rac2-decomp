@@ -42,7 +42,7 @@ void func_L01_003DA740(u8 *obj) {
     vel[3]=D_L01_001B08B8;
     accel[3]=D_L01_001B08BC;
     yaw=func_00283248(*(f32 *)state,*(f32 *)(state+4));
-    pitch=-func_00283248(func_00282E20(state),*(f32 *)(state+8));
+    pitch=-func_00283248(vec_length_xy(state),*(f32 *)(state+8));
     for(i=0;i<D_L01_001B08C4;i++) {
         qcopy(pos,obj+0x10);
         pos[0]+=func_002A7878(-0.065f,0.065f);
@@ -53,11 +53,11 @@ void func_L01_003DA740(u8 *obj) {
         angle=func_002A7878(-D_L01_001B08C0,D_L01_001B08C0)*0.01745329424738884f;
         speed=D_L01_001B08B0;
         speed*=0.01666666753590107f;
-        angle=func_00283B98(yaw,angle);
+        angle=FastAddRotations(yaw,angle);
         func_002AF000(accel,speed,angle,pitch);
-        a=func_00283CF0(func_002A7878(D_L01_001B089C,D_L01_001B089C*2));
-        b=func_00283CF0(func_002A7878(D_L01_001B08A0,D_L01_001B08A0*1.2f));
-        c=func_00283CF0(func_002A7878(D_L01_001B08A4,D_L01_001B08A4*1.2f));
+        a=FloatToInt(func_002A7878(D_L01_001B089C,D_L01_001B089C*2));
+        b=FloatToInt(func_002A7878(D_L01_001B08A0,D_L01_001B08A0*1.2f));
+        c=FloatToInt(func_002A7878(D_L01_001B08A4,D_L01_001B08A4*1.2f));
         part=func_002BAA28(pos,vel,accel,D_L01_001B0894,D_L01_001B0898,a,b,c,-1);
         if(part && (func_001163B0()&1)) part[3]=0x48;
     }
@@ -71,16 +71,16 @@ void func_L01_003DA740(u8 *obj) {
         angle=func_002A7878(-D_L01_001B08F8,D_L01_001B08F8)*0.01745329424738884f;
         speed=D_L01_001B08DC;
         speed*=0.01666666753590107f;
-        angle=func_00283B98(yaw,angle);
+        angle=FastAddRotations(yaw,angle);
         func_002AF000(vel,speed,angle,pitch);
         angle=func_002A7878(-D_L01_001B08F4,D_L01_001B08F4)*0.01745329424738884f;
         speed=D_L01_001B08E4;
         speed*=0.01666666753590107f;
-        angle=func_00283B98(yaw,angle);
+        angle=FastAddRotations(yaw,angle);
         func_002AF000(accel,speed,angle,pitch);
-        a=func_00283CF0(func_002A7878(D_L01_001B08D0,D_L01_001B08D0*2));
-        b=func_00283CF0(func_002A7878(D_L01_001B08D4,D_L01_001B08D4*1.2f));
-        c=func_00283CF0(func_002A7878(D_L01_001B08D8,D_L01_001B08D8*1.2f));
+        a=FloatToInt(func_002A7878(D_L01_001B08D0,D_L01_001B08D0*2));
+        b=FloatToInt(func_002A7878(D_L01_001B08D4,D_L01_001B08D4*1.2f));
+        c=FloatToInt(func_002A7878(D_L01_001B08D8,D_L01_001B08D8*1.2f));
         part=func_002BAA28(pos,vel,accel,D_L01_001B08C8,D_L01_001B08CC,a,b,c,-1);
         if(part && (func_001163B0()&1)) part[3]=0x48;
     }

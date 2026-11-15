@@ -50,11 +50,11 @@ void func_L00_002B75A0(float a, float b, float c)
         p->target = 0;
         p->active = 1;
     }
-    result = func_L00_002AE888(a, yaw, b, c, vector, -1, 0);
+    result = SelectBestEligibleTarget(a, yaw, b, c, vector, -1, 0);
     if (result != 0 && (p->target == 0 || p->active != 0)) {
         p->aimAngle = func_00283248(*(float *)(result + 0x10) - p->origin[0],
                                     *(float *)(result + 0x14) - p->origin[1]);
-        func_00282CF0(p->aim, result + 0x10, p->origin);
+        FastVecSub(p->aim, result + 0x10, p->origin);
         p->target = result;
     } else {
         D_00189E20_target.aimAngle = yaw;

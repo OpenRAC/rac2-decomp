@@ -51,7 +51,7 @@ void func_002F7738(void)
         k = selected[i];
         ref_L00_002F7738_08.entries[ref_L00_002F7738_08.count].b = b.value[k];
         ref_L00_002F7738_08.entries[ref_L00_002F7738_08.count].a = a.value[k];
-        ref_L00_002F7738_08.entries[ref_L00_002F7738_08.count].text = func_00288FB8(ids.value[k]);
+        ref_L00_002F7738_08.entries[ref_L00_002F7738_08.count].text = GetLocalizedString(ids.value[k]);
         ref_L00_002F7738_08.entries[ref_L00_002F7738_08.count].id = extra.value[k];
         ref_L00_002F7738_08.entries[ref_L00_002F7738_08.count].mask = masks.value[k];
         ref_L00_002F7738_08.entries[ref_L00_002F7738_08.count].expected = expected.value[k];
@@ -64,7 +64,7 @@ void func_002F7738(void)
             if ((masks.value[j] & D_001A7AF0) != expected.value[j] && progress >= limits.value[j]) {
                 ref_L00_002F7738_08.entries[ref_L00_002F7738_08.count].b = b.value[j];
                 ref_L00_002F7738_08.entries[ref_L00_002F7738_08.count].a = a.value[j];
-                ref_L00_002F7738_08.entries[ref_L00_002F7738_08.count].text = func_00288FB8(ids.value[j]);
+                ref_L00_002F7738_08.entries[ref_L00_002F7738_08.count].text = GetLocalizedString(ids.value[j]);
                 ref_L00_002F7738_08.entries[ref_L00_002F7738_08.count].id = ids.value[j];
                 ref_L00_002F7738_08.entries[ref_L00_002F7738_08.count].mask = masks.value[j];
                 ref_L00_002F7738_08.entries[ref_L00_002F7738_08.count].expected = expected.value[j];

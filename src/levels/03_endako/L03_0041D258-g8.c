@@ -42,7 +42,7 @@ void func_L03_0041D258(u8 *entity)
     case 0:
         if (func_002B3890(entity))
             *(s16 *)(state + 0x332) = func_002A7820(20, 60);
-        if ((*(int *)(state + 0x204) == 1 || *(s16 *)(state + 0x336) != 0) && func_00282978(state + 0x332)) {
+        if ((*(int *)(state + 0x204) == 1 || *(s16 *)(state + 0x336) != 0) && FastDecTimer(state + 0x332)) {
             func_002A7750(entity, 3, 2);
             if (entity[0x43] != 1)
                 func_002A7470(entity, 1, 0, 20);
@@ -58,7 +58,7 @@ void func_L03_0041D258(u8 *entity)
                 func_002A7470(entity, 4, 0, 20);
             *(s16 *)(state + 0x336) = 0;
         } else if (!*(s16 *)(state + 0x330)) {
-            if (func_00282E80(entity + 0x10, D_00189EA0) > 24.0f) {
+            if (vec_distance_xy(entity + 0x10, D_00189EA0) > 24.0f) {
                 func_002A7750(entity, 1, 0);
                 if (entity[0x43] != 0)
                     func_002A7470(entity, 0, 0, 20);
@@ -81,21 +81,21 @@ void func_L03_0041D258(u8 *entity)
     case 3:
         flags = func_002B1C20(entity, state + 0x50);
         if ((flags & 1) || (entity[0x43] == 8 && func_002AEB60(entity, 8.0f))) {
-            func_00283098(spawnPosition, D_L03_001B1BE0, entity + 0xC0);
-            func_00282CC0(spawnPosition, spawnPosition, entity + 0x10);
+            matrix_mul_vec3(spawnPosition, D_L03_001B1BE0, entity + 0xC0);
+            FastVecAdd(spawnPosition, spawnPosition, entity + 0x10);
             func_002AC728(entity, spawnPosition, -1, 0.5f, 13.0f);
-            func_00282CF0(targetPosition, entity + 0x10, D_00189EA0);
+            FastVecSub(targetPosition, entity + 0x10, D_00189EA0);
             targetPosition[2] = 0;
-            func_00282F20(targetPosition, targetPosition, 0.10000001f);
+            vec_scale_to_length(targetPosition, targetPosition, 0.10000001f);
             func_L03_003268C0(entity, 0xA0D, 5, 0, 0, 0, 0, D_L03_001A8F20);
-            func_002E5CF8(6, 0, entity);
+            PlayMobySound(6, 0, entity);
             if (*(int *)(state + 0x350) != -1) {
                 u8 *sound = D_L03_00188660 + *(int *)(state + 0x350) * 0x70;
                 if (*(u8 **)(sound + 0x88) == entity && sound[0x74])
                     func_002E59F8(*(int *)(state + 0x350));
             }
             *(int *)(state + 0x350) = -1;
-            func_002A6C58(entity, 0, 3);
+            SetDeathBits(entity, 0, 3);
             func_0029F338(entity);
             return;
         }
@@ -165,7 +165,7 @@ void func_L03_0041D258(u8 *entity)
             *(float *)(state + 0x288) = -value;
             *(float *)(state + 0x300) = -*(float *)(state + 0x280);
         }
-        func_002AA2E8(state + 0x33C, 16.0f, *(float *)(state + 0x348));
+        ApproachValue(state + 0x33C, 16.0f, *(float *)(state + 0x348));
         hit = 0;
         if (func_002AEB60(entity, 1.0f)) {
             hit = 1;
@@ -179,15 +179,15 @@ void func_L03_0041D258(u8 *entity)
             float spread = func_002A78D8(0, 0.5f);
 
             func_L01_0031A278(entity, target, *(float *)(state + 0x33C), spread, 0);
-            func_00282CF0(direction, targetPosition, spawnPosition);
-            func_00282F20(direction, direction, D_L03_001B1BD4 * 0.016666668f);
+            FastVecSub(direction, targetPosition, spawnPosition);
+            vec_scale_to_length(direction, direction, D_L03_001B1BD4 * 0.016666668f);
             func_002A8C28(entity, spawnPosition, 1, 0, 1, 0, 0.6660000085830688f, (float)state[0x34], 1.0f);
             func_L03_003D18F8(entity, spawnPosition, direction, state[0x34]);
             *(Quad *)effectPosition = 0;
             effectPosition[0] = 2.5f;
             effectPosition[2] = 0.5f;
-            func_00283098(effectPosition, effectPosition, entity + 0xC0);
-            func_00282CC0(effectPosition, effectPosition, entity + 0x10);
+            matrix_mul_vec3(effectPosition, effectPosition, entity + 0xC0);
+            FastVecAdd(effectPosition, effectPosition, entity + 0x10);
             func_002A8C28(entity, effectPosition, 1, 0, 1, 0, 1.5f, (float)state[0x34], 3.0f);
         }
         if (*(float *)(state + 0x33C) >= 12.0f) {

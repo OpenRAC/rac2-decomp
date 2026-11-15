@@ -52,7 +52,7 @@ void func_002CA790(void)
     src = (TI128 *)((char *)s + 0x60);
     qcopy(dst + 1, src);
     *(float *)D_001B90F0 = s->field_0F8;
-    func_0028B338(0);
+    select_moby_context(0);
     func_00279FF0();
     mode = s->field_01C;
     s->field_11C = 0;
@@ -60,13 +60,13 @@ void func_002CA790(void)
     s->field_020 = 0;
     s->field_118 = 0;
     if (mode == 3 || mode == 4 || mode == 6 || mode == 5) {
-        func_0027D330(0x10);
+        FadeToBlack(0x10);
     }
     func_00132B28(0x5D);
     if (((GameState_2CA790 *)(void *)D_001F2840)->field_01C != 2 || func_00288D30() == 0)
-        func_002B7320();
-    func_00132028();
-    func_002E4AC8();
+        music_Unpause();
+    snd_Pump();
+    UpdateSoundVoices();
     mode = ((GameState_2CA790 *)(void *)D_001F2840)->field_0DB;
     if (mode) {
         func_002B7CE0(1);

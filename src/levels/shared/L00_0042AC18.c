@@ -12,7 +12,7 @@ void func_L00_0042AC18(char *self) {
     unsigned int flags;
     float distance;
     if (sub[0] < 0) return;
-    distance = func_00282E48(D_L00_001B8DC0, self + 0x40);
+    distance = fast_vec_dist(D_L00_001B8DC0, self + 0x40);
     if (distance < *(float *)(self + 0xc)) {
         char *slot;
         flags = 0;

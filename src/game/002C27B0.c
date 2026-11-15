@@ -43,10 +43,10 @@ cont:
     } else {
         qcopy(self + 0x10, (char *)*(int *)(self + 0x30) + 0x10);
     }
-    if (1.5f < func_00282E48(self + 0x10, self + 0x20)) {
-        func_00282CF0(&local, &local, self + 0x10);
-        func_00282F20(&local, &local, 1.5f);
-        func_00282CC0(self + 0x20, self + 0x10, &local);
+    if (1.5f < fast_vec_dist(self + 0x10, self + 0x20)) {
+        FastVecSub(&local, &local, self + 0x10);
+        vec_scale_to_length(&local, &local, 1.5f);
+        FastVecAdd(self + 0x20, self + 0x10, &local);
     }
     *(float *)(self + 0x1C) = f21;
     *(float *)(self + 0x2C) = f22;

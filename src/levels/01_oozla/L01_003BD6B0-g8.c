@@ -26,22 +26,22 @@ void func_L01_003BD6B0(char *obj)
     qcopy(state + 0x1D0, obj + 0x10);
     func_L01_003BD5E8(obj);
     value = 0.0f;
-    *(unsigned char *)(state + 0x48) = func_00283CF0(10.0f);
-    *(unsigned char *)(state + 0x4A) = func_00283CF0(4.0f);
+    *(unsigned char *)(state + 0x48) = FloatToInt(10.0f);
+    *(unsigned char *)(state + 0x4A) = FloatToInt(4.0f);
     *(unsigned char *)(state + 0x200) = *(unsigned char *)(obj + 0x30);
     if (*(int *)(state + 0x294) != -1) {
         record = D_L01_001B21C0;
         record += *(int *)(state + 0x294);
         value = record->radius;
     }
-    if (value > 0.0f) *(unsigned char *)(obj + 0x30) = func_00283CF0(value + 2.0f);
+    if (value > 0.0f) *(unsigned char *)(obj + 0x30) = FloatToInt(value + 2.0f);
     *(unsigned char *)(state + 0x200) = *(unsigned char *)(state + 0x201) = *(unsigned char *)(obj + 0x30);
     if (*(int *)(state + 0x298) != -1) {
         record = D_L01_001B21C0;
         record += *(int *)(state + 0x298);
         value = record->radius;
     }
-    if (value > 0.0f) *(unsigned char *)(state + 0x200) = func_00283CF0(value + 2.0f);
+    if (value > 0.0f) *(unsigned char *)(state + 0x200) = FloatToInt(value + 2.0f);
     if (*(int *)(state + 0x210) != -1) func_L01_003377C8(D_L01_001FE180[*(int *)(state + 0x210)]);
     if (*(int *)(state + 0x214) != -1) func_L01_003377C8(D_L01_001FE180[*(int *)(state + 0x214)]);
     *(char **)(state + 0x10) = state + 0x50;
@@ -96,7 +96,7 @@ void func_L01_003BD6B0(char *obj)
         break;
     case 2:
         qcopy(state + 0x1F0, state + 0xD0);
-        func_00282CC0(obj + 0x10, obj + 0x10, state + 0x1F0);
+        FastVecAdd(obj + 0x10, obj + 0x10, state + 0x1F0);
         qcopy(state + 0x1D0, obj + 0x10);
         if (*(unsigned char *)(obj + 0x43) != 5) func_002A7470(obj, 5, 0, 3);
         *(unsigned short *)(obj + 0x34) |= 0x1000;

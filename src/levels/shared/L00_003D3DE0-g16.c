@@ -40,7 +40,7 @@ char *func_L00_003D3DE0(char *owner, Quad *position)
         func_002E5DA0(6, 0, owner, 0xB02);
         return 0;
     }
-    moby = func_0029EFD0(0xB02);
+    moby = CreateMoby(0xB02);
     if (moby != 0) {
         state = *(char **)(moby + 0x68);
         *(char **)(state + 0x34) = owner;

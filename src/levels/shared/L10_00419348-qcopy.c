@@ -33,8 +33,8 @@ void func_L10_00419348(char *obj)
         alt.f[3] = 1.0f;
         qcopy(&dir, &alt);
     }
-    func_00283098(&tail, &dir, obj + 0xC0);
-    func_00282CC0(&tail, &tail, obj + 0x10);
+    matrix_mul_vec3(&tail, &dir, obj + 0xC0);
+    FastVecAdd(&tail, &tail, obj + 0x10);
     tail.w[3] = 0;
     qcopy(&mark1, &tail);
     qcopy(&mark2, &tail);

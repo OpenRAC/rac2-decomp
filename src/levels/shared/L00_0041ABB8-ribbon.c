@@ -76,39 +76,39 @@ void func_L00_0041F820(Quad128 *points, int firstTexture, int secondTexture, int
     frame.second.view.uv[0][0] = uv;
     frame.second.view.uv[2][0] = uv + 1;
 
-    func_00282CF0(&frame.eye, points, D_L00_001B8DC0);
-    func_00282CF0(&frame.tangent, points + 1, points);
-    func_00282DD8(&frame.side, &frame.tangent, &frame.eye);
-    func_00282F20(&frame.offset, &frame.side, ((float *)points)[3]);
-    func_00282CC0(&frame.first.view.vertices[0], points, &frame.offset);
-    func_00282CF0(&frame.first.view.vertices[1], points, &frame.offset);
-    func_00282D30(&frame.offset, &frame.offset, width);
-    func_00282CC0(&frame.second.view.vertices[0], points, &frame.offset);
-    func_00282CF0(&frame.second.view.vertices[1], points, &frame.offset);
+    FastVecSub(&frame.eye, points, D_L00_001B8DC0);
+    FastVecSub(&frame.tangent, points + 1, points);
+    FastVecCross(&frame.side, &frame.tangent, &frame.eye);
+    vec_scale_to_length(&frame.offset, &frame.side, ((float *)points)[3]);
+    FastVecAdd(&frame.first.view.vertices[0], points, &frame.offset);
+    FastVecSub(&frame.first.view.vertices[1], points, &frame.offset);
+    FastVecScale(&frame.offset, &frame.offset, width);
+    FastVecAdd(&frame.second.view.vertices[0], points, &frame.offset);
+    FastVecSub(&frame.second.view.vertices[1], points, &frame.offset);
 
     for (index = 1; index < count; index++) {
-        func_00282CF0(&frame.eye, &points[index], D_L00_001B8DC0);
-        func_00282CF0(&frame.tangent, &points[index], &points[index - 1]);
-        func_00282DD8(&frame.side, &frame.tangent, &frame.eye);
-        func_00282F20(&frame.offset, &frame.side, ((float *)&points[index])[3]);
-        func_00282CC0(&frame.first.view.vertices[2], &points[index], &frame.offset);
-        func_00282CF0(&frame.first.view.vertices[3], &points[index], &frame.offset);
-        func_00282D30(&frame.offset, &frame.offset, width);
-        func_00282CC0(&frame.second.view.vertices[2], &points[index], &frame.offset);
-        func_00282CF0(&frame.second.view.vertices[3], &points[index], &frame.offset);
+        FastVecSub(&frame.eye, &points[index], D_L00_001B8DC0);
+        FastVecSub(&frame.tangent, &points[index], &points[index - 1]);
+        FastVecCross(&frame.side, &frame.tangent, &frame.eye);
+        vec_scale_to_length(&frame.offset, &frame.side, ((float *)&points[index])[3]);
+        FastVecAdd(&frame.first.view.vertices[2], &points[index], &frame.offset);
+        FastVecSub(&frame.first.view.vertices[3], &points[index], &frame.offset);
+        FastVecScale(&frame.offset, &frame.offset, width);
+        FastVecAdd(&frame.second.view.vertices[2], &points[index], &frame.offset);
+        FastVecSub(&frame.second.view.vertices[3], &points[index], &frame.offset);
 
-        fade = 1.0f - func_00283CE0(index) / func_00283CE0(count);
-        alpha = func_00283CF0(func_00283CE0(firstAlpha) * fade);
-        frame.first.view.colors[3] = func_00283D38(0x1010ff, firstColor & 0xffffff, fade) |
+        fade = 1.0f - IntToFloat(index) / IntToFloat(count);
+        alpha = FloatToInt(IntToFloat(firstAlpha) * fade);
+        frame.first.view.colors[3] = FastTweenColor(0x1010ff, firstColor & 0xffffff, fade) |
                                      ((unsigned int)alpha << 24);
         frame.first.view.colors[2] = frame.first.view.colors[3];
-        alpha = func_00283CF0(func_00283CE0(secondAlpha) * fade);
-        frame.second.view.colors[3] = func_00283D38(0x1010ff, secondColor & 0xffffff, fade) |
+        alpha = FloatToInt(IntToFloat(secondAlpha) * fade);
+        frame.second.view.colors[3] = FastTweenColor(0x1010ff, secondColor & 0xffffff, fade) |
                                       ((unsigned int)alpha << 24);
         frame.second.view.colors[2] = frame.second.view.colors[3];
 
-        func_00280B90(&frame.first, 0, 0);
-        func_00280B90(&frame.second, 0, 0);
+        draw_world_quad(&frame.first, 0, 0);
+        draw_world_quad(&frame.second, 0, 0);
 
         qcopy(&frame.first.view.vertices[0], &frame.first.view.vertices[2]);
         qcopy(&frame.first.view.vertices[1], &frame.first.view.vertices[3]);

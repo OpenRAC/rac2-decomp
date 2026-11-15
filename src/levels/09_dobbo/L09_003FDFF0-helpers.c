@@ -16,11 +16,11 @@ void func_L09_003FDFF0(unsigned char *a0) {
         return;
     qcopy(buf, s1 + 0x10);
     buf[3] = 4.0f;
-    if (func_00283DB8(buf, func_00283CE0(*(short *)(s1 + 0x32))) == -1)
+    if (func_00283DB8(buf, IntToFloat(*(short *)(s1 + 0x32))) == -1)
         return;
     func_0029FC20((char *)s1, 1, (char *)(s2 + 0x340));
-    func_00282F20((float *)(s2 + 0x340), (float *)(s2 + 0x340), 1.0f);
-    func_00282F20((float *)(s2 + 0x350), (float *)(s2 + 0x350), 1.0f);
-    func_00282F20((float *)(s2 + 0x360), (float *)(s2 + 0x360), 1.0f);
+    vec_scale_to_length((float *)(s2 + 0x340), (float *)(s2 + 0x340), 1.0f);
+    vec_scale_to_length((float *)(s2 + 0x350), (float *)(s2 + 0x350), 1.0f);
+    vec_scale_to_length((float *)(s2 + 0x360), (float *)(s2 + 0x360), 1.0f);
     *(int *)(s2 + 0x42C) = 2;
 }

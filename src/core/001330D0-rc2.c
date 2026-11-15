@@ -32,5 +32,5 @@ void func_001330D0(void) {
 
     temp_a0 = *(s32 *)((s32) ((s8 *) ((D_001A74C0 * 4)) + (s32) (&D_001A74A0)));
     *temp_a0 += 1;
-    func_00132028();
+    snd_Pump();
 }

@@ -119,40 +119,40 @@ void func_L18_002DEFF8(void) {
         D_00189E20.step_frames = step;
         D_00189E20.animation_frames = animation;
     }
-    func_00282978(((unsigned char *)&D_00189E20)+0x1E0);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1DC);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1D2);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1E4);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1F8);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1FE);
+    FastDecTimer(((unsigned char *)&D_00189E20)+0x1E0);
+    FastDecTimer(((unsigned char *)&D_00189E20)+0x1DC);
+    FastDecTimer(((unsigned char *)&D_00189E20)+0x1D2);
+    FastDecTimer(((unsigned char *)&D_00189E20)+0x1E4);
+    FastDecTimer(((unsigned char *)&D_00189E20)+0x1F8);
+    FastDecTimer(((unsigned char *)&D_00189E20)+0x1FE);
     func_00282948(((unsigned char *)&D_00189E20)+0x1D4);
-    func_00282978(((unsigned char *)&D_00189E20)+0x210);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1D0);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1F4);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1F6);
-    func_00282978(((unsigned char *)&D_00189E20)+0x204);
-    func_00282978(((unsigned char *)&D_00189E20)+0x206);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1F0);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1EC);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1EE);
-    func_00282978(((unsigned char *)&D_00189E20)+0x208);
-    func_00282978(((unsigned char *)&D_00189E20)+0x200);
-    func_00282978(((unsigned char *)&D_00189E20)+0x20E);
-    func_00282978(((unsigned char *)&D_00189E20)+0x20A);
-    func_00282978(((unsigned char *)&D_00189E20)+0x214);
-    func_00282978(((unsigned char *)&D_00189E20)+0x212);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1FC);
-    func_00282978(((unsigned char *)&D_00189E20)+0x216);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1FA);
-    func_00282978(((unsigned char *)&D_00189E20)+0x218);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1F2);
-    func_00282978(((unsigned char *)&D_00189E20)+0x21A);
-    func_00282978(((unsigned char *)&D_00189E20)+0x21C);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1DE);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1E6);
-    func_00282978(((unsigned char *)&D_00189E20)+0x222);
-    func_00282978(((unsigned char *)&D_00189E20)+0x224);
-    func_00282978(((unsigned char *)&D_00189E20)+0x226);
+    FastDecTimer(((unsigned char *)&D_00189E20)+0x210);
+    FastDecTimer(((unsigned char *)&D_00189E20)+0x1D0);
+    FastDecTimer(((unsigned char *)&D_00189E20)+0x1F4);
+    FastDecTimer(((unsigned char *)&D_00189E20)+0x1F6);
+    FastDecTimer(((unsigned char *)&D_00189E20)+0x204);
+    FastDecTimer(((unsigned char *)&D_00189E20)+0x206);
+    FastDecTimer(((unsigned char *)&D_00189E20)+0x1F0);
+    FastDecTimer(((unsigned char *)&D_00189E20)+0x1EC);
+    FastDecTimer(((unsigned char *)&D_00189E20)+0x1EE);
+    FastDecTimer(((unsigned char *)&D_00189E20)+0x208);
+    FastDecTimer(((unsigned char *)&D_00189E20)+0x200);
+    FastDecTimer(((unsigned char *)&D_00189E20)+0x20E);
+    FastDecTimer(((unsigned char *)&D_00189E20)+0x20A);
+    FastDecTimer(((unsigned char *)&D_00189E20)+0x214);
+    FastDecTimer(((unsigned char *)&D_00189E20)+0x212);
+    FastDecTimer(((unsigned char *)&D_00189E20)+0x1FC);
+    FastDecTimer(((unsigned char *)&D_00189E20)+0x216);
+    FastDecTimer(((unsigned char *)&D_00189E20)+0x1FA);
+    FastDecTimer(((unsigned char *)&D_00189E20)+0x218);
+    FastDecTimer(((unsigned char *)&D_00189E20)+0x1F2);
+    FastDecTimer(((unsigned char *)&D_00189E20)+0x21A);
+    FastDecTimer(((unsigned char *)&D_00189E20)+0x21C);
+    FastDecTimer(((unsigned char *)&D_00189E20)+0x1DE);
+    FastDecTimer(((unsigned char *)&D_00189E20)+0x1E6);
+    FastDecTimer(((unsigned char *)&D_00189E20)+0x222);
+    FastDecTimer(((unsigned char *)&D_00189E20)+0x224);
+    FastDecTimer(((unsigned char *)&D_00189E20)+0x226);
 
     if (!(D_00138180.held&4)) D_00189E20.field_20C = 0;
     if (D_00189E20.field_21C) func_L00_002A7A10();
@@ -194,9 +194,9 @@ void func_L18_002DEFF8(void) {
                 if ((D_L18_001B2348&7) == (((int)m>>8)&7) || !func_002A77E0(4)) {
                     hero = (unsigned char *)&D_00189E20+0x80;
                     pos = m+0x10;
-                    if (func_00282E48(hero, pos)<15.37f) {
-                        func_00282CF0(sum, pos, hero);
-                        func_00282F20(sum, sum, 1.7f);
+                    if (fast_vec_dist(hero, pos)<15.37f) {
+                        FastVecSub(sum, pos, hero);
+                        vec_scale_to_length(sum, sum, 1.7f);
                         func_002A8F70(m, D_00189E20.field_2290, 0x4000000, hero, sum, 1.0f);
                     }
                 }
@@ -213,12 +213,12 @@ void func_L18_002DEFF8(void) {
             history_index = D_00189E20.pos_history_index-i;
             first_index = (history_index+31)%32;
             second_index = (history_index+30)%32;
-            func_00282CF0(delta, ((unsigned char *)&D_00189E20)+0x1D90+first_index*16, ((unsigned char *)&D_00189E20)+0x1D90+second_index*16);
+            FastVecSub(delta, ((unsigned char *)&D_00189E20)+0x1D90+first_index*16, ((unsigned char *)&D_00189E20)+0x1D90+second_index*16);
             i++;
-            func_00282CC0(sum, sum, delta);
+            FastVecAdd(sum, sum, delta);
         }
-        func_00282D30(sum, sum, 1.0f/(float)count);
-        if (func_00282DF0(sum)<0.016666668f) {
+        FastVecScale(sum, sum, 1.0f/(float)count);
+        if (FastVecLength(sum)<0.016666668f) {
             D_00189E20.still_frames++;
             goto history_done;
         }

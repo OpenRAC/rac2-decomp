@@ -61,10 +61,10 @@ fail:
         e *= 16;
     } while (0);
     rec = (char *)tab + e;
-    func_00282D60(p, rec, s * k);
+    scale_vector(p, rec, s * k);
     rec += 0x10;
-    func_00283098(m, m, obj + 0xC0);
-    func_00282CC0(m, m, obj + 0x10);
+    matrix_mul_vec3(m, m, obj + 0xC0);
+    FastVecAdd(m, m, obj + 0x10);
     do {
         n = *(short *)(rec + 6);
     } while (0);
@@ -74,7 +74,7 @@ fail:
             i--;
             func_00283130(dst, *(unsigned long long *)rec);
             rec += 8;
-            func_00282D30(dst, dst, *(float *)(obj + 0x2C) * k);
+            FastVecScale(dst, dst, *(float *)(obj + 0x2C) * k);
             *(float *)(dst + 0xC) = 1.0f;
             dst += 0x10;
         }

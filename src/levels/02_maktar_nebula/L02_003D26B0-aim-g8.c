@@ -4,7 +4,7 @@
  * list-pointer guard in front of the aim code is deleted by the compiler's null-pointer-check
  * pass (p was just dereferenced); without the block merge it leaves retail's CSE block boundary
  * there, which keeps the second saved copy of the target position (daddu of e + 0x10). The same
- * body, with a visibility test in front, is func_L11_00449C70. */
+ * body, with a visibility test in front, is AimAtGroupEntityInCone. */
 
 extern u16 *D_L02_001FC060[];
 extern u8 *D_L02_001B359C_1[] __attribute__((sda));
@@ -47,19 +47,19 @@ int func_L02_003D26B0(char *self) {
             return 0;
         if (func_L02_003D7300(e) == 0)
             continue;
-        if (!(func_00282E80(self + 0x10, e + 0x10) < D_L02_001B016C))
+        if (!(vec_distance_xy(self + 0x10, e + 0x10) < D_L02_001B016C))
             continue;
-        if (!(func_00283C80(*(float *)(self + 0xF8), ANGLE()) < D_L02_001B0170 * 0.017453294f))
+        if (!(FastDiffRots(*(float *)(self + 0xF8), ANGLE()) < D_L02_001B0170 * 0.017453294f))
             continue;
         if (p == 0)
             return 0;
 
-        func_00282CF0(buf, (float *)(self + 0x10), (float *)(e + 0x10));
+        FastVecSub(buf, (float *)(self + 0x10), (float *)(e + 0x10));
         ax = self + 0xE0;
         r = D_L02_001B0174 * 0.017453294f;
         func_002ACEC0(buf, buf, ax,
-                      0.0f <= func_00283BE0(*(float *)(self + 0xF8), ANGLE()) ? -r : r);
-        func_00282CC0(buf, buf, e + 0x10);
+                      0.0f <= fast_subtract_rotations(*(float *)(self + 0xF8), ANGLE()) ? -r : r);
+        FastVecAdd(buf, buf, e + 0x10);
         saved = *(float *)(state + 0x134);
         *(float *)(state + 0x134) = 0.0001f;
         func_L01_00321178(self, buf);

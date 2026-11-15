@@ -9,7 +9,7 @@ extern void func_002A0F48(char *object);
 /* Finds the object with the fixed id, marks it and gives it the caller's position. */
 int func_00302A20(void *object)
 {
-    void *found = func_0029EFD0(0x3EF);
+    void *found = CreateMoby(0x3EF);
 
     if (found != 0) {
         *(unsigned short *)((char *)found + 0x34) |= 0x41;

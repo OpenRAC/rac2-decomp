@@ -77,7 +77,7 @@ int func_L02_003272D8(char *arg0) {
     int w8;
     int v;
 
-    func_002A04B8(arg0, &w0, &w4, &w8);
+    get_moby_color(arg0, &w0, &w4, &w8);
     v = (w4 << 8) | 0x80000000;
     return (w8 << 16) | v | w0;
 }
@@ -126,7 +126,7 @@ void func_L02_003294D8(char *arg0, float *arg1, float arg2) {
 
     func_00282C88(p);
     *p = arg2;
-    func_00283098(p, p, (const float *)(q + 0xC0));
+    matrix_mul_vec3(p, p, (const float *)(q + 0xC0));
 }
 
 typedef int TI128 __attribute__((mode(TI)));
@@ -175,14 +175,14 @@ int func_L02_0032E3B0(void *object, float *target, int index) {
     func_00282C88(quat);
     quat[2] = func_00283248(target[0] - *(float *)((char *)object + 0x10),
                                    target[1] - *(float *)((char *)object + 0x14));
-    func_00283410(mat, quat);
-    func_00283698(mat, mat);
+    euler_to_matrix(mat, quat);
+    matrix_from_basis_rows(mat, mat);
     p = (short *)D_L02_001FC060[index];
     do {
         entity = D_L02_001B359C + ((*(unsigned short *)p & 0x7FFF) << 8);
         if (entity[0x20] >= 0 && entity != (char *)object) {
-            func_00282CF0(vec, (float *)(entity + 0x10), (float *)((char *)object + 0x10));
-            func_00283098(vec, vec, mat);
+            FastVecSub(vec, (float *)(entity + 0x10), (float *)((char *)object + 0x10));
+            matrix_mul_vec3(vec, vec, mat);
             if (best < vec[1])
                 count--;
             else
@@ -202,7 +202,7 @@ int func_L02_0032E998(float *position, float *target, float *heading, struct Rou
     float angle;
     *heading = func_00283248(target[0] - position[0], target[1] - position[1]);
     if (override != 0.0f)
-        *heading = func_00283B98(override, *heading);
+        *heading = FastAddRotations(override, *heading);
     if (!func_L02_0032EDD8(position, nodes, count, sourceNode))
         return 0;
     if (!func_L02_0032EDD8(target, nodes, count, targetNode))
@@ -280,23 +280,23 @@ float func_L02_0032EC98(void *a0, void *a1, void *position, float angle, float m
     float mid;
     float f;
 
-    func_00282CF0(v0, (float *)a1, (float *)a0);
-    func_00282F20(v0, v0, margin);
-    func_00282CC0(v1, a0, v0);
-    func_00282CF0(v2, (float *)a1, v0);
+    FastVecSub(v0, (float *)a1, (float *)a0);
+    vec_scale_to_length(v0, v0, margin);
+    FastVecAdd(v1, a0, v0);
+    FastVecSub(v2, (float *)a1, v0);
 
     start = func_00283248(v1[0] - *(float *)position, v1[1] - *(float *)((char *)position + 4));
-    half = func_00283BE0(func_00283248(v2[0] - *(float *)position,
+    half = fast_subtract_rotations(func_00283248(v2[0] - *(float *)position,
                                        v2[1] - *(float *)((char *)position + 4)), start) * 0.5f;
-    mid = func_00283B98(half, start);
-    angle = func_00283BE0(angle, mid);
+    mid = FastAddRotations(half, start);
+    angle = fast_subtract_rotations(angle, mid);
     f = func_00282C48(half);
     if (f < angle)
         angle = f;
     f = -f;
     if (angle < f)
         angle = f;
-    return func_00283B98(angle, mid);
+    return FastAddRotations(angle, mid);
 }
 
 extern int func_002A8AF0(float *p, float *v, int n);
@@ -315,18 +315,18 @@ int func_L02_0032EDD8(void *point, struct RouteNode *nodes, int count, int *inde
         entry = D_L02_001FF1C0[nodes[*index].path];
         n = *(int *)entry;
         entry += 0x10;
-        if (func_002A8AF0(point, (float *)entry, n) != 0)
+        if (point_in_path_xy(point, (float *)entry, n) != 0)
             return 1;
     }
     for (i = 0; i < count; i++) {
         if (i != *index
-            && func_00282E80(point, (char *)&nodes[i] + 0x10) <= *(float *)((char *)&nodes[i] + 0x1C)) {
+            && vec_distance_xy(point, (char *)&nodes[i] + 0x10) <= *(float *)((char *)&nodes[i] + 0x1C)) {
             char *entry;
             int n;
             entry = D_L02_001FF1C0[nodes[i].path];
             n = *(int *)entry;
             entry += 0x10;
-            if (func_002A8AF0(point, (float *)entry, n) != 0) {
+            if (point_in_path_xy(point, (float *)entry, n) != 0) {
                 *index = i;
                 return 1;
             }
@@ -374,7 +374,7 @@ extern int func_L02_00332668(char *arg0, char *arg1);
 int func_L02_00332630(char *arg0, void *arg1) {
     int tmp[4];
 
-    func_00282CF0((float *)tmp, (const float *)arg1, (const float *)(arg0 + 0x10));
+    FastVecSub((float *)tmp, (const float *)arg1, (const float *)(arg0 + 0x10));
     return func_L02_00332668(arg0, (char *)tmp);
 }
 
@@ -414,9 +414,9 @@ int func_L02_003329C8(char *a0, char *a1, float f12, float f13) {
     if (rec == 0)
         return 0;
     *(float *)(rec + 0x2C) = f13;
-    func_00282CF0((float *)(rec + 0xA0), (const float *)a1, (const float *)(a0 + 0x10));
+    FastVecSub((float *)(rec + 0xA0), (const float *)a1, (const float *)(a0 + 0x10));
     *(int *)(rec + 0xA8) = 0;
-    func_00282F20((float *)(rec + 0xA0), (const float *)(rec + 0xA0), f12);
+    vec_scale_to_length((float *)(rec + 0xA0), (const float *)(rec + 0xA0), f12);
     *(float *)(rec + 0xA8) = func_L00_0031CDD0(a0 + 0x10, a1, 0, f12, -f13);
     return 1;
 }
@@ -454,26 +454,26 @@ void func_L02_00332A80(char *object, char *data, void *target, TI128 *input, voi
         func_00282C88(&desired.q);
     } else {
         float gap;
-        distance = func_00282E48(object + 0x10, target);
+        distance = fast_vec_dist(object + 0x10, target);
         *(float *)(data + 0xCC) = distance;
         gap = *(float *)(data + 0x34);
         if (distance <= gap) {
             qzero(&desired);
         } else {
             gap = distance - gap;
-            speed = func_00282C10((gap + gap) * *(float *)(data + 0x24));
+            speed = square_root((gap + gap) * *(float *)(data + 0x24));
             if (*(float *)(data + 0x28) < speed)
                 speed = *(float *)(data + 0x28);
             func_L02_003294D8(object, desired.f, speed);
         }
     }
-    func_00282CF0(change.f, desired.f, (float *)(data + 0xA0));
+    FastVecSub(change.f, desired.f, (float *)(data + 0xA0));
     func_002AFEB8(object, (char *)&change, (char *)&change, 0.0f, transform);
-    if (func_00282DB0(&desired, data + 0xA0) > 0.0f)
+    if (FastVecDot(&desired, data + 0xA0) > 0.0f)
         func_002AC9F8(change.f, *(float *)(data + 0x20));
     else
         func_002AC9F8(change.f, *(float *)(data + 0x24));
-    func_00282CC0(data + 0xA0, data + 0xA0, &change);
+    FastVecAdd(data + 0xA0, data + 0xA0, &change);
     *(float *)(data + 0xB0) = func_002AFF08(object, data + 0xA0, transform);
     if (!(*(unsigned int *)(data + 0x38) & 4)) {
         height = func_002B0360(object + 0x10);
@@ -514,17 +514,17 @@ void func_L02_00333300(char *a0, char *a1) {
     char *sub;
 
     func_002AFFD8(a0 + 0x10, (char *)buf0, 1);
-    func_00282F20(buf1, buf0, *(float *)(a1 + 8) + 0.1f);
-    func_00282F20(buf2, buf0, -*(float *)(a1 + 0xC) - 0.1f);
-    func_00282CC0((char *)buf1, (char *)buf1, a0 + 0x10);
-    func_00282CC0((char *)buf2, (char *)buf2, a0 + 0x10);
-    if (func_002761F8((char *)buf1, (char *)buf2, 0, a0, 0)) {
+    vec_scale_to_length(buf1, buf0, *(float *)(a1 + 8) + 0.1f);
+    vec_scale_to_length(buf2, buf0, -*(float *)(a1 + 0xC) - 0.1f);
+    FastVecAdd((char *)buf1, (char *)buf1, a0 + 0x10);
+    FastVecAdd((char *)buf2, (char *)buf2, a0 + 0x10);
+    if (CollLine((char *)buf1, (char *)buf2, 0, a0, 0)) {
         obj = &D_L02_001C0960;
         *(float *)(a1 + 0x90) = func_002B0360(obj);
         sub = obj - 0x20;
         *(int *)(a1 + 0x88) = *(int *)(sub + 0x18);
         *(int *)(a1 + 0x8C) = *(int *)(sub + 0x1C);
-        func_00282F20((float *)(a1 + 0x50), (float *)(obj + 0x20), 1.0f);
+        vec_scale_to_length((float *)(a1 + 0x50), (float *)(obj + 0x20), 1.0f);
     } else {
         *(int *)(a1 + 0x90) = 0;
         *(int *)(a1 + 0x88) = 0;
@@ -538,7 +538,7 @@ extern void func_L02_00333480(char *arg0, char *arg1, void *arg2);
 void func_L02_00333438(char *arg0, char *arg1) {
     int tmp[4];
 
-    func_00282CF0((float *)tmp, (const float *)arg1, (const float *)(arg0 + 0x10));
+    FastVecSub((float *)tmp, (const float *)arg1, (const float *)(arg0 + 0x10));
     func_L02_00333480(arg0, arg1, tmp);
 }
 
@@ -566,7 +566,7 @@ void *func_L02_003449D8(void *a0, void *a1, void *a2, void *a3, int a4) {
 
     rec = (unsigned char *)func_002B9030(0x56);
     if (rec != 0) {
-        rec[9] = (unsigned char)(func_00283CF0(0.04f) - 0x60);
+        rec[9] = (unsigned char)(FloatToInt(0.04f) - 0x60);
         rec[3] = (a3 != 0) ? 0x48 : 0x44;
         rec[1] = 0;
         rec[2] = *D_L02_002001D8;
@@ -574,7 +574,7 @@ void *func_L02_003449D8(void *a0, void *a1, void *a2, void *a3, int a4) {
         f21 = func_002A7878(0.0f, 1.0f);
 
         p = *(short **)((char *)a2 + 8);
-        f20 = f21 / func_00283CE0(p[1] - p[0]);
+        f20 = f21 / IntToFloat(p[1] - p[0]);
 
         r = *(int **)((char *)a2 + 0);
         *(int *)(rec + 4) = func_L00_0031C998(r[0], r[1], f20);
@@ -582,13 +582,13 @@ void *func_L02_003449D8(void *a0, void *a1, void *a2, void *a3, int a4) {
         q = *(short **)((char *)a2 + 4);
         *(float *)(rec + 0xC) = ((float)q[0] + f20 * (float)(q[1] - q[0])) * 1000.0f;
 
-        func_00282D30(buf, a1, f21);
-        func_00282CC0(rec + 0x10, a0, buf);
+        FastVecScale(buf, a1, f21);
+        FastVecAdd(rec + 0x10, a0, buf);
 
         *(short *)(rec + 0xA) = (short)(*(int *)((char *)a2 + 0x10) - (f21 > 0.5f));
 
         rec2 = rec + 0x20;
-        func_00282D30(rec2, a1, f21 * *(float *)((char *)a2 + 0x14));
+        FastVecScale(rec2, a1, f21 * *(float *)((char *)a2 + 0x14));
         *(int *)(rec2 + 0x18) = a4;
         *(void **)(rec2 + 0x10) = a2;
         *(short *)(rec2 + 0x14) = 0;
@@ -629,7 +629,7 @@ extern void func_L02_0038DA00(void *arg0);
 
 /* State machine of the controller object that owns a group id list. On level 13 it retires
    itself (+0x30 = 0xFF, bits 0 and 6 of +0x34 set, bit 12 cleared) once the resident float is
-   past 89 or the resident word is 0x74. State 0 runs func_L02_0038BD00; state 1 switches the
+   past 89 or the resident word is 0x74. State 0 runs InitRailGroupMembers; state 1 switches the
    whole group off (+0x31 cleared, bit 0 of +0x34 set) when the record test passes, then runs
    func_L02_0038C998 and queues func_L02_0038DA00; state 2 switches the group back on. */
 void func_L02_0038BA28(unsigned char *arg0) {
@@ -651,7 +651,7 @@ void func_L02_0038BA28(unsigned char *arg0) {
         return;
     switch (arg0[0x20]) {
     case 0:
-        func_L02_0038BD00(arg0, arg0[0x21]);
+        InitRailGroupMembers(arg0, arg0[0x21]);
         break;
     case 1:
         /* each walk has its own q and e: retail gives the two walks different registers */
@@ -711,11 +711,11 @@ void func_L02_0038D978(char *arg0) {
 
     if (*(short *)(arg0 + 0xAA) != 0x9B0)
         return;
-    if (func_00282978(s0 + 0x74) != 0) {
+    if (FastDecTimer(s0 + 0x74) != 0) {
         *(unsigned short *)(s0 + 0x74) = 0x32;
         *(unsigned int *)(s0 + 0x8C) = (*(unsigned int *)(s0 + 0x8C) == 0);
     }
-    *(int *)(arg0 + 0x78) = func_00283D38(*(int *)(arg0 + 0x78),
+    *(int *)(arg0 + 0x78) = FastTweenColor(*(int *)(arg0 + 0x78),
         *(unsigned int *)(s0 + 0x8C) != 0 ? 0x50787878 : 0x50141414, 0.15f);
 }
 
@@ -768,7 +768,7 @@ void func_L02_0038DA60(unsigned char *arg0) {
             break;
         o = *(char **)(e + 0x68);
         if (e[0x31] != 0) {
-            func_00282D60(buf, e, 0.0009765625f);
+            scale_vector(buf, e, 0.0009765625f);
             buf[3] *= 1.1f;
             if (func_00283DB8(buf, (float)*(int *)(o + 0x98)) != -1 &&
                 (*(unsigned short *)(e + 0x34) & 1) == 0 && *(short *)(e + 0xAA) == 0x9B0 &&
@@ -778,7 +778,7 @@ void func_L02_0038DA60(unsigned char *arg0) {
                     if (*(float *)(o + 0x1C) <= -8.0f)
                         *(float *)(o + 0x1C) += 8.0f;
                 }
-                func_L00_002ECFE8(e, o + 0xA0, 3, 0x60804040, *(float *)(o + 0x78) * 0.8f,
+                DrawOrientedQuadsAtPoints(e, o + 0xA0, 3, 0x60804040, *(float *)(o + 0x78) * 0.8f,
                                   *(float *)(o + 0x78) * 5.0f, *(float *)(o + 0x1C), 0x204090, 0x17);
             }
         }
@@ -807,7 +807,7 @@ void func_L02_0038DC68(unsigned char *arg0) {
             break;
         o = *(char **)(e + 0x68);
         if (e[0x31] != 0) {
-            func_00282D60(buf, e, 0.0009765625f);
+            scale_vector(buf, e, 0.0009765625f);
             buf[3] *= 1.1f;
             if (func_00283DB8(buf, (float)*(int *)(o + 0x98)) != -1 &&
                 !(*(unsigned short *)(e + 0x34) & 1) && *(short *)(e + 0xAA) == 0x9B7 &&
@@ -817,7 +817,7 @@ void func_L02_0038DC68(unsigned char *arg0) {
                     if (*(float *)(o + 0x1C) <= -8.0f)
                         *(float *)(o + 0x1C) += 8.0f;
                 }
-                func_L00_002ECFE8(e, o + 0xA0, 2, 0x605696FF, *(float *)(o + 0x78),
+                DrawOrientedQuadsAtPoints(e, o + 0xA0, 2, 0x605696FF, *(float *)(o + 0x78),
                                   *(float *)(o + 0x78) * 7.0f, *(float *)(o + 0x1C), 0xC0, 0x17);
             }
         }
@@ -844,7 +844,7 @@ void func_L02_0038DE58(unsigned char *arg0) {
             break;
         o = *(char **)(e + 0x68);
         if (e[0x31] != 0) {
-            func_00282D60(buf, e, 0.0009765625f);
+            scale_vector(buf, e, 0.0009765625f);
             buf[3] *= 1.1f;
             if (func_00283DB8(buf, (float)*(int *)(o + 0x98)) != -1 &&
                 !(*(unsigned short *)(e + 0x34) & 1) && *(short *)(e + 0xAA) == 0xB15 &&
@@ -854,7 +854,7 @@ void func_L02_0038DE58(unsigned char *arg0) {
                     if (*(float *)(o + 0x1C) <= -8.0f)
                         *(float *)(o + 0x1C) += 8.0f;
                 }
-                func_L00_002ECFE8(e, o + 0xA0, 2, 0x605696FF, *(float *)(o + 0x78),
+                DrawOrientedQuadsAtPoints(e, o + 0xA0, 2, 0x605696FF, *(float *)(o + 0x78),
                                   *(float *)(o + 0x78) * 7.0f, *(float *)(o + 0x1C), 0xC0, 0x17);
             }
         }
@@ -882,7 +882,7 @@ void func_L02_0038E048(unsigned char *arg0) {
             break;
         o = *(char **)(e + 0x68);
         if (e[0x31] != 0) {
-            func_00282D60(buf, e, 0.0009765625f);
+            scale_vector(buf, e, 0.0009765625f);
             buf[3] *= 1.1f;
             if (func_00283DB8(buf, (float)*(int *)(o + 0x98)) != -1 &&
                 (*(unsigned short *)(e + 0x34) & 1) == 0 && *(short *)(e + 0xAA) == 0x134B &&
@@ -892,7 +892,7 @@ void func_L02_0038E048(unsigned char *arg0) {
                     if (*(float *)(o + 0x1C) <= -8.0f)
                         *(float *)(o + 0x1C) += 8.0f;
                 }
-                func_L00_002ECFE8(e, o + 0xA0, 2, 0x60804040, *(float *)(o + 0x78) * 0.3f,
+                DrawOrientedQuadsAtPoints(e, o + 0xA0, 2, 0x60804040, *(float *)(o + 0x78) * 0.3f,
                                   *(float *)(o + 0x78) * 2.1000001f, *(float *)(o + 0x1C), 0x204090, 0x17);
             }
         }
@@ -919,7 +919,7 @@ void func_L02_0038E250(unsigned char *arg0) {
             break;
         o = *(char **)(e + 0x68);
         if (e[0x31] != 0) {
-            func_00282D60(buf, e, 0.0009765625f);
+            scale_vector(buf, e, 0.0009765625f);
             buf[3] *= 1.1f;
             if (func_00283DB8(buf, (float)*(int *)(o + 0x98)) != -1 &&
                 !(*(unsigned short *)(e + 0x34) & 1) && *(short *)(e + 0xAA) == 0x127D &&
@@ -927,7 +927,7 @@ void func_L02_0038E250(unsigned char *arg0) {
                 *(float *)(o + 0x1C) -= 0.1f;
                 if (*(float *)(o + 0x1C) <= -8.0f)
                     *(float *)(o + 0x1C) += 8.0f;
-                func_L00_002ECFE8(e, o + 0xA0, 2, 0x605696FF, *(float *)(o + 0x78) * 0.4f,
+                DrawOrientedQuadsAtPoints(e, o + 0xA0, 2, 0x605696FF, *(float *)(o + 0x78) * 0.4f,
                                   *(float *)(o + 0x78) * 4.0f, *(float *)(o + 0x1C), 0xC0, 0x17);
             }
         }
@@ -953,7 +953,7 @@ void func_L02_0038E430(unsigned char *arg0) {
             break;
         o = *(char **)(e + 0x68);
         if (e[0x31] != 0) {
-            func_00282D60(buf, e, 0.0009765625f);
+            scale_vector(buf, e, 0.0009765625f);
             buf[3] *= 1.1f;
             if (func_00283DB8(buf, (float)*(int *)(o + 0x98)) != -1 &&
                 !(*(unsigned short *)(e + 0x34) & 1) && *(short *)(e + 0xAA) == 0x128B &&
@@ -961,7 +961,7 @@ void func_L02_0038E430(unsigned char *arg0) {
                 *(float *)(o + 0x1C) -= 0.1f;
                 if (*(float *)(o + 0x1C) <= -8.0f)
                     *(float *)(o + 0x1C) += 8.0f;
-                func_L00_002ECFE8(e, o + 0xA0, 2, 0x605696FF, *(float *)(o + 0x78) * 0.4f,
+                DrawOrientedQuadsAtPoints(e, o + 0xA0, 2, 0x605696FF, *(float *)(o + 0x78) * 0.4f,
                                   *(float *)(o + 0x78) * 3.0f, *(float *)(o + 0x1C), 0xC0, 0x17);
             }
         }
@@ -989,7 +989,7 @@ void func_L02_0038E610(unsigned char *arg0) {
             break;
         o = *(char **)(e + 0x68);
         if (e[0x31] != 0) {
-            func_00282D60(buf, e, 0.0009765625f);
+            scale_vector(buf, e, 0.0009765625f);
             buf[3] *= 1.1f;
             if (func_00283DB8(buf, (float)*(int *)(o + 0x98)) != -1 &&
                 (*(unsigned short *)(e + 0x34) & 1) == 0 && *(short *)(e + 0xAA) == 0x1290 &&
@@ -999,8 +999,8 @@ void func_L02_0038E610(unsigned char *arg0) {
                     *(float *)(o + 0x1C) += 8.0f;
                 a = *(float *)(o + 0x78) * 0.4f;
                 b = *(float *)(o + 0x78) * 3.0f;
-                func_L00_002ECFE8(e, o + 0xA0, 2, 0x60804020, a, b, *(float *)(o + 0x1C), 0xC00000, 0x17);
-                func_L00_002ECFE8(e, o + 0xC0, 1, 0x60804020, a * 1.5f, b * 1.5f, *(float *)(o + 0x1C), 0xC00000,
+                DrawOrientedQuadsAtPoints(e, o + 0xA0, 2, 0x60804020, a, b, *(float *)(o + 0x1C), 0xC00000, 0x17);
+                DrawOrientedQuadsAtPoints(e, o + 0xC0, 1, 0x60804020, a * 1.5f, b * 1.5f, *(float *)(o + 0x1C), 0xC00000,
                                   0x17);
             }
         }
@@ -1028,7 +1028,7 @@ void func_L02_0038E838(unsigned char *arg0) {
             break;
         o = *(char **)(e + 0x68);
         if (e[0x31] != 0) {
-            func_00282D60(buf, e, 0.0009765625f);
+            scale_vector(buf, e, 0.0009765625f);
             buf[3] *= 1.1f;
             if (func_00283DB8(buf, (float)*(int *)(o + 0x98)) != -1 &&
                 (*(unsigned short *)(e + 0x34) & 1) == 0 && *(short *)(e + 0xAA) == 0x1340 &&
@@ -1038,7 +1038,7 @@ void func_L02_0038E838(unsigned char *arg0) {
                     if (*(float *)(o + 0x1C) <= -8.0f)
                         *(float *)(o + 0x1C) += 8.0f;
                 }
-                func_L00_002ECFE8(e, o + 0xA0, 2, 0x605696FF, *(float *)(o + 0x78), *(float *)(o + 0x78) * 7.0f,
+                DrawOrientedQuadsAtPoints(e, o + 0xA0, 2, 0x605696FF, *(float *)(o + 0x78), *(float *)(o + 0x78) * 7.0f,
                                   *(float *)(o + 0x1C), 0xC0, 0x17);
             }
         }

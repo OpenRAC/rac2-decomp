@@ -70,7 +70,7 @@ void func_L12_003DF9A0(u8 *o) {
             ANIM(o,4,20);
             D_L12_001B09F4++;
             func_002AC728(o,o+0x10,-1,1.0f,0.0f);
-            func_002A6C58(o,0,3);
+            SetDeathBits(o,0,3);
             H(s,0x98)=0;
             F(s,0x20)=H(s,0x24);
             REST(o);
@@ -81,17 +81,17 @@ states:
     case 2:
         D_L12_001B09F4=0;
         I(s,0x7B8)=0;
-        func_00282CF0(v,s+0x740,o+0x10);
+        FastVecSub(v,s+0x740,o+0x10);
         speed=0.10000000894069672f;
-        if (func_00282DF0(v)>speed) { func_00282F20(v,v,speed); goto add; }
+        if (FastVecLength(v)>speed) { vec_scale_to_length(v,v,speed); goto add; }
         func_002A7750(o,3,-1);
         ANIM(o,4,20);
         goto add;
     case 3: {
         WaypointPath *path=(WaypointPath *)(s+0x518);
-        func_00283098(v,s+0x770,&D_L12_001B2F8C[path->points[I(s,0x794)]]);
-        func_00282CC0(v,v,D_L12_001B2F8C[path->points[I(s,0x794)]].position);
-        func_L02_0032E998(o+0x10,v,&angle,s+0x110,I(s,0x790),0.0f,F(s,0x7A4),s+0x79C,s+0x7A0);
+        matrix_mul_vec3(v,s+0x770,&D_L12_001B2F8C[path->points[I(s,0x794)]]);
+        FastVecAdd(v,v,D_L12_001B2F8C[path->points[I(s,0x794)]].position);
+        ComputeRegionRouteHeading(o+0x10,v,&angle,s+0x110,I(s,0x790),0.0f,F(s,0x7A4),s+0x79C,s+0x7A0);
         if (I(s,0x540) && I(s,0x540)==I(s,0x794)-1) {
             speed=0.05000000447034836f;
             if (!I(s,0x7B8)) {
@@ -99,7 +99,7 @@ states:
                 if (I(s,0x7B8)) { func_002A7750(o,7,2); ANIM(o,5,10); }
             }
         } else speed=F(s,0x7AC);
-        if (!func_00282948(s+0x7B0)) angle=func_00283B98(angle,F(s,0x7B4));
+        if (!func_00282948(s+0x7B0)) angle=FastAddRotations(angle,F(s,0x7B4));
         if (!I(s,0x7B0) && I(s,0x5D0)>60) {
             I(s,0x7B0)=60;
             F(s,0x7B4)=func_002A78D8(90.0f,135.0f)*0.01745329424738884f;
@@ -115,7 +115,7 @@ states:
             func_002A7750(o,1,0);
             ANIM(o,4,20);
             func_002AC728(o,o+0x10,-1,1.0f,0.0f);
-            func_002A6C58(o,0,3);
+            SetDeathBits(o,0,3);
             F(s,0x20)=H(s,0x24);
             REST(o);
         } else if (F(s,0x7A4)>=0.5f && F(s,0x61C)<4.0f) F(s,0x7A4)=0.4f;
@@ -123,15 +123,15 @@ states:
         break;
     }
     case 5:
-        func_L02_0032E998(o+0x10,s+0x740,&angle2,s+0x110,I(s,0x790),0.0f,F(s,0x7A4),s+0x79C,s+0x7A0);
-        if (!func_00282948(s+0x7B0)) angle2=func_00283B98(angle2,F(s,0x7B4));
+        ComputeRegionRouteHeading(o+0x10,s+0x740,&angle2,s+0x110,I(s,0x790),0.0f,F(s,0x7A4),s+0x79C,s+0x7A0);
+        if (!func_00282948(s+0x7B0)) angle2=FastAddRotations(angle2,F(s,0x7B4));
         func_L02_00331440(o,s+0x740,1,angle2,F(s,0x7AC),-1.0f);
         if (F(o,0x18)<50.0f) func_002A7750(o,1,0);
         if (!I(s,0x7B0) && I(s,0x5D0)>60) {
             I(s,0x7B0)=60;
             F(s,0x7B4)=func_002A78D8(90.0f,135.0f)*0.01745329424738884f;
         }
-        if (func_002ACBC8(o+0x10,I(s,0x54C))) { func_002A7750(o,6,-1); ANIM(o,3,20); }
+        if (IsPointInCuboid(o+0x10,I(s,0x54C))) { func_002A7750(o,6,-1); ANIM(o,3,20); }
         break;
     case 4: {
         if (I(s,0x794)!=I(s,0x798) && func_00282948(s+0x7A8)) {
@@ -165,14 +165,14 @@ states:
                     F(s,0x784)=func_00283198(randomYaw);
                     I(s,0x788)=0;
                     F(s,0x788)+=func_002A7878(F(s,0x788),0.5f);
-                    func_00282CC0(s+0x780,s+0x780,o+0x10);
+                    FastVecAdd(s+0x780,s+0x780,o+0x10);
                 }
             }
             I(s,0x7BC)=func_002A7820(60,120);
         }
-        func_00282CF0(v,s+0x780,o+0x10);
+        FastVecSub(v,s+0x780,o+0x10);
         yaw=func_00283248(v[0],v[1]);
-        pitch=-func_00283248(func_00282E20(v),v[2]);
+        pitch=-func_00283248(vec_length_xy(v),v[2]);
         func_002B5278(o,yaw);
         F(s,0x6A4)=F(s,0x724)=pitch*0.5f;
         break;
@@ -184,10 +184,10 @@ states:
             func_002A7750(o,1,0);
         }
     case 6:
-        func_00282CF0(v,s+0x750,o+0x10);
+        FastVecSub(v,s+0x750,o+0x10);
         speed=0.10000000894069672f;
-        if (func_00282DF0(v)>speed) {
-            func_00282F20(v,v,speed);
+        if (FastVecLength(v)>speed) {
+            vec_scale_to_length(v,v,speed);
         } else {
             func_002A7750(o,1,0);
             ANIM(o,4,20);
@@ -195,7 +195,7 @@ states:
             REST(o);
         }
 add:
-        func_00282CC0(o+0x10,o+0x10,v);
+        FastVecAdd(o+0x10,o+0x10,v);
         break;
     case 7:
         if (o[0x60]&2) { func_002A7750(o,3,1); ANIM(o,7,10); }

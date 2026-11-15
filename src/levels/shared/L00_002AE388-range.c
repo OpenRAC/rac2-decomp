@@ -22,14 +22,14 @@ float func_L00_002AE388(char *object, float heading, float range, int *blocked, 
     qcopy_nc(position, D_00189E20_26.position);
     if (D_00189E20_26.mode == 20)
         position[2] = D_00189E20_26.height;
-    distance = func_00282E48(position, object + 0x10);
+    distance = fast_vec_dist(position, object + 0x10);
     if (range < distance) *blocked = 1;
-    sum = func_00283C80(func_00283248(F(object,0x10)-position[0], F(object,0x14)-position[1]),heading);
+    sum = FastDiffRots(func_00283248(F(object,0x10)-position[0], F(object,0x14)-position[1]),heading);
     horizontal = sum;
-    vertical = func_00283C80(func_00283248(func_00282E80(position,object+0x10),F(object,0x18)-position[2]),0.0f);
+    vertical = FastDiffRots(func_00283248(vec_distance_xy(position,object+0x10),F(object,0x18)-position[2]),0.0f);
     if (D_00189E20_26.mode==1 || D_00189E20_26.mode==29) {
-        horizontal = func_00283C80(func_00283248(F(object,0x10)-D_L00_001B8C80.position[0],F(object,0x14)-D_L00_001B8C80.position[1]),D_L00_001B8C80.heading);
-        vertical = func_00283C80(func_00283248(func_00282E80(D_L00_001B8C80.position,object+0x10),F(object,0x18)-D_L00_001B8C80.position[2]),-D_L00_001B8C80.pitch);
+        horizontal = FastDiffRots(func_00283248(F(object,0x10)-D_L00_001B8C80.position[0],F(object,0x14)-D_L00_001B8C80.position[1]),D_L00_001B8C80.heading);
+        vertical = FastDiffRots(func_00283248(vec_distance_xy(D_L00_001B8C80.position,object+0x10),F(object,0x18)-D_L00_001B8C80.position[2]),-D_L00_001B8C80.pitch);
         sum = horizontal + vertical;
         horizontal = (horizontal > vertical ? horizontal : vertical);
     }

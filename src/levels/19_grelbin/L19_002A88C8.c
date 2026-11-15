@@ -58,7 +58,7 @@ void func_L19_002B6278(void) {
     if (((Hero *)D_00189E20)->b[0x1494] != 0)
         goto slow;
 
-    r = func_00282E80(D_00189E20 + 0x240, D_00189E20 + 0x80);
+    r = vec_distance_xy(D_00189E20 + 0x240, D_00189E20 + 0x80);
     if (r > ((Hero *)D_00189E20)->f[0x264 / 4] * 0.5f)
         goto slow;
     return;
@@ -69,8 +69,8 @@ slow:
            is taken first and the runtime block is reached back from it. */
         u8 *p = D_00189E20 + 0x250;
         float step = 0.02f;
-        func_002AA2E8((float *)p, ((Hero *)D_00189E20)->f[0x258 / 4], step);
-        func_002AA2E8((float *)(p + 4), ((Hero *)D_00189E20)->f[0x25C / 4], step);
+        ApproachValue((float *)p, ((Hero *)D_00189E20)->f[0x258 / 4], step);
+        ApproachValue((float *)(p + 4), ((Hero *)D_00189E20)->f[0x25C / 4], step);
         func_002AA3A8(
             (float *)(p + 0x14),
             (float *)(p + 0x18),

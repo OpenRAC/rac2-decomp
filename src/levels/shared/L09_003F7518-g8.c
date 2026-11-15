@@ -12,7 +12,7 @@ extern void func_002A7470(void *, int, int, int);
 #define B(p,o) (*(unsigned char *)((p)+(o)))
 void func_L09_003F7518(char *object, int state, int a2, int a3) {
     char *data = *(char **)(object+0x68);
-    func_0026FEB8(D_L09_001B10A8, *(short *)(object+0xB2), state);
+    STUB_printf(D_L09_001B10A8, *(short *)(object+0xB2), state);
     if (state == 12) {
         func_002B60B0(object, D_L09_001B0F0C * 0.00027777778f, D_L09_001B0F10 * 0.016666667f,
                       D_L09_001B0F1C * 0.0000048481374f, D_L09_001B0F20 * 0.00029088825f);

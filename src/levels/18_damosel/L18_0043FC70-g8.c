@@ -24,7 +24,7 @@ void func_L18_0043FC70(u8 *obj) {
         if (D_001395B8[0x86] || D_001A7AF8[0x37]) {
             func_0029F338(obj);
         } else {
-            *(float *)(obj + 0xf8) = func_00283B98(*(float *)(obj + 0xf8), 0.087266475f);
+            *(float *)(obj + 0xf8) = FastAddRotations(*(float *)(obj + 0xf8), 0.087266475f);
             for (i = 0; i < 2; i++) {
                 size = func_002A7878(2.0f, 5.0f);
                 sign = func_002A77E0(2);
@@ -39,7 +39,7 @@ void func_L18_0043FC70(u8 *obj) {
                 func_002C2210(point, 3, 0x208020ff, 0, sign, velocity, size * 0.1f, size, 0.006f, 0);
                 func_002C2210(point, 3, 0x20ffffff, 1, -sign, velocity, size * 0.03f, size * 0.3f, 0.006f, 0);
             }
-            if (func_00282E80(obj + 0x10, D_00189EA0) < 1.5f) {
+            if (vec_distance_xy(obj + 0x10, D_00189EA0) < 1.5f) {
                 D_001395B8[0x86] = 1;
                 if (*(int *)state != -1) {
                     D_L18_001B281C[(*(int *)state << 8) + 0xbc] = 1;

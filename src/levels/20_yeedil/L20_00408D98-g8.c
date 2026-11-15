@@ -52,19 +52,19 @@ void func_L20_00408D98(u8 *object) {
         char *record;
         if (state[0x23] == 0 &&
             (D_0019B2E8[state[2] + D_001A79F0 * 16] & 0x80) != 0 &&
-            func_002ACBC8(D_00189EA0, state[10]) != 0) {
+            IsPointInCuboid(D_00189EA0, state[10]) != 0) {
             state[0x23] = 1;
-            func_0029B3E0(0, -1);
+            MemcardSave(0, -1);
         }
         if (D_L20_001CA540 == 2) {
             if (state[4] == 0) {
-                if (func_002ACBC8(D_00189EA0, state[0x18])) {
+                if (IsPointInCuboid(D_00189EA0, state[0x18])) {
                     state[4] = 1;
                     func_L01_00323310(state[0x20], -1);
                 }
             }
         }
-        if (func_002ACBC8(D_00189EA0, state[11]) != 0) {
+        if (IsPointInCuboid(D_00189EA0, state[11]) != 0) {
             if (D_0019B2E8[state[1] + D_001A79F0 * 16] & 0x80) return;
             func_002A0430(state[1]);
             if (state[0x13] >= 0)

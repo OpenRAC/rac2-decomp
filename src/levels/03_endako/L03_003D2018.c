@@ -29,11 +29,11 @@ void func_L03_003D2018(char *a0)
     *(s32 *)(s0 + 0x98) = *(s32 *)(v0 + 0x10);
     qcopy(&v2, p);
     f = (f32 *)((char *)&v2 + 8);
-    *f = func_00283B98(*f, -1.0471977f);
+    *f = FastAddRotations(*f, -1.0471977f);
     func_L00_002B9D60(s0 + 0x10, (char *)&v2, 0, 1);
-    func_L00_002B2A40(1, 0x3F, s0);
+    SetHeroMode(1, 0x3F, s0);
     base = D_00189E20;
-    *(f32 *)(base + 0x98) = func_00283B98(*(f32 *)(base + 0x98), 1.0471977f);
+    *(f32 *)(base + 0x98) = FastAddRotations(*(f32 *)(base + 0x98), 1.0471977f);
     func_L00_0042A500(*(s32 *)(s1 + 0x28));
     func_L01_00323310(*(s32 *)(s1 + 0x20), -1);
     D_001395BF = 1;

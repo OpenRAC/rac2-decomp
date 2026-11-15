@@ -144,16 +144,16 @@ char *func_L00_003BB1F8(char *self)
     EffectLightRecord *light;
     int light_index;
     float f;
-    *(float *)(self + 0xF0) = func_00283B98(*(float *)(self + 0xF0), 0.0523598865f);
-    *(float *)(self + 0xF4) = func_00283BE0(*(float *)(self + 0xF4), 0.0130899716f);
+    *(float *)(self + 0xF0) = FastAddRotations(*(float *)(self + 0xF0), 0.0523598865f);
+    *(float *)(self + 0xF4) = fast_subtract_rotations(*(float *)(self + 0xF4), 0.0130899716f);
     *(int *)(self + 0xFC) = 0;
-    func_002833F0(self + 0xC0, self + 0xF0);
+    euler_rotation_basis(self + 0xC0, self + 0xF0);
     qcopy(saved, self + 0x10);
-    func_00282CC0(self + 0x10, ctx, self + 0x10);
+    FastVecAdd(self + 0x10, ctx, self + 0x10);
     func_002FEE70(*(int *)(ctx + 0x50), ctx, 0);
     func_00300190(self + 0x10, self + 0x10);
     func_00300248(ctx, ctx);
-    if (func_00282DF0(ctx) != 0.0f && func_00282DF0(ctx + 0x20) != 0.0f)
+    if (FastVecLength(ctx) != 0.0f && FastVecLength(ctx + 0x20) != 0.0f)
         func_002ACF68(ctx, ctx, ctx + 0x20, 0, 0.075f);
     if (func_00277258(self + 0x10, 0, self, *(float *)(ctx + 0x4C))) {
         p = D_L00_001BF218;
@@ -163,15 +163,15 @@ char *func_L00_003BB1F8(char *self)
         func_002EE178_1((char *)normal, D_L00_001BF230 + 0x10, 0.0009765625f);
         func_802EE3D0_1(normal, normal, 1.0f);
         func_00283028(ctx, ctx, normal);
-        f = func_00282DB0(ctx, normal);
+        f = FastVecDot(ctx, normal);
         func_002EE178_1((char *)projection, (char *)normal, f);
         func_802EE138_1(remainder, (float *)ctx, (char *)projection);
         func_002EE178_1(ctx, (char *)projection, 0.85f);
-        func_00282CC0(ctx, remainder, ctx);
+        FastVecAdd(ctx, remainder, ctx);
         func_002EE178_1(ctx + 0x20, ctx + 0x20, 0.95f);
         func_L00_003BD510(D_L00_001BF230 - 0x10, normal, 6, 0x72FF);
         func_L00_003BD510(D_L00_001BF230 - 0x10, normal, 6, 0xFF0000);
-        func_002E5CF8(1, 0, self);
+        PlayMobySound(1, 0, self);
     }
     light_index = *(int *)(ctx + 0x5C);
     if (light_index != -1) {
@@ -217,7 +217,7 @@ void func_L00_003BB668(char *a0)
     char *ctx;
 
     ctx = *(char **)(a0 + 0x68);
-    func_002FC560(0x47, 0x00053001);
+    VU1_addGSregister(0x47, 0x00053001);
 
     func_00281EB8(a0 + 0x10, 0x2C,
                   (func_002A7820_1(0x80, 0xC8) << 24) | 0x72FF, 1,
@@ -239,7 +239,7 @@ void func_L00_003BB668(char *a0)
                   0.0f, func_002A7940());
     func_L00_003BBF48(a0);
     func_L00_003BCDC0(a0);
-    func_002FC560(0x47, 0x0005360B);
+    VU1_addGSregister(0x47, 0x0005360B);
 }
 
 extern int D_L00_0023DDA0[];
@@ -307,8 +307,8 @@ void func_L00_003BB8B8(char *self, char *target, int count)
             info = func_002AB1F0(target);
             if (info) {
                 func_L00_003252A8(target, v, 1);
-                func_00282D30(v, v, *(float *)(info + 0x10));
-                func_00282CC0(p + 0x30, v, target + 0x10);
+                FastVecScale(v, v, *(float *)(info + 0x10));
+                FastVecAdd(p + 0x30, v, target + 0x10);
             } else {
                 qcopy(p + 0x30, target_position);
             }
@@ -486,11 +486,11 @@ void func_L00_003BD510(float *position, float *direction, int count, int color)
         angles[1] = func_002A7878(-1.57079637f, 1.57079637f);
         angles[0] = func_002A7878(-1.57079637f, 1.57079637f);
         angles[2] = func_002A7878(-1.57079637f, 1.57079637f);
-        func_002833F0(matrix, angles);
-        func_00283098(velocity, direction, matrix);
+        euler_rotation_basis(matrix, angles);
+        matrix_mul_vec3(velocity, direction, matrix);
 
         saved = previous;
-        func_00282F20(velocity, velocity, 0.05f);
+        vec_scale_to_length(velocity, velocity, 0.05f);
         velocity[2] += 0.05f;
         qcopy(saved, position);
         position[0] += func_002A78D8(0.0f, 0.15f);
@@ -501,20 +501,20 @@ void func_L00_003BD510(float *position, float *direction, int count, int color)
             particle = func_002C2210(position, 60, scale * 0.1f, scale, color | 0x4F000000, 0,
                                      spin, velocity, 1, 0.002f);
             if (particle)
-                particle[9] = func_00283CF0(4.0f) + 112;
+                particle[9] = FloatToInt(4.0f) + 112;
             particle = func_002C2210(position, 60, scale * 0.07f, scale * 0.7f, 0x7FFFFFFF, 1,
                                      -spin, velocity, 1, 0.002f);
             if (particle)
-                particle[9] = func_00283CF0(4.0f) + 112;
+                particle[9] = FloatToInt(4.0f) + 112;
         } else {
             particle = func_002C2210(position, 60, scale * 0.1f, scale, color | 0x4F000000, 0,
                                      spin, velocity, 1, 0.002f);
             if (particle)
-                particle[9] = func_00283CF0(4.0f) + 112;
+                particle[9] = FloatToInt(4.0f) + 112;
             particle = func_002C2210(position, 60, scale * 0.07f, scale * 0.7f, 0x7FFFFFFF, 1,
                                      -spin, velocity, 1, 0.002f);
             if (particle)
-                particle[9] = func_00283CF0(4.0f) + 112;
+                particle[9] = FloatToInt(4.0f) + 112;
         }
     }
 }
@@ -532,7 +532,7 @@ void func_L00_003BFDE8(char *self, char *p1, int p2)
     func_00282CC0_6(a, a, self + 16);
     func_00282CC0_6(b, b, self + 16);
 
-    if (func_002761F8(a, b, 2, self, 0))
+    if (CollLine(a, b, 2, self, 0))
         func_00282F20_2(p1, D_L00_001BF240, 1.0f);
     else
         func_00282F20_2(p1, self + 224, -1.0f);
@@ -581,8 +581,8 @@ float func_L00_003BFF68(char *a0, char *a1, char *a2, char *a3)
     func_002AAA00(scratch + 0x40, f, *(float *)(a1 + 0x14), *(float *)(a1 + 0x18), 3.14159274f, a1 + 0xB4, 0);
     *(Rac2TI128 *)scratch = 0;
     *(float *)(scratch + 8) = *(float *)(a1 + 0xB4);
-    func_002833F0(scratch + 0x10, scratch);
-    func_00283738(a0 + 0xC0, a0 + 0xC0, scratch + 0x10);
+    euler_rotation_basis(scratch + 0x10, scratch);
+    multiply_matrix3x3(a0 + 0xC0, a0 + 0xC0, scratch + 0x10);
     return func_00282C48(f) - func_00282C48(*(float *)(a1 + 0xB4));
 }
 
@@ -693,7 +693,7 @@ void func_L00_003C2DE8(char *a0, char *a1, float fa, float fb)
         func_002A7A00(v1, fa, fa);
         func_00282F20_2(v2, v1, func_002A7878_2(fb * 0.75f, fb * 1.25f));
         func_00282CC0_6(v1, v1, pv0);
-        func_L00_003263D0(a0, v1, 0.0f, 1, 0, v2, 0.0f, 0x50804040, 0, 2.0f, 5.0f);
+        SpawnTintedEffects(a0, v1, 0.0f, 1, 0, v2, 0.0f, 0x50804040, 0, 2.0f, 5.0f);
         i--;
     } while (i >= 0);
 }
@@ -779,7 +779,7 @@ void func_L00_003C3920(char *unused, char *arg)
         v = x | v;
         func_002A7A00(local, 1.6666668670950457453728e-05f,
                 6.6666672937572002410889e-03f);
-        r = func_002BDCE8(0.3f, 1.0f, 1.01f, f, arg, 0, local, v, 1);
+        r = SpawnSpinningSparkParticle(0.3f, 1.0f, 1.01f, f, arg, 0, local, v, 1);
         if (r != 0) {
             char *q = r + 32;
 

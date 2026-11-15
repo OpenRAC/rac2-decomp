@@ -76,7 +76,7 @@ void func_L05_003CFF90(char *obj)
                 p->hasTarget = 1;
                 target = (char *)(D_L05_001B251C + (s->target << 8));
                 p->targetObject = target;
-                if (func_00282E48(target + 0x10, obj + 0x10) < 10.0f) {
+                if (fast_vec_dist(target + 0x10, obj + 0x10) < 10.0f) {
                     SoundSlot003CFF90 *sound = (SoundSlot003CFF90 *)(D_00188660 + s->nearSound * 0x70);
                     if ((sound->owner != obj || sound->live == 0) && func_002A77E0(400) == 0)
                         s->nearSound = func_002E5DA0(14, 0, obj, 0xFBF);

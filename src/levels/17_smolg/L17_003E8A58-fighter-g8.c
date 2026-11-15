@@ -205,7 +205,7 @@ state->f98=0;
         if(state->f744) I(state->f744,0)=-1;
         state->f750=func_L02_0032E508(object,state->f684,(char *)state+0x280,32);
     }
-    if(U(object,0x31) && func_00282E48(object+16,D_L17_001B9BC0)<24.0f) {func_002A93B0(object);U(object,0x6f)=22;}
+    if(U(object,0x31) && fast_vec_dist(object+16,D_L17_001B9BC0)<24.0f) {func_002A93B0(object);U(object,0x6f)=22;}
     hit=func_002A9640(object,0x10000,1);
     if(hit && P(hit,0x20) && (H(P(hit,0x20),0xaa)==0x31a || H(P(hit,0x20),0xaa)==0x1256 || H(P(hit,0x20),0xaa)==0x1305)) goto impact;
     if(U(object,0x20)!=1) func_002B0ED8(object,(char *)state+0x60,0);

@@ -100,7 +100,7 @@ void func_L18_002D0C00(void)
     if (D_00138180.held & 3) {
         u8 *hero = snapshot - 0x2030;
         if (*(s16 *)(hero + 0x1454) < 1) *(s16 *)(hero + 0x1454) = 1;
-    } else func_00282978(snapshot - 0xBDC);
+    } else FastDecTimer(snapshot - 0xBDC);
     base = D_00189E20;
     if (*(s32 *)(base + 0x2294) == 16) *(s16 *)(base + 0x1454) = 0;
     base[0x22C3] = func_L00_002D3400();
@@ -108,7 +108,7 @@ void func_L18_002D0C00(void)
     *(float *)(base + 0x1FB4) = D_00138180.vertical;
     *(s32 *)(base + 0x270) = 0;
     *(float *)(base + 0x24BC) = func_L00_002B3900();
-    if (func_00282E20(base + 0x1FB0) < 0.25f) {
+    if (vec_length_xy(base + 0x1FB0) < 0.25f) {
         /* horizontal and vertical start as the left and down bits. */
         s32 right = (D_00138180.pressed >> 13) & 1;
         s32 horizontal = (D_00138180.pressed >> 15) & 1;
@@ -129,9 +129,9 @@ void func_L18_002D0C00(void)
     qcopy_nc(positions + index * 16, (base + 0x80));
     *(s32 *)(base + 0x23C4) = (index + 1) % 32;
     if (++*(s32 *)(base + 0x23C8) > 32) *(s32 *)(base + 0x23C8) = 32;
-    func_00283410(base, base + 0x90);
-    func_00283388(base + 0x40);
-    func_00283698(base + 0x40, base);
+    euler_to_matrix(base, base + 0x90);
+    set_identity_matrix(base + 0x40);
+    matrix_from_basis_rows(base + 0x40, base);
     func_L18_002D0850();
     func_L00_002C2DE8();
     func_L18_002DEFF8();
@@ -155,35 +155,35 @@ void func_L18_002D1998(s32 force)
     }
     func_L00_002D36E0(start, 0.0f, 0.0f, height, 1);
     func_L00_002D36E0(lowerStart, 0.0f, 0.0f, height * 0.3f, 1);
-    if (force || func_00282E20(D_00189E20 + 0xF0) < 0.01f) {
-        func_00282F20(end, D_00189E20, reach);
-        func_00282F20(lowerEnd, D_00189E20, reach * 1.4f);
+    if (force || vec_length_xy(D_00189E20 + 0xF0) < 0.01f) {
+        vec_scale_to_length(end, D_00189E20, reach);
+        vec_scale_to_length(lowerEnd, D_00189E20, reach * 1.4f);
     } else {
         func_L00_002D3B58(end, D_00189E20 + 0xF0, 0.0f);
-        func_00282F20(end, end, reach);
-        func_00282D30(lowerEnd, end, 1.4f);
+        vec_scale_to_length(end, end, reach);
+        FastVecScale(lowerEnd, end, 1.4f);
     }
-    func_00282CC0(end, end, start);
+    FastVecAdd(end, end, start);
     material = -1;
-    func_00282CC0(lowerEnd, lowerEnd, lowerStart);
+    FastVecAdd(lowerEnd, lowerEnd, lowerStart);
     {
         u8 *hero = D_00189E20;
-        if (func_002761F8(lowerStart, lowerEnd, 2, *(u8 **)(hero + 0x2290), 0) && D_L18_001BFC00.count > 0) material = func_00278E78();
+        if (CollLine(lowerStart, lowerEnd, 2, *(u8 **)(hero + 0x2290), 0) && D_L18_001BFC00.count > 0) material = GetCollHitMaterial();
     }
     angle = 0.0f;
     {
         u8 *hero = D_00189E20;
-        if (func_002761F8(start, end, 2, *(u8 **)(hero + 0x2290), 0) && D_L18_001BFC00.count > 0) angle = func_L00_002D3EA8(D_L18_001BFC00.normal);
+        if (CollLine(start, end, 2, *(u8 **)(hero + 0x2290), 0) && D_L18_001BFC00.count > 0) angle = func_L00_002D3EA8(D_L18_001BFC00.normal);
     }
     if (angle >= 0.8726647f || material == 8 || material == 12) {
         u8 *hero = D_00189E20;
         *(s32 *)(hero + 0x270) = D_L18_001BFC00.object;
         func_L00_002D3B58(D_L18_001BFC00.normal, D_L18_001BFC00.normal, 0.0f);
-        func_00282F20(D_L18_001BFC00.normal, D_L18_001BFC00.normal, 1.0f);
-        dot = func_00282DB0(D_L18_001BFC00.normal, hero + 0xF0);
+        vec_scale_to_length(D_L18_001BFC00.normal, D_L18_001BFC00.normal, 1.0f);
+        dot = FastVecDot(D_L18_001BFC00.normal, hero + 0xF0);
         if (dot < 0.0f) {
-            func_00282D30(D_L18_001BFC00.normal, D_L18_001BFC00.normal, -dot);
-            func_00282CC0(hero + 0xF0, hero + 0xF0, D_L18_001BFC00.normal);
+            FastVecScale(D_L18_001BFC00.normal, D_L18_001BFC00.normal, -dot);
+            FastVecAdd(hero + 0xF0, hero + 0xF0, D_L18_001BFC00.normal);
         }
     }
 }
@@ -242,7 +242,7 @@ BatchA_A18_s32 func_L18_0033B628(BatchA_A18_s32 a0, BatchA_A18_s32 a1, BatchA_A1
         p = (BatchA_A18_u8 *)D_001FE480[a1];
         if (p != 0) {
             if (*(BatchA_A18_s32 *)p != 0) {
-                return func_002A8AF0(a0, (BatchA_A18_s32)(p + 0x10), *(BatchA_A18_s32 *)p);
+                return point_in_path_xy(a0, (BatchA_A18_s32)(p + 0x10), *(BatchA_A18_s32 *)p);
             }
         }
     }
@@ -280,13 +280,13 @@ f32 func_L18_0035D5F8(void *out, void *origin, void *direction, char *path, floa
     s32 i = 0;
     PathPoints *points = (PathPoints *)path;
     for (; i < points->count - 1; i++) {
-        score = func_L18_0035D238(candidate, origin, direction, points->point[i], points->point[i + 1], scale);
+        score = FindSegmentSpherePoint(candidate, origin, direction, points->point[i], points->point[i + 1], scale);
         if (score < best) {
             best = score;
             qcopy(out, candidate);
         } else if (func_00282C48(score - best) < 0.1f) {
-            distance = func_00282E48((char *)candidate, origin);
-            if (distance < func_00282E48(out, origin)) {
+            distance = fast_vec_dist((char *)candidate, origin);
+            if (distance < fast_vec_dist(out, origin)) {
                 best = score;
                 qcopy(out, candidate);
             }
@@ -325,7 +325,7 @@ void func_L18_003F7198(void *a0) {
     }
     *(unsigned short *)((char *)s1 + 0x290) = 0;
     if (s0[0x31] != 0) {
-        if (func_00282E48((char *)s0 + 0x10, D_L18_001B97C0) < 24.0f) {
+        if (fast_vec_dist((char *)s0 + 0x10, D_L18_001B97C0) < 24.0f) {
             func_002A93B0(s0);
             s0[0x6F] = 0x16;
         }
@@ -386,8 +386,8 @@ int func_L18_003F73B8(char *a0, float *a1)
     int r = 0;
 
     if (*(unsigned char *)(s1 + 0x31) != 0) {
-        if (func_00282E80(s1 + 0x10, a1) < 3.2f) {
-            if (func_00283C80(*(float *)(s1 + 0xF8),
+        if (vec_distance_xy(s1 + 0x10, a1) < 3.2f) {
+            if (FastDiffRots(*(float *)(s1 + 0xF8),
                              func_00283248(s0[0] - *(float *)(s1 + 0x10),
                                            s0[1] - *(float *)(s1 + 0x14))) < 1.5707965f)
                 r = 1;
@@ -520,14 +520,14 @@ void func_L18_003F7818(BatchA_A18_u8 *s2, BatchA_A18_u8 *s3, BatchA_A18_s32 s7) 
         s4[0x2E] = state;
         s2[0x7F] = 0;
         *(float *)(s4 + 0x20) = (float)*(short *)(s4 + 0x24);
-        func_00282F20(local, s3 + 0xC0, -0.5f);
-        func_00282CC0(s2 + 0x10, s3 + 0x10, local);
+        vec_scale_to_length(local, s3 + 0xC0, -0.5f);
+        FastVecAdd(s2 + 0x10, s3 + 0x10, local);
         if (s7 != 0) {
-            func_00282F20(local, s3 + 0xD0, 0.5f);
+            vec_scale_to_length(local, s3 + 0xD0, 0.5f);
         } else {
-            func_00282F20(local, s3 + 0xD0, -0.5f);
+            vec_scale_to_length(local, s3 + 0xD0, -0.5f);
         }
-        func_00282CC0(s2 + 0x10, s3 + 0x10, local);
+        FastVecAdd(s2 + 0x10, s3 + 0x10, local);
         *(float *)(s2 + 0xF8) =
             func_00283248(*(float *)(s3 + 0x10) - *(float *)(s2 + 0x10),
                           *(float *)(s3 + 0x14) - *(float *)(s2 + 0x14));
@@ -593,13 +593,13 @@ void func_L18_003F8D28(void *a0, void *a1, void *a2) {
     *(void **)((char *)s4 + 0x74C) = a2;
     if (a1 != 0) {
         func_L18_003FB5E8(a1, mat);
-        func_00282F20(scratch, (char *)a1 + 0xD0, -0.3f);
-        func_00282CC0((char *)a0 + 0x10, mat, scratch);
+        vec_scale_to_length(scratch, (char *)a1 + 0xD0, -0.3f);
+        FastVecAdd((char *)a0 + 0x10, mat, scratch);
         *(float *)((char *)a0 + 0x18) = func_002A89A8((char *)a0 + 0x10, 0, 0.5f);
         f = func_00283248(*(float *)mat - *(float *)((char *)a0 + 0x10),
                            *(float *)(mat + 4) - *(float *)((char *)a0 + 0x14));
         *(float *)((char *)a0 + 0xF8) = f;
-        func_002833F0((char *)a0 + 0xC0, (char *)a0 + 0xF0);
+        euler_rotation_basis((char *)a0 + 0xC0, (char *)a0 + 0xF0);
         *(void **)((char *)s4 + 0x750) = a1;
         *(BatchA_A18_u8 *)((char *)a0 + 0x7F) = 0;
     }
@@ -819,7 +819,7 @@ int func_L18_003FA920(char *owner, int slot) {
     char *entity;
     int i;
 
-    func_00115484(secondary, 0, 8);
+    memset(secondary, 0, 8);
     {
         unsigned short *entry;
         for (entry = D_L18_001FB320[L18_SelectionGroupId(state, slot, 0)];

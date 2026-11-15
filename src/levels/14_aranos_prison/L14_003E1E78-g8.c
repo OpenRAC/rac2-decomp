@@ -73,7 +73,7 @@ void func_L14_003E1E78(FieldMob *self) {
 
     switch (self->state) {
     case 0:
-        func_002A04B8(self, &r, &g, &bl);
+        get_moby_color(self, &r, &g, &bl);
         s->color = (long long)(int)(0x80000000 + (bl << 16) + (g << 8)) + r;
         if (s->mobIndex != -1) {
             s->linked = D_L14_001B259C_base[0] + (s->mobIndex << 8);
@@ -107,12 +107,12 @@ void func_L14_003E1E78(FieldMob *self) {
             s->emitTimer = D_L14_001B04D0;
         }
         c = (long long)(int)(0xFF000000 | (D_L14_001B04CC << 16) | (D_L14_001B04C8 << 8)) | D_L14_001B04C4;
-        c = func_00283D38(c, s->color, func_L14_003E22A8(self));
-        func_002A0488(self, c & 0xFF, (c >> 8) & 0xFF, (c >> 16) & 0xFF);
+        c = FastTweenColor(c, s->color, func_L14_003E22A8(self));
+        set_moby_color(self, c & 0xFF, (c >> 8) & 0xFF, (c >> 16) & 0xFF);
         func_L14_00328E70(self, a, b);
         func_L14_003E2238(self);
         func_L14_00328E90(self, a, b);
-        func_L00_002E6EF8(func_L14_003E2328, (char *)self);
+        func_L00_002E6EF8(DrawFadingField, (char *)self);
         break;
     case 1:
         if (func_002B3868(self)) {
@@ -140,12 +140,12 @@ void func_L14_003E1E78(FieldMob *self) {
             s->emitTimer = D_L14_001B04D0;
         }
         c = (long long)(int)(0xFF000000 | (D_L14_001B04CC << 16) | (D_L14_001B04C8 << 8)) | D_L14_001B04C4;
-        c = func_00283D38(c, s->color, func_L14_003E22A8(self));
-        func_002A0488(self, c & 0xFF, (c >> 8) & 0xFF, (c >> 16) & 0xFF);
+        c = FastTweenColor(c, s->color, func_L14_003E22A8(self));
+        set_moby_color(self, c & 0xFF, (c >> 8) & 0xFF, (c >> 16) & 0xFF);
         func_L14_00328E70(self, a, b);
         func_L14_003E2238(self);
         func_L14_00328E90(self, a, b);
-        func_L00_002E6EF8(func_L14_003E2328, (char *)self);
+        func_L00_002E6EF8(DrawFadingField, (char *)self);
         break;
     case 3:
         if (func_002B3868(self)) {

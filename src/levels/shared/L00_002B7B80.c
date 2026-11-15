@@ -49,7 +49,7 @@ void func_L00_002B7B80(void)
         if (((Hero *)D_00189E20)->b[0x22C3] != 0) {
             yaw = func_L00_002B9B38(((Hero *)D_00189E20)->b + 0x1440, 0);
         } else {
-            yaw = func_00283BE0(((Hero *)D_00189E20)->f[0x1458 / 4], ((Hero *)D_00189E20)->f[0x98 / 4]);
+            yaw = fast_subtract_rotations(((Hero *)D_00189E20)->f[0x1458 / 4], ((Hero *)D_00189E20)->f[0x98 / 4]);
         }
         ((Pose *)D_L00_0025BE10)->f[0x68 / 4] = yaw;
         ((Pose *)D_L00_0025BE10)->f[0x118 / 4] = -yaw;
@@ -96,7 +96,7 @@ void func_L00_002B7B80(void)
             float v = ((Hero *)D_00189E20)->f[0x1A8 / 4];
             float y, ny, d, e;
             if (((Hero *)D_00189E20)->f[0x24B8 / 4] < 0.8f && ((Hero *)D_00189E20)->i[0x1B8 / 4] < 40) {
-                func_002AA2E8(&v, 0.0f, (float)(40 - ((Hero *)D_00189E20)->i[0x1B8 / 4]) * 0.087266475f);
+                ApproachValue(&v, 0.0f, (float)(40 - ((Hero *)D_00189E20)->i[0x1B8 / 4]) * 0.087266475f);
             }
             y = v * 0.5f;
             if (y > 0.8f) y = 0.8f;
@@ -149,12 +149,12 @@ void func_L00_002B7B80(void)
         if (((Pose *)D_L00_0025BE10)->f[0x278 / 4] > 0.6f) ((Pose *)D_L00_0025BE10)->f[0x278 / 4] = 0.6f;
         else if (((Pose *)D_L00_0025BE10)->f[0x278 / 4] < -0.6f) ((Pose *)D_L00_0025BE10)->f[0x278 / 4] = -0.6f;
         ((Pose *)D_L00_0025BE10)->f[0x270 / 4] = func_00282C48(x82) * 0.16f;
-        ((Pose *)D_L00_0025BE10)->f[0x64 / 4] = func_00283B98(((Pose *)D_L00_0025BE10)->f[0x64 / 4], -0.122173056f);
+        ((Pose *)D_L00_0025BE10)->f[0x64 / 4] = FastAddRotations(((Pose *)D_L00_0025BE10)->f[0x64 / 4], -0.122173056f);
         if (((Hero *)D_00189E20)->f[0x24B8 / 4] > 0.1f) {
-            ang = func_00283BE0(((Hero *)D_00189E20)->f[0x1A0 / 4], ((Hero *)D_00189E20)->f[0x98 / 4]);
+            ang = fast_subtract_rotations(((Hero *)D_00189E20)->f[0x1A0 / 4], ((Hero *)D_00189E20)->f[0x98 / 4]);
             mag = ((Hero *)D_00189E20)->f[0x24B8 / 4] * 0.6108653f;
             ((Pose *)D_L00_0025BE10)->f[0x60 / 4] = -func_00283198(ang) * mag;
-            ((Pose *)D_L00_0025BE10)->f[0x64 / 4] = func_00283B98(((Pose *)D_L00_0025BE10)->f[0x64 / 4], func_00283180(ang) * mag);
+            ((Pose *)D_L00_0025BE10)->f[0x64 / 4] = FastAddRotations(((Pose *)D_L00_0025BE10)->f[0x64 / 4], func_00283180(ang) * mag);
             if (((Pose *)D_L00_0025BE10)->f[0x60 / 4] > 0.47123894f) ((Pose *)D_L00_0025BE10)->f[0x60 / 4] = 0.47123894f;
             else if (((Pose *)D_L00_0025BE10)->f[0x60 / 4] < -0.47123894f) ((Pose *)D_L00_0025BE10)->f[0x60 / 4] = -0.47123894f;
             if (((Pose *)D_L00_0025BE10)->f[0x64 / 4] > 0.47123894f) ((Pose *)D_L00_0025BE10)->f[0x64 / 4] = 0.47123894f;
@@ -170,7 +170,7 @@ void func_L00_002B7B80(void)
             left = 0;
             right = 0;
         }
-        a = func_00283B98(((Hero *)D_00189E20)->f[0x118 / 4] * 5.0f, 0.296706f);
+        a = FastAddRotations(((Hero *)D_00189E20)->f[0x118 / 4] * 5.0f, 0.296706f);
         if (left) {
             ((Pose *)D_L00_0025BE10)->f[0x5E8 / 4] = -0.3490659f;
             ((Pose *)D_L00_0025BE10)->f[0x5E0 / 4] = -a;
@@ -227,24 +227,24 @@ void func_L00_002B8F00(V_c *v, M_c *m, void *p, float a, float b, float c) {
         d->q[2] = s->q[2];
         d->q[3] = s->q[3];
     }
-    d = func_00282DB0(v, &m->r[2]);
-    pitch = func_00283248(d, func_00282C10(1.0f - d * d));
-    func_00282DD8(&x, v, &m->r[2]);
+    d = FastVecDot(v, &m->r[2]);
+    pitch = func_00283248(d, square_root(1.0f - d * d));
+    FastVecCross(&x, v, &m->r[2]);
     if (x.f[2] < 0.99f) {
         roll = func_00283248(x.f[0], x.f[1]);
         r.f[0] = 0.0f;
         r.f[1] = 0.0f;
         r.f[2] = -roll;
         func_00283430(&m1, &r);
-        func_00283788(m, &m1, m);
-        func_002830C0(&x, &x, &m1);
+        multiply_matrix(m, &m1, m);
+        transform_vector(&x, &x, &m1);
         yaw = func_00283248(x.f[2], x.f[0]);
         r.f[0] = 0.0f;
         r.f[2] = 0.0f;
         r.f[1] = -yaw;
         func_00283430(&m0, &r);
-        func_00283788(m, &m0, m);
-        func_002830C0(&x, &x, &m0);
+        multiply_matrix(m, &m0, m);
+        transform_vector(&x, &x, &m0);
     } else {
         roll = 0.0f;
         yaw = roll;
@@ -259,15 +259,15 @@ void func_L00_002B8F00(V_c *v, M_c *m, void *p, float a, float b, float c) {
     }
     r.f[1] = 0.0f;
     func_00283430(&m1, &r);
-    func_00283788(m, &m1, m);
+    multiply_matrix(m, &m1, m);
     r.f[1] = yaw;
     r.f[2] = 0.0f;
     func_00283430(&m0, &r);
-    func_00283788(m, &m0, m);
+    multiply_matrix(m, &m0, m);
     r.f[2] = roll;
     r.f[1] = 0.0f;
     func_00283430(&m1, &r);
-    func_00283788(m, &m1, m);
+    multiply_matrix(m, &m1, m);
     if (p) func_002AB6D8(m, p);
     else func_002AB6D8(m, D_00189E20 + 0x90);
 }

@@ -43,14 +43,14 @@ void func_L02_0040CAF0(u8 *object)
         *(u8 **)(state + 0x18) = state + 0x60;
         *(float *)(object + 0x2C) *= 0.75f;
         *(s32 *)(state + 0x19C) = -1;
-        state[0x48] = func_00283CF0(15.0f);
-        state[0x4A] = func_00283CF0(4.0f);
+        state[0x48] = FloatToInt(15.0f);
+        state[0x4A] = FloatToInt(4.0f);
         *(float *)(state + 0x190) = func_002A7878(-*(float *)(state + 0x190), *(float *)(state + 0x190)) * 0.017453294f;
         object[0x30] = 0x80;
         *(s32 *)(state + 0x194) = 1;
         *(float *)(state + 0x198) *= 0.016666668f;
         func_002B60B0(object, 0.027777778f, 1.6666667f, 0.001163553f, 0.10471977f);
-        func_002A04B8(object, (s32 *)(state + 0x1A0), (s32 *)(state + 0x1A4), (s32 *)(state + 0x1A8));
+        get_moby_color(object, (s32 *)(state + 0x1A0), (s32 *)(state + 0x1A4), (s32 *)(state + 0x1A8));
         *(float *)(state + 0x60) = 0.75f;
         *(float *)(state + 0x68) = 0.75f;
         *(s32 *)(state + 0x64) = 0;
@@ -64,13 +64,13 @@ void func_L02_0040CAF0(u8 *object)
         state[0x28] = 3;
         func_L02_0040D180(object);
     }
-    if (object[0x31] && func_00282E48(object + 0x10, D_L02_001BA500) < 24.0f) {
+    if (object[0x31] && fast_vec_dist(object + 0x10, D_L02_001BA500) < 24.0f) {
         func_002A93B0(object);
         object[0x6F] = 0x16;
     }
     if (object[0x95] >= 2) {
         if (!func_002E59B0((s32)object, *(s32 *)(state + 0x19C)))
-            *(s32 *)(state + 0x19C) = func_002E5CF8(1, 4, (char *)object);
+            *(s32 *)(state + 0x19C) = PlayMobySound(1, 4, (char *)object);
     } else if (func_002E59B0((s32)object, *(s32 *)(state + 0x19C))) {
         s32 slot = *(s32 *)(state + 0x19C);
         if (slot != -1) {
@@ -94,16 +94,16 @@ void func_L02_0040CAF0(u8 *object)
         scale = 0.00027777778f;
         push = D_L02_001B194C * scale;
         *(float *)(state + 0x20) -= amount;
-        func_00282F20(velocity, (float *)(contact + 0x10), push);
+        vec_scale_to_length(velocity, (float *)(contact + 0x10), push);
         func_002A7A00(random, D_L02_001B1950 * scale, D_L02_001B1954 * scale);
-        func_00282CC0(velocity, velocity, random);
+        FastVecAdd(velocity, velocity, random);
         velocity[2] = func_002A7878(D_L02_001B1958, D_L02_001B1958) * scale;
         velocity[3] = 5627.925f;
-        func_00282CC0((float *)(state + 0x100), (float *)(state + 0x100), velocity);
+        FastVecAdd((float *)(state + 0x100), (float *)(state + 0x100), velocity);
         func_002A7A00(random, D_L02_001B1960 * 0.0000048481375f, D_L02_001B1964 * 0.0000048481375f);
-        *(float *)(state + 0x170) = func_00283B98(*(float *)(state + 0x170), random[0]);
-        *(float *)(state + 0x174) = func_00283B98(*(float *)(state + 0x174), random[1]);
-        *(float *)(state + 0x178) = func_00283B98(*(float *)(state + 0x178), random[2]);
+        *(float *)(state + 0x170) = FastAddRotations(*(float *)(state + 0x170), random[0]);
+        *(float *)(state + 0x174) = FastAddRotations(*(float *)(state + 0x174), random[1]);
+        *(float *)(state + 0x178) = FastAddRotations(*(float *)(state + 0x178), random[2]);
         func_002AB800((s32)object, (char *)(state + 0x50));
         func_002A7750(object, 13, 4);
     }

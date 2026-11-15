@@ -42,17 +42,17 @@ dispatch:
     case 0:
         if(target) {
             H(p,0x14)=H(target,0xAA);
-            F(p,0x44)=func_00283CE0(target[0x23]);
+            F(p,0x44)=IntToFloat(target[0x23]);
             if(I(p,8)&0x10) qcopy_nc(obj+0x10,target+0x10);
             else if(I(p,8)&0x40) qcopy_nc(target+0x10,obj+0x10);
             if(I(p,8)&0x20) qcopy_nc(obj+0xF0,target+0xF0);
             else if(I(p,8)&0x80) qcopy_nc(target+0xF0,obj+0xF0);
-        } else func_0026FEB8(D_L17_001B20F0);
+        } else STUB_printf(D_L17_001B20F0);
         for(i=0,link=links;i<5;i++,link++) {
             if(link->index!=-1) {
                 link->uid=H(D_L17_001B2C1C+link->index*256,0xAA);
-                func_0026FEB8(D_L17_001B2120,(obj-D_L17_001B2C1C)>>8,i,link->index,(int)link->uid);
-            } else func_0026FEB8(D_L17_001B2150,(obj-D_L17_001B2C1C)>>8,i);
+                STUB_printf(D_L17_001B2120,(obj-D_L17_001B2C1C)>>8,i,link->index,(int)link->uid);
+            } else STUB_printf(D_L17_001B2150,(obj-D_L17_001B2C1C)>>8,i);
         }
         F(obj,0x2C)=(F(p,0)<F(p,4)?F(p,4):F(p,0))*F(*(u8 **)(obj+0x24),0x24);
         obj[0x20]=1;
@@ -67,9 +67,9 @@ dispatch:
         break;
     case 2:
         if(target && !(I(p,8)&2)) {
-            float timer=func_00283CE0(I(p,0x40));
-            float total=func_00283CE0(I(p,0xC));
-            target[0x23]=func_00283CF0((F(p,0x44)*timer)/total);
+            float timer=IntToFloat(I(p,0x40));
+            float total=IntToFloat(I(p,0xC));
+            target[0x23]=FloatToInt((F(p,0x44)*timer)/total);
         }
         if(!(I(p,8)&4)) {
             if(target && *(signed char *)(p+0x17)!=-1 && target[0x20]==*(signed char *)(p+0x17)) obj[0x20]=3;

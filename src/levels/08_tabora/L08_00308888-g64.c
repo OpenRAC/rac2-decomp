@@ -105,7 +105,7 @@ extern void func_002C2FD8(void *, int, int, int, int, int, int, float);
 void func_L08_00308888(void) {
     float v[4] __attribute__((aligned(16)));
     float w[4] __attribute__((aligned(16)));
-    /* Adjacent in the frame: func_002833F0 fills all three as rows of one matrix. */
+    /* Adjacent in the frame: euler_rotation_basis fills all three as rows of one matrix. */
     float matrix[4] __attribute__((aligned(16)));
     float offset[4] __attribute__((aligned(16)));
     float forward[4] __attribute__((aligned(16)));
@@ -119,7 +119,7 @@ void func_L08_00308888(void) {
         for (; j < D_L08_001BD800.count; ++j) {
             p = D_L08_001BD800.objects[j];
             if (p && p->classId==0xE29) p->flags |= 0x800;
-            if (p->classId==0xD54) func_002E64A0(p);
+            if (p->classId==0xD54) UpdateEquipmentPieces(p);
             if (p && p->classId==0xFA0 && p->vars)
             func_L00_00326048(p,p->vars+12,0x80AAAAD2,0x80396464,0.061086535f);
         }
@@ -133,8 +133,8 @@ void func_L08_00308888(void) {
                 TaboraEffectEntry *entry=&D_L08_00288D10[j];
                 if (D_L08_001BD800.frame==entry->frame) {
                     *(u128 *)v=*(u128 *)entry->position;
-                    func_00282CC0(v,v,D_L08_001A9430);
-                    func_0032C700(v,0,25,20,20,20,45,1,1,1,0,0,entry->radius,20.0f);
+                    FastVecAdd(v,v,D_L08_001A9430);
+                    SpawnExplosion(v,0,25,20,20,20,45,1,1,1,0,0,entry->radius,20.0f);
                     if (entry->shake>0.0f) {
                         D_L08_001B99C0.duration0=55;
                         D_L08_001B99C0.duration2=70;
@@ -170,10 +170,10 @@ void func_L08_00308888(void) {
                     qzero(w);
                     func_002ACB48(w,scale*0.7f);
                     w[2]*=0.3f;
-                    func_00282CC0(w,w,p->position);
+                    FastVecAdd(w,w,p->position);
                     alpha=func_002A7820(64,112);
                     colour=func_002A7820(64,127);
-                    packed=(alpha<<24)|(func_00283CF0((float)colour*0.3f)<<16);
+                    packed=(alpha<<24)|(FloatToInt((float)colour*0.3f)<<16);
                     packed|=colour<<8;
                     colour|=packed;
                     angle=func_002A7878(1.0f,1.013f);
@@ -182,8 +182,8 @@ void func_L08_00308888(void) {
                     v[0]=func_002A78D8(0.0f,0.011666667f);
                     v[1]=func_002A78D8(0.0f,0.011666667f);
                     v[2]=func_002A7878(frameStep*0.1f,0.008333334f);
-                    func_00282D30(v,v,scale);
-                    r=func_002BDCE8(w,0.1f,1.0f,angle,spin,v,colour,size*210000.0f,0);
+                    FastVecScale(v,v,scale);
+                    r=SpawnSpinningSparkParticle(w,0.1f,1.0f,angle,spin,v,colour,size*210000.0f,0);
                     if (r) {
                         TaboraParticleData *particleData=&r->data;
                         if (func_002A77E0(2)) r->kind=0x44;
@@ -203,10 +203,10 @@ void func_L08_00308888(void) {
         TaboraObject *second=D_L08_001BD800.objects[2];
         qcopy(v,second->position);
         v[2]+=0.8f;
-        func_00282CF0(w,first->position,second->position);
-        func_00282F20(w,w,0.035f);
+        FastVecSub(w,first->position,second->position);
+        vec_scale_to_length(w,w,0.035f);
         w[2]=0.041666668f;
-        func_L00_003263D0(0,v,40,0,w,0x39969696,0,0.75f,1.3f,0.2f,0.37f);
+        SpawnTintedEffects(0,v,40,0,w,0x39969696,0,0.75f,1.3f,0.2f,0.37f);
         D_L08_001B99C0.amount2=0.047f;
         D_L08_001B99C0.duration2=35;
         D_L08_001B99C0.amount0=0.037f;
@@ -232,22 +232,22 @@ void func_L08_00308888(void) {
         int j;
         int spin;
         float size;
-        D_L08_001B2820[0]=func_00283B98(D_L08_001B2820[0],D_L08_001A9490*0.00029088824f);
-        D_L08_001B2820[1]=func_00283B98(D_L08_001B2820[1],D_L08_001A9494*0.00029088824f);
-        D_L08_001B2820[2]=func_00283B98(D_L08_001B2820[2],D_L08_001A9498*0.00029088824f);
-        D_L08_001B2820[3]=func_00283B98(D_L08_001B2820[3],D_L08_001A949C*0.00029088824f);
-        func_002833F0(matrix,D_L08_001B2820);
+        D_L08_001B2820[0]=FastAddRotations(D_L08_001B2820[0],D_L08_001A9490*0.00029088824f);
+        D_L08_001B2820[1]=FastAddRotations(D_L08_001B2820[1],D_L08_001A9494*0.00029088824f);
+        D_L08_001B2820[2]=FastAddRotations(D_L08_001B2820[2],D_L08_001A9498*0.00029088824f);
+        D_L08_001B2820[3]=FastAddRotations(D_L08_001B2820[3],D_L08_001A949C*0.00029088824f);
+        euler_rotation_basis(matrix,D_L08_001B2820);
         for(j=0;j<4;++j) {
-            func_00282CF0(start,D_L08_001B9B00,v);
-            func_00282F20(start,start,5.0f);
-            func_00282CC0(end,start,v);
+            FastVecSub(start,D_L08_001B9B00,v);
+            vec_scale_to_length(start,start,5.0f);
+            FastVecAdd(end,start,v);
             end[2]+=0.5f;
-            spin=func_00283CF0(func_002A78D8(2.0f,5.0f));
-            func_00283098(direction,D_L08_001A9450[j],matrix);
-            func_00282F20(direction,direction,3.5f);
-            func_00282CC0(direction,direction,end);
-            func_00282CF0(w,end,direction);
-            func_00282F20(w,w,0.058333337f);
+            spin=FloatToInt(func_002A78D8(2.0f,5.0f));
+            matrix_mul_vec3(direction,D_L08_001A9450[j],matrix);
+            vec_scale_to_length(direction,direction,3.5f);
+            FastVecAdd(direction,direction,end);
+            FastVecSub(w,end,direction);
+            vec_scale_to_length(w,w,0.058333337f);
             size=func_002A7878(0.2f,0.32f);
             func_002C7970(direction,w,60,0x804080,spin,0,63,6,size*210000.0f,147000.0f,0.0f);
         }
@@ -264,11 +264,11 @@ void func_L08_00308888(void) {
         *(u128 *)w=*(u128 *)v;
         w[2]+=1.0f;
         if (func_002A77E0(4)==0) {
-            func_00282CF0(forward,D_L08_001B9B00,w);
+            FastVecSub(forward,D_L08_001B9B00,w);
             timeScale=0.016666668f;
             frameStep=0.008333334f;
-            func_00282F20(forward,forward,5.0f);
-            func_00282CC0(w,forward,w);
+            vec_scale_to_length(forward,forward,5.0f);
+            FastVecAdd(w,forward,w);
             func_002A7A00(matrix,rate,rate);
             size=(D_L08_001BD800.frame-480);
             size*=0.06666667f;
@@ -279,7 +279,7 @@ void func_L08_00308888(void) {
             for (j=0;j<1;++j) {
                 t=rate*timeScale;
                 func_002A7A00(offset,t,t);
-                func_00282CC0(matrix,matrix,offset);
+                FastVecAdd(matrix,matrix,offset);
                 t=0.0f; /* Second set in the loop: keeps rate*timeScale from being hoisted and folded. */
                 scale=amount*frameStep*(D_L08_001BD800.frame-480);
                 alpha=func_002A77E0(255)&255;
@@ -288,24 +288,24 @@ void func_L08_00308888(void) {
             }
         }
     }
-    func_00282F20(direction,forward,0.1f);
+    vec_scale_to_length(direction,forward,0.1f);
     {
         int j, alpha, colour, full, value;
         float size;
         j=0;
         full=255;
         for (;j<=0;++j) {
-            size=func_00283CE0(full-((D_L08_001B2508+j*20)&255));
+            size=IntToFloat(full-((D_L08_001B2508+j*20)&255));
             size=func_00282C48(0.5f-size*0.003921569f);
-            colour=func_00283D38(0x40FF40FF,0x10FF40FF,size);
+            colour=FastTweenColor(0x40FF40FF,0x10FF40FF,size);
             alpha=(unsigned char)D_L08_001B2508;
             if(j&2) alpha<<=1;
             if(j&1) alpha=full-alpha;
             value=alpha&255;
-            size=(func_00283CE0(j)+5.0f)*0.008333334f;
+            size=(IntToFloat(j)+5.0f)*0.008333334f;
             size*=(D_L08_001BD800.frame-480);
             func_002C2FD8(forward,colour,value,53,1,2,0,size);
-            func_00282CC0(forward,forward,direction);
+            FastVecAdd(forward,forward,direction);
         }
     }
 }

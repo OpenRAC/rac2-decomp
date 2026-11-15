@@ -52,7 +52,7 @@ void func_L00_004243C0(char *obj)
     unsigned short timer;
     Moby243 *entry;
     char *goal;
-    func_00282D08(a,base+176,camera-96,0.5f);
+    lerp_vector(a,base+176,camera-96,0.5f);
     count=func_00277F48(a,1,D_L00_00189E20.owner,0,distance*0.5f);
     if(count>0) {
         char **scan,**hidden;
@@ -68,13 +68,13 @@ void func_L00_004243C0(char *obj)
                     numhidden++;
                     m->visible=0;
                 } else {
-                    func_00282CF0(b,m->pos,goal);
+                    FastVecSub(b,m->pos,goal);
                     axis=camera+48;
-                    dot=func_00282DB0(axis,b);
-                    func_00282D30(c,axis,dot);
-                    func_00282CF0(d,b,c);
-                    func_00282F20(d,d,1.0f);
-                    dot=func_00282DB0(d,move);
+                    dot=FastVecDot(axis,b);
+                    FastVecScale(c,axis,dot);
+                    FastVecSub(d,b,c);
+                    vec_scale_to_length(d,d,1.0f);
+                    dot=FastVecDot(d,move);
                     {
                     float span=move->distance-state->offset;
                     span=dot/span;
@@ -82,9 +82,9 @@ void func_L00_004243C0(char *obj)
                     }
                     t=func_00282C48(1.5707963705062866f-t);
                     if(t<0.4363323450088501f) {
-                        func_00282DD8(e,move,axis);
-                        func_00282F20(e,e,1.0f);
-                        if(func_00282DB0(e,b)>0.0f)func_002ACEC0(move,move,camera+32,-0.01745329424738884f);
+                        FastVecCross(e,move,axis);
+                        vec_scale_to_length(e,e,1.0f);
+                        if(FastVecDot(e,b)>0.0f)func_002ACEC0(move,move,camera+32,-0.01745329424738884f);
                         else func_002ACEC0(move,move,camera+32,0.01745329424738884f);
                     }
                 }
@@ -114,22 +114,22 @@ void func_L00_004243C0(char *obj)
         if(blocked || !(((unsigned)(timer-1)<1999) ||
             (D_00138180.x<0.3f && D_00138180.y<0.3f))) goto hold;
     }
-    if(func_00282978(&state->timer))state->flag=0;
+    if(FastDecTimer(&state->timer))state->flag=0;
     if(state->flag) {
-        if(func_00282978(&state->timer))state->flag=0;
+        if(FastDecTimer(&state->timer))state->flag=0;
     }
-    t=func_00283CE0(state->timer);
-    t=t/func_00283CE0(2000);
+    t=IntToFloat(state->timer);
+    t=t/IntToFloat(2000);
     state->offset=func_002A7C00(0.0f,state->offset,t);
     goto scaled;
 hold:
-    if((short)timer>2000)func_00282978(&state->timer);
+    if((short)timer>2000)FastDecTimer(&state->timer);
     else state->timer=2000;
 scaled:
-    func_00282F20(move,move,move->distance-state->offset);
-    func_00282CC0(b,move,pos+80);
+    vec_scale_to_length(move,move,move->distance-state->offset);
+    FastVecAdd(b,move,pos+80);
     if(D_L00_00189E20.mode!=49 && !state->locked &&
-       func_002761F8(pos+80,b,D_L00_001B184C,D_L00_00189E20.owner,0) &&
+       CollLine(pos+80,b,D_L00_001B184C,D_L00_00189E20.owner,0) &&
        !func_L00_004204A0(D_L00_001BF220)) {
         state->counter++;
         if(state->counter>=30)func_L00_002D9D98();

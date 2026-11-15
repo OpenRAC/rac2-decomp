@@ -20,7 +20,7 @@ char *func_002BDCE8(TI128 *position, int spin, TI128 *axis, int colour, int coun
         *(TI128 *)(p + 0x10) = *position;
         *(int *)(p + 4) = colour | 0x20000000;
         m = p + 0x20;
-        p[9] = func_00283CF0(4.0f) + 0x70;
+        p[9] = FloatToInt(4.0f) + 0x70;
         p[3] = 0x48;
         *(float *)(p + 0xC) = size;
         p[1] = 0;
@@ -29,14 +29,14 @@ char *func_002BDCE8(TI128 *position, int spin, TI128 *axis, int colour, int coun
         *(float *)(p + 0x10) += func_002A78D8(0.0f, jitter);
         *(float *)(p + 0x14) += func_002A78D8(0.0f, jitter);
         *(float *)(p + 0x18) += func_002A78D8(0.0f, jitter);
-        *(float *)(p + 0x1C) = func_00283CE0(count);
+        *(float *)(p + 0x1C) = IntToFloat(count);
         *(short *)(p + 0xA) = 10;
         *(int *)(m + 4) = 0;
         *(int *)(p + 0x20) = colour;
-        *(short *)(m + 8) = func_00283CF0(func_002A77E0(2) ? (float)spin : (float)-spin);
+        *(short *)(m + 8) = FloatToInt(func_002A77E0(2) ? (float)spin : (float)-spin);
         *(float *)(m + 0xC) = func_002A7878(lo, hi);
         *(TI128 *)(m + 0x10) = *axis;
-        *(float *)(m + 0x1C) = func_00283CE0(0x1E);
+        *(float *)(m + 0x1C) = IntToFloat(0x1E);
     }
     return p;
 }

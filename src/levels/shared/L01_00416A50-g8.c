@@ -54,10 +54,10 @@ void func_L01_00416A50(Obj_416A50 *a0)
     if (a0->b20 == 1) {
         f = func_00283198(a0->fFC);
         a0->f18 = s1->f18 + D_L01_001B1A5C + D_L01_001B1A60 * f;
-        a0->fF0 = func_00283B98(a0->fF0, s1->f68);
-        a0->fF4 = func_00283B98(a0->fF4, s1->f64);
-        a0->fF8 = func_00283B98(a0->fF8, s1->f60);
-        a0->fFC = func_00283B98(a0->fFC, 0.0002908882452175021f * D_L01_001B1A74);
+        a0->fF0 = FastAddRotations(a0->fF0, s1->f68);
+        a0->fF4 = FastAddRotations(a0->fF4, s1->f64);
+        a0->fF8 = FastAddRotations(a0->fF8, s1->f60);
+        a0->fFC = FastAddRotations(a0->fFC, 0.0002908882452175021f * D_L01_001B1A74);
     }
 
     func_L01_00416C08(a0);

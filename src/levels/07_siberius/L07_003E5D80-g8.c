@@ -29,7 +29,7 @@ void func_L07_003E5D80(u8 *obj) {
     int count;
 
     if (st[0x2E] != 2) {
-        func_002A6C58(obj, 0, 1);
+        SetDeathBits(obj, 0, 1);
     }
     slot = *(s32 *)(st + 0x264);
     if (slot != -1) {
@@ -39,19 +39,19 @@ void func_L07_003E5D80(u8 *obj) {
         }
     }
     *(s32 *)(st + 0x264) = -1;
-    func_002E5CF8(0, 0, obj);
+    PlayMobySound(0, 0, obj);
     pos = obj + 0x10;
     a.q = 0;
     a.f[2] = 0.5f;
-    func_00282CC0(&a, &a, pos);
-    func_0032C700(&a, 0, 0, 0, 0, 0x14, 0x2D, 1, D_L07_001B0AAC, 20.0f, 1, 0, 0, *(s32 *)(st + 0x260));
-    func_00282CF0(b, pos, D_00189EA0);
+    FastVecAdd(&a, &a, pos);
+    SpawnExplosion(&a, 0, 0, 0, 0, 0x14, 0x2D, 1, D_L07_001B0AAC, 20.0f, 1, 0, 0, *(s32 *)(st + 0x260));
+    FastVecSub(b, pos, D_00189EA0);
     b[2] = 0.0f;
     func_00282F70(b, b, 0.06666667f);
     toward = *(u8 **)(st + 0x260);
     if (toward != 0) {
         func_002AD330(obj, toward, pos, c);
-        func_00282CC0(b, b, c);
+        FastVecAdd(b, b, c);
     }
     func_002B0A68(obj, 3, b, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
     count = *(u16 *)(st + 0x21A) - 1;

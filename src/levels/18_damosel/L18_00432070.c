@@ -29,7 +29,7 @@ void func_L18_00432070(u8 *a) {
     case 3: case 4: case 5: case 6: case 7:
     case 10: case 11: case 12: case 13: case 14: case 15:
         if (H(s, 0x808) == 1) {
-            if (func_00283C80(F(s, 0x7A4), F(a, 0xF8)) > 0.6108652949333191f) {
+            if (FastDiffRots(F(s, 0x7A4), F(a, 0xF8)) > 0.6108652949333191f) {
                 func_002B5278(a, F(s, 0x7A4));
             } else {
                 if (P(s, 0x7C0))
@@ -49,7 +49,7 @@ void func_L18_00432070(u8 *a) {
         break;
     case 8: case 9:
         if (W(s, 0x7D4) != -1) {
-            func_L02_0032E998(a + 0x10, s + 0x750, s + 0x7DC, s + 0x210, W(s, 0x780),
+            ComputeRegionRouteHeading(a + 0x10, s + 0x750, s + 0x7DC, s + 0x210, W(s, 0x780),
                               s + 0x78C, s + 0x7D8, 0.0f, 0.4f);
             func_002B50E0(a, s + 0x750, F(s, 0x7DC));
         } else {
@@ -57,7 +57,7 @@ void func_L18_00432070(u8 *a) {
         }
         if (P(s, 0x7C0)) {
             if (H(s, 0x808) == 1 &&
-                func_00283C80(F(s, 0x7A4), F(a, 0xF8)) < 0.6108652949333191f) {
+                FastDiffRots(F(s, 0x7A4), F(a, 0xF8)) < 0.6108652949333191f) {
                 func_002AAA00(P(s, 0x7C0) + 0xF8, F(s, 0x7A4), s + 0x7CC,
                               0.006981317885220051f, 0.006981317885220051f,
                               0.20943955f, 0);

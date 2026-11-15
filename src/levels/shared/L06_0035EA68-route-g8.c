@@ -139,19 +139,19 @@ void func_L06_003E3F28(char *moby)
         if (!(D_0019B2E8[B(moby,0xB0)+(currentLevelGp<<4)]&0x80)) break;
         for(i=0;i<5;i++) {
             if(st->trigger[i]==-1 && st->forcedRoute!=i) continue;
-            if(!func_002ACBC8(D_00189EA0,st->trigger[i]) && st->forcedRoute!=i) continue;
+            if(!IsPointInCuboid(D_00189EA0,st->trigger[i]) && st->forcedRoute!=i) continue;
             I(moby,0x98)=I(*(char **)(moby+0x24),0x10);
             if(st->approach[i]!=-1) {
                 rot[2]=func_00283248(F(D_L06_001FE500[st->approach[i]],0x20)-F(moby,0x10),F(D_L06_001FE500[st->approach[i]],0x24)-F(moby,0x14));
                 func_L02_002EF388(moby,D_L06_001FE500[st->approach[i]]+16,rot,0,0);
                 st->baseHeight=F(D_L06_001FE500[st->approach[i]],0x18);
             } else if (st->depart[i]!=-1) {
-                if(func_00282E48(moby+0x10,D_L06_001FE500[st->depart[i]]+16)>4) {
+                if(fast_vec_dist(moby+0x10,D_L06_001FE500[st->depart[i]]+16)>4) {
                     rot[2]=func_00283248(F(D_L06_001FE500[st->depart[i]],0x20)-F(moby,0x10),F(D_L06_001FE500[st->depart[i]],0x24)-F(moby,0x14));
                     func_L02_002EF388(moby,D_L06_001FE500[st->depart[i]]+16,rot,0,0);
                     st->baseHeight=F(D_L06_001FE500[st->depart[i]],0x18);
                 }
-                func_002A7CA0(moby,&st->yawRate,func_00283248(F(D_L06_001FE500[st->depart[i]],0x20)-F(moby,0x10),F(D_L06_001FE500[st->depart[i]],0x24)-F(moby,0x14)),0.00116355298087f,0.00116355298087f,0.104719772935f);
+                MobySpringTurn(moby,&st->yawRate,func_00283248(F(D_L06_001FE500[st->depart[i]],0x20)-F(moby,0x10),F(D_L06_001FE500[st->depart[i]],0x24)-F(moby,0x14)),0.00116355298087f,0.00116355298087f,0.104719772935f);
             }
             M->route=i; M->state=2; M->flags32=0x80;
             st->timer=D_L06_001AF528*(1.0f/60); st->moving=1; st->forcedRoute=-1;
@@ -166,7 +166,7 @@ void func_L06_003E3F28(char *moby)
         break;
     case 3: {
         int i;
-        func_002A7CA0(moby,&st->yawRate,func_00283248(F(D_L06_001FE500[st->depart[M->route]],0x20)-F(moby,0x10),F(D_L06_001FE500[st->depart[M->route]],0x24)-F(moby,0x14)),0.000581776490435f,0.000581776490435f,0.0203621778637f);
+        MobySpringTurn(moby,&st->yawRate,func_00283248(F(D_L06_001FE500[st->depart[M->route]],0x20)-F(moby,0x10),F(D_L06_001FE500[st->depart[M->route]],0x24)-F(moby,0x14)),0.000581776490435f,0.000581776490435f,0.0203621778637f);
         func_002AAA00(moby+0xF4,0,&st->pitchRate,D_L06_001AF530*0.000004848137291264255f,D_L06_001AF530*0.000004848137291264255f,0.20943954586982727f,0);
         func_002AAA00(moby+0xF0,0,&st->rollRate,D_L06_001AF53C*0.000004848137291264255f,D_L06_001AF53C*0.000004848137291264255f,0.20943954586982727f,0);
         if(D_00189E20.attached==moby && !D_00189E20.animation) {
@@ -178,19 +178,19 @@ void func_L06_003E3F28(char *moby)
         for(i=0;i<5;i++) {
             if(st->trigger[i]==-1 && st->forcedRoute!=i) continue;
             if(i==M->route) continue;
-            if(!func_002ACBC8(D_00189EA0,st->trigger[i]) && st->forcedRoute!=i) continue;
+            if(!IsPointInCuboid(D_00189EA0,st->trigger[i]) && st->forcedRoute!=i) continue;
             I(moby,0x98)=I(*(char **)(moby+0x24),0x10);
             if(st->approach[i]!=-1) {
                 rot[2]=func_00283248(F(D_L06_001FE500[st->approach[i]],0x20)-F(moby,0x10),F(D_L06_001FE500[st->approach[i]],0x24)-F(moby,0x14));
                 func_L02_002EF388(moby,D_L06_001FE500[st->approach[i]]+16,rot,0,0);
                 st->baseHeight=F(D_L06_001FE500[st->approach[i]],0x18);
             } else if (st->depart[i]!=-1) {
-                if(func_00282E48(moby+0x10,D_L06_001FE500[st->depart[i]]+16)>4) {
+                if(fast_vec_dist(moby+0x10,D_L06_001FE500[st->depart[i]]+16)>4) {
                     rot[2]=func_00283248(F(D_L06_001FE500[st->depart[i]],0x20)-F(moby,0x10),F(D_L06_001FE500[st->depart[i]],0x24)-F(moby,0x14));
                     func_L02_002EF388(moby,D_L06_001FE500[st->depart[i]]+16,rot,0,0);
                     st->baseHeight=F(D_L06_001FE500[st->depart[i]],0x18);
                 }
-                func_002A7CA0(moby,&st->yawRate,func_00283248(F(D_L06_001FE500[st->depart[i]],0x20)-F(moby,0x10),F(D_L06_001FE500[st->depart[i]],0x24)-F(moby,0x14)),0.00116355298087f,0.00116355298087f,0.104719772935f);
+                MobySpringTurn(moby,&st->yawRate,func_00283248(F(D_L06_001FE500[st->depart[i]],0x20)-F(moby,0x10),F(D_L06_001FE500[st->depart[i]],0x24)-F(moby,0x14)),0.00116355298087f,0.00116355298087f,0.104719772935f);
             }
             M->route=i; M->state=2; M->flags32=0x80;
             st->timer=D_L06_001AF528*(1.0f/60); st->moving=1; st->forcedRoute=-1;
@@ -211,9 +211,9 @@ void func_L06_003E3F28(char *moby)
     case 6:
         func_002AAA00(moby+0xF4,0,&st->pitchRate,D_L06_001AF530*0.000004848137291264255f,D_L06_001AF530*0.000004848137291264255f,0.20943954586982727f,0);
         func_002AAA00(moby+0xF0,0,&st->rollRate,D_L06_001AF53C*0.000004848137291264255f,D_L06_001AF53C*0.000004848137291264255f,0.20943954586982727f,0);
-        if(st->back[M->route]!=-1 && func_00282E48(moby+0x10,D_00189EA0)>15) {
+        if(st->back[M->route]!=-1 && fast_vec_dist(moby+0x10,D_00189EA0)>15) {
             M->state=7; st->moving=1;
-        } else if(st->back[M->route]==-1 && func_00282E80(moby+0x10,D_00189EA0)>5) M->state=1;
+        } else if(st->back[M->route]==-1 && vec_distance_xy(moby+0x10,D_00189EA0)>5) M->state=1;
         break;
     case 7:
         if(func_L06_003E4BE0(moby,st->back[M->route],&st->pointIndex)) {
@@ -222,6 +222,6 @@ void func_L06_003E3F28(char *moby)
         break;
     }
     func_L06_003E4F08(moby);
-    func_00282CF0(delta,moby+0x10,oldpos);
+    FastVecSub(delta,moby+0x10,oldpos);
     func_002AD6F0((char *)st+0x20,delta,oldrot,moby+0xF0);
 }

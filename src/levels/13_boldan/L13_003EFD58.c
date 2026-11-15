@@ -17,13 +17,13 @@ void func_L13_003EFD58(u8 *a0) {
     case 0:
         a0[0x30] = 0xFF;
         *(f32 *)(vars + 8) = *(f32 *)(a0 + 0xF0);
-        *(f32 *)vars = func_00283B98(*(f32 *)(a0 + 0xF0), 0.78539824f);
+        *(f32 *)vars = FastAddRotations(*(f32 *)(a0 + 0xF0), 0.78539824f);
         a0[0x20] = 1;
         *(u16 *)(a0 + 0x96) = 0;
         return;
     case 1:
         if (func_002B3868(a0))
-            func_002E5CF8(0, 0, a0);
+            PlayMobySound(0, 0, a0);
         func_002AAA00((f32 *)(a0 + 0xF0), *(f32 *)vars, vars + 4, 0.00087266474f, 0.00087266474f,
                       0.10471977f, 0);
         counter = *(u16 *)(a0 + 0x96);
@@ -36,7 +36,7 @@ void func_L13_003EFD58(u8 *a0) {
         return;
     case 3:
         if (func_002B3868(a0))
-            func_002E5CF8(0, 0, a0);
+            PlayMobySound(0, 0, a0);
         func_002AAA00((f32 *)(a0 + 0xF0), *(f32 *)(vars + 8), vars + 4, 0.00087266474f,
                       0.00087266474f, 0.10471977f, 0);
         counter = *(u16 *)(a0 + 0x96);

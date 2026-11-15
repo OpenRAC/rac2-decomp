@@ -23,7 +23,7 @@ Moby_332590 *func_00332590(int owner, TI128 *pos, void *a2, TI128 *a3)
     Moby_332590 *p;
     char *vars;
 
-    p = func_0029EFD0(0xEAB);
+    p = CreateMoby(0xEAB);
     if (p != 0) {
         vars = p->vars;
         p->timer = 0xFF;
@@ -32,7 +32,7 @@ Moby_332590 *func_00332590(int owner, TI128 *pos, void *a2, TI128 *a3)
         p->position = *pos;
         *(TI128 *)vars = *a3;
         *(int *)(vars + 0x30) = func_002FED90(p, 0, 1.0f, 1.0f, 1.0f);
-        func_00282CF0(vars + 0x20, a2, pos);
+        FastVecSub(vars + 0x20, a2, pos);
         *(int *)(vars + 0x34) = owner;
     }
     return p;

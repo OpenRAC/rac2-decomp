@@ -2,7 +2,7 @@
 
 /* func_L20_0044AE58: mode 0 steers the velocity (0xF0..0xF8), moves by an interpolated
  * step with a contact test and emits particles; mode 1 calls func_002A8C28 and
- * func_0032C700 at the position and removes the object (func_0029F338).  Every other
+ * SpawnExplosion at the position and removes the object (func_0029F338).  Every other
  * mode, mode 0 included, ends with the common callback.
  * Built -G8: the body reaches level data through $gp.
  *
@@ -74,15 +74,15 @@ void func_L20_0044AE58(char *arg0) {
 
         base = arg0 + 0x10;
         *(float *)(arg0 + 0xF0) =
-            func_00283B98(*(float *)(arg0 + 0xF0), v * 0.7f);
-        *(float *)(arg0 + 0xF4) = func_00283B98(
+            FastAddRotations(*(float *)(arg0 + 0xF0), v * 0.7f);
+        *(float *)(arg0 + 0xF4) = FastAddRotations(
             *(float *)(arg0 + 0xF4), *(float *)(state + 0x28) * 0.5f);
-        *(float *)(arg0 + 0xF8) = func_00283B98(
+        *(float *)(arg0 + 0xF8) = FastAddRotations(
             *(float *)(arg0 + 0xF8), *(float *)(state + 0x28));
-        func_00282D08(buf30, state, state + 0x10,
+        lerp_vector(buf30, state, state + 0x10,
                       *(float *)(state + 0x30));
-        func_002AA2E8((float *)(state + 0x30), 1.0f, *(float *)(state + 0x34));
-        func_00282CC0(buf20, base, buf30);
+        ApproachValue((float *)(state + 0x30), 1.0f, *(float *)(state + 0x34));
+        FastVecAdd(buf20, base, buf30);
         if (func_00277258(buf20, 0, arg0, D_L20_001B2468) != 0) {
             int id = D_L20_001C0418;
 
@@ -92,7 +92,7 @@ void func_L20_0044AE58(char *arg0) {
             }
         }
         qcopy(arg0 + 0x10, buf20);
-        func_00282D30(buf40, state, -0.5f);
+        FastVecScale(buf40, state, -0.5f);
         func_00282C88(buf50);
         a = func_002A7878(2.5f, 3.0f) * 210000.0f;
         b = func_002A7878(0.2f, 0.4f) * 210000.0f;
@@ -104,7 +104,7 @@ void func_L20_0044AE58(char *arg0) {
         base = arg0 + 0x10;
         func_002A8C28(arg0, base, 0x10001, 0, 3.0f, *(float *)(state + 0x20),
                       1.0f, 1, 0);
-        func_0032C700(base, 1, 0xA, 0xA, 0xA, 0xA, 0xA, 0, 2.0f, 20.0f, mode,
+        SpawnExplosion(base, 1, 0xA, 0xA, 0xA, 0xA, 0xA, 0, 2.0f, 20.0f, mode,
                       mode, 0, 0);
         func_0029F338(arg0);
         return;

@@ -21,7 +21,7 @@ extern void func_L16_003C3A10(void *a0, void *a1, void *a2);
 void func_L22_003F52D8(u8 *a0)
 {
     u8 *state = *(u8 **)(a0 + 0x68);
-    f32 f23 = 60.0f / func_00282E48(D_L22_001B9C80, a0 + 0x10);
+    f32 f23 = 60.0f / fast_vec_dist(D_L22_001B9C80, a0 + 0x10);
     f32 f22;
     f32 f25;
     f32 lim;
@@ -38,7 +38,7 @@ void func_L22_003F52D8(u8 *a0)
     if (f22 > lim)
         f22 = lim;
     for (i = 0; (f32)i < f22; i++) {
-        f32 f21 = func_00283CE0(i) * f25;
+        f32 f21 = IntToFloat(i) * f25;
         f32 f20 = f23 + f21 * 0.1f;
 
         v10.q = 0;
@@ -46,8 +46,8 @@ void func_L22_003F52D8(u8 *a0)
         v10.f[1] = func_002A78D8(0.0f, f20);
         v10.f[2] = f21;
         v0.q = v10.q;
-        func_00283098(&v0, &v0, a0 + 0xC0);
-        func_00282CC0(&v0, &v0, a0 + 0x10);
+        matrix_mul_vec3(&v0, &v0, a0 + 0xC0);
+        FastVecAdd(&v0, &v0, a0 + 0x10);
         v20.q = 0;
         v20.f[0] = func_002A7940();
         v20.f[1] = func_002A7940();

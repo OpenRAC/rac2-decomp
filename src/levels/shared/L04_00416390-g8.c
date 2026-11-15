@@ -36,9 +36,9 @@ void func_L04_00416390(char *owner, void *pos, void *dir, float length)
     frame.types = D_L04_001B0AD8;
     frame.sizes = D_L04_001B0AF0;
     chance = func_002A7878(0.0f, 1.0f);
-    func_00282D30(frame.bias, owner + 0xC0, 0.05f);
-    func_00282D30(frame.step, dir, 1.0f / length);
-    func_00282DB0(frame.step, owner + 0xC0);
+    FastVecScale(frame.bias, owner + 0xC0, 0.05f);
+    FastVecScale(frame.step, dir, 1.0f / length);
+    FastVecDot(frame.step, owner + 0xC0);
     if (*(short *)(owner + 0xAA) == 0xB2D)
         count = (int)(length + length) + 1;
     else
@@ -53,19 +53,19 @@ void func_L04_00416390(char *owner, void *pos, void *dir, float length)
     else if (chance < 0.15f)
         type = 2;
     for (i = 0; i < count; i++) {
-        angle = func_00283B98(angle, inc);
+        angle = FastAddRotations(angle, inc);
         frame.offset[0] = func_00283180(angle);
         frame.offset[1] = func_00283198(angle);
         frame.offset[2] = 0.3f;
-        magnitude = func_00282DB0(frame.offset, frame.step);
-        func_00282D30(frame.point, frame.offset,
+        magnitude = FastVecDot(frame.offset, frame.step);
+        FastVecScale(frame.point, frame.offset,
             (length * 0.1f + frame.sizes.values[D_L04_001B0B18] * 1.05f) * 0.016666668f);
-        func_00282D30(frame.offset, frame.offset, 0.15f);
-        func_00282CC0(frame.offset, frame.offset, origin);
-        func_00282CC0(frame.offset, frame.offset, frame.bias);
+        FastVecScale(frame.offset, frame.offset, 0.15f);
+        FastVecAdd(frame.offset, frame.offset, origin);
+        FastVecAdd(frame.offset, frame.offset, frame.bias);
         frame.offset[2] -= 0.2f;
         if (i == 1 && type >= 0) {
-            func_00282CC0(frame.point, frame.point, dir);
+            FastVecAdd(frame.point, frame.point, dir);
             func_L04_00363690(frame.offset, frame.point, dir, frame.types.values[type], type,
                 magnitude * 0.01f + 0.05f, frame.offset[2] - 0.25f, 0.0027777778f);
         } else {

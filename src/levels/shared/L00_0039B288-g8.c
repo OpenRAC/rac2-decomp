@@ -36,10 +36,10 @@ void func_L00_0039B288(char *obj)
         *(u8 *)(obj + 0x23) -= 2;
         break;
     }
-    shade = func_00282C48(func_00282DB0(obj + 0xC0, D_L00_001B8FF0));
+    shade = func_00282C48(FastVecDot(obj + 0xC0, D_L00_001B8FF0));
     shade = shade * (shade * shade * shade * shade);
     if (*(u16 *)(obj + 0x96) != 0) {
-        shade = (float)(10 - func_00282C30(*(u16 *)(obj + 0x96) - 10)) * 0.1f;
+        shade = (float)(10 - subtract_integer_with_clamp(*(u16 *)(obj + 0x96) - 10)) * 0.1f;
         *(u16 *)(obj + 0x96) = *(u16 *)(obj + 0x96) - 1;
     } else if (func_002A77E0(0x2D) == 0) {
         *(u16 *)(obj + 0x96) = 0x14;
@@ -47,8 +47,8 @@ void func_L00_0039B288(char *obj)
     base = *(unsigned int *)(rig + 0x50);
     if ((base >> 24) != 0)
         shade = shade * 0.8f;
-    color = func_00283D38(base, -1, shade);
+    color = FastTweenColor(base, -1, shade);
     blue = (color >> 16) & 0xFF;
     green = (color >> 8) & 0xFF;
-    func_002A0488(obj, color & 0xFF, green, blue);
+    set_moby_color(obj, color & 0xFF, green, blue);
 }

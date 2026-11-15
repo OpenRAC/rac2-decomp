@@ -5,7 +5,7 @@ extern void func_00132028(void);
 
 void func_00133230(void) {
     r1_D_0015EDC4 = 0;
-    func_00132028();
+    snd_Pump();
 }
 
 extern int D_001A74F8 __attribute__((sda));
@@ -59,7 +59,7 @@ void func_001325E0(int a, int c, long d) {
     } while (0);
     while (func_0011D810(&D_001A7140)) {
         if (D_001A74F8 == 0) func_00115D48(D_001A7578);
-        func_00132028();
+        snd_Pump();
         func_0011AEA0(0);
     }
     D_001A74C8 = 1;

@@ -295,7 +295,7 @@ float func_L00_002D3B00(char *in)
         return 0.0f;
     if (mode >= 3)
         return 0.0f;
-    func_00283098(local, in, p + 64);
+    matrix_mul_vec3(local, in, p + 64);
     return local[2];
 }
 
@@ -315,9 +315,9 @@ void func_L00_002D3B58(V4_F6a70b950 *dst, V4_F6a70b950 *src, float k)
         return;
     if (mode >= 3)
         return;
-    func_002830C0(dst, src, p + 64);
+    transform_vector(dst, src, p + 64);
     ((float *)dst)[2] = k;
-    func_002830C0(dst, dst, p);
+    transform_vector(dst, dst, p);
 }
 
 /* reads a mode byte from a global block; when zero it forwards the arguments to one helper, otherwise it range-checks the byte and drives two helpers with the object and block pointers */
@@ -535,7 +535,7 @@ void func_L00_002D4140(void)
         mode = 1;
     } else if (D_00189E20_4140.platform) {
         mode = 1;
-        func_00283CE0(120 - D_00189E20_4140.platform_timer);
+        IntToFloat(120 - D_00189E20_4140.platform_timer);
         blend = D_00189E20_4140.platform_timer;
     } else {
         D_00189E20_4140.platform = 0;
@@ -550,15 +550,15 @@ void func_L00_002D4140(void)
         return;
 
     if (((D_00189E20_4140.state2 == 0 || D_00189E20_4140.state2 == 12) &&
-         func_00282DF0(&D_00189E20_4140.f160) == 0.0f &&
+         FastVecLength(&D_00189E20_4140.f160) == 0.0f &&
          D_00189E20_4140.platform_timer == 0 && D_00189E20_4140.f216 == 0) ||
         (unsigned)(D_00189E20_4140.state - 23) < 2) {
         if (((D_00189E20_4140.platform_flags ^ 1) & 1)) {
             if ((unsigned)(D_00189E20_4140.state - 23) < 2) {
                 qcopy(delta, &D_00189E20_4140.ledge_offset);
-                delta[0] += func_00283180(func_00283B98(D_00189E20_4140.ledge_angle,
+                delta[0] += func_00283180(FastAddRotations(D_00189E20_4140.ledge_angle,
                         3.1415925f)) * 0.45f;
-                delta[1] += func_00283198(func_00283B98(D_00189E20_4140.ledge_angle,
+                delta[1] += func_00283198(FastAddRotations(D_00189E20_4140.ledge_angle,
                         3.1415925f)) * 0.45f;
                 delta[2] -= -1.43f;
                 func_002AD0E0(D_00189E20_4140.f2290, D_00189E20_4140.platform,
@@ -601,7 +601,7 @@ void func_L00_002D4140(void)
 
     if (blend != 0.0f) {
         int flags;
-        float planar = func_00282E20(&D_00189E20_4140.platform_delta);
+        float planar = vec_length_xy(&D_00189E20_4140.platform_delta);
 
         flags = object->flags;
         height = D_00189E20_4140.platform_delta.f[2];
@@ -612,8 +612,8 @@ void func_L00_002D4140(void)
             if (flags & 16)
                 rate = 20.0f;
             rate *= 0.00027777778f;
-            func_002AA2E8(&height, 0.0f, blend * 0.0069444445f);
-            func_002AA2E8(&length, 0.0f, rate * blend);
+            ApproachValue(&height, 0.0f, blend * 0.0069444445f);
+            ApproachValue(&length, 0.0f, rate * blend);
             func_00282F70((char *)delta, (int)&D_00189E20_4140.platform_delta, length);
             delta[2] = height;
         } else if (D_00189E20_4140.platform) {
@@ -621,7 +621,7 @@ void func_L00_002D4140(void)
                     &D_00189E20_4140.rot, local_pos, local_rot);
             if (D_00189E20_4140.f226 == 0)
                 D_00189E20_4140.rot.q = *(V4_F6a70b950 *)local_rot;
-            func_00282CF0(delta, local_pos, &D_00189E20_4140.pos);
+            FastVecSub(delta, local_pos, &D_00189E20_4140.pos);
             qcopy(&D_00189E20_4140.platform_delta, delta);
         } else
             qcopy(delta, &D_00189E20_4140.platform_delta);
@@ -631,7 +631,7 @@ void func_L00_002D4140(void)
                 &D_00189E20_4140.rot, local_pos, local_rot);
         if (D_00189E20_4140.f226 == 0)
             D_00189E20_4140.rot.q = *(V4_F6a70b950 *)local_rot;
-        func_00282CF0(delta, local_pos, &D_00189E20_4140.pos);
+        FastVecSub(delta, local_pos, &D_00189E20_4140.pos);
         qcopy(&D_00189E20_4140.platform_delta, delta);
     } else if (mode == 2) {
         func_002AD0E0(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.pos,
@@ -653,17 +653,17 @@ void func_L00_002D4140(void)
                 offset[0] = func_00283180(D_00189E20_4140.ledge_angle) * 0.45f;
                 offset[1] = func_00283198(D_00189E20_4140.ledge_angle) * 0.45f;
                 offset[2] = 0;
-                func_00282CC0(offset, offset, anchor2_pos);
+                FastVecAdd(offset, offset, anchor2_pos);
                 offset[2] += -1.43f;
-                func_00282CF0(delta, hero_pos, &D_00189E20_4140.pos);
+                FastVecSub(delta, hero_pos, &D_00189E20_4140.pos);
                 qcopy(&D_00189E20_4140.ledge_offset, offset);
                 D_00189E20_4140.ledge_angle = func_00283248(anchor_pos[0] - anchor2_pos[0],
                         anchor_pos[1] - anchor2_pos[1]);
             } else {
                 float distance;
 
-                func_00282CF0(delta, anchor_pos, &D_00189E20_4140.pos);
-                distance = func_00282DF0(delta);
+                FastVecSub(delta, anchor_pos, &D_00189E20_4140.pos);
+                distance = FastVecLength(delta);
                 if (distance < 0.0001f) {
                     func_00282C88(delta);
                     qcopy(&D_00189E20_4140.pos, anchor_pos);
@@ -672,20 +672,20 @@ void func_L00_002D4140(void)
                     D_00189E20_4140.platform_flags &= ~2;
                     D_00189E20_4140.platform_flags &= ~1;
                 }
-                func_00282CC0(&D_00189E20_4140.ledge_offset, &D_00189E20_4140.ledge_offset, delta);
-                func_00282CF0(offset, delta, &D_00189E20_4140.f150);
-                if (func_00282DF0(offset) > 0.1f)
+                FastVecAdd(&D_00189E20_4140.ledge_offset, &D_00189E20_4140.ledge_offset, delta);
+                FastVecSub(offset, delta, &D_00189E20_4140.f150);
+                if (FastVecLength(offset) > 0.1f)
                     D_00189E20_4140.platform_flags &= ~1;
             }
         } else {
-            func_00282CF0(delta, hero_pos, &D_00189E20_4140.pos);
+            FastVecSub(delta, hero_pos, &D_00189E20_4140.pos);
             qcopy(next, delta);
         }
         qcopy(&D_00189E20_4140.platform_delta, delta);
     }
 
-    func_00282CC0(&D_00189E20_4140.f100, &D_00189E20_4140.f100, delta);
-    D_00189E20_4140.f100.f[3] = func_00283BE0(D_00189E20_4140.rot.f[2], old_yaw);
+    FastVecAdd(&D_00189E20_4140.f100, &D_00189E20_4140.f100, delta);
+    D_00189E20_4140.f100.f[3] = fast_subtract_rotations(D_00189E20_4140.rot.f[2], old_yaw);
 }
 
 
@@ -761,7 +761,7 @@ void func_L00_002D4D98(char *arg0) {
 
     *(int *)(base + 0x12E8) = 0x2F;
     if (*(int *)(base + 0x12C0) == 0) {
-        node = func_0029EFD0(0x50A);
+        node = CreateMoby(0x50A);
         if (node != 0) {
             *(unsigned short *)(node + 0x32) = 0x20;
             *(unsigned short *)(node + 0x34) =
@@ -778,7 +778,7 @@ void func_L00_002D4D98(char *arg0) {
         }
     }
     func_L00_002AA178(arg0);
-    func_L00_002B0968(arg0);
+    update_hero_item_mobys(arg0);
 }
 
 /* func_L00_002D4E58 is in L00_002D4E58-g8.c (-G8). */

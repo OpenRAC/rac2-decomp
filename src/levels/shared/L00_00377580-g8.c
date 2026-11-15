@@ -48,30 +48,30 @@ void func_L00_00377580(void) {
     if (((unsigned long)D_001A7A80[group] & ((1U << (slot * 2)) & 255UL)) != 0) return;
     if (group != 0) {
         func_00115DA8(first, D_L00_001AD738,
-            (unsigned char *)func_00288FB8(D_L00_001A8E40[slot]),
-            (unsigned char *)func_00288FB8(((UpgradeInfo *)((char *)D_L00_00262570 + D_00139568[D_L00_0022F7C0.groups.rows[*(int *)(model + 0x80)].group] * 224))->name));
+            (unsigned char *)GetLocalizedString(D_L00_001A8E40[slot]),
+            (unsigned char *)GetLocalizedString(((UpgradeInfo *)((char *)D_L00_00262570 + D_00139568[D_L00_0022F7C0.groups.rows[*(int *)(model + 0x80)].group] * 224))->name));
         func_0027FB40(D_L00_001AD728, (int)((float)D_L00_001AD72C * D_L00_001B25E0 + 0.5f),
                       0x80F0F0F0ULL, (unsigned char *)first, -1);
     }
     func_002F9BC0(first, D_L00_0022F7C0.prices.rows[*(int *)(model + 0x80)].group);
-    func_00115DA8(second, D_L00_001AD748, (unsigned char *)func_00288FB8(0x114E), first,
-        (unsigned char *)func_00288FB8(0x3262));
+    func_00115DA8(second, D_L00_001AD748, (unsigned char *)GetLocalizedString(0x114E), first,
+        (unsigned char *)GetLocalizedString(0x3262));
     func_0027FB40(D_L00_001AD718, (int)((float)D_L00_001AD71C * D_L00_001B25E0 + 0.5f),
                   0x80F0F0F0ULL, (unsigned char *)second, -1);
     colors[0] = 0x60F0F0B0;
     colors[1] = 0x60F0F0B0;
     colors[2] = 0x60F0F0B0;
     colors[3] = 0x60F0F0B0;
-    handle = func_0028E588(0xEAA2, 0);
+    handle = GetIconFrame(0xEAA2, 0);
     width = func_L00_002E9120((unsigned char *)second, -1);
     func_0028EA58(handle, D_L00_001AD718 + (width >> 1) + 4,
                   (int)((float)D_L00_001AD724 * D_L00_001B25E0 + 0.5f), 16,
                   (int)(D_L00_001B25E0 * 16.0f + 0.5f), colors);
-    func_00115DA8(first, D_L00_001AD758, (unsigned char *)func_00288FB8(0x2F2D),
-        func_002B0D70(), (unsigned char *)func_00288FB8(0x3262));
+    func_00115DA8(first, D_L00_001AD758, (unsigned char *)GetLocalizedString(0x2F2D),
+        func_002B0D70(), (unsigned char *)GetLocalizedString(0x3262));
     func_0027FB40(D_L00_001AD730, (int)((float)D_L00_001AD734 * D_L00_001B25E0 + 0.5f),
                   0x80F0F0F0ULL, (unsigned char *)first, -1);
-    handle = func_0028E588(0xEAA2, 0);
+    handle = GetIconFrame(0xEAA2, 0);
     width = func_L00_002E9120((unsigned char *)first, -1);
     func_0028EA58(handle, D_L00_001AD730 + (width >> 1) + 4,
                   (int)((float)D_L00_001AD734 * D_L00_001B25E0 + 0.5f), 16,

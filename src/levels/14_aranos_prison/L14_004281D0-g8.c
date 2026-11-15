@@ -110,7 +110,7 @@ void func_L14_004281D0(char *self)
             s->h338 = 1;
             W(self, 0x9C) = 3;
             UH(self, 0x34) |= 0x100;
-            s->f90 = func_00282E48(self + 0x10, D_L14_001B2210) - 1.5f;
+            s->f90 = fast_vec_dist(self + 0x10, D_L14_001B2210) - 1.5f;
         } else {
             W(self, 0x9C) = 12;
             s->f90 = F(self, 0x18) - 1.0f;
@@ -129,8 +129,8 @@ void func_L14_004281D0(char *self)
         }
         s->f324 = func_002A7878(1.0f, 1.333f);
         F(self, 0x2C) = F(*(char **)(self + 0x24), 0x24) * s->f324;
-        s->b48 = func_00283CF0(15.0f);
-        s->b4A = func_00283CF0(6.4f);
+        s->b48 = FloatToInt(15.0f);
+        s->b4A = FloatToInt(6.4f);
         s->i98 = 3;
         s->f80 = 0.2f;
         s->f84 = 0.2f;
@@ -169,7 +169,7 @@ void func_L14_004281D0(char *self)
     }
 
     if (B(self, 0x31) != 0) {
-        if (func_00282E48(self + 0x10, D_L14_001B9500) < 24.0f) {
+        if (fast_vec_dist(self + 0x10, D_L14_001B9500) < 24.0f) {
             func_002A93B0(self);
             B(self, 0x6F) = 22;
         }

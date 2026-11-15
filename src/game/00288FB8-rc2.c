@@ -31,7 +31,7 @@ extern s32 D_001B1840;
 s32 func_00288FB8(s32 arg0) {
     s32 t;
 
-    t = func_00288F48(arg0);
+    t = Help_FindIndex(arg0);
     if (t >= 0) {
         return *(s32 *)(D_001B1840 + t * 0x10);
     }

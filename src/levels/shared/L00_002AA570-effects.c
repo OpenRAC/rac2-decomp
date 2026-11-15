@@ -36,9 +36,9 @@ void func_L00_002AA570(char *self, int arg1)
     if (arg1 < (short)n) {
         for (i = 0; i < 2; i++) {
             if (i == 0)
-                f = func_00283B98(D_00189E20_20.angle, 0.785398006f);
+                f = FastAddRotations(D_00189E20_20.angle, 0.785398006f);
             else
-                f = func_00283BE0(D_00189E20_20.angle, 0.785398006f);
+                f = fast_subtract_rotations(D_00189E20_20.angle, 0.785398006f);
             v[0] = func_00283180(f) * 0.0100000007f;
             v[1] = func_00283198(f) * 0.0100000007f;
             w[0] = D_00189E20_20.x + v[0] * 18.0f;

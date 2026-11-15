@@ -55,13 +55,13 @@ void func_002E3998(Sky *sky)
     D_001B22A8 = D_001B22A8 + 16;
     D_001ABDE0 = 1 - D_001ABDE0;
     if (visible[0] == 1)
-        func_0029CF58(PIECE(sky, 0)->data, PIECE(sky, 0)->size >> 4, D_001ABDD8[D_001ABDE0]);
+        DmaToSpr(PIECE(sky, 0)->data, PIECE(sky, 0)->size >> 4, D_001ABDD8[D_001ABDE0]);
     for (i = 0; i < sky->count; i++) {
         if (visible[i] == 1)
-            func_0029CF78();
+            DmaToSprSync();
         D_001ABDE0 = 1 - D_001ABDE0;
         if (i + 1 < sky->count && visible[i + 1] == 1)
-            func_0029CF58(PIECE(sky, i + 1)->data, PIECE(sky, i + 1)->size >> 4,
+            DmaToSpr(PIECE(sky, i + 1)->data, PIECE(sky, i + 1)->size >> 4,
                           D_001ABDD8[D_001ABDE0]);
         if (visible[i] == 1) {
             int base = D_001ABDD8[1 - D_001ABDE0];
@@ -94,13 +94,13 @@ void func_002E3BD8(Sky *sky)
     D_001B22A8 = D_001B22A8 + 16;
     D_001ABDE0 = 1 - D_001ABDE0;
     if (visible[0] == 1)
-        func_0029CF58(PIECE(sky, 0)->data, PIECE(sky, 0)->size >> 4, D_001ABDD8[D_001ABDE0]);
+        DmaToSpr(PIECE(sky, 0)->data, PIECE(sky, 0)->size >> 4, D_001ABDD8[D_001ABDE0]);
     for (i = 0; i < sky->count; i++) {
         if (visible[i] == 1)
-            func_0029CF78();
+            DmaToSprSync();
         D_001ABDE0 = 1 - D_001ABDE0;
         if (i + 1 < sky->count && visible[i + 1] == 1)
-            func_0029CF58(PIECE(sky, i + 1)->data, PIECE(sky, i + 1)->size >> 4,
+            DmaToSpr(PIECE(sky, i + 1)->data, PIECE(sky, i + 1)->size >> 4,
                           D_001ABDD8[D_001ABDE0]);
         if (visible[i] == 1) {
             int base = D_001ABDD8[1 - D_001ABDE0];
@@ -115,6 +115,6 @@ void func_002E3BD8(Sky *sky)
                 func_002E3FA0(PIECE(sky, i)->face_count, face_list, colour_list, SKY_VERTEX_RECORDS);
         }
     }
-    func_002FC560(0x47, 0x3180B);
-    func_002FC560(0x4E, (long)(D_001A72E0 >> 13) | 0x1000000 | 0x100000000L);
+    VU1_addGSregister(0x47, 0x3180B);
+    VU1_addGSregister(0x4E, (long)(D_001A72E0 >> 13) | 0x1000000 | 0x100000000L);
 }

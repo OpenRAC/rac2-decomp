@@ -37,7 +37,7 @@ void *func_L00_00333F90(EffectVector *position, EffectVector *a1)
         packed = (func_002A77E0(6) * 6 + 0x40) | 0x78404000;
         record->word4 = packed;
         record->wordC = packed;
-        record->b9 = func_00283CF0(2.0f) + 0x20;
+        record->b9 = FloatToInt(2.0f) + 0x20;
         record->b3 = 0x48;
         record->b1 = 3;
         record->b2 = *D_L00_001FE98C;
@@ -45,8 +45,8 @@ void *func_L00_00333F90(EffectVector *position, EffectVector *a1)
         endpoint = &record->endpoint;
         qcopy(endpoint, a1);
         difference = &record->difference;
-        func_00282CF0((char *)difference, (char *)position, (char *)endpoint);
-        func_00282CF0((char *)difference, (char *)difference, (char *)endpoint);
+        FastVecSub((char *)difference, (char *)position, (char *)endpoint);
+        FastVecSub((char *)difference, (char *)difference, (char *)endpoint);
         endpoint->f[3] = 6.0f;
         record->position.f[3] = 0.09f;
         record->difference.f[3] = 0.5f;

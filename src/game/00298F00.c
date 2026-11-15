@@ -277,7 +277,7 @@ void func_00298F00(void)
                 s32 i;
                 s32 blocks;
                 icon0 = 0;
-                func_00115484(workspace.directory.seen, 0, 16);
+                memset(workspace.directory.seen, 0, 16);
                 icon1 = 0;
                 icon2 = 0;
                 blocks = 0;
@@ -364,10 +364,10 @@ void func_00298F00(void)
         case 4:
             if (D_001393E0.result == D_001393E0.size) {
                 D_001393E0.card[D_001393E0.cur].x24 = 0;
-                if (D_001393E0.card[D_001393E0.cur].x28 != func_0029AE78(D_00256138)) {
+                if (D_001393E0.card[D_001393E0.cur].x28 != memcard_GetDataSize(D_00256138)) {
                     D_001393E0.card[D_001393E0.cur].x24++;
                 }
-                if (D_001393E0.card[D_001393E0.cur].x2C != func_0029AE78(D_00256368)) {
+                if (D_001393E0.card[D_001393E0.cur].x2C != memcard_GetDataSize(D_00256368)) {
                     D_001393E0.card[D_001393E0.cur].x24++;
                 }
                 D_001393E0.busy = 0;
@@ -511,8 +511,8 @@ void func_00298F00(void)
                     D_001393E0.buf = &D_001A79F0;
                     break;
                 case 14: {
-                    s32 n = func_0029AE78(D_00256138);
-                    D_001393E0.size = n + func_0029AE78(D_00256368) * 0x1C + 8;
+                    s32 n = memcard_GetDataSize(D_00256138);
+                    D_001393E0.size = n + memcard_GetDataSize(D_00256368) * 0x1C + 8;
                     D_001393E0.buf = (u8 *)chunk + chunk->x10;
                     break;
                 }
@@ -584,8 +584,8 @@ void func_00298F00(void)
             D_001393E0.busy = 0;
             break;
         case 21:
-            D_001393E0.card[D_001393E0.cur].x28 = func_0029AE78(D_00256138);
-            D_001393E0.card[D_001393E0.cur].x2C = func_0029AE78(D_00256368);
+            D_001393E0.card[D_001393E0.cur].x28 = memcard_GetDataSize(D_00256138);
+            D_001393E0.card[D_001393E0.cur].x2C = memcard_GetDataSize(D_00256368);
             D_001393E0.card[D_001393E0.cur].status = -1;
             D_001393E0.card[D_001393E0.cur].x24 = 0;
             D_001393E0.state = 0;
@@ -608,7 +608,7 @@ void func_00298F00(void)
         case 1:
             if (D_001393E0.result == 1) {
                 func_00115DA8(workspace.name, D_001A9998, D_001A7930, D_001C52A0);
-                func_0026FEB8(D_001A99A0, workspace.name);
+                STUB_printf(D_001A99A0, workspace.name);
                 if (func_00128068(D_001393E0.card[D_001393E0.cur].port, D_001393E0.card[D_001393E0.cur].slot, workspace.name) == 0) {
                     D_001393E0.sub = 2;
                 }
@@ -639,7 +639,7 @@ void func_00298F00(void)
             break;
         case 3:
             if (func_00128068(D_001393E0.card[D_001393E0.cur].port, D_001393E0.card[D_001393E0.cur].slot, D_001A7930) == 0) {
-                func_0026FEB8(D_001A99B0, D_001A7930);
+                STUB_printf(D_001A99B0, D_001A7930);
                 D_001393E0.sub = 4;
             }
             break;
@@ -779,10 +779,10 @@ void func_00298F00(void)
         case 5:
             if (D_001393E0.result == D_001393E0.size) {
                 if (D_001393E0.state == 23) {
-                    func_0029B0B0(D_001A2BA8, D_001393E0.cur, D_001393E0.card[D_001393E0.cur].tries);
+                    FillSaveSlotInfo(D_001A2BA8, D_001393E0.cur, D_001393E0.card[D_001393E0.cur].tries);
                     D_001393E0.sub = 8;
                 } else {
-                    D_001393E0.card[D_001393E0.cur].x24 = func_0029B168(D_001A2BA8, 0, D_00256138);
+                    D_001393E0.card[D_001393E0.cur].x24 = MemcardRestoreData(D_001A2BA8, 0, D_00256138);
                     D_001393E0.sub = 6;
                 }
                 D_001393E0.busy = 0;
@@ -824,7 +824,7 @@ void func_00298F00(void)
             break;
         case 7:
             if (D_001393E0.result == D_001393E0.size) {
-                D_001393E0.card[D_001393E0.cur].x24 += func_0029B168(D_001A53A8, D_001393E0.index, D_00256368);
+                D_001393E0.card[D_001393E0.cur].x24 += MemcardRestoreData(D_001A53A8, D_001393E0.index, D_00256368);
                 if (++D_001393E0.index < 0x1C) {
                     D_001393E0.sub = 6;
                 } else {
@@ -940,12 +940,12 @@ void func_00298F00(void)
             }
             break;
         case 4:
-            if (func_001279A0(D_001393E0.fd, D_001A2BA8, func_0029AE78(D_00256138)) == 0) {
+            if (func_001279A0(D_001393E0.fd, D_001A2BA8, memcard_GetDataSize(D_00256138)) == 0) {
                 D_001393E0.sub = 5;
             }
             break;
         case 5:
-            if (D_001393E0.result == func_0029AE78(D_00256138)) {
+            if (D_001393E0.result == memcard_GetDataSize(D_00256138)) {
                 D_001393E0.sub = 6;
                 break;
             }
@@ -991,12 +991,12 @@ void func_00298F00(void)
             }
             break;
         case 8:
-            if (func_001279A0(D_001393E0.fd, D_001A53A8, func_0029AE78(D_00256368)) == 0) {
+            if (func_001279A0(D_001393E0.fd, D_001A53A8, memcard_GetDataSize(D_00256368)) == 0) {
                 D_001393E0.sub = 9;
             }
             break;
         case 9:
-            if (D_001393E0.result == func_0029AE78(D_00256368)) {
+            if (D_001393E0.result == memcard_GetDataSize(D_00256368)) {
                 D_001393E0.sub = 10;
                 break;
             }
@@ -1088,8 +1088,8 @@ void func_00298F00(void)
                 s32 n;
 
                 D_001393E0.fd = D_001393E0.result;
-                n = func_0029AE78(D_00256138);
-                D_001393E0.size = n + func_0029AE78(D_00256368) * 0x1C + 8;
+                n = memcard_GetDataSize(D_00256138);
+                D_001393E0.size = n + memcard_GetDataSize(D_00256368) * 0x1C + 8;
                 if (func_001279A0(D_001393E0.fd, D_001393E0.buf, D_001393E0.size) == 0) {
                     D_001393E0.sub = 2;
                 }

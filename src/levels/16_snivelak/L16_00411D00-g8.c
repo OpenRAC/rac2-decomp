@@ -26,18 +26,18 @@ void func_L16_00411D00(char *obj)
     float rate, angle;
 
     func_002A7A00(a, 0.0f, 1.0f);
-    func_00283098(b, &D_L16_001B17A0, obj + 0xC0);
-    func_00282CC0(b, b, obj + 0x10);
-    func_00282CC0(b, b, a);
-    func_00282D30(c, a, 3.0f);
+    matrix_mul_vec3(b, &D_L16_001B17A0, obj + 0xC0);
+    FastVecAdd(b, b, obj + 0x10);
+    FastVecAdd(b, b, a);
+    FastVecScale(c, a, 3.0f);
     c[2] = 0.0f;
-    func_00282CC0(c, c, *(char **)(rec + 0x24C) + 0x10);
+    FastVecAdd(c, c, *(char **)(rec + 0x24C) + 0x10);
     rate = D_L16_001B17B0 * 0.016666668f;
     angle = func_002A7878(D_L16_001B17B8, D_L16_001B17BC[0]) * 0.00027777778f;
-    func_00282CF0(d, c, b);
+    FastVecSub(d, c, b);
     d[2] = 0.0f;
-    func_00282F20(d, d, rate);
+    vec_scale_to_length(d, d, rate);
     d[2] = func_L00_0031CDD0(b, c, 0, D_L16_001B17B0 * 0.016666668f, -angle);
-    func_0032C700(b, 0, 0x19, 0x14, 1.0f, 20.0f, 0x14, 0x14, 0x2D, 1, 1, 0, 0, 0);
+    SpawnExplosion(b, 0, 0x19, 0x14, 1.0f, 20.0f, 0x14, 0x14, 0x2D, 1, 1, 0, 0, 0);
     func_L16_0041F1F0(*(s32 *)(rec + 0x1F0), b, d, 0, angle, (float)*(u8 *)(rec + 0x36));
 }

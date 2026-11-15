@@ -48,32 +48,32 @@ void func_L01_003CEB00(char *m)
         for (i = 2; i >= 0; i--) {
             int trailAlpha;
             func_002A7A00(jitter, D_L01_001B0460 * (1.0f / 60.0f), D_L01_001B0464 * (1.0f / 60.0f));
-            func_00282CC0(v, v, jitter);
+            FastVecAdd(v, v, jitter);
             trailAlpha = D_L01_001B0468;
             n = func_002A77E0(255);
             func_002C3150(pos, v, D_L01_001B0470, trailAlpha, n & 255, 0, D_L01_001B0478);
         }
     }
     colorScale = 1.0f / 255.0f;
-    func_00282CF0(dir, &D_L01_001B94C0, pos);
+    FastVecSub(dir, &D_L01_001B94C0, pos);
     midpoint = 0.5f;
-    func_00282F20(dir, dir, -0.3f);
-    func_00282F20(step, dir, 0.1f);
-    func_00282CC0(dir, dir, pos);
+    vec_scale_to_length(dir, dir, -0.3f);
+    vec_scale_to_length(step, dir, 0.1f);
+    FastVecAdd(dir, dir, pos);
     for (i = 0; i < 4; i++) {
         int ringAlpha;
         unsigned char finalAlpha;
-        float t = func_00283CE0(255 - ((ref_L01_003CEB00_0 + i * 20) & 255));
-        c = func_00283D38(D_L01_001B047C, D_L01_001B0480, func_00282C48(midpoint - t * colorScale));
+        float t = IntToFloat(255 - ((ref_L01_003CEB00_0 + i * 20) & 255));
+        c = FastTweenColor(D_L01_001B047C, D_L01_001B0480, func_00282C48(midpoint - t * colorScale));
         ringAlpha = *(unsigned char *)&D_L01_001B2088;
         if (i & 2)
             ringAlpha = ringAlpha * 2;
         if (i & 1)
             ringAlpha = 255 - ringAlpha;
         finalAlpha = ringAlpha;
-        t = func_00283CE0(i);
+        t = IntToFloat(i);
         func_002C2FD8(dir, c, finalAlpha, D_L01_001B0490, D_L01_001B048C, 2, 0,
           (D_L01_001B0484 + t * D_L01_001B0488) * (*(float *)(m + 0x2C) / *(float *)(*(char **)(m + 0x24) + 0x24)));
-        func_00282CC0(dir, dir, step);
+        FastVecAdd(dir, dir, step);
     }
 }

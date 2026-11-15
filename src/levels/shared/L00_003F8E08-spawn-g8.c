@@ -42,7 +42,7 @@ void func_L00_003F9040(char *object)
             Slot *slot = &D_L00_002533B0[i];
 
             func_002AFFD8(slot->object + 0x10, (char *)reference, 1);
-            func_00282D30(reference, reference, *(float *)(slot->object + 0xC) * 0.0007812f);
+            FastVecScale(reference, reference, *(float *)(slot->object + 0xC) * 0.0007812f);
             owner = slot->object;
             reference[0] += *(float *)(owner + 0) * 0.0009765f;
             reference[1] += *(float *)(owner + 4) * 0.0009765f;
@@ -60,7 +60,7 @@ void func_L00_003F9040(char *object)
                 position[1] += *(float *)(owner + 4) * 0.0009765f;
                 position[2] += *(float *)(owner + 8) * 0.0009765f;
                 kind = func_002A7820(1, 5);
-                particle = func_002BDCE8(0.0f, 1.0f, 1.01f,
+                particle = SpawnSpinningSparkParticle(0.0f, 1.0f, 1.01f,
                                          func_002A7878(0.25f, 1.0f) * 210000.0f,
                                          (char *)position, kind, (char *)direction, 0x5A182, 1);
                 palette = D_L00_001B0A48[0];
@@ -70,8 +70,8 @@ void func_L00_003F9040(char *object)
                     index = func_001163B0() % 2;
                     particle[3] = palette.color[index];
                     *(u16 *)(particle + 10) = 35;
-                    particle[9] = func_00283CF0(4.0f) + 64;
-                    *(float *)(properties + 0x1C) = func_00283CE0(5);
+                    particle[9] = FloatToInt(4.0f) + 64;
+                    *(float *)(properties + 0x1C) = IntToFloat(5);
                     *(int *)(properties + 4) = 3;
                     properties[0xA] = func_002A7820(64, 128);
                     properties[0xB] = particle[10];

@@ -31,12 +31,12 @@ int func_L01_003120A8(void *owner, void *start, void *end, s32 queryMode,
         direction.f[1] = func_00283198(*(float *)(object + 0xF8));
         direction.f[2] = 0.0f;
     }
-    func_00282D30(&direction, &direction, scale);
+    FastVecScale(&direction, &direction, scale);
     direction.f[2] = 1.0f;
     direction.f[3] = 5627.9248046875f;
-    func_002A8C00((char *)&query, (int)object, queryMode, distance, (Quad16 *)&direction);
+    make_hit_descriptor((char *)&query, (int)object, queryMode, distance, (Quad16 *)&direction);
     query.first = first;
     query.second = second;
     query.objectId = *(u16 *)(object + 0xAA);
-    return func_002761F8(start, end, mode | 9, object, &query);
+    return CollLine(start, end, mode | 9, object, &query);
 }

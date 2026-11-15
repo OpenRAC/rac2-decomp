@@ -47,7 +47,7 @@ unsigned int func_00132318(int loc, int offset) {
             func_00115D48(D_001A7600);
         return 0;
     }
-    if (func_00133580(1) == 1) {
+    if (snd_CheckLoadInProgress(1) == 1) {
         if (D_001A74F8 == 0)
             func_00115D48(D_001A7630);
         return 0;
@@ -58,7 +58,7 @@ unsigned int func_00132318(int loc, int offset) {
     while (func_0011D810(&D_001A7140) != 0) {
         if (D_001A74F8 == 0)
             func_00115D48(D_001A7578);
-        func_00132028();
+        snd_Pump();
         func_0011AEA0(0);
     }
     if (func_0011D620(&D_001A7140, 3, 1, &D_001A71C0, 8, &D_001A7180, 4, 0, 0) < 0) {
@@ -99,7 +99,7 @@ unsigned int func_001326D8(int arg0) {
     while (func_0011D810(&D_001A7140) != 0) {
         if (D_001A74F8 == 0)
             func_00115D48(D_001A7578);
-        func_00132028();
+        snd_Pump();
         func_0011AEA0(0);
     }
     if (func_0011D620(&D_001A7140, 0x59, 1, &D_001A71C0, 4, &D_001A7180, 4, 0,

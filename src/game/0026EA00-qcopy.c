@@ -59,7 +59,7 @@ void func_00270E30(void)
     if (object[2] == 0) {
         *(TI128 *)(object + 0xC0) = *(TI128 *)(object + 0x50);
         if (object[3] == 2)
-            func_00282CC0((char *)(object + 0xC0), D_00189F70, (char *)(object + 0xC0));
+            FastVecAdd((char *)(object + 0xC0), D_00189F70, (char *)(object + 0xC0));
         *(TI128 *)(object + 0xD0) = *(TI128 *)(object + 0x60);
     }
 }
@@ -94,17 +94,17 @@ void func_00273418(void) {
         D_001B7600.count = 0;
         return;
     }
-    func_00272CB0();
+    DrawTargetReticle();
     if (D_001B7600.count != 0) {
-        base[0] = func_00283CE0(D_001A7348[0]);
-        base[1] = func_00283CE0(D_001A7348[1]);
+        base[0] = IntToFloat(D_001A7348[0]);
+        base[1] = IntToFloat(D_001A7348[1]);
         for (i = 0; i < D_001B7600.count; i++) {
             m = &D_001B7600.e[i];
             if (m->obj != 0 && m->obj[0x20] != 0xFE && m->obj[0x20] != 0xFD) {
                 if (m->flag != 0) {
                     func_00279BD8(vec, m);
-                    vec[0] = (vec[0] - func_00283CE0(D_001A7348[2])) * 0.0625f;
-                    vec[1] = (vec[1] - func_00283CE0(D_001A7348[3])) * 0.0625f;
+                    vec[0] = (vec[0] - IntToFloat(D_001A7348[2])) * 0.0625f;
+                    vec[1] = (vec[1] - IntToFloat(D_001A7348[3])) * 0.0625f;
                 } else {
                     qcopy(vec, base);
                 }
@@ -161,10 +161,10 @@ void func_00272368(void) {
         p = D_001B5200 + 0x140;
         qcopy(p, D_0018B2F0);
         qcopy(p + 0x230, D_0018B2F0 + 0x10);
-        func_00282DD8(p + 0x240, p + 0x230, D_0018B2F0 - 0x14B0);
-        func_00282F20(p + 0x240, p + 0x240, 1.0f);
-        func_00282DD8(p + 0x250, p + 0x240, p + 0x230);
-        func_00282F20(p + 0x250, p + 0x250, 1.0f);
+        FastVecCross(p + 0x240, p + 0x230, D_0018B2F0 - 0x14B0);
+        vec_scale_to_length(p + 0x240, p + 0x240, 1.0f);
+        FastVecCross(p + 0x250, p + 0x240, p + 0x230);
+        vec_scale_to_length(p + 0x250, p + 0x250, 1.0f);
     }
     q = D_001B5200 + 0x370;
     func_002AB6D8(q, q - 0x220);
@@ -174,7 +174,7 @@ void func_00272368(void) {
     func_00271E88();
     func_002735A0(q - 0x230);
     if (D_001A7A44[0])
-        func_00282DD8(q + 0x10, q + 0x20, q);
+        FastVecCross(q + 0x10, q + 0x20, q);
     func_00270018();
     qzero(q + 0x50);
 }

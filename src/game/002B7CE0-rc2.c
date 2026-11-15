@@ -37,7 +37,7 @@ s16 func_002B7CE0(s32 arg0) {
         while (1) {
             func_002B7578();
             func_00133230();
-            func_00132028();
+            snd_Pump();
             func_00133220();
             if (D_001A63A8[2] == 0) {
                 break;
@@ -50,7 +50,7 @@ s16 func_002B7CE0(s32 arg0) {
     } else {
         func_002B7578();
         func_00133230();
-        func_00132028();
+        snd_Pump();
         func_00133220();
     }
     q = D_001A63A8;

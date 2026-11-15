@@ -41,8 +41,8 @@ int func_L04_003E4C00(unsigned char *moby)
         *(unsigned char **)(vars + 0x18) = vars + 0x140;
         *(float *)(moby + 0x18) = ground;
         *(int *)(vars + 0x2D0) = 0;
-        *(unsigned char *)(vars + 0x48) = func_00283CF0(20.0f);
-        result = func_00283CF0(11.2f);
+        *(unsigned char *)(vars + 0x48) = FloatToInt(20.0f);
+        result = FloatToInt(11.2f);
         *(int *)(vars + 0xA8) = 3;
         *(float *)(vars + 0x90) = 0.5f;
         *(float *)(vars + 0x94) = 0.5f;
@@ -105,7 +105,7 @@ int func_L04_003E4C00(unsigned char *moby)
             *(float *)(moby + 0x48) = func_002A7878(0.5f, scale);
         }
     }
-    if (*(unsigned char *)(moby + 0x31) && func_00282E48(moby + 0x10, D_L04_001B9680) < 24.0f) {
+    if (*(unsigned char *)(moby + 0x31) && fast_vec_dist(moby + 0x10, D_L04_001B9680) < 24.0f) {
         func_002A93B0(moby);
         moby[0x6F] = 22;
     }

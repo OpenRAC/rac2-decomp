@@ -56,7 +56,7 @@ void func_L11_004702F0(u8 *object) {
         VF(0x4C) = 0.00138888892f;
         func_002B60B0(object, 0.000555555569f, 0.0166666675f, 0.00116355298f, 0.104719773f);
         func_L02_0031E9E8((float *)(vars + 0x120), 4.0f);
-        func_00282CC0((float *)(vars + 0x120), (float *)(vars + 0x120), (float *)(vars + 0x110));
+        FastVecAdd((float *)(vars + 0x120), (float *)(vars + 0x120), (float *)(vars + 0x110));
         func_002A7750(object, VI(0x130), -1);
         object[0x30] = 255;
         first = func_002A77E0(8);
@@ -74,13 +74,13 @@ void func_L11_004702F0(u8 *object) {
         }
         break;
     case 2:
-        if (func_00282E48(object + 0x10, D_00189EA0) < 9.0f) {
+        if (fast_vec_dist(object + 0x10, D_00189EA0) < 9.0f) {
             if (object[0x43] != 3) func_002A7470(object, 3, 0, 10);
             func_002A7750(object, 4, -1);
             break;
         }
         if (*(int *)(D_00189EA0 + 0x11C8) != 10 && *(int *)(D_00189EA0 + 0x11C8) != 13 && (D_00138324 & 0x20)) {
-            if (!(func_00282E80(object + 0x10, D_00189EA0) < 64.0f) || VI(0x150)) break;
+            if (!(vec_distance_xy(object + 0x10, D_00189EA0) < 64.0f) || VI(0x150)) break;
             VF(0x134) = (float)func_002A7820(170, 190);
             if (object[0x43] != 4) func_002A7470(object, 4, 0, 10);
             VF(0x138) = 0.083333336f;
@@ -99,14 +99,14 @@ void func_L11_004702F0(u8 *object) {
         VF(0x138) += 0.008333334f;
         if (VF(0x138) > 0.116666675f) VF(0x138) = 0.116666675f;
         qcopy(previous, object + 0x10);
-        angle = func_00283B98(*(float *)(object + 0xF8), VF(0x134) * 0.017453294f);
+        angle = FastAddRotations(*(float *)(object + 0xF8), VF(0x134) * 0.017453294f);
         func_002AF000(motion, VF(0x138), angle, 2.96706009f);
         func_L07_00321D68((char *)object, motion);
-        if (func_00282E80(object + 0x10, previous) < VF(0x138)) {
-            angle = func_00283B98(*(float *)(object + 0xF8), 3.141593f);
-            func_002A7CA0(object, (float *)(vars + 0x13C), angle, 0.000199999995f, 0.00200000009f, 0.04f);
+        if (vec_distance_xy(object + 0x10, previous) < VF(0x138)) {
+            angle = FastAddRotations(*(float *)(object + 0xF8), 3.141593f);
+            MobySpringTurn(object, (float *)(vars + 0x13C), angle, 0.000199999995f, 0.00200000009f, 0.04f);
         }
-        if (func_00282E80(object + 0x10, D_00189EA0) > 64.0f) {
+        if (vec_distance_xy(object + 0x10, D_00189EA0) > 64.0f) {
             func_0029F338(object);
             return;
         }
@@ -115,26 +115,26 @@ void func_L11_004702F0(u8 *object) {
     case 6:
         VF(0x138) += 0.008333334f;
         if (VF(0x138) > 0.416666687f) VF(0x138) = 0.416666687f;
-        angle = func_00283B98(*(float *)(object + 0xF8), VF(0x134) * 0.017453294f);
+        angle = FastAddRotations(*(float *)(object + 0xF8), VF(0x134) * 0.017453294f);
         func_002AF000(motion, VF(0x138), angle, 2.96706009f);
-        func_00282CC0((float *)(object + 0x10), (float *)(object + 0x10), motion);
-        if (func_00282E80(object + 0x10, D_00189EA0) > 64.0f) {
+        FastVecAdd((float *)(object + 0x10), (float *)(object + 0x10), motion);
+        if (vec_distance_xy(object + 0x10, D_00189EA0) > 64.0f) {
             func_0029F338(object);
             return;
         }
         break;
     case 7:
         path = D_L11_001FF580[VI(0x140)];
-        distance = func_00282E80(object + 0x10, path + 4 + VI(0x144) * 4);
+        distance = vec_distance_xy(object + 0x10, path + 4 + VI(0x144) * 4);
         point = (float *)((u8 *)path + VI(0x144) * 16);
         angle = func_00283248(distance, point[6] - *(float *)(object + 0x18));
         func_002AF000(motion, 0.116666675f, *(float *)(object + 0xF8), angle);
         point = (float *)((u8 *)path + VI(0x144) * 16);
         angle = func_00283248(point[4] - *(float *)(object + 0x10), point[5] - *(float *)(object + 0x14));
-        func_002A7CA0(object, (float *)(vars + 0x13C), angle, 9.99999975e-05f, 0.00100000005f, 0.02f);
-        func_00282CC0((float *)(object + 0x10), (float *)(object + 0x10), motion);
+        MobySpringTurn(object, (float *)(vars + 0x13C), angle, 9.99999975e-05f, 0.00100000005f, 0.02f);
+        FastVecAdd((float *)(object + 0x10), (float *)(object + 0x10), motion);
         if (object[0x43] != 4) func_002A7470(object, 4, 0, 10);
-        if (func_00282E80(object + 0x10, path + 4 + VI(0x144) * 4) < 0.5f) {
+        if (vec_distance_xy(object + 0x10, path + 4 + VI(0x144) * 4) < 0.5f) {
             ++VI(0x144);
             if (VI(0x144) >= *path - 1) VI(0x144) = *path - 1;
         }
@@ -142,12 +142,12 @@ void func_L11_004702F0(u8 *object) {
         break;
     case 8:
         if (object[0x43] != 2) func_002A7470(object, 2, 0, 10);
-        if (func_00282E80(object + 0x10, vars + 0x120) < 0.5f ||
+        if (vec_distance_xy(object + 0x10, vars + 0x120) < 0.5f ||
             VI(0xA0) || *(u16 *)(object + 0x96) >= 240) {
             *(u16 *)(object + 0x96) = 0;
             VI(0xA0) = 0;
             func_L02_0031E9E8((float *)(vars + 0x120), 4.0f);
-            func_00282CC0((float *)(vars + 0x120), (float *)(vars + 0x120), (float *)(vars + 0x110));
+            FastVecAdd((float *)(vars + 0x120), (float *)(vars + 0x120), (float *)(vars + 0x110));
             if (func_002A77E0(4) == 1) {
                 if (object[0x43] != 1) func_002A7470(object, 1, 0, 10);
                 func_002A7750(object, 9, -1);
@@ -155,7 +155,7 @@ void func_L11_004702F0(u8 *object) {
         } else {
             func_L01_00321178((char *)object, (char *)vars + 0x120);
         }
-        if (func_00282E48(object + 0x10, D_00189EA0) < 10.0f) {
+        if (fast_vec_dist(object + 0x10, D_00189EA0) < 10.0f) {
             if (object[0x43] != 2) func_002A7470(object, 2, 0, 10);
             func_002A7750(object, 4, -1);
         }
@@ -165,7 +165,7 @@ void func_L11_004702F0(u8 *object) {
             func_002A7750(object, 8, -1);
             if (object[0x43] != 2) func_002A7470(object, 2, 0, 10);
         }
-        if (func_00282E48(object + 0x10, D_00189EA0) < 10.0f) {
+        if (fast_vec_dist(object + 0x10, D_00189EA0) < 10.0f) {
             if (object[0x43] != 2) func_002A7470(object, 2, 0, 10);
             func_002A7750(object, 4, -1);
         }

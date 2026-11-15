@@ -43,7 +43,7 @@ s32 func_002A88A0(f32 *arg0, f32 *arg1, f32 fparg0, f32 fparg1, f32 fparg2) {
         *arg0 = -fparg1 / (2.0f * fparg0);
         return 1;
     }
-    temp_f0 = func_00282C10(func_00282C48(temp_f22));
+    temp_f0 = square_root(func_00282C48(temp_f22));
     temp_f2 = -fparg1;
     temp_f3 = 2.0f * fparg0;
     temp_f0_2 = (temp_f2 - temp_f0) / temp_f3;

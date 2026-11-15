@@ -30,8 +30,8 @@ void func_L18_004302B0(u8 *a) {
     u8 *s = *(u8 **)(a + 0x68);
     int i;
 
-    s[0x48] = func_00283CF0(15);
-    s[0x4A] = func_00283CF0(16);
+    s[0x48] = FloatToInt(15);
+    s[0x4A] = FloatToInt(16);
     s[0x60] = 13;
     W(s, 0x98) = 2;
     F(s, 0x84) = F(s, 0x80) = 1.5f;
@@ -53,7 +53,7 @@ void func_L18_004302B0(u8 *a) {
     F(s, 0x110) = 1.5707965f;
     if (W(s, 0x798) != -1) W(s, 0x13C) = W(s, 0x798);
 
-    CHILD(0x7C0) = func_0029EFD0(0xF0B);
+    CHILD(0x7C0) = CreateMoby(0xF0B);
     if (CHILD(0x7C0) == 0) goto fail;
     CHILD(0x7C0)[0x30] = a[0x30];
     U(CHILD(0x7C0), 0x32) = U(a, 0x32);
@@ -69,15 +69,15 @@ void func_L18_004302B0(u8 *a) {
         i = 0;
         v = values.value;
         for (; i < 15; i++) {
-            float divisor = func_00283CE0(H(s, 0x24));
+            float divisor = IntToFloat(H(s, 0x24));
             float n = *v++;
             float ratio = n / divisor;
-            *((u8 *)*(int *)(CHILD(0x7C0) + 0x68) + i + 0x20) = func_00283CF0(ratio * 255.0f);
+            *((u8 *)*(int *)(CHILD(0x7C0) + 0x68) + i + 0x20) = FloatToInt(ratio * 255.0f);
         }
     }
 
-    if (H(s, 0x7FC)) CHILD(0x7C8) = func_0029EFD0(0xF0D);
-    else CHILD(0x7C8) = func_0029EFD0(0xF0E);
+    if (H(s, 0x7FC)) CHILD(0x7C8) = CreateMoby(0xF0D);
+    else CHILD(0x7C8) = CreateMoby(0xF0E);
     if (CHILD(0x7C8) == 0) goto fail;
     CHILD(0x7C8)[0x30] = a[0x30];
     U(CHILD(0x7C8), 0x32) = U(a, 0x32);

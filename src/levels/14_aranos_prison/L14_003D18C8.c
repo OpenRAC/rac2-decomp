@@ -28,9 +28,9 @@ float func_L14_003D18C8(char *object, char *state, TI128 *input, char *transform
     qzero(&work.vector);
     work.vector.f[2] = *(float *)(state + 0xB4);
     rotation = work.matrix;
-    func_002833F0(rotation, &work.vector);
+    euler_rotation_basis(rotation, &work.vector);
     basis = object + 0xC0;
-    func_00283738(basis, basis, rotation);
+    multiply_matrix3x3(basis, basis, rotation);
     value = func_00282C48(value);
     return value - func_00282C48(*(float *)(state + 0xB4));
 }

@@ -122,9 +122,9 @@ void func_L09_003C0DF8(DobboMoby *moby) {
         if (vars->t > 1.0f)
             vars->t = 1.0f;
         blend = (1.0f - func_00283180(vars->t * 3.14159274f)) * 0.5f;
-        func_00282CF0(v, D_L09_001B294C[vars->point].pos, vars->pos);
-        func_00282D30(v, v, blend);
-        func_00282CC0(moby->pos, vars->pos, v);
+        FastVecSub(v, D_L09_001B294C[vars->point].pos, vars->pos);
+        FastVecScale(v, v, blend);
+        FastVecAdd(moby->pos, vars->pos, v);
         moby->rot[2] = func_002AA150(vars->rot[2], D_L09_001B294C[vars->point].rot[2], blend);
         moby->rot[1] = func_002AA150(vars->rot[1], D_L09_001B294C[vars->point].rot[1], blend);
         moby->rot[0] = func_002AA150(vars->rot[0], D_L09_001B294C[vars->point].rot[0], blend);

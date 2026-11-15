@@ -84,7 +84,7 @@ void func_003320F0(struct Obj *arg0)
             func_002AF000(&a, ra, rb, rc);
             rd = func_002A7878(0.3499999940395355f, 0.6000000238418579f);
             a.z = a.z + rd;
-            func_00282CC0(&a, &a, &arg0->pos);
+            FastVecAdd(&a, &a, &arg0->pos);
             re = func_002A7878(0.0016666668234393f, 0.01666666753590107f);
             rf = func_002A7940();
             rg = func_002A7940();
@@ -99,7 +99,7 @@ void func_003320F0(struct Obj *arg0)
         do {
             j++;
             p1 = func_00283248(tb->f140 - arg0->pos.x, tb->f144 - arg0->pos.y);
-            func_00283CF0(func_002A78D8(1.0f, 2.0f));
+            FloatToInt(func_002A78D8(1.0f, 2.0f));
             r3 = func_002A78D8(0.0f, 0.15000000596046448f);
             b.x = arg0->pos.x + r3;
             r4 = func_002A78D8(0.0f, 0.15000000596046448f);
@@ -108,7 +108,7 @@ void func_003320F0(struct Obj *arg0)
             b.z = arg0->pos.z + r5;
             d80 = D_001B0A80;
             r6 = func_002A78D8(0.0f, -1.5707964897155762f);
-            p2 = func_00283B98(p1, r6);
+            p2 = FastAddRotations(p1, r6);
             pa = func_00283180(p2);
             a.x = pa * 0.01666666753590107f * d80;
             pb = func_00283198(p2);

@@ -77,15 +77,15 @@ void func_00314FD0(unsigned char *self)
     grip.f[1] = -0.15f;
     grip.f[2] = -0.05f;
     data = THROW_PTR(self,0x68);
-    func_00283678(matrix,D_001B5200);
-    func_00283698(inverse,matrix);
+    copy_matrix3x4(matrix,D_001B5200);
+    matrix_from_basis_rows(inverse,matrix);
     if (!data) return;
     qcopy(&position,self+0x10);
-    func_00282D30(&basis[0],self+0xD0,-1.0f);
+    FastVecScale(&basis[0],self+0xD0,-1.0f);
     qcopy(&basis[1],self+0xC0);
     qcopy(&basis[2],self+0xE0);
-    func_002830C0(&offset,&grip,basis);
-    func_00282CC0(data+0x40,&position,&offset);
+    transform_vector(&offset,&grip,basis);
+    FastVecAdd(data+0x40,&position,&offset);
     if (THROW_PTR(data,0x50)) {
         THROW_INT(THROW_PTR(data,0x50),0x9C)=1;
     }
@@ -97,36 +97,36 @@ void func_00314FD0(unsigned char *self)
         velocity.q=0;
         velocity.f[0]=(D_00138180.buttons&4)?0.10000000894f:0.06666667014f;
         aim.q=velocity.q;
-        func_00283098(&aim,&aim,D_00189E20.aimMatrix);
-        launch.f[0]=func_00283180(func_00283B98(-0.3619680106639862f,func_00283248(D_00189E20.aimX,D_00189E20.aimY)))*0.8590390086f;
-        launch.f[1]=func_00283198(func_00283B98(-0.3619680106639862f,func_00283248(D_00189E20.aimX,D_00189E20.aimY)))*0.8590390086f;
+        matrix_mul_vec3(&aim,&aim,D_00189E20.aimMatrix);
+        launch.f[0]=func_00283180(FastAddRotations(-0.3619680106639862f,func_00283248(D_00189E20.aimX,D_00189E20.aimY)))*0.8590390086f;
+        launch.f[1]=func_00283198(FastAddRotations(-0.3619680106639862f,func_00283248(D_00189E20.aimX,D_00189E20.aimY)))*0.8590390086f;
         launch.f[2]=0;
-        func_00282CC0(&launch,&launch,D_00189E20.launchOrigin);
+        FastVecAdd(&launch,&launch,D_00189E20.launchOrigin);
         launch.f[2]+=0.4908199906f;
         func_00283248(aim.f[0],aim.f[1]);
-        func_00282D30(&end,&aim,60.0f);
-        func_00282CC0(&end,&end,&launch);
+        FastVecScale(&end,&aim,60.0f);
+        FastVecAdd(&end,&end,&launch);
         if (D_00138180.buttons&4) {
             temp.q=0;
             temp.f[2]=6.0f;
             hit=0;
             velocity.q=temp.q;
-            func_002830C0(&velocity,&velocity,inverse);
+            transform_vector(&velocity,&velocity,inverse);
             player=D_00189E20.moby;
-            func_00283BE0(THROW_FLOAT(player,0xF8),func_00283248(velocity.f[0],velocity.f[1]));
+            fast_subtract_rotations(THROW_FLOAT(player,0xF8),func_00283248(velocity.f[0],velocity.f[1]));
             angle=func_00283248(velocity.f[0],velocity.f[1]);
-            pitch=func_00283248(func_00282E20(&velocity),velocity.f[2]);
+            pitch=func_00283248(vec_length_xy(&velocity),velocity.f[2]);
             if(pitch>0.5934119821f) pitch=0.5934119821f;
             if(pitch< -1.396263599f) pitch=-1.396263599f;
             func_002AF000(&velocity,(D_00138180.buttons&4)?6.0f:4.0f,angle,pitch);
             {
-                float planarLength=func_00282E20(&velocity);
+                float planarLength=vec_length_xy(&velocity);
                 float z = velocity.f[2];
                 if(planarLength!=0) slope=z/planarLength;
                 else slope=z*100.0f;
             }
             {
-                float fallTime=func_00282C10((D_00138180.buttons&4)?0.008166667074f:0.005444444716f);
+                float fallTime=square_root((D_00138180.buttons&4)?0.008166667074f:0.005444444716f);
                 distance=((fallTime+fallTime)*fallTime)*(1.0f-slope)*367.3469238f;
             }
             height=slope*distance;
@@ -134,8 +134,8 @@ void func_00314FD0(unsigned char *self)
                 velocity.f[0]=func_00283180(angle)*distance;
                 velocity.f[1]=func_00283198(angle)*distance;
                 velocity.f[2]=height;
-                func_00282CC0(&temp,D_001B5340,&velocity);
-                if(func_002761F8(D_001B5340,&temp,2,self,0) && D_001BAF80.moby!=D_00189E20.moby) {
+                FastVecAdd(&temp,D_001B5340,&velocity);
+                if(CollLine(D_001B5340,&temp,2,self,0) && D_001BAF80.moby!=D_00189E20.moby) {
                     qcopy(&end,D_001BAF80.point);
                     hit=1;
                     angle=func_00283248(end.f[0]-launch.f[0],end.f[1]-launch.f[1]);
@@ -144,7 +144,7 @@ void func_00314FD0(unsigned char *self)
                     end.f[0]=(func_00283180(angle)*distance)*5.0f;
                     end.f[1]=(func_00283198(angle)*distance)*5.0f;
                     end.f[2]=height*5.0f;
-                    func_00282CC0(&end,&end,D_001B5340);
+                    FastVecAdd(&end,&end,D_001B5340);
                 }
             }
         }
@@ -173,7 +173,7 @@ void func_00314FD0(unsigned char *self)
                     ThrowClass *weapon = &((ThrowClass *)D_00239BA0)[D_0013958A];
                     THROW_FLOAT(data,0x58) = 1.0f / weapon->speed;
                 }
-            } else func_002E5CF8(4,0,self);
+            } else PlayMobySound(4,0,self);
         }
         if(!(D_00138180.buttons&D_00189E20.fireMask) || !func_0026F738(-1)) {
             if(D_00189E20.action>=9 || !D_00189E20.active) func_0026F760();
@@ -183,7 +183,7 @@ void func_00314FD0(unsigned char *self)
         if(self[0x42]==self[0x43] && self[0x42]==3 && func_0029F530(self)>=2.0f) {
             if(THROW_PTR(data,0x50)) {
                 func_003159D0(&launch,THROW_PTR(data,0x50),THROW_PTR(THROW_PTR(data,0x50),0x68));
-                func_002ACA50(THROW_PTR(data,0x50),D_001F1AF8,0x3F);
+                AddMobyToIndexList(THROW_PTR(data,0x50),D_001F1AF8,0x3F);
                 THROW_PTR(data,0x50)=0;
                 THROW_INT(data,0x54)=10;
             }

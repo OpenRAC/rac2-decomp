@@ -128,7 +128,7 @@ void func_L11_0042F018(u8 *arg0) {
                 func_L11_0042EF90(arg0, 4, 3, 0, 0xC);
             }
         } else if (*(s32 *)(data + 0x2AC) != -1 &&
-                   func_002A8AF0(&((Hero *)D_00189E20)->f[0x80 / 4], (u8 *)D_L11_001FF580[*(s32 *)(data + 0x2AC)] + 0x10,
+                   point_in_path_xy(&((Hero *)D_00189E20)->f[0x80 / 4], (u8 *)D_L11_001FF580[*(s32 *)(data + 0x2AC)] + 0x10,
                                  *D_L11_001FF580[*(s32 *)(data + 0x2AC)]) != 0) {
             func_L11_0042EF90(arg0, 6, 5, 0, 0xA);
             func_002B60B0(arg0, 0.016666668f, 0.5f, 0.001163553f, 0.10471977f);
@@ -160,7 +160,7 @@ void func_L11_0042F018(u8 *arg0) {
         if (func_002B3890(arg0) != 0)
             func_002B60B0(arg0, 0.0033333334f, 0.10000001f, 0.001163553f, 0.10471977f);
         if (*(s32 *)(data + 0x2AC) == -1 ||
-            func_002A8AF0(&((Hero *)D_00189E20)->f[0x80 / 4], (u8 *)D_L11_001FF580[*(s32 *)(data + 0x2AC)] + 0x10,
+            point_in_path_xy(&((Hero *)D_00189E20)->f[0x80 / 4], (u8 *)D_L11_001FF580[*(s32 *)(data + 0x2AC)] + 0x10,
                           *D_L11_001FF580[*(s32 *)(data + 0x2AC)]) == 0) {
             if ((u16)(*(s16 *)(data + 0x274) - 1) >= 2) {
                 if (arg0[0x20] == 0x11 || arg0[0x20] == 0x14 || arg0[0x20] == 0x10) {
@@ -209,7 +209,7 @@ void func_L11_0042F018(u8 *arg0) {
         r = func_002B1C20(arg0, data + 0x60);
         if (r & 1) {
             D_L11_001AED04[0] = D_L11_001AED04[0] - 1;
-            func_002A6C58(arg0, 0, 3);
+            SetDeathBits(arg0, 0, 3);
             func_L01_003E9CF8(arg0, 0, 0);
             return;
         }
@@ -242,7 +242,7 @@ void func_L11_0042F018(u8 *arg0) {
             if (*(s32 *)(data + 0x28C) >= 0x15)
                 *(f32 *)(data + 0x124) = 0.06666667f;
             else
-                func_002AA2E8((f32 *)(data + 0x124), 0.0f, 0.0011111111f);
+                ApproachValue((f32 *)(data + 0x124), 0.0f, 0.0011111111f);
             if (arg0[0x43] == 5) {
                 if (*(s32 *)(data + 0x28C) == 0) {
                     func_L11_0042EF90(arg0, 1, 1, 0, 0xC);
@@ -300,9 +300,9 @@ void func_L11_0042F018(u8 *arg0) {
     case 11:
         func_00282948(data + 0x28C);
         if (*(s32 *)(data + 0x28C) >= 0x15)
-            func_002AA2E8((f32 *)(data + 0x124), 0.06666667f, 0.0019444445f);
+            ApproachValue((f32 *)(data + 0x124), 0.06666667f, 0.0019444445f);
         else
-            func_002AA2E8((f32 *)(data + 0x124), 0.0f, 0.0019444445f);
+            ApproachValue((f32 *)(data + 0x124), 0.0f, 0.0019444445f);
         if (arg0[0x43] == 6) {
             if (*(s32 *)(data + 0x28C) == 0) {
                 func_L11_0042EF90(arg0, 3, 2, 0, 0xC);
@@ -338,20 +338,20 @@ void func_L11_0042F018(u8 *arg0) {
         func_L11_00432628(arg0, &((Hero *)D_00189E20)->f[0x80 / 4]);
         *(s32 *)(data + 0x280) = *(s32 *)(data + 0x280) + 1;
         if (*(u8 **)(data + 0x27C) != 0) {
-            if (func_00282E80(arg0 + 0x10, &((Hero *)D_00189E20)->f[0x80 / 4]) < 20.0f &&
-                func_00283C80(*(f32 *)(arg0 + 0xF8), func_00283248(((Hero *)D_00189E20)->f[0x80 / 4] - *(f32 *)(arg0 + 0x10),
+            if (vec_distance_xy(arg0 + 0x10, &((Hero *)D_00189E20)->f[0x80 / 4]) < 20.0f &&
+                FastDiffRots(*(f32 *)(arg0 + 0xF8), func_00283248(((Hero *)D_00189E20)->f[0x80 / 4] - *(f32 *)(arg0 + 0x10),
                                                                  ((Hero *)D_00189E20)->f[0x84 / 4] - *(f32 *)(arg0 + 0x14))) < 0.17453295f) {
                 func_L11_0042EF90(arg0, 9, 6, 0, 0xA);
                 func_002A7750(arg0, 0x12, -1);
             }
         } else {
-            if (func_00282E80(arg0 + 0x10, &((Hero *)D_00189E20)->f[0x80 / 4]) < 2.7f &&
-                func_00283C80(*(f32 *)(arg0 + 0xF8), func_00283248(((Hero *)D_00189E20)->f[0x80 / 4] - *(f32 *)(arg0 + 0x10),
+            if (vec_distance_xy(arg0 + 0x10, &((Hero *)D_00189E20)->f[0x80 / 4]) < 2.7f &&
+                FastDiffRots(*(f32 *)(arg0 + 0xF8), func_00283248(((Hero *)D_00189E20)->f[0x80 / 4] - *(f32 *)(arg0 + 0x10),
                                                                  ((Hero *)D_00189E20)->f[0x84 / 4] - *(f32 *)(arg0 + 0x14))) < 0.3490659f) {
                 func_L11_0042EF90(arg0, 0xC, 0, 0, 5);
                 func_002A7750(arg0, 0x15, -1);
             }
-            if (func_00282E80(arg0 + 0x10, &((Hero *)D_00189E20)->f[0x80 / 4]) > 2.7f && (arg0[0x42] == 5 || arg0[0x42] == 0xF)) {
+            if (vec_distance_xy(arg0 + 0x10, &((Hero *)D_00189E20)->f[0x80 / 4]) > 2.7f && (arg0[0x42] == 5 || arg0[0x42] == 0xF)) {
                 func_L11_0042EF90(arg0, 6, 5, 0, 4);
                 func_002B60B0(arg0, 0.0033333334f, 0.10000001f, 0.001163553f, 0.10471977f);
             }
@@ -363,7 +363,7 @@ void func_L11_0042F018(u8 *arg0) {
         func_L01_00321178(arg0, &((Hero *)D_00189E20)->f[0x80 / 4]);
         func_002A7E08(arg0, ((Hero *)D_00189E20)->ptr[0x2290 / 4], data + 0x284, 0.001f, 0.01f, 0.1f);
         *(s32 *)(data + 0x280) = *(s32 *)(data + 0x280) + 1;
-        if (func_00282E80(arg0 + 0x10, &((Hero *)D_00189E20)->f[0x80 / 4]) < 2.1f) {
+        if (vec_distance_xy(arg0 + 0x10, &((Hero *)D_00189E20)->f[0x80 / 4]) < 2.1f) {
             func_L11_0042EF90(arg0, 8, 0, 1, 3);
             *(f32 *)(arg0 + 0x48) = 1.0f;
             func_002A7750(arg0, 0x14, -1);
@@ -379,9 +379,9 @@ void func_L11_0042F018(u8 *arg0) {
         dir[1] = func_00283198(*(f32 *)(arg0 + 0xF8));
         dir[2] = 2.0f;
         qcopy(scaled, dir);
-        func_00282D30(scaled, scaled, 2.5f);
+        FastVecScale(scaled, scaled, 2.5f);
         scaled[3] = 5627.925f;
-        func_002A8C00(req, arg0, 0x10001, *(f32 *)(data + 0x2B8), scaled);
+        make_hit_descriptor(req, arg0, 0x10001, *(f32 *)(data + 0x2B8), scaled);
         req[0x19] = 1;
         *(u16 *)(req + 0x1A) = *(u16 *)(arg0 + 0xAA);
         req[0x18] = 0;
@@ -399,13 +399,13 @@ void func_L11_0042F018(u8 *arg0) {
         off[0] = func_00283180(*(f32 *)(arg0 + 0xF8)) * 4.0f;
         off[1] = func_00283198(*(f32 *)(arg0 + 0xF8)) * 4.0f;
         off[2] = 0.0f;
-        func_00282CC0(off, p, off);
+        FastVecAdd(off, p, off);
         func_L01_00321178(arg0, &((Hero *)D_00189E20)->f[0x80 / 4]);
         *(s32 *)(data + 0x280) = *(s32 *)(data + 0x280) + 1;
         if (arg0[0x60] & 2) {
             func_L11_0042EF90(arg0, 2, 2, 0, 0xA);
             func_002A7750(arg0, 0x10, -1);
-            if (func_00282E80(p, &((Hero *)D_00189E20)->f[0x80 / 4]) < 3.0f) {
+            if (vec_distance_xy(p, &((Hero *)D_00189E20)->f[0x80 / 4]) < 3.0f) {
                 func_002B60B0(arg0, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
                 if (arg0[0x43] != 0x10)
                     func_002A7470(arg0, 0x10, 0, 0xA);
@@ -424,9 +424,9 @@ void func_L11_0042F018(u8 *arg0) {
         dir[1] = func_00283198(*(f32 *)(arg0 + 0xF8));
         dir[2] = 2.0f;
         qcopy(scaled, dir);
-        func_00282D30(scaled, scaled, 2.5f);
+        FastVecScale(scaled, scaled, 2.5f);
         scaled[3] = 5627.925f;
-        func_002A8C00(req, arg0, 0x10001, *(f32 *)(data + 0x2B8), scaled);
+        make_hit_descriptor(req, arg0, 0x10001, *(f32 *)(data + 0x2B8), scaled);
         req[0x19] = 1;
         *(u16 *)(req + 0x1A) = *(u16 *)(arg0 + 0xAA);
         req[0x18] = 0;
@@ -439,8 +439,8 @@ void func_L11_0042F018(u8 *arg0) {
         {
         f32 v[4] __attribute__((aligned(16)));
 
-        func_00282F20(v, arg0 + 0xC0, -5.5f);
-        func_00282CC0(v, v, arg0 + 0x10);
+        vec_scale_to_length(v, arg0 + 0xC0, -5.5f);
+        FastVecAdd(v, v, arg0 + 0x10);
         func_L02_00331440(arg0, v, func_00283248(v[0] - *(f32 *)(arg0 + 0x10), v[1] - *(f32 *)(arg0 + 0x14)), 0x10, -1.0f, -1.0f);
         }
         if (*(u16 *)(arg0 + 0x96) >= 0x79) {
@@ -495,7 +495,7 @@ void func_L11_0042F018(u8 *arg0) {
             v10[0] = func_00283180(*(f32 *)(arg0 + 0xF8)) * 0.1f;
             v10[1] = func_00283198(*(f32 *)(arg0 + 0xF8)) * 0.1f;
             v10[2] = 0.0f;
-            func_00282CC0(v0, v0, v10);
+            FastVecAdd(v0, v0, v10);
             v0[2] -= 0.05f;
             g = func_0029F530(arg0);
             f = func_002A7878(0.2f, 0.9f) * 0.2f * g;
@@ -519,8 +519,8 @@ void func_L11_0042F018(u8 *arg0) {
         if (arg0[0x42] == 0xC && f >= 10.0f && f <= 15.0f)
             func_002A8D70(arg0, 1.0f, *(f32 *)(data + 0x2B4), 1, 1, 1.0f, 0, 1, 0);
         if (arg0[0x60] & 2) {
-            if (func_00282E80(arg0 + 0x10, &((Hero *)D_00189E20)->f[0x80 / 4]) < 2.7f &&
-                func_00283C80(*(f32 *)(arg0 + 0xF8), func_00283248(((Hero *)D_00189E20)->f[0x80 / 4] - *(f32 *)(arg0 + 0x10),
+            if (vec_distance_xy(arg0 + 0x10, &((Hero *)D_00189E20)->f[0x80 / 4]) < 2.7f &&
+                FastDiffRots(*(f32 *)(arg0 + 0xF8), func_00283248(((Hero *)D_00189E20)->f[0x80 / 4] - *(f32 *)(arg0 + 0x10),
                                                                  ((Hero *)D_00189E20)->f[0x84 / 4] - *(f32 *)(arg0 + 0x14))) < 0.3490659f) {
                 func_L11_0042EF90(arg0, 0xC, 0, 0, 0xA);
                 func_002A7750(arg0, 0x15, -1);
@@ -541,9 +541,9 @@ void func_L11_0042F018(u8 *arg0) {
             func_L11_0042EF90(arg0, 6, 5, 0, 0xA);
         }
         if (arg0[0x60] & 2) {
-            if (func_00282E80(arg0 + 0x10, &((Hero *)D_00189E20)->f[0x80 / 4]) < 25.0f && *(u8 **)(data + 0x27C) != 0 &&
+            if (vec_distance_xy(arg0 + 0x10, &((Hero *)D_00189E20)->f[0x80 / 4]) < 25.0f && *(u8 **)(data + 0x27C) != 0 &&
                 *(s32 *)(data + 0x2A0) < 3) {
-                if (func_00283C80(*(f32 *)(arg0 + 0xF8), func_00283248(((Hero *)D_00189E20)->f[0x80 / 4] - *(f32 *)(arg0 + 0x10),
+                if (FastDiffRots(*(f32 *)(arg0 + 0xF8), func_00283248(((Hero *)D_00189E20)->f[0x80 / 4] - *(f32 *)(arg0 + 0x10),
                                                                      ((Hero *)D_00189E20)->f[0x84 / 4] - *(f32 *)(arg0 + 0x14))) > 0.087266475f) {
                     func_002A7750(arg0, 0x18, -1);
                     func_L11_0042EF90(arg0, 0xF, 4, 0, 0xA);
@@ -551,7 +551,7 @@ void func_L11_0042F018(u8 *arg0) {
                     func_L11_0042EF90(arg0, 9, 6, 0, 0xA);
                     func_002A7750(arg0, 0x12, -1);
                 }
-            } else if (func_00282E80(arg0 + 0x10, &((Hero *)D_00189E20)->f[0x80 / 4]) > 10.0f && *(u8 **)(data + 0x27C) != 0 &&
+            } else if (vec_distance_xy(arg0 + 0x10, &((Hero *)D_00189E20)->f[0x80 / 4]) > 10.0f && *(u8 **)(data + 0x27C) != 0 &&
                        *(s32 *)(data + 0x2A0) >= 3 && *(s32 *)(data + 0x2BC) == -1) {
                 func_L11_0042EF90(arg0, 3, 2, 0, 0xA);
                 func_002A7750(arg0, 0x17, -1);
@@ -571,7 +571,7 @@ void func_L11_0042F018(u8 *arg0) {
             f32 v0[4] __attribute__((aligned(16)));
             f32 v10[4] __attribute__((aligned(16)));
 
-            if (func_00283C80(*(f32 *)(arg0 + 0xF8), func_00283248(((Hero *)D_00189E20)->f[0x80 / 4] - *(f32 *)(arg0 + 0x10),
+            if (FastDiffRots(*(f32 *)(arg0 + 0xF8), func_00283248(((Hero *)D_00189E20)->f[0x80 / 4] - *(f32 *)(arg0 + 0x10),
                                                                  ((Hero *)D_00189E20)->f[0x84 / 4] - *(f32 *)(arg0 + 0x14))) < 0.78539824f) {
                 s32 k;
                 u8 *l;
@@ -580,10 +580,10 @@ void func_L11_0042F018(u8 *arg0) {
                 v10[0] = func_00283180(*(f32 *)(arg0 + 0xF8)) * 0.1f;
                 v10[1] = func_00283198(*(f32 *)(arg0 + 0xF8)) * 0.1f;
                 v10[2] = 0.0f;
-                func_00282CC0(v0, v0, v10);
+                FastVecAdd(v0, v0, v10);
                 v0[2] -= 0.05f;
                 *(TI128 *)(data + 0x230) = *(TI128 *)v0;
-                func_00282CF0(data + 0x250, &((Hero *)D_00189E20)->f[0xD0 / 4], v0);
+                FastVecSub(data + 0x250, &((Hero *)D_00189E20)->f[0xD0 / 4], v0);
                 *(f32 *)(data + 0x298) = 0.0f;
                 func_L00_003294F0(arg0, 0);
                 k = func_L00_002FCF18(arg0 + 0x10, 5.0f, 0.0f, 1.0f, 0.0f, 0.0f);
@@ -606,14 +606,14 @@ void func_L11_0042F018(u8 *arg0) {
                 v10[0] = func_00283180(*(f32 *)(arg0 + 0xF8)) * 0.1f;
                 v10[1] = func_00283198(*(f32 *)(arg0 + 0xF8)) * 0.1f;
                 v10[2] = 0.0f;
-                func_00282CC0(v0, v0, v10);
+                FastVecAdd(v0, v0, v10);
                 v0[2] -= 0.05f;
                 *(TI128 *)(data + 0x230) = *(TI128 *)v0;
                 v10[0] = func_00283180(*(f32 *)(arg0 + 0xF8)) * 25.0f;
                 v10[1] = func_00283198(*(f32 *)(arg0 + 0xF8)) * 25.0f;
                 v10[2] = 0.0f;
-                func_00282CC0(v10, v10, arg0 + 0x10);
-                func_00282CF0(data + 0x250, v10, v0);
+                FastVecAdd(v10, v10, arg0 + 0x10);
+                FastVecSub(data + 0x250, v10, v0);
                 *(f32 *)(data + 0x298) = 0.0f;
                 func_L00_003294F0(arg0, 0);
                 k = func_L00_002FCF18(arg0 + 0x10, 5.0f, 0.0f, 1.0f, 0.0f, 0.0f);
@@ -642,7 +642,7 @@ void func_L11_0042F018(u8 *arg0) {
                 v10[0] = func_00283180(*(f32 *)(arg0 + 0xF8)) * 0.1f;
                 v10[1] = func_00283198(*(f32 *)(arg0 + 0xF8)) * 0.1f;
                 v10[2] = 0.0f;
-                func_00282CC0(v0, v0, v10);
+                FastVecAdd(v0, v0, v10);
                 v0[2] -= 0.05f;
                 f = func_002A7878(0.2f, 0.9f) * 0.2f * *(f32 *)(data + 0x288);
                 n = func_002A77E0(2);
@@ -664,11 +664,11 @@ void func_L11_0042F018(u8 *arg0) {
             s32 n;
 
             *(f32 *)(data + 0x298) = *(f32 *)(data + 0x298) + 1.0f;
-            func_00282F20(data + 0x240, data + 0x250, *(f32 *)(data + 0x298));
-            func_002A8C00(req, arg0, 1, hp, data + 0x240);
+            vec_scale_to_length(data + 0x240, data + 0x250, *(f32 *)(data + 0x298));
+            make_hit_descriptor(req, arg0, 1, hp, data + 0x240);
             *(u16 *)(req + 0x1A) = *(u16 *)(arg0 + 0xAA);
-            func_00282CC0(data + 0x240, data + 0x230, data + 0x240);
-            if (func_002761F8(data + 0x230, data + 0x240, 0, arg0, req) != 0) {
+            FastVecAdd(data + 0x240, data + 0x230, data + 0x240);
+            if (CollLine(data + 0x230, data + 0x240, 0, arg0, req) != 0) {
                 *(TI128 *)(data + 0x240) = D_L11_001C0D20;
                 if (func_002B38B8(arg0) == 0) {
                     func_L04_003E5830(&D_L11_001C0D20, 6);
@@ -706,7 +706,7 @@ void func_L11_0042F018(u8 *arg0) {
         }
         if (t >= 9.0f && t < 15.0f && arg0[0x42] == 0xA) {
                         
-            if (func_00282E80(data + 0x230, data + 0x240) > 1.6666667f) {
+            if (vec_distance_xy(data + 0x230, data + 0x240) > 1.6666667f) {
                 u8 req[0x30] __attribute__((aligned(16)));
                 f32 v30[4] __attribute__((aligned(16)));
                 f32 v40[4] __attribute__((aligned(16)));
@@ -715,19 +715,19 @@ void func_L11_0042F018(u8 *arg0) {
                 s32 n;
 
                 *(f32 *)(data + 0x298) = *(f32 *)(data + 0x298) + 1.0f;
-                func_00282F20(data + 0x240, data + 0x250, *(f32 *)(data + 0x298));
-                func_002A8C00(req, arg0, 1, hp, data + 0x240);
+                vec_scale_to_length(data + 0x240, data + 0x250, *(f32 *)(data + 0x298));
+                make_hit_descriptor(req, arg0, 1, hp, data + 0x240);
                 *(u16 *)(req + 0x1A) = *(u16 *)(arg0 + 0xAA);
-                func_00282CC0(data + 0x240, data + 0x230, data + 0x240);
-                if (func_002761F8(data + 0x230, data + 0x240, 0, arg0, req) != 0) {
+                FastVecAdd(data + 0x240, data + 0x230, data + 0x240);
+                if (CollLine(data + 0x230, data + 0x240, 0, arg0, req) != 0) {
                     *(TI128 *)(data + 0x240) = D_L11_001C0D20;
                     if (func_002B38B8(arg0) == 0) {
                         func_L04_003E5830(&D_L11_001C0D20, 6);
                         func_L00_003294F0(arg0, 1);
                     }
                 }
-                func_00282F20(v30, data + 0x250, 1.6666667f);
-                func_00282CC0(data + 0x230, data + 0x230, v30);
+                vec_scale_to_length(v30, data + 0x250, 1.6666667f);
+                FastVecAdd(data + 0x230, data + 0x230, v30);
                 f = func_002A7878(1.0f, 6.0f);
                 n = func_002A7820(0x19, 0x23);
                 if (n == 0)
@@ -766,21 +766,21 @@ void func_L11_0042F018(u8 *arg0) {
         u8 *p = arg0 + 0x10;
 
         if (arg0[0x60] & 2) {
-            if (func_00282E80(p, &((Hero *)D_00189E20)->f[0x80 / 4]) < 25.0f && *(u8 **)(data + 0x27C) != 0) {
+            if (vec_distance_xy(p, &((Hero *)D_00189E20)->f[0x80 / 4]) < 25.0f && *(u8 **)(data + 0x27C) != 0) {
                 func_002A7750(arg0, 0x18, -1);
                 func_L11_0042EF90(arg0, 5, 4, 0, 0xA);
             } else {
                 func_002A7750(arg0, 0xF, -1);
                 func_L11_0042EF90(arg0, 6, 5, 0, 0xA);
             }
-        } else if (func_00282E80(p, &((Hero *)D_00189E20)->f[0x80 / 4]) < 6.0f) {
+        } else if (vec_distance_xy(p, &((Hero *)D_00189E20)->f[0x80 / 4]) < 6.0f) {
             func_L11_0042EF90(arg0, 9, 6, 0, 0xA);
             func_002A7750(arg0, 0x12, -1);
         }
         break;
     }
     case 24:
-        if (func_00283C80(*(f32 *)(arg0 + 0xF8), func_00283248(((Hero *)D_00189E20)->f[0x80 / 4] - *(f32 *)(arg0 + 0x10),
+        if (FastDiffRots(*(f32 *)(arg0 + 0xF8), func_00283248(((Hero *)D_00189E20)->f[0x80 / 4] - *(f32 *)(arg0 + 0x10),
                                                              ((Hero *)D_00189E20)->f[0x84 / 4] - *(f32 *)(arg0 + 0x14))) <= 0.087266475f) {
             func_L11_0042EF90(arg0, 9, 6, 0, 0xA);
             func_002A7750(arg0, 0x12, -1);
@@ -806,7 +806,7 @@ void func_L11_0042F018(u8 *arg0) {
     }
     func_L11_00431D50(arg0);
     if (*(f32 *)(arg0 + 0x18) < 74.0f) {
-        func_002A6C58(arg0, 0, 3);
+        SetDeathBits(arg0, 0, 3);
         D_L11_001AED04[0] = D_L11_001AED04[0] - 1;
         func_0029F338(arg0);
     }

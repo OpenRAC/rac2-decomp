@@ -80,7 +80,7 @@ void func_L08_003D4190(u8 *object)
             return;
         vehicleData = *(u8 **)(vehicle + 0x68);
         *(u8 **)(vehicleData + 0x1b0) = object;
-        value = func_00282E80(object + 0x10, &D_00189E20.position);
+        value = vec_distance_xy(object + 0x10, &D_00189E20.position);
         if (value < *(float *)(vehicleData + 0x68)) {
             *(float *)(vehicleData + 0x68) = value;
             *(u8 **)(vehicleData + 0x6c) = object;
@@ -90,11 +90,11 @@ void func_L08_003D4190(u8 *object)
         { u8 *activeVehicle = D_00189E20.vehicle;
         if (activeVehicle == 0 || (activeVehicle[0x42] != 2 && activeVehicle[0x43] != 2))
             return; }
-        func_00282CF0(movement, &D_00189E20.position, object + 0x10);
-        func_00282D30(movement, movement, 0.1f);
+        FastVecSub(movement, &D_00189E20.position, object + 0x10);
+        FastVecScale(movement, movement, 0.1f);
         movement[2] = 0;
         func_00282FB8(movement, movement, D_L08_001B0334 * 0.0166666675f);
-        func_00282CC0(object + 0x10, object + 0x10, movement);
+        FastVecAdd(object + 0x10, object + 0x10, movement);
         if (!func_00282948(&data->timer))
             return;
         ((VData *)vehicleData)->lock = 180;
@@ -140,7 +140,7 @@ kill:
                 return;
             }
         }
-        func_L08_003D3EF8(object);
+        SpawnParticlesAndDrawGlowRings(object);
         break;
     }
     }

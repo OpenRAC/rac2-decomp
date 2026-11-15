@@ -40,35 +40,35 @@ void func_L00_003E6C10(char *owner)
     for (; i < 320; i++) {
         record = (Effect *)(i * sizeof(Effect) + (unsigned int)D_L00_001B2B54);
         if (record->owner == owner) {
-            numerator = func_00283CE0(record->remaining);
-            denominator = func_00283CE0(record->duration);
+            numerator = IntToFloat(record->remaining);
+            denominator = IntToFloat(record->duration);
             fraction = 1.0f - numerator / denominator;
             if (record->state == 0)
                 goto interpolate;
             if (record->state == 1) {
-                first = func_00283CE0(record->initialCount);
-                second = func_00283CE0(record->initialCount);
+                first = IntToFloat(record->initialCount);
+                second = IntToFloat(record->initialCount);
                 curve = func_002A7790(fraction);
-                record->count = func_00283CF0(first - second * curve);
+                record->count = FloatToInt(first - second * curve);
                 if (record->kind != 2) {
 interpolate:
-                    record->color = func_00283D38(record->colorStart, record->colorEnd, fraction);
+                    record->color = FastTweenColor(record->colorStart, record->colorEnd, fraction);
                     record->spin = record->spinStart + (record->spinEnd - record->spinStart) * fraction;
                     record->offset = record->offsetStart + (record->offsetEnd - record->offsetStart) * fraction;
                     record->size = record->sizeStart + (record->sizeEnd - record->sizeStart) * fraction;
-                    func_00282F20(&displacement, &record->direction, record->scale * func_002A7798(fraction));
+                    vec_scale_to_length(&displacement, &record->direction, record->scale * func_002A7798(fraction));
                 } else {
-                    func_00282F20(&displacement, &record->direction, record->scale);
+                    vec_scale_to_length(&displacement, &record->direction, record->scale);
                 }
             }
             func_002AFFD8(*(char **)(owner + 0x30) + 0x10, &axis, 1);
-            func_00282F20(&velocity, &axis, record->offset);
-            func_00282CC0(record, record, &velocity);
+            vec_scale_to_length(&velocity, &axis, record->offset);
+            FastVecAdd(record, record, &velocity);
             if (record->kind != 1)
-                func_00282CC0(record, &displacement, record);
+                FastVecAdd(record, &displacement, record);
             object = *(char **)(record->owner + 0x30);
             data = *(char **)(object + 0x68);
-            record->phase = func_00283B98(record->phase, record->spin);
+            record->phase = FastAddRotations(record->phase, record->spin);
             if (*(unsigned char *)(object + 0x20) == 2 && *(int *)(data + 0x14) < 38 && record->kind != 2) {
                 record->state = 1;
                 record->duration = record->remaining = func_002A7820(30, 45);

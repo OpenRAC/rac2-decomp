@@ -91,86 +91,86 @@ void func_L09_0037FCE8(char *moby) {
         ((Fog_30BCD8 *)D_L09_001BDF00)->f228 = 255.0f;
         ((Fog_30BCD8 *)D_L09_001BDF00)->f22C = 249.9f;
     }
-    func_002FC560(0x42, 0x3200000044LL);
-    func_002FC560(8, 0);
-    func_002FC560(0x14, 0xFF9000000260LL);
-    if (d->f38) func_002FC560(0x47, 0x5310B);
-    else func_002FC560(0x47, 0x513F1);
-    func_002FC560(6, func_0027C878(0x16));
-    func_00280328();
+    VU1_addGSregister(0x42, 0x3200000044LL);
+    VU1_addGSregister(8, 0);
+    VU1_addGSregister(0x14, 0xFF9000000260LL);
+    if (d->f38) VU1_addGSregister(0x47, 0x5310B);
+    else VU1_addGSregister(0x47, 0x513F1);
+    VU1_addGSregister(6, GetEffectTextureDescriptor(0x16));
+    font_queue_vu_state();
     a.x = 1.0f;
     a.y = 0.0f;
     a.z = 0.0f;
     a.w = 1.0f;
-    func_00283098(&a, &a, D_L09_001B9C30);
+    matrix_mul_vec3(&a, &a, D_L09_001B9C30);
     b.x = 0.0f;
     b.y = 1.0f;
     b.z = 0.0f;
     b.w = 1.0f;
-    func_00283098(&b, &b, D_L09_001B9C30);
+    matrix_mul_vec3(&b, &b, D_L09_001B9C30);
     if (D_001A79F0 != 13) a.z = 0.0f;
-    func_00282F20(&a, &a, 1.0f);
+    vec_scale_to_length(&a, &a, 1.0f);
     if (D_001A79F0 != 13) b.z = 0.0f;
-    func_00282F20(&b, &b, 1.0f);
-    func_00282F20(&v0, &a, -75.0f);
-    func_00282F20(&v1, &b, -87.0f);
-    func_00282CC0(&c[0], &v0, &v1);
-    func_00282F20(&v1, &b, 87.0f);
-    func_00282CC0(&c[2], &v0, &v1);
-    func_00282F20(&v0, &a, d->f28);
-    func_00282F20(&v1, &b, -750.0f);
-    func_00282CC0(&c[1], &v0, &v1);
-    func_00282F20(&v1, &b, 750.0f);
-    func_00282CC0(&c[3], &v0, &v1);
+    vec_scale_to_length(&b, &b, 1.0f);
+    vec_scale_to_length(&v0, &a, -75.0f);
+    vec_scale_to_length(&v1, &b, -87.0f);
+    FastVecAdd(&c[0], &v0, &v1);
+    vec_scale_to_length(&v1, &b, 87.0f);
+    FastVecAdd(&c[2], &v0, &v1);
+    vec_scale_to_length(&v0, &a, d->f28);
+    vec_scale_to_length(&v1, &b, -750.0f);
+    FastVecAdd(&c[1], &v0, &v1);
+    vec_scale_to_length(&v1, &b, 750.0f);
+    FastVecAdd(&c[3], &v0, &v1);
     for (i = 0; i < 4; i++) {
         Vec4f *p = &c[i];
-        func_00282CC0(p, p, D_L09_001B9A00);
+        FastVecAdd(p, p, D_L09_001B9A00);
         p->z = D_L09_001B3120;
     }
-    func_00282CF0(&d0, &c[1], &c[0]);
-    func_00282CF0(&d1, &c[3], &c[2]);
+    FastVecSub(&d0, &c[1], &c[0]);
+    FastVecSub(&d1, &c[3], &c[2]);
     t = 10.0f;
     for (i = 0; i < 12; i += 2) {
-        float f = func_00283CE0(i) * 0.1f;
-        float blend = func_00283CE0(i);
+        float f = IntToFloat(i) * 0.1f;
+        float blend = IntToFloat(i);
         int col;
         blend = blend / t;
-        col = func_00283D38(d->f0, d->f4, blend);
-        func_00282D30(&v0, &d0, f);
+        col = FastTweenColor(d->f0, d->f4, blend);
+        FastVecScale(&v0, &d0, f);
         D_L09_002339A0[i] = col;
         D_L09_00233EA0[i].u = 0.0f;
         D_L09_00233EA0[i].v = 0.0f;
-        func_00282CC0(&v0, &v0, &c[0]);
+        FastVecAdd(&v0, &v0, &c[0]);
         D_L09_002336A0[i].x = v0.x;
         D_L09_002336A0[i].y = v0.y;
         D_L09_002336A0[i].z = v0.z;
-        func_00282D30(&v0, &d1, f);
+        FastVecScale(&v0, &d1, f);
         D_L09_002339A0[i + 1] = col;
         D_L09_00233EA0[i + 1].u = 0.0f;
         D_L09_00233EA0[i + 1].v = 0.0f;
-        func_00282CC0(&v0, &v0, &c[2]);
+        FastVecAdd(&v0, &v0, &c[2]);
         D_L09_002336A0[i + 1].x = v0.x;
         D_L09_002336A0[i + 1].y = v0.y;
         D_L09_002336A0[i + 1].z = v0.z;
     }
     func_00281810(0xC, D_L09_002336A0, D_L09_002339A0, D_L09_00233EA0, 1);
-    q.z78 = func_0027C878(0x16);
+    q.z78 = GetEffectTextureDescriptor(0x16);
     q.q80 = 0xFF9000000260LL;
     q.q88 = 0x8000000044LL;
     q.z70 = 0;
-    func_002FC560(0x42, 0x8000000048LL);
-    func_002FC560(8, 0);
-    func_002FC560(0x14, 0xFF9000000260LL);
-    func_002FC560(0x47, 0x513F1);
+    VU1_addGSregister(0x42, 0x8000000048LL);
+    VU1_addGSregister(8, 0);
+    VU1_addGSregister(0x14, 0xFF9000000260LL);
+    VU1_addGSregister(0x47, 0x513F1);
     colA = d->fC;
     colB = d->f10;
     t = 1.0f;
     {
-        colA = func_00283D38(0, colA, t);
-        colB = func_00283D38(0, colB, t);
+        colA = FastTweenColor(0, colA, t);
+        colB = FastTweenColor(0, colB, t);
         for (layer = 0; layer < 2; layer++) {
             int id = layer + 0x3F;
-            func_002FC560(6, func_0027C878(d->f1C + id));
+            VU1_addGSregister(6, GetEffectTextureDescriptor(d->f1C + id));
             for (y = d->f18 * -2.0f; y < d->f18 * 2.0f; y += d->f18) {
                 n = 0;
                 for (x = d->f18 * -2.0f; x < d->f18 * 2.0f; x += d->f18) {
@@ -206,11 +206,11 @@ void func_L09_0037FCE8(char *moby) {
                         v0.y = D_L09_00233AA0[i].y - ((Cam_30BCD8 *)D_L09_001B98C0)->y;
                         v0.z = D_L09_00233AA0[i].z - ((Cam_30BCD8 *)D_L09_001B98C0)->z;
                         v0.w = 1.0f;
-                        t = func_00282E20(&v0) / (d->f18 * 2.0f);
+                        t = vec_length_xy(&v0) / (d->f18 * 2.0f);
                         if (t > 1.0f) {
                             t = 1.0f;
                         }
-                        D_L09_00233DA0[i] = func_00283D38(colA, colB, t);
+                        D_L09_00233DA0[i] = FastTweenColor(colA, colB, t);
                     }
                     n += 4;
                     if (n >= 0x40) {
@@ -223,5 +223,5 @@ void func_L09_0037FCE8(char *moby) {
     }
     ((Fog_30BCD8 *)D_L09_001BDF00)->f228 = s228;
     ((Fog_30BCD8 *)D_L09_001BDF00)->f22C = s22C;
-    func_002FC560(0x47, 0x5360B);
+    VU1_addGSregister(0x47, 0x5360B);
 }

@@ -192,7 +192,7 @@ int func_L19_00412140(void)
         func_L08_00389B68(2, 0x47, test | ((unsigned long)D_L19_001B1A60 << 17),
             0x42, alpha | ((unsigned long)D_L19_001B1A58 << 32));
     }
-    func_00282978(s + 0x8E);
+    FastDecTimer(s + 0x8E);
     if (D_L19_001A904C) {
         float delta, ratio;
         unsigned char *str;
@@ -229,7 +229,7 @@ int func_L19_00412140(void)
         palette.a = c0;
         palette.b = c1;
         *(struct Palette *)colors = palette;
-        colors[1] = func_00283D38(c0,c1,ratio);
+        colors[1] = FastTweenColor(c0,c1,ratio);
         func_0027EAE8((int)D_L19_001B1AE4,
             D_001A7344 - hud_coord(D_L19_001B3280, D_L19_001B1AE8, half, one, -4.0f),
             (int)(D_L19_001B1AE4 + D_L19_001B1AEC * ratio),
@@ -243,25 +243,25 @@ int func_L19_00412140(void)
             float ratio, scale, alpha;
             int color;
             if (*(short *)(s + 0x8E) == 1) func_002E5DA0(3,0,obj,0x85C);
-            ratio = func_00283CE0(180-*(short *)(s + 0x8E)) / func_00283CE0(180);
+            ratio = IntToFloat(180-*(short *)(s + 0x8E)) / IntToFloat(180);
             scale = D_L19_001B1ADC + (D_L19_001B1AE0-D_L19_001B1ACC)*func_002A7798(ratio);
-            alpha = func_L08_003277C0(3,1.0f-ratio)*127.0f;
-            color = func_00283CF0(alpha*0.5f) << 24;
-            str = func_00288FB8(0x2F59);
-            func_L08_002F5CB8(D_001A7340-D_L19_001B1AB4,D_001A7344-hud_coord(D_L19_001B3280, (float)D_L19_001B1AB8, 0.5f, 1, -6.0f),
+            alpha = IntegerPower(3,1.0f-ratio)*127.0f;
+            color = FloatToInt(alpha*0.5f) << 24;
+            str = GetLocalizedString(0x2F59);
+            DrawCenteredScaledText(D_001A7340-D_L19_001B1AB4,D_001A7344-hud_coord(D_L19_001B3280, (float)D_L19_001B1AB8, 0.5f, 1, -6.0f),
                 (color|0x80)&mask,str,0x11,scale*0.96f);
-            color = func_00283CF0(alpha*0.75f) << 24;
-            func_L08_002F5CB8(D_001A7340-D_L19_001B1AB4,D_001A7344-hud_coord(D_L19_001B3280, (float)D_L19_001B1AB8, 0.5f, 1, -6.0f),
+            color = FloatToInt(alpha*0.75f) << 24;
+            DrawCenteredScaledText(D_001A7340-D_L19_001B1AB4,D_001A7344-hud_coord(D_L19_001B3280, (float)D_L19_001B1AB8, 0.5f, 1, -6.0f),
                 (color|0x800000)&mask,str,0x11,scale*0.98f);
-            color = func_00283CF0(alpha) << 24;
-            func_L08_002F5CB8(D_001A7340-D_L19_001B1AB4,D_001A7344-hud_coord(D_L19_001B3280, (float)D_L19_001B1AB8, 0.5f, 1, -6.0f),
+            color = FloatToInt(alpha) << 24;
+            DrawCenteredScaledText(D_001A7340-D_L19_001B1AB4,D_001A7344-hud_coord(D_L19_001B3280, (float)D_L19_001B1AB8, 0.5f, 1, -6.0f),
                 (color|0x808080)&mask,str,0x11,scale);
         } else if (*(int *)(s + 0x6C)) {
             if (*(float *)(s + 0x68) > D_L19_001B0120) {
                 int x, y;
                 char *line;
-                str = func_00288FB8(0x31E0);
-                func_L08_0033CD18(text,str,func_00283CF0(*(float *)(s + 0x68)));
+                str = GetLocalizedString(0x31E0);
+                func_L08_0033CD18(text,str,FloatToInt(*(float *)(s + 0x68)));
                 line = text;
                 x = D_001A7340-D_L19_001B1AB0;
                 y = D_001A7344-hud_coord(D_L19_001B3280, (float)D_L19_001B1AB8, 0.5f, 1, -6.0f);
@@ -269,38 +269,38 @@ int func_L19_00412140(void)
                 hero = mask & hero;
                 func_0027F5B8(x,y,(unsigned int)hero,line,func_001157AC(line));
             } else if (D_00138320 & 0x80) {
-                str = func_00288FB8(0x2F57);
-                func_L08_002F5CB8(D_001A7340-D_L19_001B1AB4,D_001A7344-hud_coord(D_L19_001B3280, (float)D_L19_001B1AB8, 0.5f, 1, -6.0f),
+                str = GetLocalizedString(0x2F57);
+                DrawCenteredScaledText(D_001A7340-D_L19_001B1AB4,D_001A7344-hud_coord(D_L19_001B3280, (float)D_L19_001B1AB8, 0.5f, 1, -6.0f),
                     (unsigned int)(mask&0x80F0F0F0),str,0xD,D_L19_001B1AD0);
             } else {
                 float scale;
-                scale = func_002ABB18(func_00283CE0(D_L19_001B2508)*0.1f);
+                scale = func_002ABB18(IntToFloat(D_L19_001B2508)*0.1f);
                 scale = func_00283198(scale);
                 scale = D_L19_001B1AD4 + D_L19_001B1AD8*scale;
-                str = func_00288FB8(0x2F58);
-                func_L08_002F5CB8(D_001A7340-D_L19_001B1AB4,D_001A7344-hud_coord(D_L19_001B3280, (float)D_L19_001B1AB8, 0.5f, 1, -6.0f),
+                str = GetLocalizedString(0x2F58);
+                DrawCenteredScaledText(D_001A7340-D_L19_001B1AB4,D_001A7344-hud_coord(D_L19_001B3280, (float)D_L19_001B1AB8, 0.5f, 1, -6.0f),
                     (unsigned int)(mask&0x80F0F0F0),str,0x11,scale);
             }
         }
         if (s[0x8A]) {
             float ratio, width, height, dx, dy, top;
             int color, tex, x, y, a, b, alpha;
-            ratio = func_00283CE0(*(short *)(s + 0x88))/func_00283CE0(D_L19_001B1A98);
+            ratio = IntToFloat(*(short *)(s + 0x88))/IntToFloat(D_L19_001B1A98);
             width = func_002A7790(ratio)*32.0f;
             height = func_002A7790(ratio)*24.0f;
             dx = D_L19_001B1AA0*func_002A7798(ratio);
             dy = D_L19_001B1AA4*func_002A7798(ratio);
-            color = func_00283CF0(ratio*128.0f)<<24;
+            color = FloatToInt(ratio*128.0f)<<24;
             top = 16.0f-width*0.5f;
             if (D_L19_001A904C) {
                 func_L08_00300090();
                 func_L08_00300100();
-                alpha = func_00283CF0(func_00283CE0(96)*ratio)<<24;
+                alpha = FloatToInt(IntToFloat(96)*ratio)<<24;
                 str = (unsigned char *)func_00336D50(D_L19_001A904C+0x8710,0xAA);
                 func_00300A00((char *)str,
                     (alpha|0x442D00)&mask,
                     (float)(D_001A7340/2+32)-dx,(float)(D_001A7344/2+D_L19_001B1A94),1.0f,1.0f,0.0f);
-                alpha = func_00283CF0(func_00283CE0(85)*ratio)<<24;
+                alpha = FloatToInt(IntToFloat(85)*ratio)<<24;
                 str = (unsigned char *)func_00336D50(D_L19_001A904C+0x8710,0xAB);
                 func_00300A00((char *)str,
                     (alpha|0xF0C070)&mask,
@@ -313,12 +313,12 @@ int func_L19_00412140(void)
                 colors[1]=c;
                 colors[2]=c;
                 colors[3]=c;
-                tex=func_0028E588(0xEAA2,3);
-                x=func_00283CF0((float)D_001A7340-D_L19_001B1AAC-dy);
-                y=func_00283CF0(D_L19_001B1AA8+(float)D_L19_001B1A94+(float)*(short *)(s + 0x8C)+top);
+                tex=GetIconFrame(0xEAA2,3);
+                x=FloatToInt((float)D_001A7340-D_L19_001B1AAC-dy);
+                y=FloatToInt(D_L19_001B1AA8+(float)D_L19_001B1A94+(float)*(short *)(s + 0x8C)+top);
                 y=scaled_coord(y,D_L19_001B3284,0.5f,1);
-                a=func_00283CF0(height);
-                b=func_00283CF0(height);
+                a=FloatToInt(height);
+                b=FloatToInt(height);
                 func_0028EA58(tex,x,y,a,b,colors);
             }
         }

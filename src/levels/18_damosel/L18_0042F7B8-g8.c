@@ -24,25 +24,25 @@ void func_L18_0042F7B8(u8 *a,void *offset) {
  float direction[4],velocity[4],position[4],drift[4];
  float speed;
  int i;
- func_00283098(position,offset,a+0xc0);
- func_00282CC0(position,a+0x10,position);
+ matrix_mul_vec3(position,offset,a+0xc0);
+ FastVecAdd(position,a+0x10,position);
  qcopy(direction,a+0xc0);
- speed=func_00282DF0(*(u8 **)(a+0x68)+0x80);
+ speed=FastVecLength(*(u8 **)(a+0x68)+0x80);
  { float r=func_002A7878(0.0f,0.1f); speed*=5.0f; speed/=D_L18_001B1460*0.0166666675f; speed+=r; }
  if(speed>1.0f) speed=1.0f;
  else if(speed<0.0f) speed=0.0f;
- func_00282F20(drift,direction,-D_L18_001B14E8*0.0002f);
+ vec_scale_to_length(drift,direction,-D_L18_001B14E8*0.0002f);
  for(i=0;i<D_L18_001B1518;i++) {
-  func_00282F20(velocity,direction,-((D_L18_001B1510+func_002A7878(0.0f,speed*D_L18_001B1514))*0.0166666675f));
+  vec_scale_to_length(velocity,direction,-((D_L18_001B1510+func_002A7878(0.0f,speed*D_L18_001B1514))*0.0166666675f));
   func_002ACB48(position,D_L18_001B151C);
-  func_00282CC0(position,position,drift);
+  FastVecAdd(position,position,drift);
   func_L02_003449D8(position,velocity,D_L18_001B14F8,func_002A77E0(2),1);
  }
- func_00282F20(drift,direction,-D_L18_001B14B8*0.0002f);
+ vec_scale_to_length(drift,direction,-D_L18_001B14B8*0.0002f);
  for(i=0;(float)i<speed*(float)D_L18_001B14A8+2.0f;i++) {
-  func_00282F20(velocity,direction,-((D_L18_001B14A0+func_002A7878(0.0f,speed*D_L18_001B14A4))*0.0166666675f));
+  vec_scale_to_length(velocity,direction,-((D_L18_001B14A0+func_002A7878(0.0f,speed*D_L18_001B14A4))*0.0166666675f));
   func_002ACB48(position,D_L18_001B14AC);
-  func_00282CC0(position,position,drift);
+  FastVecAdd(position,position,drift);
   func_L02_003449D8(position,velocity,D_L18_001B14C8,func_002A77E0(2),1);
  }
 }

@@ -1,13 +1,13 @@
 /*
  * func_L01_003D8358 (oozla, -G8 profile). Case 0 waits for a positive
  * height from func_L01_003BAFB0, then either picks two random angles and
- * moves to case 1 (linked object at s+0x8C) or calls func_0026FEB8 and
+ * moves to case 1 (linked object at s+0x8C) or calls STUB_printf and
  * moves to case 2. Case 1 falls to case 2 once the linked object is gone or
  * in state 0xFE/0xFD. In case 2, when hero mode (0x34E) is 0 and hero+0x33C
  * points at this object, two func_002AA898 springs are driven by dot
  * products of the hero offset and the hero is moved by the resulting change;
  * otherwise the height eases towards s+0x84, the springs relax and a
- * one-shot func_002E5CF8 fires when the threshold is crossed.
+ * one-shot PlayMobySound fires when the threshold is crossed.
  *
  * Shape notes: height stays distinct from the first dot product. The scale
  * constant is its own variable (k), read once for -k*y and k*x; reusing one
@@ -58,7 +58,7 @@ void func_L01_003D8358(u8 *m)
     u8 *s = *(u8 **)(m+0x68);
     f32 k, height, previous, x, y, pitch, scale, speed, step;
     u8 *other;
-    func_00282D30(delta,m+0x10,-1.0f);
+    FastVecScale(delta,m+0x10,-1.0f);
     qcopy(rotation,m+0xF0);
     previous=F(m,0x18);
     height=func_L01_003BAFB0();
@@ -75,7 +75,7 @@ void func_L01_003D8358(u8 *m)
                 F(m,0xF4)=func_002A7878(-1.57079637f,1.57079637f);
                 m[0x20]=1;
             } else {
-                func_0026FEB8(D_L01_002A4E20,H(m,0xB2),H(m,0xAA));
+                STUB_printf(D_L01_002A4E20,H(m,0xB2),H(m,0xAA));
                 m[0x20]=2;
             }
         }
@@ -86,9 +86,9 @@ void func_L01_003D8358(u8 *m)
         break;
     case 2:
         if(D_00189E20.mode==0 && *(u8 **)(HERO+0x33C)==m) {
-            func_00282CF0(relative,HERO+0x80,m+0x10);
-            x=func_00282DB0(relative,m+0xC0);
-            y=func_00282DB0(relative,m+0xD0);
+            FastVecSub(relative,HERO+0x80,m+0x10);
+            x=FastVecDot(relative,m+0xC0);
+            y=FastVecDot(relative,m+0xD0);
             k=D_L01_001B076C;
             pitch=-k*y;
             *(Quad *)oldAngle=*(Quad *)(s+0x60);
@@ -97,7 +97,7 @@ void func_L01_003D8358(u8 *m)
             func_002AA898(s+0x60,pitch,s+0x70,D_L01_001B077C,D_L01_001B0780,D_L01_001B0784,0);
             func_002AA898(s+0x64,scale,s+0x74,D_L01_001B077C,D_L01_001B0780,D_L01_001B0784,0);
             func_L01_00316C48(HERO+0x80,move,m+0x10,oldAngle,s+0x60);
-            func_00282CF0(HERO+0x100,move,HERO+0x80);
+            FastVecSub(HERO+0x100,move,HERO+0x80);
             F(HERO,0x108)+=F(m,0x18)-oldPos[2];
         } else {
             speed=D_L01_001B0774;
@@ -110,14 +110,14 @@ void func_L01_003D8358(u8 *m)
             }
             if(F(m,0x18)>F(s,0x84)) F(m,0x18)=F(s,0x84);
             if(previous<height-D_L01_001B0768 && F(m,0x18)>=height-D_L01_001B0768 && !I(s,0xA0)) {
-                func_002E5CF8(0,0,m);
+                PlayMobySound(0,0,m);
                 I(s,0xA0)=1;
             }
         }
         func_002AEF28(m,s+0x90,s+0x94,0.0200712885708f,0.00727220624685f,0.00901753548533f);
-        F(m,0xF0)=func_00283B98(F(s,0x60),F(m,0xF0));
-        F(m,0xF4)=func_00283B98(F(s,0x64),F(m,0xF4));
-        func_00282CC0(delta,delta,m+0x10);
+        F(m,0xF0)=FastAddRotations(F(s,0x60),F(m,0xF0));
+        F(m,0xF4)=FastAddRotations(F(s,0x64),F(m,0xF4));
+        FastVecAdd(delta,delta,m+0x10);
         func_002AD6F0(s+0x20,delta,rotation,m+0xF0);
         break;
     }

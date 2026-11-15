@@ -47,22 +47,22 @@ void func_L16_003A8D58(ShotMoby *m)
     func_002AFFD8(m->position, scratch, 1);
     qcopy(old, m->position);
     if (m->state == 0) {
-        func_00282CC0(m->position, m->position, v->velocity);
+        FastVecAdd(m->position, m->position, v->velocity);
         probe.owner = m;
         probe.flags = 0x10001;
         probe.radius = v->radius;
         probe.active = 1;
         qcopy(probe.v, v->velocity);
-        func_00282F20(&probe, &probe, v->speed);
+        vec_scale_to_length(&probe, &probe, v->speed);
         probe.v[3] = 5627.9248046875f;
         probe.mode = v->mode;
         probe.enabled = v->enabled;
         probe.kind = m->kind;
-        if (func_002761F8(old, m->position, 0, v->owner, &probe) ||
+        if (CollLine(old, m->position, 0, v->owner, &probe) ||
             func_00277258(m->position, 0, 0.2f, v->owner)) {
-            func_002E5CF8(0, 0, m);
-            func_002ABBB8(m, v->velocity, 0, 0.0f, 0.0f, func_00283CF0(v->size * 5.0f),
-                         func_00283CF0(v->size * 4.0f), func_00283CF0(v->size * 10.0f),
+            PlayMobySound(0, 0, m);
+            SpawnExplosionEffects(m, v->velocity, 0, 0.0f, 0.0f, FloatToInt(v->size * 5.0f),
+                         FloatToInt(v->size * 4.0f), FloatToInt(v->size * 10.0f),
                          0.0f, 0.0f, 9.0f, v->size, -1, 0.0f, 0, 1, -1, 0, 0x810001);
             func_00277F48(m->position, 0x10, v->owner, &probe, 1.0f);
             func_0029F338(m);
@@ -70,8 +70,8 @@ void func_L16_003A8D58(ShotMoby *m)
         }
     }
     if (func_00282948(&v->timer)) {
-        func_002ABBB8(m, v->velocity, 0, 2.0f, v->radius, func_00283CF0(v->size * 5.0f),
-                     func_00283CF0(v->size * 4.0f), func_00283CF0(v->size * 10.0f),
+        SpawnExplosionEffects(m, v->velocity, 0, 2.0f, v->radius, FloatToInt(v->size * 5.0f),
+                     FloatToInt(v->size * 4.0f), FloatToInt(v->size * 10.0f),
                      0.0f, 0.0f, 9.0f, v->size, -1, 0.0f, 0, 1, -1, 0, 0x810001);
         func_0029F338(m);
         return;

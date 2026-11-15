@@ -2,7 +2,7 @@
 
 /* func_L06_00403130 updates the level's water sheet; RAC1's ocean_pokitaru_update
  * (homing_missile_and_water_sheet.c) is its counterpart. Its draw callback is
- * func_L06_00402570 (L06_00402570.c), which reads the same layer tables. */
+ * DrawOceanWaterSheet (L06_00402570.c), which reads the same layer tables. */
 
 typedef int OceanQuad __attribute__((mode(TI)));
 typedef union { OceanQuad q; float f[4]; } OceanVector;
@@ -107,17 +107,17 @@ void func_L06_00403130(OceanMoby *moby)
         D_L06_001B3284 = vars->level;
         return;
     }
-    if (func_002ACBC8(D_00189E20.position, vars->outerArea)) {
+    if (IsPointInCuboid(D_00189E20.position, vars->outerArea)) {
         D_00189E20.waterState = 0;
         return;
     }
-    if (func_002ACBC8(D_00189E20.position, vars->innerArea) && D_001A79F0 != 13 &&
+    if (IsPointInCuboid(D_00189E20.position, vars->innerArea) && D_001A79F0 != 13 &&
         (vars->f38 != 0 || D_L06_001B9700.angle > 0.031f || D_L06_001B9700.angle < -1.62f ||
          (unsigned int)(D_00189E20.animation - 17) < 2)) {
         D_00189E20.waterState = 0;
         return;
     }
-    if (func_002ACBC8(D_00189E20.position, vars->innerArea)) {
+    if (IsPointInCuboid(D_00189E20.position, vars->innerArea)) {
         D_00189E20.waterState = 0;
         return;
     }
@@ -127,17 +127,17 @@ void func_L06_00403130(OceanMoby *moby)
             range = 32.0f;
     }
     D_00189E20.waterState = 2;
-    func_00282CF0(&movement, &D_L06_001B9700.pos, &D_L06_001B3260);
+    FastVecSub(&movement, &D_L06_001B9700.pos, &D_L06_001B3260);
     qcopy(&D_L06_001B3260, &D_L06_001B9700.pos);
     if (!(D_L06_001B9700.pos.f[2] > vars->limit))
         return;
     for (i = 0; i < 2; i++) {
         float layer = D_L06_001B0060[i] + D_L06_001B0060[i];
-        func_00282D30(&scaled, &movement, layer / (range * 5.0f));
+        FastVecScale(&scaled, &movement, layer / (range * 5.0f));
         if (scaled.f[0] > 1.0f || scaled.f[0] < 1.0f)
-            scaled.f[0] -= func_00283CE0(func_00283CF0(scaled.f[0]));
+            scaled.f[0] -= IntToFloat(FloatToInt(scaled.f[0]));
         if (scaled.f[1] > 1.0f || scaled.f[1] < 1.0f)
-            scaled.f[1] -= func_00283CE0(func_00283CF0(scaled.f[1]));
+            scaled.f[1] -= IntToFloat(FloatToInt(scaled.f[1]));
         D_L06_001B3270[i].u += scaled.f[0];
         D_L06_001B3270[i].v += scaled.f[1];
         if (D_L06_001B3270[i].u > 1.0f)
@@ -149,7 +149,7 @@ void func_L06_00403130(OceanMoby *moby)
         if (D_L06_001B3270[i].v < -1.0f)
             D_L06_001B3270[i].v += 1.0f;
     }
-    tide = func_00283CE0(D_L06_001B2348 % 360) * 0.017444445f - 3.14f;
+    tide = IntToFloat(D_L06_001B2348 % 360) * 0.017444445f - 3.14f;
     D_L06_001B3280 = D_L06_001B3284 + func_00283198(tide) * vars->amplitude;
     for (i = 0; i < 2; i++) {
         D_L06_001B3270[i].u += D_L06_001B0070_gp[i].u * D_001A7928;
@@ -164,7 +164,7 @@ void func_L06_00403130(OceanMoby *moby)
             D_L06_001B3270[i].v += 1.0f;
     }
     if (vars->drawMode < 0)
-        func_L00_002E6DB8(func_L06_00402570, moby);
+        func_L00_002E6DB8(DrawOceanWaterSheet, moby);
     else
-        func_L00_002E6CF0(func_L06_00402570, moby);
+        func_L00_002E6CF0(DrawOceanWaterSheet, moby);
 }

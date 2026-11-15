@@ -58,7 +58,7 @@ void func_L01_003D68C0(OozlaStateMoby *a0)
             func_L01_003D6B00(a0, 15, 1.5f, 6.5f, 1.5f, 0.06666667f);
         else
             func_L01_003D6B00(a0, 6, 1.5f, 6.5f, 1.5f, 0.06666667f);
-        func_002E5CF8(0, 0, a0);
+        PlayMobySound(0, 0, a0);
         func_L00_00326110(a0, 1, 0.0f);
         func_L00_00326620(a0, 0xF94, 0);
         func_002A7750(a0, 3, -1);

@@ -115,13 +115,13 @@ void *func_L01_00333FA8(L01_00333FA8_PARENT *arg0, void *arg1, int arg2, float a
             qcopy(&obj->f10, (char *)arg0 + 0x10);
         } else {
             func_0029FCC0(obj->tail.f20, (short)arg2, buf0);
-            func_00282CF0(buf1, D_L01_001B94C0, buf0);
-            func_00282F20(buf1, buf1, 0.4f);
-            func_00282CC0(&obj->f10, buf0, buf1);
+            FastVecSub(buf1, D_L01_001B94C0, buf0);
+            vec_scale_to_length(buf1, buf1, 0.4f);
+            FastVecAdd(&obj->f10, buf0, buf1);
         }
         obj->f08 = (char)func_001163B0();
         obj->f04 = (int)arg1;
-        r = func_00283CF0(4.0f);
+        r = FloatToInt(4.0f);
         bits = ((short)arg0->group >> 5) * 16;
         obj->f03 = 0x48;
         obj->f01 = 0;

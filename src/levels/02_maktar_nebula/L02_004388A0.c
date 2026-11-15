@@ -64,7 +64,7 @@ void func_L02_004388A0(u8 *a0) {
                  q != 0 && ((short)q[-1] >= 0 || q == D_L02_001A9014[*(int *)st]) &&
                  (e = D_L02_001B3C1C + ((*q & 0x7FFF) << 6)) != 0;
                  q++) {
-                d = func_00282E80(e + 0x30, pt);
+                d = vec_distance_xy(e + 0x30, pt);
                 if (d < best) {
                     best = d;
                     bestid = *q & 0x7FFF;
@@ -73,10 +73,10 @@ void func_L02_004388A0(u8 *a0) {
             if (bestid != -1) {
                 rec = D_L02_001B3C1C + (bestid << 6);
                 for (k = 0; k < 4; k++) {
-                    func_00283098(m + k * 4, D_L02_001B2640 + k * 4, rec);
-                    func_00282CC0(m + k * 4, m + k * 4, rec + 0x30);
+                    matrix_mul_vec3(m + k * 4, D_L02_001B2640 + k * 4, rec);
+                    FastVecAdd(m + k * 4, m + k * 4, rec + 0x30);
                 }
-                func_L01_002E2608(m, idx, 2, 0xFF808080, 0);
+                DrawQuadWithRotatedUVs(m, idx, 2, 0xFF808080, 0);
             }
         }
     }

@@ -54,12 +54,12 @@ void func_L17_00418A68(char *obj)
         func_002AD0E0(obj, D_L17_001B2C1C + (I(state, 0x90) << 8),
                       obj + 0x10, obj + 0xF0, target, dir);
         target[2] = 0;
-        func_00282CF0(delta, target, obj + 0x10);
+        FastVecSub(delta, target, obj + 0x10);
         *(Quad *)target = *(Quad *)delta;
         dir[0] = func_00283180(F(obj, 0xF8));
         dir[1] = func_00283198(F(obj, 0xF8));
         dir[2] = 0;
-        F(state, 0x9C) = func_00282DB0(target, dir);
+        F(state, 0x9C) = FastVecDot(target, dir);
     }
     v[0] = func_00283180(F(obj, 0xF8)) * F(state, 0x9C);
     v[1] = func_00283198(F(obj, 0xF8)) * F(state, 0x9C);
@@ -77,6 +77,6 @@ void func_L17_00418A68(char *obj)
     } else {
         SoundAnchor *effect = (SoundAnchor *)(D_00188660 + I(state, 0xA0) * 0x70);
         if (effect->owner != obj || !effect->active)
-            I(state, 0xA0) = func_002E5CF8(0, 4, obj);
+            I(state, 0xA0) = PlayMobySound(0, 4, obj);
     }
 }

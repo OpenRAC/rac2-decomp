@@ -87,7 +87,7 @@ int func_L17_003BCC30(ChainMoby *moby)
                           path->points[1].f[1] - path->points[0].f[1]);
     moby->position.q = start.q;
     qzero_nc(&moby->rotation);
-    moby->rotation.f[2] = func_00283B98(angle, 1.5707965f);
+    moby->rotation.f[2] = FastAddRotations(angle, 1.5707965f);
     vars->headingSpeed = 0;
     vars->pitchSpeed = 0;
 
@@ -95,7 +95,7 @@ int func_L17_003BCC30(ChainMoby *moby)
     rear.f[0] = func_00283180(angle) * -vars->halfLength;
     rear.f[1] = func_00283198(angle) * -vars->halfLength;
     rear.f[2] = 0;
-    func_00282CC0(&rear, &rear, &moby->position);
+    FastVecAdd(&rear, &rear, &moby->position);
 
     while (link) {
         flash = (D_L17_001B2748[0] + link->uid) % 60 < 15;
@@ -106,13 +106,13 @@ int func_L17_003BCC30(ChainMoby *moby)
         hitch.f[0] = func_00283180(angle) * -vars->gap;
         hitch.f[1] = func_00283198(angle) * -vars->gap;
         hitch.f[2] = 0;
-        func_00282CC0(&hitch, &hitch, &rear);
+        FastVecAdd(&hitch, &hitch, &rear);
         back.f[0] = func_00283180(angle) * -linkVars->halfLength;
         back.f[1] = func_00283198(angle) * -linkVars->halfLength;
         back.f[2] = 0;
-        func_00282CC0(&link->position, &back, &hitch);
+        FastVecAdd(&link->position, &back, &hitch);
         link->position.f[2] = moby->position.f[2];
-        link->rotation.f[2] = func_00283B98(func_00283248(hitch.f[0] - link->position.f[0],
+        link->rotation.f[2] = FastAddRotations(func_00283248(hitch.f[0] - link->position.f[0],
                                                           hitch.f[1] - link->position.f[1]),
                                             1.5707965f);
         link->rotation.f[1] = 0;
@@ -124,8 +124,8 @@ int func_L17_003BCC30(ChainMoby *moby)
         /* This link's rear hitch, through its new orientation (at the leader's half length). */
         qzero_nc(&rear);
         rear.f[1] = vars->halfLength;
-        func_00283098(&rear, &rear, link->matrix);
-        func_00282CC0(&rear, &rear, &link->position);
+        matrix_mul_vec3(&rear, &rear, link->matrix);
+        FastVecAdd(&rear, &rear, &link->position);
         link = linkVars->next;
     }
     return 1;
@@ -148,7 +148,7 @@ int func_L17_003BCEC0(char *obj)
     if (*(int *)ctx == -1)
         return 0;
     path = D_L17_001FE880[*(int *)ctx];
-    length = func_00283CE0(*(int *)path) * *(float *)(path + 0x1C);
+    length = IntToFloat(*(int *)path) * *(float *)(path + 0x1C);
     *(float *)(ctx + 0xC) += *(float *)(ctx + 0x10) * 0.016666668f;
     if (length < *(float *)(ctx + 0xC))
         *(float *)(ctx + 0xC) = length - *(float *)(ctx + 0xC);
@@ -163,16 +163,16 @@ int func_L17_003BCEC0(char *obj)
     low = 0.00043633237f;
     middle = 0.00087266474f;
     high = 0.052359887f;
-    angle = func_00283B98(func_00283248(target.f[0] - *(float *)(obj + 0x10),
+    angle = FastAddRotations(func_00283248(target.f[0] - *(float *)(obj + 0x10),
                                       target.f[1] - *(float *)(obj + 0x14)), 1.5707965f);
     func_002AAA00(heading, angle, ctx + 0x18, 0, low, middle, high);
-    angle = func_00283248(func_00282E80(obj + 0x10, &target),
+    angle = func_00283248(vec_distance_xy(obj + 0x10, &target),
                          target.f[2] - *(float *)(obj + 0x18));
     func_002AAA00(pitch, angle, ctx + 0x14, 0, low, middle, high);
     qzero_nc(&anchor);
     anchor.f[1] = *(float *)(ctx + 0x24);
-    func_00283098(&anchor, &anchor, obj + 0xC0);
-    func_00282CC0(&anchor, &anchor, obj + 0x10);
+    matrix_mul_vec3(&anchor, &anchor, obj + 0xC0);
+    FastVecAdd(&anchor, &anchor, obj + 0x10);
 
     while (next) {
         float *nextHeading, *nextPitch;
@@ -186,19 +186,19 @@ int func_L17_003BCEC0(char *obj)
         other.f[1] = -*(float *)(ctx + 0x24);
         nextHeading = (float *)(next + 0xF8);
         nextPitch = (float *)(next + 0xF4);
-        func_00283098(&other, &other, next + 0xC0);
-        func_00282CC0(&other, &other, next + 0x10);
-        func_00282CF0(&desired, &other, &anchor);
+        matrix_mul_vec3(&other, &other, next + 0xC0);
+        FastVecAdd(&other, &other, next + 0x10);
+        FastVecSub(&desired, &other, &anchor);
         func_00282F70(&desired, &desired, *(float *)(ctx + 0x20));
-        func_00282CC0(&desired, &desired, &anchor);
+        FastVecAdd(&desired, &desired, &anchor);
         desired.f[2] = anchor.f[2];
-        func_00282CF0(&delta, &desired, next + 0x10);
-        func_00282F20(&delta, &delta, func_00282DF0(&delta) - *(float *)(ctx + 0x24));
-        func_00282CC0(next + 0x10, &delta, next + 0x10);
-        angle = func_00283B98(func_00283248(desired.f[0] - *(float *)(next + 0x10),
+        FastVecSub(&delta, &desired, next + 0x10);
+        vec_scale_to_length(&delta, &delta, FastVecLength(&delta) - *(float *)(ctx + 0x24));
+        FastVecAdd(next + 0x10, &delta, next + 0x10);
+        angle = FastAddRotations(func_00283248(desired.f[0] - *(float *)(next + 0x10),
                                           desired.f[1] - *(float *)(next + 0x14)), 1.5707965f);
         func_002AAA00(nextHeading, angle, nctx + 0x18, 0, low, middle, high);
-        angle = func_00283248(func_00282E80(next + 0x10, &desired),
+        angle = func_00283248(vec_distance_xy(next + 0x10, &desired),
                              desired.f[2] - *(float *)(next + 0x18));
         func_002AAA00_pitch(nextPitch, angle, nctx + 0x14, low, middle, high, 0);
         func_002A05A8(next);
@@ -207,8 +207,8 @@ int func_L17_003BCEC0(char *obj)
         *(short *)(next + 0x34) |= 4;
         qzero_nc(&anchor);
         anchor.f[1] = *(float *)(ctx + 0x24);
-        func_00283098(&anchor, &anchor, next + 0xC0);
-        func_00282CC0(&anchor, &anchor, next + 0x10);
+        matrix_mul_vec3(&anchor, &anchor, next + 0xC0);
+        FastVecAdd(&anchor, &anchor, next + 0x10);
         next = *(char **)(nctx + 0x1C);
     }
     return 1;

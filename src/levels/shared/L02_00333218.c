@@ -25,8 +25,8 @@ int func_L02_00333218(char *object, char *record) {
     initial.q = 0;
     initial.f[2] = *(float *)(record + 4) + *(float *)record;
     offset.q = initial.q;
-    func_00283098((float *)&offset, (float *)&offset, (float *)(object + 0xC0));
-    func_00282CC0(&position, origin, &offset);
+    matrix_mul_vec3((float *)&offset, (float *)&offset, (float *)(object + 0xC0));
+    FastVecAdd(&position, origin, &offset);
     if (!func_00277258(&position, *(int *)(record + 0x38) & 2, object, *(float *)record)) {
         result = 0;
         goto done;
@@ -34,7 +34,7 @@ int func_L02_00333218(char *object, char *record) {
     *(char **)(record + 0x84) = D_L02_001C0940.hit;
     qcopy(record + 0x60, &D_L02_001C0940.point);
     qcopy(&position, D_L02_001C0940.gap);
-    func_00282CF0((float *)origin, (float *)&position, (float *)&offset);
+    FastVecSub((float *)origin, (float *)&position, (float *)&offset);
     result = 1;
 done:
     return result;

@@ -22,7 +22,7 @@ void func_L04_003C6FE8(u8 *a0)
         D_L04_001B2E70 = v;
         ref_L04_003C6FE8_00 = v;
         {
-            float duration = func_00283CE0(v);
+            float duration = IntToFloat(v);
             ref_L04_003C6FE8_01 = 1.0f / duration;
         }
         D_L04_001B2E7C = v;

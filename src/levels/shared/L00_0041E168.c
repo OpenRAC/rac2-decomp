@@ -32,7 +32,7 @@ void func_L00_0041E168(float *origin, int count, int mode)
     unsigned int color;
     char *particle;
 
-    func_00282CF0(difference, D_L00_001B8DC0, origin);
+    FastVecSub(difference, D_L00_001B8DC0, origin);
     if (D_L00_001A8FF0 == 0) {
         difference[2] = 0.0f;
         axis[0] = 0.0f;
@@ -40,10 +40,10 @@ void func_L00_0041E168(float *origin, int count, int mode)
         axis[2] = 1.0f;
         axis[3] = 1.0f;
     } else {
-        func_00282CF0(projection, origin, D_00189ED0);
-        func_00282F20(axis, projection, 1.0f);
-        func_00282D30(projection, axis, func_00282DB0(axis, difference));
-        func_00282CF0(difference, difference, projection);
+        FastVecSub(projection, origin, D_00189ED0);
+        vec_scale_to_length(axis, projection, 1.0f);
+        FastVecScale(projection, axis, FastVecDot(axis, difference));
+        FastVecSub(difference, difference, projection);
     }
     if (count <= 0)
         return;
@@ -54,7 +54,7 @@ void func_L00_0041E168(float *origin, int count, int mode)
             direction--;
         rotation = func_002A7878(-1.0471977f, 1.0471977f);
         func_002ACEC0(velocity, difference, axis, rotation);
-        func_00282F20(velocity, velocity, func_002A7878(D_L00_001B1474, D_L00_001B1478) * 0.016666668f);
+        vec_scale_to_length(velocity, velocity, func_002A7878(D_L00_001B1474, D_L00_001B1478) * 0.016666668f);
         velocity[2] = func_002A7878(D_L00_001B147C, D_L00_001B1480) * 0.016666668f;
         qcopy(previous, origin);
         origin[0] += func_002A78D8(0.0f, 0.15f);
@@ -66,9 +66,9 @@ void func_L00_0041E168(float *origin, int count, int mode)
             color = 0x202080;
         particle = func_002C2210(origin, 60, color | 0x7F000000, size * 0.1f, size, 0, direction, velocity, 1, D_L00_001B1484);
         if (particle)
-            particle[9] = func_00283CF0(4.0f) + 112;
+            particle[9] = FloatToInt(4.0f) + 112;
         particle = func_002C2210(origin, 60, 0x7F7F7F7F, size * 0.07f, size * 0.7f, 1, -direction, velocity, 1, D_L00_001B1484);
         if (particle)
-            particle[9] = func_00283CF0(4.0f) + 112;
+            particle[9] = FloatToInt(4.0f) + 112;
     } while (--count);
 }

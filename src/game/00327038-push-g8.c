@@ -62,10 +62,10 @@ void func_00327B40(ObjectB40 *self)
             obj = (char *)*list;
             if ((func_002AB1F0(obj) || (*(unsigned short *)(obj + 0x34) & 0x4000))
                 && obj != D_00189E20.object) {
-                func_00282CF0(direction, obj + 0x10, self->pos);
-                func_00282F20(direction, direction, 1.0f);
-                func_00282F20(&hit, &hit, 1.0f);
-                func_002A8C00(&hit, self, 0x830000, direction,
+                FastVecSub(direction, obj + 0x10, self->pos);
+                vec_scale_to_length(direction, direction, 1.0f);
+                vec_scale_to_length(&hit, &hit, 1.0f);
+                make_hit_descriptor(&hit, self, 0x830000, direction,
                               ((B40Class *)((int)D_00239BA0 + D_00139568.selection * sizeof(B40Class)))->damage);
                 *(B40Quad *)hit.direction = *(B40Quad *)direction;
                 hit.enabled = 1;
@@ -73,8 +73,8 @@ void func_00327B40(ObjectB40 *self)
                 hit.kind = 5;
                 hit.mode = 3;
                 hit.classid = *(short *)(obj + 0xAA);
-                func_002A8E20(obj, &hit);
-                func_0032D758(obj, 32, self->id);
+                QueueMobyImpact(obj, &hit);
+                StartAttachedEffect(obj, 32, self->id);
             }
             list++;
         } while (--remaining);

@@ -148,14 +148,14 @@ void *func_L00_00338E90(TI128 *position, TI128 *velocity, int frames, int step, 
         qcopy_nc(&obj->position, position);
         cursor = &obj->tail;
         obj->rgb = color & 0x00FFFFFF;
-        obj->f09 = func_00283CF0(2.0f) + 0x10;
+        obj->f09 = FloatToInt(2.0f) + 0x10;
         obj->f03 = 0x44;
         obj->f01 = 0;
         obj->f02 = D_L00_001FEA00[0][0];
         obj->f0C = scale * 210000.0f;
         obj->f08 = func_002A77E0(0x100);
         qcopy_nc(cursor, velocity);
-        cursor->duration = 2.0f / func_00283CE0(frames);
+        cursor->duration = 2.0f / IntToFloat(frames);
         obj->frames = frames;
         cursor->step = step;
         cursor->rgb = color & 0x00FFFFFF;
@@ -175,10 +175,10 @@ extern void func_002B9180(void *);
 void func_L00_00338FB8(char *obj) {
     char *tail = obj + 0x20;
     obj[8] += tail[0x1C];
-    func_00282CC0(obj + 0x10, obj + 0x10, tail);
-    *(int *)(obj + 4) = func_00283D38(*(char **)(tail + 0x18), *(char **)(tail + 0x14),
-        func_00282C48(func_00283CE0(*(short *)(obj + 0x0A)) * *(float *)(tail + 0x10) - 1.0f));
-    if (func_00282978(obj + 0x0A) != 0) {
+    FastVecAdd(obj + 0x10, obj + 0x10, tail);
+    *(int *)(obj + 4) = FastTweenColor(*(char **)(tail + 0x18), *(char **)(tail + 0x14),
+        func_00282C48(IntToFloat(*(short *)(obj + 0x0A)) * *(float *)(tail + 0x10) - 1.0f));
+    if (FastDecTimer(obj + 0x0A) != 0) {
         func_002B9180(obj);
     }
 }
@@ -245,8 +245,8 @@ void func_L00_00383958(AranosMoby *obj) {
                 offset.f[0] = -4.1919f;
                 offset.f[2] = -1.355f;
                 func_0029FCC0(obj, 1, &transformed);
-                func_00283098(&offset, &offset, D_L00_00220DA0[i]->matrix);
-                func_00282CC0(&transformed, &transformed, &offset);
+                matrix_mul_vec3(&offset, &offset, D_L00_00220DA0[i]->matrix);
+                FastVecAdd(&transformed, &transformed, &offset);
                 qcopy(&D_L00_00220DA0[i]->position, &transformed);
             }
             func_002AB6D8(D_L00_00220DA0[i]->matrix, &D_L00_00220DA0[i]->rotation);
@@ -284,7 +284,7 @@ void func_L00_0038D750(unsigned char *obj) {
     frame.normal.q = 0;
     frame.normal.f[2] = 1.0f;
     qcopy(&frame.old, position);
-    func_00282CC0(position, ctx, position);
+    FastVecAdd(position, ctx, position);
     func_002FEE70(*(int *)(ctx + 0x1C), ctx, 0);
     func_00300190(position, position);
     func_00300248(ctx, ctx);
@@ -304,11 +304,11 @@ void func_L00_0038D750(unsigned char *obj) {
     frame.packet.kind = 2;
     frame.packet.class_id = *(unsigned short *)(obj + 0xAA);
     frame.packet.active = 1;
-    if (func_002761F8(&frame.old, position, 0x10, obj, &frame.packet)) {
-        if (!func_00278E78() && *(float *)(ctx + 8) < 0.0f) {
+    if (CollLine(&frame.old, position, 0x10, obj, &frame.packet)) {
+        if (!GetCollHitMaterial() && *(float *)(ctx + 8) < 0.0f) {
             char *effect;
             Vec *spread;
-            func_002FD1B8(D_L00_001B2630, D_L00_001B2638, 1,
+            RippleDisturb(D_L00_001B2630, D_L00_001B2638, 1,
                 *(float *)(obj + 0x10), *(float *)(obj + 0x14), 0.5f, -0.35f);
             *(int *)(ctx + 0x14) = 1;
             func_00282C88(ctx);
@@ -349,21 +349,21 @@ void func_L00_0038D750(unsigned char *obj) {
                 obj[0xBC] = 1;
                 qcopy(obj + 0x10, &reread->point);
                 func_00283028(&frame.velocity, ctx, &reread->normal);
-                func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-                func_00282F20(&frame.normal, &reread->normal, 1.0f);
+                vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+                vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
             } else {
                 if (collision->count < 1)
                     goto finish;
                 obj[0xBC] = 1;
                 qcopy(obj + 0x10, &collision->point);
                 func_00283028(&frame.velocity, ctx, &collision->normal);
-                func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-                func_00282F20(&frame.normal, &collision->normal, 1.0f);
+                vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+                vec_scale_to_length(&frame.normal, &collision->normal, 1.0f);
             }
         }
     } else if (func_00282948(ctx + 0x18)) {
         obj[0xBC] = 1;
-        func_00282CC0((char *)&frame.velocity, (char *)&frame.velocity, ctx);
+        FastVecAdd((char *)&frame.velocity, (char *)&frame.velocity, ctx);
     }
 finish:
     if (obj[0xBC]) {
@@ -395,9 +395,9 @@ void func_L00_0038DB68(char *obj) {
     frame.normal.q = 0;
     frame.normal.f[2] = 1.0f;
     qcopy(&frame.old, position);
-    func_00282CC0(position, position, ctx);
+    FastVecAdd(position, position, ctx);
     func_002AFFD8(position, &frame.surface, 0);
-    func_00282D30(&frame.surface, &frame.surface, 0.0003055556f);
+    FastVecScale(&frame.surface, &frame.surface, 0.0003055556f);
     func_L00_0038F3D8(obj);
     frame.packet.moby = obj;
     frame.packet.flags = 0x830000;
@@ -413,7 +413,7 @@ void func_L00_0038DB68(char *obj) {
     frame.packet.vector.f[2] = 1.0f;
     frame.packet.active = 1;
     (*(int *)(ctx + 0x14))++;
-    if (func_002761F8(&frame.old, position, 0x10, obj, &frame.packet)) {
+    if (CollLine(&frame.old, position, 0x10, obj, &frame.packet)) {
         collision = &D_L00_001BF200;
         hit = collision->hit;
         if (hit) {
@@ -432,8 +432,8 @@ void func_L00_0038DB68(char *obj) {
                 qcopy(dest, source);
             }
             func_00283028(&frame.velocity, ctx, &reread->normal);
-            func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-            func_00282F20(&frame.normal, &reread->normal, 1.0f);
+            vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+            vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
         } else {
             collision = &D_L00_001BF200;
             if (collision->count <= 0)
@@ -441,12 +441,12 @@ void func_L00_0038DB68(char *obj) {
             obj[0xBC] = 1;
             qcopy(position, &collision->point);
             func_00283028(&frame.velocity, ctx, &collision->normal);
-            func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-            func_00282F20(&frame.normal, &collision->normal, 1.0f);
+            vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+            vec_scale_to_length(&frame.normal, &collision->normal, 1.0f);
         }
     } else if (func_00282948(ctx + 0x18)) {
         obj[0xBC] = 1;
-        func_00282CC0((char *)&frame.velocity, (char *)&frame.velocity, ctx);
+        FastVecAdd((char *)&frame.velocity, (char *)&frame.velocity, ctx);
     }
 finish:
     if (*(unsigned char *)(obj + 0xBC)) {
@@ -521,7 +521,7 @@ void func_L00_003B9CD8(char *self)
             FH(d,0x276)=0;
             if (FH(d,0x270)<300) FH(d,0x270)=func_002A7820(480,600);
         }
-        FF(self,0xF8)=func_00283B98(FF(self,0xF8),0.03490659f);
+        FF(self,0xF8)=FastAddRotations(FF(self,0xF8),0.03490659f);
         break;
     case 1:
         if (func_002B3890(self))
@@ -534,7 +534,7 @@ void func_L00_003B9CD8(char *self)
                 if (FB(self,0x43)!=2) func_002A7470(self,2,0,5);
             }
         }
-        FF(self,0xF8)=func_00283B98(FF(self,0xF8),0.03490659f);
+        FF(self,0xF8)=FastAddRotations(FF(self,0xF8),0.03490659f);
         break;
     case 2:
         if (func_002B3890(self))
@@ -554,9 +554,9 @@ void func_L00_003B9CD8(char *self)
                 if (FP(sound,0x88)==self && FB(sound,0x74)) func_002E59F8(n);
             }
             FI(d,0x2A8)=-1;
-            func_0032C700(self+0x10,0,0,0,0,20,45,1,0.3f,20.0f,1,0,0,0);
-            func_002E5CF8(0,0,self);
-            func_002A6C58(self,0,3);
+            SpawnExplosion(self+0x10,0,0,0,0,20,45,1,0.3f,20.0f,1,0,0,0);
+            PlayMobySound(0,0,self);
+            SetDeathBits(self,0,3);
             func_0029F338(self);
             return;
         }
@@ -592,10 +592,10 @@ void func_L00_003B9CD8(char *self)
             func_002A7750(self,5,-1);
         } else {
             qcopy(target,path+0x10+FI(d,0x298)*16);
-            func_00282CF0(delta,target,self+0x10);
-            func_00282F20(delta,delta,FF(d,0x1C0));
-            func_00282CC0(self+0x10,self+0x10,delta);
-            if (func_00282E80(self+0x10,target)<0.5f) FI(d,0x298)++;
+            FastVecSub(delta,target,self+0x10);
+            vec_scale_to_length(delta,delta,FF(d,0x1C0));
+            FastVecAdd(self+0x10,self+0x10,delta);
+            if (vec_distance_xy(self+0x10,target)<0.5f) FI(d,0x298)++;
             if (FI(d,0x298)>=FI(path,0)-6 && FF(d,0x1C0)>=0.10000001f)
                 FF(d,0x1C0)-=0.0022222223f;
             height=func_002A89A8(self+0x10,0,0.5f)+0.5f;
@@ -603,14 +603,14 @@ void func_L00_003B9CD8(char *self)
             FF(d,0x28C)=FF(self,0x18);
             func_002A677C(self);
         }
-        FF(self,0xF8)=func_00283B98(FF(self,0xF8),0.03490659f);
+        FF(self,0xF8)=FastAddRotations(FF(self,0xF8),0.03490659f);
         break;
     case 5:
         savedHeight=FF(self,0x18);
         func_002B4FF0(self,d+0x230,FF(d,0x290));
         FF(self,0x18)=savedHeight;
-        if (func_00282E80(self+0x10,FP(d,0x240)+0x10)<1.3f) func_002A7750(self,7,-1);
-        FF(self,0xF8)=func_00283B98(FF(self,0xF8),0.03490659f);
+        if (vec_distance_xy(self+0x10,FP(d,0x240)+0x10)<1.3f) func_002A7750(self,7,-1);
+        FF(self,0xF8)=FastAddRotations(FF(self,0xF8),0.03490659f);
         break;
     case 6:
         if (FB(self,0x60)&2) {
@@ -623,7 +623,7 @@ void func_L00_003B9CD8(char *self)
         FF(self,0x48)=height;
         for (i=0;i<4;i++) func_002A8D70(self,i,0.17f,FF(d,0x2B0),1,1.0f,0,1,0);
         if (((Hero3173 *)D_00189E20)->target==self) func_002A7750(self,9,-1);
-        if (func_00282E80(self+0x10,FP(d,0x240)+0x10)>1.3f && (float)FU(self,0x96)>120.0f) {
+        if (vec_distance_xy(self+0x10,FP(d,0x240)+0x10)>1.3f && (float)FU(self,0x96)>120.0f) {
             if (FB(self,0x43)) func_002A7470(self,0,0,15);
             func_002A7750(self,5,-1);
             FF(self,0x48)=1.0f;
@@ -683,11 +683,11 @@ void func_L00_003CF530(AranosMoby *obj) {
 
     ctx = obj->ctx;
     if (obj->state == 0) {
-        result = func_002ACBC8(D_00189EA0, ctx->flag);
+        result = IsPointInCuboid(D_00189EA0, ctx->flag);
         if (result != 0) {
             obj->state = 1;
             ctx->frames = 0;
-            func_002E5CF8(0, 0, obj);
+            PlayMobySound(0, 0, obj);
         }
     }
     if (obj->state != 1)
@@ -697,7 +697,7 @@ void func_L00_003CF530(AranosMoby *obj) {
     angle = obj->rotation.f[2];
     point[1] = func_00283198(angle) * 0.4166667f;
     point[2] = 0.0f;
-    func_00282CC0(&obj->position, &obj->position, point);
+    FastVecAdd(&obj->position, &obj->position, point);
     ctx->frames += 1;
     if (ctx->frames < 0x65)
         return;
@@ -720,16 +720,16 @@ void func_L00_003CF9B0(char *obj) {
         *(int *)(ctx + 0x0C) = func_002A7820(0x3C, 0x78);
         limit = *(float *)(ctx + 8) * 0.017453294f;
         if (*(float *)(obj + 0xF0) < limit) {
-            func_002E5CF8(0, 0, obj);
+            PlayMobySound(0, 0, obj);
         } else {
-            func_002E5CF8(1, 0, obj);
+            PlayMobySound(1, 0, obj);
         }
     }
     if (*(unsigned char *)(obj + 0x20) != 1) return;
     limit = *(float *)(ctx + 8) * 0.017453294f;
     func_002AA3A8((float *)(obj + 0xF0), (float *)ctx, limit,
         0.0008726647356525064f, 0.0008726647356525064f, 0.004363324f);
-    func_002833F0(obj + 0xC0, obj + 0xF0);
+    euler_rotation_basis(obj + 0xC0, obj + 0xF0);
     if (func_00282948(ctx + 0x0C) != 0) {
         *(unsigned char *)(obj + 0x20) = 0;
     } else if (*(float *)(obj + 0xF0) == *(float *)(ctx + 8) * 0.017453294f) {
@@ -762,7 +762,7 @@ void func_L00_003CFB00(AranosMoby *obj) {
             ctx->sparks[i] = 0;
         if (obj->classId == 0xAC9) {
             obj->rotation.f[1] += 0.78539824f;
-            func_002833F0(obj->matrix, &obj->rotation);
+            euler_rotation_basis(obj->matrix, &obj->rotation);
         }
         func_002A7750(obj, 1, -1);
         break;
@@ -780,7 +780,7 @@ void func_L00_003CFB00(AranosMoby *obj) {
         for (n = 0; n < count; n++) {
             func_002A7A00(&frame.offset, 0.85f, 1.95f);
             func_002A99A0(obj, 1, &frame.position, 0xFFFF, 1000.0f);
-            func_00282CC0(&frame.offset, &frame.offset, &frame.position);
+            FastVecAdd(&frame.offset, &frame.offset, &frame.position);
             frame.velocity.f[2] = func_002A7878(0.0f, 5.0f) * 0.016666668f;
             frame.velocity.f[1] = func_002A7878(-6.0f, 6.0f) * 0.016666668f;
             if (func_002A77E0(4)) {
@@ -803,7 +803,7 @@ void func_L00_003CFB00(AranosMoby *obj) {
                 ctx->sparks[n]->f2C = ctx->sparks[n]->model->f24 * life;
                 childctx = ctx->sparks[n]->ctx;
                 alpha = 0x80;
-                func_002A0488(ctx->sparks[n], 0x20, 0x60, alpha);
+                set_moby_color(ctx->sparks[n], 0x20, 0x60, alpha);
                 ctx->sparks[n]->f23 = alpha;
                 childctx->f50 = 0x1806020;
             }

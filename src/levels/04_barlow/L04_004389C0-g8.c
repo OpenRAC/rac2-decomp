@@ -33,7 +33,7 @@ void func_L04_004389C0(u8 *obj)
             }
         }
         if (found == 0 || (D_0019B2E8[obj[0xB0] + (D_001A79F0 << 4)] & 0x80)) {
-            func_002E5CF8(0, 0, (char *)obj);
+            PlayMobySound(0, 0, (char *)obj);
             obj[0x20] = 2;
         }
     }

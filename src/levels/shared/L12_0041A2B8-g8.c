@@ -47,7 +47,7 @@ void func_L12_0041A2B8(char *self) {
     }
     *(float *)(self + 0x2C) = *(float *)(*(char **)(self + 0x24) + 0x24) * D_L12_001B1C70;
     if (*(u8 *)(self + 0x31) != 0) {
-        if (func_00282E48(self + 0x10, D_L12_001B9E00) < 24.0f) {
+        if (fast_vec_dist(self + 0x10, D_L12_001B9E00) < 24.0f) {
             func_002A93B0(self);
             *(u8 *)(self + 0x6F) = 0x16;
         }

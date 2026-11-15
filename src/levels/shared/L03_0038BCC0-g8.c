@@ -96,15 +96,15 @@ void func_L03_0038BCC0(unsigned char *object) {
         PI(object, 0x98) = 0;
     case 1:
         func_002FE8D8(object + 0x10, &normal);
-        func_00282F20(&forward, object + 0xE0, 1.0f);
-        func_00282DD8(&cross, &forward, &normal);
-        halfAngle = func_00282DB0(&forward, &normal) * 0.5f;
-        func_00282D30(&quaternion, &cross, func_00283198(halfAngle));
+        vec_scale_to_length(&forward, object + 0xE0, 1.0f);
+        FastVecCross(&cross, &forward, &normal);
+        halfAngle = FastVecDot(&forward, &normal) * 0.5f;
+        FastVecScale(&quaternion, &cross, func_00283198(halfAngle));
         quaternion.v.w = func_00283180(halfAngle);
-        func_00283958(&quaternion, matrix);
-        func_00283738(object + 0xC0, matrix, object + 0xC0);
+        quaternion_to_rotation_basis(&quaternion, matrix);
+        multiply_matrix3x3(object + 0xC0, matrix, object + 0xC0);
         qcopy(&oldPosition, object + 0x10);
-        func_00282CC0(object + 0x10, object + 0x10, state);
+        FastVecAdd(object + 0x10, object + 0x10, state);
         func_002FEE70((signed char)state[0x4F], state, 0);
         func_002FE880(D_L03_001AEFB0 * 0.00027777778450399637f, object + 0x10, state);
         func_00300190(object + 0x10, object + 0x10);
@@ -124,7 +124,7 @@ void func_L03_0038BCC0(unsigned char *object) {
         query.tolerance = 0.07400000095367432f;
         query.active = 1;
         query.enabled = 1;
-        collision = func_002FE9D0(&query);
+        collision = CollideSweptSphere(&query);
         qcopy(object + 0x10, &query.position);
         qcopy(state, &query.velocity);
         if (collision == 2) {
@@ -143,7 +143,7 @@ void func_L03_0038BCC0(unsigned char *object) {
                     PF(state, 8) = -0.02500000223517418f;
                     object[0x20] = 7;
                     if (!query.surface) {
-                        func_002FD1B8(D_L03_001B31B0, D_L03_001B31B8[0], 1, PF(object, 0x10), PF(object, 0x14), 0.5f, -0.35f);
+                        RippleDisturb(D_L03_001B31B0, D_L03_001B31B8[0], 1, PF(object, 0x10), PF(object, 0x14), 0.5f, -0.35f);
                         created = func_00312D58(2.0f, object + 0x10);
                         if (created)
                             created[0x23] = 0x70;
@@ -155,7 +155,7 @@ void func_L03_0038BCC0(unsigned char *object) {
                     func_L00_00387F98();
                     if (D_L03_0023B300.row1[(signed char)state[0x4E]]) {
                         object[0x20] = 2;
-                        func_002E5CF8(1, 0, object);
+                        PlayMobySound(1, 0, object);
                         func_002A75E0(object, 1, 0, 0, 0);
                     } else {
                         object[0x20] = 6;
@@ -165,9 +165,9 @@ void func_L03_0038BCC0(unsigned char *object) {
                 { unsigned char *owner = D_L03_001ADAAC[0];
                 D_L03_0023B530[PI(state, 0x6C)] = owner;
                 if (owner) {
-                    func_00282CF0(&relative, object + 0x10, owner + 0x10);
-                    func_00283698(inverse, D_L03_0023B530[PI(state, 0x6C)] + 0xC0);
-                    func_002830C0(&relative, &relative, inverse);
+                    FastVecSub(&relative, object + 0x10, owner + 0x10);
+                    matrix_from_basis_rows(inverse, D_L03_0023B530[PI(state, 0x6C)] + 0xC0);
+                    transform_vector(&relative, &relative, inverse);
                     { int entry = PI(state, 0x6C) * 12;
                     entry += (int)D_L03_0023B6C0;
                     ((ProjectileOffset *)entry)->x = relative.v.x;
@@ -176,7 +176,7 @@ void func_L03_0038BCC0(unsigned char *object) {
                 } }
                 PI(object, 0x98) = PI(PP(object, 0x24), 0x10);
             } else {
-                func_00282D30(state, state, 1.1f);
+                FastVecScale(state, state, 1.1f);
             }
         }
         break;
@@ -215,7 +215,7 @@ checkAttached:
     case 6:
         if (D_L03_0023B300.row1[(signed char)state[0x4E]]) {
             object[0x20] = 2;
-            func_002E5CF8(1, 0, object);
+            PlayMobySound(1, 0, object);
             func_002A75E0(object, 1, 0, 0, 0);
             PI(state, 0x48) = func_002FEC78(object, 0);
         }
@@ -225,7 +225,7 @@ checkAttached:
         func_L00_00387408(object);
         break;
     case 8:
-        func_002E5CF8(3, 0, object);
+        PlayMobySound(3, 0, object);
         func_002AC728(0.5f, 13.0f, object, object + 0x10, -1);
         object[0x20] = 9;
         *(unsigned short *)(object + 0x34) |= 0x41;
@@ -249,15 +249,15 @@ checkAttached:
         normal.v.y = ((ProjectileOffset *)entry)->y;
         normal.v.z = ((ProjectileOffset *)entry)->z; }
         normal.v.w = 0;
-        func_00283098(&normal, &normal, D_L03_0023B530[PI(state, 0x6C)] + 0xC0);
-        func_00282CC0(object + 0x10, D_L03_0023B530[PI(state, 0x6C)] + 0x10, &normal);
+        matrix_mul_vec3(&normal, &normal, D_L03_0023B530[PI(state, 0x6C)] + 0xC0);
+        FastVecAdd(object + 0x10, D_L03_0023B530[PI(state, 0x6C)] + 0x10, &normal);
     }
     if ((unsigned int)(object[0x20] - 3) < 2)
         func_L00_00387AC8(object);
     func_002829D8(state + 0x5C);
     if ((func_00282948(state + 0x40) || PI(D_L03_00189E20, 0x2294) == 0x6F) && object[0x20] != 9)
         object[0x20] = 8;
-    func_003054E8(object);
+    UpdateOwnedParticleTrails(object);
     if ((unsigned int)(object[0x20] - 3) < 2) {
         func_00304C18(object);
         if (!D_L03_0023B300.row1[(signed char)state[0x4E]]) {

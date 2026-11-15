@@ -36,11 +36,11 @@ void func_0030A188(char *obj) {
         D_001AEE58 = 0x7F2020;
         D_001AEDF0 = 0;
         D_001B240C = 0;
-        func_00282CF0(&delta, state + 1, state);
-        func_00282F20(&step, &delta, D_001AEDF4 * 0.05f);
+        FastVecSub(&delta, state + 1, state);
+        vec_scale_to_length(&step, &delta, D_001AEDF4 * 0.05f);
         qcopy(&D_00229170[0], state);
         for (i = 1; i < 20; i++) {
-            func_00282CC0(&D_00229170[i], &D_00229160[i], &step);
+            FastVecAdd(&D_00229170[i], &D_00229160[i], &step);
             D_002293F0[i] = 0;
             func_00282C88(&D_00229440[i]);
             D_00229580[i] = 0;

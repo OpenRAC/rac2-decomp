@@ -35,7 +35,7 @@ void func_L15_00430C80(void *self) {
     if (D_L15_001B1534 == 0) {
         D_L15_001B1534 = 1;
         D_L15_00221E10[0x2C / 4] = 0;
-        func_002B7320();
+        music_Unpause();
         func_L05_0037B210();
         func_L05_00379F18(0);
         list = func_L05_00379EB8();
@@ -47,13 +47,13 @@ void func_L15_00430C80(void *self) {
                 func_L05_0037D608(list[i], D_L15_001B2714[0] + D_L15_00221E10[0] * 128 + 0x30, 64.0f);
             }
         }
-        obj = func_L05_0037B440(0x1211, 1);
+        obj = SpawnFreeLevelObjectById(0x1211, 1);
         if (obj != 0) {
-            func_L15_00435E80(obj);
+            ResetGroupToPathStart(obj);
             func_L15_00436090(obj);
         }
     }
-    if (func_L15_00381CF0(func_L05_00379ED0(0x1211)) == 0 && D_L15_001B2148[0] >= 6) {
+    if (CountActiveLinkedListObjects(func_L05_00379ED0(0x1211)) == 0 && D_L15_001B2148[0] >= 6) {
         func_L15_00430590(self, 2);
     }
 }

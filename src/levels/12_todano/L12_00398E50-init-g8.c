@@ -46,7 +46,7 @@ void func_L12_004135A8(u8 *o) {
     d[0x2E]=1;
     d[0x4D]=0;
     d[0x2F]=8;
-    d[0x48]=func_00283CF0(25.0f);d[0x4A]=func_00283CF0(16.0f);
+    d[0x48]=FloatToInt(25.0f);d[0x4A]=FloatToInt(16.0f);
     { float first,second,third,fourth;
     acceleration=D_L12_001B180C*0.00027777778450399637f;
     d[0x1E8]=12;d[0x1E9]=11;
@@ -61,7 +61,7 @@ void func_L12_004135A8(u8 *o) {
     if(*(int *)(d+0x2BC)!=-1)func_L01_003377C8(D_L12_001FEAC0[*(int *)(d+0x2BC)]);
     if(*(int *)(d+0x2B4)!=-1)func_L01_003377C8(D_L12_001FEAC0[*(int *)(d+0x2B4)]);
     if(*(int *)(d+0x2B8)!=-1)func_L01_003377C8(D_L12_001FEAC0[*(int *)(d+0x2B8)]);
-    p=func_0029EFD0(0x114B);
+    p=CreateMoby(0x114B);
     if(p) {
         *(u8 **)(d+0x2F8)=p;*(u16 *)(p+0x32)=*(u16 *)(o+0x32);p[0x30]=o[0x30];
         *(u64 *)(p+0x38)=*(u64 *)(o+0x38);*(int *)(p+0x78)=*(int *)(o+0x78);p[0x31]=1;
@@ -72,7 +72,7 @@ void func_L12_004135A8(u8 *o) {
         *(float *)(pd+0x30)=0.7f;pd[0x2F]=4;pd[0x2A]=2;pd[0x4A]=3;pd[0x4D]=1;*(u8 **)(pd+0x70)=o;
         for(i=0;i<2;i++) {
             u8 *child;
-            func_0029FCC0(*(u8 **)(d+0x2F8),i,pos);func_00282CF0(pos,pos,*(u8 **)(d+0x2F8)+0x10);
+            func_0029FCC0(*(u8 **)(d+0x2F8),i,pos);FastVecSub(pos,pos,*(u8 **)(d+0x2F8)+0x10);
             child=func_L02_0032B468(*(u8 **)(d+0x2F8),0xD66,pos,D_L12_001A8F20,0,0,D_L12_001A8F20,D_L12_001A8F20,D_L12_001A8F20,0);
             if(child && *(s16 *)(child+0xAA)==0xD66 && child[0x20]!=254 && child[0x20]!=253) {
                 *(u16 *)(child+0x32)=*(u16 *)(o+0x32);*(u8 **)(d+0x2F0+i*4)=child;*(u16 *)(child+0x34)|=2;
@@ -81,9 +81,9 @@ void func_L12_004135A8(u8 *o) {
         parameters=pd+0x50;
         for(j=0;j<10;j++)parameters[j]=bytes.bytes[j];
         switch(func_001163B0()%3) {
-        case 0:parameters[4]=func_00283CF0((2.0f/ *(s16 *)(d+0x24))*255.0f);parameters[8]=func_00283CF0((1.0f/ *(s16 *)(d+0x24))*255.0f);break;
-        case 1:parameters[5]=func_00283CF0((2.0f/ *(s16 *)(d+0x24))*255.0f);parameters[9]=func_00283CF0((1.0f/ *(s16 *)(d+0x24))*255.0f);break;
-        case 2:parameters[7]=func_00283CF0((2.0f/ *(s16 *)(d+0x24))*255.0f);break;
+        case 0:parameters[4]=FloatToInt((2.0f/ *(s16 *)(d+0x24))*255.0f);parameters[8]=FloatToInt((1.0f/ *(s16 *)(d+0x24))*255.0f);break;
+        case 1:parameters[5]=FloatToInt((2.0f/ *(s16 *)(d+0x24))*255.0f);parameters[9]=FloatToInt((1.0f/ *(s16 *)(d+0x24))*255.0f);break;
+        case 2:parameters[7]=FloatToInt((2.0f/ *(s16 *)(d+0x24))*255.0f);break;
         }
         func_002B3380(*(u8 **)(d+0x2F8),pd+0x50,pd+0x20);{ u8 *partner=*(u8 **)(d+0x2F8);*(u16 *)(partner+0x7C)&=0xFCFF; }
     }

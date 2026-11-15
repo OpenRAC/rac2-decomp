@@ -33,8 +33,8 @@ void func_L03_003844D8(char *m)
                     velocity[0] = func_002A7878(-0.9f, 0.9f);
                     velocity[1] = func_002A7878(-0.9f, 0.9f);
                     *(ParticleQuad *)position = *(ParticleQuad *)velocity;
-                    func_00283098(position, position, D_L03_001B2B0C + ids->id[i] * 128);
-                    func_00282CC0(position, position, D_L03_001B2B0C + ids->id[i] * 128 + 0x30);
+                    matrix_mul_vec3(position, position, D_L03_001B2B0C + ids->id[i] * 128);
+                    FastVecAdd(position, position, D_L03_001B2B0C + ids->id[i] * 128 + 0x30);
                     qzero_nc(velocity);
                     {
                         float upper = D_L03_001AEC4C;
@@ -47,7 +47,7 @@ void func_L03_003844D8(char *m)
                     params[3] = func_002A7878(D_L03_001AEC60, D_L03_001AEC64);
                     {
                         float blend = func_002A7878(0, 1);
-                        color = func_00283D38(D_L03_001AEC68, D_L03_001AEC6C, blend);
+                        color = FastTweenColor(D_L03_001AEC68, D_L03_001AEC6C, blend);
                     }
                     {
                         unsigned int flags = D_L03_001AEC70;

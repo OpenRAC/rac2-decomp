@@ -24,10 +24,10 @@ void func_002E7570(void *src, void *matrix, int count, unsigned int colour,
     int i;
 
     quad[0] = *(TI128 *)src;
-    step = 1.0f / func_00283CE0(count);
+    step = 1.0f / IntToFloat(count);
     for (i = 0; i < count; i++) {
         short *table = (short *)D_00152C00;
-        float f = func_00283CE0(i) * step;
+        float f = IntToFloat(i) * step;
         float t = from + (to - from) * f;
         float angle = func_002A7940();
 
@@ -35,7 +35,7 @@ void func_002E7570(void *src, void *matrix, int count, unsigned int colour,
         func_002ACB48((float *)&quad[1], radius);
         func_00281EB8((char *)&quad[1], table[0x10] == 2 ? 5 : 0x2E, colour, 1,
                       t, 0.0f, angle);
-        func_00282CC0((char *)&quad[0], (char *)&quad[0], matrix);
+        FastVecAdd((char *)&quad[0], (char *)&quad[0], matrix);
     }
 }
 
@@ -62,8 +62,8 @@ void func_002E8F80(char *object, float height)
         qcopy(to, from);
         to[3] = 0.6f;
         qcopy(position, ref_L00_002E8F80_00[i]);
-        func_00283098(position, position, object + 0xC0);
-        func_00282CC0(position, position, object + 0x10);
+        matrix_mul_vec3(position, position, object + 0xC0);
+        FastVecAdd(position, position, object + 0x10);
         func_002BAA28(position, from, to, 0x30F0F0F0, 0x14F0F0F0, 4, 4, func_002A77E0(4) + 4, 0x17);
     }
 }

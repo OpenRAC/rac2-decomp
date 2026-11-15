@@ -44,7 +44,7 @@ void func_L20_0039AA98(unsigned char *object)
         if (state->mode != 7)
             break;
         if (state->frame == 157)
-            func_0032C700(state->second + 0x10, 1, 40, 20, 30, 40, 50, 1,
+            SpawnExplosion(state->second + 0x10, 1, 40, 20, 30, 40, 50, 1,
                           1, 1, 0, 0, 1.5f, 20.0f);
         if ((unsigned int)(state->frame - 171) < 149) {
             func_0029FCC0(state->first, 0, position);
@@ -82,7 +82,7 @@ void func_L20_00330A68(void *arg0, int arg1)
     *(short *)(arg0 + 0xAA) = (short)arg1;
     *(unsigned char *)(arg0 + 0x22) = D_L20_001DBA60[(short)arg1];
     *(void **)(arg0 + 0x24) = D_L20_001DB100[*(unsigned char *)(arg0 + 0x22)];
-    func_0029F390(arg0);
+    update_moby_animation_state(arg0);
     p = *(unsigned char **)(arg0 + 0x24);
     *(unsigned char *)(arg0 + 0x62) = p[0xE];
     *(float *)(arg0 + 0x2C) = *(float *)(p + 0x24);
@@ -152,7 +152,7 @@ char *func_L20_0039BDF0(void *arg0, void *arg1, int arg2, int arg3)
     int addr2;
     char *b;
 
-    p = (char *)func_0029EFD0(0x12C2);
+    p = (char *)CreateMoby(0x12C2);
     if (p) {
         *(int *)(p + 0xB8) = (int)arg0;
         *(unsigned char *)(p + 0x30) = 0xFF;
@@ -165,7 +165,7 @@ char *func_L20_0039BDF0(void *arg0, void *arg1, int arg2, int arg3)
         *(int *)(b + 0x98) = *(int *)(*(int *)(b + 0x24) + 0x10);
         addr2 = (int)p + 0xF0;
         qzero_nc((void *)addr2);
-        func_002833F0((void *)((int)p + 0xC0), (void *)((int)p + 0xF0));
+        euler_rotation_basis((void *)((int)p + 0xC0), (void *)((int)p + 0xF0));
         {
             int *vars = *(int **)(p + 0x68);
             vars[1] = arg2;

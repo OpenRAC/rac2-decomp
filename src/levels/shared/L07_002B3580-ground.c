@@ -139,32 +139,32 @@ void func_L07_002B3580(void)
         reach = D_00189E20.field_264 * 2.9f;
     if (func_L00_002ADF80())
         reach = 0.0f;
-    func_L00_002B47A8(start, end, 1, reach, -48.0f);
-    if (func_002761F8(start, end, 2, D_00189E20.field_2290, 0)) {
+    BuildOffsetVectorPair(start, end, 1, reach, -48.0f);
+    if (CollLine(start, end, 2, D_00189E20.field_2290, 0)) {
         D_00189E20.field_149d = func_L00_002E2048();
         if (D_L07_001BF640.object)
             D_00189E20.field_149d = 0;
         if (D_001A79F0 == 7 && D_L07_001BF640.object)
             D_00189E20.field_149d = 1;
-        D_00189E20.field_1490 = func_00278E78();
+        D_00189E20.field_1490 = GetCollHitMaterial();
         if (!D_00189E20.field_1490) {
             D_00189E20.field_330 = func_002A90F8(D_L07_001BF640.position, &D_00189E20.vector_2b0);
             if (D_00189E20.vector_80.field_88 < D_00189E20.field_330 && D_00189E20.field_338 < 1)
                 D_00189E20.field_338 = 1;
-            if (!func_002761F8(start, end, 0x24, D_00189E20.field_2290, 0))
+            if (!CollLine(start, end, 0x24, D_00189E20.field_2290, 0))
                 goto contacts_done;
             D_00189E20.field_149d = func_L00_002E2048();
         }
         if (D_00189E20.field_1490 == 13) {
             start[2] = D_L07_001BF640.position[2] - 0.01f;
             D_00189E20.field_330 = D_L07_001BF640.position[2];
-            if (!func_002761F8(start, end, 4, D_00189E20.field_2290, 0))
+            if (!CollLine(start, end, 4, D_00189E20.field_2290, 0))
                 goto contacts_done;
         }
         if (D_00189E20.field_1490 == 3) {
             start[2] = D_L07_001BF640.position[2] - 0.01f;
             D_00189E20.field_334 = D_L07_001BF640.position[2];
-            if (!func_002761F8(start, end, 4, D_00189E20.field_2290, 0))
+            if (!CollLine(start, end, 4, D_00189E20.field_2290, 0))
                 goto contacts_done;
         }
         if (D_00189E20.field_1490 == 11) {
@@ -186,13 +186,13 @@ void func_L07_002B3580(void)
                 D_00189E20.field_318 = D_L07_001BF640.position[2];
                 if (D_L07_001A8FF0)
                     D_00189E20.field_318 = func_002B0360((char *)D_L07_001BF640.position);
-                D_00189E20.field_31c = func_00282E48(&D_00189E20.vector_80, &D_00189E20.vector_2d0);
+                D_00189E20.field_31c = fast_vec_dist(&D_00189E20.vector_80, &D_00189E20.vector_2d0);
                 D_00189E20.field_33c = (int)D_L07_001BF640.object;
                 func_001290E0(&D_00189E20.vector_2a0, D_L07_001BF640.normal);
                 D_00189E20.field_320 = func_L00_002D3EA8(D_L07_001BF640.normal);
                 D_00189E20.field_32c = func_00283248(D_L07_001BF640.normal[0], D_L07_001BF640.normal[1]);
-                func_00282CF0(difference, &D_00189E20.vector_2d0, &D_00189E20.vector_80);
-                if (func_00282DB0(difference, &D_00189E20.vector_2a0) > 0.0f)
+                FastVecSub(difference, &D_00189E20.vector_2d0, &D_00189E20.vector_80);
+                if (FastVecDot(difference, &D_00189E20.vector_2a0) > 0.0f)
                     D_00189E20.field_31c = -D_00189E20.field_31c;
                 if (D_00189E20.field_31c < 0.02f) {
                     D_00189E20.field_34c = 0;
@@ -225,11 +225,11 @@ contacts_done:
             func_002AFF60((char *)&D_00189E20.vector_80, (char *)&D_00189E20.vector_2c0, 0);
         } else {
             if (D_00189E20.vector_2f0.field_2fc != 0.0f) {
-                func_002AA2E8(&D_00189E20.vector_2f0.field_2fc, 0.0f, 1.0f);
+                ApproachValue(&D_00189E20.vector_2f0.field_2fc, 0.0f, 1.0f);
                 qcopy(&D_00189E20.vector_2c0, &D_00189E20.vector_2f0);
             } else {
                 qcopy(&D_00189E20.vector_2c0, &D_00189E20.vector_2a0);
-                func_00282D30(&D_00189E20.vector_2c0, &D_00189E20.vector_2c0, -1.0f);
+                FastVecScale(&D_00189E20.vector_2c0, &D_00189E20.vector_2c0, -1.0f);
             }
         }
         break;
@@ -238,8 +238,8 @@ contacts_done:
             float sign = -1.0f;
             if (D_00189E20.vector_b0.field_bc > 0.0f)
                 sign = 1.0f;
-            func_00282CF0(&D_00189E20.vector_2c0, &D_00189E20.vector_b0, &D_00189E20.vector_80);
-            func_00282F20(&D_00189E20.vector_2c0, &D_00189E20.vector_2c0, sign);
+            FastVecSub(&D_00189E20.vector_2c0, &D_00189E20.vector_b0, &D_00189E20.vector_80);
+            vec_scale_to_length(&D_00189E20.vector_2c0, &D_00189E20.vector_2c0, sign);
         }
         break;
     }
@@ -265,7 +265,7 @@ contacts_done:
                 angle = -angle;
             func_L00_002D3638(left, 0.2f, angle, 1, 0.44999998807907104f);
             func_L00_002D3638(right, 0.2f, angle, 1, -0.44999998807907104f);
-            if (func_002761F8(left, right, 0x22, D_00189E20.field_2290, 0)) {
+            if (CollLine(left, right, 0x22, D_00189E20.field_2290, 0)) {
                 if (D_L07_001A8FF0) {
                     float firstHeight = func_002B0360((char *)D_L07_001BF640.position);
                     D_00189E20.footHeight[side] = firstHeight - func_002B0360((char *)&D_00189E20.vector_2d0);

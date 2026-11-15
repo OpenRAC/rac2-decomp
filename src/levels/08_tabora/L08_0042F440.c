@@ -57,7 +57,7 @@ void func_L08_0042F440(char *a0) {
             func_002B0A68(a0, 3.0f, 6.0f, 9, D_L08_001A8F20, 3.0f, 6.0f, 0xFF);
         }
         func_L00_00326110(a0, 1, 0.0f);
-        func_002E5CF8(0, 0, a0);
+        PlayMobySound(0, 0, a0);
         func_002A7750(a0, 3, -1);
         return;
     case 3:

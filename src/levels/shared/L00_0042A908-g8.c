@@ -28,27 +28,27 @@ void func_L00_0042A908(char *o, char *out, char *start, char *end)
     a[3] = 0;
     a[2] = *(float *)(entry + 0x34);
     a[1] = 0;
-    length = func_00282DF0(a);
+    length = FastVecLength(a);
     for (i = 0; i < count; i++) {
         int hit;
         {
             float t, radius;
-            t = func_00283CE0(i) / func_00283CE0(count - 1) * 0.9f + 0.1f;
-            func_00282D08(b, start, end, t);
+            t = IntToFloat(i) / IntToFloat(count - 1) * 0.9f + 0.1f;
+            lerp_vector(b, start, end, t);
             radius = (hi - lo) * t;
             hit = func_00277258(b, 16, *(void **)(entry + 0x20), lo + radius);
         }
         if (hit) {
             float t, radius;
             t = func_L00_0031BDC0(e, start, end, D_L00_001BF220);
-            func_00282CF0(f, e, D_L00_001BF220);
+            FastVecSub(f, e, D_L00_001BF220);
             radius = lo + (hi - lo) * t;
-            if (func_00282DF0(f) <= radius) {
-                func_00282F20(f, f, radius);
-                func_00282CC0(f, D_L00_001BF220, f);
-                func_00282CF0(c, f, start);
-                func_00282F20(d, c, length);
-                func_00282CC0(end, start, d);
+            if (FastVecLength(f) <= radius) {
+                vec_scale_to_length(f, f, radius);
+                FastVecAdd(f, D_L00_001BF220, f);
+                FastVecSub(c, f, start);
+                vec_scale_to_length(d, c, length);
+                FastVecAdd(end, start, d);
                 qcopy(out, end);
             }
         }

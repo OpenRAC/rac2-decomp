@@ -25,8 +25,8 @@ void func_L05_003CF040(unsigned char *obj)
         func_L05_003CF9C8(obj);
     case 2:
     case 3:
-        func_00282CC0(obj + 0x10, obj + 0x10, s + 0x10);
-        func_00282D30(s + 0x10, s + 0x10, (D_L05_001AFBE4 - 1.0f) + 1.0f);
+        FastVecAdd(obj + 0x10, obj + 0x10, s + 0x10);
+        FastVecScale(s + 0x10, s + 0x10, (D_L05_001AFBE4 - 1.0f) + 1.0f);
         if ((unsigned char)obj[0x20] != 2) {
             if (func_002829D8(s + 0xC) && (unsigned char)obj[0x31] == 0) {
                 func_0029F338(obj);
@@ -41,9 +41,9 @@ void func_L05_003CF040(unsigned char *obj)
     case 1:
         kind = func_L05_003CFC28(*(short *)(obj + 0xAA));
         *(float *)(obj + 0x2C) = *(float *)(*(char **)(obj + 0x24) + 0x24) * D_L05_001AFB68[kind];
-        *(float *)(obj + 0xF0) = func_00283B98(*(float *)s, *(float *)(obj + 0xF0));
-        *(float *)(obj + 0xF4) = func_00283B98(*(float *)(s + 4), *(float *)(obj + 0xF4));
-        *(float *)(obj + 0xF8) = func_00283B98(*(float *)(s + 8), *(float *)(obj + 0xF8));
+        *(float *)(obj + 0xF0) = FastAddRotations(*(float *)s, *(float *)(obj + 0xF0));
+        *(float *)(obj + 0xF4) = FastAddRotations(*(float *)(s + 4), *(float *)(obj + 0xF4));
+        *(float *)(obj + 0xF8) = FastAddRotations(*(float *)(s + 8), *(float *)(obj + 0xF8));
         func_L05_003CFAB8(obj);
         if (func_L05_003CF350(obj) || *(float *)(obj + 0x10) < 2.0f || *(float *)(obj + 0x10) > 1021.0f ||
             *(float *)(obj + 0x14) < 2.0f || *(float *)(obj + 0x14) > 1021.0f ||

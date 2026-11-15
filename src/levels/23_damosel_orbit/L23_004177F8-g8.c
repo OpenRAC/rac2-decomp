@@ -302,8 +302,8 @@ void func_L23_004177F8(L23Moby *object) {
                 }
         }
         }
-        func_00282CF0(&v[0], &v[0], D_00189E20 + 0xB0);
-        D_L23_001B36A4 = func_00282DF0(&v[0]);
+        FastVecSub(&v[0], &v[0], D_00189E20 + 0xB0);
+        D_L23_001B36A4 = FastVecLength(&v[0]);
         v[1] = 0;
         ((float *)&v[1])[0] = 500.0f;
         ((float *)&v[1])[1] = 500.0f;
@@ -346,7 +346,7 @@ void func_L23_004177F8(L23Moby *object) {
         state->f80 = 1.55334318f;
         func_002B60B0(object, 0.019444445f, 0.6333334f, 0.0017453295f, 0.20943955f);
         func_002A7750(object, 2, 0);
-        func_00115484(D_L23_002595C8, 0, 0xFE0);
+        memset(D_L23_002595C8, 0, 0xFE0);
         state->h390 = 0;
         state->h39C = -1;
         state->h39A = -1;
@@ -391,7 +391,7 @@ void func_L23_004177F8(L23Moby *object) {
             }
         }
     }
-    func_0029B758((int)func_L23_0041B478, (int)func_L23_0041DA48);
+    func_0029B758((int)func_L23_0041B478, (int)L23_DrawEncounterHud);
     object->scale = object->cls->scale * D_L23_001B1470;
     {
         int part;
@@ -413,11 +413,11 @@ void func_L23_004177F8(L23Moby *object) {
             game->f1E0 = 20;
             pad->f1A4 = 0;
             D_L23_001B3748 = D_L23_001B14A0;
-            func_L00_0030DD70(func_00288FB8(0x3157), -1);
+            func_L00_0030DD70(GetLocalizedString(0x3157), -1);
         } else if (D_L23_001B1424 < 30) {
             game->f2294 = 0;
-            func_L00_002AF7D0();
-            func_L00_00310C88(game->f2290, game->f1870);
+            cancel_hero_item_animation();
+            release_moby_animation_slot(game->f2290, game->f1870);
             game->f187C = 0;
             func_L22_002C9898(0, 1);
         }
@@ -425,5 +425,5 @@ void func_L23_004177F8(L23Moby *object) {
     func_002AFFD8(&object->pos, state->m410, 0);
     func_L00_00325600(&object->rot, state->m410, 0);
     if (object->mode != 7) func_L23_00418650(&object->pos, state->f588);
-    func_L23_0041B9F0(object);
+    UpdateShieldHitsAndStrength(object);
 }

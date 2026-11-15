@@ -97,7 +97,7 @@ void func_L06_0047A408(char *arg) {
         return;
     }
     if (params->check_yaw != 0
-        && func_00283C80(((CamDesc *)ref_L06_0047A408_00)[cam->descriptor_index].yaw, ref_L06_0047A408_03) >= 1.396263599395752f) {
+        && FastDiffRots(((CamDesc *)ref_L06_0047A408_00)[cam->descriptor_index].yaw, ref_L06_0047A408_03) >= 1.396263599395752f) {
         goto stop;
     }
     if (params->l_buttons_end != 0 && params->type == 5 && (D_00138320[0] & 4)) {
@@ -124,24 +124,24 @@ stop:
         snap = &rig->tail.snap;
         state = rig;
         reset = &state->reset;
-        func_00282F20(tail->unk130, tail->unk130, params->distance);
+        vec_scale_to_length(tail->unk130, tail->unk130, params->distance);
         follow_copy = follow;
         tail->unk15C = params->distance;
         tail->distance = params->height;
         follow_copy->look_height = params->offset_scale;
         qcopy(state->tail.unk140, tail->unk130);
-        func_00282D30(dir, D_0018A0E0, -tail->distance);
+        FastVecScale(dir, D_0018A0E0, -tail->distance);
         pos = &rec->pos;
-        func_00282CC0(state->follow.eye, hero_pos, dir);
-        func_00282CC0(pos, state->follow.eye, tail->unk130);
-        func_00282D30(dir, D_0018A0E0, -follow_copy->look_height);
-        func_00282CC0(state->follow.look_target, hero_pos, dir);
+        FastVecAdd(state->follow.eye, hero_pos, dir);
+        FastVecAdd(pos, state->follow.eye, tail->unk130);
+        FastVecScale(dir, D_0018A0E0, -follow_copy->look_height);
+        FastVecAdd(state->follow.look_target, hero_pos, dir);
         qcopy(state->follow.unkD0, state->follow.look_target);
         qcopy(follow_copy->focus, hero_pos);
         qcopy(state->follow.offset, follow_copy->focus);
         qcopy(state->position, pos);
         qcopy(state->tail.snap.unk1F0, pos);
-        snap->unk200 = tail->unk15C - func_00282DF0(tail->unk130);
+        snap->unk200 = tail->unk15C - FastVecLength(tail->unk130);
         *(s32 *)&reset->unk34 = 0;
         reset->look_height = follow_copy->look_height;
         reset->distance = tail->distance;
@@ -149,7 +149,7 @@ stop:
         reset->unk2C = reset->unk30 = reset->unk38 = reset->unk34 = zero;
     }
     at_end = 0;
-    total = func_00283CE0(200);
+    total = IntToFloat(200);
     params->timer++;
     if (params->type == 10) {
         func_L00_00424C60();
@@ -182,7 +182,7 @@ stop:
             params->timer = 1;
         }
     } else if (params->type == 3) {
-        total = func_00283CE0(1);
+        total = IntToFloat(1);
         if (params->timer > 1) {
             params->timer = 1;
             at_end = 1;
@@ -202,18 +202,18 @@ stop:
     }
     if (params->distance != 0.0f) {
         if (params->type == 6 || params->type == 8) {
-            func_L00_00424A08(0, params->distance, 0.002f);
+            follow_camera_set_distance(0, params->distance, 0.002f);
             func_L06_00475C10(params->distance + 1.36f);
         } else {
-            func_L00_00424A08(0, params->distance, 0.003f);
+            follow_camera_set_distance(0, params->distance, 0.003f);
             func_L00_00424C00();
         }
     }
     if (params->height != 0.0f) {
         if (params->type == 6 || params->type == 8) {
-            func_L00_00424A50(params->height, 0.002f);
+            follow_camera_set_height(params->height, 0.002f);
         } else {
-            func_L00_00424A50(params->height, 0.003f);
+            follow_camera_set_height(params->height, 0.003f);
         }
     }
     if (params->offset_scale != 0.0f) {
@@ -233,13 +233,13 @@ stop:
         { FollowCamFlags *ctl = &FOLLOW_CAM_STATE(((struct UpdateCam *)ref_L06_0047A408_01))->tail.ctl; ctl->flags |= 1; }
     }
     if (params->keep_unk10 == 0) {
-        func_L00_00424B48(0);
+        set_follow_camera_orbit_clamp_mode(0);
     }
     if (params->lateral_stiffness != 0.0f || params->lateral_damping != 0.0f) {
         if (params->timer >= 120) {
             func_L00_00424B70(params->lateral_stiffness, params->lateral_damping);
         } else {
-            t = params->timer / func_00283CE0(120);
+            t = params->timer / IntToFloat(120);
             func_L00_00424B70(
                 params->start_lateral_stiffness + (params->lateral_stiffness - params->start_lateral_stiffness) * t,
                 params->start_lateral_damping + (params->lateral_damping - params->start_lateral_damping) * t);

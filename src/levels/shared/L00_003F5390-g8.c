@@ -49,14 +49,14 @@ void func_L00_003F5390(char *object, HitVector *source)
 
     qcopy(&scratch.position, source);
     if (D_L00_00262570[D_00139568[0x17]].enabled) {
-        func_0032C700(object + 0x10, 1.0f, 20.0f, 1, 0x28, 0x14, 0x1E, 0x28, 0x32, 1,
+        SpawnExplosion(object + 0x10, 1.0f, 20.0f, 1, 0x28, 0x14, 0x1E, 0x28, 0x32, 1,
                       1, 1, 0, D_L00_001ADB2C);
         scratch.u.request.flags = 0x810000;
         scratch.u.request.active = 1;
         scratch.u.request.owner = object;
         scratch.u.request.scale = D_L00_00262570[D_00139568[0x17]].scale;
         qcopy(&scratch.u.request.direction, state);
-        func_00282F20(&scratch.u.request.direction, &scratch.u.request.direction, 1.0f);
+        vec_scale_to_length(&scratch.u.request.direction, &scratch.u.request.direction, 1.0f);
         scratch.u.request.direction.values[3] = 5627.9248046875f;
         scratch.u.request.enabled = 3;
         scratch.u.request.kind = 2;

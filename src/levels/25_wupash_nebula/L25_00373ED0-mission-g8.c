@@ -132,7 +132,7 @@ void func_L25_0040CDA0(char *obj)
         qcopy(obj+0x10,(void *)((I(state,0x20)<<8) + D_L25_001B209C + 0x10));
         if (D_00138324&0x10) func_002E5DA0(0,0,obj,0xeee);
         if (D_L25_001A904C && !D_L25_001B0CDC) {
-            func_0029B758(0,func_L25_0040D208);
+            func_0029B758(0,DrawWupashCombatHud);
             D_L25_001B0CDC=active;
         }
         /* Retail executes this counted wait before reading the mission state:

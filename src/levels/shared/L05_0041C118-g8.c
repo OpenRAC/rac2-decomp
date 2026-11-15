@@ -35,7 +35,7 @@ Moby_L05_0041C118 *func_L05_0041C118(Moby_L05_0041C118 *object)
     Moby_L05_0041C118 *moby;
     Moby_L05_0041C118 *m;
 
-    moby = func_0029EFD0(0x10CF);
+    moby = CreateMoby(0x10CF);
     if (moby != 0) {
         moby->updateDist = 0xFF;
         moby->drawDist = 0xFF;

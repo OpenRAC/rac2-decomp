@@ -123,9 +123,9 @@ void func_L03_003E4680(char *obj) {
     }
     case 1:
         if (D_00189E20.focus!=obj || D_L03_001B2940<16 || !D_001A7B2B) break;
-        func_002B0CE0(12,0x27F0,1);
+        ForceClaimNotice(12,0x27F0,1);
         if (!func_00294630(((MuseumSound *)D_L03_00266DA0)[D_00139568.mode].handle)) {
-            func_00294420(((MuseumSound *)D_L03_00266DA0)[D_00139568.mode].handle);
+            LoadClassIntoFreeCacheSlot(((MuseumSound *)D_L03_00266DA0)[D_00139568.mode].handle);
             break;
         }
         if (D_00138180.buttons.words.high&0x10) {
@@ -137,9 +137,9 @@ void func_L03_003E4680(char *obj) {
     case 2: {
         unsigned int cameraState;
         if (func_002B3868(obj)) {
-            func_00283098(vec,D_L03_001B0C70_gp,obj+0xC0);
-            func_00282CC0(vec,vec,obj+0x10);
-            func_L00_002D40A0(vec,0,func_00283B98(F(obj,0xF8),3.1415927f));
+            matrix_mul_vec3(vec,D_L03_001B0C70_gp,obj+0xC0);
+            FastVecAdd(vec,vec,obj+0x10);
+            func_L00_002D40A0(vec,0,FastAddRotations(F(obj,0xF8),3.1415927f));
         }
         cameraState=func_L00_002D40F0();
         if (cameraState==2) func_002A7750(obj,3,-1);
@@ -149,29 +149,29 @@ void func_L03_003E4680(char *obj) {
     }
     case 3:
         if (func_002B3868(obj)) {
-            func_002E5CF8(0,0,obj);
-            func_L03_002C6F08(0x6F,0);func_L00_002D2168(0x54,0,20.0f);
-            func_00282CF0(vec,D_L03_001B9980,D_00189E20.position);
-            func_00283098(vec,vec,D_00189E20.matrix40);
-            func_00335438(D_L03_001B9980,D_L03_001B9980,3,120,0);
+            PlayMobySound(0,0,obj);
+            func_L03_002C6F08(0x6F,0);set_hero_animation(0x54,0,20.0f);
+            FastVecSub(vec,D_L03_001B9980,D_00189E20.position);
+            matrix_mul_vec3(vec,vec,D_00189E20.matrix40);
+            SetCamera5Pose(D_L03_001B9980,D_L03_001B9980,3,120,0);
             st->fade=0;
         }
-        func_00283098(vec,D_L03_001B0C70_gp,obj+0xC0);
-        func_00282CC0(vec,vec,obj+0x10);
-        func_00282CF0(D_00189E20.velocity,vec,D_00189E20.position);
+        matrix_mul_vec3(vec,D_L03_001B0C70_gp,obj+0xC0);
+        FastVecAdd(vec,vec,obj+0x10);
+        FastVecSub(D_00189E20.velocity,vec,D_00189E20.position);
         D_00189E20.velocity[2]=0;
         func_002AC9F8(D_00189E20.velocity,0.012500001f);
-        func_002AA800(D_00189E20.rotation,0,func_00283B98(F(obj,0xF8),3.1415927f),0.017453296f);
+        StepAngleTowardTarget(D_00189E20.rotation,0,FastAddRotations(F(obj,0xF8),3.1415927f),0.017453296f);
         D_00189E20.mode=3;
-        if ((D_00189E20.flags&2) && B(D_00189E20.animation,0x43)==0x54) func_L00_002D2168(0x55,0,7.0f);
+        if ((D_00189E20.flags&2) && B(D_00189E20.animation,0x43)==0x54) set_hero_animation(0x55,0,7.0f);
         if (D_00189E20.animationId!=0x6F) {func_L03_003E5170(obj);func_002A7750(obj,1,-1);}
-        func_00283098(pos,D_L03_001B0C80_gp,&D_00189E20);
-        func_00282CC0(pos,pos,D_00189E20.position);
+        matrix_mul_vec3(pos,D_L03_001B0C80_gp,&D_00189E20);
+        FastVecAdd(pos,pos,D_00189E20.position);
         qzero_nc(rot);
-        func_00283098(target,D_L03_001B0C90_gp,&D_00189E20);
-        func_00282CC0(target,target,D_00189E20.position);
+        matrix_mul_vec3(target,D_L03_001B0C90_gp,&D_00189E20);
+        FastVecAdd(target,target,D_00189E20.position);
         rot[2]=func_00283248(target[0]-pos[0],target[1]-pos[1]);
-        rot[1]=-func_00283248(func_00282E80(pos,target),target[2]-pos[2]);
+        rot[1]=-func_00283248(vec_distance_xy(pos,target),target[2]-pos[2]);
         func_00335370(pos);func_003353C8(rot);
         if ((AdvanceMuseumTimer(obj)>=61)) {
             func_002A7750(obj,4,-1);
@@ -182,14 +182,14 @@ void func_L03_003E4680(char *obj) {
     case 4: {
         unsigned int elapsed;
         if (func_002B3868(obj)) {
-            func_002E5CF8(0,0,obj);
+            PlayMobySound(0,0,obj);
             D_L03_001B9C14=0.017453294f;
             func_0026FF08(30,1,0.017453294f,0.005f,0.2f,0.0f);
         }
         D_00189E20.mode=3;
         if (D_00189E20.animationId!=0x6F) {func_L03_003E5170(obj);func_002A7750(obj,1,-1);break;}
         if ((AdvanceMuseumTimer(obj)<21)) break;
-        func_002AA2E8(&st->fade,1.0f,0.116666675f);
+        ApproachValue(&st->fade,1.0f,0.116666675f);
         elapsed=U(obj,0x96);
         D_L03_001B2464=st->fade;
         if (elapsed<31) break;
@@ -217,10 +217,10 @@ void func_L03_003E4680(char *obj) {
             U(st->display,0x34)&=~1;
             B(st->display,0x31)=1;
             U(st->display,0x34)&=~0x80;
-            func_00283360(D_L03_001B9BB0);
+            set_identity_rotation_rows(D_L03_001B9BB0);
             func_00282C88((char *)st->display+0xF0);
             F(st->display,0xF4)=-1.5707964f;
-            func_002833F0((char *)st->display+0xC0,(char *)st->display+0xF0);
+            euler_rotation_basis((char *)st->display+0xC0,(char *)st->display+0xF0);
             func_002A7750(obj,6,-1);
         } else if ((AdvanceMuseumTimer(obj)>=6)) {
             func_L03_003E5170(obj);
@@ -229,7 +229,7 @@ void func_L03_003E4680(char *obj) {
         }
         break;
     case 6:
-        if (D_L03_001A8F00==7) {func_00283360(D_L03_001B9BB0);func_L03_003E50E0(obj);break;}
+        if (D_L03_001A8F00==7) {set_identity_rotation_rows(D_L03_001B9BB0);func_L03_003E50E0(obj);break;}
         func_L03_003E5170(obj);
         func_L01_00323310(st->resume,st->volume);
         if (st->cleanupId!=-1) func_L00_0042A500(st->cleanupId);

@@ -35,8 +35,8 @@ void func_L18_003F5198(u8 *object)
     s16 mode;
     s32 configuration;
     InitializationFields *settings = (InitializationFields *)state;
-    settings->duration = func_00283CF0(15.0f);
-    settings->speed = func_00283CF0(6.0f);
+    settings->duration = FloatToInt(15.0f);
+    settings->speed = FloatToInt(6.0f);
     configuration = *(s32 *)(state + 0x260);
     settings->type = 17;
     settings->ready = 1;

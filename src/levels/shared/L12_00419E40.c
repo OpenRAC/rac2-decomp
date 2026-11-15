@@ -84,7 +84,7 @@ void func_L12_00419E40(char *obj) {
         }
         break;
     case 6:
-        if(func_L12_0041A460(obj)) {
+        if(AimAtPathCursorAndAdvance(obj)) {
             if(W(s,0x220)==W(D_L12_001FEAC0[W(s,0x110)],0)-1) {
                 func_002A7750(obj,3,-1);
                 if(B(obj,0x43)!=9)func_002A7470(obj,9,0,20);
@@ -92,7 +92,7 @@ void func_L12_00419E40(char *obj) {
                 func_002A7750(obj,7,-1);
                 if(B(obj,0x43))func_002A7470(obj,0,0,20);
                 W(s,0x22C)=120;
-                F(s,0x228)=func_00283B98(F(obj,0xF8),3.141590118408203f);
+                F(s,0x228)=FastAddRotations(F(obj,0xF8),3.141590118408203f);
             }
         }
         break;
@@ -123,7 +123,7 @@ set_attack_animation:
             func_002A7750(obj,1,-1);
             qcopy(obj+0x10,s+0x210);
         }
-        func_L02_003CA0A8(obj);
+        SpawnEffectParticleRing(obj);
         break;
     case 1:
         W(obj,0x98)=0; U(obj,0x34)=(U(obj,0x34)|0x41)&0xEFFF;

@@ -52,13 +52,13 @@ void func_00291158(void) {
         axis.f[0] = 0.0f;
         axis.f[1] = -1.0f;
     }
-    scale = -func_00282DB0(D_001B5570, &axis);
+    scale = -FastVecDot(D_001B5570, &axis);
     for (j = 0; j < 10; j++) {
         D_00255BB8[j].z = D_00255B40[j].z * scale;
     }
     for (i = 0; i < *(short *)(D_001B20C0 + 6); i++) {
         if (i >= 10) {
-            func_00283388(D_001B20F0);
+            set_identity_matrix(D_001B20F0);
         } else {
             func_002E3478(i);
         }

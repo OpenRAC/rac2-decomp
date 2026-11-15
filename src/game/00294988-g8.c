@@ -37,7 +37,7 @@ found:
 slotfound:
     func_002FC3C0(1);
     if(slot==3) {
-        func_0026FEB8(D_001A9370,id);
+        STUB_printf(D_001A9370,id);
         slot=0;
         func_002945E8(id,0);
     }
@@ -55,10 +55,10 @@ slotfound:
     }
     if(D_00152CD0.sound) {
         func_00132858(D_00152CD0.sound);
-        while(func_00132028()) {}
+        while(snd_Pump()) {}
     }
     if(D_0014B540.slots[index].sound) {
-        D_00152CD0.sound=func_001326D8(D_001A7278[0]+slot*0xc800);
+        D_00152CD0.sound=snd_BankLoadFromIOP(D_001A7278[0]+slot*0xc800);
         D_00188660.sound=D_00152CD0.sound;
     } else D_00152CD0.sound=0;
     func_00132828();

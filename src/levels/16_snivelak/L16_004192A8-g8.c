@@ -50,10 +50,10 @@ active:
     if (D_001A79F0==16) {
 
         qcopy(&local.position,&H->q[8]);
-        func_00282F20(&local.offset,H->ptr[2212]+0xe0,0.75f);
-        func_00282CC0(&local.position,&local.position,&local.offset);
+        vec_scale_to_length(&local.offset,H->ptr[2212]+0xe0,0.75f);
+        FastVecAdd(&local.position,&local.position,&local.offset);
         if (func_00277258(&local.position,0,H->ptr[2212],0.5f)!=0 && D_L16_001BFF58!=0 && D_L16_001BFF58==object) {
-            func_002A8C00((char *)&local.request,(int)object,1,100.0f,&D_L16_001A8F20);
+            make_hit_descriptor((char *)&local.request,(int)object,1,100.0f,&D_L16_001A8F20);
             local.request.id=*(unsigned short *)(object+0xaa);
             func_L00_002B30E8();
         }
@@ -62,16 +62,16 @@ active:
             ((float *)&local.direction)[1]=1.0f;
             ((float *)&local.direction)[2]=0.0f;
             ((float *)&local.direction)[3]=1.0f;
-            func_00282F20(&local.direction,&local.direction,10.0f);
-            func_002A8C00((char *)&local.request,(int)object,1,10.0f,(Quad16 *)&local.direction);
+            vec_scale_to_length(&local.direction,&local.direction,10.0f);
+            make_hit_descriptor((char *)&local.request,(int)object,1,10.0f,(Quad16 *)&local.direction);
             local.request.id=*(unsigned short *)(object+0xaa);
             func_L00_002B30E8();
         }
     }
 common:
     if (state[0]!=0.0f) {
-        func_00282D60(&local.position,object,0.0009765625f);
-        state[8]=func_00283B98(state[8],D_L16_001B1CA0*0.0002908882452f);
+        scale_vector(&local.position,object,0.0009765625f);
+        state[8]=FastAddRotations(state[8],D_L16_001B1CA0*0.0002908882452f);
         state[3]+=(D_L16_001B1CA4+func_002A78D8(0.25f,0.5f))*0.016666668f;
         if (state[3]>1.0f) state[3]-=1.0f;
         for(i=1;i<=2;i++) {
@@ -80,6 +80,6 @@ common:
             if(value>1.0f) state[i]=value-1.0f;
         }
         func_L00_002E6CF0(func_L13_0041FBE0,object);
-        func_002AA2E8(state,1.0f,0.008333333768f);
+        ApproachValue(state,1.0f,0.008333333768f);
     }
 }

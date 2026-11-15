@@ -91,17 +91,17 @@ void func_L30_003840E0(char *object) {
                 D_L30_001AEC14 = -D_L30_001AEC14;
             D_00233A60[D_L30_001AEBB8][D_L30_001AEC18][D_L30_001AEC1C] = D_L30_001AEC20;
         } else {
-            func_00283CF0(func_L30_00382EF0(func_00283CE0(D_L30_001AEC18),
-                                            func_00283CE0(D_L30_001AEC18 + D_L30_001AEC10),
+            FloatToInt(func_L30_00382EF0(IntToFloat(D_L30_001AEC18),
+                                            IntToFloat(D_L30_001AEC18 + D_L30_001AEC10),
                                             D_L30_001AEC24));
-            func_00283CF0(func_L30_00382EF0(func_00283CE0(D_L30_001AEC1C),
-                                            func_00283CE0(D_L30_001AEC1C + D_L30_001AEC14),
+            FloatToInt(func_L30_00382EF0(IntToFloat(D_L30_001AEC1C),
+                                            IntToFloat(D_L30_001AEC1C + D_L30_001AEC14),
                                             D_L30_001AEC24));
         }
         D_L30_001AEC24 += D_L30_001AEC28;
         if (D_00138180.f1A0 & 0x20)
-            func_L30_003831E8(12, 12, D_L30_001AEC08, D_L30_001AEC0C);
-        func_L00_002E6CF0(func_L30_00383928, object);
+            RaiseMuseumHeightFieldDome(12, 12, D_L30_001AEC08, D_L30_001AEC0C);
+        func_L00_002E6CF0(DrawMuseumWaterGrid, object);
         break;
     }
 }
@@ -125,7 +125,7 @@ void func_L30_00386300(u8 *object) {
             short a2 = *(short *)(object + 0xB2);
             unsigned int ticks = T1_COUNT;
 
-            func_0026FEB8(D_L30_001AEE98, a1, a2);
+            STUB_printf(D_L30_001AEE98, a1, a2);
             func_001163A0(ticks);
             *(int *)state = func_002A77E0(13);
         }
@@ -137,7 +137,7 @@ void func_L30_00386300(u8 *object) {
         func_002AEE70(object, state + 4, state + 8, D_L30_001AEE90,
                       f0 * 0.000290888245f, *(float *)(state + 0xC));
         *(float *)(object + 0xF8) =
-            func_00283B98(*(float *)(object + 0xF8), 0.01745329424738884f);
+            FastAddRotations(*(float *)(object + 0xF8), 0.01745329424738884f);
         *(u16 *)(object + 0x96) = 0;
     }
     v = *(u16 *)(object + 0x96);
@@ -188,7 +188,7 @@ void func_L30_003BE478(char *object) {
         }
         g = D_00189E20;
         if (*(char **)(g + 0x33C) == object && *(int *)(g + 0x340) != 0) {
-            func_002B0C28(8, id, 1);
+            TryClaimNotice(8, id, 1);
             if (D_00138180.f1A4 & 0x10) {
                 char *s0 = D_001B2D1C + (*(int *)state << 8);
 
@@ -243,7 +243,7 @@ extern void func_L30_00382FB8(void);
 void func_L30_003830D8(void) {
     if (0.95f <= D_L30_001AEBC8) {
         D_L30_001AEBC8 = D_L30_001AEBCC;
-        func_L30_00382FB8();
+        StepMuseumHeightField();
         D_L30_001AEBC0 = D_L30_001AEBBC;
         D_L30_001AEBC4 = D_L30_001AEBB8;
     } else {

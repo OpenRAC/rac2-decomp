@@ -63,15 +63,15 @@ void func_L00_003C3418(unsigned char *object) {
     if (H->ptr[1300] != 0) H->ptr[766] = H->ptr[1300];
     if (object[0x42] == object[0x43] && (object[0x60] & 2))
         func_002A75E0(object, 1, 0, 10, 0);
-    if (state->repeat != 0 && func_00282978(&state->repeat)) func_L00_002AF7D0();
-    func_00283098(origin, D_L00_001AFEF0, object + 0xC0);
-    func_00282CC0(origin, origin, object + 0x10);
+    if (state->repeat != 0 && FastDecTimer(&state->repeat)) cancel_hero_item_animation();
+    matrix_mul_vec3(origin, D_L00_001AFEF0, object + 0xC0);
+    FastVecAdd(origin, origin, object + 0x10);
     func_002829D8(&state->timer);
     allowed = 1;
     if (H->i[2213] == 29) {
         if (!func_00282948(&H->i[2381])) allowed = 0;
         else {
-            if (state->timer > 0.0f || !func_L00_002D4040(-1) || object[0x20] != 1)
+            if (state->timer > 0.0f || !get_ammo(-1) || object[0x20] != 1)
                 color = 0x600000FF;
             else color = 0x600FFF0F;
             func_00273318(1.0f, 0.0f, 90.0f, object, color, 0, 31, -1, 4);
@@ -81,23 +81,23 @@ void func_L00_003C3418(unsigned char *object) {
     if (phase == 1) {
         if (D_L00_001A8F00 != 0 || state->timer != 0.0f || H->b[8892] != 0 ||
             (u8)object[0x42] > 1 || !(PAD->u[104] & H->u[1164]) || H->i[1168] < 23 || !allowed) return;
-        if (func_L00_002D4040(-1)) {
+        if (get_ammo(-1)) {
             func_L00_002D3F30(-1, 1);
             D_L00_001B28EC = phase;
             func_002A75E0(object, 2, 4, 2, 0);
-            func_002E5CF8(0, 0, object);
-            func_L00_002AF568();
+            PlayMobySound(0, 0, object);
+            start_equipped_item_animation();
             object[0x20] = 2;
             state->delay = D_L00_001AFF00;
             state->repeat = D_L00_001AFF04;
         } else if ((PAD->u[105] & H->u[1164]) || D_L00_001B28EC == 1) {
-            func_002E5CF8(1, 0, object);
+            PlayMobySound(1, 0, object);
             D_L00_001B28EC = 0;
         }
         entry = D_L00_00262570 + D_00139581[0];
         state->timer = 1.0f / entry->rate;
     } else if (phase == 2) {
-        if (!func_00282978(&state->delay)) return;
+        if (!FastDecTimer(&state->delay)) return;
         func_L00_003C37C8(object, origin);
         object[0x20] = 3;
     } else {

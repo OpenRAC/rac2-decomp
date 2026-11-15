@@ -46,13 +46,13 @@ void func_00292888(void)
         bank1_qwords = ((root[9] + 63) & 0xffffffc0U) >> 4;
         func_00292B20(0, bank1_target);
         D_001B1888.header[0x25] = func_002EED58((void *)(root[8] + (int)root), bank1_qwords, bank1_qwords, D_001A9200);
-        func_0028B160(0, bank1_target, 1);
+        Hud_SendResidentBank(0, bank1_target, 1);
     }
     if (D_001B1888.header[0x16]) {
         bank2_data = func_0028B2B8(D_001B1888.header[0x16], 0, allocation_file, 0x327);
         func_00292B20(1, bank2_data);
         func_0011AEA0(0);
-        func_0028AE88(1, bank2_data);
+        LinkHudBank(1, bank2_data);
     }
     if (D_001B1888.header[0x17]) {
         bank3_qwords = ((root[13] + 63) & 0xffffffc0U) >> 4;

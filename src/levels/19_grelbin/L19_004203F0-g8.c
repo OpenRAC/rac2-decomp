@@ -38,10 +38,10 @@ void func_L19_004203F0(char *o)
   *(float *)(o+0x18)=func_002A89A8(o+0x10,0,0.5f)-0.1f;
   *(u8 *)(o+0x31)=1; *(u16 *)(o+0x34)|=0x100; *(int *)(o+0x48)=0;
   qcopy(a,o+0x10); qcopy(b,o+0x10); a[2]+=1; b[2]-=10;
-  func_002761F8(a,b,2,o,0);
+  CollLine(a,b,2,o,0);
   func_002B0408(o+0xc0,D_L19_001BFEC0,0); func_002A7750(o,1,0);
  }
- if (*(u8 *)(o+0x31)) func_L19_00423270(o);
+ if (*(u8 *)(o+0x31)) EmitGrelbinGlowSprites(o);
  if (*(u8 *)(o+0x20)!=1) return;
  hit=func_002A9640(o,0x230000,0);
  health=(float *)(d+0x20);color=d+0x50;
@@ -50,8 +50,8 @@ void func_L19_004203F0(char *o)
   *health-=damage;
   *(u8 *)(color+7)=255; *(u8 *)(color+8)=255; *(u8 *)(color+9)=255;
   func_002AB800(o,color);
-  func_002A7398(o,0,func_00283CF0(func_00283CE0(*(short *)(d+0x24))-*health)<8 ? func_00283CF0(func_00283CE0(*(short *)(d+0x24))-*health):7);
-  {int s=func_002A7820(0,2); if(*health>0)func_002E5CF8(s,0,o);}
+  func_002A7398(o,0,FloatToInt(IntToFloat(*(short *)(d+0x24))-*health)<8 ? FloatToInt(IntToFloat(*(short *)(d+0x24))-*health):7);
+  {int s=func_002A7820(0,2); if(*health>0)PlayMobySound(s,0,o);}
  }
  *(u8 *)(o+0xa8)=255;func_002AB8C0(o,color);
  if(*health<=0) {
@@ -59,12 +59,12 @@ void func_L19_004203F0(char *o)
   if(hit)qcopy(b,hit);else {qcopy(b,o+0x10); b[2]+=2;}
   qzero(a);a[2]=0.15f;
   func_002B0A68(o,15,a,3,6,3,6,255);
-  n=func_0029EFD0(0x1266);
+  n=CreateMoby(0x1266);
   if(n) {
    *(u8 *)(n+0x23)=0x50;*(u16 *)(n+0x34)|=0x800;
    *(float *)(n+0x2c)=*(float *)(*(char **)(n+0x24)+0x24)*0.65f;
    *(u8 *)(n+0x30)=255;*(u16 *)(n+0x32)=255;*(u8 *)(n+0x31)=1;*(u8 *)(n+0x20)=0;*(u8 *)(n+0xbc)=0;
-   qcopy(n+0x10,o+0x10);func_002A0F48(n);func_002AB650(n);func_002E5CF8(3,0,o);*(char **)(*(char **)(n+0x68)+4)=o;
+   qcopy(n+0x10,o+0x10);func_002A0F48(n);func_002AB650(n);PlayMobySound(3,0,o);*(char **)(*(char **)(n+0x68)+4)=o;
   }
   *(u8 *)(o+0x20)=2;*(u16 *)(o+0x34)=(*(u16 *)(o+0x34)|0x41)&0xefff;*(int *)(o+0x98)=0;
  }

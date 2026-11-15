@@ -58,8 +58,8 @@ void func_L22_003FCF08(u8 *origin, u8 *base, int count)
             func_002AF000(dir, func_002A7878(D_L22_001B0D0C * scale, D_L22_001B0D10 * scale),
                           heading, a);
             *(TI128 *)q = *(TI128 *)base;
-            func_00282D30((char *)q, (char *)base, func_002A7878(0.75f, 0.95f));
-            func_00282CD8((char *)out, (char *)dir, (char *)q);
+            FastVecScale((char *)q, (char *)base, func_002A7878(0.75f, 0.95f));
+            add_vectors((char *)out, (char *)dir, (char *)q);
             qcopy(v, origin);
             v[0] += func_002A78D8(zero, step);
             v[1] += func_002A78D8(zero, step);

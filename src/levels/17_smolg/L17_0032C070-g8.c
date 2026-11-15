@@ -57,9 +57,9 @@ int func_L17_003C70E0(char *a0)
     float v[4];
     float m[12];
 
-    func_00282CF0(v, D_00189EA0, a0 + 0x10);
+    FastVecSub(v, D_00189EA0, a0 + 0x10);
     func_002836E8(m, a0 + 0xC0);
-    func_00283098(v, v, m);
+    matrix_mul_vec3(v, v, m);
     if (!(func_00282C48(v[0]) <= D_L17_001B0360))
         return 0;
     if (!(func_00282C48(v[1]) <= D_L17_001B0360))

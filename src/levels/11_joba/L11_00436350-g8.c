@@ -27,8 +27,8 @@ void func_L11_00436350(char *p) {
     char *s=F(p,char *,0x68), *hit;
     float v[4], angle, z;
     if (F(p,unsigned char,0x20)==0) {
-        F(s,unsigned char,0x48)=func_00283CF0(15.0f);
-        F(s,unsigned char,0x4A)=func_00283CF0(4.0f);
+        F(s,unsigned char,0x48)=FloatToInt(15.0f);
+        F(s,unsigned char,0x4A)=FloatToInt(4.0f);
         F(s,unsigned char,0x29)=1;
         F(s,char *,0x18)=s+0x100;
         angle=func_002A7878(15.0f,40.0f)*0.017453294f;
@@ -60,13 +60,13 @@ void func_L11_00436350(char *p) {
             (F(other,short,0xAA)==0xA03 || F(other,short,0xAA)==0xB89)) F(hit,int,0x2C)=0;
             if(F(s,short,0x286)) {
                 char *velocity=hit+0x10;
-                func_00282CF0(v,(float *)func_L11_004417E8(F(p,int,0xB8)),(float *)(p+0x10));
+                FastVecSub(v,(float *)func_L11_004417E8(F(p,int,0xB8)),(float *)(p+0x10));
                 v[2]=0;
-                func_00282F20((char *)v,(char *)v,1.0f);
-                func_00282F20((char *)v,(char *)v,func_00282DB0(velocity,v));
-                angle=func_00282DF0(velocity);
-                func_00282CF0((float *)velocity,(float *)velocity,v);
-                func_00282F20(velocity,velocity,angle);
+                vec_scale_to_length((char *)v,(char *)v,1.0f);
+                vec_scale_to_length((char *)v,(char *)v,FastVecDot(velocity,v));
+                angle=FastVecLength(velocity);
+                FastVecSub((float *)velocity,(float *)velocity,v);
+                vec_scale_to_length(velocity,velocity,angle);
             }
         }
         if(func_002B0ED8(p,s+0x50,0)==5) {
@@ -75,7 +75,7 @@ void func_L11_00436350(char *p) {
         }
         func_L11_00436850(p);
         if(F(s,short,0x286)) {
-            func_00283698(s+0x210,p+0xC0);
+            matrix_from_basis_rows(s+0x210,p+0xC0);
             func_002AFFD8(p+0x10,s+0x240,0);
             if(!func_L11_004461C0(F(p,int,0xB8),p+0x10)) {
                 F(s,int,0x20)=0;
@@ -83,11 +83,11 @@ void func_L11_00436350(char *p) {
             }
             if(F(p,unsigned char,0x20)!=11) {
                 z=F(p,float,0x18);
-                func_00282CF0(v,(float *)(p+0x10),(float *)func_L11_004417E8(F(p,int,0xB8)));
+                FastVecSub(v,(float *)(p+0x10),(float *)func_L11_004417E8(F(p,int,0xB8)));
                 v[2]=0;
                 if(func_L00_002EE290(v)>225.0f) {
-                    func_00282F20((char *)v,(char *)v,15.0f);
-                    func_00282CC0(p+0x10,(char *)v,func_L11_004417E8(F(p,int,0xB8)));
+                    vec_scale_to_length((char *)v,(char *)v,15.0f);
+                    FastVecAdd(p+0x10,(char *)v,func_L11_004417E8(F(p,int,0xB8)));
                     F(p,float,0x18)=z;
                 }
             }
@@ -95,7 +95,7 @@ void func_L11_00436350(char *p) {
     }
     if(!F(s,short,0x286) && F(p,unsigned char,0x20)!=11 && !D_L11_001A8FF4) {
         F(p,unsigned short,0x34)|=0x400;
-        if(F(p,unsigned char,0x31) && func_00282E48(p+0x10,D_L11_001BA8C0)<24.0f) {
+        if(F(p,unsigned char,0x31) && fast_vec_dist(p+0x10,D_L11_001BA8C0)<24.0f) {
             func_002A93B0(p);
             F(p,unsigned char,0x6F)=22;
         }

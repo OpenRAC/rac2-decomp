@@ -129,8 +129,8 @@ void func_L04_0044D0C0(u8 *obj)
         }
         p->i320 = 0;
         p->i324 = 0;
-        p->b48 = func_00283CF0(15.0f);
-        p->b4A = func_00283CF0(4.0f);
+        p->b48 = FloatToInt(15.0f);
+        p->b4A = FloatToInt(4.0f);
         p->b29 = 1;
         p->b70 = 6;
         p->iA8 = 3;
@@ -152,10 +152,10 @@ void func_L04_0044D0C0(u8 *obj)
         p->bCF = 11;
         p->bD2 = 6;
         p->bD3 = 11;
-        func_L04_0033CB88(&p->t140);
+        MoveCtl_Init(&p->t140);
         p->t140.f0C = 2.5f;
         p->t140.f08 = 2.0f;
-        p->t140.i00 = func_00283CF0(D_L04_001B1870 * 1024.0f);
+        p->t140.i00 = FloatToInt(D_L04_001B1870 * 1024.0f);
         p->t140.f04 = D_L04_001B1870;
         p->t140.f24 = p->f30C * (1.0f / 60.0f);
         if (p->v2E0.f[3] != 12439.4f) {
@@ -177,7 +177,7 @@ void func_L04_0044D0C0(u8 *obj)
         if (obj[0x43])
             func_002A7470(obj, 0, 0, 0);
     }
-    if (obj[0x31] && func_00282E48(obj + 0x10, D_L04_001B9680) < 24.0f) {
+    if (obj[0x31] && fast_vec_dist(obj + 0x10, D_L04_001B9680) < 24.0f) {
         func_002A93B0(obj);
         obj[0x6F] = 22;
     }

@@ -62,7 +62,7 @@ void func_L14_003DECE0(char *self) {
         if (D_00189E20.obj == self && D_00189E20.active) {
             func_L14_003DF200(self);
             if (!*(int *)(state + 0x6C) || func_L14_003DF440(self) || func_L14_003DF540(self)) {
-                func_002B0C28(4, 0x279A, 1);
+                TryClaimNotice(4, 0x279A, 1);
                 {
                     int flags = D_00138324 & 0x10;
                     active = flags != 0;
@@ -73,13 +73,13 @@ void func_L14_003DECE0(char *self) {
              * compiler share the floating-point branch, as retail does. */
             if (*(int *)(state + 0x7C)) {
                 if (D_00189E20.pos[2] - *(float *)(state + 0x70) > -0.25f) {
-                    if (func_00282E80(D_00189E20.pos, self + 0x10) < 24.0f)
+                    if (vec_distance_xy(D_00189E20.pos, self + 0x10) < 24.0f)
                         active = 1;
                 }
             } else {
                 PlayerState *player = &D_00189E20;
                 if (func_00282C48(player->pos[2] - D_L14_001B268C[*(int *)(state + 0x60)].height) < 1.0f) {
-                    if (func_00282E80(player->pos, self + 0x10) < 24.0f)
+                    if (vec_distance_xy(player->pos, self + 0x10) < 24.0f)
                         active = 1;
                 }
             }
@@ -98,7 +98,7 @@ void func_L14_003DECE0(char *self) {
         speed = 0.00111111114f;
         blocked = 0;
         if (*(int *)(state + 0x7C) && D_00189E20.pos[2] < *(float *)(self + 0x18) - 1.0f &&
-            func_002ACBC8(D_00189E20.pos, *(int *)(state + 0x60))) {
+            IsPointInCuboid(D_00189E20.pos, *(int *)(state + 0x60))) {
             blocked = 1;
             target += 1.5f;
             speed = 0.00222222228f;
@@ -124,7 +124,7 @@ void func_L14_003DECE0(char *self) {
     if (func_00282C48(*(float *)(state + 0x74)) > 0.01f) {
         unsigned char *e = (unsigned char *)D_00188660 + *(int *)(state + 0x78) * 0x70;
         if (*(char **)(e + 0x88) != self || !e[0x74])
-            *(int *)(state + 0x78) = func_002E5CF8(0, 4, self);
+            *(int *)(state + 0x78) = PlayMobySound(0, 4, self);
     } else {
         int n = *(int *)(state + 0x78);
         if (n != -1) {

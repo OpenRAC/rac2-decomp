@@ -79,12 +79,12 @@ void func_L00_002A9760(void)
     P->flags |= 0x400;
     if (D_L00_001A8FF0 || (O(float, 0xe8) < 0.99f && D_00189E20_2.f229c != 17)) {
         P->opacity = 255;
-        func_00282D30(a, P, 0.0009765625f);
-        func_00282D30(b, P->up, -16.0f);
-        func_00282CC0(b, a, b);
-        if (func_002761F8(a, b, 34, 0, 0)) {
-            func_00282CF0(c, D_L00_001BF220, P->position);
-            O(float, 0x70) = func_00282DB0(c, P->up);
+        FastVecScale(a, P, 0.0009765625f);
+        FastVecScale(b, P->up, -16.0f);
+        FastVecAdd(b, a, b);
+        if (CollLine(a, b, 34, 0, 0)) {
+            FastVecSub(c, D_L00_001BF220, P->position);
+            O(float, 0x70) = FastVecDot(c, P->up);
             O(float, 0x74) = O(float, 0xc) * 0.000244140625f;
         } else {
             O(int, 0x70) = 0;
@@ -99,12 +99,12 @@ void func_L00_002A9760(void)
         float delta, target = 0.97f;
         if (D_00189E20_2.f34e || D_00189E20_2.f229c == 4)
             target = 1.56f;
-        delta = func_00283BE0(target, D_00189E20_2.feb0);
+        delta = fast_subtract_rotations(target, D_00189E20_2.feb0);
         if (delta > 0.052f)
             delta = 0.052f;
         else if (delta < -0.052f)
             delta = -0.052f;
-        D_00189E20_2.feb0 = func_00283B98(D_00189E20_2.feb0, delta);
+        D_00189E20_2.feb0 = FastAddRotations(D_00189E20_2.feb0, delta);
     }
     func_002A04E8(P, a);
     angle = func_00283248(a[0], a[1]);
@@ -142,17 +142,17 @@ void func_L00_002A9760(void)
         for (i = 3; i >= 0; offset++, i--, turn++) {
             float scale, t, step, cosine, distance;
             scale = O(float, 0xc) * 0.0009765625f;
-            func_00282D30(probeStart, P, 0.0009765625f);
-            t = func_00283B98(angle, *turn);
+            FastVecScale(probeStart, P, 0.0009765625f);
+            t = FastAddRotations(angle, *turn);
             cosine = func_00283180(t);
             step = scale * 0.35f;
             b[0] += cosine * step;
             b[1] += func_00283198(t) * step;
             b[2] += *offset * scale;
             distance = ((b[2] - height + 0.5f) * 2.0f) / -a[2];
-            func_00282F20(probeEnd, a, distance);
-            func_00282CC0(probeEnd, probeStart, probeEnd);
-            if (func_002761F8(probeStart, probeEnd, 34, 0, 0)) {
+            vec_scale_to_length(probeEnd, a, distance);
+            FastVecAdd(probeEnd, probeStart, probeEnd);
+            if (CollLine(probeStart, probeEnd, 34, 0, 0)) {
                 lo = func_00282C50(lo, D_L00_001BF200.height);
                 hi = func_L00_002EE050(hi, D_L00_001BF200.height);
             }

@@ -1,5 +1,5 @@
 /* func_L00_002B5590 (92 bytes, 27 levels): copies a vector next to a zero one, has
-   func_L00_002D3798 fill the zero one, and combines the two with func_00282DB0. The
+   func_L00_002D3798 fill the zero one, and combines the two with FastVecDot. The
    zero store is qzero_nc: retail builds the second slot's address again after it. */
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
@@ -18,5 +18,5 @@ void func_L00_002B5590(TI128 *p)
     qzero_nc(&buf[1]);
     b = &buf[1];
     func_L00_002D3798(b, b, 1.0f);
-    func_00282DB0(a, b);
+    FastVecDot(a, b);
 }

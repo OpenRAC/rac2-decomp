@@ -24,9 +24,9 @@ char *func_L20_00442F80(char *arg0) {
         char *p=points+0x10+i*0x10;
         if (*(int *)(state+0x182C)==0 && i!=0 && i!=3) continue;
         if (*(int *)(state+0x182C)==1 && (i==0 || i==3)) continue;
-        if (func_00282E80(p,D_00189EA0)>3.0f && func_00282E80(p,arg0+0x10)>6.0f) {
+        if (vec_distance_xy(p,D_00189EA0)>3.0f && vec_distance_xy(p,arg0+0x10)>6.0f) {
             angle=func_00283248(*(float *)p-D_L20_001B9E80.x,*(float *)(p+4)-D_L20_001B9E80.y);
-            angle=func_00283C80(D_L20_001B9E80.yaw,angle);
+            angle=FastDiffRots(D_L20_001B9E80.yaw,angle);
             if (angle<limit) {
                 qcopy(&pos,p);
                 pos.f[2]=func_002A89A8(&pos,0,0.5f)+0.6f;

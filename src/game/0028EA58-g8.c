@@ -23,7 +23,7 @@ void func_0028EA58(int texture, int x, int y, int width, int height, int *colors
     qcopy(D_001B22A8, D_001AC830);
     q = p + 32;
     ref_L00_002FA150_00 = q;
-    result = func_0028E640(texture);
+    result = GetFrameTexture(texture);
     *(u64 *)q = result;
     *(u64 *)(q+8) = 0x15c;
     *(s64 *)(q+16) = colors[0];

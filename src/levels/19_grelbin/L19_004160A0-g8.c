@@ -86,7 +86,7 @@ void func_L19_004160A0(char *obj)
 
     if (((GrelbinContext *)D_00189E20)->mode == 0x6F) return;
     if (!func_002ACD38(obj+0x10)) {
-        B(obj,0x30)=func_00283CF0((float)S(obj,0x32)+15.0f);
+        B(obj,0x30)=FloatToInt((float)S(obj,0x32)+15.0f);
         return;
     }
     s=P(obj,0x68);
@@ -121,7 +121,7 @@ void func_L19_004160A0(char *obj)
             if (W(s,0x2FC)==1) {
                 func_002A7750(obj,4,2);
                 if (B(obj,0x43)) func_002A7470(obj,0,0,10);
-            } else if (W(s,0x220) && func_00282978(s+0x21E)) {
+            } else if (W(s,0x220) && FastDecTimer(s+0x21E)) {
                 func_002A7750(obj,2,1);
                 W(s,0x220)=0;
                 if (W(s,0x218)<300) W(s,0x218)=func_002A7820(480,600);
@@ -151,8 +151,8 @@ void func_L19_004160A0(char *obj)
         func_L01_00322288(obj,func_00283248(F(attackTarget,0x10)-F(obj,0x10),F(attackTarget,0x14)-F(obj,0x14)));
         if (B(obj,0x20)!=4) func_002AA548(obj+0x18,s+0x2D4,F(s,0x2D0),0.003888888983f,0.003888888983f,0.7000000477f);
         if (B(obj,0x20)!=4 && B(obj,0x20)!=11) {
-            if (func_00282E80(obj+0x10,((GrelbinContext *)D_00189E20)->position)<12.0f) F(s,0x2D0)=F(s,0x2D8)-10.0f;
-            else if (func_00282E80(obj+0x10,((GrelbinContext *)D_00189E20)->position)<26.0f) F(s,0x2D0)=F(s,0x2D8)-7.0f;
+            if (vec_distance_xy(obj+0x10,((GrelbinContext *)D_00189E20)->position)<12.0f) F(s,0x2D0)=F(s,0x2D8)-10.0f;
+            else if (vec_distance_xy(obj+0x10,((GrelbinContext *)D_00189E20)->position)<26.0f) F(s,0x2D0)=F(s,0x2D8)-7.0f;
             else F(s,0x2D0)=F(s,0x2D8)-4.0f;
         }
         if (W(s,0x2FC)!=1 && W(s,0x2F8)!=1 && B(obj,0x20)!=4 && B(obj,0x20)!=7 && B(obj,0x20)!=8 && B(obj,0x20)!=9 && B(obj,0x20)!=11) {
@@ -170,13 +170,13 @@ void func_L19_004160A0(char *obj)
         /* fall through */
     }
     case 3:
-        if (B(obj,0x60)&2) {func_002A6C58(obj,0,3);func_0029F338(obj);return;}
+        if (B(obj,0x60)&2) {SetDeathBits(obj,0,3);func_0029F338(obj);return;}
     {
     char *childState;
     if (F(s,0x20)<=0.0f && func_002AEB60(obj,45.0f) && !(D_L19_0021EA30.entries[(s16)(flags=H(obj,0xB2))])) {
         int counts=D_0019B4A8[((s16)flags>>1)+(D_001A79F0<<10)];
         if (!((flags&1) ? (counts>>4)&7 : counts&7)) {
-            spawnedActor=func_0029EFD0(0x1266);
+            spawnedActor=CreateMoby(0x1266);
             if (spawnedActor) {
                 u16 id=H(obj,0xB2);
                 if (id&1) {
@@ -218,12 +218,12 @@ void func_L19_004160A0(char *obj)
                 func_002A7A00(v,0.2833333611f,0.3500000238f);
                 v[2]=func_00282C48(v[2])*6.5f;
                 if (v[2]>1.2500001192f) v[2]=1.2500001192f;
-                func_00282CC0(v,v,D_L19_001A8F20);
+                FastVecAdd(v,v,D_L19_001A8F20);
                 src=P(s,0x2F0);
                 effect=func_00273730(src,1,S(src,0xAA),j,src+0x10,src+0xF0,v,0xFF,180.0f,45.0f);
                 P(effect,0x64)=(char *)func_00310C88;
             }
-            newActor=func_0029EFD0(0x1208);
+            newActor=CreateMoby(0x1208);
             if (newActor) {
                 func_002B37E8(newActor,P(s,0x2F0));
                 H(newActor,0x32)=H(obj,0x32);B(newActor,0x30)=B(obj,0x30);
@@ -262,7 +262,7 @@ void func_L19_004160A0(char *obj)
         }
         break;
     case 7:
-        if (func_002AEB60(obj,13.0f)) func_002E5CF8(4,0,obj);
+        if (func_002AEB60(obj,13.0f)) PlayMobySound(4,0,obj);
         if (func_0029F530(obj)>17.0f && B(obj,0x42)==2) {
             F(obj,0x48)=0.5f;func_L00_002E6CF0(func_L19_00417A58,obj);
             if (B(obj,0x60)&2) {
@@ -274,20 +274,20 @@ void func_L19_004160A0(char *obj)
         break;
     case 8:
         func_L00_002E6CF0(func_L19_00417CA0,obj);
-        if (F(s,0x22C)>=1.0f) {func_002E5CF8(3,0,obj);func_002A7750(obj,9,-1);}
+        if (F(s,0x22C)>=1.0f) {PlayMobySound(3,0,obj);func_002A7750(obj,9,-1);}
         break;
     case 9:
     {
         char *particle;
-        func_L00_002E6CF0(func_L19_00417F88,obj);
+        func_L00_002E6CF0(DrawGrelbinBeamEffect,obj);
         qcopy(v,D_L19_001BFEA0);
         for (i=9;i>=0;i--) {
             func_002A7988(vel,0.2333333492f,0.2666666806f);
             if (vel[2]<0.0f) vel[2]=-vel[2];
-            n=func_00283CF0(func_002A78D8(2.0f,5.0f));
+            n=FloatToInt(func_002A78D8(2.0f,5.0f));
             f=func_002A7878(0.6f,1.0f);
             func_002C7970(s+0x2C0,vel,20,0x804020,n,127,127,210000.0f*f,2100.0f,0.00405555591f,D_L19_001B1BF8);
-            n=func_00283CF0(func_002A78D8(2.0f,5.0f));
+            n=FloatToInt(func_002A78D8(2.0f,5.0f));
             f=func_002A7878(0.6f,1.0f);
             particle=func_002C7970(s+0x2C0,vel,20,0x804040,n,48,48,630000.0f*f,4200.0f,0.00405555591f,0);
             if (particle) {
@@ -295,15 +295,15 @@ void func_L19_004160A0(char *obj)
                 B(particle,2)=B(P(g,0xD4),0);
             }
         }
-        func_002A8C00(mat,obj,0x10001,D_L19_001A8F20,(float)B(s,0x34));
+        make_hit_descriptor(mat,obj,0x10001,D_L19_001A8F20,(float)B(s,0x34));
         func_0029FC20(obj,0,mat2);
         qcopy(vel,mat2+0x30);
-        func_00282F20(tmp,mat2,0.25f);
-        func_00282CC0(vel,vel,tmp);
-        func_00282CF0(delta,s+0x2E0,vel);
-        func_00282F20(delta,delta,F(s,0x238)*60.0f);
-        func_00282CC0(delta,delta,vel);
-        func_002761F8(vel,delta,0,obj,mat);
+        vec_scale_to_length(tmp,mat2,0.25f);
+        FastVecAdd(vel,vel,tmp);
+        FastVecSub(delta,s+0x2E0,vel);
+        vec_scale_to_length(delta,delta,F(s,0x238)*60.0f);
+        FastVecAdd(delta,delta,vel);
+        CollLine(vel,delta,0,obj,mat);
         if (H(obj,0x96)>40) {
             F(s,0x234)-=0.05f;
             if (F(s,0x234)<=0.0f) {

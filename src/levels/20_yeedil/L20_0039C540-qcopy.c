@@ -7,7 +7,7 @@ extern char *func_0029EFD0(int);
 /* Spawns an object of type 0x12F2 and fills its position and its sub-record vector. */
 char *func_L20_0039C540(char *arg0, char *arg1, char *arg2, float f12) {
     char *v;
-    char *o = func_0029EFD0(0x12F2);
+    char *o = CreateMoby(0x12F2);
 
     if (o != 0) {
         *(int *)(o + 0xB8) = (int)arg0;

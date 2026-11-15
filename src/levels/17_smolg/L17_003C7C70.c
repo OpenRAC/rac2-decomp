@@ -61,10 +61,10 @@ s32 func_L17_003CC798(u8 *a0, TI128 *a1, f32 f1, f32 f2) {
     Vec4 out[1];
 
     v[0].q = *a1;
-    func_00283698(mat, a0 + 0xC0);
-    func_00282CF0(&out[0].q, &v[0].q, a0 + 0x10);
+    matrix_from_basis_rows(mat, a0 + 0xC0);
+    FastVecSub(&out[0].q, &v[0].q, a0 + 0x10);
     w[0].q = out[0].q;
-    func_002830C0(&w[0].q, &w[0].q, mat);
+    transform_vector(&w[0].q, &w[0].q, mat);
     if (func_00282C48(w[0].f.x) < f2) {
         if (func_00282C48(w[0].f.y) < f1)
             return 1;
@@ -108,7 +108,7 @@ void func_L17_003CC850(u8 *a0)
         if (!(D_00189E20.z < *(f32 *)(a0 + 0x18))) {
             break;
         }
-        if (!(func_00283C80(*(f32 *)(a0 + 0xF8),
+        if (!(FastDiffRots(*(f32 *)(a0 + 0xF8),
                           func_00283248(D_00189E20.x - *(f32 *)(a0 + 0x10),
                                       D_00189E20.y - *(f32 *)(a0 + 0x14))) < 1.5707965f)) {
             break;
@@ -126,14 +126,14 @@ void func_L17_003CC850(u8 *a0)
         }
         here = *(TI128 *)&D_00189E20.x;
         if (func_L17_003CC798(a0, &here, 60.0f, 2.5f)) {
-            func_002AA2E8(st + 3, st[2] * (1.0f / 60.0f), st[2] * 0.0011111112544313073f);
+            ApproachValue(st + 3, st[2] * (1.0f / 60.0f), st[2] * 0.0011111112544313073f);
         } else {
-            func_002AA2E8(st + 3, 0.0f, st[2] * 0.0005555556272156537f);
+            ApproachValue(st + 3, 0.0f, st[2] * 0.0005555556272156537f);
         }
         dir[0] = func_00283180(*(f32 *)(a0 + 0xF8)) * st[3];
         dir[1] = func_00283198(*(f32 *)(a0 + 0xF8)) * st[3];
         dir[2] = 0;
-        func_00282CD8(&here, (u8 *)&D_00189E20 + 0x100, dir);
+        add_vectors(&here, (u8 *)&D_00189E20 + 0x100, dir);
         break;
     }
     if (a0[0x20] != 3) {
@@ -232,7 +232,7 @@ int func_L17_003E6DE8(char *object)
         **(int **)(state + 0x720) = index;
         **(int **)(state + 0x748) = 1;
         nearest = *(float **)(state + 0x74C);
-        *nearest = func_00282E48(object + 0x10, state + 0x240);
+        *nearest = fast_vec_dist(object + 0x10, state + 0x240);
         return 0;
     }
     if (**(int **)(state + 0x748) == 1) {
@@ -240,7 +240,7 @@ int func_L17_003E6DE8(char *object)
             **(int **)(state + 0x748) = 2;
             return 1;
         }
-        distance = func_00282E48(object + 0x10, state + 0x240);
+        distance = fast_vec_dist(object + 0x10, state + 0x240);
         best = *(float **)(state + 0x74C);
         if (distance < *best) {
             **(int **)(state + 0x720) = index;
@@ -337,7 +337,7 @@ void func_L17_0041ED58(unsigned char *o)
         if(bits) goto remove_self;
         position=o+0x10;
         {
-            *(float *)(o+0xf8)=func_00283B98(*(float *)(o+0xf8),0.087266474f);
+            *(float *)(o+0xf8)=FastAddRotations(*(float *)(o+0xf8),0.087266474f);
             n=1;
             do {
                 size=func_002A7878(2.0f,5.0f);
@@ -353,7 +353,7 @@ void func_L17_0041ED58(unsigned char *o)
                 func_002C2210(pos,3,0x208020ff,0,sign,vel,size*0.1f,size,0.006f,0);
                 func_002C2210(pos,3,0x20ffffff,1,-sign,vel,size*0.03f,size*0.3f,0.006f,0);
             } while(--n>=0);
-            if(func_00282E80(position,D_00189EA0)<1.5f) {
+            if(vec_distance_xy(position,D_00189EA0)<1.5f) {
                 unsigned short pickupId;
                 unsigned char *counter;
                 D_0013963C=1;

@@ -122,7 +122,7 @@ void func_0027AB40(void) {
     D_00263690.near_int = near_bits;
     D_00263640.max = 0x437EFFFF;
     D_00263690.max = 0x437EFFFF;
-    func_002EF080();
+    SetTfragDists();
 
     projection_near_clip = clip_view->near_clip;
     far_clip = clip_view->far_clip;

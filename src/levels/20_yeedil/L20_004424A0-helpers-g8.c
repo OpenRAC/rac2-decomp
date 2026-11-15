@@ -21,5 +21,5 @@ void func_L20_004424A0(char *actor)
     *(float *)(state + 0x7C) = D_L20_001B2138 * 0.000277777785f;
     *(float *)(state + 0xE0) = func_002A89A8(actor + 0x10, 0, 0.5f);
     qzero(state + 0xF0);
-    *(float *)(state + 0xF8) = func_00282C10(*(float *)(state + 0x7C) * 2.0f * D_L20_001B2128);
+    *(float *)(state + 0xF8) = square_root(*(float *)(state + 0x7C) * 2.0f * D_L20_001B2128);
 }

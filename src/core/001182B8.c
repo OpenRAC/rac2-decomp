@@ -78,6 +78,6 @@ double func_001182B8(double x)
         hx = (hx&0x000fffff)|((0x3ff-i)<<20);
         y  = (double)(k+i);
 	SET_HIGH_WORD(x,hx);
-	z  = y*log10_2lo + ivln10*func_00117CA0(x);
+	z  = y*log10_2lo + ivln10*__ieee754_log(x);
 	return  z+y*log10_2hi;
 }

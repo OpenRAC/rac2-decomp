@@ -70,7 +70,7 @@ void func_L01_003C2680(L01_003C2680_OBJ *a0)
         func_002B41A8(a0, (char *)s1 + 0x60, 0, 0, &D_L01_001AFF40, 0, 0, 0, &D_L01_001AFF60, &D_L01_001AFF50, 0);
         return;
     case 1:
-        if (a0->f31 != 0 && func_00282E80(p + 0x10, D_L01_001B94C0) < 32.0f) {
+        if (a0->f31 != 0 && vec_distance_xy(p + 0x10, D_L01_001B94C0) < 32.0f) {
             s1->f68 = func_L01_003BAFB0() + D_L01_001AFF6C;
             func_002B44C0(a0, (char *)s1 + 0x60, 0);
         }

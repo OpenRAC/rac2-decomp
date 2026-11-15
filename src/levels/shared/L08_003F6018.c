@@ -34,7 +34,7 @@ u8 *func_L08_003F6018(u8 *owner, SpawnQuad *position, float *direction)
     state = *(PoolSlotsPrefix **)(owner + 0x68);
     child = 0;
     for (i = 0; i < 2; i++) {
-        if (func_002A8600(&child, state->slots[i], 1, 1) != 0)
+        if (GetFirstMobyInGroup(&child, state->slots[i], 1, 1) != 0)
             continue;
         state->activeCount++;
         {
@@ -73,7 +73,7 @@ u8 *func_L08_003F6018(u8 *owner, SpawnQuad *position, float *direction)
         if (head != 0)
             *(SpawnQuad *)(head + 0x80) = *(SpawnQuad *)direction;
         else
-            func_0026FEB8(D_L08_001B0B68, *(short *)(child + 0xaa), *(short *)(child + 0xb2), D_L08_001B2508);
+            STUB_printf(D_L08_001B0B68, *(short *)(child + 0xaa), *(short *)(child + 0xb2), D_L08_001B2508);
         if (state->smallScale)
             *(float *)(child + 0x2c) = *(float *)(*(u8 **)(child + 0x24) + 0x24) * 0.1f;
         if (*(short *)(owner + 0xb4) < *(short *)(child + 0xb4))
@@ -85,7 +85,7 @@ u8 *func_L08_003F6018(u8 *owner, SpawnQuad *position, float *direction)
         child[0x6e] = 0;
         child[0x6c] = 255;
         child[0x6d] = 255;
-        func_0029F390(child);
+        update_moby_animation_state(child);
         *(int *)(child + 0x98) = *(int *)(*(u8 **)(child + 0x24) + 0x10);
         func_002AB650(child);
         func_002A0F48(child);
@@ -98,6 +98,6 @@ u8 *func_L08_003F6018(u8 *owner, SpawnQuad *position, float *direction)
         }
         return c;
     }
-    func_0026FEB8(D_L08_001B0BA8, *(short *)(owner + 0xb2), D_L08_001B2508);
+    STUB_printf(D_L08_001B0BA8, *(short *)(owner + 0xb2), D_L08_001B2508);
     return 0;
 }

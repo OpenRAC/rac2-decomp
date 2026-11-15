@@ -33,10 +33,10 @@ void func_L00_003C58E8(void *position, int color)
         offset[2] += func_002A78D8(0.0f, 0.1f);
         particle = func_002C2210(scale * 0.1f, offset, 20, scale, color | 0x7F000000, 0, sign, vector, 0.0f, 1);
         if (particle)
-            particle[9] = func_00283CF0(4.0f) + 112;
+            particle[9] = FloatToInt(4.0f) + 112;
         particle = func_002C2210(scale * 0.04f, offset, 20, scale * 0.4f, 0x7F7F7F7F, 1, -sign, vector, 0.0f, 1);
         if (particle)
-            particle[9] = func_00283CF0(4.0f) + 112;
+            particle[9] = FloatToInt(4.0f) + 112;
         i--;
     } while (i >= 0);
 }

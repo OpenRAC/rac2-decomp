@@ -12,7 +12,7 @@ char *func_L04_00363690(void *position, void *velocity, int word, int color,
     if (particle) {
         data = particle + 0x20;
         qcopy(particle + 0x10, position);
-        particle[9] = func_00283CF0(1.0f) + 0x40;
+        particle[9] = FloatToInt(1.0f) + 0x40;
         particle[3] = 0x44;
         particle[1] = 0;
         particle[2] = D_L04_001FF390[index];
@@ -23,7 +23,7 @@ char *func_L04_00363690(void *position, void *velocity, int word, int color,
         qcopy(data, velocity);
         *(int *)(data + 0x1C) = word;
         *(float *)(data + 0x10) = scale;
-        *(int *)(data + 0x14) = func_00283CF0(func_002A7878(-3.0f, 3.0f));
+        *(int *)(data + 0x14) = FloatToInt(func_002A7878(-3.0f, 3.0f));
         *(float *)(data + 0x18) = size;
     }
     return particle;

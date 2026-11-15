@@ -18,7 +18,7 @@ void func_L22_002AA480(void) {
     if ((*(u16 *)(*(char **)(g + 0x2290) + 0x34) ^ 1) & 1) {
         func_0029FC20(*(void **)(g + 0x2290), 5, matrix);
         qcopy(p + 0x10, matrix + 0x30);
-        func_00283678(p + 0xC0, matrix);
+        copy_matrix3x4(p + 0xC0, matrix);
         func_002AB6D8(matrix, p + 0xF0);
         *(u16 *)(p + 0x34) &= 0xFFBE;
         if (*(u8 *)(p + 0x43) != 0x7A) {

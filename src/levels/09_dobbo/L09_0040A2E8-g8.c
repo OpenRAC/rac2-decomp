@@ -95,14 +95,14 @@ void func_L09_0040A2E8(char *obj) {
             func_002A7750(obj, 1, -1);
         }
         if (U8(obj, 0x20) == 3) {
-            if (!func_002ACBC8(HERO_POS, I32(data, 0x118)) || !D_001395B8.unlocked) {
+            if (!IsPointInCuboid(HERO_POS, I32(data, 0x118)) || !D_001395B8.unlocked) {
                 D_L09_001B15A0 = 1;
             }
         }
         func_L01_003128C0(obj);
         break;
     case 1:
-        if (func_002ACBC8(HERO_POS, I32(data, 0x118))) {
+        if (IsPointInCuboid(HERO_POS, I32(data, 0x118))) {
             if (func_00288AA0(D_L09_001BFC00, 99)) {
                 func_L01_003246D0(obj);
                 func_00288BE8(D_L09_001BFC00);
@@ -127,7 +127,7 @@ void func_L09_0040A2E8(char *obj) {
         }
         break;
     case 3:
-        if (func_002ACBC8(HERO_POS, I32(data, 0x118))) {
+        if (IsPointInCuboid(HERO_POS, I32(data, 0x118))) {
             if (D_001395B8.completed) {
                 if (func_00288AA0(D_L09_001BFC00, 103)) {
                     func_00288AA0(D_L09_001BFC00, 11);
@@ -158,7 +158,7 @@ void func_L09_0040A2E8(char *obj) {
             D_L09_001B25A0[2] = 0;
             U8(obj, 0x31) = 1;
             U16(obj, 0x34) &= 0xFFFE;
-            func_0029B3E0(0, -1);
+            MemcardSave(0, -1);
             func_002A7750(obj, 3, -1);
         }
         break;
@@ -176,7 +176,7 @@ void func_L09_0040A2E8(char *obj) {
                 func_002A0430(U8(obj, 0xB0));
             }
             func_002DF3F8(HERO_POS, HERO_ROT);
-            func_0029B3E0(0, -1);
+            MemcardSave(0, -1);
             U8(obj, 0x31) = 1;
             U16(obj, 0x34) &= 0xFFFE;
             func_0029F338(obj);
@@ -184,7 +184,7 @@ void func_L09_0040A2E8(char *obj) {
         }
         break;
     case 6:
-        if (func_002ACBC8(HERO_POS, I32(data, 0x118)) && D_L09_001B2388 < 10 && D_001395B8.unlocked
+        if (IsPointInCuboid(HERO_POS, I32(data, 0x118)) && D_L09_001B2388 < 10 && D_001395B8.unlocked
             && !D_L09_001B15A0) {
             if (func_00288AA0(D_L09_001BFC00, 102)) {
                 func_00288BE8(D_L09_001BFC00);
@@ -206,7 +206,7 @@ void func_L09_0040A2E8(char *obj) {
             D_L09_001B25A0[2] = 0;
             func_002A7750(obj, 8, -1);
             func_002DF3F8(HERO_POS, HERO_ROT);
-            func_0029B3E0(0, -1);
+            MemcardSave(0, -1);
             func_0029F338(obj);
             return;
         }
@@ -214,8 +214,8 @@ void func_L09_0040A2E8(char *obj) {
     }
 
     if (U8(obj, 0x20)) {
-        if (U8(obj, 0x43) == 1 && func_00282978(data + 0x114)) {
-            S16(data, 0x114) = func_00283CF0(func_002A7878(1200.0f, 2400.0f));
+        if (U8(obj, 0x43) == 1 && FastDecTimer(data + 0x114)) {
+            S16(data, 0x114) = FloatToInt(func_002A7878(1200.0f, 2400.0f));
             if (U8(obj, 0x43) != 2) {
                 func_002A7470(obj, 2, 0, 10);
             }
@@ -229,23 +229,23 @@ void func_L09_0040A2E8(char *obj) {
     if (U8(obj, 0x43) == 1) {
         player = HERO_POS;
         active = 1;
-        if (func_00282E80(obj + 0x10, player) < 8.0f
-            && func_00283C80(F32(obj, 0xF8), yawToHero(obj)) < 1.57079649f) {
-            if (func_00282DF0(player + 0x90) > 0.01f) {
+        if (vec_distance_xy(obj + 0x10, player) < 8.0f
+            && FastDiffRots(F32(obj, 0xF8), yawToHero(obj)) < 1.57079649f) {
+            if (FastVecLength(player + 0x90) > 0.01f) {
                 S16(data, 0x110) = 120;
             } else {
-                func_00282978(data + 0x110);
+                FastDecTimer(data + 0x110);
             }
         } else if (S16(data, 0x110)) {
             S16(data, 0x110) = 0;
             qcopy(data + 0x100, HERO_AIM);
         }
-        if (func_00282978(data + 0x112)) {
-            S16(data, 0x112) = func_00283CF0(func_002A7878(180.0f, 300.0f));
-            randomYaw = func_00283B98(F32(obj, 0xF8), func_002A7878(-90.0f, 90.0f) * 0.017453294f);
+        if (FastDecTimer(data + 0x112)) {
+            S16(data, 0x112) = FloatToInt(func_002A7878(180.0f, 300.0f));
+            randomYaw = FastAddRotations(F32(obj, 0xF8), func_002A7878(-90.0f, 90.0f) * 0.017453294f);
             pitch = func_002A7878(0.0f, 30.0f) * 0.017453294f;
             func_002AF000(data + 0x100, 6.0f, randomYaw, pitch);
-            func_00282CC0(data + 0x100, data + 0x100, obj + 0x10);
+            FastVecAdd(data + 0x100, data + 0x100, obj + 0x10);
         }
         if (S16(data, 0x110)) {
             qcopy(target, HERO_AIM);
@@ -257,9 +257,9 @@ void func_L09_0040A2E8(char *obj) {
     if (active) {
         qcopy(pos, obj + 0x10);
         pos[2] += 2.0f;
-        func_00282CF0(delta, target, pos);
-        yaw = func_00283BE0(func_00283248(delta[0], delta[1]), F32(obj, 0xF8));
-        pitch = -func_00283248(func_00282E20(delta), delta[2]);
+        FastVecSub(delta, target, pos);
+        yaw = fast_subtract_rotations(func_00283248(delta[0], delta[1]), F32(obj, 0xF8));
+        pitch = -func_00283248(vec_length_xy(delta), delta[2]);
         if (yaw > 1.57079649f) {
             yaw = 1.57079649f;
         } else if (yaw < -1.57079649f) {

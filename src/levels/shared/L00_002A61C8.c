@@ -45,7 +45,7 @@ void func_L00_002A61C8(int kind, int side, int play_sound, int duration) {
             if ((unsigned int)(mode - 19) < 2 || mode == 54)
                 special = 1;
         }
-        ticks = func_00283CF0((float)((duration << 10) / 30));
+        ticks = FloatToInt((float)((duration << 10) / 30));
         func_L00_0035F6D8(kind, side, special, 0, (int)D_00189E20.f2290, ticks);
     }
     if (D_001A79F0 == 7) {
@@ -61,13 +61,13 @@ effect:
     heading = D_00189E20.f98;
     if (D_00189E20.f2294 == 0 || D_00189E20.f229C == 4) {
         if (side == 0) {
-            heading = func_00283B98(heading, 0.436332345f);
-            func_00282F20(offset, D_00189E20.v10, 0.037f);
-            func_00282CC0(point, point, offset);
+            heading = FastAddRotations(heading, 0.436332345f);
+            vec_scale_to_length(offset, D_00189E20.v10, 0.037f);
+            FastVecAdd(point, point, offset);
         } else {
-            heading = func_00283B98(heading, -0.436332345f);
-            func_00282F20(offset, D_00189E20.v10, -0.037f);
-            func_00282CC0(point, point, offset);
+            heading = FastAddRotations(heading, -0.436332345f);
+            vec_scale_to_length(offset, D_00189E20.v10, -0.037f);
+            FastVecAdd(point, point, offset);
         }
     }
     func_L00_0033BA68((char *)point, !side, heading);

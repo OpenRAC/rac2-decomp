@@ -78,14 +78,14 @@ void func_L09_00410200(u8 *obj)
     pos[0] = func_00283180(func_002A7940()) * r;
     pos[1] = func_00283198(func_002A7940()) * r;
     pos[2] = 0.0f;
-    func_00282CD8(tmp, pos, obj + 0x10);
+    add_vectors(tmp, pos, obj + 0x10);
     pos[2] -= D_L09_001B17E8;
     qzero_nc(vel);
     vel[2] = func_002A7878(D_L09_001B17B8, D_L09_001B17BC) * (1.0f / 60.0f);
     life = func_002A7820(D_L09_001B17A8, D_L09_001B17AC);
     spin = func_002A7878(D_L09_001B17C8, D_L09_001B17CC);
     size = func_002A7878(D_L09_001B17D0, D_L09_001B17D4);
-    tex = func_00283D38(D_L09_001B17D8, D_L09_001B17DC, func_002A7878(0.0f, 1.0f));
+    tex = FastTweenColor(D_L09_001B17D8, D_L09_001B17DC, func_002A7878(0.0f, 1.0f));
     n = func_002A7820(D_L09_001B17E0, D_L09_001B17E4);
     dir = (func_001163B0() & 1) ? -n : n;
     func_002C2210(pos, life, spin, size, tex, 2, dir, vel, 0,
@@ -99,16 +99,16 @@ void func_L09_00410200(u8 *obj)
     case 1:
         p = D_00188660 + st[2] * 0x70;
         if (*(u8 **)(p + 0x88) != obj || *(u8 *)(p + 0x74) == 0)
-            st[2] = func_002E5CF8(0, 4, obj);
+            st[2] = PlayMobySound(0, 4, obj);
         if (D_00189E20.standing != obj || D_00189E20.busy != 0)
             break;
         if (D_00189E20.help == 0) {
             if (D_001A79F0 == 9)
-                func_002B0C28(4, 0x27C6, 1);
+                TryClaimNotice(4, 0x27C6, 1);
             else if (D_001A79F0 == 18)
-                func_002B0C28(4, 0x27ED, 1);
+                TryClaimNotice(4, 0x27ED, 1);
         } else if (D_00189E20.help == 2) {
-            func_002B0C28(4, 0x27B4, 1);
+            TryClaimNotice(4, 0x27B4, 1);
         }
         if (!(D_00138324 & 0x10) || D_L00_001A8FB4 != 4)
             break;

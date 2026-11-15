@@ -49,7 +49,7 @@ void func_L06_0037E6B0(void *a0, void *a1, u32 a2, f32 f3, f32 f4) {
         p->field10 = *(L06Quad *)a0;
         q = (L06RecordTail *)((u8 *)p + 0x20);
         p->field04 = 0x50502010;
-        p->field09 = (u8)(func_00283CF0(2.0f) + 0x40);
+        p->field09 = (u8)(FloatToInt(2.0f) + 0x40);
         p->field03 = 0x48;
         p->field01 = 0;
         p->field02 = *D_L06_001FF50C;
@@ -58,7 +58,7 @@ void func_L06_0037E6B0(void *a0, void *a1, u32 a2, f32 f3, f32 f4) {
         p->field0A = (u16)a2;
         t = *(L06Quad *)a1;
         p->field20 = t;
-        q->field0C = func_00283CE0((s16)a2);
+        q->field0C = IntToFloat((s16)a2);
         q->field10 = 0.5f;
         q->field14 = f3;
         q->field18 = 0;

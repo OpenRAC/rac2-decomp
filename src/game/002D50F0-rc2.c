@@ -43,7 +43,7 @@ s32 func_002D50F0(void) {
     s32 s0;
     s32 s1;
 
-    func_0027C540(0);
+    SetupGifPaging(0);
     if (D_001A8CFC != 0) {
         func_00300968(func_00336D50(D_001A8CFC + 0x8710, 0x8B), 0x60442D00, (f32)g_001ABAB0, (f32)D_001ABAB4, D_001B23A8, g_001ABAC0);
         func_00300968(func_00336D50(D_001A8CFC + 0x8710, 0x8C), 0x55F0C070, (f32)g_001ABAB0, (f32)D_001ABAB4, D_001B23A8, g_001ABAC0);
@@ -52,13 +52,13 @@ s32 func_002D50F0(void) {
         s1 = s1 + g_001ABAA8;
         s0 = D_001ABAB4;
         s0 = s0 + D_001ABAAC;
-        func_0027FAA8(s1, s0, (u64)0x80F0F0F0, func_00288FB8(0x2D61), -1);
+        func_0027FAA8(s1, s0, (u64)0x80F0F0F0, GetLocalizedString(0x2D61), -1);
         s1 = g_001ABAB0;
         s1 = s1 + g_001ABAB8;
         s0 = D_001ABAB4;
         s0 = s0 + D_001ABABC;
-        func_0027FAA8(s1, s0, (u64)0x80F0F0F0, func_00288FB8(0x2D4F), -1);
+        func_0027FAA8(s1, s0, (u64)0x80F0F0F0, GetLocalizedString(0x2D4F), -1);
     }
-    func_0027C660();
+    DoGifPaging();
     return 0;
 }

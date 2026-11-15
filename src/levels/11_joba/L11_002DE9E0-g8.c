@@ -22,7 +22,7 @@ void func_L11_00397068(u8 *arg0) {
     u8 *s0 = *(u8 **)(s1 + 0x68);
     f32 f0, f1, f2, f4;
 
-    func_00282CC0((f32 *)(s1 + 0x10), (f32 *)(s1 + 0x10), (f32 *)s0);
+    FastVecAdd((f32 *)(s1 + 0x10), (f32 *)(s1 + 0x10), (f32 *)s0);
     f2 = *(f32 *)(s0 + 0x8) - 0.0041666667f;
     f0 = *(f32 *)(s0 + 0x0) * D_L11_001AEC40;
     f1 = *(f32 *)(s0 + 0x4) * D_L11_001AEC40;
@@ -32,8 +32,8 @@ void func_L11_00397068(u8 *arg0) {
     *(f32 *)(s0 + 0x4) = f1;
     if (f2 < f4)
         *(f32 *)(s0 + 0x8) = f4;
-    *(f32 *)(s1 + 0xF8) = func_00283B98(*(f32 *)(s1 + 0xF8), *(f32 *)(s0 + 0x28));
-    *(f32 *)(s1 + 0xF0) = func_00283B98(*(f32 *)(s1 + 0xF0), *(f32 *)(s0 + 0x2C) * (f32)*(s32 *)(s0 + 0x24));
+    *(f32 *)(s1 + 0xF8) = FastAddRotations(*(f32 *)(s1 + 0xF8), *(f32 *)(s0 + 0x28));
+    *(f32 *)(s1 + 0xF0) = FastAddRotations(*(f32 *)(s1 + 0xF0), *(f32 *)(s0 + 0x2C) * (f32)*(s32 *)(s0 + 0x24));
     f0 = func_00282C48(*(f32 *)(s1 + 0xF0));
     if (f0 > 0.78539824f)
         *(s32 *)(s0 + 0x24) = -*(s32 *)(s0 + 0x24);
@@ -142,7 +142,7 @@ typedef struct {
    rates, a random lifetime around D_L11_001AEC3C frames and the level's scale (doubled
    when the current selection record is enabled). */
 PieceMoby_00396DC8 *func_L11_00396DC8(void *unused, f32 *position, f32 *motion) {
-    PieceMoby_00396DC8 *obj = func_0029EFD0(0x1AC);
+    PieceMoby_00396DC8 *obj = CreateMoby(0x1AC);
 
     if (obj != 0) {
         Piece_00396DC8 *vars;
@@ -172,8 +172,8 @@ PieceMoby_00396DC8 *func_L11_00396DC8(void *unused, f32 *position, f32 *motion) 
         vars->spinRate = -(func_002A7878(200.0f, 550.0f) * 0.00029088825f);
         vars->random10 = func_002A7940();
         vars->random14 = func_002A7940();
-        low = func_00283CF0((f32)D_L11_001AEC3C * 0.7f);
-        vars->lifetime = func_002A7820(low, func_00283CF0((f32)D_L11_001AEC3C * 1.2f));
+        low = FloatToInt((f32)D_L11_001AEC3C * 0.7f);
+        vars->lifetime = func_002A7820(low, FloatToInt((f32)D_L11_001AEC3C * 1.2f));
         obj->scale *= D_L11_001AEC38;
         if (((JobaChoice_00396DC8 *)(D_L11_00279BA0 + D_00139578[0] * 0xE0))->enabled)
             obj->scale += obj->scale;

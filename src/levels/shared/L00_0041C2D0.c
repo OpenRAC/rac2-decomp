@@ -85,7 +85,7 @@ char *func_L00_0041C2D0(char *owner, void *pos, int mode, int id, char *hint, in
     float speed, fr;
     char *base;
     int *tab, *pp;
-    m = func_0029EFD0(0x87A);
+    m = CreateMoby(0x87A);
     if (m) {
     s = *(Rocket **)(m + 0x68);
     s->life = 0x12C;
@@ -113,17 +113,17 @@ char *func_L00_0041C2D0(char *owner, void *pos, int mode, int id, char *hint, in
     else
         *(int *)(m + 0x78) = 0xFF0A0AFF;
     if (flag) {
-        func_00282D30(a, HERO->p[0x2290 / 4] + 0xE0, 0.3f);
-        func_00282CC0(m + 0x10, m + 0x10, a);
-        func_00282D30(b, HERO->p[0x2290 / 4] + 0xD0, 0.3f);
-        func_00282CC0(m + 0x10, m + 0x10, b);
-        func_00282D30(c, HERO->p[0x2290 / 4] + 0xC0, 0.5f);
-        func_00282CC0(m + 0x10, m + 0x10, c);
-        func_00282CC0(d, D_00189E20 + 0x80, a);
-        if (func_002761F8(d, m + 0x10, 0x10, HERO->p[0x2290 / 4], 0)) {
-            func_00282CF0(e, d, m + 0x10);
-            func_00282D30(e, e, 0.75f);
-            func_00282CC0(m + 0x10, m + 0x10, e);
+        FastVecScale(a, HERO->p[0x2290 / 4] + 0xE0, 0.3f);
+        FastVecAdd(m + 0x10, m + 0x10, a);
+        FastVecScale(b, HERO->p[0x2290 / 4] + 0xD0, 0.3f);
+        FastVecAdd(m + 0x10, m + 0x10, b);
+        FastVecScale(c, HERO->p[0x2290 / 4] + 0xC0, 0.5f);
+        FastVecAdd(m + 0x10, m + 0x10, c);
+        FastVecAdd(d, D_00189E20 + 0x80, a);
+        if (CollLine(d, m + 0x10, 0x10, HERO->p[0x2290 / 4], 0)) {
+            FastVecSub(e, d, m + 0x10);
+            FastVecScale(e, e, 0.75f);
+            FastVecAdd(m + 0x10, m + 0x10, e);
         }
     } else
         qcopy(m + 0x10, pos);
@@ -131,23 +131,23 @@ char *func_L00_0041C2D0(char *owner, void *pos, int mode, int id, char *hint, in
     speed = (D_L00_00262570 + D_00139568.x16)->speed * 0.016666668f;
     if (mode) {
         HERO->f[0xC04 / 4] = VIEW[2];
-        HERO->f[0xC08 / 4] = func_00283B98(-VIEW[1], 0.12217305600643158f);
+        HERO->f[0xC08 / 4] = FastAddRotations(-VIEW[1], 0.12217305600643158f);
         func_002AF000(s, speed, HERO->f[0xC04 / 4], HERO->f[0xC08 / 4]);
     } else
         func_L00_002D3798(s, s, speed);
     func_00282C88(a);
-    func_002833F0(b, a);
+    euler_rotation_basis(b, a);
     if (mode) {
         a[0] = VIEW[0];
         a[1] = VIEW[1];
         a[2] = VIEW[2];
-        func_002833F0(f, a);
-        func_00283738(b, f, b);
+        euler_rotation_basis(f, a);
+        multiply_matrix3x3(b, f, b);
     } else
-        func_00283738(b, HERO->p[0x2290 / 4] + 0xC0, b);
-    func_00283658(e, b);
+        multiply_matrix3x3(b, HERO->p[0x2290 / 4] + 0xC0, b);
+    copy_matrix_rotation(e, b);
     func_002AB6D8(e, m + 0xF0);
-    func_00283678(m + 0xC0, e);
+    copy_matrix3x4(m + 0xC0, e);
     *(float *)(m + 0xCC) = *(float *)(m + 0xDC) = *(float *)(m + 0xEC) = 0.0f;
     *(u16 *)(m + 0x34) |= 0x100;
     s->scale = 1.0f;
@@ -159,31 +159,31 @@ char *func_L00_0041C2D0(char *owner, void *pos, int mode, int id, char *hint, in
         r = func_002AB1F0(s->target);
         if (r) {
             func_002AFFD8(m + 0x10, n, 1);
-            func_00282D30(t, n, *(float *)(r + 0x10));
-            func_00282CC0(m + 0x10, s->target + 0x10, t);
+            FastVecScale(t, n, *(float *)(r + 0x10));
+            FastVecAdd(m + 0x10, s->target + 0x10, t);
         }
     } else if (flag == 0) {
         char *lock = HERO->p[0x1450 / 4];
         if (lock != 0 && ((u8 *)lock)[0x20] != 0xFE && ((u8 *)lock)[0x20] != 0xFD)
             s->target = lock;
         else
-            s->target = func_002AF580(m + 0x10, e, 0.174532949924469f, 0.349065899848938f, &outv, 0, 0, 0, 30.0f, 0.0f, 0.0f, 0, 0);
+            s->target = SelectBestTargetInCone(m + 0x10, e, 0.174532949924469f, 0.349065899848938f, &outv, 0, 0, 0, 30.0f, 0.0f, 0.0f, 0, 0);
     } else
         s->target = hint;
     if (s->target) {
         func_002AFFD8(m + 0x10, n, 1);
-        fr = func_00282E48(m + 0x10, s->target + 0x10) * 0.033333335f;
+        fr = fast_vec_dist(m + 0x10, s->target + 0x10) * 0.033333335f;
         if (fr > 1.0f)
             fr = 1.0f;
         func_002ACEC0(s, s, n, -(fr * 0.43633235f));
         s->h36 = 0;
     } else {
         if (mode) {
-            func_00282D30(s->aim, D_L00_001B8FF0, 64.0f);
-            func_00282CC0(s->aim, s->aim, D_L00_001B8FF0 - 0x230);
+            FastVecScale(s->aim, D_L00_001B8FF0, 64.0f);
+            FastVecAdd(s->aim, s->aim, D_L00_001B8FF0 - 0x230);
         } else {
-            func_00282D30(n, HERO->p[0x2290 / 4] + 0xC0, 64.0f);
-            func_00282CC0(s->aim, m + 0x10, n);
+            FastVecScale(n, HERO->p[0x2290 / 4] + 0xC0, 64.0f);
+            FastVecAdd(s->aim, m + 0x10, n);
         }
         if (D_L00_001A8FF0 != 0)
             s->h36 = 0;
@@ -228,9 +228,9 @@ char *func_L00_0041C2D0(char *owner, void *pos, int mode, int id, char *hint, in
     qcopy(s->start, m + 0x10);
     if (D_L00_001A8FF0 != 0) {
         func_002AFFD8(m + 0x10, t, 1);
-        fr = func_00282DB0(t, s);
-        func_00282D30(u, t, fr);
-        func_00282CF0(s, s, u);
+        fr = FastVecDot(t, s);
+        FastVecScale(u, t, fr);
+        FastVecSub(s, s, u);
     }
     }
     return m;

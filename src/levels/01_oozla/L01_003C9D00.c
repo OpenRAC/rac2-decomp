@@ -31,7 +31,7 @@ void func_L01_003C9D00(char *obj)
         *(float *)(s + 0x74) = 0.0f;
         *(int *)(obj + 0x98) = 0;
         qcopy(s + 0x80, obj + 0x10);
-        *(float *)(s + 0x98) = func_00282E48(D_L01_001B264C[*(int *)(s + 0x94)].position);
+        *(float *)(s + 0x98) = fast_vec_dist(D_L01_001B264C[*(int *)(s + 0x94)].position);
         func_002A7750(obj, 1, -1);
         break;
     case 1:
@@ -46,12 +46,12 @@ void func_L01_003C9D00(char *obj)
         else if (*(float *)(s + 0x70) < 0.0f) *(float *)(s + 0x70) = 0.0f;
         blend = (1.0f - func_00283180(*(float *)(s + 0x70) * 3.1415927f)) * 0.5f;
         if (*(int *)(s + 0x94) == -1) {
-            func_00282F20(vec, obj + 0xC0, blend * 10.0f);
-            func_00282CF0(obj + 0x10, s + 0x80, vec);
+            vec_scale_to_length(vec, obj + 0xC0, blend * 10.0f);
+            FastVecSub(obj + 0x10, s + 0x80, vec);
         } else {
-            func_00282CF0(vec, D_L01_001B264C[*(int *)(s + 0x94)].position, s + 0x80);
-            func_00282F20(vec, vec, *(float *)(s + 0x98) * blend);
-            func_00282CC0(obj + 0x10, s + 0x80, vec);
+            FastVecSub(vec, D_L01_001B264C[*(int *)(s + 0x94)].position, s + 0x80);
+            vec_scale_to_length(vec, vec, *(float *)(s + 0x98) * blend);
+            FastVecAdd(obj + 0x10, s + 0x80, vec);
         }
         if (*(float *)(s + 0x70) >= 1.0f) {
             *(int *)(s + 0x6C) = *(int *)(s + 0x64);
@@ -68,12 +68,12 @@ void func_L01_003C9D00(char *obj)
         else if (*(float *)(s + 0x70) < 0.0f) *(float *)(s + 0x70) = 0.0f;
         blend = (1.0f - func_00283180(*(float *)(s + 0x70) * 3.1415927f)) * 0.5f;
         if (*(int *)(s + 0x94) == -1) {
-            func_00282F20(vec, obj + 0xC0, blend * 10.0f);
-            func_00282CF0(obj + 0x10, s + 0x80, vec);
+            vec_scale_to_length(vec, obj + 0xC0, blend * 10.0f);
+            FastVecSub(obj + 0x10, s + 0x80, vec);
         } else {
-            func_00282CF0(vec, D_L01_001B264C[*(int *)(s + 0x94)].position, s + 0x80);
-            func_00282F20(vec, vec, *(float *)(s + 0x98) * blend);
-            func_00282CC0(obj + 0x10, s + 0x80, vec);
+            FastVecSub(vec, D_L01_001B264C[*(int *)(s + 0x94)].position, s + 0x80);
+            vec_scale_to_length(vec, vec, *(float *)(s + 0x98) * blend);
+            FastVecAdd(obj + 0x10, s + 0x80, vec);
         }
         if (*(float *)(s + 0x70) <= 0.0f) {
             *(int *)(obj + 0x98) = 0;
@@ -84,8 +84,8 @@ void func_L01_003C9D00(char *obj)
     }
     *(unsigned char *)(obj + 0xBC) = 0;
     if ((unsigned int)(*(unsigned char *)(obj + 0x20) - 2) < 3) {
-        func_L00_002E6CF0(func_L01_003C97D8, obj);
-        func_00282F20(vec, obj + 0xC0, *(float *)(s + 0x68) * ((float)*(int *)(s + 0x7C) * 0.016666668f));
+        func_L00_002E6CF0(DrawFiveLayerScrollingRibbons, obj);
+        vec_scale_to_length(vec, obj + 0xC0, *(float *)(s + 0x68) * ((float)*(int *)(s + 0x7C) * 0.016666668f));
         func_002AD6F0(s + 0x20, vec, obj + 0xF0, obj + 0xF0);
     }
     qcopy(vec, obj + 0x10);

@@ -34,30 +34,30 @@ int func_00273E98(char *object)
     func_00274208(object);
     if (func_002746C8(object)) {
         orientation = state + 0x10;
-        func_00282F20(1.0f, D_001BAFC0, D_001BAFC0);
-        func_00282DD8(delta, D_001BAFC0, state);
+        vec_scale_to_length(1.0f, D_001BAFC0, D_001BAFC0);
+        FastVecCross(delta, D_001BAFC0, state);
         func_00274A88(object, orientation, delta);
         func_002AFFD8(object + 0x10, direction, 1);
-        if (func_00282DB0(direction, D_001BAFC0) > 0.7f) {
-            distance = func_00282DB0(state, D_001BAFC0);
+        if (FastVecDot(direction, D_001BAFC0) > 0.7f) {
+            distance = FastVecDot(state, D_001BAFC0);
             step = distance * 0.5f;
             if (func_00282C48(step) < 0.033333335f)
                 step = 0.0f;
-            func_00282F20(distance + step, scaled, D_001BAFC0);
-            func_00282CF0(state, state, scaled);
+            vec_scale_to_length(distance + step, scaled, D_001BAFC0);
+            FastVecSub(state, state, scaled);
             if (step == 0.0f) {
-                length = func_00282DF0(state);
-                func_002AA2E8(&length, 0.033333335f, 0.0019444445f);
-                func_00282F20(length, state, state);
-                func_00282DD8(correction, state, D_001BAFC0);
-                factor = func_00282DF0(correction) * -0.5f;
+                length = FastVecLength(state);
+                ApproachValue(&length, 0.033333335f, 0.0019444445f);
+                vec_scale_to_length(length, state, state);
+                FastVecCross(correction, state, D_001BAFC0);
+                factor = FastVecLength(correction) * -0.5f;
                 factor /= *(float *)(state + 0x2C);
                 func_002ACE78(correction, correction, factor);
                 func_00283810(orientation, orientation, correction, 0.1f);
             }
             if (func_00282C48(distance) >= 0.033333335f) {
                 if (*(u8 *)(state + 0x5E) != 0xFF)
-                    sound = func_002E5CF8(*(u8 *)(state + 0x5E), 0, object);
+                    sound = PlayMobySound(*(u8 *)(state + 0x5E), 0, object);
                 else
                     sound = func_002E5E58(8, 0, object);
                 if (sound != -1)

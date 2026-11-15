@@ -42,7 +42,7 @@ void func_L05_00420A88(char *actor)
     if (D_L05_001B1364 == 0) {
         D_L05_00221D10[11] = 0;
         D_L05_001B1364 = 1;
-        func_002B7320();
+        music_Unpause();
         func_L05_0037B210();
         func_L05_00379F18(0);
         item = func_L05_00379EB8();
@@ -110,7 +110,7 @@ void func_L05_00420A88(char *actor)
             *(int *)(state + 0x58) = 25;
             D_L05_001B1350++;
             func_L05_004222D8();
-            func_0029B3E0(0, -1);
+            MemcardSave(0, -1);
             D_L05_001B1350--;
             func_L00_003294F0(D_L05_001B251C + (*(int *)(state + 0x2C) << 8), 1);
             D_L05_001B13D8 = 0;
@@ -119,6 +119,6 @@ void func_L05_00420A88(char *actor)
             func_002AD7B8(6);
         }
     } else if (func_00282948(state + 0x58) != 0) {
-        func_L05_00420788(actor, 0);
+        UpdateFeltzinMissionReward(actor, 0);
     }
 }

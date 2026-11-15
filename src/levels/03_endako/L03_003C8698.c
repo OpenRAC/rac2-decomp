@@ -48,14 +48,14 @@ void func_L03_003C8698(char *a0)
 
     func_002A8BD0(&b.st, a0, 0x10000, 2.0f);
     func_002A8C28(a0, aim, 0x10000, 1.25f, 100.0f, one, 0, 1, 0);
-    func_00283658(&b.v[0], a0 + 0xC0);
+    copy_matrix_rotation(&b.v[0], a0 + 0xC0);
     qcopy(&b.q80, aim);
     *(f32 *)((u8 *)&b.q80 + 12) = one;
-    func_002830C0(&b.q30, &D_L03_0029A8D0[0], &b.v[0]);
+    transform_vector(&b.q30, &D_L03_0029A8D0[0], &b.v[0]);
     p = &D_L03_0029A8D0[1];
     for (i = 3; i >= 0; i--) {
-        func_002830C0(&b.q40, p, &b.v[0]);
-        func_002761F8(&b.q30, &b.q40, 0, a0, &b.st);
+        transform_vector(&b.q40, p, &b.v[0]);
+        CollLine(&b.q30, &b.q40, 0, a0, &b.st);
         qcopy(&b.q30, &b.q40);
         p++;
     }

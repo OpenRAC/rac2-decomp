@@ -49,8 +49,8 @@ void func_L03_0038B5D8(u8 *object)
     int row, column;
     float segmentLength, vertical, phase, angle, magnitude;
 
-    state->phaseA = func_00283B98(state->phaseA, state->rate);
-    state->phaseB = func_00283B98(state->phaseB, state->rate);
+    state->phaseA = FastAddRotations(state->phaseA, state->rate);
+    state->phaseB = FastAddRotations(state->phaseB, state->rate);
     state->cycle += state->cycleRate;
     if (state->cycle > 1.0f)
         state->cycle -= 1.0f;
@@ -62,24 +62,24 @@ void func_L03_0038B5D8(u8 *object)
                 qcopy_nc(&D_L03_00238040[state->pool + row][column], &source[column + 1]);
             if (state->flags & 8) {
                 float distance, strength;
-                func_00282CF0(&toward, D_00189EA0, state->center);
-                distance = func_00282DF0(&toward);
-                func_00282F20(&toward, &toward, 1.1f);
+                FastVecSub(&toward, D_00189EA0, state->center);
+                distance = FastVecLength(&toward);
+                vec_scale_to_length(&toward, &toward, 1.1f);
                 if (!(distance > state->radius + 1.1f)) {
                     strength = 1.0f - (distance - 1.1f) / state->radius;
                     for (column = 0; column < state->count; column++) {
                         float length, amount;
                         qcopy(&relative, &D_L03_00238040[state->pool + row][column]);
-                        func_00282CF0(&relative, &relative, state->center);
-                        length = func_00282DF0(&relative);
+                        FastVecSub(&relative, &relative, state->center);
+                        length = FastVecLength(&relative);
                         if (length > 1.1f)
                             length = 1.1f;
                         length *= 0.9090909f;
                         amount = strength * (1.0f - length);
-                        func_00282D30(&blended, &toward, amount);
-                        func_00282D30(&relative, &relative, 1.0f - amount);
-                        func_00282CC0(&blended, &blended, &relative);
-                        func_00282CC0(&D_L03_00238040[state->pool + row][column], &blended, state->center);
+                        FastVecScale(&blended, &toward, amount);
+                        FastVecScale(&relative, &relative, 1.0f - amount);
+                        FastVecAdd(&blended, &blended, &relative);
+                        FastVecAdd(&D_L03_00238040[state->pool + row][column], &blended, state->center);
                     }
                 }
             }
@@ -106,20 +106,20 @@ void func_L03_0038B5D8(u8 *object)
                 break;
             }
             for (column = 0; column < state->count; column++) {
-                func_00282F20(&radial, &tangent, (float)column / ((float)state->count - 0.5f));
+                vec_scale_to_length(&radial, &tangent, (float)column / ((float)state->count - 0.5f));
                 qcopy_nc(&D_L03_00238040[state->pool + row][column], &radial);
-                func_00282CC0(&D_L03_00238040[state->pool + row][column], &D_L03_00238040[state->pool + row][column], state->center);
+                FastVecAdd(&D_L03_00238040[state->pool + row][column], &D_L03_00238040[state->pool + row][column], state->center);
             }
         }
     }
-    func_00282CF0(&tangent, &(*(RopeVector *)((unsigned int)D_L03_00238040 + ((state->pool) * 256 + (1) * 16))),
+    FastVecSub(&tangent, &(*(RopeVector *)((unsigned int)D_L03_00238040 + ((state->pool) * 256 + (1) * 16))),
                              &(*(RopeVector *)((unsigned int)D_L03_00238040 + ((state->pool) * 256 + (0) * 16))));
-    segmentLength = func_00282DF0(&tangent);
+    segmentLength = FastVecLength(&tangent);
     for (column = 0; column < state->count; column++) {
         vertical = 0.0f;
         phase = 0.0f;
         if (!(state->flags & 0x40))
-            func_00282D30(&jitter, &D_L03_00237F40[column], state->jitterScale * segmentLength);
+            FastVecScale(&jitter, &D_L03_00237F40[column], state->jitterScale * segmentLength);
         if (!(state->flags & 0x80)) {
             float firstPhase = func_002ABB18(state->phaseA + (float)column * -1.780236005783081f);
             float first = state->amplitude * func_00283198(firstPhase);
@@ -127,7 +127,7 @@ void func_L03_0038B5D8(u8 *object)
             vertical = segmentLength * (first * func_00283198(phase));
         }
         if (!(state->flags & 0x100)) {
-            angle = func_00283B98(func_00283248(tangent.f[0], tangent.f[1]), 1.5707964897155762f);
+            angle = FastAddRotations(func_00283248(tangent.f[0], tangent.f[1]), 1.5707964897155762f);
             magnitude = segmentLength * state->swayScale * func_00283180(phase);
             radial.f[0] = func_00283180(angle) * magnitude;
             radial.f[1] = func_00283198(angle) * magnitude;
@@ -137,13 +137,13 @@ void func_L03_0038B5D8(u8 *object)
             qcopy_nc(&D_L03_00238040[state->pool + row + 4][column], &D_L03_00238040[state->pool + row][column]);
             if (column != 0 && column != state->count - 1) {
                 if (!(state->flags & 0x40)) {
-                    func_00282CC0(&D_L03_00238040[state->pool + row + 4][column], &D_L03_00238040[state->pool + row + 4][column], &jitter);
-                    func_00282CC0(&D_L03_00238040[state->pool + row][column], &D_L03_00238040[state->pool + row][column], &jitter);
+                    FastVecAdd(&D_L03_00238040[state->pool + row + 4][column], &D_L03_00238040[state->pool + row + 4][column], &jitter);
+                    FastVecAdd(&D_L03_00238040[state->pool + row][column], &D_L03_00238040[state->pool + row][column], &jitter);
                 }
                 if (!(state->flags & 0x80))
                     D_L03_00238040[state->pool + row + 4][column].f[2] += vertical;
                 if (!(state->flags & 0x100))
-                    func_00282CC0(&D_L03_00238040[state->pool + row + 4][column], &D_L03_00238040[state->pool + row + 4][column], &radial);
+                    FastVecAdd(&D_L03_00238040[state->pool + row + 4][column], &D_L03_00238040[state->pool + row + 4][column], &radial);
             }
         }
     }

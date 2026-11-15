@@ -80,8 +80,8 @@ void func_L08_004233E0(u8 *object)
 {
     InitState1348 *state = *(InitState1348 **)(object + 0x68);
     float position[4], radius;
-    state->f48 = func_00283CF0(15.0f);
-    state->f4A = func_00283CF0(3.2f);
+    state->f48 = FloatToInt(15.0f);
+    state->f4A = FloatToInt(3.2f);
     state->f29 = 1;
     if (!D_L08_001B2508[0]) **(int **)((char *)state+0x1CC)=0;
     qcopy((char *)state+0x150,object+0x10);
@@ -91,11 +91,11 @@ void func_L08_004233E0(u8 *object)
     state->f188=object[0x30];
     *(V4 *)position=*(V4 *)(object+0x10);
     radius=func_L08_0032EF80(position,state->f190,state->f198,state->f194,-1);
-    if(radius>0) object[0x30]=func_00283CF0(radius+2.0f);
+    if(radius>0) object[0x30]=FloatToInt(radius+2.0f);
     state->f188=state->f189=object[0x30];
     *(V4 *)position=*(V4 *)(object+0x10);
     radius=func_L08_0032EF80(position,state->f19C,state->f1A4,state->f1A0,-1);
-    if(radius>0) state->f188=func_00283CF0(radius+2.0f);
+    if(radius>0) state->f188=FloatToInt(radius+2.0f);
     if(state->f1A8!=-1) func_L01_003377C8(D_L08_001FE7C0[state->f1A8]);
     *(void **)((char *)state+0x10)=(char *)state+0x50;
     state->f60=9; state->f98=-1;

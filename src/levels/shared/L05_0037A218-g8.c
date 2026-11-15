@@ -62,11 +62,11 @@ void func_L05_0037A218(void *unused)
         }
         scale = func_002A7878(1.1f,0.6f);
         speed = record->life;
-        func_00282F20(step,record->velocity,scale*speed);
-        func_00282CC0(record->position,record->position,step);
-        func_00282CC0(record->previous,record->previous,step);
+        vec_scale_to_length(step,record->velocity,scale*speed);
+        FastVecAdd(record->position,record->position,step);
+        FastVecAdd(record->previous,record->previous,step);
         record->distance += scale*speed;
-        if (record->flags == 0 && record->mode && func_00282E48(record->position,*(u8 **)(state+0x120)+0x10) < record->rate) {
+        if (record->flags == 0 && record->mode && fast_vec_dist(record->position,*(u8 **)(state+0x120)+0x10) < record->rate) {
             D_L05_001B9580.frames = 30;
             D_L05_001B9580.slow = 0.05f;
             D_L05_001B9580.flags = 0;
@@ -79,11 +79,11 @@ void func_L05_0037A218(void *unused)
             record->flags = 1;
             record->object = 0;
         }
-        if (record->effect && *(u8 **)(state+0x120) && func_00282E48(record->position,*(u8 **)(state+0x120)+0x10) < 32.0f) {
+        if (record->effect && *(u8 **)(state+0x120) && fast_vec_dist(record->position,*(u8 **)(state+0x120)+0x10) < 32.0f) {
             qcopy(check, pos);
             check[3] = 1.0f;
-            if (func_00283DB8(check,256.0f) != -1 && func_002761F8(record->previous,record->position,0,0,0)) {
-                func_L05_0037DA58(D_L05_001BFB18.pos,20,record->color,60);
+            if (func_00283DB8(check,256.0f) != -1 && CollLine(record->previous,record->position,0,0,0)) {
+                EmitParticlePairBurst(D_L05_001BFB18.pos,20,record->color,60);
                 if (D_L05_001BFB18.on)
                     func_002A8F70(*(u8 **)(state+0x120),record->object,0x10000,D_L05_001BFB18.pos,D_L05_001A8F20,0.25f);
                 record->object = 0;

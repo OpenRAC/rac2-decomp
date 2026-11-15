@@ -31,16 +31,16 @@ int func_002A8C28(void *owner, void *start, s32 queryMode, s32 first, s32 second
     Vector direction;
     CollisionQuery query;
     if (*(u16 *)(object + 0x34) & 0x100) {
-        func_00282F20(&direction, object + 0xE0, 0.25f);
-        func_00282CC0(&direction, &direction, object + 0xC0);
+        vec_scale_to_length(&direction, object + 0xE0, 0.25f);
+        FastVecAdd(&direction, &direction, object + 0xC0);
     } else {
         direction.f[0] = func_00283180(*(float *)(object + 0xF8));
         direction.f[1] = func_00283198(*(float *)(object + 0xF8));
         direction.f[2] = 1.0f;
     }
-    func_00282D30(&direction, &direction, scale);
+    FastVecScale(&direction, &direction, scale);
     direction.f[3] = 5627.9248046875f;
-    func_002A8C00((char *)&query, (int)object, queryMode, distance, (Quad16 *)&direction);
+    make_hit_descriptor((char *)&query, (int)object, queryMode, distance, (Quad16 *)&direction);
     query.first = first;
     query.second = second;
     query.objectId = *(u16 *)(object + 0xAA);

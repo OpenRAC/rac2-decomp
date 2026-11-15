@@ -91,7 +91,7 @@ void func_L11_003F1C68(u8 *arg0) {
         if (func_L11_003F2E00(s0) != 0)
             return;
         if (*(u8 *)(s0 + 0x31) != 0
-            && func_00282E48(s0 + 0x10, D_L11_001BA8C0) < 48.0f) {
+            && fast_vec_dist(s0 + 0x10, D_L11_001BA8C0) < 48.0f) {
             func_002A93B0(s0);
             *(u8 *)(s0 + 0x6F) = 0x2D;
         }
@@ -104,9 +104,9 @@ void func_L11_003F1C68(u8 *arg0) {
 void func_L11_003F1D18(u8 *arg0) {
     u8 *s1 = arg0;
     u8 *s0 = *(u8 **)(s1 + 0x68);
-    *(u8 *)(s0 + 0x48) = func_00283CF0(15.0f);
-    *(u8 *)(s0 + 0x4A) = func_00283CF0(16.0f);
-    func_002A04B8(s1, s0 + 0x280, s0 + 0x284, s0 + 0x288);
+    *(u8 *)(s0 + 0x48) = FloatToInt(15.0f);
+    *(u8 *)(s0 + 0x4A) = FloatToInt(16.0f);
+    get_moby_color(s1, s0 + 0x280, s0 + 0x284, s0 + 0x288);
     *(u8 *)(s0 + 0x28) = 3;
     *(f32 *)(s0 + 0x30) = 1.5f;
     *(u8 *)(s0 + 0x29) = 1;
@@ -187,7 +187,7 @@ void func_L11_003F3140(u8 *arg0) {
         v0++;
     } while (i >= 0);
     if (func_002E59B0(s0, *(s32 *)(s1 + 0x290)) == 0) {
-        *(s32 *)(s1 + 0x290) = func_002E5CF8(2, 4, s0);
+        *(s32 *)(s1 + 0x290) = PlayMobySound(2, 4, s0);
     }
 }
 
@@ -256,11 +256,11 @@ void func_L11_004169E0(u8 *arg0) {
         break;
     case 1:
         if (func_002B38B8(s0)) {
-            func_002E5CF8(0, 0, s2);
+            PlayMobySound(0, 0, s2);
             func_002A7750(s2, 2, -1);
         }
         if (D_0019B2E8[D_001A79F0[0]][*(u8 *)(s2 + 0xB0)] & 0x80) {
-            *(f32 *)(s2 + 0xF0) = func_00283BE0(*(f32 *)(s2 + 0xF0), 1.5707964897155762f);
+            *(f32 *)(s2 + 0xF0) = fast_subtract_rotations(*(f32 *)(s2 + 0xF0), 1.5707964897155762f);
             func_002A7750(s2, 6, -1);
         }
         break;
@@ -270,7 +270,7 @@ void func_L11_004169E0(u8 *arg0) {
         if (*(f32 *)(s2 + 0xF0) <= -1.5707964897155762f) {
             *(s32 *)(s1 + 4) = 0;
             func_002A7750(s2, 3, -1);
-            func_002E5CF8(1, 0, s2);
+            PlayMobySound(1, 0, s2);
         }
         break;
     case 3:
@@ -287,7 +287,7 @@ void func_L11_004169E0(u8 *arg0) {
         if (*(f32 *)(s2 + 0xF0) <= -1.5707964897155762f) {
             *(s32 *)(s1 + 4) = 0;
             func_002A7750(s2, 5, -1);
-            func_002E5CF8(1, 0, s2);
+            PlayMobySound(1, 0, s2);
         }
         break;
     case 5:
@@ -304,16 +304,16 @@ void func_L11_004169E0(u8 *arg0) {
         if (*(f32 *)(s2 + 0xF0) <= -1.5707964897155762f) {
             *(s32 *)(s1 + 4) = 0;
             func_002A7750(s2, 7, -1);
-            func_002E5CF8(1, 0, s2);
+            PlayMobySound(1, 0, s2);
         }
         break;
     }
     pos = s0 + 0x10;
     qcopy(pos, s2 + 0x10);
-    func_00282F20(tmp, s2 + 0xE0, 5.7f);
-    func_00282CC0(pos, pos, tmp);
-    func_00282F20(tmp2, s2 + 0xD0, 0.35f);
-    func_00282CC0(pos, pos, tmp2);
+    vec_scale_to_length(tmp, s2 + 0xE0, 5.7f);
+    FastVecAdd(pos, pos, tmp);
+    vec_scale_to_length(tmp2, s2 + 0xD0, 0.35f);
+    FastVecAdd(pos, pos, tmp2);
 }
 
 

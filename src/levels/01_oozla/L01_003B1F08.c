@@ -79,9 +79,9 @@ extern void func_L01_003208D0(void *, void *, int);
 #define INTERPOLATE() { \
     weight = 1.0f - func_00283180(state->t * 3.1415927f); \
     weight *= 0.5f; \
-    func_00282CF0(delta, D_L01_001B264C[state->target].pos, state->homePos); \
-    func_00282D30(delta, delta, weight); \
-    func_00282CC0(object->pos, state->homePos, delta); \
+    FastVecSub(delta, D_L01_001B264C[state->target].pos, state->homePos); \
+    FastVecScale(delta, delta, weight); \
+    FastVecAdd(object->pos, state->homePos, delta); \
     object->rot[2] = func_002AA150(state->homeRot[2], D_L01_001B264C[state->target].rot[2], weight); \
     object->rot[1] = func_002AA150(state->homeRot[1], D_L01_001B264C[state->target].rot[1], weight); \
     object->rot[0] = func_002AA150(state->homeRot[0], D_L01_001B264C[state->target].rot[0], weight); \
@@ -181,7 +181,7 @@ void func_L01_003B1F08(MoverObject *object)
     }
     object->triggered = 0;
     if (object->mode < 8) {
-        func_00282CF0(delta, object->pos, oldpos);
+        FastVecSub(delta, object->pos, oldpos);
         func_002AD6F0(state->motion, delta, oldrot, object->rot);
     }
     func_L01_003208D0(object, state->tailAC, object->mode >= 2);

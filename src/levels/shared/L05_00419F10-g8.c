@@ -38,8 +38,8 @@ void func_L05_00419F10(float *pos, int count, int color, char *owner)
         D_L05_001B1064 = 2.0f;
         D_L05_001B1068 = 10.0f;
     }
-    func_00282CF0(toward, D_L05_001B96C0, pos);
-    func_00282F20(half, toward, 0.5f);
+    FastVecSub(toward, D_L05_001B96C0, pos);
+    vec_scale_to_length(half, toward, 0.5f);
     toward[2] = 0.0f;
     for (i = 0; i < count; i++) {
         size = func_002A7878(D_L05_001B1070, D_L05_001B1074);
@@ -48,22 +48,22 @@ void func_L05_00419F10(float *pos, int count, int color, char *owner)
             sign = sign - 1;
         angle = func_002A7878(-1.0471977f, 1.0471977f);
         func_002ACEC0(dir, toward, up, angle);
-        func_00282F20(dir, dir, func_002A7878(D_L05_001B105C, D_L05_001B1060) * (1.0f / 60.0f));
+        vec_scale_to_length(dir, dir, func_002A7878(D_L05_001B105C, D_L05_001B1060) * (1.0f / 60.0f));
         dir[2] = func_002A7878(D_L05_001B1064, D_L05_001B1068) * (1.0f / 60.0f);
-        func_00282CC0(tmp, pos, half);
+        FastVecAdd(tmp, pos, half);
         pos[0] += func_002A78D8(0.0f, 0.15f);
         pos[1] += func_002A78D8(0.0f, 0.15f);
         pos[2] += func_002A78D8(0.0f, 0.15f);
         sprite = func_002C2210(pos, 60, size * 0.1f, size, color, 0, sign, dir, D_L05_001B106C, 0);
         if (sprite) {
             sprite[2] = D_L05_001FF240[97][6];
-            sprite[9] = func_00283CF0(4.0f) + 0x70;
+            sprite[9] = FloatToInt(4.0f) + 0x70;
         }
         sprite = func_002C2210(pos, 60, size * 0.07f, size * 0.7f, 0x7F7F7F7F, 1, -sign, dir,
                                D_L05_001B106C, 0);
         if (sprite) {
             sprite[2] = D_L05_001FF240[97][6];
-            sprite[9] = func_00283CF0(4.0f) + 0x70;
+            sprite[9] = FloatToInt(4.0f) + 0x70;
         }
     }
 }

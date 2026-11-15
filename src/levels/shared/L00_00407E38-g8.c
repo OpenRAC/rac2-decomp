@@ -1,5 +1,5 @@
 /* func_L00_00407E38 has its own unit for -frac2-hazard-labels; it is the level
- * copy of func_00332658 (src/game/0032EB28-ai-g8.c). func_002A7CA0 is void here
+ * copy of func_00332658 (src/game/0032EB28-ai-g8.c). MobySpringTurn is void here
  * as it is there; the evidence for that is in that file's header. */
 #include "common.h"
 
@@ -50,10 +50,10 @@ void func_L00_00407E38(char *object)
     float angle, choice;
     int hit;
     if (AI_B(object,0x20) && D_L00_001ADB2C) {
-        func_00283658(scratch,object+0xC0);
+        copy_matrix_rotation(scratch,object+0xC0);
         func_002AB6D8(scratch,end);
         func_002AD0E0(object,D_L00_001ADB2C,object+0x10,end,object+0x10,offset);
-        func_002833F0(object+0xC0,offset);
+        euler_rotation_basis(object+0xC0,offset);
         qcopy(object+0xF0,offset);
     }
     if (func_002A9640(object,0x4010000,0)) func_00333048(object);
@@ -72,7 +72,7 @@ void func_L00_00407E38(char *object)
             if (choice>=50.0f && choice<75.0f) func_002A7470(object,1,0,10);
             if (choice>=75.0f && choice<100.0f && !D_L00_001A8FF4 && !D_L00_001A8FF0) {
                 *(AI_Quad *)scratch=*(AI_Quad *)(object+0x10);
-                AI_P(state,0x7C)=func_002AF460(scratch,1.5707964897155762f,999.0f,-1.0f,-1.0f);
+                AI_P(state,0x7C)=FindBestTargetByReach(scratch,1.5707964897155762f,999.0f,-1.0f,-1.0f);
                 if (AI_P(state,0x7C)) {
                     func_002A7750(object,8,-1);
                     func_002A7470(object,5,0,1);
@@ -80,7 +80,7 @@ void func_L00_00407E38(char *object)
                 }
             }
         }
-        if (func_00282E80(object+0x10,D_00189E20.pos)<2.0f && !D_L00_001A8FF4 && !D_L00_001A8FF0) {
+        if (vec_distance_xy(object+0x10,D_00189E20.pos)<2.0f && !D_L00_001A8FF4 && !D_L00_001A8FF0) {
             func_002A7750(object,2,-1);
             func_002A7470(object,5,0,1);
             AI_F(object,0x48)=1.7f;
@@ -103,9 +103,9 @@ void func_L00_00407E38(char *object)
     case 8:
         target=AI_P(state,0x7C);
         choice=func_00283248(AI_F(target,0x10)-AI_F(object,0x10),AI_F(target,0x14)-AI_F(object,0x14));
-        func_002A7CA0(choice,object,state+0x58,0.00021816618391312659f,0.00043633236782625318f,0.017453296110033989f);
-        func_00282F20(offset,object+0xC0,1.0f/24.0f);
-        func_00282CC0(end,object+0x10,offset);
+        MobySpringTurn(choice,object,state+0x58,0.00021816618391312659f,0.00043633236782625318f,0.017453296110033989f);
+        vec_scale_to_length(offset,object+0xC0,1.0f/24.0f);
+        FastVecAdd(end,object+0x10,offset);
         if (!func_002A7EA0(object,object+0x10,end,0.5f,0.6f,0.25f,0.52359885f,0)) func_00333048(object);
         break;
     case 6:
@@ -118,7 +118,7 @@ void func_L00_00407E38(char *object)
         break;
     case 5:
         if (AI_B(object,0x60)&2) func_002A7470(object,2,0,2);
-        if (func_00282E80(object+0x10,D_00189E20.pos)<2.0f) {
+        if (vec_distance_xy(object+0x10,D_00189E20.pos)<2.0f) {
             func_002A7750(object,2,-1);
             func_002A7470(object,5,0,1);
         }
@@ -126,40 +126,40 @@ void func_L00_00407E38(char *object)
             func_002A7750(object,1,-1);
             AI_I(state,0x70)=func_002A7820(400,600);
         }
-        func_002A7CA0(func_00283B98(AI_F(object,0xF8),func_002A7878(-30.0f,30.0f)*0.01745329424738884f),object,state+0x58,0.00014544412260875106f,0.00043633236782625318f,0.013089972f);
-        func_00282F20(offset,object+0xC0,1.0f/240.0f);
-        func_00282CC0(end,object+0x10,offset);
+        MobySpringTurn(FastAddRotations(AI_F(object,0xF8),func_002A7878(-30.0f,30.0f)*0.01745329424738884f),object,state+0x58,0.00014544412260875106f,0.00043633236782625318f,0.013089972f);
+        vec_scale_to_length(offset,object+0xC0,1.0f/240.0f);
+        FastVecAdd(end,object+0x10,offset);
         if (!func_002A7EA0(object,object+0x10,end,0.1f,0.5f,0.25f,0.52359885f,0)) {
-            func_002A7CA0(func_00283B98(AI_F(object,0xF8),func_002A7878(20.0f,135.0f)*0.01745329424738884f),object,state+0x58,0.000048481375415576622f,0.00043633236782625318f,0.013089972f);
+            MobySpringTurn(FastAddRotations(AI_F(object,0xF8),func_002A7878(20.0f,135.0f)*0.01745329424738884f),object,state+0x58,0.000048481375415576622f,0.00043633236782625318f,0.013089972f);
         }
         break;
     case 2:
         position=object+0x10;
         *(AI_Quad *)scratch=*(AI_Quad *)(object+0x10);
-        AI_P(state,0x7C)=func_002AF460(scratch,1.5707964897155762f,999.0f,-1.0f,-1.0f);
+        AI_P(state,0x7C)=FindBestTargetByReach(scratch,1.5707964897155762f,999.0f,-1.0f,-1.0f);
         target=AI_P(state,0x7C);
         if (target) {
             choice=func_00283248(AI_F(target,0x10)-AI_F(object,0x10),AI_F(target,0x14)-AI_F(object,0x14));
-            func_002A7CA0(choice,object,state+0x58,0.00021816618391312659f,0.00043633236782625318f,0.017453296110033989f);
-            func_00282F20(offset,object+0xC0,1.0f/24.0f);
-            func_00282CC0(end,position,offset);
+            MobySpringTurn(choice,object,state+0x58,0.00021816618391312659f,0.00043633236782625318f,0.017453296110033989f);
+            vec_scale_to_length(offset,object+0xC0,1.0f/24.0f);
+            FastVecAdd(end,position,offset);
         }
         if (!func_002A7EA0(object,position,end,0.5f,0.6f,0.25f,0.52359885f,0)) {
             func_00333048(object);
-        } else if (func_00283C80(angle,AI_F(object,0xF8))>0.52359885f) {
-            func_002A7CA0(angle,object,state+0x58,0.00038785100332461298f,0.00043633236782625318f,0.013089972f);
+        } else if (FastDiffRots(angle,AI_F(object,0xF8))>0.52359885f) {
+            MobySpringTurn(angle,object,state+0x58,0.00038785100332461298f,0.00043633236782625318f,0.013089972f);
         }
         break;
     case 4:
         func_L00_003252A8(object,scratch,0);
-        func_00282F20(scratch,scratch,4.0f);
-        func_00282CC0(front,object+0x10,scratch);
-        func_00282F20(scratch,scratch,-1.0f);
-        func_00282CC0(back,object+0x10,scratch);
-        if (func_002761F8(back,front,0,object,0)) {
+        vec_scale_to_length(scratch,scratch,4.0f);
+        FastVecAdd(front,object+0x10,scratch);
+        vec_scale_to_length(scratch,scratch,-1.0f);
+        FastVecAdd(back,object+0x10,scratch);
+        if (CollLine(back,front,0,object,0)) {
             if (D_L00_001BF200.surface!=D_00189E20.surface) qcopy(object+0x10,D_L00_001BF200.point);
         }
-        hit=func_00278E78();
+        hit=GetCollHitMaterial();
         if (hit>0 && hit!=10 && !D_L00_001A8FF4) {func_00333048(object);return;}
         func_002A7750(object,1,-1);
         break;

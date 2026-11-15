@@ -43,7 +43,7 @@ void func_L00_0039E7A8(char *actor) {
     if ((flags & 16) && D_0018C0BC > 1 && D_0018C0BC != 9) return;
     if ((flags & 32) && D_0018C0B4 == 49) return;
     if (state[3] == 2 && func_00282948(state + 8)) state[3] = 0;
-    active = func_002ACBC8(D_00189EA0, state[0]);
+    active = IsPointInCuboid(D_00189EA0, state[0]);
     if (active) goto activate;
     {
         unsigned short triggerId = *(u16 *)(actor + 0xB2);

@@ -72,40 +72,40 @@ void func_L07_003F4578(u8 *object)
         frame.points[i].f[1] = func_00283198(angle) * *(f32 *)(state + 0x24);
         frame.points[i].f[2] = 0.0f;
         if (*(u8 **)(state + 0x20) != 0)
-            func_00283098(&frame.points[i], &frame.points[i], *(u8 **)(state + 0x20) + 0xC0);
-        func_00282CC0(&frame.points[i], &frame.points[i], object + 0x10);
+            matrix_mul_vec3(&frame.points[i], &frame.points[i], *(u8 **)(state + 0x20) + 0xC0);
+        FastVecAdd(&frame.points[i], &frame.points[i], object + 0x10);
         frame.points[i].f[3] = D_L07_001B0E90;
     }
     qcopy(&frame.points[32], &frame.points[0]);
     for (j = 0; j < 32; j++) {
-        func_002A8C00(&frame.work.query, object, 1, D_L07_001A8F20, *(f32 *)(state + 0x34));
+        make_hit_descriptor(&frame.work.query, object, 1, D_L07_001A8F20, *(f32 *)(state + 0x34));
         frame.work.query.type = 0;
         frame.work.query.count = 1;
         frame.work.query.classId = *(u16 *)(object + 0xAA);
-        func_002761F8(&frame.points[j], &frame.points[j + 1], 9, object, &frame.work.query);
+        CollLine(&frame.points[j], &frame.points[j + 1], 9, object, &frame.work.query);
     }
-    color0 = func_00283D38(D_L07_001B0E88 & 0xFFFFFF, D_L07_001B0E88, *(f32 *)(state + 0x28));
-    color1 = func_00283D38(D_L07_001B0E8C & 0xFFFFFF, D_L07_001B0E8C, *(f32 *)(state + 0x28));
-    func_L00_002EBE88(frame.points, D_L07_001B0E80, D_L07_001B0E84, 33,
+    color0 = FastTweenColor(D_L07_001B0E88 & 0xFFFFFF, D_L07_001B0E88, *(f32 *)(state + 0x28));
+    color1 = FastTweenColor(D_L07_001B0E8C & 0xFFFFFF, D_L07_001B0E8C, *(f32 *)(state + 0x28));
+    DrawTwoLayerPolylineRibbon(frame.points, D_L07_001B0E80, D_L07_001B0E84, 33,
                      color0, color1, D_L07_001B0E90, D_L07_001B0E94, *(f32 *)(state + 0x2C));
     if (!func_L02_002F1658())
         return;
     for (k = 0; (f32)k < (f32)D_L07_001B0E54 * *(f32 *)(state + 0x24); k++) {
         size = func_002A7820(D_L07_001B0E70[0], D_L07_001B0E70[1]);
-        count = func_00283CF0(func_002A78D8(1.0f, 2.0f));
+        count = FloatToInt(func_002A78D8(1.0f, 2.0f));
         life = func_002A7878(D_L07_001B0E78, D_L07_001B0E78_4[1]) * 210000.0f;
         step = D_L07_001B0E40 * (1.0f / 60.0f);
-        func_002AA2E8(&step, 0.0f, func_002A7878(0.0f, 2.0f) * (1.0f / 60.0f));
+        ApproachValue(&step, 0.0f, func_002A7878(0.0f, 2.0f) * (1.0f / 60.0f));
         segment = func_002A77E0(32);
         next = (segment + 1) % 32;
-        func_00282D08(&frame.work.particle.point, &frame.points[segment],
+        lerp_vector(&frame.work.particle.point, &frame.points[segment],
                      &frame.points[next], func_002A7878(0.0f, 1.0f));
-        func_00282CF0(&frame.work.particle.direction, &frame.work.particle.point, position);
+        FastVecSub(&frame.work.particle.direction, &frame.work.particle.point, position);
         frame.work.particle.direction.f[2] = 0.0f;
-        func_00282F20(&frame.work.particle.direction, &frame.work.particle.direction, step);
+        vec_scale_to_length(&frame.work.particle.direction, &frame.work.particle.direction, step);
         frame.work.particle.point.f[3] = 2.0f;
         color = D_L07_001B0E58;
-        func_00283D38(color & 0xFFFFFF, color, *(f32 *)(state + 0x28));
+        FastTweenColor(color & 0xFFFFFF, color, *(f32 *)(state + 0x28));
         func_002C16C0(&frame.work.particle.point, &frame.work.particle.direction,
                      size, (s32)color >> 24, color & 0xFFFFFF,
                      count, life, 500.0f, 1.0f, 0.0f, 1.0f);

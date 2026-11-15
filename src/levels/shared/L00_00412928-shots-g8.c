@@ -70,26 +70,26 @@ void func_L00_0041A5C0(char *object)
             func_00300190(e, e);
         if (e->handle >= 0)
             func_002FEE70(e->handle, &e->vel, e);
-        func_00282CC0(&next, e, &e->vel);
+        FastVecAdd(&next, e, &e->vel);
         if (!e->active) {
-            if (func_002761F8(e, &next, 0x10, object, 0)) {
+            if (CollLine(e, &next, 0x10, object, 0)) {
                 qcopy(e, &D_L00_001BF200.point);
                 func_00282C88(&e->vel);
-                func_00282F20(&temp, &D_L00_001BF200.normal, 0.1f);
-                func_00282CC0(e, e, &temp);
+                vec_scale_to_length(&temp, &D_L00_001BF200.normal, 0.1f);
+                FastVecAdd(e, e, &temp);
                 e->active = 1;
                 func_002FEE50(e->handle);
                 e->handle = -1;
                 qcopy_nc(&e->accel, &temp);
-                func_00282F20(&small, &temp, 0.01f);
+                vec_scale_to_length(&small, &temp, 0.01f);
                 angles.f[0] = func_002A7878(-0.7853981853f, 0.7853981853f);
                 angles.f[1] = func_002A7878(-0.7853981853f, 0.7853981853f);
                 angles.f[2] = func_002A7878(-0.7853981853f, 0.7853981853f);
-                func_00283410(rot, &angles);
+                euler_to_matrix(rot, &angles);
                 rot[3].f[0] = 0;
                 rot[3].f[1] = 0;
                 rot[3].f[2] = 0;
-                func_002830C0(&small, &small, rot);
+                transform_vector(&small, &small, rot);
                 func_002BE278(e, &small, 0, -1);
                 func_00282C88(&angles);
                 target = D_L00_001BF200.target;
@@ -97,39 +97,39 @@ void func_L00_0041A5C0(char *object)
                     && ((*(unsigned short *)(target + 0x34) & 0x1000)
                         || *(short *)(*(char **)(target + 0x24) + 0x46) == 5)) {
                     nextIndex = index - 1;
-                    func_00282CF0(&direction, target + 0x10, object + 0x10);
-                    func_00282F20(&direction, &direction, 1);
-                    func_00282F20(&hit, &hit, 1);
+                    FastVecSub(&direction, target + 0x10, object + 0x10);
+                    vec_scale_to_length(&direction, &direction, 1);
+                    vec_scale_to_length(&hit, &hit, 1);
                     c = &D_L00_00262570[D_00139568[0x1d]];
-                    func_002A8C00(&hit, object, 0x910000, &direction, c->direct);
+                    make_hit_descriptor(&hit, object, 0x910000, &direction, c->direct);
                     hit.direction.q = direction.q;
                     hit.direction.f[3] = 5627.9248046875f;
                     hit.type = 9;
                     hit.enabled = 1;
                     hit.flag = 1;
                     hit.id = *(unsigned short *)(D_L00_001BF200.target + 0xaa);
-                    func_002A8E20(D_L00_001BF200.target, &hit);
-                    func_0032D758(D_L00_001BF200.target, 0x1d, object);
-                    func_002E5CF8(1, 0, object);
+                    QueueMobyImpact(D_L00_001BF200.target, &hit);
+                    StartAttachedEffect(D_L00_001BF200.target, 0x1d, object);
+                    PlayMobySound(1, 0, object);
                     n = func_00277F48(D_L00_001BF200.target + 0x10, 0x10, object, 0, 1.5f);
                     for (j = 0; j < n; j++) {
                         target = ((char **)D_L00_001C3280)[j];
                         if (target == *(char **)(resident + 0x2290))
                             continue;
-                        func_00282CF0(&direction, target + 0x10, object + 0x10);
-                        func_00282F20(&direction, &direction, 1);
-                        func_00282F20(&hit, &hit, 1);
+                        FastVecSub(&direction, target + 0x10, object + 0x10);
+                        vec_scale_to_length(&direction, &direction, 1);
+                        vec_scale_to_length(&hit, &hit, 1);
                         c = &D_L00_00262570[D_00139568[0x1d]];
-                        func_002A8C00(&hit, object, 0x910000, &direction, c->splash);
+                        make_hit_descriptor(&hit, object, 0x910000, &direction, c->splash);
                         hit.direction.q = direction.q;
                         hit.direction.f[3] = 5627.9248046875f;
                         hit.type = 9;
                         hit.enabled = 1;
                         hit.flag = 1;
                         hit.id = *(unsigned short *)(((char **)D_L00_001C3280)[j] + 0xaa);
-                        func_002A8E20(((char **)D_L00_001C3280)[j], &hit);
-                        func_0032D758(((char **)D_L00_001C3280)[j], 0x1d, object);
-                        func_002E5CF8(1, 0, object);
+                        QueueMobyImpact(((char **)D_L00_001C3280)[j], &hit);
+                        StartAttachedEffect(((char **)D_L00_001C3280)[j], 0x1d, object);
+                        PlayMobySound(1, 0, object);
                         /* The block must not end in the call: flow would pad it with a
                          * (use 0) insn, which lengthens the inner pointers' live ranges
                          * and hands `object` the wrong saved register. */
@@ -138,7 +138,7 @@ void func_L00_0041A5C0(char *object)
                 } else {
                     nextIndex = index - 1;
                     if (func_001163B0() % 11 == 0)
-                        func_L00_0041B840(object, &D_L00_001BF200.point, &temp, &angles);
+                        SpawnRandomTaperedQuadPair(object, &D_L00_001BF200.point, &temp, &angles);
                 }
             } else {
                 func_002FE880(e, &e->vel, 0.006f);
@@ -147,16 +147,16 @@ void func_L00_0041A5C0(char *object)
         } else {
             nextIndex = index - 1;
         }
-        func_00282CC0(e, e, &e->vel);
+        FastVecAdd(e, e, &e->vel);
         index = nextIndex;
         if (nextIndex < 0)
             index = 0x22;
         if (func_001163B0() % 7 == 0) {
-            func_00282F20(&temp, &e->vel, 0.05f);
+            vec_scale_to_length(&temp, &e->vel, 0.05f);
             func_L00_0041AD40(object, e, &e->vel);
         }
         if (func_001163B0() % 22 == 0) {
-            func_00282F20(&temp, &e->vel, 0.05f);
+            vec_scale_to_length(&temp, &e->vel, 0.05f);
             func_002BE278(e, &temp, 0, -1);
         }
     }

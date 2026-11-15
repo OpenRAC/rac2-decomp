@@ -141,7 +141,7 @@ void func_L09_002F8FD8(void) {
         if (mob != 0 && mob->type == 0xE29)
             mob->flags |= 0x800;
         if (mob->type == 0xD54)
-            func_002E64A0(mob);
+            UpdateEquipmentPieces(mob);
         if (mob != 0 && mob->type == 0xFA0 && mob->p68 != 0)
             func_L00_00326048(mob, (unsigned char *)mob->p68 + 0xC, 0x80AAAAD2, 0x80396464, 0.0610865355f);
     }
@@ -175,7 +175,7 @@ void func_L09_0038B700(unsigned char *obj) {
     frame.normal.q = 0;
     frame.normal.f[2] = 1.0f;
     qcopy(&frame.old, position);
-    func_00282CC0(position, ctx, position);
+    FastVecAdd(position, ctx, position);
     func_002FEE70(*(int *)(ctx + 0x1C), ctx, 0);
     func_00300190(position, position);
     func_00300248(ctx, ctx);
@@ -195,11 +195,11 @@ void func_L09_0038B700(unsigned char *obj) {
     frame.packet.kind = 2;
     frame.packet.class_id = *(unsigned short *)(obj + 0xAA);
     frame.packet.active = 1;
-    if (func_002761F8(&frame.old, position, 0x10, obj, &frame.packet)) {
-        if (!func_00278E78() && *(float *)(ctx + 8) < 0.0f) {
+    if (CollLine(&frame.old, position, 0x10, obj, &frame.packet)) {
+        if (!GetCollHitMaterial() && *(float *)(ctx + 8) < 0.0f) {
             char *effect;
             Vec *spread;
-            func_002FD1B8(D_L09_001B2FF0, D_L09_001B2FF8, 1,
+            RippleDisturb(D_L09_001B2FF0, D_L09_001B2FF8, 1,
                 *(float *)(obj + 0x10), *(float *)(obj + 0x14), 0.5f, -0.35f);
             *(int *)(ctx + 0x14) = 1;
             func_00282C88(ctx);
@@ -240,21 +240,21 @@ void func_L09_0038B700(unsigned char *obj) {
                 obj[0xBC] = 1;
                 qcopy(obj + 0x10, &reread->point);
                 func_00283028(&frame.velocity, ctx, &reread->normal);
-                func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-                func_00282F20(&frame.normal, &reread->normal, 1.0f);
+                vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+                vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
             } else {
                 if (collision->count < 1)
                     goto finish;
                 obj[0xBC] = 1;
                 qcopy(obj + 0x10, &collision->point);
                 func_00283028(&frame.velocity, ctx, &collision->normal);
-                func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-                func_00282F20(&frame.normal, &collision->normal, 1.0f);
+                vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+                vec_scale_to_length(&frame.normal, &collision->normal, 1.0f);
             }
         }
     } else if (func_00282948(ctx + 0x18)) {
         obj[0xBC] = 1;
-        func_00282CC0((char *)&frame.velocity, (char *)&frame.velocity, ctx);
+        FastVecAdd((char *)&frame.velocity, (char *)&frame.velocity, ctx);
     }
 finish:
     if (obj[0xBC]) {
@@ -286,9 +286,9 @@ void func_L09_0038BB18(char *obj) {
     frame.normal.q = 0;
     frame.normal.f[2] = 1.0f;
     qcopy(&frame.old, position);
-    func_00282CC0(position, position, ctx);
+    FastVecAdd(position, position, ctx);
     func_002AFFD8(position, &frame.surface, 0);
-    func_00282D30(&frame.surface, &frame.surface, 0.0003055556f);
+    FastVecScale(&frame.surface, &frame.surface, 0.0003055556f);
     func_L00_0038F3D8(obj);
     frame.packet.moby = obj;
     frame.packet.flags = 0x830000;
@@ -304,7 +304,7 @@ void func_L09_0038BB18(char *obj) {
     frame.packet.vector.f[2] = 1.0f;
     frame.packet.active = 1;
     (*(int *)(ctx + 0x14))++;
-    if (func_002761F8(&frame.old, position, 0x10, obj, &frame.packet)) {
+    if (CollLine(&frame.old, position, 0x10, obj, &frame.packet)) {
         collision = &D_L09_001BFE40;
         hit = collision->hit;
         if (hit) {
@@ -323,8 +323,8 @@ void func_L09_0038BB18(char *obj) {
                 qcopy(dest, source);
             }
             func_00283028(&frame.velocity, ctx, &reread->normal);
-            func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-            func_00282F20(&frame.normal, &reread->normal, 1.0f);
+            vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+            vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
         } else {
             collision = &D_L09_001BFE40;
             if (collision->count <= 0)
@@ -332,12 +332,12 @@ void func_L09_0038BB18(char *obj) {
             obj[0xBC] = 1;
             qcopy(position, &collision->point);
             func_00283028(&frame.velocity, ctx, &collision->normal);
-            func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-            func_00282F20(&frame.normal, &collision->normal, 1.0f);
+            vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+            vec_scale_to_length(&frame.normal, &collision->normal, 1.0f);
         }
     } else if (func_00282948(ctx + 0x18)) {
         obj[0xBC] = 1;
-        func_00282CC0((char *)&frame.velocity, (char *)&frame.velocity, ctx);
+        FastVecAdd((char *)&frame.velocity, (char *)&frame.velocity, ctx);
     }
 finish:
     if (*(unsigned char *)(obj + 0xBC)) {
@@ -373,13 +373,13 @@ void func_L09_003C8CD8(unsigned char *a0) {
             unsigned char stamp = 0xFF;
             *(unsigned char *)(s0 + 0x30) = stamp;
         }
-        func_L00_00323448(s0, s1 + 0x30, 0x64, *(int *)(s1 + 4), *(int *)s1,
+        BuildObjectAttachmentTransforms(s0, s1 + 0x30, 0x64, *(int *)(s1 + 4), *(int *)s1,
                           -1, 7, 0);
         s1[0xC5A] = 1;
         s0[0x20] = 1;
         break;
     case 1:
-        *(float *)(s0 + 0xF0) = func_00283B98(
+        *(float *)(s0 + 0xF0) = FastAddRotations(
             *(float *)(s0 + 0xF0), *(float *)(s1 + 8) * 0.000290888245f);
         func_L00_00323958(s0, s1 + 0x30);
         break;
@@ -432,10 +432,10 @@ void func_L09_003E31C0(unsigned char *a0) {
         break;
     case 1:
         if (a0[0x95] != 0) {
-            *(float *)(a0 + 0xF4) = func_00283B98(
+            *(float *)(a0 + 0xF4) = FastAddRotations(
                 *(float *)(a0 + 0xF4), -((float)a0[0xBC] * 0.000290888245f));
         } else {
-            *(float *)(a0 + 0xF4) = func_00283B98(
+            *(float *)(a0 + 0xF4) = FastAddRotations(
                 *(float *)(a0 + 0xF4), (float)a0[0xBC] * 0.000290888245f);
         }
         break;
@@ -466,7 +466,7 @@ void func_L09_003F0330(unsigned char *a0) {
     if (*(unsigned short *)(a0 + 0x96) < 0xFFFFu) {
         *(unsigned short *)(a0 + 0x96) = *(unsigned short *)(a0 + 0x96) + 1;
     }
-    func_00282978((unsigned short *)(s0 + 0x92));
+    FastDecTimer((unsigned short *)(s0 + 0x92));
     func_002829A8((unsigned short *)(s0 + 0x90));
 }
 
@@ -565,16 +565,16 @@ void func_L09_003F04D0(unsigned char *object)
             S16(state, 0x92) = U16(state, 0x9C);
             if (object[0x43] != 2)
                 func_002A7470(object, 2, 0, 3);
-            func_002E5CF8(2, 0, object);
+            PlayMobySound(2, 0, object);
             for (i = 0; i < 6; i += 2) {
-                func_00282F20(&direction, object + 0xC0, F32(state, 0x98) * (1.0f / 60.0f));
+                vec_scale_to_length(&direction, object + 0xC0, F32(state, 0x98) * (1.0f / 60.0f));
                 func_0029FCC0(object, i, &point);
-                first = (unsigned char *)func_L09_003F6820(&point, &direction,
+                first = (unsigned char *)SpawnBeamLink(&point, &direction,
                     (struct DobboMoby *)object, 0, (i / 2) * S16(state, 0xA0) + S16(state, 0xA2),
                     F32(state, 0x94), (float)state[0x34], F32(state, 0x80));
                 if (first && S16(first, 0xAA) == 0xD09 && first[0x20] != 254 && first[0x20] != 253) {
                     func_0029FCC0(object, i + 1, &point);
-                    second = (unsigned char *)func_L09_003F6820(&point, &direction,
+                    second = (unsigned char *)SpawnBeamLink(&point, &direction,
                         (struct DobboMoby *)object, (struct DobboMoby *)first,
                         (i / 2) * S16(state, 0xA0) + S16(state, 0xA2),
                         F32(state, 0x94), (float)state[0x34], F32(state, 0x80));
@@ -582,7 +582,7 @@ void func_L09_003F04D0(unsigned char *object)
                     *(unsigned char **)(*(unsigned char **)(first + 0x68) + 0x24) = second;
                     if (second && S16(second, 0xAA) == 0xD09 && second[0x20] != 254 &&
                         second[0x20] != 253)
-                        func_L09_003FB650(first, second, 1, 0);
+                        ReserveDobboPairSlot(first, second, 1, 0);
                     else
                         func_0029F338(first);
                 }
@@ -615,12 +615,12 @@ void func_L09_003F04D0(unsigned char *object)
         }
         break;
     case 6:
-        func_002A6C58(object, 0, 3);
+        SetDeathBits(object, 0, 3);
         func_0029FCC0(object, 6, &direction);
-        func_00282CF0(&point, &direction, object + 0x10);
-        func_002ABBB8(object, &point, &direction, 0, 0, 10, 3, 16, 4, 2, 9, 1, -1, 15, 1, 1, -1, 0,
+        FastVecSub(&point, &direction, object + 0x10);
+        SpawnExplosionEffects(object, &point, &direction, 0, 0, 10, 3, 16, 4, 2, 9, 1, -1, 15, 1, 1, -1, 0,
                       0x810001);
-        func_002E5CF8(3, 0, object);
+        PlayMobySound(3, 0, object);
         func_0029F338(object);
         return;
     }
@@ -689,7 +689,7 @@ struct DobboMoby {
 DobboMoby *func_L09_003F6820(void *position, void *direction, DobboMoby *owner, DobboMoby *partner,
                              int duration, float radius, float f2c, float max_distance)
 {
-    DobboMoby *moby = (DobboMoby *)func_0029EFD0(0xD09);
+    DobboMoby *moby = (DobboMoby *)CreateMoby(0xD09);
     DobboLinkState *state;
 
     if (moby) {
@@ -710,7 +710,7 @@ DobboMoby *func_L09_003F6820(void *position, void *direction, DobboMoby *owner, 
         state->f2c = f2c;
         state->partner = partner;
         state->timer = duration;
-        state->duration_f = func_00283CE0(duration);
+        state->duration_f = IntToFloat(duration);
         state->max_distance = max_distance;
         moby->alpha = 0;
         /* stored as !partner: a plain 1 here is not what retail emits */
@@ -734,8 +734,8 @@ DobboMoby *func_L09_003F6820(void *position, void *direction, DobboMoby *owner, 
 
 /* Steps the beam-link slot table once per frame. State 0 clears all sixteen slots. State 1 walks
    them: a slot whose first moby has been destroyed is released, a slot in state 4 is handed to
-   func_L09_003FB860, and any other live slot is handed to func_L09_003FB9F8 and moves to state 4.
-   If any slot was handed over, func_L09_003FBF98 is queued on the moby to draw the links. */
+   func_L09_003FB860, and any other live slot is handed to UpdateBeamLinkStrips and moves to state 4.
+   If any slot was handed over, DrawBeamLinks is queued on the moby to draw the links. */
 void func_L09_003FB4D0(DobboMoby *moby)
 {
     int i, count;
@@ -764,12 +764,12 @@ void func_L09_003FB4D0(DobboMoby *moby)
                 func_L09_003FB860(i);
             } else if (D_L09_001B35E0[i]) {
                 count++;
-                func_L09_003FB9F8(D_L09_00255E90[i][0], i);
+                UpdateBeamLinkStrips(D_L09_00255E90[i][0], i);
                 D_L09_001B35E0[i] = 4;
             }
         }
         if (count)
-            func_L08_002F2D10(func_L09_003FBF98, moby);
+            func_L08_002F2D10(DrawBeamLinks, moby);
         break;
     }
 }
@@ -866,15 +866,15 @@ void func_L09_003FBF98(char *moby)
     char *small_tex;
     DobboLinkScreen *screen = *(DobboLinkScreen **)(moby + 0x68);
 
-    func_002FC560(0x47, 0x51001);
+    VU1_addGSregister(0x47, 0x51001);
     for (i = 0; i < 16; i++) {
         if (!D_L09_00255E90[i][0] || !D_L09_00255E90[i][1] || D_L09_001B35E0[i] < 2)
             continue;
 
-        func_00282CC0((char *)&midpoint, D_L09_00255E90[i][0] + 0x10, D_L09_00255E90[i][1] + 0x10);
+        FastVecAdd((char *)&midpoint, D_L09_00255E90[i][0] + 0x10, D_L09_00255E90[i][1] + 0x10);
         sphere.q = midpoint.q;
-        func_00282D48(&midpoint, &sphere, 0.5f);
-        sphere.f[3] = func_00282E48(D_L09_00255E90[i][0] + 0x10, D_L09_00255E90[i][1] + 0x10) * 0.5263158f;
+        scale_vector_xyz_in_place(&midpoint, &sphere, 0.5f);
+        sphere.f[3] = fast_vec_dist(D_L09_00255E90[i][0] + 0x10, D_L09_00255E90[i][1] + 0x10) * 0.5263158f;
         if (func_00283DB8(&sphere, 64.0f) == -1)
             continue;
 
@@ -887,11 +887,11 @@ void func_L09_003FBF98(char *moby)
                 D_L09_001B37E0[i] += 8.0f;
         }
         small_tex = D_L09_00256510[small];
-        func_L09_003FCA58(D_L09_00255E90[i][0], i, fade);
+        DrawDobboPairedGlowQuads(D_L09_00255E90[i][0], i, fade);
         y = screen->y + 63;
         x = screen->x + 63;
-        func_L09_003FC1E8(y, x, D_L09_00256510[big], 128, 64, fade, i, -1);
-        func_L09_003FC1E8(y, x, small_tex, 48, 16, fade, i, func_002A7820(1, 6));
+        DrawBeamLinkStrip(y, x, D_L09_00256510[big], 128, 64, fade, i, -1);
+        DrawBeamLinkStrip(y, x, small_tex, 48, 16, fade, i, func_002A7820(1, 6));
     }
     func_L08_00389B68(2, 0x47, 0x5340BUL, 0x42, 0x8000000044UL);
 }
@@ -922,7 +922,7 @@ void func_L09_003FDC58(unsigned char *a0) {
     float step = 0.02f;
     float keep = *(float *)(s0 + 0x3EC);
     int save = *(int *)(s0 + 0x324);
-    int live = func_L00_00341820(
+    int live = Spline_AdvanceByDistance(
         (char *)D_L09_001FE6C0[*(int *)(s0 + 0x318)], (char *)buf,
         (char *)(s0 + 0x324), (char *)(s0 + 0x3EC), *(short *)(s0 + 0x32A),
         *(float *)(s0 + 0x388));
@@ -957,12 +957,12 @@ void func_L09_003FDED8(unsigned char *a0) {
     func_002AEF28(s1, s0 + 0x3C8, s0 + 0x3CC, 0.15f, 0.05f, 0.025f);
     if (s1[0x20] != 1)
         return;
-    if (func_00282978((unsigned short *)(s0 + 0x3D4)) != 0) {
+    if (FastDecTimer((unsigned short *)(s0 + 0x3D4)) != 0) {
         float t = 2.0943954f;
         *(short *)(s0 + 0x3D4) = 0x104;
         if (func_002A77E0(2) != 0)
             t = -t;
-        *(float *)(s0 + 0x3D0) = func_00283B98(*(float *)(s1 + 0xF8), t);
+        *(float *)(s0 + 0x3D0) = FastAddRotations(*(float *)(s1 + 0xF8), t);
     }
     func_002AA3A8(s1 + 0xF8, s0 + 0x3D8, *(float *)(s0 + 0x3D0), 0.003f, 0.2f,
                   0.02f);
@@ -1006,10 +1006,10 @@ void func_L09_003FE918(unsigned char *a0) {
         *(unsigned short *)(a0 + 0x96) = *(unsigned short *)(a0 + 0x96) + 1;
     }
     if (*(int *)(s0 + 0x154) == 0) {
-        func_00282978((unsigned short *)(s0 + 0x412));
+        FastDecTimer((unsigned short *)(s0 + 0x412));
     }
     func_002829A8((unsigned short *)(s0 + 0x428));
-    func_00282978((unsigned short *)(s0 + 0x426));
+    FastDecTimer((unsigned short *)(s0 + 0x426));
 }
 
 /* func_L09_003FE978 is defined in L09_002F8BA0-g8.c (it reads the group count through $gp). */

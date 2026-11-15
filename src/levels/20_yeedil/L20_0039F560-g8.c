@@ -39,32 +39,32 @@ void func_L20_0039F560(u8 *object)
     float wide,narrow;
     unsigned int rgba;
     int i,j;
-    packet.texture=func_0027C878(D_L20_001AED20);
+    packet.texture=GetEffectTextureDescriptor(D_L20_001AED20);
     packet.state=0xff9000000260ULL;
     packet.flags=0x8000000044ULL;
     packet.reserved=0;
-    func_002FC560(0x47,0x53001);
+    VU1_addGSregister(0x47,0x53001);
     func_00282C98(&up);
     basis[3].q=*(Quadword *)(object+0x10);
     basis[3].f[3]=1.0f;
-    func_00282CF0(&relative,&D_L20_001B9FC0,&basis[3]);
-    func_00282F20(&basis[0],&relative,1.0f);
-    func_00282DD8(&basis[1],&basis[0],&up);
-    func_00282F20(&basis[1],&basis[1],1.0f);
-    func_00282DD8(&basis[2],&basis[1],&basis[0]);
-    func_00282D30(&basis[0],&basis[0],D_L20_001AED24);
-    func_00282D30(&basis[1],&basis[1],D_L20_001AED24);
-    func_00282D30(&basis[2],&basis[2],D_L20_001AED24);
-    rgba=func_00283CF0((float)D_L20_001AED30 * *(float *)(state+0x14));
+    FastVecSub(&relative,&D_L20_001B9FC0,&basis[3]);
+    vec_scale_to_length(&basis[0],&relative,1.0f);
+    FastVecCross(&basis[1],&basis[0],&up);
+    vec_scale_to_length(&basis[1],&basis[1],1.0f);
+    FastVecCross(&basis[2],&basis[1],&basis[0]);
+    FastVecScale(&basis[0],&basis[0],D_L20_001AED24);
+    FastVecScale(&basis[1],&basis[1],D_L20_001AED24);
+    FastVecScale(&basis[2],&basis[2],D_L20_001AED24);
+    rgba=FloatToInt((float)D_L20_001AED30 * *(float *)(state+0x14));
     packet.color[0]=packet.color[1]=packet.color[2]=packet.color[3]=(rgba&0xffffff)|*(u32 *)(state+4);
-    func_002FC560(6,func_0027C878(D_L20_001AED20));
-    func_002FC560(0x42,0x8000000044ULL);
-    func_002FC560(8,0);
-    func_002FC560(0x14,0xff9000000260ULL);
-    func_002FC560(0x4a,0);
-    func_00280328();
+    VU1_addGSregister(6,GetEffectTextureDescriptor(D_L20_001AED20));
+    VU1_addGSregister(0x42,0x8000000044ULL);
+    VU1_addGSregister(8,0);
+    VU1_addGSregister(0x14,0xff9000000260ULL);
+    VU1_addGSregister(0x4a,0);
+    font_queue_vu_state();
     for (j=0;j<290;j++) {
-        func_002830C0(&transformed,&D_L20_0029DC20[j],basis);
+        transform_vector(&transformed,&D_L20_0029DC20[j],basis);
         D_L20_0023D8D0[j][0]=transformed.f[0];
         D_L20_0023D8D0[j][1]=transformed.f[1];
         D_L20_0023D8D0[j][2]=transformed.f[2];
@@ -73,9 +73,9 @@ void func_L20_0039F560(u8 *object)
     func_00281810(148,D_L20_0023D8D0,colors,D_L20_0029EE40,1);
     func_00281810(109,D_L20_0023D8D0[146],colors+146,D_L20_0029EE40[146],1);
     func_00281810(36,D_L20_0023D8D0[254],colors+254,D_L20_0029EE40[254],1);
-    packet.texture=func_0027C878(11);
+    packet.texture=GetEffectTextureDescriptor(11);
     packet.flags=0x8000000048ULL;
-    rgba=func_00283CF0(*(float *)(state+0x14)*64.0f);
+    rgba=FloatToInt(*(float *)(state+0x14)*64.0f);
     packet.color[0]=packet.color[1]=(rgba<<24)|*(u32 *)(state+4);
     packet.color[3]=0;packet.color[2]=0;
     wide=D_L20_001AED28*D_L20_001AED2C;
@@ -84,8 +84,8 @@ void func_L20_0039F560(u8 *object)
         face=D_L20_0029FD60[i];
         for (j=0;j<4;j++,face++) {
             int index=*face;
-            if (j>=2) func_00282D30(&packet.vertex[j],&D_L20_0029F760[index],wide);
-            else func_00282D30(&packet.vertex[j],&D_L20_0029F760[index],narrow);
+            if (j>=2) FastVecScale(&packet.vertex[j],&D_L20_0029F760[index],wide);
+            else FastVecScale(&packet.vertex[j],&D_L20_0029F760[index],narrow);
         }
         packet.uv[0]=0.5f;
         packet.uv[1]=0.5f;
@@ -95,6 +95,6 @@ void func_L20_0039F560(u8 *object)
         packet.uv[5]=1.0f;
         packet.uv[6]=0.5f;
         packet.uv[7]=1.0f;
-        func_00280B90(&packet,basis,0);
+        draw_world_quad(&packet,basis,0);
     }
 }

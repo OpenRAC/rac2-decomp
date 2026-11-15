@@ -43,7 +43,7 @@ extern float D_L00_001B0C2C __attribute__((sda));
    scale that depends on the flag. */
 DebrisObject_F3FED60 *func_L00_003FED60(SpawnVector_F3FED60 *position, SpawnVector_F3FED60 *velocity, int flag)
 {
-    DebrisObject_F3FED60 *object = func_0029EFD0(0xE64);
+    DebrisObject_F3FED60 *object = CreateMoby(0xE64);
     if (object != 0) {
         DebrisState_F3FED60 *state;
         float spin;
@@ -60,7 +60,7 @@ DebrisObject_F3FED60 *func_L00_003FED60(SpawnVector_F3FED60 *position, SpawnVect
         object->angle[0] = func_002A7940();
         object->angle[1] = func_002A7940();
         object->angle[2] = func_002A7940();
-        func_002833F0(object->rotation, object->angle);
+        euler_rotation_basis(object->rotation, object->angle);
         spin = func_002A7878(0.052359886f, 0.10471977f);
         func_002AB668(&state->spin, object->matrix, spin);
         if (flag) object->scale *= D_L00_001B0C38;

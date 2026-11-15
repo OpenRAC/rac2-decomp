@@ -2,7 +2,7 @@
  * State 0 copies the yaw at +0x18 to +0x44 and starts animation 1. State 1 turns and moves the
  * moby, probes the move with collision lines and slides along what they hit; on Circle it spawns
  * an explosion, damages the mobys in range and starts the timer at +0x40 (state 2). State 2 waits
- * for the timer, then calls func_003355A8 and func_L01_002BEB90 and deletes the moby, as state 1
+ * for the timer, then calls func_003355A8 and SetHeroMoveState and deletes the moby, as state 1
  * does when the moby leaves the 2..1021 box. */
 #include "common.h"
 
@@ -103,19 +103,19 @@ void func_L01_003A6638(u8 *object)
                 float start[4], angles[4], finish[4], shift[4], offset[4], hit[4], normal[4], force[4], adjustment[4], edge[4];
 
                 func_L01_003A6448(&horizontal,&vertical);
-                F(state,0x18) = F(state,0x44) = func_00283B98(F(state,0x44),D_L01_001AF870*(horizontal*0.00029088825f));
+                F(state,0x18) = F(state,0x44) = FastAddRotations(F(state,0x44),D_L01_001AF870*(horizontal*0.00029088825f));
                 maximum = ((OozlaMaterial *)((u32)D_L01_002637A0 + D_00139568[0x20]*sizeof(OozlaMaterial)))->speed*0.016666668f;
                 F(state,0x4C) += (vertical*maximum-F(state,0x4C))*D_L01_001AF880;
                 speed = F(state,0x4C)/maximum;
                 F(object,0x48) = speed+speed+horizontal;
-                func_00282F20(velocity,D_L01_001AC580,F(state,0x4C));
-                func_00283098(velocity,velocity,object+0xC0);
+                vec_scale_to_length(velocity,D_L01_001AC580,F(state,0x4C));
+                matrix_mul_vec3(velocity,velocity,object+0xC0);
                 velocity[2] += F(state,0x54);
-                func_00282CC0(position,object+0x10,velocity);
+                FastVecAdd(position,object+0x10,velocity);
                 qcopy((object+0x10), position);
                 func_L01_003A65B0(object);
-                if (F(state,0x4C) < 0.0f) F(state,0x4C) = -func_00282DF0(velocity);
-                else F(state,0x4C) = func_00282DF0(velocity);
+                if (F(state,0x4C) < 0.0f) F(state,0x4C) = -FastVecLength(velocity);
+                else F(state,0x4C) = FastVecLength(velocity);
                 func_L01_003A64F0(object,state);
                 *(OozlaQuad *)angles = 0;
                 angles[2] = D_L01_001AF870*(horizontal*0.00029088825f);
@@ -123,61 +123,61 @@ void func_L01_003A6638(u8 *object)
                 qzero_nc(rotation);
                 qzero_nc(basis[0]);
                 qzero_nc(matrix);
-                func_00283410(rotation,start);
+                euler_to_matrix(rotation,start);
                 progress = 0.0f;
                 collision = 0;
                 while (progress <= D_L01_001AF8A0 && !collision) {
                     sign = vertical < 0.0f ? -1.0f : 1.0f;
-                    func_00282F20(angles,object+0xE0,D_L01_001AF87C);
-                    func_00282CC0(angles,angles,object+0x10);
-                    func_00282F20(shift,object+0xC0,D_L01_001AF8AC*progress*sign);
-                    func_00282CC0(angles,angles,shift);
-                    func_00282F20(offset,object+0xE0,D_L01_001AF8A8);
-                    func_00282CF0(finish,object+0x10,offset);
-                    func_00282D30(normal,velocity,func_00282C48(vertical));
+                    vec_scale_to_length(angles,object+0xE0,D_L01_001AF87C);
+                    FastVecAdd(angles,angles,object+0x10);
+                    vec_scale_to_length(shift,object+0xC0,D_L01_001AF8AC*progress*sign);
+                    FastVecAdd(angles,angles,shift);
+                    vec_scale_to_length(offset,object+0xE0,D_L01_001AF8A8);
+                    FastVecSub(finish,object+0x10,offset);
+                    FastVecScale(normal,velocity,func_00282C48(vertical));
                     half = D_L01_001AF8A0*0.5f;
-                    func_00282D30(shift,normal,(D_L01_001AF8BC*(half-progress))/half);
-                    func_00282CC0(finish,finish,shift);
-                    collision = func_002761F8(angles,finish,lineFlags,object,linePacket);
+                    FastVecScale(shift,normal,(D_L01_001AF8BC*(half-progress))/half);
+                    FastVecAdd(finish,finish,shift);
+                    collision = CollLine(angles,finish,lineFlags,object,linePacket);
                     progress += 1.0f;
                 }
                 if (collision) {
                     qcopy(hit, (D_L01_001BF900+0x20));
-                    func_00282F20(normal,object+0xE0,1.0f);
-                    func_00282F20(force,D_L01_001BF900+0x40,1.0f);
-                    angle = 1.5707964f-func_002831B0(func_00282DB0(normal,force));
+                    vec_scale_to_length(normal,object+0xE0,1.0f);
+                    vec_scale_to_length(force,D_L01_001BF900+0x40,1.0f);
+                    angle = 1.5707964f-func_002831B0(FastVecDot(normal,force));
                     if (D_L01_001AF8C0*0.017453294f < angle) {
                         qcopy((object+0x10), previous);
                     } else {
-                        func_00282F20(adjustment,D_L01_001BF900+0x40,D_L01_001AF894);
-                        func_00282F20(angles,object+0xE0,D_L01_001AF87C);
-                        func_00282CF0(finish,object+0x10,angles);
-                        func_00282CC0(angles,angles,object+0x10);
-                        if (func_002761F8(angles,finish,lineFlags,object,linePacket)) {
-                            func_00282F20(edge,D_L01_001BF900+0x40,D_L01_001AF898);
-                            func_00282CC0(adjustment,adjustment,edge);
+                        vec_scale_to_length(adjustment,D_L01_001BF900+0x40,D_L01_001AF894);
+                        vec_scale_to_length(angles,object+0xE0,D_L01_001AF87C);
+                        FastVecSub(finish,object+0x10,angles);
+                        FastVecAdd(angles,angles,object+0x10);
+                        if (CollLine(angles,finish,lineFlags,object,linePacket)) {
+                            vec_scale_to_length(edge,D_L01_001BF900+0x40,D_L01_001AF898);
+                            FastVecAdd(adjustment,adjustment,edge);
                         }
-                        func_00282F20(edge,object+0xE0,D_L01_001AF89C);
-                        func_00282CC0(adjustment,adjustment,edge);
-                        func_00283658(basis[0],object+0xC0);
-                        func_00282F20(basis[2],adjustment,-1.0f);
-                        func_00282DD8(basis[1],basis[2],basis[0]);
-                        func_00282DD8(basis[0],basis[1],basis[2]);
-                        func_00283788(matrix,basis[0],rotation);
+                        vec_scale_to_length(edge,object+0xE0,D_L01_001AF89C);
+                        FastVecAdd(adjustment,adjustment,edge);
+                        copy_matrix_rotation(basis[0],object+0xC0);
+                        vec_scale_to_length(basis[2],adjustment,-1.0f);
+                        FastVecCross(basis[1],basis[2],basis[0]);
+                        FastVecCross(basis[0],basis[1],basis[2]);
+                        multiply_matrix(matrix,basis[0],rotation);
                         func_002AB6D8(matrix,object+0xF0);
-                        func_00282CF0(edge,hit,object+0x10);
-                        func_00282F20(edge,edge,
-                            D_L01_001AF8B0*0.016666668f < func_00282DF0(edge)
-                            ? D_L01_001AF8B0*0.016666668f : func_00282DF0(edge));
-                        func_00282CC0(object+0x10,object+0x10,edge);
+                        FastVecSub(edge,hit,object+0x10);
+                        vec_scale_to_length(edge,edge,
+                            D_L01_001AF8B0*0.016666668f < FastVecLength(edge)
+                            ? D_L01_001AF8B0*0.016666668f : FastVecLength(edge));
+                        FastVecAdd(object+0x10,object+0x10,edge);
                         F(state,0x54) = 0.0f;
                     }
                 } else {
                     qcopy((object+0x10), previous);
-                    func_00283658(basis[0],object+0xC0);
-                    func_00283678(object+0xC0,matrix);
-                    func_00283788(matrix,basis[0],rotation);
-                    func_00283678(object+0xC0,matrix);
+                    copy_matrix_rotation(basis[0],object+0xC0);
+                    copy_matrix3x4(object+0xC0,matrix);
+                    multiply_matrix(matrix,basis[0],rotation);
+                    copy_matrix3x4(object+0xC0,matrix);
                 }
             }
         }
@@ -185,14 +185,14 @@ void func_L01_003A6638(u8 *object)
         {
             float displacement[4], inverse[16], center[4];
 
-            func_00283698(inverse,object+0xC0);
-            func_00282CF0(displacement,object+0x10,previous);
-            func_002830C0(displacement,displacement,inverse);
+            matrix_from_basis_rows(inverse,object+0xC0);
+            FastVecSub(displacement,object+0x10,previous);
+            transform_vector(displacement,displacement,inverse);
             func_L00_002EE4D8(displacement,displacement,func_00282C48(F(state,0x4C)));
-            func_00283098(displacement,displacement,object+0xC0);
-            func_00282CC0(object+0x10,previous,displacement);
+            matrix_mul_vec3(displacement,displacement,object+0xC0);
+            FastVecAdd(object+0x10,previous,displacement);
             if (((OozlaInput *)D_00138180)->flags & detonate) {
-                func_002ABBB8((char *)object,velocity,explosionAt,0.0f,0.0f,sparks,flashes,smoke,4.0f,2.0f,0.0f,1.0f,1,20.0f,1,1,-1,0,0x810001);
+                SpawnExplosionEffects((char *)object,velocity,explosionAt,0.0f,0.0f,sparks,flashes,smoke,4.0f,2.0f,0.0f,1.0f,1,20.0f,1,1,-1,0,0x810001);
                 count = func_00277F48(object+0x10,sphereFlags,object,sphereHit,D_L01_001AF874);
                 *(OozlaQuad *)center = *(OozlaQuad *)(object+0x10);
                 func_002A9850(object,center,D_L01_001C3980,count,spared,0x830000,3,2,((OozlaMaterial *)((u32)D_L01_002637A0 + D_00139568[0x20]*sizeof(OozlaMaterial)))->material,1.0f,1.0f);
@@ -211,7 +211,7 @@ void func_L01_003A6638(u8 *object)
     case 2:
         if (func_00282948(state+0x40)) {
             func_003355A8(0);
-            func_L01_002BEB90(0,1);
+            SetHeroMoveState(0,1);
             func_0029F338(object);
             return;
         }

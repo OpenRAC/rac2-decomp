@@ -15,7 +15,7 @@ int func_003286D0(char *self, void *a1)
 {
     char *o;
 
-    if (func_002761F8(a1, self + 0x10, 0, self, 0) != 0) {
+    if (CollLine(a1, self + 0x10, 0, self, 0) != 0) {
         o = ref_L00_003286D0_00;
         if (o != 0 && (*(short *)(o + 0xAA) == 0xFB0 || o == D_0018C0B0))
             return 0;

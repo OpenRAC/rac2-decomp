@@ -29,9 +29,9 @@ void func_L18_003FD730(u8 *obj) {
         r = 0.0f;
     t = func_002AA140(D_L18_001B0778, D_L18_001B077C[0], r);
     if (r < 0.1f) {
-        n = func_00283CF0((f32)D_L18_001B0780 * r * 10.0f);
+        n = FloatToInt((f32)D_L18_001B0780 * r * 10.0f);
     } else {
-        n = func_00283CF0((f32)D_L18_001B0780 * (1.0f - r));
+        n = FloatToInt((f32)D_L18_001B0780 * (1.0f - r));
     }
     func_002820D0(state + 0x90, n, 0, t, D_L18_001B0784, 0.08f);
 }

@@ -153,7 +153,7 @@ void func_L01_003CC930(u8 *self)
     s32 busy8 = 0;
 
     pv = *(u8 **)(self + 0x68);
-    func_L01_003CC280(self);
+    UpdateOozlaLinkedGroupDamage(self);
     switch (self[0x95]) {
     case 0:
         if (D_L01_001B2088 < 2)

@@ -80,11 +80,11 @@ void func_L00_002A6DD0(void) {
     *(short *)(player + 0x2162) = 0;
     *(short *)(player + 0x2160) = 0;
     if (player[0x22B4]) { func_L00_002A65D8(); return; }
-    func_L00_002D24E8();
-    func_L00_002B36E0();
+    AdvanceHeroAnimation();
+    UpdateHeroInputAndHistory();
     func_L00_002ACA08();
     func_L00_002ACF88(player + 0x80, player + 0x90, player + 0x550);
-    func_L00_002ADB40();
+    FindGrindRail();
     func_L00_002ADD30();
     func_L00_002CB3A8();
     if (D_L00_001A8F00 == 2 || D_L00_001A8F00 == 6) {
@@ -92,19 +92,19 @@ void func_L00_002A6DD0(void) {
         else func_L00_002D3068();
         return;
     }
-    func_L00_002AE0C8();
+    RebuildRegionObjectMembership();
     if (player[0x22B4]) return;
-    func_L00_002B9CA8();
-    func_L00_002AC1A0();
+    UpdateDelayedSounds();
+    UpdateHeroEasingTargetsAndPointEffects();
     func_L00_002AB1D8();
-    func_L00_002AB420();
-    func_L00_002ABBA0();
-    func_L00_002AB948();
-    func_L00_002A5518();
-    func_L00_002A5840();
-    func_L00_002B7718();
+    UpdateHeroPitchAndYawEasingTargets();
+    UpdateHeroAutoAimAngles();
+    UpdateHeroIdleRandomRotationTargets();
+    ClampHeroControlAndUpdateEffects();
+    UpdateHeroGlowAndExtraManipulators();
+    UpdateHeroTiltPoseTargets();
     func_L00_002A5368();
-    func_L00_002A9460();
+    update_hero_moby();
     func_L00_002AA178(0);
     func_L00_002B2120();
     func_L00_002B2318();
@@ -113,15 +113,15 @@ void func_L00_002A6DD0(void) {
     if (player[0x22B5] || func_L00_002D6418()) func_L00_002D2E68();
     else func_L00_002D3068();
     func_L00_002A7958();
-    func_L00_002A7748();
+    ApplyHeroAxisScales();
     func_L00_002A67F8();
     func_L00_002D5EB8();
     func_L00_002A6420();
-    func_L00_002D5158();
+    UpdateHeroAimAndTransitions();
     hero = D_00189E20;
     if ((*(int *)(hero + 0x229C) != 0x16 && *(int *)(hero + 0x229C) != 0x1F && *(int *)(hero + 0x2294) != 0x31) || func_L00_002A7000())
         func_L00_003080D0(D_00189EA0);
     { unsigned char *base = D_00189E20; func_002A677C(*(void **)(base + 0x2290)); }
-    func_L00_002A74A8();
-    func_L00_002A9760();
+    UpdateHeroBlinkAndItemTint();
+    UpdateHeroMobyProbedHeightBounds();
 }

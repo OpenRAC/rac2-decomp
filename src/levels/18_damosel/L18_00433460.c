@@ -70,7 +70,7 @@ extern void func_002830C0(void *, void *, void *);
 extern void func_00280B90(void *, void *, int);
 
 void func_L18_00435CC8(void) {
-    func_L04_003A21F8(D_L18_002A9C40, 0x12);
+    render_water_grids(D_L18_002A9C40, 0x12);
 }
 
 void func_L18_00434128(u8 *obj) {
@@ -81,9 +81,9 @@ void func_L18_00434128(u8 *obj) {
         s32 j;
         for (j = 1; j >= 0; j--) {
             float x;
-            *(float *)(p + 0x40) = func_00283B98(*(float *)(p + 0x40), *(float *)(p + 0x60));
-            *(float *)(p + 0x44) = func_00283B98(*(float *)(p + 0x44), *(float *)(p + 0x64));
-            *(float *)(p + 0x48) = func_00283B98(*(float *)(p + 0x48), *(float *)(p + 0x68));
+            *(float *)(p + 0x40) = FastAddRotations(*(float *)(p + 0x40), *(float *)(p + 0x60));
+            *(float *)(p + 0x44) = FastAddRotations(*(float *)(p + 0x44), *(float *)(p + 0x64));
+            *(float *)(p + 0x48) = FastAddRotations(*(float *)(p + 0x48), *(float *)(p + 0x68));
             x = func_00283180(*(float *)(p + 0x40));
             *(float *)(p + 0x20) = x * *(float *)(p + 0x80);
             *(float *)(p + 0x24) = func_00283198(*(float *)(p + 0x44)) * *(float *)(p + 0x84);
@@ -145,23 +145,23 @@ void func_L18_00433460(u8 *obj) {
     p0+=0xa0;p1+=0xa0;p2+=0xa0;p3+=0xa0;
    }
    H(s,0x804)=0;H(s,0x806)=2;
-   if(!func_002E59B0(obj,I(s,0x7f0)))I(s,0x7f0)=func_002E5CF8(1,4,obj);
+   if(!func_002E59B0(obj,I(s,0x7f0)))I(s,0x7f0)=PlayMobySound(1,4,obj);
    if(P(s,0x7bc))qcopy(target,P(s,0x7bc)+0x10);else qcopy(target,s+0x1f0);
-  } else F(s,0x7e0)=func_00283CE0(H(s,0x804))/func_00283CE0(5);
+  } else F(s,0x7e0)=IntToFloat(H(s,0x804))/IntToFloat(5);
   break;
  case 2:
   qcopy(s+0x610,a);qcopy(s+0x6b0,b);
   func_002A8C28(obj,a,0x10001,0,1,0,0.2f,(float)s[0x34],1);
   if(H(s,0x804)<6) {
-   t=func_00283CE0(H(s,0x804))/func_00283CE0(5);
+   t=IntToFloat(H(s,0x804))/IntToFloat(5);
    F(s,0x620)=a[0]+(F(s,0x760)-a[0])*t;
    F(s,0x624)=a[1]+(F(s,0x764)-a[1])*t;
    F(s,0x628)=a[2]+(F(s,0x768)-a[2])*t;
    qcopy(s+0x6c0,s+0x620);
-   func_00282CF0(v,s+0x620,s+0x610);func_00282F20(v,v,1.0f/30.0f);
-   func_002A8C00(&hit,obj,0x210001,v,(float)s[0x34]);
+   FastVecSub(v,s+0x620,s+0x610);vec_scale_to_length(v,v,1.0f/30.0f);
+   make_hit_descriptor(&hit,obj,0x210001,v,(float)s[0x34]);
    hit.type=5;hit.flags=3;hit.id=*(u16 *)(obj+0xaa);
-   if(func_002761F8(s+0x610,s+0x620,0,obj,&hit)) {
+   if(CollLine(s+0x610,s+0x620,0,obj,&hit)) {
     func_L18_00434A98(s+0x620,15);qcopy(s+0x760,s+0x620);H(s,0x804)=0;
     if(D_L18_001BFC00.object) {
      float *point=D_L18_001BFC00.position;
@@ -175,7 +175,7 @@ void func_L18_00433460(u8 *obj) {
  case 3:
   qcopy(s+0x610,a);qcopy(s+0x6b0,b);
   if(H(s,0x804)<51 && (other=P(s,0x7e4)) && other[0x20]!=254 && other[0x20]!=253) {
-   func_00282CF0(v,other+0x10,s+0x770);func_00282CC0(s+0x620,s+0x620,v);
+   FastVecSub(v,other+0x10,s+0x770);FastVecAdd(s+0x620,s+0x620,v);
    qcopy(s+0x6c0,s+0x620);qcopy(s+0x770,P(s,0x7e4)+0x10);
    if((D_L18_001B2348&15)==(((int)obj>>8)&15))func_L18_00434A98(s+0x620,1);
   } else {
@@ -186,7 +186,7 @@ void func_L18_00433460(u8 *obj) {
  case 4:
   qcopy(s+0x610,a);qcopy(s+0x6b0,b);
   if(H(s,0x804)<5) {
-   t=func_00283CE0(H(s,0x804))/func_00283CE0(5);
+   t=IntToFloat(H(s,0x804))/IntToFloat(5);
    F(s,0x620)=F(s,0x760)+(a[0]-F(s,0x760))*t;
    F(s,0x624)=F(s,0x764)+(a[1]-F(s,0x764))*t;
    F(s,0x628)=F(s,0x768)+(a[2]-F(s,0x768))*t;
@@ -221,7 +221,7 @@ void func_L18_00434510(RibbonVector *points, int count, int flags, u32 color0, u
     RibbonVector template0, template1;
     float u, nextU, step;
     int i;
-    mainQuad.texture = func_0027C878(0x2B);
+    mainQuad.texture = GetEffectTextureDescriptor(0x2B);
     mainQuad.flags = ((u64)(u32)flags << 32) | 0x68;
     mainQuad.giftag = 0xFF9000000260ULL;
     mainQuad.color[0] = mainQuad.color[1] = mainQuad.color[2] = mainQuad.color[3] = color0;
@@ -231,7 +231,7 @@ void func_L18_00434510(RibbonVector *points, int count, int flags, u32 color0, u
     mainQuad.uv[1][0] = 0.0f; mainQuad.uv[1][1] = 1.0f;
     mainQuad.uv[2][0] = 1.0f; mainQuad.uv[2][1] = 0.0f;
     mainQuad.uv[3][0] = 1.0f; mainQuad.uv[3][1] = 1.0f;
-    innerQuad.texture = func_0027C878(0x2B);
+    innerQuad.texture = GetEffectTextureDescriptor(0x2B);
     innerQuad.giftag = 0xFF9000000260ULL;
     innerQuad.clear = 0;
     innerQuad.flags = ((u64)(long)(flags / 3) << 32) | 0x68;
@@ -247,45 +247,45 @@ void func_L18_00434510(RibbonVector *points, int count, int flags, u32 color0, u
     template1.f[3] = 1.0f;
     template0.f[2] = width;
     template1.f[2] = width * scale;
-    func_00282CF0((float *)&basis[0], (float *)&points[1], (float *)&points[0]);
-    func_00282F20((char *)&basis[0], (char *)&basis[0], 1.0f);
-    func_00282CF0((float *)&basis[1], D_L18_001B97C0, (float *)&points[0]);
-    func_00282DD8(&basis[2], &basis[1], &basis[0]);
-    func_00282F20((char *)&basis[2], (char *)&basis[2], 1.0f);
-    func_00282DD8(&basis[1], &basis[0], &basis[2]);
+    FastVecSub((float *)&basis[0], (float *)&points[1], (float *)&points[0]);
+    vec_scale_to_length((char *)&basis[0], (char *)&basis[0], 1.0f);
+    FastVecSub((float *)&basis[1], D_L18_001B97C0, (float *)&points[0]);
+    FastVecCross(&basis[2], &basis[1], &basis[0]);
+    vec_scale_to_length((char *)&basis[2], (char *)&basis[2], 1.0f);
+    FastVecCross(&basis[1], &basis[0], &basis[2]);
     qcopy(&basis[3], &points[0]);
     qcopy(&mainQuad.position[0], &template0);
-    func_00282D30(&mainQuad.position[1], &mainQuad.position[0], -1.0f);
-    func_002830C0(&mainQuad.position[0], &mainQuad.position[0], basis);
-    func_002830C0(&mainQuad.position[1], &mainQuad.position[1], basis);
+    FastVecScale(&mainQuad.position[1], &mainQuad.position[0], -1.0f);
+    transform_vector(&mainQuad.position[0], &mainQuad.position[0], basis);
+    transform_vector(&mainQuad.position[1], &mainQuad.position[1], basis);
     qcopy(&innerQuad.position[0], &template1);
-    func_00282D30(&innerQuad.position[1], &innerQuad.position[0], -1.0f);
-    func_002830C0(&innerQuad.position[0], &innerQuad.position[0], basis);
-    func_002830C0(&innerQuad.position[1], &innerQuad.position[1], basis);
+    FastVecScale(&innerQuad.position[1], &innerQuad.position[0], -1.0f);
+    transform_vector(&innerQuad.position[0], &innerQuad.position[0], basis);
+    transform_vector(&innerQuad.position[1], &innerQuad.position[1], basis);
     for (i = 1; i < count - 1; i++) {
         qcopy(&mainQuad.position[2], &template0);
-        func_00282D30(&mainQuad.position[3], &mainQuad.position[2], -1.0f);
+        FastVecScale(&mainQuad.position[3], &mainQuad.position[2], -1.0f);
         qcopy(&innerQuad.position[2], &template1);
-        func_00282D30(&innerQuad.position[3], &innerQuad.position[2], -1.0f);
-        func_00282CF0((float *)&basis[0], (float *)&points[i + 1], (float *)&points[i]);
-        func_00282F20((char *)&basis[0], (char *)&basis[0], 1.0f);
-        func_00282CF0((float *)&basis[1], D_L18_001B97C0, (float *)&points[i]);
-        func_00282DD8(&basis[2], &basis[1], &basis[0]);
-        func_00282F20((char *)&basis[2], (char *)&basis[2], 1.0f);
-        func_00282DD8(&basis[1], &basis[0], &basis[2]);
+        FastVecScale(&innerQuad.position[3], &innerQuad.position[2], -1.0f);
+        FastVecSub((float *)&basis[0], (float *)&points[i + 1], (float *)&points[i]);
+        vec_scale_to_length((char *)&basis[0], (char *)&basis[0], 1.0f);
+        FastVecSub((float *)&basis[1], D_L18_001B97C0, (float *)&points[i]);
+        FastVecCross(&basis[2], &basis[1], &basis[0]);
+        vec_scale_to_length((char *)&basis[2], (char *)&basis[2], 1.0f);
+        FastVecCross(&basis[1], &basis[0], &basis[2]);
         qcopy(&basis[3], &points[i]);
-        func_002830C0(&mainQuad.position[2], &mainQuad.position[2], basis);
-        func_002830C0(&mainQuad.position[3], &mainQuad.position[3], basis);
-        func_002830C0(&innerQuad.position[2], &innerQuad.position[2], basis);
-        func_002830C0(&innerQuad.position[3], &innerQuad.position[3], basis);
+        transform_vector(&mainQuad.position[2], &mainQuad.position[2], basis);
+        transform_vector(&mainQuad.position[3], &mainQuad.position[3], basis);
+        transform_vector(&innerQuad.position[2], &innerQuad.position[2], basis);
+        transform_vector(&innerQuad.position[3], &innerQuad.position[3], basis);
         if (i == count - 2) {
             mainQuad.color[2] = 0; mainQuad.color[3] = 0;
             innerQuad.color[2] = 0; innerQuad.color[3] = 0;
         }
-        func_00280B90(&mainQuad, 0, 0);
-        func_00280B90(&innerQuad, 0, 0);
+        draw_world_quad(&mainQuad, 0, 0);
+        draw_world_quad(&innerQuad, 0, 0);
         step = 0.33f;
-        u = step * func_00283CE0(i);
+        u = step * IntToFloat(i);
         nextU = u + step;
         if (u >= 1.0f) {
             u -= 1.0f;
@@ -312,7 +312,7 @@ void func_L18_00434A98(char *pos, int count) {
 
     *(TI128 *)axis = 0;
     axis[2] = 1.0f;
-    func_00282CF0(direction, D_L18_001B97C0, (float *)pos);
+    FastVecSub(direction, D_L18_001B97C0, (float *)pos);
     direction[2] = 0.0f;
     for (i = 0; i < count; i++) {
         size = func_002A7878(0.5f, 2.0f);
@@ -322,29 +322,29 @@ void func_L18_00434A98(char *pos, int count) {
         angle = func_002A7878(-1.0471977f, 1.0471977f);
         func_002ACEC0(velocity, direction, axis, angle);
         speed = func_002A7878(0.05f, 3.0f) * (1.0f / 60.0f);
-        func_00282F20((char *)velocity, (char *)velocity, speed);
+        vec_scale_to_length((char *)velocity, (char *)velocity, speed);
         velocity[2] = func_002A7878(1.0f, 5.0f) * (1.0f / 60.0f);
         qcopy(point, pos);
         point[0] += func_002A78D8(0.0f, 0.15f);
         point[1] += func_002A78D8(0.0f, 0.15f);
         point[2] += func_002A78D8(0.0f, 0.15f);
         if (!(func_001163B0() & 1)) {
-            func_00282D30(velocity, velocity, 1.5f);
+            FastVecScale(velocity, velocity, 1.5f);
             particle = func_002C2210(point, 60, size * 0.35f, size, 0x7F800000, 0, sign, velocity, 0, 0.002f);
             if (particle)
-                particle[9] = func_00283CF0(4.0f) + 0x70;
+                particle[9] = FloatToInt(4.0f) + 0x70;
             particle = func_002C2210(point, 60, size * 0.245f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, 0.002f);
         } else {
-            func_00282CF0(extra, D_L18_001B97C0, point);
-            func_00282F20((char *)extra, (char *)extra, speed);
-            func_00282CC0((char *)velocity, (char *)velocity, (char *)extra);
+            FastVecSub(extra, D_L18_001B97C0, point);
+            vec_scale_to_length((char *)extra, (char *)extra, speed);
+            FastVecAdd((char *)velocity, (char *)velocity, (char *)extra);
             particle = func_002C2210(point, 40, size * 2.05f, size, 0x7F800000, 0, sign, velocity, 0, 0.002f);
             if (particle)
-                particle[9] = func_00283CF0(4.0f) + 0x70;
+                particle[9] = FloatToInt(4.0f) + 0x70;
             particle = func_002C2210(point, 40, size * 1.43500006f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, 0.002f);
         }
         if (particle)
-            particle[9] = func_00283CF0(4.0f) + 0x70;
+            particle[9] = FloatToInt(4.0f) + 0x70;
     }
 }
 
@@ -356,10 +356,10 @@ void func_L18_00434FC0(u8 *obj) {
     a = func_002A7878(0.5f, 0.8f);
     func_0029FCC0(obj, 0, v);
     a = a * 0.5f;
-    func_00282CF0(w, D_L18_001B97C0, v);
+    FastVecSub(w, D_L18_001B97C0, v);
     w[2] = 0.0f;
-    func_00282F20((char *)w, (char *)w, 0.2f);
-    func_00282CC0((char *)v, (char *)v, (char *)w);
+    vec_scale_to_length((char *)w, (char *)w, 0.2f);
+    FastVecAdd((char *)v, (char *)v, (char *)w);
     func_L02_003FFC48(v, 0x807070, a, func_002A7820(0x50, 0x60), func_002A7940(), 0x31, 2);
     func_L02_003FFC48(v, 0x802020, 0.56f, func_002A7820(0x16, 0x32), func_002A7940(), 0xB, 2);
 }
@@ -376,7 +376,7 @@ void func_L18_004350E0(char *pos, int count) {
 
     *(TI128 *)axis = 0;
     axis[2] = 1.0f;
-    func_00282CF0(direction, D_L18_001B97C0, (float *)pos);
+    FastVecSub(direction, D_L18_001B97C0, (float *)pos);
     direction[2] = 0.0f;
     for (i = 0; i < count; i++) {
         size = func_002A7878(0.5f, 2.0f);
@@ -386,29 +386,29 @@ void func_L18_004350E0(char *pos, int count) {
         angle = func_002A7878(-1.0471977f, 1.0471977f);
         func_002ACEC0(velocity, direction, axis, angle);
         speed = func_002A7878(0.05f, 3.0f) * (1.0f / 60.0f);
-        func_00282F20((char *)velocity, (char *)velocity, speed);
+        vec_scale_to_length((char *)velocity, (char *)velocity, speed);
         velocity[2] = func_002A7878(1.0f, 5.0f) * (1.0f / 60.0f);
         qcopy(point, pos);
         point[0] += func_002A78D8(0.0f, 0.15f);
         point[1] += func_002A78D8(0.0f, 0.15f);
         point[2] += func_002A78D8(0.0f, 0.15f);
         if (!(func_001163B0() & 1)) {
-            func_00282D30(velocity, velocity, 1.5f);
+            FastVecScale(velocity, velocity, 1.5f);
             particle = func_002C2210(point, 60, size * 0.05f, size, 0x7F800000, 0, sign, velocity, 0, 0.002f);
             if (particle)
-                particle[9] = func_00283CF0(4.0f) + 0x70;
+                particle[9] = FloatToInt(4.0f) + 0x70;
             particle = func_002C2210(point, 60, size * 0.035f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, 0.002f);
         } else {
-            func_00282CF0(extra, D_L18_001B97C0, point);
-            func_00282F20((char *)extra, (char *)extra, speed);
-            func_00282CC0((char *)velocity, (char *)velocity, (char *)extra);
+            FastVecSub(extra, D_L18_001B97C0, point);
+            vec_scale_to_length((char *)extra, (char *)extra, speed);
+            FastVecAdd((char *)velocity, (char *)velocity, (char *)extra);
             particle = func_002C2210(point, 40, size * 0.15f, size, 0x7F800000, 0, sign, velocity, 0, 0.002f);
             if (particle)
-                particle[9] = func_00283CF0(4.0f) + 0x70;
+                particle[9] = FloatToInt(4.0f) + 0x70;
             particle = func_002C2210(point, 40, size * 0.105000004f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, 0.002f);
         }
         if (particle)
-            particle[9] = func_00283CF0(4.0f) + 0x70;
+            particle[9] = FloatToInt(4.0f) + 0x70;
     }
 }
 
@@ -454,10 +454,10 @@ void func_L18_00439FC8(u8 *obj) {
         return;
     case 1:
         if (func_002E59B0(obj, *(s32 *)(state + 0x68)) == 0) {
-            *(s32 *)(state + 0x68) = func_002E5CF8(0, 4, obj);
+            *(s32 *)(state + 0x68) = PlayMobySound(0, 4, obj);
         }
         p = state + 0x50;
-        *(float *)(obj + 0xF8) = func_00283B98(*(float *)(obj + 0xF8),
+        *(float *)(obj + 0xF8) = FastAddRotations(*(float *)(obj + 0xF8),
                                                *(float *)(state + 0x64) * 0.000290888245f);
         f = func_002A96A0(obj, func_002A9640(obj, 0x230000, 0));
         if (f > 0.0f) {
@@ -546,8 +546,8 @@ void func_L18_00441438(unsigned char *object)
     case 0:
         *(int *)(state + 0x100) = -1;
         *(unsigned short *)(object + 0x34) |= 0x1000;
-        state[0x48] = func_00283CF0(15.0f);
-        state[0x4a] = func_00283CF0(6.0f);
+        state[0x48] = FloatToInt(15.0f);
+        state[0x4a] = FloatToInt(6.0f);
         func_002A7750(object, 1, -1);
         break;
     case 1:
@@ -567,14 +567,14 @@ void func_L18_00441438(unsigned char *object)
         object[0xa8] = 255;
         *(float *)(state + 0x20) -= damage;
         if (*(float *)(state + 0x20) <= zero) {
-            func_002ABBB8(object, object + 0x10, 0, zero, zero, 10, 3, 9,
+            SpawnExplosionEffects(object, object + 0x10, 0, zero, zero, 10, 3, 9,
                          4.0f, 2.0f, 9.0f, zero, -1, 15.0f, 1, 1, -1, 0, 0x810001);
-            func_002E5CF8(0, 0, object);
-            func_00282CF0(direction, (float *)(object + 0x10), (float *)D_00189EA0);
+            PlayMobySound(0, 0, object);
+            FastVecSub(direction, (float *)(object + 0x10), (float *)D_00189EA0);
             func_002AFEB8(object, direction, direction, 0, zero);
-            func_00282F20((char *)direction, (char *)direction, 0.10000001f);
+            vec_scale_to_length((char *)direction, (char *)direction, 0.10000001f);
             func_002B0A68(object, 0x1fff, direction, 3.0f, 6.0f, 3.0f, 6.0f, 255);
-            func_002A6C58(object, 0, 3);
+            SetDeathBits(object, 0, 3);
             func_0029F338(object);
         }
         break;

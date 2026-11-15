@@ -42,9 +42,9 @@ void func_L06_00457270(unsigned char *m)
         } else {
             t[0] = 0.16666667f;
         }
-        func_00283098(t, t, m + 0xC0);
+        matrix_mul_vec3(t, t, m + 0xC0);
         func_002B0A68((char *)m, 7, t, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
-        func_002E5CF8(0, 0, (char *)m);
+        PlayMobySound(0, 0, (char *)m);
         func_0029F338(m);
         break;
     }

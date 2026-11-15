@@ -142,7 +142,7 @@ int func_L01_002C1A70(void)
     case 10:
         if (D_00189E20.attackDisabled) break;
         if (MOTION < 2 || (MOTION == 4 && D_00189E20.canAttack)) {
-            if (func_L00_0032EF10(mask, 10, &scratch.attackBuffered)) {
+            if (PadPressedWithin(mask, 10, &scratch.attackBuffered)) {
                 object = D_00189E20.actionObject;
                 if (!object) goto clearPending;
                 if (!func_L00_002B3248((unsigned char *)object) || *(unsigned char *)(object + 0x20))
@@ -153,9 +153,9 @@ int func_L01_002C1A70(void)
                         func_L00_002BA508();
                         goto clearPending;
                     }
-                    func_L01_002BEB90(0x15, 1);
+                    SetHeroMoveState(0x15, 1);
                 } else {
-                    func_L01_002BEB90(0x13, 1);
+                    SetHeroMoveState(0x13, 1);
                 }
             }
         } else {
@@ -167,14 +167,14 @@ int func_L01_002C1A70(void)
                 if (D_00189E20.transitionTimer > 10) {
                     int airWindow = 0xE;
                     if (ACTION == 0xB || ACTION == 0xE) airWindow = 0x12;
-                    if (!func_L00_0032EF10(mask, airWindow, 0)) goto clearPending;
+                    if (!PadPressedWithin(mask, airWindow, 0)) goto clearPending;
                     if ((!D_00189E20.highAttack && D_00189E20.height > 0.1f) ||
                         (D_00189E20.highAttack && D_00189E20.height > 0.57f) ||
                         (ACTION == 8 && D_00189E20.height > 0.57f)) {
                         if (!D_00189E20.attackBlock && !D_00189E20.pendingAttack)
-                            func_L01_002BEB90(0x14, 1);
+                            SetHeroMoveState(0x14, 1);
                     } else {
-                        func_L01_002BEB90(0x13, 1);
+                        SetHeroMoveState(0x13, 1);
                     }
                     goto clearPending;
                 }
@@ -185,8 +185,8 @@ int func_L01_002C1A70(void)
                     if (D_00189E20.actionLock) goto checkAnimationLock;
                     if (D_00189E20.animationLock) goto clearPending;
                     if ((float)*(int *)(timing + 0x10) <= D_00189E20.animationFrame &&
-                        (D_00138180.buttons.word.buffered & 8) && func_L00_0032EF10(mask, 15, 0)) {
-                        func_L01_002BEB90(0x15, 1);
+                        (D_00138180.buttons.word.buffered & 8) && PadPressedWithin(mask, 15, 0)) {
+                        SetHeroMoveState(0x15, 1);
                         goto complete;
                     }
                 }
@@ -195,13 +195,13 @@ checkAnimationLock:
                     if (!D_00189E20.actionLock) {
                         float frame = D_00189E20.animationFrame;
                         if ((float)*(int *)(timing + 0x10) <= frame) {
-                            window = (func_00283CF0(frame) - *(int *)(timing + 0xC)) * 2;
+                            window = (FloatToInt(frame) - *(int *)(timing + 0xC)) * 2;
                             window = window > 0 ? window : 1;
-                            if (func_L00_0032EF10(mask, window < 16 ? window : 15, 0)) {
+                            if (PadPressedWithin(mask, window < 16 ? window : 15, 0)) {
                                 if (D_00138180.buttons.word.buffered & 8)
-                                    func_L01_002BEB90(0x15, 1);
+                                    SetHeroMoveState(0x15, 1);
                                 else
-                                    func_L01_002BEB90(0x13, 1);
+                                    SetHeroMoveState(0x13, 1);
                                 goto clearPending;
                             }
                         }
@@ -219,8 +219,8 @@ clearPending:
             (MOTION > 1 && MOTION != 12 && (MOTION != 4 || !D_00189E20.canAttack)) ||
             (D_00189E20.queuedAction && D_00189E20.queuedAction != 22 && D_00189E20.queuedAction != 65)) break;
         if (!(D_00138180.buttons.word.buffered & 0x20) || D_00189E20.actionAge < 23) break;
-        if (func_L00_002D4040(request)) {
-            func_L01_002BEB90(0x83, 1);
+        if (get_ammo(request)) {
+            SetHeroMoveState(0x83, 1);
             goto complete;
         }
         if (D_00138180.buttons.word.pressed & 0x20)
@@ -235,19 +235,19 @@ clearPending:
                 D_00189E20.target = 0;
                 break;
             }
-            target = func_L00_002AE888((char *)&D_00189E20, 21, 0, 20.0f, D_00189E20.facing,
+            target = SelectBestEligibleTarget((char *)&D_00189E20, 21, 0, 20.0f, D_00189E20.facing,
                                       0.52359885f, 0.6981318f);
             D_00189E20.target = target;
             if (target) {
                 qcopy(&scratch.position, target + 0x10);
                 ((float *)&scratch.position)[2] += 0.5f;
-                if (func_002761F8(&scratch.position, D_00189E20.origin, 2, target, 0)) {
+                if (CollLine(&scratch.position, D_00189E20.origin, 2, target, 0)) {
                     D_00189E20.target = 0;
                 } else {
                     char *aimTarget = D_00189E20.target;
                     angle = func_00283248(D_00189E20.position[0] - *(float *)(aimTarget + 0x10),
                                           D_00189E20.position[1] - *(float *)(aimTarget + 0x14));
-                    D_00189E20.targetAngle = func_00283BE0(*(float *)(D_00189E20.target + 0xF8), angle);
+                    D_00189E20.targetAngle = fast_subtract_rotations(*(float *)(D_00189E20.target + 0xF8), angle);
                 }
             }
         }
@@ -263,17 +263,17 @@ clearPending:
         actionAge = D_00189E20.actionAge;
         actionWindow = actionAge;
         if (actionAge >= 7) actionWindow = 7;
-        if (!func_L00_0032EF10(mask, actionWindow, &scratch.actionBuffered) && !(D_00138180.buttons.word.buffered & 0x20)) break;
+        if (!PadPressedWithin(mask, actionWindow, &scratch.actionBuffered) && !(D_00138180.buttons.word.buffered & 0x20)) break;
         if (actionAge < 23) break;
-        if (func_L00_002D4040(-1)) {
+        if (get_ammo(-1)) {
             if (MOTION == 12 || MOTION == 0 || ACTION == 3 ||
                 (MOTION == 1 && D_00189E20.blend < 0.7f)) {
-                func_L01_002BEB90(0x22, 1);
+                SetHeroMoveState(0x22, 1);
                 goto complete;
             }
-            func_L00_002AF568();
+            start_equipped_item_animation();
         } else if (D_00189E20.actionObject && (D_00138180.buttons.word.pressed & 0x20)) {
-            func_002E5CF8(0, 0, D_00189E20.actionObject);
+            PlayMobySound(0, 0, D_00189E20.actionObject);
         }
         break;
     }
@@ -286,9 +286,9 @@ clearPending:
             wrenchAge = D_00189E20.actionAge;
             wrenchWindow = 10;
             if (wrenchAge < 10) wrenchWindow = wrenchAge;
-            if (func_L00_0032EF10(mask, wrenchWindow, &scratch.wrenchBuffered) && D_00189E20.actionObject) {
-                func_L01_002BEB90(31, 1);
-                if (D_00189E20.actionObject) func_002E5CF8(0, 0, D_00189E20.actionObject);
+            if (PadPressedWithin(mask, wrenchWindow, &scratch.wrenchBuffered) && D_00189E20.actionObject) {
+                SetHeroMoveState(31, 1);
+                if (D_00189E20.actionObject) PlayMobySound(0, 0, D_00189E20.actionObject);
             }
         }
         break;
@@ -304,7 +304,7 @@ complete:
             if (D_L01_001A7CC4 &&
                 (MOTION < 2 || MOTION == 12 || ((MOTION == 2 || MOTION == 4) && D_00189E20.platformMode)) &&
                 (D_00138180.buttons.both & 0x800000008UL) == 0x800000008UL)
-                func_L01_002BEB90(0x7B, 1);
+                SetHeroMoveState(0x7B, 1);
             if (D_00138180.buttons.word.pressed & 8) D_L01_001A7CC4 = 30;
         }
     }

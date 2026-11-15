@@ -20,21 +20,21 @@ void func_L11_003F4198(float (*points)[4], int count, float (*control)[4], float
     float step;
     int i;
     qcopy(before, control[2]);
-    func_00282CC0(before, before, control[0]);
+    FastVecAdd(before, before, control[0]);
     qcopy(after, control[3]);
-    func_00282CC0(after, after, control[1]);
-    step = 1.0f / func_00283CE0(count - 2);
+    FastVecAdd(after, after, control[1]);
+    step = 1.0f / IntToFloat(count - 2);
     for (i = 0; i < count - 1; i++) {
-        ref_L11_003F4198_00(points[i], control[0], control[1], before, after, func_00283CE0(i) * step);
+        ref_L11_003F4198_00(points[i], control[0], control[1], before, after, IntToFloat(i) * step);
         if (i > 0 && i < count - 2) {
             offset[3] = 0.0f;
             offset[0] = func_002A7878(-1.0f, 1.0f);
             offset[1] = func_002A7878(-1.0f, 1.0f);
             offset[2] = func_002A7878(-1.0f, 1.0f);
-            func_00282F20(offset, offset, displacement);
-            func_00282CC0(points[i], points[i], offset);
+            vec_scale_to_length(offset, offset, displacement);
+            FastVecAdd(points[i], points[i], offset);
         }
     }
-    func_00282CF0(offset, points[count - 2], points[count - 3]);
-    func_00282CC0(points[count - 1], points[count - 2], offset);
+    FastVecSub(offset, points[count - 2], points[count - 3]);
+    FastVecAdd(points[count - 1], points[count - 2], offset);
 }

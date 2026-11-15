@@ -40,14 +40,14 @@ void func_L01_00412F18(void *arg) {
         func_L00_00326110(obj,3,1.1f);
         up.q=0; up.f[2]=1.0f/6.0f;
         func_L01_0031A278(obj,&tmp,offset.f[0],offset.f[1],offset.f[2]);
-        func_0032C700(&tmp,0,2,2,2,2,2,0,1,0,0,0,*(f32 *)(obj+0x2C),20.0f);
-        func_002ABBB8(obj,&up,&tmp,0,0,20,1,1,0,0,9.0f,0.75f,-1,0,0,0,-1,0,0x810001);
+        SpawnExplosion(&tmp,0,2,2,2,2,2,0,1,0,0,0,*(f32 *)(obj+0x2C),20.0f);
+        SpawnExplosionEffects(obj,&up,&tmp,0,0,20,1,1,0,0,9.0f,0.75f,-1,0,0,0,-1,0,0x810001);
         for(i=0;i<4;i++) {
             direction[0]=(i/2*2-1)*(1.0f/30.0f);
             direction[1]=(i%2*2-1)*(1.0f/30.0f);
             direction[2]=1.0f/15.0f;
-            func_00283098(direction,direction,obj+0xC0);
-            func_L00_003263D0(obj,&tmp,0.25f,3,1,direction,5.0f,0x4080FF00,0,0.75f,1.25f);
+            matrix_mul_vec3(direction,direction,obj+0xC0);
+            SpawnTintedEffects(obj,&tmp,0.25f,3,1,direction,5.0f,0x4080FF00,0,0.75f,1.25f);
         }
         if(D_L01_001B19B0>=0) {
             *(u16 *)(obj+0x7C)=(1<<D_L01_001B19B0)|0x8000;

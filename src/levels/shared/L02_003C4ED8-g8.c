@@ -44,13 +44,13 @@ void func_L02_003C4ED8(u8 *self)
     if (*(s32 *)(state + 0x18) != 0) {
         qcopy(origin, self + 0x10);
     } else {
-        func_00283098(origin, D_L02_001AFE60, self + 0xC0);
-        func_00282CC0(origin, origin, self + 0x10);
+        matrix_mul_vec3(origin, D_L02_001AFE60, self + 0xC0);
+        FastVecAdd(origin, origin, self + 0x10);
     }
-    func_00283098(dir0, D_L02_001AFE70_gp, self + 0xC0);
-    func_00282F20(dir0, dir0, speed.a * 0.016666668f);
-    func_00283098(dir1, D_L02_001AFE80, self + 0xC0);
-    func_00282F20(dir1, dir1, speed.b * 0.016666668f);
+    matrix_mul_vec3(dir0, D_L02_001AFE70_gp, self + 0xC0);
+    vec_scale_to_length(dir0, dir0, speed.a * 0.016666668f);
+    matrix_mul_vec3(dir1, D_L02_001AFE80, self + 0xC0);
+    vec_scale_to_length(dir1, dir1, speed.b * 0.016666668f);
     D_L02_001AFE70[1] = -D_L02_001AFE70[1];
     D_L02_001AFE80[1] = -D_L02_001AFE80[1];
     func_L02_002EFB60(origin, dir0, dir1, 12, 0, 0, 0, 15.0f);

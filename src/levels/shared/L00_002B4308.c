@@ -25,7 +25,7 @@ void func_L00_002B4308(void)
         return;
     if (!(0.0f < *(float *)(p + 0x238)))
         return;
-    distance = func_00282E20(p + 0x230);
+    distance = vec_length_xy(p + 0x230);
     angle = func_00283248(*(float *)(p + 0x238), distance);
     if (!(angle >= 0.8726646900177002f))
         return;
@@ -34,8 +34,8 @@ void func_L00_002B4308(void)
     func_001290E0((int *)vector, (int *)vector);
     value = -*(float *)(p + 0xF0) * vector[0] - *(float *)(p + 0xF4) * vector[1];
     if (value > 0.0f) {
-        func_00282D30((char *)vector, (char *)vector, value);
-        func_00282CC0(p + 0xF0, p + 0xF0, (char *)vector);
+        FastVecScale((char *)vector, (char *)vector, value);
+        FastVecAdd(p + 0xF0, p + 0xF0, (char *)vector);
         *(float *)(p + 0xF8) -= 0.030000001192092896f;
     }
 }

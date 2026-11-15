@@ -33,11 +33,11 @@ void func_L00_003A1580(void *object)
     char *state = 0;
     int lookup, i;
     int attachment_count = 5, inner = 0x40, outer = 0x78, channel = 0x47, spark_count = 1;
-    func_002FC560(channel, 0x53001ULL);
+    VU1_addGSregister(channel, 0x53001ULL);
     state = *(char **)(moby + 0x68);
     func_L00_003A2138((int)moby, D_L00_0023B510[0], 4);
     lookup = 0;
-    func_002A3F10(moby, 1, &lookup, matrix);
+    get_moby_joint_matrices(moby, 1, &lookup, matrix);
     matrix[3][0] = 0.0f;
     matrix[3][1] = 0.0f;
     matrix[3][2] = 0.0f;
@@ -45,10 +45,10 @@ void func_L00_003A1580(void *object)
     D_L00_002947B0[1][0] = func_00283198(D_L00_001AF5F0) * 0.015f + 0.4f;
     D_L00_002947B0[1][2] = func_00283180(D_L00_001AF5F0) * 0.0149f;
     D_L00_002947B0[1][1] = -func_00283180(D_L00_001AF5F4) * 0.0151f;
-    D_L00_001AF5F0 = func_00283B98(D_L00_001AF5F0, 0.4188790917f);
-    D_L00_001AF5F4 = func_00283B98(D_L00_001AF5F4, 0.4130613208f);
+    D_L00_001AF5F0 = FastAddRotations(D_L00_001AF5F0, 0.4188790917f);
+    D_L00_001AF5F4 = FastAddRotations(D_L00_001AF5F4, 0.4130613208f);
     for (i = 0; i < attachment_count; i++)
-        func_002830C0(attachments[i], D_L00_002947B0[i], matrix);
+        transform_vector(attachments[i], D_L00_002947B0[i], matrix);
     func_L00_003A2BB8(moby, 0, (char *)points[0], (char *)attachments[0]);
     func_L00_003A25D8((int)moby, (int)points[0], 0x7F7F2020, inner, 0.11f);
     func_L00_003A25D8((int)moby, (int)points[0], 0x7FFF4040, outer, 0.05f);
@@ -73,37 +73,37 @@ void func_L00_003A1580(void *object)
     func_L00_003A25D8((int)moby, (int)points[4], 0x7FFF4040, outer, 0.025f);
     func_L00_003A2258(moby, points[0], D_L00_001B2850, D_L00_0023B510[0]);
     func_L00_003A2408(moby, D_L00_001B2850, normal, *(float *)(state + 0xC) * 0.35f);
-    func_00282CF0(side, D_L00_001B2850, points[2]);
-    func_00282F20(side, side, 1.0f);
-    func_00282DD8(side, side, normal);
-    func_00282F20(side, side, 1.0f);
-    func_00282DD8(side, side, normal);
-    func_00282F20(side, side, *(float *)(state + 0xC) * 0.45f);
-    func_00282CC0(endpoint, side, D_L00_001B2850);
+    FastVecSub(side, D_L00_001B2850, points[2]);
+    vec_scale_to_length(side, side, 1.0f);
+    FastVecCross(side, side, normal);
+    vec_scale_to_length(side, side, 1.0f);
+    FastVecCross(side, side, normal);
+    vec_scale_to_length(side, side, *(float *)(state + 0xC) * 0.45f);
+    FastVecAdd(endpoint, side, D_L00_001B2850);
     func_L00_003A2258(moby, points[2], endpoint, D_L00_0023B510[1]);
     func_L00_003A25D8((int)moby, (int)endpoint, 0x7F7F2020, inner, 0.055f);
     func_L00_003A25D8((int)moby, (int)endpoint, 0x7FFF4040, outer, 0.025f);
     if (func_001163B0() % 11 == 0 && *(float *)(state + 0xC) > D_L00_001AF5D8)
         func_L00_003A2C60(endpoint, spark_count, 0.0f);
-    func_00282CF0(side, D_L00_001B2850, points[3]);
-    func_00282F20(side, side, 1.0f);
-    func_00282DD8(side, side, normal);
-    func_00282F20(side, side, 1.0f);
-    func_00282DD8(side, side, normal);
-    func_00282F20(side, side, *(float *)(state + 0xC) * 0.45f);
-    func_00282CC0(endpoint, side, D_L00_001B2850);
+    FastVecSub(side, D_L00_001B2850, points[3]);
+    vec_scale_to_length(side, side, 1.0f);
+    FastVecCross(side, side, normal);
+    vec_scale_to_length(side, side, 1.0f);
+    FastVecCross(side, side, normal);
+    vec_scale_to_length(side, side, *(float *)(state + 0xC) * 0.45f);
+    FastVecAdd(endpoint, side, D_L00_001B2850);
     func_L00_003A2258(moby, points[3], endpoint, D_L00_0023B510[2]);
     func_L00_003A25D8((int)moby, (int)endpoint, 0x7F7F2020, inner, 0.055f);
     func_L00_003A25D8((int)moby, (int)endpoint, 0x7FFF4040, outer, 0.025f);
     if (func_001163B0() % 11 == 0 && *(float *)(state + 0xC) > D_L00_001AF5D8)
         func_L00_003A2C60(endpoint, spark_count, 0.0f);
-    func_00282CF0(side, D_L00_001B2850, points[4]);
-    func_00282F20(side, side, 1.0f);
-    func_00282DD8(side, side, normal);
-    func_00282F20(side, side, 1.0f);
-    func_00282DD8(side, side, normal);
-    func_00282F20(side, side, *(float *)(state + 0xC) * 0.45f);
-    func_00282CC0(endpoint, side, D_L00_001B2850);
+    FastVecSub(side, D_L00_001B2850, points[4]);
+    vec_scale_to_length(side, side, 1.0f);
+    FastVecCross(side, side, normal);
+    vec_scale_to_length(side, side, 1.0f);
+    FastVecCross(side, side, normal);
+    vec_scale_to_length(side, side, *(float *)(state + 0xC) * 0.45f);
+    FastVecAdd(endpoint, side, D_L00_001B2850);
     func_L00_003A2258(moby, points[4], endpoint, D_L00_0023B510[3]);
     func_L00_003A25D8((int)moby, (int)endpoint, 0x7F7F2020, inner, 0.055f);
     func_L00_003A25D8((int)moby, (int)endpoint, 0x7FFF4040, outer, 0.025f);
@@ -126,5 +126,5 @@ void func_L00_003A1580(void *object)
         selected %= 4;
         func_L00_003A2C60(points[selected + 1], spark_count, 0.001f);
     }
-    func_002FC560(channel, 0x5360BULL);
+    VU1_addGSregister(channel, 0x5360BULL);
 }

@@ -39,7 +39,7 @@ int func_002B0ED8(char *object,char *state,int special)
     func_002AB8C0(object,state);
     original=0.0f;
     hit=func_002A9640(object,0x10000,0);
-    if (!func_00282978(health+6)) hit=0;
+    if (!FastDecTimer(health+6)) hit=0;
     if (hit) {
         original=F(hit,0x2c);
         if (F(state,0xa8)!=0.0f && P(hit,0x20) && H(object,0xaa)==H(P(hit,0x20),0xaa))
@@ -56,7 +56,7 @@ int func_002B0ED8(char *object,char *state,int special)
     kind=U(health,0x17);
     if (damage*((DamageClass *)(D_00139568[kind]*224+(char *)D_00239BA0))->scale>=H(health,4)*F(state,0x58)) timeout=90;
     else timeout=300;
-    if (!U(state,0x77) && func_00282C30(D_001B1688.frame-I(state,0x44))>timeout) {
+    if (!U(state,0x77) && subtract_integer_with_clamp(D_001B1688.frame-I(state,0x44))>timeout) {
         if (damage<H(health,4)*F(state,0x58)) damage=H(health,4)*F(state,0x58);
     }
     if (F(health,0)<=0.0f) result=4;
@@ -67,7 +67,7 @@ int func_002B0ED8(char *object,char *state,int special)
     if (special && (unsigned)(result-1)<=2) result=6;
     if (result>=2 && hit && U(health,0x17)==10) {
         damage=func_002AFF08(object,hit+0x10,0);
-        func_00282CF0(hit+0x10,object+0x10,D_00189EA0);
+        FastVecSub(hit+0x10,object+0x10,D_00189EA0);
         func_002AFE58(object,hit+0x10,hit+0x10,0,damage);
     }
     if (!result || (*(u16 *)(state+0x38)&3)) return 0;
@@ -77,11 +77,11 @@ int func_002B0ED8(char *object,char *state,int special)
     }
     if (hit && (I(hit,0x30)&1)) qcopy(vector,hit+0x10);
     else {
-        func_00282D30(vector,object+0xc0,-1.0f);
+        FastVecScale(vector,object+0xc0,-1.0f);
         vector[2]=1.0f;
         vector[3]=5627.925f;
     }
-    if (func_002B1350(object,state,vector,result)) {
+    if (ApplyObjectReaction(object,state,vector,result)) {
         I(state,0x44)=D_001B1688_1;
         if (I(state,0x48)!=-1) func_002A7750(object,U(state,0x10),I(state,0x48));
         else func_002A7750(object,U(state,0x10),-1);

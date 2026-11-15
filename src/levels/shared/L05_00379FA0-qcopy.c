@@ -50,12 +50,12 @@ void func_L05_00379FA0(u8 *object, int color, int mode, float rate, int effect, 
             *(Quad *)p->target = *(Quad *)position;
         }
         *(Quad *)direction = *(Quad *)(*(u8 **)(state + 0x120) + 0xC0);
-        func_00282F20(direction, direction, speed);
-        func_00282CC0(p->origin, *(u8 **)(state + 0x120) + 0x10, direction);
+        vec_scale_to_length(direction, direction, speed);
+        FastVecAdd(p->origin, *(u8 **)(state + 0x120) + 0x10, direction);
         *(Quad *)p->previous = *(Quad *)p->target;
-        func_00282CF0(p->velocity, p->origin, p->target);
-        func_00282F20(p->velocity, p->velocity, 2.0f);
-        func_00282CC0(p->position, p->velocity, p->previous);
+        FastVecSub(p->velocity, p->origin, p->target);
+        vec_scale_to_length(p->velocity, p->velocity, 2.0f);
+        FastVecAdd(p->position, p->velocity, p->previous);
         p->color = color;
         p->mode = mode;
         p->rate = rate;
@@ -65,9 +65,9 @@ void func_L05_00379FA0(u8 *object, int color, int mode, float rate, int effect, 
         p->flags = 0;
         p->distance = 0.0f;
         if (emit) {
-            func_00282F20(point, p->velocity, 0.8f);
-            func_00282CC0(point, point, p->target);
-            func_L05_0037DA58(point, emit, p->color, 20);
+            vec_scale_to_length(point, p->velocity, 0.8f);
+            FastVecAdd(point, point, p->target);
+            EmitParticlePairBurst(point, emit, p->color, 20);
         }
         return;
     }

@@ -51,7 +51,7 @@ void func_L05_0042AC30(u8 *actor)
         float span;
         float phase = 0.0f;
         ((Fields *)actor)->uh[0x34 / 2] |= 0x41;
-        func_002833F0(actor + 0xC0, actor + 0xF0);
+        euler_rotation_basis(actor + 0xC0, actor + 0xF0);
         actor[0x30] = 0xFF;
         actor[0x20] = 1;
         ((Fields *)actor)->f[0x2C / 4] = *(float *)(*(char **)(actor + 0x24) + 0x24) * (D_L05_001B1680 * D_L05_001B1688);
@@ -60,8 +60,8 @@ void func_L05_0042AC30(u8 *actor)
         D_L05_001B16FC = D_L05_001B16F8 = D_L05_001B16E4 = D_L05_001B1690 = 0.0f;
         D_L05_001B16E8 = D_L05_001B16D4 = D_L05_001B170C = D_L05_001B1704 = 0.0f;
         ((Fields *)state)->f[0x20 / 4] = span;
-        func_00282D30(&position, actor + 0xC0, span);
-        func_00282CC0(&position, &position, actor + 0x10);
+        FastVecScale(&position, actor + 0xC0, span);
+        FastVecAdd(&position, &position, actor + 0x10);
         {
             float *head = (float *)(state + 0x24);
             head[0] = position.f[0];
@@ -69,7 +69,7 @@ void func_L05_0042AC30(u8 *actor)
             head[2] = position.f[2];
         }
         span *= 0.14285715f;
-        func_00282D30(&step, actor + 0xC0, -span);
+        FastVecScale(&step, actor + 0xC0, -span);
         func_002AB600(&rotation, actor + 0xC0);
         {
         char **child = (char **)state;
@@ -77,7 +77,7 @@ void func_L05_0042AC30(u8 *actor)
         for (i = 6; i >= 0; i--, child++) {
             *child = func_L05_0042BCE0(&position, &rotation, D_L05_001B1680, phase);
             phase += span;
-            func_00282CC0(&position, &position, &step);
+            FastVecAdd(&position, &position, &step);
         }
         }
         D_L05_001B1728 = actor;
@@ -91,8 +91,8 @@ void func_L05_0042AC30(u8 *actor)
             float *pos = (float *)(object + 0x10);
             u8 *objectState;
             amount += amount;
-            func_00282D30(&position, actor + 0xC0, -amount);
-            func_00282CC0(pos, pos, &position);
+            FastVecScale(&position, actor + 0xC0, -amount);
+            FastVecAdd(pos, pos, &position);
             objectState = *(u8 **)(object + 0x68);
             ((Fields *)objectState)->f[0x10 / 4] += amount;
             if (((Fields *)state)->f[0x20 / 4] <= ((Fields *)objectState)->f[0x10 / 4]) {

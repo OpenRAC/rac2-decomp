@@ -72,7 +72,7 @@ void func_L02_003D0408(char *self) {
         targetY -= selfY;
         heading = func_00283248(targetX, targetY);
     }
-    distance = func_00282E80(self + 0x10, &target);
+    distance = vec_distance_xy(self + 0x10, &target);
     switch ((u8)self[0x95]) {
     case 2:
         if (func_002B3890((u8 *)self)) {
@@ -90,7 +90,7 @@ void func_L02_003D0408(char *self) {
         if (*(short *)(state + 0x2F6)) func_L02_003D1588(self);
         point = state + 0x2D0;
         if (!*(u8 *)(self + 0xBC)) {
-            if (func_00282E80(self + 0x10, point) < 0.5f) { self[0xBC] = 1; break; }
+            if (vec_distance_xy(self + 0x10, point) < 0.5f) { self[0xBC] = 1; break; }
         }
         func_002B50E0(self, point, heading);
         break;
@@ -98,7 +98,7 @@ void func_L02_003D0408(char *self) {
         if (((ActorAnimationFlags *)self)->animation_flags & 2) func_L02_003D1610(self);
         break;
     case 3:
-        if (!func_L02_003D26B0(self)) {
+        if (!AimAtGroupEntityInConeL02(self)) {
             switch ((u8)self[0x42]) {
             case 2: func_L01_00321178(self, (char *)&target); break;
             case 3: func_002B4FF0(self, target.f, *(float *)(state + 0x2E8)); break;
@@ -109,7 +109,7 @@ void func_L02_003D0408(char *self) {
         if (distance > 14) func_L02_003D1588(self);
         else if (!func_L02_003D1698(self)) {
             if (distance < 4) {
-                turn = func_00283C80(*(float *)(self + 0xF8), heading);
+                turn = FastDiffRots(*(float *)(self + 0xF8), heading);
                 if (turn < 0.26179942f) { func_002A7750((u8 *)self, 11, -1); break; }
             }
             if ((u8)self[0x20] == 11 && distance > 5) func_002A7750((u8 *)self, 10, -1);
@@ -122,7 +122,7 @@ void func_L02_003D0408(char *self) {
             scratch.quad = *(Quad *)(*(char **)(state + 0x2E4) + 0x10); func_L02_003D1ED0(self, &scratch.quad);
         }
         if (*(float *)(state + 0x20) <= 0 && !*(u8 *)(state + 0x291)) {
-            func_00282A60(state + 0x290, 0, 64); func_0029F978((u8 *)self, 3, (u8 *)(state + 0x290));
+            func_00282A60(state + 0x290, 0, 64); AttachManipulator((u8 *)self, 3, (u8 *)(state + 0x290));
             *(float *)(state + 0x2B8) = 0.0001f; *(float *)(state + 0x2B4) = 0.0001f; *(float *)(state + 0x2B0) = 0.0001f; state[0x292] = 1;
             func_002A7A00(scratch.f, 0.016666668f, 0.050000004f);
             func_002B0A68(self, 0x20, scratch.f, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);

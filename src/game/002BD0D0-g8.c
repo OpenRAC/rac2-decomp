@@ -21,18 +21,18 @@ void func_002BD0D0(char *p)
  float f,d,size;
  int color,alpha,other,kind;
  local.gravity=D_001AA350;
- if(*(short *)(q+26)==3 && D_001B168C>0.95f) func_00282978(p+10);
- if(func_00282978(p+10)) {func_002B9180(p);return;}
+ if(*(short *)(q+26)==3 && D_001B168C>0.95f) FastDecTimer(p+10);
+ if(FastDecTimer(p+10)) {func_002B9180(p);return;}
  pos=p+16;
- f=func_00283CE0(*(short *)(p+10));
- *(int *)(p+4)=func_002A9568(*(int *)(q+20),*(int *)(q+16),f/func_00283CE0(*(short *)(q+24)));
+ f=IntToFloat(*(short *)(p+10));
+ *(int *)(p+4)=func_002A9568(*(int *)(q+20),*(int *)(q+16),f/IntToFloat(*(short *)(q+24)));
  alpha=*(int *)(p+4)>>24;
- d=func_00282E48(pos,D_001B5340);
+ d=fast_vec_dist(pos,D_001B5340);
  if(*(short *)(p+10)<6) alpha=alpha* *(short *)(p+10)/6;
  if(d<4.0f) {func_002B9180(p);return;}
- if(d<8.0f) alpha=func_00283CF0(func_00283CE0(alpha)*(d-4.0f)*0.25f);
+ if(d<8.0f) alpha=FloatToInt(IntToFloat(alpha)*(d-4.0f)*0.25f);
  *(int *)(p+4)=(alpha<<24)|(*(int *)(p+4)&0xffffff);
- func_00282CC0(pos,pos,q);
+ FastVecAdd(pos,pos,q);
  kind=*(short *)(q+26);
  *(float *)(q+8)-=local.gravity.v[kind];
  qcopy(&local.saved,pos);

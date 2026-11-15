@@ -354,7 +354,7 @@ void func_00318340(char *obj)
         flags = func_002B1C20(obj, pv + 0x80);
         if ((flags & 1) || *(f32 *)(pv + 0x40) <= 0.0f) {
             func_002AC728(obj, obj + 0x10, -1, 1.0f, 13.0f);
-            func_002A6C58(obj, 0, 3);
+            SetDeathBits(obj, 0, 3);
             func_0029F338(obj);
             return;
         }
@@ -433,7 +433,7 @@ void func_00318340(char *obj)
         } else if (diff12 > 0.05f) {
             func_002AA548(obj + 0x18, pv + 0x290, h12, 0.016666668f, 0.16333334f, 0.16666667f);
         } else {
-            func_0026FEB8(D_001AFA80, *(s32 *)(pv + 0x2C0));
+            STUB_printf(D_001AFA80, *(s32 *)(pv + 0x2C0));
             func_002A7750(obj, 6, -1);
             if (*(u8 *)(obj + 0x43) != 0xE)
                 func_002A7470(obj, 0xE, 0, 3);
@@ -447,7 +447,7 @@ void func_00318340(char *obj)
             else
                 *(f32 *)(pv + 0x368) = *(f32 *)(pv + 0x2DC) + func_002A7878(-3.0f, 3.0f);
         }
-        if (func_00282E48(obj + 0x10, pv + 0x360) < 0.05f) {
+        if (fast_vec_dist(obj + 0x10, pv + 0x360) < 0.05f) {
             *(s32 *)(pv + 0x354) = 0;
             func_002A7750(obj, 0x10, -1);
         }
@@ -465,7 +465,7 @@ void func_00318340(char *obj)
     case 5:
         if (*(char **)(pv + 0x30) != 0) {
             func_002AA3A8(obj + 0xF4, 0.0f, pv + 0x2A0, 0.016666668f, 0.0f, 0.06666667f);
-            func_002833F0(obj + 0xC0, obj + 0xF0);
+            euler_rotation_basis(obj + 0xC0, obj + 0xF0);
             func_002A7E08(obj, *(char **)(pv + 0x30), pv + 0x29C, 0.001f, 0.01f, 0.1f);
             h5 = func_002A89A8(obj + 0x10, 0, 0.5f);
             diff5 = *(f32 *)(obj + 0x18) - h5;
@@ -522,20 +522,20 @@ void func_00318340(char *obj)
                 v10[2] += *(f32 *)(tgt10 + 0xC) * 0.0009765625f;
             }
             if (func_0031A848(obj, 10.0f) != 0) {
-                func_00282CF0(v40, pos, v0);
+                FastVecSub(v40, pos, v0);
                 qcopy(v20, D_001A8BD0);
                 v20[0] = 1.0f;
-                func_00283098(v20, v20, obj + 0xC0);
-                func_00282DD8(v30, v20, v40);
-                dot = func_00282DB0(v20, v40);
+                matrix_mul_vec3(v20, v20, obj + 0xC0);
+                FastVecCross(v30, v20, v40);
+                dot = FastVecDot(v20, v40);
                 if (dot > 0.0f)
                     func_002ACEC0(v20, v20, v30, -0.17453294f);
                 else
                     func_002ACEC0(v20, v20, v30, 0.17453294f);
             } else {
-                func_00282CF0(v20, pos, v0);
+                FastVecSub(v20, pos, v0);
             }
-            func_00282F20(v20, v20, 0.33333334f);
+            vec_scale_to_length(v20, v20, 0.33333334f);
             func_003280C8(obj, v20, v0, 0, 0, *(u8 *)(pv + 0x54));
         } else if (dist10 < 17.0f && *(u8 *)(obj + 0x43) == 0x1E) {
             func_0029FCC0(obj, 4, v0);
@@ -543,7 +543,7 @@ void func_00318340(char *obj)
         break;
     case 11:
         if (*(u8 *)(obj + 0x60) & 2) {
-            if (func_00282E80(obj + 0x10, D_00189EA0) > 4.0f) {
+            if (vec_distance_xy(obj + 0x10, D_00189EA0) > 4.0f) {
                 func_002B60B0(obj, 0.0033333334f, 0.10000001f, 0.001163553f, 0.10471977f);
                 func_002A7750(obj, 0xA, -1);
                 if (*(u8 *)(obj + 0x43) != 0x1E)
@@ -567,13 +567,13 @@ void func_00318340(char *obj)
             *(f32 *)(pv + 0x378) = 0.0f;
         }
         if (*(s32 *)(pv + 0x37C) == 0) {
-            if (func_002ACBC8(D_00189EA0, *(s32 *)(pv + 0x35C)) != 0)
+            if (IsPointInCuboid(D_00189EA0, *(s32 *)(pv + 0x35C)) != 0)
                 *(s32 *)(pv + 0x37C) = 1;
         } else {
             path = (s32 *)D_001F1700[*(s32 *)(pv + 0x370)];
             func_002AA548(pv + 0x374, pv + 0x378, (f32)(*path - 1), 0.013888889f, 0.0013888889f, 0.33333334f);
             func_002C9828(path, 0, obj + 0x10, obj + 0xF0, 0, *(f32 *)(pv + 0x374));
-            func_002833F0(obj + 0xC0, obj + 0xF0);
+            euler_rotation_basis(obj + 0xC0, obj + 0xF0);
             if ((f32)(*path - 1) <= *(f32 *)(pv + 0x374))
                 func_002A7750(obj, 0xA, 3);
         }
@@ -607,9 +607,9 @@ void func_00318340(char *obj)
                 pos = v10;
                 v10[2] += *(f32 *)(tgt16 + 0xC) * 0.0009765625f;
             }
-            func_00282CF0(v20, pos, v0);
-            func_00282F20(v20, v20, 0.33333334f);
-            func_002E5CF8(0xB, 0, obj);
+            FastVecSub(v20, pos, v0);
+            vec_scale_to_length(v20, v20, 0.33333334f);
+            PlayMobySound(0xB, 0, obj);
             func_003280C8(obj, v20, v0, 0, 0, *(u8 *)(pv + 0x54));
         } else if (dist16 < 17.0f && *(u8 *)(obj + 0x43) == 0x1E) {
             func_0029FCC0(obj, 4, v0);
@@ -626,7 +626,7 @@ void func_00318340(char *obj)
         u8 *recA;
         recA = *(s32 *)(pv + 0x2C4) * 0x70 + D_00188660;
         if (*(char **)(recA + 0x88) != obj || recA[0x74] == 0)
-            *(s32 *)(pv + 0x2C4) = func_002E5CF8(10, 4, obj);
+            *(s32 *)(pv + 0x2C4) = PlayMobySound(10, 4, obj);
     } else {
         u8 *recB;
         id = *(s32 *)(pv + 0x2C4);

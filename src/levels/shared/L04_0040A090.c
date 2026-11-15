@@ -22,11 +22,11 @@ void func_L04_0040A090(int n, int (*pts)[2], float (*dirs)[4], float *lens, floa
         b[0] = pts[j][0];
         b[1] = pts[j][1];
         b[2] = 0.0f;
-        func_00282CF0(d, b, a);
-        len = func_00282DF0(d);
+        FastVecSub(d, b, a);
+        len = FastVecLength(d);
         lens[i] = len;
         starts[i] = *total;
         *total = *total + len;
-        func_00282D30(dirs[i], d, 1.0f / len);
+        FastVecScale(dirs[i], d, 1.0f / len);
     }
 }

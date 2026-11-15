@@ -56,7 +56,7 @@ void func_L02_00411750(u8 *object)
         *(s32 *)(state + 0x20) = 0;
         *(float *)(state + 0x24) = 0.5f;
         {
-        float visible = func_00282E80(D_L02_001BA500, object + 0x10) > 66.0f ? 0.0f : 1.0f;
+        float visible = vec_distance_xy(D_L02_001BA500, object + 0x10) > 66.0f ? 0.0f : 1.0f;
         *(float *)(state + 0x1C) = visible;
         }
         i = 3;
@@ -84,7 +84,7 @@ void func_L02_00411750(u8 *object)
         }
         break;
     case 2:
-        func_002AA2E8((float *)(state + 0x1C), 0.0f, 0.016666668f);
+        ApproachValue((float *)(state + 0x1C), 0.0f, 0.016666668f);
         if (*(float *)(state + 0x1C) <= 0.0f) {
             s32 i;
             ids = (s32 *)state;
@@ -105,7 +105,7 @@ void func_L02_00411750(u8 *object)
         if (D_00189E20.ptr[0x270 / 4] == object || D_00189E20.ptr[0x26C / 4] == object) {
             scratch[0].quad = D_00189E20.q[0xE0 / 16];
             scratch[0].f[0] = *(float *)(object + 0x10);
-            if (func_002761F8(&D_00189E20.q[0xE0 / 16], scratch[0].f, 2, D_00189E20.v[0x2290 / 4], 0)) {
+            if (CollLine(&D_00189E20.q[0xE0 / 16], scratch[0].f, 2, D_00189E20.v[0x2290 / 4], 0)) {
                 s32 lifetime;
                 s32 shade;
                 scratch[1].quad = D_L02_001C0960;
@@ -115,9 +115,9 @@ void func_L02_00411750(u8 *object)
                 func_002C3150(scratch[1].f, D_L02_001A8F20, 0x60106070, lifetime, shade, 0, 1.0f);
             }
         }
-        func_00282D60(scratch[0].f, object, 0.0009765625f);
+        scale_vector(scratch[0].f, object, 0.0009765625f);
         if (func_00283DB8(scratch[0].f, 80.0f) != -1) {
-            *(float *)(state + 0x2C) = func_00283B98(*(float *)(state + 0x2C), 0.040724356f);
+            *(float *)(state + 0x2C) = FastAddRotations(*(float *)(state + 0x2C), 0.040724356f);
             *(float *)(state + 0x28) += 0.020833334f;
             if (*(float *)(state + 0x28) > 1.0f)
                 *(float *)(state + 0x28) -= 1.0f;
@@ -134,12 +134,12 @@ void func_L02_00411750(u8 *object)
             }
             func_L00_002E6CF0(func_L02_00411D18, object);
         }
-        if (func_00282E80(object + 0x10, D_L02_001BA500) > 68.0f)
-            func_002AA2E8((float *)(state + 0x1C), 0.0f, 0.008333334f);
+        if (vec_distance_xy(object + 0x10, D_L02_001BA500) > 68.0f)
+            ApproachValue((float *)(state + 0x1C), 0.0f, 0.008333334f);
         else
-            func_002AA2E8((float *)(state + 0x1C), 1.0f, 0.008333334f);
-    } else if (*(float *)(state + 0x1C) < 1.0f && func_00282E80(object + 0x10, D_L02_001BA500) < 64.0f)
-        func_002AA2E8((float *)(state + 0x1C), 1.0f, 0.008333334f);
+            ApproachValue((float *)(state + 0x1C), 1.0f, 0.008333334f);
+    } else if (*(float *)(state + 0x1C) < 1.0f && vec_distance_xy(object + 0x10, D_L02_001BA500) < 64.0f)
+        ApproachValue((float *)(state + 0x1C), 1.0f, 0.008333334f);
 
     {
     s32 *out = (s32 *)scratch;

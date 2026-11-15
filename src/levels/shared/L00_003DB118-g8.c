@@ -106,18 +106,18 @@ void func_L00_003DB118(char *self)
         ray.q = *(Quad *)(self + 0x10);
         timer = pv + 0x60;
         func_002FEE70(*(int *)(pv + 0x78), pv, 0);
-        func_00282CC0(self + 0x10, self + 0x10, pv);
+        FastVecAdd(self + 0x10, self + 0x10, pv);
         func_002FE880(self + 0x10, pv, D_L00_001B03E4 * 0.00027777778f);
         for (i = 3; i > 0; i--) {
-            func_00282D08(pv + 0x10 + i * 0x10, pv + 0x10 + i * 0x10, pv + i * 0x10, 0.2f);
+            lerp_vector(pv + 0x10 + i * 0x10, pv + 0x10 + i * 0x10, pv + i * 0x10, 0.2f);
         }
         *(Quad *)(pv + 0x10) = *(Quad *)(self + 0x10);
-        *(float *)(pv + 0x64) = func_00283B98(*(float *)(pv + 0x64), *(float *)(pv + 0x68));
+        *(float *)(pv + 0x64) = FastAddRotations(*(float *)(pv + 0x64), *(float *)(pv + 0x68));
         func_00282C88(&scale3);
         scale3.f[1] = *(float *)(pv + 0x64) * 0.5f;
         scale3.f[0] = *(float *)(pv + 0x64) * 0.25f;
         scale3.f[2] = *(float *)(pv + 0x64) * 0.375f;
-        func_002833F0(self + 0xC0, &scale3);
+        euler_rotation_basis(self + 0xC0, &scale3);
         *(float *)(self + 0xC0) = *(float *)(self + 0xC0) * 0.4f * (func_00283198(*(float *)(pv + 0x64)) + 2.0f);
         *(float *)(self + 0xD4) = *(float *)(self + 0xD4) * 0.5f * (func_00283180(*(float *)(pv + 0x64)) + 2.0f);
         *(float *)(self + 0xE8) = *(float *)(self + 0xE8) * 0.75f * (func_00283198(*(float *)(pv + 0x64)) + 2.0f);
@@ -125,7 +125,7 @@ void func_L00_003DB118(char *self)
             int c = func_002A7820(0x7F, 0xFF);
             *(int *)(self + 0x78) = ((c << 16) + (c << 8) + c) | 0x7F000000;
         }
-        func_00282D30(&push, pv, -0.125f);
+        FastVecScale(&push, pv, -0.125f);
         if (func_001163B0() % 10 == 0) {
             func_00282C88(a40);
             a30[0] = *(float *)(self + 0x10) + func_002A7878(-0.15f, 0.15f);
@@ -134,13 +134,13 @@ void func_L00_003DB118(char *self)
             a40[0] = func_002A7878(-0.025f, 0.025f);
             a40[1] = func_002A7878(-0.025f, 0.025f);
             a40[2] = func_002A7878(0.0f, 0.025f);
-            func_00282F20(a40, a40, 0.05f);
+            vec_scale_to_length(a40, a40, 0.05f);
             func_002BE278(a30, a40, 0, -1.0f);
         }
         if (func_00282948(timer) != 0) goto kill;
         {
         int collision;
-        if (func_002761F8(&ray, self + 0x10, 0, self, 0) != 0)
+        if (CollLine(&ray, self + 0x10, 0, self, 0) != 0)
             collision = 1;
         else
             collision = func_00277258(self + 0x10, 0, self, 0.05f) != 0;
@@ -151,10 +151,10 @@ void func_L00_003DB118(char *self)
                 char *hero;
                 if ((*(long long *)(obj + 0x30) & ((long long)0xA000 << 31)) && obj != (hero = D_0018C0B0)
                     && *(short *)(obj + 0xAA) != 0x5C9) {
-                    func_00282CF0(a30, obj + 0x10, hero + 0x10);
-                    func_00282F20(a30, a30, 1.0f);
-                    func_00282F20(&hit, &hit, 0.116666675f);
-                    func_002A8C00(&hit, self, 0x910000, a30, ((TableEntry *)D_L00_00262570)[D_00139585].scale);
+                    FastVecSub(a30, obj + 0x10, hero + 0x10);
+                    vec_scale_to_length(a30, a30, 1.0f);
+                    vec_scale_to_length(&hit, &hit, 0.116666675f);
+                    make_hit_descriptor(&hit, self, 0x910000, a30, ((TableEntry *)D_L00_00262570)[D_00139585].scale);
                     {
                     Quad hitPosition = *(Quad *)a30;
                     hit.kind = 5;
@@ -163,9 +163,9 @@ void func_L00_003DB118(char *self)
                     hit.count = 1;
                     hit.flag = 1;
                     hit.type = *(unsigned short *)(col->object + 0xAA);
-                    func_002A8E20(col->object, &hit);
+                    QueueMobyImpact(col->object, &hit);
                     }
-                    func_0032D758(col->object, 0x3F, *(int *)(self + 0xB8));
+                    StartAttachedEffect(col->object, 0x3F, *(int *)(self + 0xB8));
                     *(Quad *)a40 = *(Quad *)(col->object + 0x10);
                     a40[2] = a40[2] + 5.0f;
                     *(Quad *)a30 = *(Quad *)a40;
@@ -176,11 +176,11 @@ void func_L00_003DB118(char *self)
                     *(Quad *)(pv + 0x50) = col->normal.q;
                     *(int *)(pv + 0x7C) = 1;
                     for (i = 0; i < 3; i++) {
-                        func_00282F20(spark, &D_L00_001BF240, func_002A7878(0.16666667f, 0.33333334f));
+                        vec_scale_to_length(spark, &D_L00_001BF240, func_002A7878(0.16666667f, 0.33333334f));
                         spark[0] += func_002A7878(-0.15f, 0.15f);
                         spark[1] += func_002A7878(-0.15f, 0.15f);
                         spark[2] += func_002A7878(-0.15f, 0.15f);
-                        func_00282F20(spark, spark, func_002A7878(0.033333335f, 0.10000001f));
+                        vec_scale_to_length(spark, spark, func_002A7878(0.033333335f, 0.10000001f));
                         func_002BE278(self + 0x10, spark, 0, -1.0f);
                     }
                 } else {
@@ -189,11 +189,11 @@ void func_L00_003DB118(char *self)
                     *(unsigned short *)(self + 0x34) |= 0x41;
                     *(Quad *)(pv + 0x50) = D_L00_001BF220.normal.q;
                     for (i = 0; i < 6; i++) {
-                        func_00282F20(a30, &D_L00_001BF240, func_002A7878(0.16666667f, 0.33333334f));
+                        vec_scale_to_length(a30, &D_L00_001BF240, func_002A7878(0.16666667f, 0.33333334f));
                         a30[0] += func_002A7878(-0.15f, 0.15f);
                         a30[1] += func_002A7878(-0.15f, 0.15f);
                         a30[2] += func_002A7878(-0.15f, 0.15f);
-                        func_00282F20(a30, a30, func_002A7878(0.033333335f, 0.10000001f));
+                        vec_scale_to_length(a30, a30, func_002A7878(0.033333335f, 0.10000001f));
                         func_002BE278(self + 0x10, a30, 0, -1.0f);
                     }
                 }
@@ -203,16 +203,16 @@ void func_L00_003DB118(char *self)
                 *(unsigned short *)(self + 0x34) |= 0x41;
                 *(Quad *)(pv + 0x50) = col->normal.q;
                 for (i = 0; i < 6; i++) {
-                    func_00282F20(a30, &D_L00_001BF240, func_002A7878(0.16666667f, 0.33333334f));
+                    vec_scale_to_length(a30, &D_L00_001BF240, func_002A7878(0.16666667f, 0.33333334f));
                     a30[0] += func_002A7878(-0.15f, 0.15f);
                     a30[1] += func_002A7878(-0.15f, 0.15f);
                     a30[2] += func_002A7878(-0.15f, 0.15f);
-                    func_00282F20(a30, a30, func_002A7878(0.033333335f, 0.10000001f));
+                    vec_scale_to_length(a30, a30, func_002A7878(0.033333335f, 0.10000001f));
                     func_002BE278(self + 0x10, a30, 0, -1.0f);
                 }
             }
             *(int *)(pv + 0x60) = 15;
-            func_L00_003DC3E0(self, 15, self + 0x10, &D_L00_001BF240, 0.083333336f);
+            EmitRingAndDirectionalParticles(self, 15, self + 0x10, &D_L00_001BF240, 0.083333336f);
         }
         }
         }
@@ -224,10 +224,10 @@ void func_L00_003DB118(char *self)
             HitInfo hit;
             pick[0] = 0x44;
             pick[1] = 0x48;
-            func_00282F20(a40, pv, 2.0f);
-            func_00282CC0(a40, a40, self + 0x10);
-            func_00282DD8(&hit, self + 0x10, a40);
-            func_00282F20(&hit, &hit, 1.0f);
+            vec_scale_to_length(a40, pv, 2.0f);
+            FastVecAdd(a40, a40, self + 0x10);
+            FastVecCross(&hit, self + 0x10, a40);
+            vec_scale_to_length(&hit, &hit, 1.0f);
             func_002ACEC0(&hit, &hit, pv, func_002A7940());
             func_L00_00340CF8(self + 0x10, pv, &hit, func_002A7878(0.008333334f, 0.050000004f), pick[func_001163B0() % 2], func_002A7820(0x1E, 0x32));
             func_L00_003DCAC8(self + 0x10, 0x103080, func_002A7878(0.75f, 1.2f), func_002A7820(0x3F, 0x5F), 0xB, 2, pv, func_002A7940());
@@ -236,11 +236,11 @@ void func_L00_003DB118(char *self)
             if (func_00282948(pv + 0x60) != 0) goto kill;
             if (*(int *)(pv + 0x7C) == 0) {
                 for (i = 3; i > 0; i--) {
-                    func_00282D08(pv + 0x10 + i * 0x10, pv + 0x10 + i * 0x10, pv + i * 0x10, 0.2f);
+                    lerp_vector(pv + 0x10 + i * 0x10, pv + 0x10 + i * 0x10, pv + i * 0x10, 0.2f);
                 }
             } else {
                 for (i = 3; i > 0; i--) {
-                    func_00282D08(pv + 0x10 + i * 0x10, pv + 0x10 + i * 0x10, pv + i * 0x10, 0.5f);
+                    lerp_vector(pv + 0x10 + i * 0x10, pv + 0x10 + i * 0x10, pv + i * 0x10, 0.5f);
                 }
             }
             *(Quad *)(pv + 0x10) = *(Quad *)(self + 0x10);
@@ -251,11 +251,11 @@ void func_L00_003DB118(char *self)
     if (*(unsigned char *)(self + 0x20) == 1) {
         for (i = 0; i < 4; i++) {
             int n = func_002A77E0(5);
-            p = func_002BDCE8(self + 0x10, 0.2f, 1.0f, 0.9f, func_002A77E0(2) ? -n : n, &D_L00_001A8F20, 210000.0f, 0x7F204080, 1);
+            p = SpawnSpinningSparkParticle(self + 0x10, 0.2f, 1.0f, 0.9f, func_002A77E0(2) ? -n : n, &D_L00_001A8F20, 210000.0f, 0x7F204080, 1);
             if (p) {
                 u8 *t = p + 0x20;
                 *(unsigned short *)(p + 0xA) = 5;
-                p[9] = func_00283CF0(4.0f) + 0x40;
+                p[9] = FloatToInt(4.0f) + 0x40;
                 *(int *)(t + 4) = 2;
                 t[0xA] = 0x30;
                 t[0xB] = p[0xA];
@@ -263,11 +263,11 @@ void func_L00_003DB118(char *self)
         }
         for (i = 0; i < 3; i++) {
             int n = func_002A77E0(3);
-            p = func_002BDCE8(self + 0x10, 0.05f, 1.0f, 0.9f, func_002A77E0(2) ? -n : n, &D_L00_001A8F20, 157500.0f, 0x7F4080FF, 1);
+            p = SpawnSpinningSparkParticle(self + 0x10, 0.05f, 1.0f, 0.9f, func_002A77E0(2) ? -n : n, &D_L00_001A8F20, 157500.0f, 0x7F4080FF, 1);
             if (p) {
                 u8 *t = p + 0x20;
                 *(unsigned short *)(p + 0xA) = 2;
-                p[9] = func_00283CF0(4.0f) + 0x40;
+                p[9] = FloatToInt(4.0f) + 0x40;
                 *(int *)(t + 4) = 2;
                 t[0xA] = 0x40;
                 t[0xB] = p[0xA];
@@ -275,11 +275,11 @@ void func_L00_003DB118(char *self)
         }
         for (i = 0; i < 2; i++) {
             int n = func_002A77E0(3);
-            p = func_002BDCE8(self + 0x10, 0.05f, 1.0f, 0.9f, func_002A77E0(2) ? -n : n, &D_L00_001A8F20, 105000.0f, 0x7FFFFFFF, 1);
+            p = SpawnSpinningSparkParticle(self + 0x10, 0.05f, 1.0f, 0.9f, func_002A77E0(2) ? -n : n, &D_L00_001A8F20, 105000.0f, 0x7FFFFFFF, 1);
             if (p) {
                 u8 *t = p + 0x20;
                 *(unsigned short *)(p + 0xA) = 2;
-                p[9] = func_00283CF0(4.0f) + 0x40;
+                p[9] = FloatToInt(4.0f) + 0x40;
                 *(int *)(t + 4) = 2;
                 t[0xA] = 0x60;
                 t[0xB] = p[0xA];

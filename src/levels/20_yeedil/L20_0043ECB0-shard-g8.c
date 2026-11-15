@@ -55,25 +55,25 @@ void func_L20_0043ECB0(unsigned char *obj)
         ((float *)(obj + 0x10))[0] = func_00283180(s->angle) * s->radius;
         ((float *)(obj + 0x10))[1] = func_00283198(s->angle) * s->radius;
         ((float *)(obj + 0x10))[2] = 0.0f;
-        func_00282CC0(obj + 0x10, obj + 0x10, *(char **)(obj + 0xB8) + 0x10);
+        FastVecAdd(obj + 0x10, obj + 0x10, *(char **)(obj + 0xB8) + 0x10);
         ((float *)(obj + 0x10))[2] = old[2];
         if (func_00282C48(s->radius - s->targetRadius) < 0.5f) {
             speed = D_L20_001B1FA4 * 0.00029088825f;
             if (s->reverse == 0)
                 speed = -speed;
-            func_002AA2E8(&s->spin, speed, D_L20_001B1FA8 * 4.8481376e-06f);
-            s->angle = func_00283B98(s->angle, s->spin);
+            ApproachValue(&s->spin, speed, D_L20_001B1FA8 * 4.8481376e-06f);
+            s->angle = FastAddRotations(s->angle, s->spin);
             func_002AA548((float *)(obj + 0x18), &s->zSpeed, s->targetZ, D_L20_001B1FAC * 0.00027777778f, D_L20_001B1FAC * 0.00027777778f, D_L20_001B1FB0 * 0.016666668f);
             if (func_00282C48(((float *)(obj + 0x10))[2] - s->targetZ) < 0.1f)
                 s->targetZ = s->baseZ + func_002A7878(3.0f, 8.0f);
         }
         if (func_00282948(&s->timer)
-            && func_00283C80(((Moby *)obj)->rot[2], func_00283248(D_00189E20.position[0] - ((float *)(obj + 0x10))[0], D_00189E20.position[1] - ((float *)(obj + 0x10))[1])) < 0.62831855f) {
-            func_00282CF0(s->velocity, obj + 0x10, old);
+            && FastDiffRots(((Moby *)obj)->rot[2], func_00283248(D_00189E20.position[0] - ((float *)(obj + 0x10))[0], D_00189E20.position[1] - ((float *)(obj + 0x10))[1])) < 0.62831855f) {
+            FastVecSub(s->velocity, obj + 0x10, old);
             s->velocity[2] = 0.0f;
             func_002A7750(obj, 1, -1);
-        } else if (func_00282C30(*s->clock - D_L20_001B2AC8) >= 6) {
-            func_00282CF0(s->velocity, obj + 0x10, old);
+        } else if (subtract_integer_with_clamp(*s->clock - D_L20_001B2AC8) >= 6) {
+            FastVecSub(s->velocity, obj + 0x10, old);
             s->velocity[2] = 0.0f;
             func_002A7750(obj, 2, -1);
         }
@@ -84,25 +84,25 @@ void func_L20_0043ECB0(unsigned char *obj)
 
             { float b = D_L20_001B1FB0 * 0.016666668f; func_002AA548((float *)(obj + 0x18), &s->zSpeed, s->baseZ + 1.0f, D_L20_001B1FAC * 0.00027777778f, D_L20_001B1FAC * 0.00027777778f, b); }
             rate = D_L20_001B1FB8 * 0.016666668f;
-            func_00282CF0(target, D_00189E20.top, obj + 0x10);
+            FastVecSub(target, D_00189E20.top, obj + 0x10);
             target[2] = 0.0f;
-            func_00282F20(target, target, rate);
-            func_00282CF0(delta, target, s->velocity);
-            func_00282F20(delta, delta, D_L20_001B1FB4 * 0.00027777778f);
-            func_00282CC0(s->velocity, s->velocity, delta);
-            func_00282F20(s->velocity, s->velocity, rate);
-            func_00282CC0(obj + 0x10, obj + 0x10, s->velocity);
-            if (func_00283C80(((Moby *)obj)->rot[2], func_00283248(D_00189E20.position[0] - ((float *)(obj + 0x10))[0], D_00189E20.position[1] - ((float *)(obj + 0x10))[1])) > 1.5707964f)
+            vec_scale_to_length(target, target, rate);
+            FastVecSub(delta, target, s->velocity);
+            vec_scale_to_length(delta, delta, D_L20_001B1FB4 * 0.00027777778f);
+            FastVecAdd(s->velocity, s->velocity, delta);
+            vec_scale_to_length(s->velocity, s->velocity, rate);
+            FastVecAdd(obj + 0x10, obj + 0x10, s->velocity);
+            if (FastDiffRots(((Moby *)obj)->rot[2], func_00283248(D_00189E20.position[0] - ((float *)(obj + 0x10))[0], D_00189E20.position[1] - ((float *)(obj + 0x10))[1])) > 1.5707964f)
                 func_002A7750(obj, 2, -1);
         }
         break;
     case 2:
         {
-            float length = func_00282DF0(s->velocity);
+            float length = FastVecLength(s->velocity);
 
-            func_002AA2E8(&length, D_L20_001B1FB8 * 0.016666668f, 0.0027777778f);
-            func_00282F20(s->velocity, s->velocity, length);
-            func_00282CC0(obj + 0x10, obj + 0x10, s->velocity);
+            ApproachValue(&length, D_L20_001B1FB8 * 0.016666668f, 0.0027777778f);
+            vec_scale_to_length(s->velocity, s->velocity, length);
+            FastVecAdd(obj + 0x10, obj + 0x10, s->velocity);
             if (obj[0x31] == 0) {
                 func_0029F338(obj);
                 return;
@@ -110,10 +110,10 @@ void func_L20_0043ECB0(unsigned char *obj)
         }
         break;
     }
-    func_00282CF0(delta, obj + 0x10, old);
+    FastVecSub(delta, obj + 0x10, old);
     ((Moby *)obj)->rot[2] = func_00283248(delta[0], delta[1]);
-    ((Moby *)obj)->rot[1] = -func_00283248(func_00282E20(delta), delta[2]);
-    ((Moby *)obj)->rot[0] = func_00283B98(((Moby *)obj)->rot[0], 0.052359887f);
+    ((Moby *)obj)->rot[1] = -func_00283248(vec_length_xy(delta), delta[2]);
+    ((Moby *)obj)->rot[0] = FastAddRotations(((Moby *)obj)->rot[0], 0.052359887f);
     if ((D_L20_001B2AC8 & 3) == (((int)obj >> 8) & 3)) {
         int i;
 
@@ -121,16 +121,16 @@ void func_L20_0043ECB0(unsigned char *obj)
             qcopy(s->trail[i], s->trail[i - 1]);
         qcopy(s->trail[0], obj + 0x10);
     }
-    if (func_002761F8(old, obj + 0x10, 0, *(void **)(obj + 0xB8), 0)) {
+    if (CollLine(old, obj + 0x10, 0, *(void **)(obj + 0xB8), 0)) {
         if (D_L20_001C0418[0]) {
-            func_00282CF0(target, D_L20_001B9FC0, obj + 0x10);
-            func_00282F20(target, target, 1.0f);
+            FastVecSub(target, D_L20_001B9FC0, obj + 0x10);
+            vec_scale_to_length(target, target, 1.0f);
             func_002A8C28(*(void **)(obj + 0xB8), obj + 0x10, 2.0f, s->scale, 0x10001, 1.0f, 0, 1, 0);
             func_0032DA58(obj, obj + 0x10, target, 0.0f);
         } else {
-            func_0032C700(obj + 0x10, 0, 10, 20, 20, 20, 45, 0, 0.75f, 20.0f, 1, 0, 0, 0);
+            SpawnExplosion(obj + 0x10, 0, 10, 20, 20, 20, 45, 0, 0.75f, 20.0f, 1, 0, 0, 0);
         }
-        func_002E5CF8(0, 0, obj);
+        PlayMobySound(0, 0, obj);
         func_0029F338(obj);
         return;
     }

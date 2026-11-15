@@ -32,19 +32,19 @@ void func_L30_00416A88(char *obj) {
         }
         switch (*(unsigned char *)(obj + 0x20)) {
         case 0: {
-            func_00282CC0(pos, obj + 0x10, st);
-            func_002A8C00(&packet, obj, 3, *(float *)(st + 0x14), st);
+            FastVecAdd(pos, obj + 0x10, st);
+            make_hit_descriptor(&packet, obj, 3, *(float *)(st + 0x14), st);
             packet.id = *(unsigned short *)(obj + 0xAA);
-            if (func_002761F8(obj + 0x10, pos, 0, obj, &packet) || func_00277258(obj + 0x10, 0, obj, 0.3f)) {
+            if (CollLine(obj + 0x10, pos, 0, obj, &packet) || func_00277258(obj + 0x10, 0, obj, 0.3f)) {
                 /* Two full copies of the response: cross-jumping merges their tails after reload,
                    and each copy's velocity pointer stays local to its block, in $s0. */
                 if (D_L30_001C0218) {
                     if (D_L30_001C0218 == *(char **)(st + 0x10)) goto move; /* An owner hit continues normal movement. */
                     qcopy(&velocity, st);
-                    func_00282D30(&velocity, &velocity, 1.5f);
+                    FastVecScale(&velocity, &velocity, 1.5f);
                     velocity.f[2] = 1.0f;
                     velocity.f[3] = 5627.9248046875f;
-                    func_002A8C00(&query, obj, 0x10003, *(float *)(st + 0x14), &velocity);
+                    make_hit_descriptor(&query, obj, 0x10003, *(float *)(st + 0x14), &velocity);
                     query.active = 1;
                     query.id = *(unsigned short *)(obj + 0xAA);
                     query.kind = 0;
@@ -53,10 +53,10 @@ void func_L30_00416A88(char *obj) {
                     return;
                 }
                 qcopy(&velocity, st);
-                func_00282D30(&velocity, &velocity, 3.0f);
+                FastVecScale(&velocity, &velocity, 3.0f);
                 velocity.f[2] = 1.0f;
                 velocity.f[3] = 5627.9248046875f;
-                func_002A8C00(&query, obj, 0x10003, *(float *)(st + 0x14), &velocity);
+                make_hit_descriptor(&query, obj, 0x10003, *(float *)(st + 0x14), &velocity);
                 query.active = 1;
                 query.id = *(unsigned short *)(obj + 0xAA);
                 query.kind = 0;
@@ -66,7 +66,7 @@ void func_L30_00416A88(char *obj) {
             }
 move:
             if (!*(unsigned char *)(obj + 0xBC)) qcopy(obj + 0x10, pos);
-            func_00282D30(&velocity, st, -0.5f);
+            FastVecScale(&velocity, st, -0.5f);
             func_00282C88(&query);
             break;
         }

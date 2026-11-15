@@ -19,7 +19,7 @@ void func_L15_00438260(char *self) {
  float a[4],b[4],c[4];
  float distance;
  if(!D_L15_001B187C) return;
- func_L15_00437B68(self,0);
+ DrawScrollingGridLayers(self,0);
  if(!func_00282948(state+0xC)) return;
  obj=D_L15_001B261C+(*(int *)state<<8);
  basis=obj+0xC0;
@@ -28,22 +28,22 @@ void func_L15_00438260(char *self) {
  pos=obj+0x10;
  distance=800.0f;
  func_002ACEC0(a,a,axis,func_002A7878(-20.0f,20.0f)*0.01745329424738884f);
- func_00282F20(a,a,distance);
- func_00282CC0(a,a,pos);
+ vec_scale_to_length(a,a,distance);
+ FastVecAdd(a,a,pos);
  a[2]=distance;
  qcopy(b,a);
  b[2]=400.0f;
  func_L15_004320B0(a,b);
  if(func_002A77E0(2)) func_L15_004320B0(a,b);
- *(int *)(state+0xC)=func_00283CF0(func_002A7878(90.0f,350.0f));
+ *(int *)(state+0xC)=FloatToInt(func_002A7878(90.0f,350.0f));
  if(*(float *)(obj+0x18)>=565.0f) {
   qcopy(a,pos); qcopy(b,a);
   a[2]=distance;
   b[2]=*(float *)(obj+0x18)-100.0f;
   func_L15_004320B0(a,b);
   qcopy(c,basis);
-  func_00282F20(c,c,10.0f);
-  func_00282CC0(c,pos,c);
+  vec_scale_to_length(c,c,10.0f);
+  FastVecAdd(c,pos,c);
   c[2]-=1.25f;
   func_L15_00438B00(c,40,0);
   func_002E5DA0(16,0,self,0xFBF);
@@ -51,8 +51,8 @@ void func_L15_00438260(char *self) {
  }
  if(*(float *)(obj+0x18)<=415.0f) {
   qcopy(c,basis);
-  func_00282F20(c,c,10.0f);
-  func_00282CC0(c,pos,c);
+  vec_scale_to_length(c,c,10.0f);
+  FastVecAdd(c,pos,c);
   c[2]-=1.25f;
   func_L15_00438B00(c,40,0);
   func_002E5DA0(16,0,self,0xFBF);

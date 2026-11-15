@@ -112,7 +112,7 @@ void func_L08_00423970(char *actor) {
         case 0:
             if (!func_002A77E0(7)) {
                 /* Result 2 is false; normalize this with the other nonzero triggers. */
-                condition = func_L08_0032F898(actor, p + 0x100,
+                condition = SelectNearestListedMoby(actor, p + 0x100,
                     (float)*(unsigned char *)(p + 0x18D), 0.0f,
                     *(int *)(p + 0x190), *(int *)(p + 0x198),
                     *(int *)(p + 0x194), -1) ^ 2;
@@ -122,7 +122,7 @@ void func_L08_00423970(char *actor) {
         case 1:
             if (*(int *)(p + 0x180) != -1) ready = func_L08_004229C8(*(int *)(p + 0x180)) != 0;
             else {
-                func_0026FEB8(D_L08_002B5600, *(short *)(actor + 0xAA), *(short *)(actor + 0xB2));
+                STUB_printf(D_L08_002B5600, *(short *)(actor + 0xAA), *(short *)(actor + 0xB2));
                 *(unsigned char *)(p + 0x18B) = 0;
             }
             break;
@@ -144,7 +144,7 @@ normalize:
         }
         break;
     case 3:
-        if (func_00282978((short *)(p + 0x1B8))) {
+        if (FastDecTimer((short *)(p + 0x1B8))) {
             if (*(unsigned char *)(actor + 0x43)) func_002A7470(actor, 0, 0, 10);
             *(unsigned char *)(actor + 0x31) = 1;
             *(unsigned short *)(actor + 0x34) &= 0xFFFE;
@@ -157,7 +157,7 @@ normalize:
         case 0: z = FIELD(p, float, 0x1B4); break;
         case 1: z = FIELD(p, float, 0x1B0) - 1.7f; break;
         }
-        if (func_002B3868(actor)) func_002E5CF8(4, 0, actor);
+        if (func_002B3868(actor)) PlayMobySound(4, 0, actor);
         func_002AA548(actor + 0x18, z, p + 0x178,
                        0.0069444444961845875f, 0.004166666883975267f, 0.5f);
         if (func_0029F530(actor) < 12.0f) {
@@ -185,7 +185,7 @@ normalize:
         }
         break;
     case 4:
-        func_00282CC0(actor + 0x10, actor + 0x10, p + 0x170);
+        FastVecAdd(actor + 0x10, actor + 0x10, p + 0x170);
         FIELD(p, float, 0x178) -= 0.0027222223579883575f;
         FIELD(actor, float, 0x18) += 0.75f;
         if (func_00277258(actor + 0x10, 0.75f, 0, actor)) {
@@ -212,11 +212,11 @@ normalize:
             if (angle > 0.0f) angle = func_002A7878(0.2f, 0.5f) * -1.5707963705062866f;
             else angle = func_002A7878(0.2f, 0.5f) * 1.5707963705062866f;
         }
-        FIELD(p, float, 0x160) = func_00283180(func_00283B98(FIELD(actor, float, 0xF8), angle)) * 2.0f;
-        FIELD(p, float, 0x164) = func_00283198(func_00283B98(FIELD(actor, float, 0xF8), angle)) * 2.0f;
+        FIELD(p, float, 0x160) = func_00283180(FastAddRotations(FIELD(actor, float, 0xF8), angle)) * 2.0f;
+        FIELD(p, float, 0x164) = func_00283198(FastAddRotations(FIELD(actor, float, 0xF8), angle)) * 2.0f;
         FIELD(p, s32, 0x168) = 0;
-        func_00282CC0(p + 0x160, p + 0x160, actor + 0x10);
-        phase = func_002ABB18(func_00283CE0(D_L08_001B2508) * 0.025f);
+        FastVecAdd(p + 0x160, p + 0x160, actor + 0x10);
+        phase = func_002ABB18(IntToFloat(D_L08_001B2508) * 0.025f);
         func_L08_00422B98(actor);
         if (func_L08_00423010(actor, 360.0f, 180.0f, 560.0f, 20.0f, 0.0f, 16.0f,
                               FIELD(p, float, 0x15C) + 1.7f + 1.0f + func_00283198(phase), -2.0f))
@@ -258,7 +258,7 @@ normalize:
             }
             break;
         }
-        if (func_L08_0032F898(actor, p + 0x100, (float)FIELD(actor, s16, 0x32), 0.0f,
+        if (SelectNearestListedMoby(actor, p + 0x100, (float)FIELD(actor, s16, 0x32), 0.0f,
                              FIELD(p, int, 0x19C), FIELD(p, int, 0x1A4), FIELD(p, int, 0x1A0), -1) != 2) {
             if (!func_002A77E0(9)) {
                 FIELD(p, s16, 0x1BA) = func_002A7820(300, 360);
@@ -291,14 +291,14 @@ normalize:
             }
             break;
         }
-        if (func_L08_0032F898(actor, p + 0x100, (float)FIELD(actor, s16, 0x32), (float)FIELD(p, u8, 0x18D),
+        if (SelectNearestListedMoby(actor, p + 0x100, (float)FIELD(actor, s16, 0x32), (float)FIELD(p, u8, 0x18D),
                              FIELD(p, int, 0x19C), FIELD(p, int, 0x1A4), FIELD(p, int, 0x1A0), -1) == 2 ||
             D_00189E20.state == 0x31 || D_00189E20.secondaryState == 0x11 ||
             D_00189E20.secondaryState == 0x12) {
             FIELD(p, int, 0x144) = 2;
             if (FIELD(p, s16, 0x1BA) == 0) func_002A7750(actor, 6, 0);
         } else if (**(int **)(p + 0x1CC) < 3 && FIELD(p, s16, 0x1BC) == 0 &&
-                    func_00282E80(actor + 0x10, p + 0x120) < 12.0f) {
+                    vec_distance_xy(actor + 0x10, p + 0x120) < 12.0f) {
             FIELD(p, u8, 0x18C) = 1;
             qcopy(p + 0x160, p + 0x120);
             func_002A7750(actor, 8, 0);
@@ -310,7 +310,7 @@ normalize:
         switch (FIELD(actor, u8, 0x95)) {
         case 0:
             func_L08_00423010(actor, 260.0f, 180.0f, 270.0f, 32.0f, 0.15f, 8.0f, 0.4f, 0.5f);
-            if (func_00282E80(actor + 0x10, p + 0x120) < 1.5f &&
+            if (vec_distance_xy(actor + 0x10, p + 0x120) < 1.5f &&
                 func_00282C48(FIELD(actor, float, 0x18) - FIELD(p, float, 0x128)) < 1.1f) {
                 if (FIELD(actor, u8, 0x43) != 4) func_002A7470(actor, 4, 0, 3);
                 func_002A7750(actor, 8, 1);
@@ -336,8 +336,8 @@ normalize:
             break;
         case 3:
             func_L08_00423010(actor, 260.0f, 180.0f, 270.0f, 32.0f, 0.15f, 8.0f, 0.3f, 0.5f);
-            if (func_00282978((s16 *)(p + 0x1B8))) {
-                if (func_00282E80(actor + 0x10, p + 0x120) < 1.5f &&
+            if (FastDecTimer((s16 *)(p + 0x1B8))) {
+                if (vec_distance_xy(actor + 0x10, p + 0x120) < 1.5f &&
                     func_00282C48(FIELD(actor, float, 0x18) - FIELD(p, float, 0x128)) < 1.1f) {
                     if (FIELD(actor, u8, 0x43) != 4) func_002A7470(actor, 4, 0, 3);
                     func_002A7750(actor, 8, 1);
@@ -348,7 +348,7 @@ normalize:
             }
             break;
         }
-        if (func_L08_0032F898(actor, p + 0x100, (float)FIELD(actor, s16, 0x32), (float)FIELD(p, u8, 0x18D),
+        if (SelectNearestListedMoby(actor, p + 0x100, (float)FIELD(actor, s16, 0x32), (float)FIELD(p, u8, 0x18D),
                              FIELD(p, int, 0x19C), FIELD(p, int, 0x1A4), FIELD(p, int, 0x1A0), -1) == 2 ||
             D_00189E20.state == 0x31 || D_00189E20.secondaryState == 0x11 ||
             D_00189E20.secondaryState == 0x12) {
@@ -358,9 +358,9 @@ normalize:
                 if (FIELD(actor, u8, 0x43) != 3) func_002A7470(actor, 3, 0, 3);
                 func_002A7750(actor, 6, 0);
             } else {
-                func_00282CF0(p + 0x160, actor + 0x10, p + 0x160);
-                func_00282CC0(p + 0x160, p + 0x160, actor + 0x10);
-                func_00282F20(p + 0x160, p + 0x160, 5.0f);
+                FastVecSub(p + 0x160, actor + 0x10, p + 0x160);
+                FastVecAdd(p + 0x160, p + 0x160, actor + 0x10);
+                vec_scale_to_length(p + 0x160, p + 0x160, 5.0f);
                 func_L08_00422B98(actor);
                 func_L08_00423010(actor, 260.0f, 180.0f, 270.0f, 32.0f, 0.15f, 8.0f, 0.3f, 0.5f);
                 FIELD(p, s16, 0x1B8) = 0;
@@ -374,7 +374,7 @@ normalize:
     case 9: {
         int result;
         ++FIELD(p, u16, 0x1BE);
-        if (func_002B3868(actor)) func_002E5CF8(0, 0, actor);
+        if (func_002B3868(actor)) PlayMobySound(0, 0, actor);
         result = func_002B1C20(actor, p + 0x50);
         if (result & 1) {
             func_002A7750(actor, 10, -1);
@@ -392,13 +392,13 @@ normalize:
         u16 tag;
         int kind;
         u32 bits;
-        if (func_002B3868(actor)) func_002E5CF8(1, 0, actor);
+        if (func_002B3868(actor)) PlayMobySound(1, 0, actor);
         func_L08_00422428(actor);
         func_L08_00422578(actor, D_L08_001A8F20);
-        func_002ABBB8(actor, p + 0x170, 0, 0.0f, 0.0f, 4, 0, 0,
+        SpawnExplosionEffects(actor, p + 0x170, 0, 0.0f, 0.0f, 4, 0, 0,
                       2.0f, 1.0f, 9.0f, 1.0f, -1, 0.0f, 0, 0, -1, 1, 0x810001);
         func_L08_00422B60(actor);
-        func_002A6C58(actor, 0, 3);
+        SetDeathBits(actor, 0, 3);
         D_L08_0021DE80.flags[FIELD(actor, s16, 0xB2)] = FIELD(actor, u8, 0xB0) + 2;
         kind = FIELD(actor, u8, 0xB0);
         if (kind == 255 || (!(D_L08_001B2840[(u8)kind] & 0x80) &&

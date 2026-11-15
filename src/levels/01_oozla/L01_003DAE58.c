@@ -76,16 +76,16 @@ void func_L01_003DAE58(u8 *obj)
             I(obj, 0x98) = 0;
             obj[0x31] = 0;
         }
-        if (I(state, 0x2F4) == 1 && func_00282978(state + 0x3D4)) {
+        if (I(state, 0x2F4) == 1 && FastDecTimer(state + 0x3D4)) {
             if (state[0x3D0]) {
                 func_L01_003DCE70(obj, pos);
-                func_00282CF0(delta, pos, obj + 0x10);
+                FastVecSub(delta, pos, obj + 0x10);
                 rate = 0.033333335071802139282f;
-                if (func_00282DF0(delta) * rate < 0.13333334028720855713f)
-                    speed = func_00282DF0(delta) * rate;
+                if (FastVecLength(delta) * rate < 0.13333334028720855713f)
+                    speed = FastVecLength(delta) * rate;
                 else
                     speed = 0.13333334028720855713f;
-                func_00282F20(delta, delta, speed);
+                vec_scale_to_length(delta, delta, speed);
                 height = 0;
                 delta[2] = func_L00_0031CDD0(obj + 0x10, pos, &height, speed, -0.005f);
                 qcopy(state + 0x190, delta);
@@ -110,16 +110,16 @@ void func_L01_003DAE58(u8 *obj)
     case 2: {
         f32 distance;
 
-        func_00282CC0(obj + 0x10, obj + 0x10, state + 0x190);
-        func_002A7CA0(obj, func_00283248(F(state, 0x2E0) - F(obj, 0x10), F(state, 0x2E4) - F(obj, 0x14)),
+        FastVecAdd(obj + 0x10, obj + 0x10, state + 0x190);
+        MobySpringTurn(obj, func_00283248(F(state, 0x2E0) - F(obj, 0x10), F(state, 0x2E4) - F(obj, 0x14)),
                       F(state, 0x1D4), F(state, 0x1E4), F(state, 0x1DC) * 2, state + 0x274);
         F(state, 0x198) -= 0.005f;
         if (F(state, 0x198) <= 0 && func_00282C48(F(obj, 0x18) - F(state, 0x398)) < -F(state, 0x198)) {
             F(obj, 0x48) = 1;
             F(obj, 0x18) = F(state, 0x398);
             F(state, 0x198) = 0;
-            distance = func_00282E80(obj + 0x10, state + 0x390);
-            if (distance < func_00282DF0(state + 0x190)) {
+            distance = vec_distance_xy(obj + 0x10, state + 0x390);
+            if (distance < FastVecLength(state + 0x190)) {
                 qcopy(obj + 0x10, state + 0x390);
                 qzero(state + 0x190);
             }
@@ -191,7 +191,7 @@ void func_L01_003DAE58(u8 *obj)
             f32 distance;
 
             func_L01_003DCDD8(obj, state + 0x390);
-            distance = func_00282E80(obj + 0x10, state + 0x390);
+            distance = vec_distance_xy(obj + 0x10, state + 0x390);
             if (obj[0x60] & 2) {
                 if ((H(*(u8 **)(state + 0x2F0), 0xAA) != 0xB1A && distance <= 3) ||
                     (H(*(u8 **)(state + 0x2F0), 0xAA) == 0xB1A && distance < 1)) {
@@ -222,7 +222,7 @@ void func_L01_003DAE58(u8 *obj)
         case 4:
             func_L01_003DCD40(obj, state + 0x2B0);
             if (obj[0x60] & 2) {
-                if (!I(state, 0x404) || func_00282E80(obj + 0x10, D_00189E20 + 0x80) > 7) {
+                if (!I(state, 0x404) || vec_distance_xy(obj + 0x10, D_00189E20 + 0x80) > 7) {
                     H(state, 0x3D8) = 60;
                     if (obj[0x43] != (func_001163B0() & 1) + 4)
                         func_002A7470(obj, (func_001163B0() & 1) | 4, 0, 12);
@@ -231,7 +231,7 @@ void func_L01_003DAE58(u8 *obj)
             }
             break;
         case 5:
-            func_002A7CA0(obj, func_00283248(F(state, 0x2E0) - F(obj, 0x10), F(state, 0x2E4) - F(obj, 0x14)),
+            MobySpringTurn(obj, func_00283248(F(state, 0x2E0) - F(obj, 0x10), F(state, 0x2E4) - F(obj, 0x14)),
                           F(state, 0x1D4) * 2, F(state, 0x1E4), F(state, 0x1DC) * 2, state + 0x274);
             if (obj[0x60] & 2) {
                 if (obj[0x43] != 7)
@@ -261,7 +261,7 @@ void func_L01_003DAE58(u8 *obj)
             F(state, 0x380) = func_00283180(F(obj, 0xF8)) * 3.25f;
             F(state, 0x384) = func_00283198(F(obj, 0xF8)) * 3.25f;
             I(state, 0x388) = 0;
-            func_00282CC0(state + 0x380, state + 0x380, obj + 0x10);
+            FastVecAdd(state + 0x380, state + 0x380, obj + 0x10);
             F(state, 0x388) = func_002A89A8(state + 0x380, 0, 0.5f) + 0.025f;
             func_L01_003DBB88(obj, 1);
         }
@@ -291,7 +291,7 @@ void func_L01_003DAE58(u8 *obj)
         }
         break;
     case 6:
-        func_002A6C58(obj, 0, 3);
+        SetDeathBits(obj, 0, 3);
         func_L01_003DBF38(obj);
         func_L01_003DBB88(obj, 1);
         func_L01_003E9CF8(obj, 0, 0);
@@ -301,9 +301,9 @@ void func_L01_003DAE58(u8 *obj)
         *(UpdateQuad *)pos = 0;
         pos[2] = F(obj, 0xF8);
         *(UpdateQuad *)delta = *(UpdateQuad *)pos;
-        func_00283410(matrix, delta);
-        func_00283698(inverse, matrix);
-        func_00283698(oldInverse, obj + 0xC0);
+        euler_to_matrix(matrix, delta);
+        matrix_from_basis_rows(inverse, matrix);
+        matrix_from_basis_rows(oldInverse, obj + 0xC0);
         {
             f32 *v;
             u8 *target = *(u8 **)(state + 0x248);
@@ -312,9 +312,9 @@ void func_L01_003DAE58(u8 *obj)
                 v = pos;
                 qcopy(v, D_L01_001AC5A0);
             } else
-                func_00282F20(pos, state + 0x210, 1);
+                vec_scale_to_length(pos, state + 0x210, 1);
             v = pos;
-            func_00283098(v, v, inverse);
+            matrix_mul_vec3(v, v, inverse);
         }
         angle = func_00283248(pos[2], pos[0]);
         pitch = -func_00283248(pos[2], pos[1]);

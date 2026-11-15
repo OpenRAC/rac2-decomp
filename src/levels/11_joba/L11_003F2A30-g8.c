@@ -20,7 +20,7 @@ void func_L11_003F2A30(u8 *arg0) {
         *(f32 *)(s1 + 0x254) = speed;
         if (speed > limit) *(f32 *)(s1 + 0x254) = limit;
         else if (speed < -limit) *(f32 *)(s1 + 0x254) = -limit;
-        *(f32 *)(s1 + 0x250) = func_00283B98(*(f32 *)(s1 + 0x250), *(f32 *)(s1 + 0x254));
+        *(f32 *)(s1 + 0x250) = FastAddRotations(*(f32 *)(s1 + 0x250), *(f32 *)(s1 + 0x254));
         break;
     case 2:
         speed = *(f32 *)(s1 + 0x254) + D_L11_001B0550 * 0.000004848137447610265f;
@@ -28,7 +28,7 @@ void func_L11_003F2A30(u8 *arg0) {
         *(f32 *)(s1 + 0x254) = speed;
         if (speed > limit) *(f32 *)(s1 + 0x254) = limit;
         else if (speed < -limit) *(f32 *)(s1 + 0x254) = -limit;
-        *(f32 *)(s1 + 0x250) = func_00283B98(*(f32 *)(s1 + 0x250), *(f32 *)(s1 + 0x254));
+        *(f32 *)(s1 + 0x250) = FastAddRotations(*(f32 *)(s1 + 0x250), *(f32 *)(s1 + 0x254));
         break;
     case 0: case 3: case 4: case 5: case 6: case 7: case 8: case 9: case 10: break;
     }
@@ -44,12 +44,12 @@ void func_L11_003F2A30(u8 *arg0) {
         *(f32 *)(s0 + 0xF4) = -1.5707964897155762f;
         *(s32 *)(s0 + 0xF0) = 0;
         *(f32 *)(s0 + 0xF8) = *(f32 *)(s1 + 0x250);
-        func_002833F0(s0 + 0xC0, s0 + 0xF0);
+        euler_rotation_basis(s0 + 0xC0, s0 + 0xF0);
     } else if (*(u8 *)(s0 + 0x95) == 1) {
         *(f32 *)(s0 + 0x18) = D_L11_001B0544;
         *(f32 *)(s0 + 0xF4) = 1.5707964897155762f;
         *(s32 *)(s0 + 0xF0) = 0;
-        *(f32 *)(s0 + 0xF8) = func_00283B98(3.1415927410125732f, *(f32 *)(s1 + 0x250));
-        func_002833F0(s0 + 0xC0, s0 + 0xF0);
+        *(f32 *)(s0 + 0xF8) = FastAddRotations(3.1415927410125732f, *(f32 *)(s1 + 0x250));
+        euler_rotation_basis(s0 + 0xC0, s0 + 0xF0);
     }
 }

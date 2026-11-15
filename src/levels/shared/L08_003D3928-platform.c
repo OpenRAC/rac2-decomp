@@ -40,7 +40,7 @@ void func_L08_003E5BB8(u8 *m)
     case 1:
         d1=func_00282C48(E_F((u8 *)p,0x68)-D_00189E20.z);
         d2=func_00282C48(E_F(D_L08_001B2ACC+p->index*128,0x38)-D_00189E20.z);
-        if (((!p->trigger || func_00283CF0(p->progress)==p->side) && D_00189E20.object==(int)m && D_00189E20.state!=0) ||
+        if (((!p->trigger || FloatToInt(p->progress)==p->side) && D_00189E20.object==(int)m && D_00189E20.state!=0) ||
             (p->progress<0.1f && d2<d1) || (p->progress>0.9f && d1<d2)) {
             m[0xbc]^=1;
             func_002A7750(m,2,-1);
@@ -48,15 +48,15 @@ void func_L08_003E5BB8(u8 *m)
         break;
     case 2:
         if(((ESound *)(D_00188660+p->sound*0x70))->object!=(int)m || !((ESound *)(D_00188660+p->sound*0x70))->active)
-            p->sound=func_002E5CF8(0,4,m);
+            p->sound=PlayMobySound(0,4,m);
         if(m[0xbc]) p->progress+=1.0f/p->duration;
         else p->progress-=1.0f/p->duration;
         if(p->progress>1.0f) p->progress=1.0f;
         else if(p->progress<0.0f) p->progress=0.0f;
         t=(1.0f-func_00283180(p->progress*3.141592741f))*0.5f;
-        func_00282CF0(&delta,D_L08_001B2ACC+p->index*128+0x30,&p->pos);
-        func_00282D30(&delta,&delta,t);
-        func_00282CC0(m+0x10,&p->pos,&delta);
+        FastVecSub(&delta,D_L08_001B2ACC+p->index*128+0x30,&p->pos);
+        FastVecScale(&delta,&delta,t);
+        FastVecAdd(m+0x10,&p->pos,&delta);
         ((EMob*)m)->rz=func_002AA150(E_F((u8 *)p,0x78),E_F(D_L08_001B2ACC+p->index*128,0x78),t);
         ((EMob*)m)->ry=func_002AA150(E_F((u8 *)p,0x74),E_F(D_L08_001B2ACC+p->index*128,0x74),t);
         ((EMob*)m)->rx=func_002AA150(E_F(p,0x70),E_F(D_L08_001B2ACC+p->index*128,0x70),t);
@@ -64,7 +64,7 @@ void func_L08_003E5BB8(u8 *m)
             int i=p->sound;
             if(i!=-1 && ((ESound *)(D_00188660+i*0x70))->object==(int)m && ((ESound *)(D_00188660+i*0x70))->active) func_002E59F8(i);
             p->sound=-1;
-            if(*(short *)(m+0xaa)!=0xd49) func_002E5CF8(1,0,m);
+            if(*(short *)(m+0xaa)!=0xd49) PlayMobySound(1,0,m);
             func_002A7750(m,3,-1);
         }
         break;
@@ -73,7 +73,7 @@ void func_L08_003E5BB8(u8 *m)
         break;
     }
     if(m[0x20]<4) {
-        func_00282CF0(&delta,m+0x10,&oldpos);
+        FastVecSub(&delta,m+0x10,&oldpos);
         func_002AD6F0((u8 *)p+0x20,&delta,&oldrot,m+0xf0);
     }
 }

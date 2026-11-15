@@ -86,8 +86,8 @@ end:
         qcopy(state + 0x170, arg3);
         *(int *)(found + 0xB8) = arg0;
         func_002A7750(found, 2, -1);
-        func_00282F20(state + 0x190, arg3, func_002A7878(20.0f, 30.0f));
-        func_00282CC0(state + 0x190, state + 0x190, pos);
+        vec_scale_to_length(state + 0x190, arg3, func_002A7878(20.0f, 30.0f));
+        FastVecAdd(state + 0x190, state + 0x190, pos);
         *(float *)(state + 0x198) = arg2[2];
         *(float *)(state + 0x20) = (float)*(s16 *)(state + 0x24);
         *(float *)(found + 0xF8) = func_00283248(arg3[0], arg3[1]);

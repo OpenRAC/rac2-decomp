@@ -32,13 +32,13 @@ float func_L20_0044A8F0(char *arg0) {
     float gain;
     float pitch;
 
-    func_00282CF0(b0, state + 0x190, state + 0x180);
-    speed = func_00282DF0(state + 0xF0);
-    f = func_00282DF0(b0);
+    FastVecSub(b0, state + 0x190, state + 0x180);
+    speed = FastVecLength(state + 0xF0);
+    f = FastVecLength(b0);
     func_002AAC80(&speed, f, D_L20_001B2444 * 0.00027777778f,
                   D_L20_001B2444 * 0.00027777778f,
                   D_L20_001B2448 * 0.016666668f);
-    func_00282F20(state + 0xF0, b0, speed);
+    vec_scale_to_length(state + 0xF0, b0, speed);
     qcopy(src, v);
     func_L07_00321D68(arg0, state + 0xF0);
     qcopy(v, src);

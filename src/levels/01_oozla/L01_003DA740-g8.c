@@ -54,7 +54,7 @@ void func_L01_003DCE70(u8 *arg0, u8 *out) {
             u8 *base = D_L01_001B264C;
 
             qcopy_nc(&v, base + index * 128 + 0x30);
-            f = func_00282E80(&v, D_00189EA0);
+            f = vec_distance_xy(&v, D_00189EA0);
             if (*(f32 *)(out + 0xC) < f) {
                 qcopy_nc(out, &v);
                 *(f32 *)(out + 0xC) = f;
@@ -187,19 +187,19 @@ void func_L01_0041C970(Object0041C970 *obj) {
   p->field6C+=p->field68;
   obj->position[2]=height1+p->field6C;
   func_002AEF28(obj,(u8 *)p+0x78,(u8 *)p+0x7C,D_L01_001B1B3C,D_L01_001B1B40*0.0002908882452175021f,D_L01_001B1B44*0.0002908882452175021f);
-  func_00282CF0(delta,obj->position,oldpos);
+  FastVecSub(delta,obj->position,oldpos);
   func_002AD6F0((u8 *)p+0x20,delta,oldrot,obj->rotation);
   break;
  case 2:
   if(obj->field31) {
-   p->fieldAC=func_00283B98(p->fieldAC,0.05235988646745682f);
-   obj->color=func_00283D38(0xFFEEFC0E,0xF03B4004,func_00283198(p->fieldAC)*0.5f+0.5f);
+   p->fieldAC=FastAddRotations(p->fieldAC,0.05235988646745682f);
+   obj->color=FastTweenColor(0xFFEEFC0E,0xF03B4004,func_00283198(p->fieldAC)*0.5f+0.5f);
   }
   height2=func_L01_003BAFB0();
   if(!D_00189E20.flag34E && D_00189E20.platform==obj) {
-   func_00282CF0(local,D_00189E20.position,obj->position);
-   x=func_00282DB0(local,obj->matrix);
-   y=-D_L01_001B1B48 * func_00282DB0(local,obj->matrix+4);
+   FastVecSub(local,D_00189E20.position,obj->position);
+   x=FastVecDot(local,obj->matrix);
+   y=-D_L01_001B1B48 * FastVecDot(local,obj->matrix+4);
    scaledX=D_L01_001B1B4C*x;
    *(UpdateQuad *)oldstate=*(UpdateQuad *)((u8 *)p+0x80);
    *(UpdateQuad *)current=*(UpdateQuad *)(obj->position);
@@ -212,9 +212,9 @@ void func_L01_0041C970(Object0041C970 *obj) {
   }
   obj->position[2]=height2+p->field6C;
   func_002AEF28(obj,(u8 *)p+0x78,(u8 *)p+0x7C,D_L01_001B1B3C,D_L01_001B1B40*0.0002908882452175021f,D_L01_001B1B44*0.0002908882452175021f);
-  obj->rotation[0]=func_00283B98(p->field80,obj->rotation[0]);
-  obj->rotation[1]=func_00283B98(p->field84,obj->rotation[1]);
-  func_00282CF0(delta,obj->position,oldpos);
+  obj->rotation[0]=FastAddRotations(p->field80,obj->rotation[0]);
+  obj->rotation[1]=FastAddRotations(p->field84,obj->rotation[1]);
+  FastVecSub(delta,obj->position,oldpos);
   func_002AD6F0((u8 *)p+0x20,delta,oldrot,obj->rotation);
   break;
  }
@@ -234,8 +234,8 @@ void func_L01_003DCF40(u8 *obj) {
     s32 idx;
 
     *(void **)(p + 0x18) = p + 0x1C0;
-    p[0x48] = func_00283CF0(10.0f);
-    p[0x4A] = func_00283CF0(9.6f);
+    p[0x48] = FloatToInt(10.0f);
+    p[0x4A] = FloatToInt(9.6f);
     *(s32 *)(p + 0x158) = 5;
     *(u8 *)(p + 0x127) = 11;
     *(f32 *)(p + 0x12C) = 0.20000001788139343f;

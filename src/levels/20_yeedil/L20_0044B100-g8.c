@@ -28,7 +28,7 @@ char *func_L20_0044B100(char *arg0, char *arg1, char *arg2, char *arg3, int arg4
     TI128 buf;
     float r;
 
-    obj = func_0029EFD0(0x12F7);
+    obj = CreateMoby(0x12F7);
     if (obj != 0) {
         func_002B37E8((u8 *)obj, (u8 *)arg0);
         dst = obj + 0x10;
@@ -41,13 +41,13 @@ char *func_L20_0044B100(char *arg0, char *arg1, char *arg2, char *arg3, int arg4
         *(float *)(state + 0x24) = func_002A7940();
         *(float *)(state + 0x28) = func_002A7878(0.052359886f, 0.10471977f);
         *(int *)(state + 0x30) = 0;
-        r = func_00283CE0(arg4);
+        r = IntToFloat(arg4);
         *(float *)(state + 0x34) = 1.0f / r;
-        func_00282D30(&buf, arg2, (float)(arg4 >> 1));
-        func_00282CC0(&buf, &buf, arg1);
-        func_00282CF0(state + 0x10, arg3, &buf);
-        r = func_00282DF0(state);
-        func_00282F20(state + 0x10, state + 0x10, r);
+        FastVecScale(&buf, arg2, (float)(arg4 >> 1));
+        FastVecAdd(&buf, &buf, arg1);
+        FastVecSub(state + 0x10, arg3, &buf);
+        r = FastVecLength(state);
+        vec_scale_to_length(state + 0x10, state + 0x10, r);
         func_L11_00460258(dst, D_L20_001B246C);
         func_002E5DA0(0, 0, obj, 0x12F7);
     }

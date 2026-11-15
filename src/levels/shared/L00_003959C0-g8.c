@@ -22,7 +22,7 @@ void func_L00_003959C0(char *object) {
 
     do {
         if (*enabled != 0) {
-            int scaled = func_00283CF0(func_00283CE0(*values) * D_L00_001B27DC[0]);
+            int scaled = FloatToInt(IntToFloat(*values) * D_L00_001B27DC[0]);
 
             func_L00_00395A88(record, scaled, scaled, 5, D_L00_001AF260, D_L00_001AF264, 0.2f);
         }

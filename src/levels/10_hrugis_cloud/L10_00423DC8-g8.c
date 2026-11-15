@@ -60,7 +60,7 @@ void func_L10_00423DC8(u8 *obj, s32 kind) {
     if (!func_00282948(s + 0x58))
         return;
     if (D_L10_001A904C && !D_L10_001B1440) {
-        func_0027D330(30);
+        FadeToBlack(30);
         func_0029B758(0, func_L10_004239A0);
         n = D_L10_001B1390_gp[kind];
         capped = n < 3 ? n : 2;
@@ -75,7 +75,7 @@ void func_L10_00423DC8(u8 *obj, s32 kind) {
         D_L10_001B1390_gp[kind] = n + 1;
         D_001A79F8 = D_001A79F8 + reward;
         func_L10_00425888();
-        func_0029B3E0(0, -1);
+        MemcardSave(0, -1);
     }
     func_L05_00379F48(1);
     if (!func_00282948(s + 0x40)) {
@@ -83,7 +83,7 @@ void func_L10_00423DC8(u8 *obj, s32 kind) {
         if (tmp) {
             D_L10_001B1440 = 0;
             *(s32 *)(s + 0x40) = 0x278D0;
-            func_0027D330(30);
+            FadeToBlack(30);
             func_L05_00379F48(0);
             *(s32 *)(s + 0x58) = 120;
             *(s32 *)(s + 0x48) = 0x2A30;

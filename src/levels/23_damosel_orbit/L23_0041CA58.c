@@ -32,7 +32,7 @@ void func_L23_0041CA58(char *obj) {
 
     func_L23_0041CCC0(obj);
     func_002A77E0(3);
-    func_00115484(selected, -1, 28);
+    memset(selected, -1, 28);
     for (i = 0; i < 47; i++) {
         cumulative[i] = total;
         total += D_L23_001FF300[st->ids[i]]->count - 1;

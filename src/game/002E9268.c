@@ -209,7 +209,7 @@ int func_002E9268(void)
                 func_00294070(scene->chunk);
                 scene->streamFrame=scene->frame%limit;
                 if (state->skip) state->skip=0;
-                else func_0027D330(4);
+                else FadeToBlack(4);
                 D_001B15A0=1.0f;
             } else {
                 if (state->skip) state->skip=0;
@@ -232,7 +232,7 @@ int func_002E9268(void)
             if ((unsigned short)((unsigned short)D_001A63A8.mode-6)>=2) D_001A63A8.mode=5;
             func_002FC138();
             D_001B9040.fieldOfView=0.62f;
-            func_0027AB40();
+            UpdateViewContext();
             {
                 int cleanupIndex;
                 for (cleanupIndex=0;cleanupIndex<scene->objectCount;cleanupIndex++) {
@@ -270,7 +270,7 @@ int func_002E9268(void)
             func_002AB6D8(state->object->matrix,state->object->rotation);
             state->object->rotation[0]=0;
             state->object->rotation[1]=0;
-            func_00283410(matrix,state->object->rotation);
+            euler_to_matrix(matrix,state->object->rotation);
             qcopy(point,state->object->position);
             point[2]=func_002A89A8(point,0,0.5f);
             {
@@ -281,11 +281,11 @@ int func_002E9268(void)
             last=B(key,0xC);
             rotation=key+0x10;
             D_001B9040.fieldOfView=F(rotation,0xC);
-            func_0027AB40();
+            UpdateViewContext();
             qcopy(D_001B5200.position,key);
-            func_002830C0(D_001B5200.position,D_001B5200.position,matrix);
-            func_00282CC0(D_001B5200.position,D_001B5200.position,point);
-            angle=func_00283B98(F(rotation,8),state->object->rotation[2]);
+            transform_vector(D_001B5200.position,D_001B5200.position,matrix);
+            FastVecAdd(D_001B5200.position,D_001B5200.position,point);
+            angle=FastAddRotations(F(rotation,8),state->object->rotation[2]);
             func_00129178(temp);
             func_001292C0(temp,temp,F(key,0x10));
             func_00129368(temp,temp,F(rotation,4));
@@ -300,15 +300,15 @@ int func_002E9268(void)
                     int half=scene->streamFrame>>1;
                     object->frame=half;
                     object->nextFrame=half+1;
-                    func_0029F390(object);
-                    object->animTime=func_00283CE0(scene->streamFrame&1)*0.5f;
+                    update_moby_animation_state(object);
+                    object->animTime=IntToFloat(scene->streamFrame&1)*0.5f;
                     if (last && (scene->streamFrame&1)) object->animTime=1.0f;
                     p=object->keys;
-                    func_00282D30(temp,p+object->frame*16,1.0f-object->animTime);
-                    func_00282D30(temp+4,p+object->nextFrame*16,object->animTime);
-                    func_00282CC0(object->position,temp,temp+4);
-                    func_002830C0(object->position,object->position,matrix);
-                    func_00282CC0(object->position,object->position,point);
+                    FastVecScale(temp,p+object->frame*16,1.0f-object->animTime);
+                    FastVecScale(temp+4,p+object->nextFrame*16,object->animTime);
+                    FastVecAdd(object->position,temp,temp+4);
+                    transform_vector(object->position,object->position,matrix);
+                    FastVecAdd(object->position,object->position,point);
                     object->rotation[2]=state->object->rotation[2];
                     object->animId=255;
                     func_002A0F48(object);
@@ -331,8 +331,8 @@ int func_002E9268(void)
                         PlaybackMoby *p;
                         int j, cast;
                         object->mobyState=4;
-                        func_002E64A0(object);
-                        if (!D_001B2148 || H(D_001B2148,0xAA)==0xD54) func_0027CFD0(func_002ECB70,object);
+                        UpdateEquipmentPieces(object);
+                        if (!D_001B2148 || H(D_001B2148,0xAA)==0xD54) func_0027CFD0(render_environment_mapped_object,object);
                         func_0027CDC8(func_002E6B78,object);
                         p=0;
                         j=H(D_001A8C30,((D_001A7AF0[0]>>3)&2));
@@ -368,7 +368,7 @@ int func_002E9268(void)
                                     int color=((150-scene->frame)*255)/150;
                                     p->color=color|(color<<8)|(color<<16);
                                 } else {
-                                    int color=(int)(func_00283180(func_00283CE0((scene->frame&63)-32)*0.09817477f)*80.0f)+120;
+                                    int color=(int)(func_00283180(IntToFloat((scene->frame&63)-32)*0.09817477f)*80.0f)+120;
                                     p->color=color|(color<<8)|(color<<16);
                                 }
                             }
@@ -377,8 +377,8 @@ int func_002E9268(void)
                 }
             }
             }
-            func_002E4AC8();
-            func_002914B8();
+            UpdateSoundVoices();
+            UpdateLightingEnvironment();
             func_0029FFB8();
             func_002F52B8();
         }
@@ -390,12 +390,12 @@ int func_002E9268(void)
         func_0026F718();
         func_002B9390();
         if (state->frame==0) {
-            func_002B72E8(0);
+            music_Pause(0);
             func_002B7CE0(0);
             D_001A63A8.requestedFrame=0x138E;
             D_001A63A8.requestFlags=0;
             while (D_001A63A8.mode!=3 || D_001A63A8.streamPosition>=6000) {
-                func_002E4AC8();
+                UpdateSoundVoices();
                 func_001261F0(0);
             }
             func_002B6D28();
@@ -403,7 +403,7 @@ int func_002E9268(void)
             state->object->updateState=0;
             if (state->curveIndex>=0) {
                 char *global;
-                state->hero=func_0029EFD0(0);
+                state->hero=CreateMoby(0);
                 global=D_00189E20;
                 state->hero->drawDistance=0x1FF;
                 state->hero->opacity=255;
@@ -411,7 +411,7 @@ int func_002E9268(void)
                 state->hero->flags|=6;
                 state->hero->colorData=*(unsigned long long *)(P(global,0x2290)+0x38);
                 if (B(D_001CE4EA,0)!=255 && H(global,0x24FC)==0) {
-                    state->companion=func_0029EFD0(10);
+                    state->companion=CreateMoby(10);
                     state->companion->drawDistance=0x1FF;
                     state->companion->opacity=255;
                     state->companion->updateState=0;
@@ -419,7 +419,7 @@ int func_002E9268(void)
                     state->companion->colorData=*(unsigned long long *)(P(global,0x2290)+0x38);
                 } else state->companion=0;
             }
-            func_00335438(D_001B5200.position,D_001B5200.rotation,1,0,0);
+            SetCamera5Pose(D_001B5200.position,D_001B5200.rotation,1,0,0);
             state->cameraBlend=0;
             state->cameraVelocity=0;
             if (state->curveIndex>=0) {
@@ -439,7 +439,7 @@ int func_002E9268(void)
                             char *next=curve+(pathIndex+1)*16;
                             factor=func_00283248(F(next,0x10)-F(point,0x10),F(next,0x14)-F(point,0x14));
                         }
-                        F(point,0x1C)=func_00283BE0(angle,factor);
+                        F(point,0x1C)=fast_subtract_rotations(angle,factor);
                         if(maximum<func_00282C48(F(point,0x1C))) maximum=func_00282C48(F(point,0x1C));
                     }
                 }
@@ -453,7 +453,7 @@ int func_002E9268(void)
                     char *last=curve+(W(curve,0)-1)*16;
                     factor=func_00283248(F(curve,0x10)-F(last,0x10),F(curve,0x14)-F(last,0x14));
                 }
-                angle=func_00283BE0(factor,angle);
+                angle=fast_subtract_rotations(factor,angle);
                 factor=0.22689283f/maximum;
                 {
                     char *last=curve+(W(curve,0)-1)*16;
@@ -467,7 +467,7 @@ int func_002E9268(void)
                     int rampIndex;
                     for(rampIndex=0;rampIndex<20;rampIndex++) F(curve+rampIndex*16,0x1C)=F(curve+rampIndex*16,0x1C)*0.05f*rampIndex;
                 }
-                state->length=func_00282E48(curve+0x10,curve+0x20);
+                state->length=fast_vec_dist(curve+0x10,curve+0x20);
                 state->progress=0;
                 state->speed=0;
                 /* These copies do not overlap the state pointer/length fields. */
@@ -475,7 +475,7 @@ int func_002E9268(void)
                 qcopy_nc(state->endPosition,curve+0x10);
                 qcopy_nc(state->startRotation,state->object->rotation);
                 state->endRotation[0]=F(curve,0x1C);
-                angle=func_00282E80(curve+0x20,curve+0x10);
+                angle=vec_distance_xy(curve+0x20,curve+0x10);
                 state->endRotation[1]=func_00283248(angle,F(curve,0x18)-F(curve,0x28));
                 state->endRotation[2]=func_00283248(F(curve,0x20)-F(curve,0x10),F(curve,0x24)-F(curve,0x14));
             }
@@ -483,14 +483,14 @@ int func_002E9268(void)
         if (state->cameraStart>=0 && state->cameraEnd>=0) {
             float angle;
             func_002AA548(&state->cameraBlend,&state->cameraVelocity,1.0f,0.00018500001f,0.00018500001f,0.008333334f);
-            func_00282D08(matrix,D_001B1C4C[0]+state->cameraStart*128+0x30,D_001B1C4C[0]+state->cameraEnd*128+0x30,state->cameraBlend);
+            lerp_vector(matrix,D_001B1C4C[0]+state->cameraStart*128+0x30,D_001B1C4C[0]+state->cameraEnd*128+0x30,state->cameraBlend);
             func_00282C88(matrix+4);
-            angle=func_00283BE0(F(D_001B1C4C[0]+state->cameraEnd*128,0x74),F(D_001B1C4C[0]+state->cameraStart*128,0x74));
+            angle=fast_subtract_rotations(F(D_001B1C4C[0]+state->cameraEnd*128,0x74),F(D_001B1C4C[0]+state->cameraStart*128,0x74));
             matrix[5]=angle*state->cameraBlend;
-            matrix[5]=func_00283B98(F(D_001B1C4C[0]+state->cameraStart*128,0x74),matrix[5]);
-            angle=func_00283BE0(F(D_001B1C4C[0]+state->cameraEnd*128,0x78),F(D_001B1C4C[0]+state->cameraStart*128,0x78));
+            matrix[5]=FastAddRotations(F(D_001B1C4C[0]+state->cameraStart*128,0x74),matrix[5]);
+            angle=fast_subtract_rotations(F(D_001B1C4C[0]+state->cameraEnd*128,0x78),F(D_001B1C4C[0]+state->cameraStart*128,0x78));
             matrix[6]=angle*state->cameraBlend;
-            matrix[6]=func_00283B98(F(D_001B1C4C[0]+state->cameraStart*128,0x78),matrix[6]);
+            matrix[6]=FastAddRotations(F(D_001B1C4C[0]+state->cameraStart*128,0x78),matrix[6]);
             func_00335370(matrix);
             func_003353C8(matrix+4);
         }
@@ -500,18 +500,18 @@ int func_002E9268(void)
             int *table;
             if (state->frame<120) {
                 float angle, factor, blend;
-                angle=func_00283CE0(state->frame);
-                factor=func_00283CE0(90);
+                angle=IntToFloat(state->frame);
+                factor=IntToFloat(90);
                 blend=(1.0f-func_00283180(angle*(3.1415927f/factor)))*0.5f;
                 if(state->frame>=90) blend=1.0f;
-                func_00282D08(state->object->position,state->startPosition,state->endPosition,blend);
+                lerp_vector(state->object->position,state->startPosition,state->endPosition,blend);
                 state->object->rotation[0]=state->endRotation[0]*blend;
-                angle=func_00283BE0(state->endRotation[1],state->startRotation[1]);
-                state->object->rotation[1]=func_00283B98(state->startRotation[1],angle*blend);
-                angle=func_00283BE0(state->endRotation[2],state->startRotation[2]);
-                state->object->rotation[2]=func_00283B98(state->startRotation[2],angle*blend);
-                func_00283410(matrix,state->object->rotation);
-                func_00283678(state->object->matrix,matrix);
+                angle=fast_subtract_rotations(state->endRotation[1],state->startRotation[1]);
+                state->object->rotation[1]=FastAddRotations(state->startRotation[1],angle*blend);
+                angle=fast_subtract_rotations(state->endRotation[2],state->startRotation[2]);
+                state->object->rotation[2]=FastAddRotations(state->startRotation[2],angle*blend);
+                euler_to_matrix(matrix,state->object->rotation);
+                copy_matrix3x4(state->object->matrix,matrix);
                 func_002A10E8(state->object);
                 if(D_001B15A0>0.0f) {
                     D_001B15A0-=0.125f;
@@ -539,14 +539,14 @@ int func_002E9268(void)
                 else {
                     func_002C9828(curve,1,state->object->position,state->object->rotation,0,state->progress);
                     state->object->rotation[0]=state->object->rotation[3];
-                    func_00283410(matrix,state->object->rotation);
-                    func_00283678(state->object->matrix,matrix);
+                    euler_to_matrix(matrix,state->object->rotation);
+                    copy_matrix3x4(state->object->matrix,matrix);
                     func_002A10E8(state->object);
                 }
             }
             qcopy_nc(state->hero->rotation,state->object->rotation);
-            func_00283098(state->hero->position,D_001AC1B0,state->object->matrix);
-            func_00282CC0(state->hero->position,state->hero->position,state->object->position);
+            matrix_mul_vec3(state->hero->position,D_001AC1B0,state->object->matrix);
+            FastVecAdd(state->hero->position,state->hero->position,state->object->position);
             func_002A0F48(state->hero);
             p=state->hero->classData;
             bones=(PlaybackBones *)P(p,0x48);
@@ -556,19 +556,19 @@ int func_002E9268(void)
             state->hero->previousJoints=D_001B4580;
             if(state->companion) {
                 qcopy_nc(state->companion->rotation,state->object->rotation);
-                func_00283098(state->companion->position,D_001AC1C0,state->object->matrix);
-                func_00282CC0(state->companion->position,state->companion->position,state->object->position);
+                matrix_mul_vec3(state->companion->position,D_001AC1C0,state->object->matrix);
+                FastVecAdd(state->companion->position,state->companion->position,state->object->position);
                 func_002A0F48(state->companion);
             }
         } else {
             D_001A8B84=1;
             D_001B15A0=1.0f;
         }
-        func_002E64A0(state->object);
+        UpdateEquipmentPieces(state->object);
         func_0027CFD0(func_002E7B48,state->object);
         func_00272368();
-        func_002E4AC8();
-        func_002914B8();
+        UpdateSoundVoices();
+        UpdateLightingEnvironment();
         func_0029FFB8();
         func_002F52B8();
         break;

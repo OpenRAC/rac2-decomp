@@ -50,7 +50,7 @@ void func_L04_003ED740(char *o)
                     func_002E5DA0(0, 0, a, 0xCE6);
                 *(u8 *)(a + 0x20) = 2;
                 *(u8 *)(b + 0x20) = 2;
-                if (func_002ACBC8(D_00189EA0, *(int *)(p + 0x70)) &&
+                if (IsPointInCuboid(D_00189EA0, *(int *)(p + 0x70)) &&
                     !(D_0019B2E8[*(u8 *)(o + 0xB0) + D_001A79F0 * 16] & 128)) {
                     func_L00_00429020(*(int *)(p + 0x10));
                     *(u8 *)(o + 0x20) = 2;
@@ -75,7 +75,7 @@ void func_L04_003ED740(char *o)
                 }
             }
         } else if (*(int *)(p + 0x18) == 0 &&
-                   func_002ACBC8(D_00189EA0, *(int *)(p + 0x70)) &&
+                   IsPointInCuboid(D_00189EA0, *(int *)(p + 0x70)) &&
                    !(D_0019B2E8[*(u8 *)(o + 0xB0) + D_001A79F0 * 16] & 128)) {
             func_L00_00429020(*(int *)(p + 0x10));
             *(u8 *)(o + 0x20) = 2;

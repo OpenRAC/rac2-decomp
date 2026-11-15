@@ -58,8 +58,8 @@ void func_L18_0042F308(u8 *a, int turn, int tilt)
                           D_L18_001B143C * 0.00029088824f,
                           D_L18_001B1440 * 0.00029088824f);
     } else {
-        func_002AA2E8(a + 0xF0, 0.0f, 0.052359886f);
-        func_002AA2E8(a + 0xF4, 0.0f, 0.052359886f);
+        ApproachValue(a + 0xF0, 0.0f, 0.052359886f);
+        ApproachValue(a + 0xF4, 0.0f, 0.052359886f);
     }
     func_002AA548(a + 0x10, s + 0x80, F(s, 0x70),
                   D_L18_001B1458 * 0.00027777778f,
@@ -73,7 +73,7 @@ void func_L18_0042F308(u8 *a, int turn, int tilt)
                   D_L18_001B1458 * 0.00027777778f,
                   D_L18_001B145C * 0.00027777778f,
                   D_L18_001B1460 * 0.0166666675f);
-    if (func_00282E80(a + 0x10, s + 0x70) > 1.0f) {
+    if (vec_distance_xy(a + 0x10, s + 0x70) > 1.0f) {
         u8 *heading = a + 0xF8;
         float angle = func_00283248(F(s, 0x70) - F(a, 0x10),
                                     F(s, 0x74) - F(a, 0x14));
@@ -89,16 +89,16 @@ void func_L18_0042F308(u8 *a, int turn, int tilt)
         for (i = 0; i < 6; i++, offset += 16, ids++) {
             if (*ids != -1) {
                 u8 *e = D_L18_001B281C + (*ids << 8);
-                func_00283098(e + 0x10, offset, a + 0xC0);
-                func_00282CC0(e + 0x10, e + 0x10, a + 0x10);
+                matrix_mul_vec3(e + 0x10, offset, a + 0xC0);
+                FastVecAdd(e + 0x10, e + 0x10, a + 0x10);
                 if (i < 3) {
                     F(e, 0xF0) = F(a, 0xF4);
                     F(e, 0xF4) = -F(a, 0xF0);
-                    F(e, 0xF8) = func_00283B98(F(a, 0xF8), D_L18_001B1468[i]);
+                    F(e, 0xF8) = FastAddRotations(F(a, 0xF8), D_L18_001B1468[i]);
                 } else {
                     F(e, 0xF0) = -F(a, 0xF4);
                     F(e, 0xF4) = F(a, 0xF0);
-                    F(e, 0xF8) = func_00283B98(F(a, 0xF8), D_L18_001B1468[i]);
+                    F(e, 0xF8) = FastAddRotations(F(a, 0xF8), D_L18_001B1468[i]);
                 }
             }
         }

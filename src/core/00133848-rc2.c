@@ -34,5 +34,5 @@ void func_00133848(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
     sp[3] = arg3;
     sp[4] = arg4;
     sp[5] = arg5;
-    func_00132C48(0x3B, 0x18, sp);
+    snd_SendCommandSync(0x3B, 0x18, sp);
 }

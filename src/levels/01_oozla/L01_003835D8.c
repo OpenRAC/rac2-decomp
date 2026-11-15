@@ -67,7 +67,7 @@ void func_L01_003A6350(u8 *arg0) {
             p.f1A = *(u16 *)((u8 *)r + 0x2A);
             p.f1C = *(f32 *)((u8 *)r + 0x2C) * *(f32 *)(s0 + 0x58);
             p.f20 = *(u32 *)((u8 *)r + 0x30);
-            func_002A8E20(*(u32 *)(s0 + 0x50), &p);
+            QueueMobyImpact(*(u32 *)(s0 + 0x50), &p);
         }
         arg0[0xA8] = 0xFF;
     }
@@ -107,7 +107,7 @@ void func_L01_003B45D8(void *arg0, void **arg1, int *arg2) {
     int count;
     void *p;
 
-    func_00115484(arg1, 0, 4);
+    memset(arg1, 0, 4);
     *arg2 = 0;
     count = func_00277F48(3.5f, (char *)arg0 + 0x10, 1, (char *)arg0, 0);
     if (count <= 0)
@@ -204,7 +204,7 @@ void func_L01_003B50C8(char *object, int count, float height)
         position[0] = func_00283180(angle) * radius;
         position[1] = func_00283198(angle) * radius;
         position[2] = 0.0f;
-        func_00282CC0(position, position, object + 0x10);
+        FastVecAdd(position, position, object + 0x10);
         position[2] = height;
         func_L01_0032EF38(position, 0x38002028, 0x2020, first, second, life);
     }
@@ -240,7 +240,7 @@ extern char D_00189EA0[];
 extern float func_00282E80(void *, void *);
 
 /* Of the (up to four) positions whose indices are listed at the state's +0x310, copies the one
-   func_00282E80 rates highest against D_00189EA0 to OUT (its rating at +0xC), then stores
+   vec_distance_xy rates highest against D_00189EA0 to OUT (its rating at +0xC), then stores
    func_002A89A8's value for it at +0x8. A position is the 16-byte record at +0x30 of the
    index's 0x80-byte entry in the D_L01_001B264C table. */
 void func_L01_003B57A8(u8 *arg0, u8 *out) {
@@ -253,7 +253,7 @@ void func_L01_003B57A8(u8 *arg0, u8 *out) {
     while (--count >= 0) {
         if (*p != -1) {
             qcopy(pos, D_L01_001B264C + *p * 0x80 + 0x30);
-            f = func_00282E80(pos, D_00189EA0);
+            f = vec_distance_xy(pos, D_00189EA0);
             if (*(f32 *)(out + 0xC) < f) {
                 qcopy(out, pos);
                 *(f32 *)(out + 0xC) = f;

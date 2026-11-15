@@ -99,43 +99,43 @@ int func_L17_0032C070(float *origin, float *target, void *out, void *object, flo
     Vec left, right, farLeft, farRight, start;
     float heading, angle, dleft, dright, finalDistance;
     heading = func_00283248(target[0] - origin[0], target[1] - origin[1]);
-    angle = func_00283B98(heading, 1.5707965f);
+    angle = FastAddRotations(heading, 1.5707965f);
     left.f[0] = func_00283180(angle) * radius;
     left.f[1] = func_00283198(angle) * radius;
     left.f[2] = 0;
-    func_00282CC0((char *)&left, (char *)&left, (char *)origin);
-    angle = func_00283BE0(heading, 1.5707965f);
+    FastVecAdd((char *)&left, (char *)&left, (char *)origin);
+    angle = fast_subtract_rotations(heading, 1.5707965f);
     right.f[0] = func_00283180(angle) * radius;
     right.f[1] = func_00283198(angle) * radius;
     right.f[2] = 0;
-    func_00282CC0((char *)&right, (char *)&right, (char *)origin);
+    FastVecAdd((char *)&right, (char *)&right, (char *)origin);
     start.q = *(Quad *)origin;
     func_L02_0032EF10(&start, &left, &left, object, height);
     start.q = *(Quad *)origin;
     func_L02_0032EF10(&start, &right, &right, object, height);
-    dleft = func_00282E80(origin, &left);
-    dright = func_00282E80(origin, &right);
+    dleft = vec_distance_xy(origin, &left);
+    dright = vec_distance_xy(origin, &right);
     if (radius < dleft + dright) {
         if (func_002A7878(0, dleft + dright) < dleft) qcopy(out, &left);
         else qcopy(out, &right);
         return 1;
     }
-    angle = func_00283B98(heading, 0.78539824f);
+    angle = FastAddRotations(heading, 0.78539824f);
     farLeft.f[0] = func_00283180(angle) * 12.0f;
     farLeft.f[1] = func_00283198(angle) * 12.0f;
     farLeft.f[2] = 0;
-    func_00282CC0((char *)&farLeft, (char *)&farLeft, (char *)origin);
-    angle = func_00283BE0(heading, 0.78539824f);
+    FastVecAdd((char *)&farLeft, (char *)&farLeft, (char *)origin);
+    angle = fast_subtract_rotations(heading, 0.78539824f);
     farRight.f[0] = func_00283180(angle) * 12.0f;
     farRight.f[1] = func_00283198(angle) * 12.0f;
     farRight.f[2] = 0;
-    func_00282CC0((char *)&farRight, (char *)&farRight, (char *)origin);
+    FastVecAdd((char *)&farRight, (char *)&farRight, (char *)origin);
     start.q = *(Quad *)origin;
     func_L02_0032EF10(&start, &farLeft, &farLeft, object, height);
     start.q = *(Quad *)origin;
     func_L02_0032EF10(&start, &farRight, &farRight, object, height);
-    finalDistance = func_00282E80(origin, &farLeft);
-    dright = func_00282E80(origin, &farRight);
+    finalDistance = vec_distance_xy(origin, &farLeft);
+    dright = vec_distance_xy(origin, &farRight);
     if (func_002A7878(0, finalDistance + dright) < finalDistance) qcopy(out, &farLeft);
     else qcopy(out, &farRight);
     return 0;
@@ -201,25 +201,25 @@ void func_L17_00385DE8(unsigned char *self) {
             obj = D_L17_001BD8C0.actor;
             if (*(short *)(obj + 0xAA) == 0x125E) {
                 func_0029FCC0(obj, 0, &point);
-                func_00282F20(&velocity, obj + 0xE0, -0.05f);
+                vec_scale_to_length(&velocity, obj + 0xE0, -0.05f);
                 amount = func_002A77E0(16);
                 if (func_002A77E0(2))
                     amount = -amount;
-                first = func_002BDCE8(&point, amount, 0.1f, 1.0f, &velocity, 0.9f, 0x7F204080, 100000.0f, 0);
+                first = SpawnSpinningSparkParticle(&point, amount, 0.1f, 1.0f, &velocity, 0.9f, 0x7F204080, 100000.0f, 0);
                 if (first) {
                     first->life = 16;
-                    first->size = func_00283CF0(4.0f) + 64;
+                    first->size = FloatToInt(4.0f) + 64;
                     detail = &first->tail;
                     detail->opacity = 127;
                     detail->state = state;
                     detail->age = (unsigned char)first->life;
                 }
                 amount = 16;
-                second = func_002BDCE8(&point, amount, 0.05f, 1.0f, &velocity, 0.97f, 0x7FFFFFFF, 60000.0f, 0);
+                second = SpawnSpinningSparkParticle(&point, amount, 0.05f, 1.0f, &velocity, 0.97f, 0x7FFFFFFF, 60000.0f, 0);
                 /* Retail tests the first spark again before writing the second. */
                 if (first) {
                     detail = &second->tail;
-                    second->size = func_00283CF0(4.0f) + 64;
+                    second->size = FloatToInt(4.0f) + 64;
                     second->life = amount;
                     second->color = func_002A77E0(255);
                     detail->state = state;
@@ -235,24 +235,24 @@ void func_L17_00385DE8(unsigned char *self) {
             obj = D_L17_001BD8C0.actor;
             if (*(short *)(obj + 0xAA) == 0x125E) {
                 func_0029FCC0(obj, 0, &point);
-                func_00282F20(&velocity, obj + 0xE0, -0.05f);
+                vec_scale_to_length(&velocity, obj + 0xE0, -0.05f);
                 amount = func_002A77E0(16);
                 if (func_002A77E0(2))
                     amount = -amount;
-                first = func_002BDCE8(&point, amount, 0.1f, 1.0f, &velocity, 0.9f, 0x7F204080, 100000.0f, 0);
+                first = SpawnSpinningSparkParticle(&point, amount, 0.1f, 1.0f, &velocity, 0.9f, 0x7F204080, 100000.0f, 0);
                 if (first) {
                     first->life = 16;
-                    first->size = func_00283CF0(4.0f) + 64;
+                    first->size = FloatToInt(4.0f) + 64;
                     detail = &first->tail;
                     detail->opacity = 127;
                     detail->state = state;
                     detail->age = (unsigned char)first->life;
                 }
                 amount = 16;
-                second = func_002BDCE8(&point, amount, 0.05f, 1.0f, &velocity, 0.97f, 0x7FFFFFFF, 60000.0f, 0);
+                second = SpawnSpinningSparkParticle(&point, amount, 0.05f, 1.0f, &velocity, 0.97f, 0x7FFFFFFF, 60000.0f, 0);
                 if (first) {
                     detail = &second->tail;
-                    second->size = func_00283CF0(4.0f) + 64;
+                    second->size = FloatToInt(4.0f) + 64;
                     second->life = amount;
                     second->color = func_002A77E0(255);
                     detail->state = state;
@@ -288,7 +288,7 @@ void func_L17_00390CE0(unsigned char *obj) {
     frame.normal.q = 0;
     frame.normal.f[2] = 1.0f;
     qcopy(&frame.old, position);
-    func_00282CC0(position, ctx, position);
+    FastVecAdd(position, ctx, position);
     func_002FEE70(*(int *)(ctx + 0x1C), ctx, 0);
     func_00300190(position, position);
     func_00300248(ctx, ctx);
@@ -308,11 +308,11 @@ void func_L17_00390CE0(unsigned char *obj) {
     frame.packet.kind = 2;
     frame.packet.class_id = *(unsigned short *)(obj + 0xAA);
     frame.packet.active = 1;
-    if (func_002761F8(&frame.old, position, 0x10, obj, &frame.packet)) {
-        if (!func_00278E78() && *(float *)(ctx + 8) < 0.0f) {
+    if (CollLine(&frame.old, position, 0x10, obj, &frame.packet)) {
+        if (!GetCollHitMaterial() && *(float *)(ctx + 8) < 0.0f) {
             char *effect;
             Vec *spread;
-            func_002FD1B8(D_L17_001B33B0, D_L17_001B33B8, 1,
+            RippleDisturb(D_L17_001B33B0, D_L17_001B33B8, 1,
                 *(float *)(obj + 0x10), *(float *)(obj + 0x14), 0.5f, -0.35f);
             *(int *)(ctx + 0x14) = 1;
             func_00282C88(ctx);
@@ -353,21 +353,21 @@ void func_L17_00390CE0(unsigned char *obj) {
                 obj[0xBC] = 1;
                 qcopy(obj + 0x10, &reread->point);
                 func_00283028(&frame.velocity, ctx, &reread->normal);
-                func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-                func_00282F20(&frame.normal, &reread->normal, 1.0f);
+                vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+                vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
             } else {
                 if (collision->count < 1)
                     goto finish;
                 obj[0xBC] = 1;
                 qcopy(obj + 0x10, &collision->point);
                 func_00283028(&frame.velocity, ctx, &collision->normal);
-                func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-                func_00282F20(&frame.normal, &collision->normal, 1.0f);
+                vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+                vec_scale_to_length(&frame.normal, &collision->normal, 1.0f);
             }
         }
     } else if (func_00282948(ctx + 0x18)) {
         obj[0xBC] = 1;
-        func_00282CC0((char *)&frame.velocity, (char *)&frame.velocity, ctx);
+        FastVecAdd((char *)&frame.velocity, (char *)&frame.velocity, ctx);
     }
 finish:
     if (obj[0xBC]) {
@@ -401,9 +401,9 @@ void func_L17_003910F8(char *obj) {
     frame.normal.q = 0;
     frame.normal.f[2] = 1.0f;
     qcopy(&frame.old, position);
-    func_00282CC0(position, position, ctx);
+    FastVecAdd(position, position, ctx);
     func_002AFFD8(position, &frame.surface, 0);
-    func_00282D30(&frame.surface, &frame.surface, 0.0003055556f);
+    FastVecScale(&frame.surface, &frame.surface, 0.0003055556f);
     func_L00_0038F3D8(obj);
     frame.packet.moby = obj;
     frame.packet.flags = 0x830000;
@@ -419,7 +419,7 @@ void func_L17_003910F8(char *obj) {
     frame.packet.vector.f[2] = 1.0f;
     frame.packet.active = 1;
     (*(int *)(ctx + 0x14))++;
-    if (func_002761F8(&frame.old, position, 0x10, obj, &frame.packet)) {
+    if (CollLine(&frame.old, position, 0x10, obj, &frame.packet)) {
         collision = &D_L17_001C0000;
         hit = collision->hit;
         if (hit) {
@@ -438,8 +438,8 @@ void func_L17_003910F8(char *obj) {
                 qcopy(dest, source);
             }
             func_00283028(&frame.velocity, ctx, &reread->normal);
-            func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-            func_00282F20(&frame.normal, &reread->normal, 1.0f);
+            vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+            vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
         } else {
             collision = &D_L17_001C0000;
             if (collision->count <= 0)
@@ -447,12 +447,12 @@ void func_L17_003910F8(char *obj) {
             obj[0xBC] = 1;
             qcopy(position, &collision->point);
             func_00283028(&frame.velocity, ctx, &collision->normal);
-            func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-            func_00282F20(&frame.normal, &collision->normal, 1.0f);
+            vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+            vec_scale_to_length(&frame.normal, &collision->normal, 1.0f);
         }
     } else if (func_00282948(ctx + 0x18)) {
         obj[0xBC] = 1;
-        func_00282CC0((char *)&frame.velocity, (char *)&frame.velocity, ctx);
+        FastVecAdd((char *)&frame.velocity, (char *)&frame.velocity, ctx);
     }
 finish:
     if (*(unsigned char *)(obj + 0xBC)) {
@@ -504,7 +504,7 @@ void func_L17_003C3250(char *a2)
     s2 = D_L17_00296F80;
     s0 = v1 + 0x10;
     for (i = 6; i >= 0; i--) {
-        func_00283098(s0, s2, s3);
+        matrix_mul_vec3(s0, s2, s3);
         s2 += 0x10;
         func_2EEEB8(s0, s0, s4);
         s0 += 0x10;
@@ -596,7 +596,7 @@ void func_L17_003C5E78(char *a2)
     s2 = D_L17_00296FF0;
     s0 = v1 + 0x10;
     for (i = 6; i >= 0; i--) {
-        func_00283098(s0, s2, s3);
+        matrix_mul_vec3(s0, s2, s3);
         s2 += 0x10;
         func_2EEEB8(s0, s0, s4);
         s0 += 0x10;

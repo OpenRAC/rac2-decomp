@@ -54,11 +54,11 @@ void func_L00_002A70F8(GlowMoby *object) {
     int kind, emit;
     float wave, denominator, pulse;
     object->flags |= 0x10;
-    denominator = func_00283CE0(100);
+    denominator = IntToFloat(100);
     wave = func_00283198((((float)(D_L00_001B19C8[0] % period) / denominator) * 2.0f) * 3.1415927410125732f + -3.1415927410125732f);
-    red = func_00283CF0(wave * 24.0f);
-    green = func_00283CF0(wave * 52.0f);
-    blue = func_00283CF0(wave * 24.0f);
+    red = FloatToInt(wave * 24.0f);
+    green = FloatToInt(wave * 52.0f);
+    blue = FloatToInt(wave * 24.0f);
     middle = (green + 0xA2) << 8;
     color = (blue + 0x4C) << 16;
     color |= 0x80000000U;
@@ -77,17 +77,17 @@ void func_L00_002A70F8(GlowMoby *object) {
             emit = 0;
         if (emit) {
             func_0029FCC0((char *)object, 7, (char *)&position);
-            D_00189E20.phase = func_00283B98(D_00189E20.phase, 0.06690429896116257f);
+            D_00189E20.phase = FastAddRotations(D_00189E20.phase, 0.06690429896116257f);
             pulse = func_00283198(D_00189E20.phase);
-            alpha = (unsigned int)func_00283CF0((pulse * 0.5f + 0.5f) * 13.0f) + 23U;
+            alpha = (unsigned int)FloatToInt((pulse * 0.5f + 0.5f) * 13.0f) + 23U;
             alpha <<= 24;
             func_L00_002A7DE8(&position, alpha | 0xC0U, 0.04f, 0.07f);
         } else object->color = 0x80505050U;
     } else if (!(D_001A79F0 == 3 && D_L00_001BCAC0.state == 7 && D_L00_001BCAC0.timer > 0x470)) {
         func_0029FCC0((char *)object, 1, (char *)&position);
-        D_00189E20.phase = func_00283B98(D_00189E20.phase, 0.06690429896116257f);
+        D_00189E20.phase = FastAddRotations(D_00189E20.phase, 0.06690429896116257f);
         pulse = func_00283198(D_00189E20.phase);
-        alpha = (unsigned int)func_00283CF0((pulse * 0.5f + 0.5f) * 13.0f) + 23U;
+        alpha = (unsigned int)FloatToInt((pulse * 0.5f + 0.5f) * 13.0f) + 23U;
         alpha <<= 24;
         func_L00_002A7DE8(&position, alpha | 0xC0U, 0.04f, 0.07f);
     }
@@ -98,10 +98,10 @@ void func_L00_002A70F8(GlowMoby *object) {
         if (record->initialized == 0) {
             float scale;
             if (kind == 0x27D) {
-                func_0029F978(object, 1, record);
+                AttachManipulator(object, 1, record);
                 scale = D_L00_001A7CF8;
             } else {
-                func_0029F978(object, kind == 0x57 ? 5 : 2, record);
+                AttachManipulator(object, kind == 0x57 ? 5 : 2, record);
                 scale = D_L00_001A7CF8_gp;
             }
             record->scale[0] = scale;

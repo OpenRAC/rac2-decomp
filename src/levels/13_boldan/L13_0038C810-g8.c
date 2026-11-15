@@ -37,16 +37,16 @@ void func_L13_0038C810(char *obj)
         *(u8 *)(obj + 0xA8) = 0xFF;
         return;
     case 2:
-        func_002E5CF8(0, 0, obj);
+        PlayMobySound(0, 0, obj);
         func_L00_00326110(obj, 4, 0.0f);
         pos = obj + 0xC0;
         rot = obj + 0xF0;
-        func_0032C700(obj + 0x10, 0, 0x19, 0x14, 0.5f, 20.0f, 0x14, 0x14, 0x2D, 1, 1, 1, 0, 0);
+        SpawnExplosion(obj + 0x10, 0, 0x19, 0x14, 0.5f, 20.0f, 0x14, 0x14, 0x2D, 1, 1, 1, 0, 0);
         i = 3;
         do {
             i--;
-            *(float *)(obj + 0xF8) = func_00283B98(*(float *)(obj + 0xF8), 1.5707964f);
-            func_002833F0(pos, rot);
+            *(float *)(obj + 0xF8) = FastAddRotations(*(float *)(obj + 0xF8), 1.5707964f);
+            euler_rotation_basis(pos, rot);
             func_002B0A68(obj, 0xF, &D_L13_001A8F20, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
             *(short *)(obj + 0x7C) = 0;
         } while (i >= 0);

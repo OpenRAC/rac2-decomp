@@ -211,16 +211,16 @@ void func_L00_003DF710(char *object)
 
     switch (*(unsigned char *)(object + 0x20)) {
     case 0:
-        *(float *)(data + 0x18) = func_00283B98(*(float *)(data + 0x18), *(float *)(data + 0x1c));
+        *(float *)(data + 0x18) = FastAddRotations(*(float *)(data + 0x18), *(float *)(data + 0x1c));
         func_00282C88(scale);
         scale[1] = *(float *)(data + 0x18) * 0.25f;
         scale[0] = *(float *)(data + 0x18) * 0.5f;
         scale[2] = *(float *)(data + 0x18);
-        func_002833F0(object + 0xc0, scale);
-        func_00282CC0(next, object + 0x10, data);
-        func_002A8C00(query, *(int *)(data + 0x10), 1, data, *(float *)(data + 0x14));
+        euler_rotation_basis(object + 0xc0, scale);
+        FastVecAdd(next, object + 0x10, data);
+        make_hit_descriptor(query, *(int *)(data + 0x10), 1, data, *(float *)(data + 0x14));
         *(unsigned short *)(query + 0x1a) = *(unsigned short *)(object + 0xaa);
-        if (func_002761F8(object + 0x10, next, 0, object, query) || func_00277258(object + 0x10, 0, object, 0.3f)) {
+        if (CollLine(object + 0x10, next, 0, object, query) || func_00277258(object + 0x10, 0, object, 0.3f)) {
             if (D_L00_001BF218) {
                 if (D_L00_001BF218 != *(int *)(data + 0x10)) {
                     func_002A8C28(*(int *)(data + 0x10), 0.3f, object + 0x10, 0x10001, *(float *)(data + 0x14), 0, 0, 1, 0);
@@ -234,11 +234,11 @@ void func_L00_003DF710(char *object)
             }
         }
         qcopy(object + 0x10, next);
-        func_00282D30(velocity, data, -0.5f);
+        FastVecScale(velocity, data, -0.5f);
         func_00282C88(zero);
         if (*(int *)(data + 0x24)) {
             func_002AD330(object, *(int *)(data + 0x24), object + 0x10, pos);
-            func_00282CC0(velocity, velocity, pos);
+            FastVecAdd(velocity, velocity, pos);
         }
         size0 = func_002A7878(1.0f, 1.5f) * (*(float *)(data + 0x20) * 210000.0f);
         spread = func_002A7878(0.2f, 0.4f);
@@ -265,7 +265,7 @@ void func_L00_003DF710(char *object)
         }
         break;
     case 1:
-        func_002ABBB8(object, D_L00_001A8F20, object + 0x10, 0.0f, 0.0f, 10, 0, 16, 0.0f, 0.0f, 9.0f, 1.0f, -1,
+        SpawnExplosionEffects(object, D_L00_001A8F20, object + 0x10, 0.0f, 0.0f, 10, 0, 16, 0.0f, 0.0f, 9.0f, 1.0f, -1,
                       15.0f, 0, 9, -1, 0, 0x810001);
         func_0029F338(object);
         return;

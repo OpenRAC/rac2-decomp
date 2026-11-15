@@ -50,15 +50,15 @@ void func_L03_003E21B0(u8 *p) {
             func_002A7750(p, 0, -1);
         return;
     }
-    func_002AA2E8(&D_001B2464, 0.0f, 0.16666667f);
+    ApproachValue(&D_001B2464, 0.0f, 0.16666667f);
     D_L03_001B2768 = 1;
     switch (p[0x20]) {
     case 0:
         for (i = 0; i < 52; i++)
             func_002E59F8(i);
-        func_L03_003E26C8(p);
+        InitializePathPuzzle(p);
         *(u16 *)(p + 0x34) |= 0x100;
-        func_L03_003E3018(p);
+        ComputePathPuzzleTurn(p);
         func_002A7750(p, D_001A79F0 == 11 ? 1 : 3, -1);
         break;
     case 1:
@@ -77,8 +77,8 @@ void func_L03_003E21B0(u8 *p) {
         }
         if (func_L03_003E3800(p)) {
             path->active = 1;
-            func_L03_003E2EC8(p);
-            func_002E5CF8(4, 0, p);
+            UpdateChoicePath(p);
+            PlayMobySound(4, 0, p);
             func_002A7750(p, 3, -1);
         }
         break;
@@ -97,13 +97,13 @@ void func_L03_003E21B0(u8 *p) {
             int choice = path->choices[0];
             choice ^= 255;
             if (choice == 0) {
-                func_002E5CF8(0, 0, p);
+                PlayMobySound(0, 0, p);
             } else {
-                h = func_002E5CF8(1, 0, p);
+                h = PlayMobySound(1, 0, p);
                 if (h != -1) {
-                    f = func_00283CE0(path->length);
-                    f /= func_00283CE0(D_L03_001B0B50);
-                    func_002E5F40(h, func_00283CF0(f * 1024.0f) + 1024);
+                    f = IntToFloat(path->length);
+                    f /= IntToFloat(D_L03_001B0B50);
+                    func_002E5F40(h, FloatToInt(f * 1024.0f) + 1024);
                 }
             }
         }
@@ -114,7 +114,7 @@ void func_L03_003E21B0(u8 *p) {
                 path->timer = D_L03_001B0B58;
         }
         if (path->length == D_L03_001B0B50) {
-            func_002E5CF8(5, 0, p);
+            PlayMobySound(5, 0, p);
             func_002A7750(p, 5, -1);
         } else {
             func_002A7750(p, 2, -1);
@@ -124,8 +124,8 @@ void func_L03_003E21B0(u8 *p) {
         if (path->f56) {
             if (path->last != path->current) {
                 *(u16 *)(q + 0x52) = *(u16 *)(q + 0x5C);
-                func_L03_003E2EC8(p);
-                func_002E5CF8(2, 0, p);
+                UpdateChoicePath(p);
+                PlayMobySound(2, 0, p);
             } else {
                 path->active = 0;
                 path->maximumLength = 0;
@@ -157,11 +157,11 @@ void func_L03_003E21B0(u8 *p) {
         return;
     }
     if (p[0x20] != 5 && path->active)
-        func_00282978(&path->timer);
+        FastDecTimer(&path->timer);
     if (path->active && path->timer) {
         u8 *r = D_00188660 + *(int *)(q + 0x7C) * 112;
         if (*(u8 **)(r + 0x88) != p || !r[0x74])
-            *(int *)(q + 0x7C) = func_002E5CF8(3, 4, p);
+            *(int *)(q + 0x7C) = PlayMobySound(3, 4, p);
     } else {
         int handle = *(int *)(q + 0x7C);
         if (handle != -1) {
@@ -176,5 +176,5 @@ void func_L03_003E21B0(u8 *p) {
     *(float *)(q + 0x58) -= D_L03_001B0B74 * 0.016666667f;
     if (*(float *)(q + 0x58) < -1.0f)
         *(float *)(q + 0x58) += 1.0f;
-    func_L00_002E6CF0(func_L03_003E3A00, p);
+    func_L00_002E6CF0(DrawPathPuzzleHud, p);
 }

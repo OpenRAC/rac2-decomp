@@ -27,24 +27,24 @@ void func_L04_0040DF90(unsigned char *m, unsigned char *p)
     if (elapsed < 0.0f) elapsed = 0.0f;
     if (!func_002E59B0(m, *(int *)(p + 0x330))) {
         if (m[0x20] == 3)
-            *(int *)(p + 0x330) = func_002E5CF8(20, 5, m);
+            *(int *)(p + 0x330) = PlayMobySound(20, 5, m);
         else
-            *(int *)(p + 0x330) = func_002E5CF8(0, 5, m);
+            *(int *)(p + 0x330) = PlayMobySound(0, 5, m);
     }
     if (!func_002E59B0(m, *(int *)(p + 0x334))) {
         if (m[0x20] == 3)
-            *(int *)(p + 0x334) = func_002E5CF8(21, 5, m);
+            *(int *)(p + 0x334) = PlayMobySound(21, 5, m);
         else
-            *(int *)(p + 0x334) = func_002E5CF8(1, 5, m);
+            *(int *)(p + 0x334) = PlayMobySound(1, 5, m);
     }
     if (func_002E59B0(m, *(int *)(p + 0x330))) {
         amount = elapsed * 3.0f;
         if (amount > 1.0f) amount = 1.0f;
         amount = 1.0f - amount;
-        func_L01_00355BA0(*(int *)(p + 0x330), func_00283CF0(func_00283CE0(1024) * amount));
+        func_L01_00355BA0(*(int *)(p + 0x330), FloatToInt(IntToFloat(1024) * amount));
         amount = elapsed * 3.0f;
         if (amount > 1.0f) amount = 1.0f;
-        func_002E5F40(*(int *)(p + 0x330), func_00283CF0(amount * 2816.0f));
+        func_002E5F40(*(int *)(p + 0x330), FloatToInt(amount * 2816.0f));
     }
     if (func_002E59B0(m, *(int *)(p + 0x334))) {
         float limit;
@@ -59,8 +59,8 @@ void func_L04_0040DF90(unsigned char *m, unsigned char *p)
             amount -= limit;
             amount = (1.0f - amount) * 0.8f + 0.2f;
         }
-        func_L01_00355BA0(*(int *)(p + 0x334), func_00283CF0(func_00283CE0(1024) * amount));
+        func_L01_00355BA0(*(int *)(p + 0x334), FloatToInt(IntToFloat(1024) * amount));
         amount = (1.0f - original) * -2816.0f;
-        func_002E5F40(*(int *)(p + 0x334), func_00283CF0(amount));
+        func_002E5F40(*(int *)(p + 0x334), FloatToInt(amount));
     }
 }

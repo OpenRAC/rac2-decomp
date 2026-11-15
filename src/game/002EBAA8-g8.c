@@ -37,8 +37,8 @@ extern void func_0027AB40(void);
 extern void func_0029F338(SceneObject *);
 
 /* Scene teardown: puts the transition word back to 5 unless it is 6 or 7,
-   calls func_0027D330(12) and waits until the transition is idle with
-   nothing pending, then until func_00132028 returns 0; sets the fade to
+   calls FadeToBlack(12) and waits until the transition is idle with
+   nothing pending, then until snd_Pump returns 0; sets the fade to
    0.63, clears the control words, releases every scene object (dropping its
    model's use count and entry) and the object held at D_00189E20+0x12C0,
    and clears bit 0 of flags34 on the objects held at D_001B178C+4 and
@@ -50,16 +50,16 @@ void func_002EBAA8(void)
     SceneContextEnd *context = &D_001A63A8_3;
     unsigned short state = context->state;
     if ((unsigned int)(state - 6) >= 2) context->state = 5;
-    func_0027D330(12);
+    FadeToBlack(12);
     while (D_001A63A8_3.busy || D_001A63A8_3.pending != -1) {
-        func_002E4AC8(); func_001261F0(0);
+        UpdateSoundVoices(); func_001261F0(0);
     }
-    while (func_00132028()) {}
+    while (snd_Pump()) {}
     D_001B9040.fade = 0.63f;
     D_001B15A8 = 0;
     D_001B15AC = 0;
     D_001B15A0 = 0.0f;
-    func_0027AB40();
+    UpdateViewContext();
     for (i = 0; i < D_001B8840.count; i++) {
         obj = D_001B8840.objects[i];
         if (obj) {

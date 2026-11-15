@@ -88,18 +88,18 @@ s32 func_L08_003DB518(void)
     one = 1;
     style = D_L08_001B0490;
     bottom = (f32)(D_001A7344 - r);
-    texture = func_0028E588(0xEAA2, func_L08_003DB4E8());
-    x = func_00283CF0(D_L08_001B0460 + fade);
+    texture = GetIconFrame(0xEAA2, func_L08_003DB4E8());
+    x = FloatToInt(D_L08_001B0460 + fade);
     t = D_L08_001B3244;
-    y = func_00283CF0(bottom + (f32)screen_y(fade - (f32)D_L08_001B0484, t, half, one));
+    y = FloatToInt(bottom + (f32)screen_y(fade - (f32)D_L08_001B0484, t, half, one));
     half2 = 0.5f;
     one2 = 1;
-    width = func_00283CF0(size * state->fade);
-    height = hud_round((f32)func_00283CF0(size * state->fade), D_L08_001B3244, half2, one2);
+    width = FloatToInt(size * state->fade);
+    height = hud_round((f32)FloatToInt(size * state->fade), D_L08_001B3244, half2, one2);
     func_0028EA58(texture, x, y, width, height, &style);
     func_00115DA8(text, D_L08_001B04A0, state->count);
-    x2 = func_00283CF0(D_L08_001B0460 + (f32)D_L08_001B047C);
-    y2 = func_00283CF0(bottom) + screen_y((f32)D_L08_001B0480, D_L08_001B3244, half2, one2);
+    x2 = FloatToInt(D_L08_001B0460 + (f32)D_L08_001B047C);
+    y2 = FloatToInt(bottom) + screen_y((f32)D_L08_001B0480, D_L08_001B3244, half2, one2);
     func_0027FAA8(x2, y2, 0x80F0F0F0UL, text, func_001157AC(text));
     return 0;
 }

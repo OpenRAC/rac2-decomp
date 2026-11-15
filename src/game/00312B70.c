@@ -11,7 +11,7 @@ extern void func_002AB650(char *);
 /* Spawns object 0x27F at the given position and fills its descriptor from a template record. */
 char *func_00312B70(char *tmpl, void *pos, int value, void *origin)
 {
-    char *obj = func_0029EFD0(0x27F);
+    char *obj = CreateMoby(0x27F);
     char *d;
 
     if (obj != 0) {

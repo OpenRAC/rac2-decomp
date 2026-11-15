@@ -31,9 +31,9 @@ int func_L00_00423CA8(char *obj,void *point,int index,float blend,float radius)
     qcopy(plane,D_L00_001BF220_1);
     qcopy(hit,D_L00_001BF230);
     origin=base+176;
-    func_00282CC0(endpoint,origin,movement);
-    distance=func_L00_00341D08(closest,plane,origin,endpoint,0.0f);
-    limit=func_00282E48(origin,closest);
+    FastVecAdd(endpoint,origin,movement);
+    distance=ProjectPointOntoSegment(closest,plane,origin,endpoint,0.0f);
+    limit=fast_vec_dist(origin,closest);
     limit /= F(movement,44)-F(state,48);
     limit=(D_L00_001B14D0+(threshold-D_L00_001B14D0)*limit)*0.75f;
     if(distance<limit) {
@@ -41,31 +41,31 @@ int func_L00_00423CA8(char *obj,void *point,int index,float blend,float radius)
         func_L00_00423BC0(obj,accumulated,closest,plane,original,limit-distance,blend);
         qcopy(point,hit);
         if(func_00277258(point,D_L00_001B1850[0],D_00189E20.owner,radius)) {
-            func_00282CF0(difference,original,point);
-            func_00282CC0(plane,D_L00_001BF220_1,difference);
-            distance=func_L00_00341D08(closest,plane,origin,endpoint,0.0f);
-            limit=func_00282E48(origin,closest);
+            FastVecSub(difference,original,point);
+            FastVecAdd(plane,D_L00_001BF220_1,difference);
+            distance=ProjectPointOntoSegment(closest,plane,origin,endpoint,0.0f);
+            limit=fast_vec_dist(origin,closest);
             limit /= F(movement,44)-F(state,48);
             limit=(D_L00_001B14D0+(threshold-D_L00_001B14D0)*limit)*0.75f;
             if(distance<limit) {
                 func_L00_00423BC0(obj,correction,closest,plane,original,limit-distance,blend);
-                func_00282CC0(accumulated,accumulated,correction);
+                FastVecAdd(accumulated,accumulated,correction);
                 qcopy(point,D_L00_001BF230);
                 if(func_00277258(point,D_L00_001B1850[0],D_00189E20.owner,radius)) {
-                    func_00282CF0(difference,original,point);
-                    func_00282CC0(plane,D_L00_001BF220_1,difference);
-                    distance=func_L00_00341D08(closest,plane,origin,endpoint,0.0f);
-                    limit=func_00282E48(origin,closest);
+                    FastVecSub(difference,original,point);
+                    FastVecAdd(plane,D_L00_001BF220_1,difference);
+                    distance=ProjectPointOntoSegment(closest,plane,origin,endpoint,0.0f);
+                    limit=fast_vec_dist(origin,closest);
                     limit /= F(movement,44)-F(state,48);
                     limit=(D_L00_001B14D0+(threshold-D_L00_001B14D0)*limit)*0.75f;
                     if(distance<limit) {
                         func_L00_00423BC0(obj,correction,closest,plane,original,limit-distance,blend);
-                        func_00282CC0(accumulated,accumulated,correction);
+                        FastVecAdd(accumulated,accumulated,correction);
                     }
                 }
             }
         }
     }
-    func_00282CC0(point,original,accumulated);
+    FastVecAdd(point,original,accumulated);
     return result;
 }

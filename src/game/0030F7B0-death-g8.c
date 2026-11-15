@@ -71,15 +71,15 @@ void func_003120C8(CrateMoby *self, int explode, CrateHit *hit)
     CrateMoby *p;
     int i, amount, kind;
 
-    if (func_00282C30(D_001B1688 - D_001B24AC) >= 2) {
+    if (subtract_integer_with_clamp(D_001B1688 - D_001B24AC) >= 2) {
         switch (self->oClass) {
         case 0x1FA: func_002E5DA0(0, 0, (char *)self, 0x1F4); break;
         case 0x1FF: func_002E5DA0(1, 0, (char *)self, 0x1FF); break;
-        default: func_002E5CF8(0, 0, (char *)self); break;
+        default: PlayMobySound(0, 0, (char *)self); break;
         }
         D_001B24AC = D_001B1688;
     }
-    if (func_00282C30(D_001B1688 - D_001B24B0) >= 2)
+    if (subtract_integer_with_clamp(D_001B1688 - D_001B24B0) >= 2)
         D_001B24B0 = D_001B1688;
     if (vars->above) {
         vars->above->vars->below = vars->below;
@@ -108,12 +108,12 @@ void func_003120C8(CrateMoby *self, int explode, CrateHit *hit)
     if (hit)
         qcopy(direction, hit->position);
     else
-        func_00282CF0(direction, self->position, D_0018C0B0 + 0x10);
-    if (func_00282C30(D_001B1688 - D_001AF0F8) >= 241) {
+        FastVecSub(direction, self->position, D_0018C0B0 + 0x10);
+    if (subtract_integer_with_clamp(D_001B1688 - D_001AF0F8) >= 241) {
         D_001AF0FC = 0;
         D_001AF0F8 = D_001B1688;
     } else if (D_001B1688 != D_001AF0F8) {
-        func_002AA340(&D_001AF0FC, 0, func_00282C30(D_001B1688 - D_001AF0F8) >> 2);
+        func_002AA340(&D_001AF0FC, 0, subtract_integer_with_clamp(D_001B1688 - D_001AF0F8) >> 2);
         D_001AF0F8 = D_001B1688;
     }
     if (D_001B1A80 >= 251 && D_001AF0FC < 5)
@@ -156,8 +156,8 @@ void func_003120C8(CrateMoby *self, int explode, CrateHit *hit)
     self->collision = 0;
     if (explode) {
         vars->burstFrame = 1;
-        func_00282F20(velocity, self->up, 0.5f);
-        func_00282CC0(velocity, velocity, self->position);
-        func_0032C700(velocity, 0, 10, 10, 10, 10, 15, 0, 1.0f, 0.0f, 0, 0, 0, 0);
+        vec_scale_to_length(velocity, self->up, 0.5f);
+        FastVecAdd(velocity, velocity, self->position);
+        SpawnExplosion(velocity, 0, 10, 10, 10, 10, 15, 0, 1.0f, 0.0f, 0, 0, 0, 0);
     }
 }

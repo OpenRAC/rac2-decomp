@@ -64,11 +64,11 @@ void func_L22_003A2160(char *obj) {
     qcopy_nc(flat, st->target);
     func_L22_003A2988(flat, 0.0f);
     if (st->target == D_00189EA0) hit = st->target_hit;
-    else hit = func_L22_003A2780(obj, (Quad_2160 *)(obj + 0x10), (Quad_2160 *)st->target);
+    else hit = WalkPathIsClear(obj, (Quad_2160 *)(obj + 0x10), (Quad_2160 *)st->target);
     if (!hit && st->state == 0) st->state = 1;
     active = 1;
     if (st->state == 2) {
-        if (func_L22_003A2780(obj, (Quad_2160 *)(obj + 0x10), (Quad_2160 *)st->waypoint)) {
+        if (WalkPathIsClear(obj, (Quad_2160 *)(obj + 0x10), (Quad_2160 *)st->waypoint)) {
             st->avoiding = 0; active = 0;
         }
     } else if (st->state == 4) {
@@ -142,10 +142,10 @@ void func_L22_003A2160(char *obj) {
             if (func_002F3C40((obj + 0x10), st->waypoint) < 2.0f) {
                 next = st->point + st->direction;
                 if (next < 0) {
-                    func_L22_003A2E50(obj, 1, 0, ((PathData_2160 *)D_L22_001FE940[st->paths[st->path]])->points[0].f[3]);
+                    WalkPathPickNext(obj, 1, 0, ((PathData_2160 *)D_L22_001FE940[st->paths[st->path]])->points[0].f[3]);
                 } else {
                     PathData_2160 *end = (PathData_2160 *)D_L22_001FE940[st->paths[st->path]];
-                    if (next >= end->count) func_L22_003A2E50(obj, 1, 0, end->points[end->count - 1].f[3]);
+                    if (next >= end->count) WalkPathPickNext(obj, 1, 0, end->points[end->count - 1].f[3]);
                     else st->point = next;
                 }
                 qcopy(st->waypoint, (Path_2160 *)D_L22_001FE940[st->paths[st->path]] + (st->point + 1));
@@ -182,30 +182,30 @@ int func_L22_003A2780(char *obj, Quad_003A2780 *from, Quad_003A2780 *to) {
     int last;
     float dist;
 
-    if (func_00282E48(from, to) > 50.0f) return 0;
+    if (fast_vec_dist(from, to) > 50.0f) return 0;
     qcopy(&v.end, to);
     func_L22_003A2988(&v.end, *(float *)(state + 0x114) + *(float *)(state + 0x110));
-    func_00282CF0(&v.step, &v.end, from);
-    func_00282F20(&v.step, &v.step, 8.0f);
+    FastVecSub(&v.step, &v.end, from);
+    vec_scale_to_length(&v.step, &v.step, 8.0f);
     qcopy(&v.cursor, from);
     qcopy(&v.previous, from);
     func_L22_003A2988(&v.previous, *(float *)(state + 0x114) + *(float *)(state + 0x110));
     last = 0;
     do {
-        dist = func_00282E48(&v.cursor, &v.end);
+        dist = fast_vec_dist(&v.cursor, &v.end);
         if (dist < 8.0f) {
             if (dist < 0.0f) return 1;
-            func_00282F20(&v.scaled, &v.step, dist);
+            vec_scale_to_length(&v.scaled, &v.step, dist);
             last = 1;
-            func_00282CC0(&v.next, &v.cursor, &v.scaled);
+            FastVecAdd(&v.next, &v.cursor, &v.scaled);
             func_L22_003A2988(&v.next, *(float *)(state + 0x114) + *(float *)(state + 0x110));
         } else {
-            func_00282CC0(&v.next, &v.cursor, &v.step);
+            FastVecAdd(&v.next, &v.cursor, &v.step);
             func_L22_003A2988(&v.next, *(float *)(state + 0x114) + *(float *)(state + 0x110));
         }
-        if (func_002761F8(&v.previous, &v.next, 0x12, 0, 0)) return 0;
+        if (CollLine(&v.previous, &v.next, 0x12, 0, 0)) return 0;
         qcopy(&v.previous, &v.next);
-        func_00282CC0(&v.cursor, &v.cursor, &v.step);
+        FastVecAdd(&v.cursor, &v.cursor, &v.step);
     } while (!last);
     return 1;
 }
@@ -429,7 +429,7 @@ void func_L22_003A36A0(char *obj) {
 
     func_L22_003A3CA0(obj);
     func_002A77E0(3);
-    func_00115484(v.selected, -1, 28);
+    memset(v.selected, -1, 28);
     for (i = 0; i < 32; i++) {
         v.cumulative[i] = total;
         total += D_L22_001FE940[st->ids[i]]->count - 1;
@@ -460,7 +460,7 @@ void func_L22_003A36A0(char *obj) {
         }
         if (j != 10 && j != 27 && j != 28 && j != 31 && j != 15) {
             unused = i % 3;
-            func_L22_003A3B50(&v.point, 0);
+            SpawnRandomKindAt(&v.point, 0);
         }
     }
     rec = (PathRec_003A36A0 *)D_L22_001FE940[st->other_id];
@@ -469,12 +469,12 @@ void func_L22_003A36A0(char *obj) {
         unused = i % 3;
         pt = &rec->pts[i];
         func_002AFFD8(pt, &v.normal, 0);
-        func_00282D30(&v.point, &v.normal, 6.0f);
-        func_00282D30(&v.low, &v.normal, -3.0f);
-        func_00282CC0(&v.point, &v.point, pt);
-        func_00282CC0(&v.low, &v.low, pt);
-        if (func_002761F8(&v.low, &v.point, 0x12, 0, 0)) {
-            func_L22_003A3B50(&D_L22_001C00E0, 1);
+        FastVecScale(&v.point, &v.normal, 6.0f);
+        FastVecScale(&v.low, &v.normal, -3.0f);
+        FastVecAdd(&v.point, &v.point, pt);
+        FastVecAdd(&v.low, &v.low, pt);
+        if (CollLine(&v.low, &v.point, 0x12, 0, 0)) {
+            SpawnRandomKindAt(&D_L22_001C00E0, 1);
             spawned++;
         }
     }

@@ -45,7 +45,7 @@ void func_L20_004435A0(char *arg0) {
     if (*(unsigned char *)(arg0 + 0x95) != 6) {
         func_L01_002F14E8(0xA, 0,
                          *(float *)(s1 + 0x20)
-                         / func_00283CE0(*(short *)(s1 + 0x24)));
+                         / IntToFloat(*(short *)(s1 + 0x24)));
         func_L20_00442890(arg0);
         func_L20_004429F0(arg0);
     }
@@ -79,11 +79,11 @@ copy:
     }
     *(float *)(arg0 + 0xF0) = f;
     *(float *)(arg0 + 0xF4) = *(float *)(s1 + 0x1804);
-    func_00283098(&v0, D_L20_001B20B0, arg0 + 0xC0);
-    func_002833F0(arg0 + 0xC0, arg0 + 0xF0);
-    func_00283098(&v1, D_L20_001B20B0, arg0 + 0xC0);
-    func_00282CF0(&v2, &v1, &v0);
-    func_00282CF0(src, src, &v2);
+    matrix_mul_vec3(&v0, D_L20_001B20B0, arg0 + 0xC0);
+    euler_rotation_basis(arg0 + 0xC0, arg0 + 0xF0);
+    matrix_mul_vec3(&v1, D_L20_001B20B0, arg0 + 0xC0);
+    FastVecSub(&v2, &v1, &v0);
+    FastVecSub(src, src, &v2);
 done:
     func_002A93B0(arg0);
     n = *(unsigned short *)(arg0 + 0x96);

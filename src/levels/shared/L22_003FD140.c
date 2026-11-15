@@ -16,8 +16,8 @@ void func_L22_003FD140(u8 *object)
 
     qzero(angles);
     angles[2] = 0.018907737f;
-    func_002833F0(matrix, angles);
-    func_00283738(object + 0xC0, object + 0xC0, matrix);
+    euler_rotation_basis(matrix, angles);
+    multiply_matrix3x3(object + 0xC0, object + 0xC0, matrix);
     func_002AFFD8(object + 0x10, state + 0x10, 0);
     func_L00_00325600(object + 0xC0, state + 0x10, 0);
 }

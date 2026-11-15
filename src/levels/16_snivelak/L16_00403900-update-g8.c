@@ -77,7 +77,7 @@ void func_L16_00403900(u8 *moby)
                 if (!*(int *)(state + 0x2a8) || *(int *)(state + 0x2ac))
                     if (moby[0x43]) func_002A7470(moby, 0, 0, 10);
             }
-        } else if (*(int *)(state + 0x264) && func_00282978((short *)(state + 0x25e))) {
+        } else if (*(int *)(state + 0x264) && FastDecTimer((short *)(state + 0x25e))) {
             func_002A7750(moby, 2, 1);
             *(int *)(state + 0x264) = 0;
             if (*(int *)(state + 0x258) < 300)
@@ -98,17 +98,17 @@ void func_L16_00403900(u8 *moby)
         break;
     case 3:
         if (*(float *)(state + 0x20) <= 0.0f) {
-            func_002A6C58(moby, 0, 3);
+            SetDeathBits(moby, 0, 3);
             for (i = 0; i < 5; i++) {
                 func_002A7A00(position, 0.13333334f, 0.20000002f);
                 position[2] = func_00282C48(position[2]);
                 position[2] *= 2.5f;
-                func_00282CC0(position, position, D_L16_001A8F20);
+                FastVecAdd(position, position, D_L16_001A8F20);
                 child = func_00273730(moby, 1, *(short *)(moby + 0xaa), i,
                     moby + 0x10, moby + 0xf0, position, 255, 30.0f, 15.0f);
                 *(void (**)(void *))(child + 0x64) = func_00310C88;
             }
-            func_002E5CF8(0, 0, moby);
+            PlayMobySound(0, 0, moby);
             func_L16_00406080(moby + 0x10, 0, 15, 10, 10, 10, 15, 1, 2.0f, 1, 1);
             func_L16_00406080(moby + 0x10, 0, 15, 10, 10, 10, 15, 1, 1.0f, 1, 1);
             D_L16_001B99C0.damping = 0.1f;
@@ -122,7 +122,7 @@ void func_L16_00403900(u8 *moby)
             position[2] = func_002A7878(7.0f, 9.0f) * 0.016666668f;
             position[2] = func_00282C48(position[2]);
             position[2] += position[2];
-            func_00282CC0(position, position, D_L16_001A8F20);
+            FastVecAdd(position, position, D_L16_001A8F20);
             child = func_00273730(moby, 3, 0xecb, 0, moby + 0x10,
                 moby + 0xf0, position, 255, 180.0f, 25.0f);
             func_002AB650(child);
@@ -172,7 +172,7 @@ void func_L16_00403900(u8 *moby)
         }
         if (!*(int *)(state + 0x2ac)) {
             pitchField3 = (float *)(moby + 0xf4);
-            pitch = func_00283248(func_00282E80(moby + 0x10, D_00189E20.target2290 + 0x10),
+            pitch = func_00283248(vec_distance_xy(moby + 0x10, D_00189E20.target2290 + 0x10),
                 *(float *)(D_00189E20.target2290 + 0x18) - *(float *)(moby + 0x18));
             func_002AAA00(pitchField3, (float *)(state + 0x270),
                 -pitch, 0.00349065894f, 0.00349065894f, 0.20943955f, 0);
@@ -180,14 +180,14 @@ void func_L16_00403900(u8 *moby)
         if (!func_002AEB60(moby, 1.5f)) break;
         angle = func_00283248(D_00189E20.position80[0] - *(float *)(moby + 0x10),
             D_00189E20.position80[1] - *(float *)(moby + 0x14));
-        if (!(func_00283C80(*(float *)(moby + 0xf8), angle) < 1.5707965f)) break;
+        if (!(FastDiffRots(*(float *)(moby + 0xf8), angle) < 1.5707965f)) break;
         func_0029FCC0((char *)moby, 2, (char *)position);
-        func_00282CF0(aim, D_00189E20.aimPositionE0, position);
-        func_00282F20(aim, aim, 0.833333373f);
+        FastVecSub(aim, D_00189E20.aimPositionE0, position);
+        vec_scale_to_length(aim, aim, 0.833333373f);
         func_L16_00405488(moby, aim, position, 0, (float)state[0x34]);
         func_0029FCC0((char *)moby, 3, (char *)position);
-        func_00282CF0(aim, D_00189E20.aimPositionE0, position);
-        func_00282F20(aim, aim, 0.833333373f);
+        FastVecSub(aim, D_00189E20.aimPositionE0, position);
+        vec_scale_to_length(aim, aim, 0.833333373f);
         func_L16_00405488(moby, aim, position, 0, (float)state[0x34]);
         break;
     case 6:
@@ -196,27 +196,27 @@ void func_L16_00403900(u8 *moby)
         if (func_L09_00329028((char *)moby, *(int *)(state + 0x298)) &&
             *(int *)(state + 0x29c) != -1) func_002A7750(moby, 7, -1);
         pitchField6 = (float *)(moby + 0xf4);
-        pitch = func_00283248(func_00282E80(moby + 0x10, D_00189E20.target2290 + 0x10),
+        pitch = func_00283248(vec_distance_xy(moby + 0x10, D_00189E20.target2290 + 0x10),
             *(float *)(D_00189E20.target2290 + 0x18) - *(float *)(moby + 0x18));
         func_002AAA00(pitchField6, (float *)(state + 0x270),
             -pitch, 0.00349065894f, 0.00349065894f, 0.20943955f, 0);
         if (!func_002AEB60(moby, 1.5f)) break;
         angle = func_00283248(D_00189E20.position80[0] - *(float *)(moby + 0x10),
             D_00189E20.position80[1] - *(float *)(moby + 0x14));
-        if (!(func_00283C80(*(float *)(moby + 0xf8), angle) < 1.5707965f)) break;
+        if (!(FastDiffRots(*(float *)(moby + 0xf8), angle) < 1.5707965f)) break;
         func_0029FCC0((char *)moby, 2, (char *)position);
-        func_00282CF0(aim, D_00189E20.aimPositionE0, position);
-        func_00282F20(aim, aim, 0.833333373f);
-        if (!func_002761F8(position, D_00189E20.aimPositionE0, 0, moby, 0)) {
+        FastVecSub(aim, D_00189E20.aimPositionE0, position);
+        vec_scale_to_length(aim, aim, 0.833333373f);
+        if (!CollLine(position, D_00189E20.aimPositionE0, 0, moby, 0)) {
             func_L16_00405488(moby, aim, position, 0, (float)state[0x34]);
         } else if (D_L16_001BFF58 && (D_L16_001BFF58 == D_00189E20.target2290 ||
                    *(short *)(D_L16_001BFF58 + 0xaa) != 0xebb)) {
             func_L16_00405488(moby, aim, position, 0, (float)state[0x34]);
         }
         func_0029FCC0((char *)moby, 3, (char *)position);
-        func_00282CF0(aim, D_00189E20.aimPositionE0, position);
-        func_00282F20(aim, aim, 0.833333373f);
-        if (!func_002761F8(position, D_00189E20.aimPositionE0, 0, moby, 0)) {
+        FastVecSub(aim, D_00189E20.aimPositionE0, position);
+        vec_scale_to_length(aim, aim, 0.833333373f);
+        if (!CollLine(position, D_00189E20.aimPositionE0, 0, moby, 0)) {
             func_L16_00405488(moby, aim, position, 0, (float)state[0x34]);
         } else if (D_L16_001BFF58 && (D_L16_001BFF58 == D_00189E20.target2290 ||
                    *(short *)(D_L16_001BFF58 + 0xaa) != 0xebb)) {
@@ -229,27 +229,27 @@ void func_L16_00403900(u8 *moby)
         if (func_L09_00329028((char *)moby, *(int *)(state + 0x29c)) &&
             *(int *)(state + 0x298) != -1) func_002A7750(moby, 6, -1);
         pitchField7 = (float *)(moby + 0xf4);
-        pitch = func_00283248(func_00282E80(moby + 0x10, D_00189E20.target2290 + 0x10),
+        pitch = func_00283248(vec_distance_xy(moby + 0x10, D_00189E20.target2290 + 0x10),
             *(float *)(D_00189E20.target2290 + 0x18) - *(float *)(moby + 0x18));
         func_002AAA00(pitchField7, (float *)(state + 0x270),
             -pitch, 0.00349065894f, 0.00349065894f, 0.20943955f, 0);
         if (!func_002AEB60(moby, 1.5f)) break;
         angle = func_00283248(D_00189E20.position80[0] - *(float *)(moby + 0x10),
             D_00189E20.position80[1] - *(float *)(moby + 0x14));
-        if (!(func_00283C80(*(float *)(moby + 0xf8), angle) < 1.5707965f)) break;
+        if (!(FastDiffRots(*(float *)(moby + 0xf8), angle) < 1.5707965f)) break;
         func_0029FCC0((char *)moby, 2, (char *)position);
-        func_00282CF0(aim, D_00189E20.aimPositionE0, position);
-        func_00282F20(aim, aim, 0.833333373f);
-        if (!func_002761F8(position, D_00189E20.aimPositionE0, 0, moby, 0)) {
+        FastVecSub(aim, D_00189E20.aimPositionE0, position);
+        vec_scale_to_length(aim, aim, 0.833333373f);
+        if (!CollLine(position, D_00189E20.aimPositionE0, 0, moby, 0)) {
             func_L16_00405488(moby, aim, position, 0, (float)state[0x34]);
         } else if (D_L16_001BFF58 && (D_L16_001BFF58 == D_00189E20.target2290 ||
                    *(short *)(D_L16_001BFF58 + 0xaa) != 0xebb)) {
             func_L16_00405488(moby, aim, position, 0, (float)state[0x34]);
         }
         func_0029FCC0((char *)moby, 3, (char *)position);
-        func_00282CF0(aim, D_00189E20.aimPositionE0, position);
-        func_00282F20(aim, aim, 0.833333373f);
-        if (!func_002761F8(position, D_00189E20.aimPositionE0, 0, moby, 0)) {
+        FastVecSub(aim, D_00189E20.aimPositionE0, position);
+        vec_scale_to_length(aim, aim, 0.833333373f);
+        if (!CollLine(position, D_00189E20.aimPositionE0, 0, moby, 0)) {
             func_L16_00405488(moby, aim, position, 0, (float)state[0x34]);
         } else if (D_L16_001BFF58 && (D_L16_001BFF58 == D_00189E20.target2290 ||
                    *(short *)(D_L16_001BFF58 + 0xaa) != 0xebb)) {
@@ -269,27 +269,27 @@ void func_L16_00403900(u8 *moby)
         func_L01_00322288((int)moby, func_00283248(D_00189E20.position80[0] - *(float *)(moby + 0x10),
             D_00189E20.position80[1] - *(float *)(moby + 0x14)));
         pitchField5 = (float *)(moby + 0xf4);
-        pitch = func_00283248(func_00282E80(moby + 0x10, D_00189E20.target2290 + 0x10),
+        pitch = func_00283248(vec_distance_xy(moby + 0x10, D_00189E20.target2290 + 0x10),
             *(float *)(D_00189E20.target2290 + 0x18) - *(float *)(moby + 0x18));
         func_002AAA00(pitchField5, (float *)(state + 0x270),
             -pitch, 0.00349065894f, 0.00349065894f, 0.20943955f, 0);
         if (!func_002AEB60(moby, 1.5f)) break;
         angle = func_00283248(D_00189E20.position80[0] - *(float *)(moby + 0x10),
             D_00189E20.position80[1] - *(float *)(moby + 0x14));
-        if (!(func_00283C80(*(float *)(moby + 0xf8), angle) < 1.5707965f)) break;
+        if (!(FastDiffRots(*(float *)(moby + 0xf8), angle) < 1.5707965f)) break;
         func_0029FCC0((char *)moby, 2, (char *)position);
-        func_00282CF0(aim, D_00189E20.aimPositionE0, position);
-        func_00282F20(aim, aim, 0.833333373f);
-        if (!func_002761F8(position, D_00189E20.aimPositionE0, 0, moby, 0)) {
+        FastVecSub(aim, D_00189E20.aimPositionE0, position);
+        vec_scale_to_length(aim, aim, 0.833333373f);
+        if (!CollLine(position, D_00189E20.aimPositionE0, 0, moby, 0)) {
             func_L16_00405488(moby, aim, position, 0, (float)state[0x34]);
         } else if (D_L16_001BFF58 && (D_L16_001BFF58 == D_00189E20.target2290 ||
                    *(short *)(D_L16_001BFF58 + 0xaa) != 0xebb)) {
             func_L16_00405488(moby, aim, position, 0, (float)state[0x34]);
         }
         func_0029FCC0((char *)moby, 3, (char *)position);
-        func_00282CF0(aim, D_00189E20.aimPositionE0, position);
-        func_00282F20(aim, aim, 0.833333373f);
-        if (!func_002761F8(position, D_00189E20.aimPositionE0, 0, moby, 0)) {
+        FastVecSub(aim, D_00189E20.aimPositionE0, position);
+        vec_scale_to_length(aim, aim, 0.833333373f);
+        if (!CollLine(position, D_00189E20.aimPositionE0, 0, moby, 0)) {
             func_L16_00405488(moby, aim, position, 0, (float)state[0x34]);
         } else if (D_L16_001BFF58 && (D_L16_001BFF58 == D_00189E20.target2290 ||
                    *(short *)(D_L16_001BFF58 + 0xaa) != 0xebb)) {

@@ -92,13 +92,13 @@ float func_L03_002D3498(float time, float acceleration, float height)
         float half;
         if (height < 0.0f) {
             char *pos = state + 0x80;
-            func_00282D30(end, state + 0xF0, time);
+            FastVecScale(end, state + 0xF0, time);
             end[2] -= (time * time + time) * (acceleration * 0.5f);
-            func_00282CC0(end, end, pos);
+            FastVecAdd(end, end, pos);
             *(MotionQuad *)direction = *(MotionQuad *)(state + 0x80);
             func_L00_0031EC88(direction, end);
             qcopy(direction, pos);
-            if (func_002761F8(direction, end, 0xD22, 0, 0)) {
+            if (CollLine(direction, end, 0xD22, 0, 0)) {
                 if (func_L00_002D3EA8(D_L03_001BFE00) <= 0.8726647f)
                     height = *(float *)(D_L03_001BFE00 - 0x18);
             }
@@ -119,16 +119,16 @@ float func_L03_002D3498(float time, float acceleration, float height)
         char *pos;
         qcopy(direction, state + 0x2A0);
         velocity = state + 0xF0;
-        func_00282F20(direction, direction, acceleration);
+        vec_scale_to_length(direction, direction, acceleration);
         pos = state + 0x80;
-        func_00282D30(direction, direction, -1.0f);
-        func_00282D30(end, velocity, time);
-        func_00282D30(curve, direction, (time * time + time) * (acceleration * 0.5f));
-        func_00282CC0(end, curve, end);
-        func_00282CC0(end, pos, end);
+        FastVecScale(direction, direction, -1.0f);
+        FastVecScale(end, velocity, time);
+        FastVecScale(curve, direction, (time * time + time) * (acceleration * 0.5f));
+        FastVecAdd(end, curve, end);
+        FastVecAdd(end, pos, end);
         *(MotionQuad *)start = *(MotionQuad *)(pos);
         func_L00_0031EC88(start, end);
-        if (func_002761F8(pos, end, 0xD22, 0, 0)) {
+        if (CollLine(pos, end, 0xD22, 0, 0)) {
             half = acceleration * -0.5f;
             speed = func_L00_002D3B00(velocity) - half;
             position = func_L00_002D3B00(pos);
@@ -145,16 +145,16 @@ float func_L03_002D3498(float time, float acceleration, float height)
         curve[2] = 100.0f;
         curve[1] = 100.0f;
         curve[0] = 100.0f;
-        func_00282CF0(direction, pos, curve);
-        func_00282F20(direction, direction, acceleration);
-        func_00282D30(direction, direction, -1.0f);
-        func_00282D30(end, velocity, time);
-        func_00282D30(curve, direction, (time * time + time) * (acceleration * 0.5f));
-        func_00282CC0(end, curve, end);
-        func_00282CC0(end, pos, end);
+        FastVecSub(direction, pos, curve);
+        vec_scale_to_length(direction, direction, acceleration);
+        FastVecScale(direction, direction, -1.0f);
+        FastVecScale(end, velocity, time);
+        FastVecScale(curve, direction, (time * time + time) * (acceleration * 0.5f));
+        FastVecAdd(end, curve, end);
+        FastVecAdd(end, pos, end);
         *(MotionQuad *)start = *(MotionQuad *)(pos);
         func_L00_0031EC88(start, end);
-        if (func_002761F8(pos, end, 0xD22, 0, 0)) {
+        if (CollLine(pos, end, 0xD22, 0, 0)) {
             half = acceleration * -0.5f;
             speed = func_L00_002D3B00(velocity) - half;
             position = func_L00_002D3B00(pos);
@@ -182,7 +182,7 @@ void func_L03_002FDE30(void)
         if (object != 0 && *(s16 *)(object + 0xAA) == 0xE29)
             *(u16 *)(object + 0x34) |= 0x800;
         if (*(s16 *)(object + 0xAA) == 0xD54)
-            func_002E64A0(object);
+            UpdateEquipmentPieces(object);
         if (object != 0 && *(s16 *)(object + 0xAA) == 0xFA0) {
             u8 *vars = *(u8 **)(object + 0x68);
             if (vars != 0)
@@ -197,9 +197,9 @@ void func_L03_002FDE30(void)
         *(f32 *)(p + 0x2C) = *(f32 *)(*(u8 **)(p + 0x24) + 0x24) * D_L03_001A9420;
     }
     if (state->mode == 6)
-        func_L03_00326458(state->objects[1]);
+        EmitScaledObjectParticles(state->objects[1]);
     if (state->mode == 8)
-        func_L03_00326458(state->objects[3]);
+        EmitScaledObjectParticles(state->objects[3]);
     if (state->mode == 7 && state->timer == 0x424) {
         u8 *target;
         s32 row, col, k;
@@ -260,10 +260,10 @@ int func_L03_0032CFD8(char *self, float *target, char *third, float amount, floa
         return 8;
     angle = func_00283248(target[0] - *(float *)(self + 0x10),
                          target[1] - *(float *)(self + 0x14));
-    angle = func_00283B98(angle, amount);
+    angle = FastAddRotations(angle, amount);
     if (*(float *)(data + 0xDC) != 0.0f) {
-        angle = func_00283B98(angle, *(float *)(data + 0xDC));
-        if (func_00282978((short *)(data + 0xE0))) {
+        angle = FastAddRotations(angle, *(float *)(data + 0xDC));
+        if (FastDecTimer((short *)(data + 0xE0))) {
             *(float *)(data + 0xDC) = -*(float *)(data + 0xDC);
             *(short *)(data + 0xE0) = func_002A7820(*(short *)(data + 0xE2), *(short *)(data + 0xE4));
         }
@@ -300,7 +300,7 @@ void func_L03_00393838(unsigned char *obj) {
     frame.normal.q = 0;
     frame.normal.f[2] = 1.0f;
     qcopy(&frame.old, position);
-    func_00282CC0(position, ctx, position);
+    FastVecAdd(position, ctx, position);
     func_002FEE70(*(int *)(ctx + 0x1C), ctx, 0);
     func_00300190(position, position);
     func_00300248(ctx, ctx);
@@ -320,11 +320,11 @@ void func_L03_00393838(unsigned char *obj) {
     frame.packet.kind = 2;
     frame.packet.class_id = *(unsigned short *)(obj + 0xAA);
     frame.packet.active = 1;
-    if (func_002761F8(&frame.old, position, 0x10, obj, (int)&frame.packet)) {
-        if (!func_00278E78() && *(float *)(ctx + 8) < 0.0f) {
+    if (CollLine(&frame.old, position, 0x10, obj, (int)&frame.packet)) {
+        if (!GetCollHitMaterial() && *(float *)(ctx + 8) < 0.0f) {
             char *effect;
             Vec *spread;
-            func_002FD1B8(D_L03_001B31B0, D_L03_001B31B8, 1,
+            RippleDisturb(D_L03_001B31B0, D_L03_001B31B8, 1,
                 *(float *)(obj + 0x10), *(float *)(obj + 0x14), 0.5f, -0.35f);
             *(int *)(ctx + 0x14) = 1;
             func_00282C88(ctx);
@@ -365,21 +365,21 @@ void func_L03_00393838(unsigned char *obj) {
                 obj[0xBC] = 1;
                 qcopy(obj + 0x10, &reread->point);
                 func_00283028(&frame.velocity, ctx, &reread->normal);
-                func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-                func_00282F20(&frame.normal, &reread->normal, 1.0f);
+                vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+                vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
             } else {
                 if (collision->count < 1)
                     goto finish;
                 obj[0xBC] = 1;
                 qcopy(obj + 0x10, &collision->point);
                 func_00283028(&frame.velocity, ctx, &collision->normal);
-                func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-                func_00282F20(&frame.normal, &collision->normal, 1.0f);
+                vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+                vec_scale_to_length(&frame.normal, &collision->normal, 1.0f);
             }
         }
     } else if (func_00282948(ctx + 0x18)) {
         obj[0xBC] = 1;
-        func_00282CC0((char *)&frame.velocity, (char *)&frame.velocity, ctx);
+        FastVecAdd((char *)&frame.velocity, (char *)&frame.velocity, ctx);
     }
 finish:
     if (obj[0xBC]) {
@@ -412,9 +412,9 @@ void func_L03_00393C50(char *obj) {
     frame.normal.q = 0;
     frame.normal.f[2] = 1.0f;
     qcopy(&frame.old, position);
-    func_00282CC0(position, position, ctx);
+    FastVecAdd(position, position, ctx);
     func_002AFFD8(position, &frame.surface, 0);
-    func_00282D30(&frame.surface, &frame.surface, 0.0003055556f);
+    FastVecScale(&frame.surface, &frame.surface, 0.0003055556f);
     func_L00_0038F3D8(obj);
     frame.packet.moby = obj;
     frame.packet.flags = 0x830000;
@@ -430,7 +430,7 @@ void func_L03_00393C50(char *obj) {
     frame.packet.vector.f[2] = 1.0f;
     frame.packet.active = 1;
     (*(int *)(ctx + 0x14))++;
-    if (func_002761F8(&frame.old, position, 0x10, obj, &frame.packet)) {
+    if (CollLine(&frame.old, position, 0x10, obj, &frame.packet)) {
         collision = &D_L03_001BFDC0;
         hit = collision->hit;
         if (hit) {
@@ -449,8 +449,8 @@ void func_L03_00393C50(char *obj) {
                 qcopy(dest, source);
             }
             func_00283028(&frame.velocity, ctx, &reread->normal);
-            func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-            func_00282F20(&frame.normal, &reread->normal, 1.0f);
+            vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+            vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
         } else {
             collision = &D_L03_001BFDC0;
             if (collision->count <= 0)
@@ -458,12 +458,12 @@ void func_L03_00393C50(char *obj) {
             obj[0xBC] = 1;
             qcopy(position, &collision->point);
             func_00283028(&frame.velocity, ctx, &collision->normal);
-            func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-            func_00282F20(&frame.normal, &collision->normal, 1.0f);
+            vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+            vec_scale_to_length(&frame.normal, &collision->normal, 1.0f);
         }
     } else if (func_00282948(ctx + 0x18)) {
         obj[0xBC] = 1;
-        func_00282CC0((char *)&frame.velocity, (char *)&frame.velocity, ctx);
+        FastVecAdd((char *)&frame.velocity, (char *)&frame.velocity, ctx);
     }
 finish:
     if (*(unsigned char *)(obj + 0xBC)) {

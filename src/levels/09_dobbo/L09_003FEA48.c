@@ -418,7 +418,7 @@ void func_L09_00408478(u8 *obj)
             break;
         }
         if (D_00139768.flags & 1) {
-            func_0026FEB8(D_L09_001B1458);
+            STUB_printf(D_L09_001B1458);
             startCurrency = D_001A79F8;
             if (D_001A7AF8[0x197]) {
                 if (startCurrency < D_L09_0028E364)
@@ -433,25 +433,25 @@ void func_L09_00408478(u8 *obj)
                     func_002A7750(obj, 7, 1);
             }
         } else if (D_00139768.state < 0) {
-            func_0026FEB8(D_L09_001B1480);
+            STUB_printf(D_L09_001B1480);
             if (D_001395D7[0]) {
                 obj[0x30] = 0xff;
-                func_0026FEB8(D_L09_001B1498);
+                STUB_printf(D_L09_001B1498);
                 func_002A7750(obj, 4, 1);
             } else {
                 obj[0x30] = 0xff;
-                func_0026FEB8(D_L09_001B14C0);
+                STUB_printf(D_L09_001B14C0);
                 func_002A7750(obj, 3, 0);
             }
         } else {
-            func_0026FEB8(D_L09_001B14E8);
+            STUB_printf(D_L09_001B14E8);
             func_002A7750(obj, 1, 0);
         }
         func_L01_003128C0(obj);
         break;
     case 1:
-        if (func_002ACBC8(D_00189EA0, *(int *)p)) {
-            func_0026FEB8(D_L09_001B14F8);
+        if (IsPointInCuboid(D_00189EA0, *(int *)p)) {
+            STUB_printf(D_L09_001B14F8);
             if (func_00288AA0(D_L09_001BFC00, 0x5f)) {
                 func_L01_003246D0(obj);
                 func_00288BE8(D_L09_001BFC00);
@@ -486,8 +486,8 @@ void func_L09_00408478(u8 *obj)
         break;
     case 4:
         obj[0x30] = 0xff;
-        if (func_002ACBC8(D_00189EA0, *(int *)p)) {
-            func_0026FEB8(D_L09_001B1518);
+        if (IsPointInCuboid(D_00189EA0, *(int *)p)) {
+            STUB_printf(D_L09_001B1518);
             if (func_00288AA0(D_L09_001BFC00, 0x60)) {
                 func_00288BE8(D_L09_001BFC00);
                 func_002F5CC8();
@@ -560,7 +560,7 @@ void func_L09_00408478(u8 *obj)
             func_L01_00324550(0x27d2, D_001A7AF8[0x197] ? D_L09_0028E350[5] : D_L09_0028E350[4], -1);
             func_L01_003246D0(obj);
             if ((D_00138324 & 0x10) && func_00288AA0(D_L09_001BFC00, 10)) {
-                func_0026FEB8(D_L09_001B1540);
+                STUB_printf(D_L09_001B1540);
                 balance = D_001A79F8;
                 if (D_001A7AF8[0x197])
                     remaining = balance - D_L09_0028E350[5];
@@ -594,7 +594,7 @@ void func_L09_00408478(u8 *obj)
                 func_002A0430(obj[0xb0]);
             func_002DF3F8(D_00189EA0, D_00189EA0 + 0x10);
         } else
-            func_0029B3E0(0, -1);
+            MemcardSave(0, -1);
         break;
     }
 }
@@ -610,7 +610,7 @@ void func_L09_004091C8(char *obj)
     *(Quad_Dobbo *)vel = *(Quad_Dobbo *)initial;
     for (i = 0; i < 2; i++) {
         func_0029FCC0(obj, 2, pos);
-        pos[2] += func_00283CE0(i) * 0.015f;
+        pos[2] += IntToFloat(i) * 0.015f;
         if (i & 1)
             func_002BAE50(pos, vel, 0x77FF0000, 0xFF0060, 17, 150, -100, 1);
         else

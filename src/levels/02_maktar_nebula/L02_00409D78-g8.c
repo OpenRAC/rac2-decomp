@@ -1,6 +1,6 @@
 /* Per-frame update of a Maktar Nebula object. State 0 sets up its timers; state 1 runs a
    series of tests on its state record and two global records, calling func_0028A180,
-   func_00288E18 and func_L01_002EABA8 with the ids listed below.
+   func_00288E18 and TriggerSubtitleInCuboid with the ids listed below.
 
    `base` is one local for the flags record and the first two blocks on D_0018C958. Holding
    several values gives it the references and live length that win $s0 over `s`; separate
@@ -92,14 +92,14 @@ void func_L02_00409D78(char *e) {
         int mode=func_L01_00305E18(2);
         if(mode==2 && func_L01_00305E18(0)!=mode) {
             base=(HintHistory *)&D_001395B8;
-            if(!(((HintFlags *)base)->intro&4) && func_002ACBC8(D_00189EA0,s->value9C) && (D_001A7390[0]-D_0018C750.time1CC>432000 || !D_0018C750.count1C8)) {
+            if(!(((HintFlags *)base)->intro&4) && IsPointInCuboid(D_00189EA0,s->value9C) && (D_001A7390[0]-D_0018C750.time1CC>432000 || !D_0018C750.count1C8)) {
                 ((HintFlags *)base)->intro|=4;func_0028A180(0xa3c,0x93);
             }
         }
         base=&D_0018C958;
         if(base->countF0<65535) {
             if(D_001A7AF8[0x2E]) base->countF0=65535;
-            else if(func_002ACBC8(D_00189EA0,I(s,0))) {
+            else if(IsPointInCuboid(D_00189EA0,I(s,0))) {
                 if(base->countF0) {
                     if(timer_sda-base->timeF4>1080 || !base->timeF4)func_00288E18(0x9bd,0x14);
                     else if(base->timeF4<timer_sda)base->timeF4=timer_sda;
@@ -118,21 +118,21 @@ void func_L02_00409D78(char *e) {
                 if((count&0xffff)>=3600){func_00288E18(0x9c5,0x1c);base->count152=0;}
             } else {if(base->time154<D_001A7390[0])base->time154=D_001A7390[0];base->count152=0;}
         }
-        func_L01_002EABA8(0x9bf,0x16,2,s->value10,s->value14);
+        TriggerSubtitleInCuboid(0x9bf,0x16,2,s->value10,s->value14);
         if(D_0018C958.count120<65535) {
-            if(D_0018C750.count54>=3 || func_002ACBC8(D_00189EA0,s->value24))D_0018C958.count120=65535;
-            else if(func_002ACBC8(D_00189EA0,s->value20)) {
+            if(D_0018C750.count54>=3 || IsPointInCuboid(D_00189EA0,s->value24))D_0018C958.count120=65535;
+            else if(IsPointInCuboid(D_00189EA0,s->value20)) {
                 if(timer_sda-D_0018C958.time124>1080 || !D_0018C958.time124)func_00288E18(0x9c1,0x18);
                 else if(D_0018C958.time124<timer_sda)D_0018C958.time124=timer_sda;
             }
         }
-        func_L01_002EABA8(0x9c2,0x19,1,s->value30,s->value34);
+        TriggerSubtitleInCuboid(0x9c2,0x19,1,s->value30,s->value34);
         if(!D_0018C958.count138) {
             if(!s->value3C && unlock_sda)s->value3C=1;
             if(D_001A7AF8[0x26])D_0018C958.count138=65535;
-            if(s->value3C && func_002ACBC8(D_00189EA0,s->value38))func_00288E18(0x9c3,0x1a);
+            if(s->value3C && IsPointInCuboid(D_00189EA0,s->value38))func_00288E18(0x9c3,0x1a);
         }
-        func_L01_002EABA8(0x9c4,0x1b,0,s->value44,-1);
+        TriggerSubtitleInCuboid(0x9c4,0x1b,0,s->value44,-1);
         if(func_L02_00400CC8(D_L02_001B359C+(s->value68<<8))) {
             if(func_00282948(&s->value94) && (((D_001395B8.timers>>D_001A79F0[0])^1)&1)) {
                 if(!D_0018C750.countF0 || D_001A7390[0]-D_0018C750.timeF4>42000)func_0028A180(0x9c9,0x20);
@@ -141,18 +141,18 @@ void func_L02_00409D78(char *e) {
             if(func_L02_003D6BB0(D_L02_001B359C+(s->value6C<<8)) && (!D_0018C750.count1BC || D_001A7390[0]-D_0018C750.time1C0>72000) && func_00282948(&s->value98) && D_0018C958.value2C0>=0)func_00288E18(0x9e3,0x3a);
         }
         if(D_L02_001A8FF0) {
-            if(func_002ACBC8(D_00189EA0,s->value4C) && !D_0018C958.count15C) {func_0028A180(0x9c6,0x1d);s->value90=216000;}
+            if(IsPointInCuboid(D_00189EA0,s->value4C) && !D_0018C958.count15C) {func_0028A180(0x9c6,0x1d);s->value90=216000;}
             if(func_00282948(&s->value90)){func_0028A180(0x9c6,0x1d);s->value90=216000;}
             if(D_001A7390[0]-D_0018C750.time1A8<60)s->value90=216000;
         }
-        if(func_002ACBC8(D_00189EA0,s->value78) && (!D_0018C750.count1BC || D_001A7390[0]-D_0018C750.time1C0>72000) && !D_001395B8.hint && D_0018C958.value2C0>=0)func_00288E18(0x9e3,0x3a);
-        if(func_002ACBC8(D_00189EA0,s->value38))D_001395B8.hint=1;
-        if(D_001A7AF8[0x2E])func_L01_002EABA8(0x9f1,0x48,2,s->value7C,-1);
-        if(D_L02_001B30C8<3 && D_001A7AF8[0x26] && !func_002B38B8(objects_sda+(s->value88<<8)) && func_002ACBC8(D_00189EA0,s->value80)) {
+        if(IsPointInCuboid(D_00189EA0,s->value78) && (!D_0018C750.count1BC || D_001A7390[0]-D_0018C750.time1C0>72000) && !D_001395B8.hint && D_0018C958.value2C0>=0)func_00288E18(0x9e3,0x3a);
+        if(IsPointInCuboid(D_00189EA0,s->value38))D_001395B8.hint=1;
+        if(D_001A7AF8[0x2E])TriggerSubtitleInCuboid(0x9f1,0x48,2,s->value7C,-1);
+        if(D_L02_001B30C8<3 && D_001A7AF8[0x26] && !func_002B38B8(objects_sda+(s->value88<<8)) && IsPointInCuboid(D_00189EA0,s->value80)) {
             char *q;
             func_L00_003672F8();q=D_L02_001B368C+(s->value84<<7);func_L00_002B9D60(q+0x30,q+0x70,0,1);
         }
-        if(func_002ACBC8(D_00189EA0,s->value28)) {
+        if(IsPointInCuboid(D_00189EA0,s->value28)) {
             if(D_001A7390[0]-D_0018C958.time61C>120 || !D_0018C958.time61C)func_00288E18(0xa2b,0x82);
             else if(D_0018C958.time61C<D_001A7390[0])D_0018C958.time61C=D_001A7390[0];
         }

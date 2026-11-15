@@ -29,7 +29,7 @@ void func_L04_003F9C60(unsigned char *m,int sparks) {
             v.f[1]=func_002A7878_range(-1,1);
             v.f[2]=func_002A7878_range(-1,1);
             tmp.q=v.q;
-            func_00282F20((char *)velocity,(char *)&tmp,func_002A7878_range(0.05000000447034836f,0.10000000894069672f));
+            vec_scale_to_length((char *)velocity,(char *)&tmp,func_002A7878_range(0.05000000447034836f,0.10000000894069672f));
             func_L04_00358AE8(m+0x10,velocity,0x7F2F4F6F,func_002A7820(10,15),35000.0f);
         }
     }
@@ -39,7 +39,7 @@ void func_L04_003F9C60(unsigned char *m,int sparks) {
         sign=func_002A77E0(2)?negativeSign:1;
         tmp.q=0; tmp.f[2]=1; tmp.f[3]=1;
         tmp.f[2]=func_002A7878_range(0.01f,0.025f);
-        p=func_002BDCE8(m+0x10,0.2f,1,1.02f,140000.0f,sign,&tmp,color,0);
+        p=SpawnSpinningSparkParticle(m+0x10,0.2f,1,1.02f,140000.0f,sign,&tmp,color,0);
         if(p) {
             d=p+0x20;
             *(short *)(p+0xA)=func_002A7820(50,80);

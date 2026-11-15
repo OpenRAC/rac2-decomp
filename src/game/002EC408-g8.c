@@ -13,24 +13,24 @@ extern void func_0029FAE0(),
     func_002B7170(),
     func_00132858(),
     func_00132828(),
-    func_0026FEB8(),
-    func_00284E18(),
+    STUB_printf(),
+    SetBackgroundColor(),
     func_00298F00(),
     func_00298178(),
-    func_002939D0(),
+    LoadLevelChunkFromDisc(),
     func_002FCDA8(),
-    func_0027D330(),
+    FadeToBlack(),
     func_00133AA0(),
-    func_002E6178(),
+    SpawnEquipmentPieces(),
     func_002ED260(),
-    func_002FC280(),
+    SubmitBufferedDmaChain(),
     func_002FC220(),
-    func_00284FC0(),
+    PutDrawBufferSmall(),
     func_00285338(),
     func_00284EA8(),
     func_002B9000(),
     func_002FC3C0(),
-    func_002EAB18(),
+    InitializeLevelRuntime(),
     func_002EA8E8();
 extern int D_001B1680[] __attribute__((sda));
 extern int D_001A79F0[] __attribute__((sda));
@@ -81,14 +81,14 @@ void func_002EC408(void)
     func_0011AEA0(0);
     func_00133710(2,0,0,0,0);
     func_00133230();
-    func_00132028();
+    snd_Pump();
     func_002E5FE0();
     func_002B7170();
     D_001A63A8_3[7]=1;
     for (i=0; i<6; i++)if(((TransitionEngine *)D_00188660)->handles[i]){
         func_00132858(((TransitionEngine *)D_00188660)->handles[i]);
         func_00132828();
-        func_0026FEB8(D_001AC1E0,((TransitionEngine *)D_00188660)->handles[i]);
+        STUB_printf(D_001AC1E0,((TransitionEngine *)D_00188660)->handles[i]);
         D_001B16AC[0]=0;
         ((TransitionEngine *)D_00188660)->handles[i]=0;
     }
@@ -106,7 +106,7 @@ void func_002EC408(void)
     D_001B1640.y=((TransitionFog *)D_001B9040)->far_plane;
     D_001B1640.z=((TransitionFog *)D_001B9040)->near_intensity;
     D_001B1640.w=((TransitionFog *)D_001B9040)->far_intensity;
-    func_00284E18(0,0,0);
+    SetBackgroundColor(0,0,0);
     if(D_001B1680[0]<0) {
         while(((TransitionAudio *)D_001393E0)->state>=3 || ((TransitionAudio *)D_001393E0)->request>=0){
             func_00298F00();
@@ -118,13 +118,13 @@ void func_002EC408(void)
         func_001336D0(0);
         D_001A63A8_3[7]=0;
         func_002B7CE0(1);
-        while(func_00132028()){
+        while(snd_Pump()){
         }
         D_001A63A8_3[7]=1;
-        func_0027D330(6);
+        FadeToBlack(6);
         D_001A79F0[0]=D_001B1680[0];
-        func_002939D0();
-        func_00133580(0);
+        LoadLevelChunkFromDisc();
+        snd_CheckLoadInProgress(0);
         D_001A63A8_3[7]=0;
         func_002FCDA8();
         return;
@@ -136,42 +136,42 @@ void func_002EC408(void)
     D_001A7280[1]=1;
     ((TransitionArchive *)D_001BAF80)->flags|=0x80000000;
     ready=0;
-    func_002EAB18();
+    InitializeLevelRuntime();
     func_00133AA0(D_001A79F0[0],D_001C5540);
     kind=((TransitionState *)D_00152C00)->scene;
     if(kind==3){
-        D_001B2148[0]=func_0029EFD0(0x1342);
+        D_001B2148[0]=CreateMoby(0x1342);
         *(unsigned short *)(((TransitionScene *)D_001B8840_raw)->current+0x34)|=1;
     }
     else if(kind==1){
-        D_001B2148[0]=func_0029EFD0(0x128c);
+        D_001B2148[0]=CreateMoby(0x128c);
         *(unsigned short *)(((TransitionScene *)D_001B8840_raw)->current+0x34)|=1;
     }
     else if(kind==2){
-        D_001B2148[0]=func_0029EFD0(0x128d);
+        D_001B2148[0]=CreateMoby(0x128d);
         *(unsigned short *)(((TransitionScene *)D_001B8840_raw)->current+0x34)|=1;
     }
     else{
         int i;
         for(i=0;D_00214920[i];i++)D_00214920[i]=0;
-        func_002E6178(((TransitionScene *)D_001B8840_raw)->current);
+        SpawnEquipmentPieces(((TransitionScene *)D_001B8840_raw)->current);
     }
     func_002ED260(D_00240450);
     do {
-        func_002FC280();
+        SubmitBufferedDmaChain();
         func_002FC220();
-        func_00284FC0();
+        PutDrawBufferSmall();
         func_00285338();
         func_00284EA8();
         func_002B9000();
-        done=func_002E9268();
+        done=UpdatePlaybackScene();
         func_002EA8E8();
         func_00298F00();
         func_00298178();
         func_002FC3C0(1);
         func_001261F0(0);
         D_001B1598[0]=D_001B1598[0]+1;
-        if(!D_001ABEB0 && !ready)ready=func_00293A60();
+        if(!D_001ABEB0 && !ready)ready=ServiceLevelArchiveLoad();
     }
     while(!done);
     D_001ABF0C=0;
@@ -182,7 +182,7 @@ void func_002EC408(void)
             func_00298F00();
             func_00298178();
         }
-        while(!func_00293A60());
+        while(!ServiceLevelArchiveLoad());
     }
     while(((TransitionAudio *)D_001393E0)->state!=2 || ((TransitionAudio *)D_001393E0)->request>=0){
         func_0011AEA0(0);
@@ -192,12 +192,12 @@ void func_002EC408(void)
     }
     if(D_001B2130[2])func_00132858(D_001B2130[2]);
     if(D_001B2130[4])func_00132858(D_001B2130[4]);
-    while(func_00132028()){
+    while(snd_Pump()){
     }
     func_00132828();
     func_001336D0(0);
-    func_00133580(0);
-    func_00133580(0);
+    snd_CheckLoadInProgress(0);
+    snd_CheckLoadInProgress(0);
     D_001A63A8_3[7]=0;
     func_002FCDA8();
 }

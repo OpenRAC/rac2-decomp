@@ -85,9 +85,9 @@ void func_L01_00405300(PoseMoby *m)
         p->t += 1.0f / p->duration;
         if (p->t > 1.0f) p->t = 1.0f;
         blend = (1.0f - func_00283180(p->t * 3.1415927f)) * 0.5f;
-        func_00282CF0(delta, D_L01_001B264C[p->index].position, p->start_position);
-        func_00282D30(delta, delta, blend);
-        func_00282CC0(m->position, p->start_position, delta);
+        FastVecSub(delta, D_L01_001B264C[p->index].position, p->start_position);
+        FastVecScale(delta, delta, blend);
+        FastVecAdd(m->position, p->start_position, delta);
         m->rotation[2] = func_002AA150(p->start_rotation[2], D_L01_001B264C[p->index].rotation[2], blend);
         m->rotation[1] = func_002AA150(p->start_rotation[1], D_L01_001B264C[p->index].rotation[1], blend);
         m->rotation[0] = func_002AA150(p->start_rotation[0], D_L01_001B264C[p->index].rotation[0], blend);
@@ -98,7 +98,7 @@ void func_L01_00405300(PoseMoby *m)
         break;
     }
     if (m->state < 3) {
-        func_00282CF0(delta, m->position, position);
+        FastVecSub(delta, m->position, position);
         func_002AD6F0(p->track, delta, rotation, m->rotation);
     }
 }

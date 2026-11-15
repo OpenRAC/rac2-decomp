@@ -18,15 +18,15 @@ int func_L00_004237C8(char *object, void *input, int constrained, int preserve)
     char *vector = state + 0x160;
     char *controller = state + 0x1F0;
     char *transform = state + 0x60;
-    float old_length = func_00282DF0(vector);
+    float old_length = FastVecLength(vector);
     float length;
     float limit;
-    func_00282CF0(vector, input, state + 0xB0);
+    FastVecSub(vector, input, state + 0xB0);
     if (*(short *)(controller + 0x38)) {
-        func_00282F20(vector, vector, *(float *)(vector + 0x2C) - *(float *)(controller + 0x30));
+        vec_scale_to_length(vector, vector, *(float *)(vector + 0x2C) - *(float *)(controller + 0x30));
         return preserve;
     }
-    length = func_00282DF0(vector);
+    length = FastVecLength(vector);
     if (((Hero *)D_00189E20)->b[0x22B4] != 2) {
         if (func_00282C48(D_00138280) > 0.05f && preserve) {
             length -= D_L00_001B14B4;
@@ -35,7 +35,7 @@ int func_L00_004237C8(char *object, void *input, int constrained, int preserve)
     }
     if (!constrained && ((Hero *)D_00189E20)->i[0x229C / 4] != 2) {
         if (old_length < length) {
-            func_00282D30(vector, vector, old_length / length);
+            FastVecScale(vector, vector, old_length / length);
             *(float *)(controller + 0x30) = *(float *)(vector + 0x2C) - old_length;
             return preserve;
         }
@@ -43,10 +43,10 @@ int func_L00_004237C8(char *object, void *input, int constrained, int preserve)
     limit = D_L00_001B14C8;
     if (length < limit) {
         if (length <= 0.0001f) {
-            func_00282F20(vector, *(char **)(transform + 0xC0) + 0xC0, -limit);
+            vec_scale_to_length(vector, *(char **)(transform + 0xC0) + 0xC0, -limit);
             length = D_L00_001B14C8;
         } else {
-            func_00282D30(vector, vector, limit / length);
+            FastVecScale(vector, vector, limit / length);
             length = D_L00_001B14C8;
         }
     }

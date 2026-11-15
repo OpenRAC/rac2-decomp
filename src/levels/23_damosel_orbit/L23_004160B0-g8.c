@@ -68,7 +68,7 @@ void func_L23_004160B0(char *arg0) {
 
     hit = func_002A9640(arg0, 0x30000, 1);
     *(unsigned char *)(arg0 + 0xA8) = 0xFF;
-    func_00282978(state + 0x26);
+    FastDecTimer(state + 0x26);
     if (hit != 0) {
         if (*(short *)(state + 0x26) != 0 || (D_L23_001B1484 != 0 && func_L23_0041B948() != 0)) {
             if (func_L23_0041B948() != 0)
@@ -109,7 +109,7 @@ void func_L23_004160B0(char *arg0) {
                     float to_rad = 0.017453294f;
 
                     *(unsigned short *)(arg0 + 0x7C) = mask & ~(1 << i);
-                    angle = func_00283B98(func_002A78D8(spread, 120.0f) * to_rad,
+                    angle = FastAddRotations(func_002A78D8(spread, 120.0f) * to_rad,
                                           *(float *)(base + 0x158));
                     speed = func_002A7878(2.0f, 4.0f) * per_tick;
                     vec[0] = func_00283180(angle) * speed;

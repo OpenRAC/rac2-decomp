@@ -103,23 +103,23 @@ void func_L00_003C6B98(char *arg)
     v20[3] = 1.0f;
     obj = *(char **)(arg + 0x68);
     *(int *)v20 = 0;
-    func_L00_003C6A88(arg);
+    ResetBeamChainAndPulseState(arg);
     D_L00_001B2A14 = func_002ABB18(D_L00_001B2A14 + D_L00_001AFFD4);
-    func_00282F20(v0, arg + 0xD0, -D_L00_001B2A10);
+    vec_scale_to_length(v0, arg + 0xD0, -D_L00_001B2A10);
     if (*(char **)(obj + 0x10) != 0 && (def = func_002AB1F0(*(char **)(obj + 0x10))) != 0) {
-        func_00282D30(v40, *(char **)(obj + 0x10) + 0xE0, *(float *)(def + 0x10));
-        func_00282CC0(v30, *(char **)(obj + 0x10) + 0x10, v40);
+        FastVecScale(v40, *(char **)(obj + 0x10) + 0xE0, *(float *)(def + 0x10));
+        FastVecAdd(v30, *(char **)(obj + 0x10) + 0x10, v40);
     } else {
         float x = *(float *)(obj + 0x48), y = *(float *)(obj + 0x4C);
         func_002AF000(v30, D_L00_001AFFA4, x, y);
-        func_00282CC0(v30, v30, obj);
+        FastVecAdd(v30, v30, obj);
     }
     n = 0;
     dist = D_L00_001AFFA4;
     tries = 0;
     if (*(char **)(obj + 0x10) == 0) {
         qcopy(v40, obj);
-        while (func_002761F8(v40, v30, 0x14, D_00189E20.object, 0)) {
+        while (CollLine(v40, v30, 0x14, D_00189E20.object, 0)) {
             Collision *col;
             char *hit;
             if (++tries >= 7) break;
@@ -134,11 +134,11 @@ void func_L00_003C6B98(char *arg)
             }
             {
                 float v270[4];
-                func_00282CF0(v250, obj, &D_L00_001BF200.point);
-                f = func_00282DB0(D_00189E20.object + 0xE0, v250);
-                func_00282D30(v260, D_00189E20.object + 0xE0, f);
-                func_00282CF0(v270, v250, v260);
-                dist = func_00282DF0(v270);
+                FastVecSub(v250, obj, &D_L00_001BF200.point);
+                f = FastVecDot(D_00189E20.object + 0xE0, v250);
+                FastVecScale(v260, D_00189E20.object + 0xE0, f);
+                FastVecSub(v270, v250, v260);
+                dist = FastVecLength(v270);
             }
             break;
         }
@@ -146,11 +146,11 @@ void func_L00_003C6B98(char *arg)
             *(int *)(disabled[q] + 0x98) = *(int *)(*(char **)(disabled[q] + 0x24) + 0x10);
         }
     } else {
-        func_00282CF0(v40, obj, *(char **)(obj + 0x10) + 0x10);
-        f = func_00282DB0(D_00189E20.object + 0xE0, v40);
-        func_00282D30(v250, D_00189E20.object + 0xE0, f);
-        func_00282CF0(v260, v40, v250);
-        dist = func_00282DF0(v260);
+        FastVecSub(v40, obj, *(char **)(obj + 0x10) + 0x10);
+        f = FastVecDot(D_00189E20.object + 0xE0, v40);
+        FastVecScale(v250, D_00189E20.object + 0xE0, f);
+        FastVecSub(v260, v40, v250);
+        dist = FastVecLength(v260);
     }
     D_L00_001B2A10 = dist * D_L00_001AFFCC;
     qcopy(&D_L00_002403C0[0], obj);
@@ -160,47 +160,47 @@ void func_L00_003C6B98(char *arg)
     int i;
     for (i = 1; i < 12; i++) {
         func_00300190(&D_L00_002403C0[i], &D_L00_002403C0[i]);
-        func_00282CF0(v10, &D_L00_002403C0[i], &D_L00_002403C0[i - 1]);
-        t = func_00283CE0(i) * D_L00_001AFFCC;
+        FastVecSub(v10, &D_L00_002403C0[i], &D_L00_002403C0[i - 1]);
+        t = IntToFloat(i) * D_L00_001AFFCC;
         w = t * -0.49999997f + 0.9f;
         if (D_L00_001AFFD0 < i && *(char **)(obj + 0x10) != 0) {
-            func_00282CF0(v40, *(char **)(obj + 0x10) + 0x10, &D_L00_002403C0[i]);
-            func_00282F20(v40, v40, D_L00_001B2A10);
-            func_00282D08(v0, v0, v40, 0.2f);
+            FastVecSub(v40, *(char **)(obj + 0x10) + 0x10, &D_L00_002403C0[i]);
+            vec_scale_to_length(v40, v40, D_L00_001B2A10);
+            lerp_vector(v0, v0, v40, 0.2f);
         }
-        func_00282D08(v40, v10, v0, w);
-        len = func_00282DF0(v40);
+        lerp_vector(v40, v10, v0, w);
+        len = FastVecLength(v40);
         if (len == 0.0f) {
             qcopy(&D_L00_002403C0[i], &D_L00_002403C0[i - 1]);
         } else {
-            func_00282D30(v40, v40, D_L00_001B2A10 / len);
-            func_00282CC0(&D_L00_002403C0[i], &D_L00_002403C0[i - 1], v40);
+            FastVecScale(v40, v40, D_L00_001B2A10 / len);
+            FastVecAdd(&D_L00_002403C0[i], &D_L00_002403C0[i - 1], v40);
         }
-        func_00282CF0(v250, &D_L00_002403C0[i], &D_L00_002403C0[i - 1]);
-        func_00282DD8(v260, v250, D_0018A0E0);
-        func_00282F20(v260, v260, D_L00_001AFFE4 + (D_L00_001AFFE8 - D_L00_001AFFE4) * t);
+        FastVecSub(v250, &D_L00_002403C0[i], &D_L00_002403C0[i - 1]);
+        FastVecCross(v260, v250, D_0018A0E0);
+        vec_scale_to_length(v260, v260, D_L00_001AFFE4 + (D_L00_001AFFE8 - D_L00_001AFFE4) * t);
         {
         float v270[4];
         float m[4][4];
         for (j = 0; j < 20; j++) {
             func_002ACEC0(v270, v260, v250, (float)j * D_L00_001AFFE0);
-            func_00282CC0(&D_L00_00240600[i][j], v270, &D_L00_002403C0[i]);
+            FastVecAdd(&D_L00_00240600[i][j], v270, &D_L00_002403C0[i]);
         }
         qcopy(m[3], &D_L00_002403C0[i]);
-        func_00282F20(m[0], v250, 1.0f);
-        func_00282F20(m[1], v260, 1.0f);
-        func_00282DD8(m[2], m[1], m[0]);
+        vec_scale_to_length(m[0], v250, 1.0f);
+        vec_scale_to_length(m[1], v260, 1.0f);
+        FastVecCross(m[2], m[1], m[0]);
         r = D_L00_001B0008 + (D_L00_001B000C - D_L00_001B0008) * t;
-        ang = func_002ABB18(D_L00_001B2A14 + D_L00_001AFFD8 * func_00283CE0(i));
+        ang = func_002ABB18(D_L00_001B2A14 + D_L00_001AFFD8 * IntToFloat(i));
         v20[1] = r * func_00283198(ang);
         v20[2] = r * func_00283180(ang);
-        func_002830C0(&D_L00_00240480[i], v20, m);
+        transform_vector(&D_L00_00240480[i], v20, m);
         v20[2] = -v20[2];
-        func_002830C0(&D_L00_00240540[i], v20, m);
+        transform_vector(&D_L00_00240540[i], v20, m);
         }
     }
     }
-    ref_L00_003C6B98_00(func_L00_003C79F8, arg);
+    ref_L00_003C6B98_00(DrawBeamRingAndRailEffects, arg);
     scale = func_002A7878(0.1f, 1.7f);
     sign = func_002A77E0(2);
     if (sign == 0) sign = sign - 1;
@@ -220,11 +220,11 @@ void func_L00_003C6B98(char *arg)
         p = func_002C2210(v40, 0x1E, scale * 0.07f, scale * 0.7f, 0x7F7F7F7F, 1, sign, &D_L00_001A8F20, 0.003f, 1);
         if (p) p->b2 = D_L00_001FEAC4[0][7];
     }
-    func_00282CF0(v250, &D_L00_002403C0[1], &D_L00_002403C0[0]);
-    func_00282F20(v250, v250, D_L00_001B0010);
+    FastVecSub(v250, &D_L00_002403C0[1], &D_L00_002403C0[0]);
+    vec_scale_to_length(v250, v250, D_L00_001B0010);
     if (func_002A77E0(2) == 0) {
-        func_00282F20(v260, arg + 0xD0, D_L00_001B001C);
-        func_00282CC0(v40, &D_L00_002403C0[0], v260);
+        vec_scale_to_length(v260, arg + 0xD0, D_L00_001B001C);
+        FastVecAdd(v40, &D_L00_002403C0[0], v260);
         {
             Colors colors = D_L00_001B0048;
             float up[4], side[4];
@@ -234,9 +234,9 @@ void func_L00_003C6B98(char *arg)
         a = func_002A78D8(0.0f, D_L00_001B0018);
         b = func_002A78D8(0.0f, D_L00_001B0018);
         func_002ACEC0(up, v250, D_0018A0E0, b);
-        func_00282DD8(side, v250, D_0018A0E0);
+        FastVecCross(side, v250, D_0018A0E0);
         func_002ACEC0(up, up, side, a);
-        count = func_00283CF0(dist * 1.2f / D_L00_001B0010);
+        count = FloatToInt(dist * 1.2f / D_L00_001B0010);
         if (*(char **)(obj + 0x10) != 0) count *= 3;
         p = func_L00_0033C638(scale * 0.1f, scale, v40, count, color, 0, sign, up, *(int *)(obj + 0x10));
         if (p) p->b2 = D_L00_001FEAC4[0][6];
@@ -252,10 +252,10 @@ void func_L00_003C6B98(char *arg)
                 D_L00_001B2A80[k] = D_L00_001B0028;
                 D_L00_001B2AA0[k] = 0;
                 D_L00_001B2AB0[k] = D_L00_001B0038;
-                D_L00_001B2A90[k] = func_00283CE0(D_L00_001B003F);
+                D_L00_001B2A90[k] = IntToFloat(D_L00_001B003F);
                 qcopy(&D_L00_001B2A20[k], obj);
-                func_00282CF0(v260, &D_L00_002403C0[1], &D_L00_002403C0[0]);
-                func_00282F20(&D_L00_001B2A50[k], v260, 1.0f);
+                FastVecSub(v260, &D_L00_002403C0[1], &D_L00_002403C0[0]);
+                vec_scale_to_length(&D_L00_001B2A50[k], v260, 1.0f);
                 break;
             }
         }
@@ -275,22 +275,22 @@ void func_L00_003C6B98(char *arg)
                 if (u > 1.0f) u = 1.0f;
                 D_L00_001B2AB0[kk] = D_L00_001B0038 + (D_L00_001B0034 - D_L00_001B0038) * u;
                 if (D_L00_001B2AA0[kk] >= D_L00_001AFFA4) {
-                    func_00282D30(v260, &D_L00_001B2A50[kk], step);
-                    func_00282CC0(&D_L00_001B2A20[kk], &D_L00_001B2A20[kk], v260);
+                    FastVecScale(v260, &D_L00_001B2A50[kk], step);
+                    FastVecAdd(&D_L00_001B2A20[kk], &D_L00_001B2A20[kk], v260);
                 } else {
-                    seg = func_00283CF0(D_L00_001B2AA0[kk] / D_L00_001B2A10);
-                    rem = D_L00_001B2AA0[kk] - func_00283CE0(seg) * D_L00_001B2A10;
+                    seg = FloatToInt(D_L00_001B2AA0[kk] / D_L00_001B2A10);
+                    rem = D_L00_001B2AA0[kk] - IntToFloat(seg) * D_L00_001B2A10;
                     qcopy(&D_L00_001B2A20[kk], &D_L00_002403C0[seg]);
-                    if (seg == 11) func_00282CF0(v260, &D_L00_002403C0[seg], &D_L00_002403C0[seg + -1]);
-                    else func_00282CF0(v260, &D_L00_002403C0[seg + 1], &D_L00_002403C0[seg]);
-                    inv = func_00282DF0(v260);
+                    if (seg == 11) FastVecSub(v260, &D_L00_002403C0[seg], &D_L00_002403C0[seg + -1]);
+                    else FastVecSub(v260, &D_L00_002403C0[seg + 1], &D_L00_002403C0[seg]);
+                    inv = FastVecLength(v260);
                     if (inv != 0.0f) {
                         inv = 1.0f / inv;
-                        func_00282D30(v270, v260, rem * inv);
-                        func_00282CC0(&D_L00_001B2A20[kk], &D_L00_001B2A20[kk], v270);
-                        func_00282F20(v270, v260, inv);
-                        func_00282D08(&D_L00_001B2A50[kk], &D_L00_001B2A50[kk], v270, 0.1f);
-                        func_00282F20(&D_L00_001B2A50[kk], &D_L00_001B2A50[kk], 1.0f);
+                        FastVecScale(v270, v260, rem * inv);
+                        FastVecAdd(&D_L00_001B2A20[kk], &D_L00_001B2A20[kk], v270);
+                        vec_scale_to_length(v270, v260, inv);
+                        lerp_vector(&D_L00_001B2A50[kk], &D_L00_001B2A50[kk], v270, 0.1f);
+                        vec_scale_to_length(&D_L00_001B2A50[kk], &D_L00_001B2A50[kk], 1.0f);
                     }
                 }
             }

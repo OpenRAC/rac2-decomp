@@ -43,8 +43,8 @@ void func_002B0668(float *position)
     }
 
     if (active != 0.0f) {
-        if (func_002761F8(hit, &end, 18, 0, 0)) {
-            kind = func_00278E78();
+        if (CollLine(hit, &end, 18, 0, 0)) {
+            kind = GetCollHitMaterial();
             if (kind == 0 || kind == 4 || kind == 3) {
                 float scale;
 
@@ -53,9 +53,9 @@ void func_002B0668(float *position)
                 scale = func_002A7878(0.4f, 0.6f);
                 func_002C19D8(hit, scale, D_001A9E74, 5250.0f, -1);
             } else {
-                func_00282CF0(&offset, &D_001BAFA0, &D_001B5340);
+                FastVecSub(&offset, &D_001BAFA0, &D_001B5340);
                 func_002BA8A0(&D_001BAFA0,
-                    (unsigned char)(int)(func_00282E20(&offset) * 3.1833334f + 64.0f), 0);
+                    (unsigned char)(int)(vec_length_xy(&offset) * 3.1833334f + 64.0f), 0);
             }
         }
     }

@@ -33,7 +33,7 @@ void func_L12_00421110(u8 *a0)
     case 1:
         if (func_002A9640(a0, 0x4010000, 0) != 0 && *s == 0) {
             func_002A7750(a0, 2, -1);
-            func_002E5CF8(0, 0, (s32)a0);
+            PlayMobySound(0, 0, (s32)a0);
         }
         a0[0xA8] = 0xFF;
         break;
@@ -43,7 +43,7 @@ void func_L12_00421110(u8 *a0)
         func_L00_0032A258(a0, D_L12_001B1F80, D_L12_001B1F58, D_L12_001B1F50, 0xFFFF, 0,
                           D_L12_001B1FA0, 1, 0x1FE, 0xFF, 0);
         func_L00_00324F18(a0, pos, D_L12_001B1FB0, D_L12_001B1FB4, D_L12_001B1FB8);
-        func_0032C700(pos, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 0, *(f32 *)(a0 + 0x2C) * 20.0f, 20.0f,
+        SpawnExplosion(pos, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 0, *(f32 *)(a0 + 0x2C) * 20.0f, 20.0f,
                       1, 0, 1, 0);
         func_0029F338(a0);
         break;
@@ -74,24 +74,24 @@ void func_L12_00420660(u8 *a0)
     case 1:
         rec = D_L12_001B2E9C + (s[1] << 8);
         if (rec[0x31] != 0) {
-            phase = func_00283CE0(D_L12_001B29C8 % 60);
-            d = func_00283CE0(60);
+            phase = IntToFloat(D_L12_001B29C8 % 60);
+            d = IntToFloat(60);
             phase *= 6.2831855f;
             phase /= d;
-            *(s32 *)(rec + 0x78) = func_L01_0031BC68(0x802020A0, 0x80202050, phase - 3.1415927f);
+            *(s32 *)(rec + 0x78) = PulseColor(0x802020A0, 0x80202050, phase - 3.1415927f);
         }
         if (s[0] == -1)
             break;
         obj = D_L12_001B090C;
         if (obj != 0) {
-            if (func_002ACBC8(obj + 0x10, s[0])) {
+            if (IsPointInCuboid(obj + 0x10, s[0])) {
                 *(s32 *)(rec + 0x78) = 0x80A02020;
                 func_002A7750(a0, 2, -1);
                 if (s[2] != -1)
                     func_L00_003294F0(D_L12_001B2E9C + (s[2] << 8), 1);
             }
         } else if (func_L12_00404778()) {
-            if (func_002ACBC8(D_L12_001B1360 + 0x10, s[0])) {
+            if (IsPointInCuboid(D_L12_001B1360 + 0x10, s[0])) {
                 *(s32 *)(rec + 0x78) = 0x80A02020;
                 func_002A7750(a0, 2, -1);
                 if (s[2] != -1)
@@ -133,18 +133,18 @@ void func_L12_00429868(u8 *a0)
     case 1:
         life = *(s16 *)((u8 *)s + 0x34);
         if (life < 0 || func_00273B70(a0)) {
-            func_00283098(v, (u8 *)s + 0x20, a0 + 0xC0);
+            matrix_mul_vec3(v, (u8 *)s + 0x20, a0 + 0xC0);
             obj = 0;
-            func_00282CC0(v, a0 + 0x10, v);
-            func_0032C700(v, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 1.0f, 20.0f, state, state, 0, 0);
+            FastVecAdd(v, a0 + 0x10, v);
+            SpawnExplosion(v, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 1.0f, 20.0f, state, state, 0, 0);
             func_002E5DA0(2, 0, a0, 0x12B1);
             flags = *(u16 *)(a0 + 0x7C);
             if (flags & 1)
-                obj = func_0029EFD0(0x12E0);
+                obj = CreateMoby(0x12E0);
             else if (flags & 2)
-                obj = func_0029EFD0(0x12E1);
+                obj = CreateMoby(0x12E1);
             else if (flags & 4)
-                obj = func_0029EFD0(0x12E2);
+                obj = CreateMoby(0x12E2);
             if (obj != 0) {
                 qcopy(obj + 0x10, v);
                 *(f32 *)(obj + 0x2C) = *(f32 *)(*(u8 **)(obj + 0x24) + 0x24) *

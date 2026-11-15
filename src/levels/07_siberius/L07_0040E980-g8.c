@@ -42,7 +42,7 @@ void func_L07_0040E980(u8 *a0)
     u8 *es;
 
     base = D_L07_001FDEC0[*(s32 *)(state + 0x90)];
-    inv = 1.0f / func_00282E48(base + 0x10, base + 0x20);
+    inv = 1.0f / fast_vec_dist(base + 0x10, base + 0x20);
     fast = inv * 0.016666668f * D_L07_001B1700;
     slow = inv * 0.00027777778f * D_L07_001B1704;
     *(s32 *)(state + 0x11C) = 0;

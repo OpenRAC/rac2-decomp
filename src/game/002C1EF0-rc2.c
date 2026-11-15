@@ -44,13 +44,13 @@ void func_002C1EF0(s8 *arg0) {
     tmp.y = *(f32 *)(s2 + 4);
     tmp.z = *(f32 *)(s2 + 8);
     tmp.w = 0;
-    func_00282CC0(s3, s3, &tmp);
-    func_00282CC0(s1, s1, &tmp);
-    if (func_00282978(arg0 + 0xA) != 0) {
+    FastVecAdd(s3, s3, &tmp);
+    FastVecAdd(s1, s1, &tmp);
+    if (FastDecTimer(arg0 + 0xA) != 0) {
         func_002B9180(arg0);
         return;
     }
-    if (func_002761F8(s1, s3, 0x10, *(s32 *)(s2 + 0xC), 0) != 0) {
+    if (CollLine(s1, s3, 0x10, *(s32 *)(s2 + 0xC), 0) != 0) {
         TI v = D_001BAFA0;
         *(s16 *)(arg0 + 0xA) = 0;
         *(volatile TI *)(arg0 + 0x10) = v;

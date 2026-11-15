@@ -154,7 +154,7 @@ void func_L05_0041DA20(char *object)
         func_L00_002C42E0(0x31,0);
         if (D_L05_001B13E8) {
             func_L05_00379F48(1);
-            D_L05_001B1360 = func_L05_0041ED18();
+            D_L05_001B1360 = LockedEntryMenuInput();
             if (D_L05_001B1360 != -2) func_L05_00445A98();
             break;
         }
@@ -170,11 +170,11 @@ void func_L05_0041DA20(char *object)
             case 0: func_L05_00420A88(object); break;
             case 1: func_L05_00420E28(object); break;
             case 2: func_L05_00420FB0(object); break;
-            case 3: func_L05_00421100(object); break;
+            case 3: UpdateFeltzinGateCourse(object); break;
             }
         }
         if (D_L05_001A904C && !D_L05_001B13A8 && !D_L05_001B13F0) {
-            func_0029B758(0,func_L05_0041DF58);
+            func_0029B758(0,DrawFeltzinCombatHud);
             D_L05_001B13AC = 0;
             D_L05_001B13A8 = 1;
         }

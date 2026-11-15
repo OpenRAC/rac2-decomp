@@ -45,7 +45,7 @@ void func_L11_004465F8(char *self) {
     float height;
     float depth;
     if (*(float *)(state + 0x1BC) < D_L11_001B18FC) return;
-    q.gs[1] = func_0027C878(D_L11_001B18A0);
+    q.gs[1] = GetEffectTextureDescriptor(D_L11_001B18A0);
     pos1 = q.pos[1];
     pos2 = q.pos[2];
     pos3 = q.pos[3];
@@ -79,25 +79,25 @@ void func_L11_004465F8(char *self) {
         q.uv[2][1] = D_L11_001B18C4[0];
         q.uv[3][1] = D_L11_001B18CC[0];
         for (j = 0; j < 4; j++) {
-            int index = func_00283CF0(q.uv[j][1] + 0.2f);
+            int index = FloatToInt(q.uv[j][1] + 0.2f);
             float alpha;
             u32 c;
             q.uv[j][0] = D_L11_001B18B0[j][0] + *(float *)(state + 0xD8);
             alpha = func_00283198(*(float *)(state + 0xD0) * 3.1415927410125732f);
             c = D_L11_001B18A8[index];
-            q.color[j] = func_00283D38(c & mask, c, alpha);
+            q.color[j] = FastTweenColor(c & mask, c, alpha);
         }
-        func_00280B90(&q, 0, 0);
+        draw_world_quad(&q, 0, 0);
         for (j = 0; j < 4; j++) {
-            int index = func_00283CF0(q.uv[j][1] + 0.2f);
+            int index = FloatToInt(q.uv[j][1] + 0.2f);
             float alpha;
             u32 c;
             q.uv[j][0] = D_L11_001B18B0[j][0] + *(float *)(state + 0xDC);
             alpha = func_00283198(*(float *)(state + 0xD4) * 3.1415927410125732f);
             c = D_L11_001B18A8[index];
-            q.color[j] = func_00283D38(c & 0xFFFFFF, c, alpha);
+            q.color[j] = FastTweenColor(c & 0xFFFFFF, c, alpha);
         }
-        func_00280B90(&q, 0, 0);
+        draw_world_quad(&q, 0, 0);
     }
     qcopy(q.pos[0], points + 0x10);
     depth = D_L11_001B18E8;
@@ -113,23 +113,23 @@ void func_L11_004465F8(char *self) {
     q.uv[2][1] = D_L11_001B18C4[0];
     q.uv[3][1] = D_L11_001B18CC[0];
     for (j = 0; j < 4; j++) {
-        int index = func_00283CF0(q.uv[j][1] + 0.2f);
+        int index = FloatToInt(q.uv[j][1] + 0.2f);
         float alpha;
         u32 c;
         q.uv[j][0] = D_L11_001B18B0[j][0] + *(float *)(state + 0xD8);
         alpha = func_00283198(*(float *)(state + 0xD0) * 3.1415927410125732f);
         c = D_L11_001B18A8[index];
-        q.color[j] = func_00283D38(c & 0xFFFFFF, c, alpha);
+        q.color[j] = FastTweenColor(c & 0xFFFFFF, c, alpha);
     }
-    func_00280B90(&q, 0, 0);
+    draw_world_quad(&q, 0, 0);
     for (j = 0; j < 4; j++) {
-        int index = func_00283CF0(q.uv[j][1] + 0.2f);
+        int index = FloatToInt(q.uv[j][1] + 0.2f);
         float alpha;
         u32 c;
         q.uv[j][0] = D_L11_001B18B0[j][0] + *(float *)(state + 0xDC);
         alpha = func_00283198(*(float *)(state + 0xD4) * 3.1415927410125732f);
         c = D_L11_001B18A8[index];
-        q.color[j] = func_00283D38(c & 0xFFFFFF, c, alpha);
+        q.color[j] = FastTweenColor(c & 0xFFFFFF, c, alpha);
     }
-    func_00280B90(&q, 0, 0);
+    draw_world_quad(&q, 0, 0);
 }

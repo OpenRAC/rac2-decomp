@@ -1,7 +1,7 @@
 #include "common.h"
 
 /* Update the four-mission selection menu and return a completed selection.
- * The four table entries are also read by func_0029B910's bounded loop. */
+ * The four table entries are also read by RefreshMissionMenuItems's bounded loop. */
 extern int D_001A9A50 __attribute__((sda)), D_001A9A54 __attribute__((sda)), D_001A9A58 __attribute__((sda));
 extern int D_001A9AD8 __attribute__((sda));
 extern int D_001A9AC8[4] __attribute__((sda));
@@ -77,7 +77,7 @@ int func_0029BB30(void) {
     case 0: return -1;
     case 1:
      changed = 0;
-     func_0029B910();
+     RefreshMissionMenuItems();
      if (D_00138180.flags & 0x10) {
       D_001A9AD8 = 1;
       D_00138180.state = 2;
@@ -92,7 +92,7 @@ int func_0029BB30(void) {
    }
    func_0033A9F8(D_001A8CFC + 0x3F138, enabled);
   }
-  result = func_00349190(D_001A8CFC + 0x3C950, &D_00138180);
+  result = UpdateDirectionSelection(D_001A8CFC + 0x3C950, &D_00138180);
   if (result >= 0 && func_002ED8A0(D_001A9AC8[result]) < 0) result = -1;
   if (changed) {
    func_00349488(D_001A8CFC_gp + 0x3C950);

@@ -23,10 +23,10 @@ void func_L09_003F6AB8(unsigned char *a0) {
     unsigned char *p = *(unsigned char **)(s0 + 0x68);
     unsigned char *s1 = p + 0x10;
     char buf[16];
-    func_00282CF0((f32 *)buf, (const f32 *)p, (const f32 *)s1);
-    func_00282D30(buf, buf, D_L09_001B0EE8);
-    func_00282CC0((char *)s1, (char *)s1, buf);
-    func_00282CC0((char *)(s0 + 0x10), (char *)(s0 + 0x10), (char *)s1);
+    FastVecSub((f32 *)buf, (const f32 *)p, (const f32 *)s1);
+    FastVecScale(buf, buf, D_L09_001B0EE8);
+    FastVecAdd((char *)s1, (char *)s1, buf);
+    FastVecAdd((char *)(s0 + 0x10), (char *)(s0 + 0x10), (char *)s1);
 }
 
 /* The pulse table's entry count, reached as 0x21E8($gp). */
@@ -46,7 +46,7 @@ void func_L09_003FE2D8(unsigned char *a0) {
     int step;
     int i;
     *timer = t;
-    step = func_00283CF0(t);
+    step = FloatToInt(t);
     if (*timer >= 1.0f)
         *timer = 0.0f;
     for (i = 0; i < D_L09_001B11D8; i++) {
@@ -122,13 +122,13 @@ void func_L09_003F69A0(unsigned char *a0, f32 f) {
     f32 x[4];
     f32 y[4];
     f32 z[4];
-    func_00282CF0(v, (f32 *)(s2 + 0x10), (f32 *)(*(int *)(s1 + 0x20) + 0x10));
-    func_00283698(w, (f32 *)(*(int *)(s1 + 0x20) + 0xC0));
-    func_002830C0(v, v, w);
+    FastVecSub(v, (f32 *)(s2 + 0x10), (f32 *)(*(int *)(s1 + 0x20) + 0x10));
+    matrix_from_basis_rows(w, (f32 *)(*(int *)(s1 + 0x20) + 0xC0));
+    transform_vector(v, v, w);
     v[1] = v[1] + (v[1] / func_00282C48(v[1])) *
         (*(f32 *)(s1 + 0x28) - func_00282C48(v[1])) * f;
-    func_00283098(v, v, (f32 *)(*(int *)(s1 + 0x20) + 0xC0));
-    func_00282CC0((char *)(s2 + 0x10), (char *)v, (char *)(*(int *)(s1 + 0x20) + 0x10));
+    matrix_mul_vec3(v, v, (f32 *)(*(int *)(s1 + 0x20) + 0xC0));
+    FastVecAdd((char *)(s2 + 0x10), (char *)v, (char *)(*(int *)(s1 + 0x20) + 0x10));
     *(f32 *)(s2 + 0x18) = *(f32 *)(s2 + 0x18) +
         (*(f32 *)(*(int *)(s1 + 0x20) + 0x18) + D_L09_001B0F04 - *(f32 *)(s2 + 0x18)) * f;
 }

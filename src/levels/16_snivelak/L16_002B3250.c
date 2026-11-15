@@ -132,7 +132,7 @@ s32 func_L16_002B3250(s32 arg0) {
             flag = 1;
         }
     } else if (e->f20 != 0) {
-        func_00282CF0(&vec, &D_00189E20.f80, e->f20 + 0x10);
+        FastVecSub(&vec, &D_00189E20.f80, e->f20 + 0x10);
     } else {
         func_L00_002D36E0(&vec, 0, -1.0f, 0.0f, 0.0f);
     }
@@ -148,7 +148,7 @@ s32 func_L16_002B3250(s32 arg0) {
             u8 *r = func_002A9640(D_00189E20.f2290, 1, 0);
 
             if (r != 0) {
-                func_L00_002A4EF8(func_00283CF0(*(float *)(r + 0x2C)));
+                AdjustPlayerHealth(FloatToInt(*(float *)(r + 0x2C)));
             }
             if (D_00189E20.f24CC == 0) {
                 func_L16_002C0BC8(0x16, 1);
@@ -175,7 +175,7 @@ s32 func_L16_002B3250(s32 arg0) {
         }
         break;
     }
-    func_00282CC0(&D_00189E20.fF0, &D_00189E20.fF0, &vec);
-    func_00282CC0(&D_00189E20.f110, &D_00189E20.f110, &vec);
+    FastVecAdd(&D_00189E20.fF0, &D_00189E20.fF0, &vec);
+    FastVecAdd(&D_00189E20.f110, &D_00189E20.f110, &vec);
     return 1;
 }

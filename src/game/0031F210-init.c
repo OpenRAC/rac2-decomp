@@ -43,8 +43,8 @@ int func_003248A8(char *self)
     if (B(self,0x20)==0) {
         F(self,0x2C)*=1.1f;
         B(self,0x7E)|=1;
-        B(d,0x48)=func_00283CF0(20.0f);
-        B(d,0x4A)=func_00283CF0(16.0f);
+        B(d,0x48)=FloatToInt(20.0f);
+        B(d,0x4A)=FloatToInt(16.0f);
         if(func_002A77E0(2)==1) H(self,0x34)|=0x8000;
         F(d,0x284)*=0.017453294f;
         P(d,0x18)=d+0x110;
@@ -68,7 +68,7 @@ int func_003248A8(char *self)
         func_0029FCC0(self,3,d+0x300);
         F(d,0x308)+=20.0f;
         func_0029FCC0(self,3,d+0x310);
-        if(func_002761F8(d+0x310,d+0x300,0,self,0)) F(d,0x308)=D_001BAFA8;
+        if(CollLine(d+0x310,d+0x300,0,self,0)) F(d,0x308)=D_001BAFA8;
         if(!I(d,0x27C) && I(d,0x288)==-1) {
             F(self,0x18)=func_002A89A8(self+0x10,0,0.5f);
             func_002A7750(self,1,0);
@@ -81,7 +81,7 @@ int func_003248A8(char *self)
             func_002A7750(self,3,2);
             if(B(self,0x43)!=12) func_002A7470(self,12,0,0);
             I(self,0x98)=0; F(d,0x30)=2.5f;
-            P(d,0x2E0)=func_0029EFD0(0xAB7);
+            P(d,0x2E0)=CreateMoby(0xAB7);
             if(!P(d,0x2E0)) return 1;
             B(P(d,0x2E0),0x30)=B(self,0x30);
             H(P(d,0x2E0),0x32)=H(self,0x32);
@@ -98,7 +98,7 @@ int func_003248A8(char *self)
         }
         func_00325B70(self,d+0x2A0,0,2);
     }
-    if(B(self,0x31) && func_00282E48(self+0x10,D_001B5340)<24.0f) {
+    if(B(self,0x31) && fast_vec_dist(self+0x10,D_001B5340)<24.0f) {
         func_002A93B0(self); B(self,0x6F)=22;
     }
     changed=0; if(B(d,0x2E)==2) changed=1;
@@ -149,7 +149,7 @@ int func_003248A8(char *self)
     if(F(self,0x18)<90.0f) {
         func_00325D30(self,d+0x2A0);
         func_002AC728(self,self+0x10,-1,0.5f,13.0f);
-        func_002A6C58(self,0,3);
+        SetDeathBits(self,0,3);
         return 1;
     }
     if(changed) {func_003250F8(self); return 1;}

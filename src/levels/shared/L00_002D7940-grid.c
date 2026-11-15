@@ -29,10 +29,10 @@ float *func_L00_002DB350(float radius, Quad *position)
     int x, y;
     float *point = origin.f;
     origin.q = *position;
-    x = func_00283CF0(point[0] * 0.0625f);
-    y = func_00283CF0(point[1] * 0.0625f);
+    x = FloatToInt(point[0] * 0.0625f);
+    y = FloatToInt(point[1] * 0.0625f);
     if (x < 0 || y < 0 || x > 64 || y > 64) {
-        func_0026FEB8(D_L00_001A8988);
+        STUB_printf(D_L00_001A8988);
     } else {
         int cell = ((int *)D_L00_001B1880[0])[y * 64 + x];
         int i;
@@ -42,11 +42,11 @@ float *func_L00_002DB350(float radius, Quad *position)
         for (i = 0; i < ((CollisionCell *)cell)->count; i++) {
             CollisionPrimitive *primitive = &((CollisionCell *)cell)->primitives[i];
             float limit;
-            func_00282CF0(delta, primitive->position, point);
+            FastVecSub(delta, primitive->position, point);
             limit = primitive->radius;
             delta[3] = 1.0f;
-            if (func_00282E20(delta) < limit + radius &&
-                func_L00_002DB4B8(point, primitive->position, radius))
+            if (vec_length_xy(delta) < limit + radius &&
+                IsPointInCollisionPrimitive(point, primitive->position, radius))
                 return primitive->position;
         }
     }

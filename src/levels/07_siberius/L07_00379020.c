@@ -19,13 +19,13 @@ void func_L07_00379020(u8 *m)
     for (i = 0; i < 200; i++) {
         func_L02_0031E9E8(pos, 15.0f);
         pos[2] = func_002A7878(-7.0f, 7.0f);
-        func_00282CC0(pos, pos, D_L07_001B9200);
-        func_00282D30(ahead, D_L07_001B9200 + 0x230, 4.0f);
-        func_00282CC0(pos, ahead, pos);
+        FastVecAdd(pos, pos, D_L07_001B9200);
+        FastVecScale(ahead, D_L07_001B9200 + 0x230, 4.0f);
+        FastVecAdd(pos, ahead, pos);
         func_L02_0031E9E8(vel, vars[0] * 0.0166666675f);
         vel[2] = -(vars[1] * 0.0166666675f) * func_002A7878(0.8f, 1.2f);
         func_L07_00336860(pos, vel, 0, 1);
     }
-    func_00282D30(ahead, D_L07_001B9200 + 0x230, 4.0f);
-    func_00282CC0(vars + 0x60 / 4, ahead, D_L07_001B9200);
+    FastVecScale(ahead, D_L07_001B9200 + 0x230, 4.0f);
+    FastVecAdd(vars + 0x60 / 4, ahead, D_L07_001B9200);
 }

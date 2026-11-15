@@ -255,8 +255,8 @@ void func_L02_003C49A0(float *pos, int count) {
     int i;
     int sign;
     char *particle;
-    func_00282CF0(direction, (float *)D_L02_001BA500, pos);
-    func_00282F20((char *)offset, (char *)direction, 0.3f);
+    FastVecSub(direction, (float *)D_L02_001BA500, pos);
+    vec_scale_to_length((char *)offset, (char *)direction, 0.3f);
     direction[2] = 0;
     axis[0] = 0;
     axis[1] = 0;
@@ -268,16 +268,16 @@ void func_L02_003C49A0(float *pos, int count) {
         if (!sign) sign--;
         angle = func_002A7878_range(-1.0471977f, 1.0471977f);
         func_002ACEC0(velocity, direction, axis, angle);
-        func_00282F20((char *)velocity, (char *)velocity, func_002A7878_range(0.05f, 3.0f) * 0.0166666675f);
+        vec_scale_to_length((char *)velocity, (char *)velocity, func_002A7878_range(0.05f, 3.0f) * 0.0166666675f);
         velocity[2] = func_002A7878_range(1.0f, 5.0f) * 0.0166666675f;
-        func_00282CC0(origin, pos, offset);
+        FastVecAdd(origin, pos, offset);
         pos[0] += func_002A78D8(0, 0.15f);
         pos[1] += func_002A78D8(0, 0.15f);
         pos[2] += func_002A78D8(0, 0.15f);
         particle = func_002C2210(origin, 60, size * 0.1f, size, 0xDDFF1010, 0, sign, velocity, 0, 0.002f);
-        if (particle) particle[9] = func_00283CF0(4.0f) + 0x70;
+        if (particle) particle[9] = FloatToInt(4.0f) + 0x70;
         particle = func_002C2210(origin, 60, size * 0.07f, size * 0.7f, 0xDDFF1010, 1, -sign, velocity, 0, 0.002f);
-        if (particle) particle[9] = func_00283CF0(4.0f) + 0x70;
+        if (particle) particle[9] = FloatToInt(4.0f) + 0x70;
     }
 }
 
@@ -294,7 +294,7 @@ void func_L02_003C4E18(char *a0)
     /* retail holds 0x40490FD0 here; this spelling is what the rebuilt assembler reads to
        those bits */
     f20 = func_00283B98_12(*(float *)(s0 + 0xF8), 3.14159f);
-    func_0026FEB8(D_L02_001AFE38, func_801234F0(v[0]), func_801234F0(v[1]),
+    STUB_printf(D_L02_001AFE38, func_801234F0(v[0]), func_801234F0(v[1]),
                   func_801234F0(v[2]), func_801234F0(f20));
     func_L00_002D40A0(v, 0, f20);
 }
@@ -323,12 +323,12 @@ int func_L02_003C5098(char *a0)
 
     box = *(struct L02Boxes *)D_L02_001AFEA0;
     sub = *(void **)(a0 + 0x68);
-    f0 = func_00282E80(a0 + 0x10, D_00189EA0);
+    f0 = vec_distance_xy(a0 + 0x10, D_00189EA0);
     if (f0 > 24.0f)
         return 0;
     if (*(int *)((char *)sub + 4) != -1)
-        return func_002ACBC8(D_00189EA0, *(int *)((char *)sub + 4));
-    func_00282CF0((float *)&vec, (float *)D_00189EA0, (float *)(a0 + 0x10));
+        return IsPointInCuboid(D_00189EA0, *(int *)((char *)sub + 4));
+    FastVecSub((float *)&vec, (float *)D_00189EA0, (float *)(a0 + 0x10));
     func_002AFDD8((unsigned char *)a0, (unsigned char *)&vec, (unsigned char *)&vec, 0);
     if (vec.x >= box.b[0].lo && vec.x <= box.b[0].hi &&
         vec.y >= box.b[1].lo && vec.y <= box.b[1].hi &&
@@ -356,17 +356,17 @@ void func_L02_003C51F8(char *obj, u32 color1, u32 color2) {
     if (func_002A8508(*(u8 *)(obj + 0x21), -1) < 2)
         return;
     list = (u16 *)D_L02_001FC060[*(u8 *)(obj + 0x21)];
-    *(float *)(vars + 0x128) = func_00283B98(*(float *)(vars + 0x128), 0.104719772f);
+    *(float *)(vars + 0x128) = FastAddRotations(*(float *)(vars + 0x128), 0.104719772f);
     do {
         moby = D_L02_001B359C + ((*list & 0x7FFF) << 8);
         if (*(u8 *)(obj + 0x20) == 7) {
             if (*(short *)(moby + 0xAA) != 0x896) {
-                func_002A0468(moby, func_L01_0031BC68(*(float *)(vars + 0x128), 0x5050DD, 0x505050),
+                func_002A0468(moby, PulseColor(*(float *)(vars + 0x128), 0x5050DD, 0x505050),
                               14, 14, 14);
                 if (*(short *)(moby + 0xAA) == 0x873) {
                     child = *(char **)(moby + 0x68);
                     func_002A0468(*(void **)(child + 0x1C),
-                                  func_L01_0031BC68(*(float *)(vars + 0x128), 0x5050DD, 0x505050),
+                                  PulseColor(*(float *)(vars + 0x128), 0x5050DD, 0x505050),
                                   14, 14, 14);
                 }
             }
@@ -382,9 +382,9 @@ void func_L02_003C51F8(char *obj, u32 color1, u32 color2) {
             if (*(short *)(moby + 0xAA) == 0x873) {
                 child = *(char **)(moby + 0x68);
                 *(u32 *)(*(char **)(child + 0x1C) + 0x78) =
-                    func_L01_0031BC68(*(float *)(vars + 0x128), color1, color2);
+                    PulseColor(*(float *)(vars + 0x128), color1, color2);
             } else {
-                *(u32 *)(moby + 0x78) = func_L01_0031BC68(*(float *)(vars + 0x128), color1, color2);
+                *(u32 *)(moby + 0x78) = PulseColor(*(float *)(vars + 0x128), color1, color2);
             }
         }
     } while ((short)*list++ >= 0);
@@ -415,9 +415,9 @@ void func_L02_003CCEA0(char *a0) {
     qcopy(&v[1], s0 + 0x10);
     *(float *)((char *)&v[1] + 8) += 1.0f;
     if (*(unsigned char *)(s0 + 0x20) == 0xB) {
-        func_00282CF0((float *)&v[0], (float *)(s1 + 0x360), (float *)&v[1]);
+        FastVecSub((float *)&v[0], (float *)(s1 + 0x360), (float *)&v[1]);
     } else {
-        func_00282CF0((float *)&v[0], D_00189F00, (float *)&v[1]);
+        FastVecSub((float *)&v[0], D_00189F00, (float *)&v[1]);
     }
     func_002AFDD8((unsigned char *)s0, (unsigned char *)&v[0],
                  (unsigned char *)&v[0], 0);
@@ -427,7 +427,7 @@ void func_L02_003CCEA0(char *a0) {
     else if (yaw < -0.7853982448577881f)
         yaw = -0.7853982448577881f;
     *(float *)(s1 + 0x278) = yaw;
-    pitch = func_00282E20((char *)&v[0]);
+    pitch = vec_length_xy((char *)&v[0]);
     pitch = -func_00283248(pitch, *(float *)((char *)&v[0] + 8));
     if (pitch > 0.523598849773407f)
         pitch = 0.523598849773407f;
@@ -479,7 +479,7 @@ void func_L02_003CD298(struct L02NearObject *a0)
         e = D_L02_001B359C + ((*p & 0x7FFF) << 8);
         if (e == 0)
             break;
-        d = func_00282E48(e + 0x10, D_00189EA0);
+        d = fast_vec_dist(e + 0x10, D_00189EA0);
         if (d < min) {
             min = d;
             best = e;
@@ -599,7 +599,7 @@ void func_L02_003CE4D0(char *obj) {
             *(short *)(d + 0x338) = 1;
             *(int *)(obj + 0x9c) = 3;
             *(unsigned short *)(obj + 0x34) |= 0x100;
-            *(float *)(d + 0x90) = func_00282E48(obj + 0x10, D_L02_001B3210) - 1.5f;
+            *(float *)(d + 0x90) = fast_vec_dist(obj + 0x10, D_L02_001B3210) - 1.5f;
         } else {
             *(int *)(obj + 0x9c) = 12;
             *(float *)(d + 0x90) = *(float *)(obj + 0x18) - 1.0f;
@@ -614,8 +614,8 @@ void func_L02_003CE4D0(char *obj) {
         } else *(int *)(d + 0x218) = -1;
         *(float *)(d + 0x324) = func_002A7878_range(1.0f, 1.332999945f);
         *(float *)(obj + 0x2c) = *(float *)(*(char **)(obj + 0x24) + 0x24) * *(float *)(d + 0x324);
-        *(char *)(d + 0x48) = func_00283CF0(15.0f);
-        *(char *)(d + 0x4a) = func_00283CF0(6.4f);
+        *(char *)(d + 0x48) = FloatToInt(15.0f);
+        *(char *)(d + 0x4a) = FloatToInt(6.4f);
         *(int *)(d + 0x98) = 3;
         *(float *)(d + 0x80) = 0.2f;
         *(float *)(d + 0x84) = 0.2f;
@@ -650,7 +650,7 @@ void func_L02_003CE4D0(char *obj) {
         }
         qcopy(d + 0x2e0, obj + 0x10);
     }
-    if (*(unsigned char *)(obj + 0x31) && func_00282E48(obj + 0x10, D_L02_001BA500) < 24.0f) {
+    if (*(unsigned char *)(obj + 0x31) && fast_vec_dist(obj + 0x10, D_L02_001BA500) < 24.0f) {
         func_002A93B0(obj);
         *(char *)(obj + 0x6f) = 22;
     }
@@ -685,8 +685,8 @@ void func_L02_003CE908(char *a0) {
     char *q;
     unsigned short n;
 
-    func_00282978(p + 0x310);
-    func_00282978(p + 0x312);
+    FastDecTimer(p + 0x310);
+    FastDecTimer(p + 0x312);
     n = *(unsigned short *)(a0 + 0x96);
     if (n <= 0xFFFE)
         *(unsigned short *)(a0 + 0x96) = n + 1;
@@ -728,7 +728,7 @@ void func_L02_003CEC70(char *a0) {
     float x;
     float y;
 
-    func_00282CF0(v, (const float *)(p + 0x1F0), (const float *)(a0 + 0x10));
+    FastVecSub(v, (const float *)(p + 0x1F0), (const float *)(a0 + 0x10));
     func_002AFDD8((unsigned char *)a0, (unsigned char *)v, (unsigned char *)v, 0);
     x = func_00283248(v[0], v[1]);
     *(float *)(p + 0x2C0) = x;
@@ -736,7 +736,7 @@ void func_L02_003CEC70(char *a0) {
         *(float *)(p + 0x2C0) = 0.7853982448577881f;
     else if (x < -0.7853982448577881f)
         *(float *)(p + 0x2C0) = -0.7853982448577881f;
-    y = -func_00283248(func_00282E20((char *)v), v[2]);
+    y = -func_00283248(vec_length_xy((char *)v), v[2]);
     *(float *)(p + 0x2C8) = y;
     if (y > 0.523598849773407f)
         *(float *)(p + 0x2C8) = 0.523598849773407f;
@@ -833,11 +833,11 @@ void func_L02_003CEE40(struct L02Kind330Object *a0) {
     struct L02Kind330Entity *e;
     struct L02Kind330 *s0;
 
-    f = func_00283B98(o->f328, 0.20943954586982727f);
+    f = FastAddRotations(o->f328, 0.20943954586982727f);
     o->f328 = f;
     f = func_00283198(f);
     o->f32C = f * 0.5f + 0.5f;
-    a0->f78 = func_00283D38(v.a, v.b, o->f32C);
+    a0->f78 = FastTweenColor(v.a, v.b, o->f32C);
     if (o->f330 != D_L02_001B30C8) {
         for (q = (unsigned short *)D_L02_001FC060[a0->group];
              a0->group != 0xFF && a0->group <= D_L02_001B35B8 && q != 0 &&
@@ -897,7 +897,7 @@ void func_L02_003CF1B8(u8 *self)
                   func_002A77E0(0xFF) & 0xFF, 0, size.x);
     for (i = 0; i < 1; i++) {
         func_002A7A00(pos, 0.0f, 0.5f);
-        func_00282CC0(pos, pos, self + 0x10);
+        FastVecAdd(pos, pos, self + 0x10);
         vel[2] = -(func_002A7878(speed.x, speed.y) * 0.016666668f);
         func_002C3150(pos, vel, kind.b, func_002A7820(count.r[1].a, count.r[1].b) & 0xFF,
                       func_002A77E0(0xFF) & 0xFF, 0, size.y);
@@ -930,8 +930,8 @@ float func_L02_003D1820(char *a0, char *a1) {
     v[0] = *(TI128 *)a1;
     v[1] = *(TI128 *)(a0 + 0xD0);
     func_L02_002F1FB8((char *)&v[2], (char *)&v[0], a0 + 0x10);
-    func_00282F20((char *)&v[2], (char *)&v[2], 1.0f);
-    return func_00282DB0((char *)&v[1], (char *)&v[2]);
+    vec_scale_to_length((char *)&v[2], (char *)&v[2], 1.0f);
+    return FastVecDot((char *)&v[1], (char *)&v[2]);
 }
 
 /* func_L02_003D1FA0 is in L02_003D1FA0-g8.c for its small-data accesses. */
@@ -943,7 +943,7 @@ void func_L02_003D29D0(char *a0) {
     char *s0 = a0;
 
     if (*(BatchA_A17_s32 *)(*(BatchA_A17_s32 *)(s0 + 0x68) + 0x3C) == 0)
-        func_L00_003DD2B8();
+        UpdateRotatingBouncingEffect();
     func_L00_002E6EF8((void *)func_L02_003D28E0, s0);
 }
 
@@ -975,10 +975,10 @@ void func_L02_003D6BC0(char *a0)
         *(int *)(s2 + 0xB4) = D_L02_001B3FD8;
         break;
     case 3:
-        func_00283738(s1 + 0xC0, s2 + 0x80, s1 + 0xC0);
+        multiply_matrix3x3(s1 + 0xC0, s2 + 0x80, s1 + 0xC0);
         if (*(int *)(s2 + 0xB4) == D_L02_001B3FD8)
-            func_002E5CF8(1, 0, s1);
-        func_00283658(buf, s1 + 0xC0);
+            PlayMobySound(1, 0, s1);
+        copy_matrix_rotation(buf, s1 + 0xC0);
         func_002AB6D8((float *)buf, s1 + 0xF0);
         func_L00_00323958(s1, s2 + 0x30);
         func_L02_003D7140(s1);
@@ -987,11 +987,11 @@ void func_L02_003D6BC0(char *a0)
             func_002A7750(s1, 1, -1);
         if (func_002E59B0((int)s1, *(short *)(s2 + 0xC0)) != 0)
             return;
-        *(short *)(s2 + 0xC0) = func_002E5CF8(0, 4, s1);
+        *(short *)(s2 + 0xC0) = PlayMobySound(0, 4, s1);
         break;
     case 4:
-        func_00283738(s1 + 0xC0, s2 + 0x80, s1 + 0xC0);
-        func_00283658(buf, s1 + 0xC0);
+        multiply_matrix3x3(s1 + 0xC0, s2 + 0x80, s1 + 0xC0);
+        copy_matrix_rotation(buf, s1 + 0xC0);
         func_002AB6D8((float *)buf, s1 + 0xF0);
         func_L00_00323958(s1, s2 + 0x30);
         func_L02_003D7140(s1);
@@ -1108,7 +1108,7 @@ void func_L02_003F0628(char *a0) {
 /* Forwards the first argument with a null second and a third of three. */
 /* Its callback callers also supply two integer slots that this body ignores. */
 void func_L02_003FC248(void *a0, int unused_a1, int unused_a2) {
-    func_002A6C58(a0, 0, 3);
+    SetDeathBits(a0, 0, 3);
 }
 
 /* The two entry scalers live in the -g8 sibling: retail reads the table through $gp. */
@@ -1117,7 +1117,7 @@ void func_L02_003FC248(void *a0, int unused_a1, int unused_a2) {
 
 /* Allocates sixteen of sixty with no owner; on success attaches A0 as kind two. */
 void func_L02_003FF698(void *a0) {
-    if (func_L00_0032EF10(16, 60, 0))
+    if (PadPressedWithin(16, 60, 0))
         func_002A7750(a0, 2, -1);
 }
 
@@ -1131,7 +1131,7 @@ void func_L02_003FFC48(char *pos, int a1, int a2, char *a3, int t0, float f12, f
     long long r;
 
     ref_L02_003FFC48_00(pkt);
-    r = func_0027C878(a3);
+    r = GetEffectTextureDescriptor(a3);
 
     *(long long *)(pkt + 136) = ((long long)t0 << 2) | 0x8000000040LL;
     *(long long *)(pkt + 128) = 280993940374112LL;
@@ -1145,11 +1145,11 @@ void func_L02_003FFC48(char *pos, int a1, int a2, char *a3, int t0, float f12, f
     quat[3] = 0.0f;
     quat[2] = func_00283248(D_L02_001BA3C0.x_140 - *(float *)(pos + 0),
                             D_L02_001BA3C0.y_144 - *(float *)(pos + 4));
-    quat[1] = -func_00283248(func_00282E80(pos, (void *)&D_L02_001BA3C0.x_140),
+    quat[1] = -func_00283248(vec_distance_xy(pos, (void *)&D_L02_001BA3C0.x_140),
                              D_L02_001BA3C0.z_148 - *(float *)(pos + 8));
     quat[0] = f13;
 
-    func_00283410(m, quat);
+    euler_to_matrix(m, quat);
 
     m[12] = *(float *)(pos + 0);
     m[13] = *(float *)(pos + 4);
@@ -1157,7 +1157,7 @@ void func_L02_003FFC48(char *pos, int a1, int a2, char *a3, int t0, float f12, f
     m[15] = 1.0f;
 
     ref_L02_003FFC48_01(pkt, f12);
-    func_00280B90(pkt, m, 0);
+    draw_world_quad(pkt, m, 0);
 }
 
 /* Below 6000 in the low half-word, while the high one reads three. */

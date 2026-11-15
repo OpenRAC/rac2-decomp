@@ -27,7 +27,7 @@ void func_L03_0041A570(u8 *e) {
     pos.q=0; pos.f[2]=-8.0f;
     switch(e[0x20]) {
     case 0:
-        func_00282D30(&pos,&pos,*(float *)(e+0x2c));
+        FastVecScale(&pos,&pos,*(float *)(e+0x2c));
         s->handle=func_L00_0033E220(&pos,e,0x40202080,*(float *)(e+0x2c)*4200000.0f,-1,1,1.5f,-1,0,-1);
         func_002A7750(e,1,-1);
         if (s->enabled) D_L03_001AEBF8--;
@@ -41,8 +41,8 @@ void func_L03_0041A570(u8 *e) {
     case 2: {
         int skip = D_L03_001B1B50;
         func_L00_0032A258(e,D_L03_001B1B30,D_L03_001B1B28,D_L03_001B1B20,63,0,skip,0,65535,255,0);
-        func_002E5CF8(0,0,e);
-        func_0032C700(e+0x10,0,25,20,20,20,45,1,0.75f,20.0f,1,1,0,0);
+        PlayMobySound(0,0,e);
+        SpawnExplosion(e+0x10,0,25,20,20,20,45,1,0.75f,20.0f,1,1,0,0);
         { u16 *flags=(u16 *)(e+0x34);
           *flags |= 0x41;
           s->timer=30; }
@@ -60,12 +60,12 @@ void func_L03_0041A570(u8 *e) {
         g.f[0]=5; g.f[1]=5; g.f[2]=-7;
         h.f[0]=-15; h.f[1]=-5; h.f[2]=-10;
         i.f[0]=-7; i.f[1]=5;
-        if(func_002B3868(e)) func_L03_002ECF08(e,&a,&b,&f,&g,40,1);
-        func_00282D08(&l,&f,&h,1.0f-(float)s->timer*0.033333335f);
-        func_00282D08(&m,&g,&i,1.0f-(float)s->timer*0.033333335f);
-        func_00282D08(&j,&a,&c,1.0f-(float)s->timer*0.033333335f);
-        func_00282D08(&k,&b,&d,1.0f-(float)s->timer*0.033333335f);
-        func_L03_002ECF08(e,&j,&k,&l,&m,3,1);
+        if(func_002B3868(e)) SpawnParticleBurst(e,&a,&b,&f,&g,40,1);
+        lerp_vector(&l,&f,&h,1.0f-(float)s->timer*0.033333335f);
+        lerp_vector(&m,&g,&i,1.0f-(float)s->timer*0.033333335f);
+        lerp_vector(&j,&a,&c,1.0f-(float)s->timer*0.033333335f);
+        lerp_vector(&k,&b,&d,1.0f-(float)s->timer*0.033333335f);
+        SpawnParticleBurst(e,&j,&k,&l,&m,3,1);
         if(func_00282948(&s->timer)) func_0029F338(e);
         break;
     }

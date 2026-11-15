@@ -45,7 +45,7 @@ void func_L23_003C16D8(char *obj) {
     if (*(unsigned char *)(obj + 0x95) == 2) {
         if (*(short *)(state + 0x2A6) == 0)
             *(int *)(state + 0x2AC) = 0;
-        func_00282CF0(v0, D_00189EA0, *(char **)(state + 0x2A0) + 0x10);
+        FastVecSub(v0, D_00189EA0, *(char **)(state + 0x2A0) + 0x10);
         r = func_002B04E0(*(char **)(state + 0x2A0), v0, 0);
         b1 = *(float *)(state + 0x68) + *(float *)(state + 0x68);
         a1 = *(float *)(state + 0x64);
@@ -54,12 +54,12 @@ void func_L23_003C16D8(char *obj) {
         func_002AAA00(&fz0, r, a1, b1, c1, state + 0x2AC, 0);
         qzero_nc(t);
         ((float *)t)[2] = *(float *)(state + 0x2AC);
-        func_002833F0(v1, t);
-        func_00283738(*(char **)(state + 0x2A0) + 0xC0, *(char **)(state + 0x2A0) + 0xC0, v1);
+        euler_rotation_basis(v1, t);
+        multiply_matrix3x3(*(char **)(state + 0x2A0) + 0xC0, *(char **)(state + 0x2A0) + 0xC0, v1);
         func_002A05A8(*(char **)(state + 0x2A0));
         *(unsigned short *)(*(char **)(state + 0x2A0) + 0x34) |= 0x106;
         func_002A0F48(*(char **)(state + 0x2A0));
-        func_00282D30(u, state + 0x280, -1.0f);
+        FastVecScale(u, state + 0x280, -1.0f);
         func_002B0408(*(char **)(state + 0x2A0) + 0xC0, u, 0);
         *(short *)(state + 0x2A6) = D_L23_001AFA64;
         return;
@@ -75,7 +75,7 @@ void func_L23_003C16D8(char *obj) {
             ((float *)v0)[3] = 1.0f;
             func_0029FC20(obj, 1, v1);
             qzero_nc(t);
-            func_00283098(v0, v0, v1);
+            matrix_mul_vec3(v0, v0, v1);
             r = func_002B04E0(*(char **)(state + 0x2A0), v0, 0);
             a1 = *(float *)(state + 0x64) + *(float *)(state + 0x64);
             c1 = *(float *)(state + 0x6C);
@@ -84,14 +84,14 @@ void func_L23_003C16D8(char *obj) {
             func_002AAA00(&fz1, r, a1, b1, c1, state + 0x2AC, 0);
             qzero_nc(u);
             ((float *)u)[2] = *(float *)(state + 0x2AC);
-            func_002833F0(r3, u);
-            func_00283738(*(char **)(state + 0x2A0) + 0xC0, *(char **)(state + 0x2A0) + 0xC0, r3);
+            euler_rotation_basis(r3, u);
+            multiply_matrix3x3(*(char **)(state + 0x2A0) + 0xC0, *(char **)(state + 0x2A0) + 0xC0, r3);
             func_002A05A8(*(char **)(state + 0x2A0));
             *(unsigned short *)(*(char **)(state + 0x2A0) + 0x34) |= 0x106;
             func_002A0F48(*(char **)(state + 0x2A0));
-            func_00282D30(r4, state + 0x280, -1.0f);
+            FastVecScale(r4, state + 0x280, -1.0f);
             func_002B0408(*(char **)(state + 0x2A0) + 0xC0, r4, 0);
-            func_00282978((short *)(state + 0x2A6));
+            FastDecTimer((short *)(state + 0x2A6));
         }
     }
 }

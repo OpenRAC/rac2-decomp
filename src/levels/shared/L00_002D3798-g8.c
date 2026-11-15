@@ -120,7 +120,7 @@ void func_L00_002D5940(void) {
     }
 
     mount = func_L00_002F3DA8(D_00189E20.weapon);
-    func_00283658(m, D_L00_001B8FF0);
+    copy_matrix_rotation(m, D_L00_001B8FF0);
     qcopy_nc(&m[12], D_L00_001B8FF0 - 0x230);
     m[15] = 1.0f;
     qcopy_nc(offset, mount);
@@ -133,15 +133,15 @@ void func_L00_002D5940(void) {
         turn = D_L00_001A7FE4[0] * 0.0002908882452175021f;
     else
         turn = D_L00_001A7FE0 * 0.0002908882452175021f;
-    func_002AA2E8(&D_00189E20.angleVelocity, turn, 0.006981317885220051f);
-    D_00189E20.angle = func_00283B98(D_00189E20.angle, D_00189E20.angleVelocity);
+    ApproachValue(&D_00189E20.angleVelocity, turn, 0.006981317885220051f);
+    D_00189E20.angle = FastAddRotations(D_00189E20.angle, D_00189E20.angleVelocity);
     offset[2] += func_00283198(D_00189E20.angle) * 0.02f;
 
-    func_002830C0(obj->position, offset, m);
+    transform_vector(obj->position, offset, m);
     if (!func_L00_002D6418())
-        func_00282CC0(obj->position, obj->position, D_00189E20.velocity);
-    func_00283410(rot, mount + 0x10);
-    func_00283738(obj->rotMatrix, m, rot);
+        FastVecAdd(obj->position, obj->position, D_00189E20.velocity);
+    euler_to_matrix(rot, mount + 0x10);
+    multiply_matrix3x3(obj->rotMatrix, m, rot);
     func_002AB6D8(obj->rotMatrix, obj->rotation);
     func_002A91F0(D_00189E20.rotation, obj->rotation);
 
@@ -149,12 +149,12 @@ void func_L00_002D5940(void) {
         func_002AA548(&D_00189E20.blend, &D_00189E20.blendVelocity, 1.0f,
                       D_L00_001A7CE0 * 0.016666667f, D_L00_001A7CE4 * 0.00027777778f,
                       D_L00_001A7CE0 * 0.016666667f);
-        func_00283098(temp, D_00189E20.transitionPos, &D_00189E20);
-        func_00282CC0(temp, temp, D_00189E20.position);
-        func_00282D08(obj->position, temp, obj->position, D_00189E20.blend);
+        matrix_mul_vec3(temp, D_00189E20.transitionPos, &D_00189E20);
+        FastVecAdd(temp, temp, D_00189E20.position);
+        lerp_vector(obj->position, temp, obj->position, D_00189E20.blend);
         func_002A91F0(a, obj->rotation);
         func_00283810(b, D_00189E20.transitionRot, a, D_00189E20.blend);
-        func_00283958(b, obj->rotMatrix);
+        quaternion_to_rotation_basis(b, obj->rotMatrix);
     }
 
     obj->drawn = 1;
@@ -164,11 +164,11 @@ void func_L00_002D5940(void) {
     if ((D_L00_001B19C8[0] ^ 1) & 1) {
         scale = 0.0009765625f;
         height = obj->bounds[3] * scale;
-        func_00282D30(temp, obj->bounds, scale);
-        func_00282F20(a, obj->rotMatrix[1], height * -1.2f);
-        func_00282CC0(a, a, temp);
-        if (func_002761F8(D_L00_001B8DC0, a, 0, D_00189E20.owner, 0)) {
-            target = (D_00189E20.offset - height) + func_00282E48(D_L00_001BF220, temp);
+        FastVecScale(temp, obj->bounds, scale);
+        vec_scale_to_length(a, obj->rotMatrix[1], height * -1.2f);
+        FastVecAdd(a, a, temp);
+        if (CollLine(D_L00_001B8DC0, a, 0, D_00189E20.owner, 0)) {
+            target = (D_00189E20.offset - height) + fast_vec_dist(D_L00_001BF220, temp);
             D_00189E20.offsetTarget = target;
             if (target > 0.0f)
                 D_00189E20.offsetTarget = 0.0f;
@@ -181,7 +181,7 @@ void func_L00_002D5940(void) {
 
     func_002AA548(&D_00189E20.offset, &D_00189E20.offsetVelocity, D_00189E20.offsetTarget,
                   0.0041666669f, 0.0041666669f, 0.083333336f);
-    func_00283678(D_00189E20.transform, m);
+    copy_matrix3x4(D_00189E20.transform, m);
     qcopy_nc(&D_00189E20.vector760, m);
     qcopy_nc(&D_00189E20.vector770, &D_L00_001B8DD0);
 

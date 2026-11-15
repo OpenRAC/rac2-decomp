@@ -50,7 +50,7 @@ void func_002FD1B8(SurfacePatch *patch, int count, int mode,
                 float impulse;
                 int page;
                 if (distanceSquared < 1.0f) impulse = strength;
-                else impulse = strength / func_00282C10(distanceSquared);
+                else impulse = strength / square_root(distanceSquared);
                 if (mode == 0) {
                     if (func_00282C48(impulse) < func_00282C48(patch->samples[D_001AD5A4].rows[row][column]))
                         impulse = patch->samples[D_001AD5A4].rows[row][column];

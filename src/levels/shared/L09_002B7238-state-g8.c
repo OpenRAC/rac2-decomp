@@ -33,7 +33,7 @@ void func_L09_003EAB20(char *object)
     func_L09_003EAA18(object);
     qcopy(position,state+0x330);
     switch (FIELD(object,unsigned char,0x95)) {
-    case 0: func_0026FEB8(D_L09_001B0C50,FIELD(object,short,0xB2),FIELD(object,short,0xAA)); break;
+    case 0: STUB_printf(D_L09_001B0C50,FIELD(object,short,0xB2),FIELD(object,short,0xAA)); break;
     case 1:
         if (FIELD(state,int,0x154)==1 || func_002B38B8(object)) {
             FIELD(state,int,0x354)=FIELD(state,int,0x378);
@@ -56,7 +56,7 @@ void func_L09_003EAB20(char *object)
         break;
     }
     switch (FIELD(object,unsigned char,0x20)) {
-    case 0: func_0026FEB8(D_L09_001B0C50,FIELD(object,short,0xB2),FIELD(object,short,0xAA)); break;
+    case 0: STUB_printf(D_L09_001B0C50,FIELD(object,short,0xB2),FIELD(object,short,0xAA)); break;
     case 1: break;
     case 2:
         ready = 1;

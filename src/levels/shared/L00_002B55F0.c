@@ -139,14 +139,14 @@ int func_L00_002B55F0(int mode)
         PLAYER->path_constrain_pending = 0;
     }
     facingUp = 0;
-    if (func_00282DB0(&PLAYER->basis, &PLAYER->up) > -0.92f) facingUp = 1;
+    if (FastVecDot(&PLAYER->basis, &PLAYER->up) > -0.92f) facingUp = 1;
     switch (PLAYER->control_mode) {
     case 17:
         break;
     case 15:
         func_00282C88(&offset);
         offset.z = 0.8f;
-        func_00283098(&offset, &offset, PLAYER->moby + 0xc0);
+        matrix_mul_vec3(&offset, &offset, PLAYER->moby + 0xc0);
         break;
     default:
         if (PLAYER->gravity_mode || PLAYER->timer || facingUp) {
@@ -164,7 +164,7 @@ int func_L00_002B55F0(int mode)
         }
         break;
     }
-    func_00282CC0(&PLAYER->position, &PLAYER->position, &offset);
+    FastVecAdd(&PLAYER->position, &PLAYER->position, &offset);
     for (iteration = 0; iteration < 8; ++iteration) {
         if (PLAYER->control_mode == 17) {
             if (!func_00277258(0.6f, &PLAYER->position, 0x24, PLAYER->moby)) break;
@@ -193,9 +193,9 @@ int func_L00_002B55F0(int mode)
         PLAYER->wall_hit = 1;
         PLAYER->coll_hit_moby = HIT->moby;
     }
-    func_00282CF0(&PLAYER->position, &PLAYER->position, &offset);
-    func_00282CF0(&displacement, &PLAYER->position, &previous);
-    if (func_00282DF0(&displacement) > PLAYER->capsule_radius * 1.5f) {
+    FastVecSub(&PLAYER->position, &PLAYER->position, &offset);
+    FastVecSub(&displacement, &PLAYER->position, &previous);
+    if (FastVecLength(&displacement) > PLAYER->capsule_radius * 1.5f) {
         if (mode == 15) {
             if (displacement.x > 512.0f) displacement.x = 512.0f;
             else if (displacement.x < -512.0f) displacement.x = -512.0f;
@@ -203,8 +203,8 @@ int func_L00_002B55F0(int mode)
             else if (displacement.y < -512.0f) displacement.y = -512.0f;
             if (displacement.z > 512.0f) displacement.z = 512.0f;
             else if (displacement.z < -512.0f) displacement.z = -512.0f;
-            func_00282F20(&displacement, &displacement, PLAYER->capsule_radius);
-            func_00282CC0(&PLAYER->position, &previous, &displacement);
+            vec_scale_to_length(&displacement, &displacement, PLAYER->capsule_radius);
+            FastVecAdd(&PLAYER->position, &previous, &displacement);
         }
         return -1;
     }

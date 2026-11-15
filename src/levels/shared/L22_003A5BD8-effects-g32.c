@@ -38,7 +38,7 @@ void func_L22_003A5BD8(u8 * obj, int index, int flip) {
     qcopy(z, obj + 0xE0);
     qcopy(origin, p);
     qcopy(dir, obj + 0xE0);
-    f = func_00282DF0(ctl + 0x1B0, x);
+    f = FastVecLength(ctl + 0x1B0, x);
     {
         float r = func_002A7878(0.0f, 0.1f);
         f *= 60.0f;
@@ -54,27 +54,27 @@ void func_L22_003A5BD8(u8 * obj, int index, int flip) {
         a[1] = -a[1];
         b[1] = -b[1];
     }
-    func_002830C0(pos, a, x);
-    func_00282CC0(pos, pos, p);
-    func_00282CF0(tmp, D_L22_001B9C80, pos);
+    transform_vector(pos, a, x);
+    FastVecAdd(pos, pos, p);
+    FastVecSub(tmp, D_L22_001B9C80, pos);
     tmp[2] = 0.0f;
-    func_00282F20(tmp, tmp, ref_L22_003A5BD8_02);
-    func_00282CC0(pos, pos, tmp);
+    vec_scale_to_length(tmp, tmp, ref_L22_003A5BD8_02);
+    FastVecAdd(pos, pos, tmp);
     for (i = 0; i < ref_L22_003A5BD8_03; i++) {
         float r = func_002A7878(0.0f, f * ref_L22_003A5BD8_04);
-        func_00282F20(vel, dir, -((ref_L22_003A5BD8_05 + r) * (1.0f / 60.0f)));
+        vec_scale_to_length(vel, dir, -((ref_L22_003A5BD8_05 + r) * (1.0f / 60.0f)));
         func_002ACB48(pos, ref_L22_003A5BD8_06);
         func_L02_003449D8(pos, vel, &ref_L22_003A5BD8_11, (void *)func_002A77E0(2), 1);
     }
-    func_002830C0(pos, b, x);
-    func_00282CC0(pos, pos, p);
+    transform_vector(pos, b, x);
+    FastVecAdd(pos, pos, p);
     for (i = 0; (float)i < f * (float)ref_L22_003A5BD8_10 + 2.0f; i++) {
         float r = func_002A7878(0.0f, f * ref_L22_003A5BD8_07);
-        func_00282F20(vel, dir, -((ref_L22_003A5BD8_08 + r) * (1.0f / 60.0f)));
+        vec_scale_to_length(vel, dir, -((ref_L22_003A5BD8_08 + r) * (1.0f / 60.0f)));
         func_002ACB48(pos, ref_L22_003A5BD8_09);
         func_L02_003449D8(pos, vel, &ref_L22_003A5BD8_12, (void *)func_002A77E0(2), 1);
         r = func_002A7878(0.0f, f * ref_L22_003A5BD8_07);
-        func_00282F20(vel, dir, -((ref_L22_003A5BD8_08 + r) * (1.0f / 60.0f)));
+        vec_scale_to_length(vel, dir, -((ref_L22_003A5BD8_08 + r) * (1.0f / 60.0f)));
         func_002ACB48(pos, ref_L22_003A5BD8_09);
         func_L02_003449D8(pos, vel, &ref_L22_003A5BD8_13, (void *)func_002A77E0(2), 1);
     }

@@ -75,7 +75,7 @@ void func_L07_0040FC88(u8 *self)
                     func_002E5DA0(1,0,P(state,0xf4),0x11d9);
                     D_L07_001B31A0[i]=1;
                 } else if((D_L07_001B1E08[0]&7)==(((int)P(state,0xf4)>>8)&7)) {
-                    func_00282CF0(&pos,D_L07_00189EA0,P(state,0xf4)+0x10);
+                    FastVecSub(&pos,D_L07_00189EA0,P(state,0xf4)+0x10);
                     func_002AFDD8(P(state,0xf4),&pos,&pos,0);
                     if(pos.f[0]<-14.0f) {
                         func_002E5DA0(1,0,P(state,0xf4),0x11d9);
@@ -117,7 +117,7 @@ void func_L07_0040FC88(u8 *self)
                     func_L07_003F7968(D_L07_001B22DC[0]+(W(state,0xc4)<<8),P(state,0xf8),0);
                     D_L07_001B31A0[i]=2;
                 } else if((D_L07_001B1E08[0]&7)==(((int)P(state,0xf8)>>8)&7)) {
-                    func_00282CF0(&pos,D_L07_00189EA0,P(state,0xf8)+0x10);
+                    FastVecSub(&pos,D_L07_00189EA0,P(state,0xf8)+0x10);
                     func_002AFDD8(P(state,0xf8),&pos,&pos,0);
                     if(pos.f[0]<-12.0f) {
                         func_L07_003EEE08(sibEntities+(W(P(P(state,0xf8),0x68),0xb8)<<8));
@@ -180,7 +180,7 @@ void func_L07_0040FC88(u8 *self)
                     D_L07_001B31A0[i]=1;
                     func_002E5DA0(1,0,P(state,0xfc),0x11d9);
                 } else if((D_L07_001B1E08[0]&7)==(((int)P(state,0xfc)>>8)&7)) {
-                    func_00282CF0(&pos,D_L07_00189EA0,P(state,0xfc)+0x10);
+                    FastVecSub(&pos,D_L07_00189EA0,P(state,0xfc)+0x10);
                     func_002AFDD8(P(state,0xfc),&pos,&pos,0);
                     if(pos.f[0]<-14.0f) {
                         D_L07_001B31A0[i]=1;
@@ -195,7 +195,7 @@ void func_L07_0040FC88(u8 *self)
             break;
         case 9:
             if(D_L07_001B31A0[i]==0 && D_L07_00189E20.ridingFlag && D_L07_00189E20.riding==P(state,0x100)) {
-                func_00282CF0(&pos,&D_L07_00189E20.position,P(state,0x100)+0x10);
+                FastVecSub(&pos,&D_L07_00189E20.position,P(state,0x100)+0x10);
                 func_002AFDD8(P(state,0x100),&pos,&pos,0);
                 if(pos.f[2]>5.8f) {
                     func_L07_003F7968(sibEntities+(W(state,0xc4)<<8),P(state,0x100),1);

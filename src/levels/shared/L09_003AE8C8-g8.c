@@ -35,7 +35,7 @@ extern void func_002A0F48(char *);
 char *func_L09_003AE8C8(void *pos, char *owner, float f, float range, float c, void *dir, int a,
                         int b, float d)
 {
-    char *obj = func_0029EFD0(0x5DE);
+    char *obj = CreateMoby(0x5DE);
 
     if (obj) {
         float length, ticks, factor;
@@ -48,13 +48,13 @@ char *func_L09_003AE8C8(void *pos, char *owner, float f, float range, float c, v
         qcopy(obj + 0x10, pos);
         st->range = range;
         qcopy(obj + 0xC0, &st->direction);
-        func_00282DD8(obj + 0xD0, obj + 0xC0, D_0018A0E0);
-        func_00282F20(obj + 0xD0, obj + 0xD0, -1.0f);
-        func_00282DD8(obj + 0xE0, obj + 0xD0, obj + 0xC0);
-        length = func_00282DF0(dir);
+        FastVecCross(obj + 0xD0, obj + 0xC0, D_0018A0E0);
+        vec_scale_to_length(obj + 0xD0, obj + 0xD0, -1.0f);
+        FastVecCross(obj + 0xE0, obj + 0xD0, obj + 0xC0);
+        length = FastVecLength(dir);
         ticks = st->range / length;
-        st->ticks = func_00283CF0(ticks);
-        length = func_00283CE0(st->ticks);
+        st->ticks = FloatToInt(ticks);
+        length = IntToFloat(st->ticks);
         factor = D_L09_001AF89C;
         st->owner = owner;
         st->f = f;
@@ -66,7 +66,7 @@ char *func_L09_003AE8C8(void *pos, char *owner, float f, float range, float c, v
         *(unsigned char *)(obj + 0x20) = 0;
         st->d = d;
         func_L09_003AEE10(obj);
-        func_002E5CF8(0, 0, obj);
+        PlayMobySound(0, 0, obj);
         func_002A0F48(obj);
     }
     return obj;

@@ -110,7 +110,7 @@ void func_L00_0040A4A8(ProjectileObjectA4A8 *object)
     {
         SoundSlotA4A8 *sound = (SoundSlotA4A8 *)(D_00188660 + state->sound * 0x70);
         if (sound->object != object || sound->active == 0)
-            state->sound = func_002E5CF8(1, 4, object);
+            state->sound = PlayMobySound(1, 4, object);
     }
     {
         if (target != 0) {
@@ -124,8 +124,8 @@ void func_L00_0040A4A8(ProjectileObjectA4A8 *object)
                 target = 0;
             } else {
                 qcopy(target_position, target->position);
-                func_00282D30(step, up, state->height);
-                func_00282CC0(target_position, target_position, step);
+                FastVecScale(step, up, state->height);
+                FastVecAdd(target_position, target_position, step);
             }
         }
         if (target != 0 && state->life < 295 && target->status >= 0 && state->homing != 0) {
@@ -133,41 +133,41 @@ void func_L00_0040A4A8(ProjectileObjectA4A8 *object)
             step[1] = state->last_target[1];
             step[2] = state->last_target[2];
             step[3] = 0.0f;
-            func_00282CF0(delta, target_position, step);
-            length = func_00282DF0(delta);
-            func_00282CC0(desired, target_position, state->target_offset);
-            func_00282CF0(direction, object->position, desired);
-            distance = func_00282DF0(direction);
+            FastVecSub(delta, target_position, step);
+            length = FastVecLength(delta);
+            FastVecAdd(desired, target_position, state->target_offset);
+            FastVecSub(direction, object->position, desired);
+            distance = FastVecLength(direction);
             if (distance != 0.0f) {
-                angle = func_00282DB0(direction, delta) / distance;
+                angle = FastVecDot(direction, delta) / distance;
                 angle = 1.5707963705f - func_002831B0(angle);
-                func_00282DD8(scratch.v[0], delta, direction);
-                func_00282DD8(scratch.v[1], delta, scratch.v[0]);
-                if (func_00282DB0(direction, scratch.v[1]) < 0.0f)
+                FastVecCross(scratch.v[0], delta, direction);
+                FastVecCross(scratch.v[1], delta, scratch.v[0]);
+                if (FastVecDot(direction, scratch.v[1]) < 0.0f)
                     angle = -angle;
                 turn = length / state->speed;
                 turn *= func_00283198(angle);
                 while (turn > 1.0f) turn -= 1.0f;
                 while (turn < -1.0f) turn += 1.0f;
                 angle = func_002831B0(turn);
-                func_00282D30(direction, direction, -1.0f);
-                func_00282F20(direction, direction, 1.0f);
+                FastVecScale(direction, direction, -1.0f);
+                vec_scale_to_length(direction, direction, 1.0f);
                 if (func_00282C48(angle) > 0.00001f) {
-                    func_00282F20(scratch.v[2], scratch.v[0], 1.0f);
+                    vec_scale_to_length(scratch.v[2], scratch.v[0], 1.0f);
                     func_002AB668(scratch.v[2], scratch.v[2], angle);
                     func_002ACDE8(object->forward, direction, scratch.v[2]);
-                    func_00282DD8(object->right, object->forward, up);
-                    func_00282F20(object->right, object->right, 1.0f);
-                    func_00282DD8(object->up, object->right, object->forward);
+                    FastVecCross(object->right, object->forward, up);
+                    vec_scale_to_length(object->right, object->right, 1.0f);
+                    FastVecCross(object->up, object->right, object->forward);
                     qcopy(state->forward, object->forward);
                 }
             }
         } else {
             func_002FEE70(state->handle, state->forward, 0);
             qcopy(object->forward, state->forward);
-            func_00282DD8(object->right, object->forward, up);
-            func_00282F20(object->right, object->right, 1.0f);
-            func_00282DD8(object->up, object->right, object->forward);
+            FastVecCross(object->right, object->forward, up);
+            vec_scale_to_length(object->right, object->right, 1.0f);
+            FastVecCross(object->up, object->right, object->forward);
         }
         if (target != 0) {
             state->last_target[0] = target_position[0];
@@ -186,16 +186,16 @@ void func_L00_0040A4A8(ProjectileObjectA4A8 *object)
             func_002AB668(delta, object->forward, state->spin);
             func_002ACDE8(object->right, object->right, delta);
             func_002ACDE8(object->up, object->up, delta);
-            state->spin = func_00283B98(state->spin, state->spin_speed * 0.017453294f);
+            state->spin = FastAddRotations(state->spin, state->spin_speed * 0.017453294f);
         }
         object->forward[3] = object->right[3] = object->up[3] = 0.0f;
-        func_00282D30(step, object->forward, state->speed);
-        func_00282CC0(object->position, object->position, step);
+        FastVecScale(step, object->forward, state->speed);
+        FastVecAdd(object->position, object->position, step);
         func_00300190(object->position, object->position);
         if (object->position[0] < 2.0f || object->position[0] > 1021.0f ||
             object->position[1] < 2.0f || object->position[1] > 1021.0f ||
             object->position[2] < 2.0f || object->position[2] > 1021.0f) {
-            func_002ACAD0(object, D_L00_001B1FB0);
+            RemoveMobyFromIndexList(object, D_L00_001B1FB0);
             func_0029F338(object);
         } else {
             func_L00_0040B2C0(object, delta);
@@ -204,13 +204,13 @@ void func_L00_0040A4A8(ProjectileObjectA4A8 *object)
             qcopy(history, delta);
             if (++state->age >= 4)
                 ref_L00_0040A4A8_00(func_L00_0040B330, object);
-            func_L00_0040B098(object, old);
+            SpawnLineParticles(object, old);
             qcopy(desired, object->position);
-            func_00282D30(direction, up, -0.3f);
-            func_00282CC0(direction, object->position, direction);
-            if (func_002761F8(desired, direction, 2, 0, 0)) {
-                func_00282D30(desired, up, 0.3f);
-                func_00282CC0(object->position, D_L00_001BF200.position, desired);
+            FastVecScale(direction, up, -0.3f);
+            FastVecAdd(direction, object->position, direction);
+            if (CollLine(desired, direction, 2, 0, 0)) {
+                FastVecScale(desired, up, 0.3f);
+                FastVecAdd(object->position, D_L00_001BF200.position, desired);
             }
             {
                 int settings_index = D_00139568[0x2c];
@@ -221,12 +221,12 @@ void func_L00_0040A4A8(ProjectileObjectA4A8 *object)
             scratch.record.object = object;
             scratch.record.active = 1;
             qcopy(scratch.record.direction, step);
-            func_00282F20(scratch.record.direction, scratch.record.direction, 1.0f);
+            vec_scale_to_length(scratch.record.direction, scratch.record.direction, 1.0f);
             scratch.record.marker = 5627.925f;
             scratch.record.kind = 3;
             scratch.record.enabled = 1;
             scratch.record.class_id = object->class_id;
-            if (func_002761F8(old, object->position, 0, D_00189E20.object, &scratch.record)) {
+            if (CollLine(old, object->position, 0, D_00189E20.object, &scratch.record)) {
                 if (D_L00_001BF200.object != 0) {
                     if (D_L00_001BF200.object != D_00189E20.object &&
                         D_L00_001BF200.object != state->owner) {
@@ -248,16 +248,16 @@ void func_L00_0040A4A8(ProjectileObjectA4A8 *object)
                     }
                 }
                 state->sound = -1;
-                func_002E5CF8(0, 0, object);
+                PlayMobySound(0, 0, object);
                 qcopy(object->position, D_L00_001BF200.position);
                 func_002AFFD8((char *)object->position, axis, 1);
                 explode = 1;
                 if (D_L00_001BF200.object != 0 && D_L00_001BF200.surface <= 0) {
-                    func_00282CF0(normal, D_L00_001B8DC0, object->position);
-                    func_00282F20(normal, normal, 1.0f);
+                    FastVecSub(normal, D_L00_001B8DC0, object->position);
+                    vec_scale_to_length(normal, normal, 1.0f);
                 } else {
-                    func_00282F20(normal, D_L00_001BF200.normal, 1.0f);
-                    if (func_00282C48(func_00282DB0(normal, axis)) >= 0.1f) explode = 0;
+                    vec_scale_to_length(normal, D_L00_001BF200.normal, 1.0f);
+                    if (func_00282C48(FastVecDot(normal, axis)) >= 0.1f) explode = 0;
                 }
                 if (explode) func_002A89A8(object->position, 0, 0.5f);
                 {
@@ -265,10 +265,10 @@ void func_L00_0040A4A8(ProjectileObjectA4A8 *object)
                     func_L00_00414020(object->position, 0.5f, 1, 15, 0, 0, 8, 15, 0, 1, 0, draw_effect, D_L00_001ADB2C);
                 }
                 func_L00_0040AFB8(object, axis, hit_object);
-                func_002ACAD0(object, D_L00_001B1FB0);
+                RemoveMobyFromIndexList(object, D_L00_001B1FB0);
                 func_002FEE50(state->handle);
                 func_0029F338(object);
-            } else if (func_00282978(&state->life) || func_00282E80(object->position, D_00189EA0) > 60.0f) {
+            } else if (FastDecTimer(&state->life) || vec_distance_xy(object->position, D_00189EA0) > 60.0f) {
                 {
                     int sound_index = state->sound;
                     if (sound_index != -1) {
@@ -277,7 +277,7 @@ void func_L00_0040A4A8(ProjectileObjectA4A8 *object)
                     }
                 }
                 state->sound = -1;
-                func_002ACAD0(object, D_L00_001B1FB0);
+                RemoveMobyFromIndexList(object, D_L00_001B1FB0);
                 func_002FEE50(state->handle);
                 func_0029F338(object);
             }

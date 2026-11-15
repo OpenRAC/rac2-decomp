@@ -100,25 +100,25 @@ void func_L05_00445338(char *obj, void *target)
         func_L05_00442398(obj);
         return;
     }
-    func_00282CF0(delta, moby->position, target);
-    distance = func_00282DF0(delta);
+    FastVecSub(delta, moby->position, target);
+    distance = FastVecLength(delta);
     if (distance <= D_L05_001B1C1C) {
         count = 2;
         divisor = 2;
     } else {
         if (distance > 30)
             return;
-        count = func_00283CF0(distance / D_L05_001B1C1C) + 2;
-        divisor = func_00283CE0(count);
+        count = FloatToInt(distance / D_L05_001B1C1C) + 2;
+        divisor = IntToFloat(count);
     }
-    func_00282D30(step, delta, 1.0f / divisor);
-    func_00282D30(offset, moby->up, D_L05_001B1C20);
-    func_00282CC0(pos, target, offset);
+    FastVecScale(step, delta, 1.0f / divisor);
+    FastVecScale(offset, moby->up, D_L05_001B1C20);
+    FastVecAdd(pos, target, offset);
     for (i = 0; i < count; i++) {
         float *direction;
 
-        func_00282CC0(pos, pos, step);
-        if (!func_00277258(pos, 16, moby, D_L05_001B1C1C) || func_00278E78() == 6)
+        FastVecAdd(pos, pos, step);
+        if (!func_00277258(pos, 16, moby, D_L05_001B1C1C) || GetCollHitMaterial() == 6)
             continue;
 
         if (D_L05_001BFB00.object && !func_L00_0031BE88(D_L05_001BFB00.object)) {
@@ -126,8 +126,8 @@ void func_L05_00445338(char *obj, void *target)
                 char *link = *(char **)(D_L05_001BFB00.object + 0x24);
 
                 if (link && *(short *)(link + 0x46) == 11) {
-                    func_00282CF0(dir, moby->position, D_L05_001BFB00.object + 0x10);
-                    func_00282F20(dir, dir, 1);
+                    FastVecSub(dir, moby->position, D_L05_001BFB00.object + 0x10);
+                    vec_scale_to_length(dir, dir, 1);
                     qcopy(hit, D_L05_001BFB00.object + 0x10);
                     direction = dir;
                     goto impact;
@@ -144,18 +144,18 @@ void func_L05_00445338(char *obj, void *target)
                 if (kind == 0x1328)
                     return;
             }
-            func_00282CF0(move, D_L05_001BFB00.position, pos);
-            func_00282CC0(moby->position, moby->position, move);
-            func_00282CC0(obj + 0x30, obj + 0x30, move);
+            FastVecSub(move, D_L05_001BFB00.position, pos);
+            FastVecAdd(moby->position, moby->position, move);
+            FastVecAdd(obj + 0x30, obj + 0x30, move);
             qcopy(pos, D_L05_001BFB00.position);
             {
                 float facing;
 
                 if (*(unsigned short *)(D_L05_001BFB00.object + 0x34) & 0x100) {
-                    facing = func_00282DB0(D_L05_001BFB00.object + 0xC0, moby->forward);
+                    facing = FastVecDot(D_L05_001BFB00.object + 0xC0, moby->forward);
                 } else {
-                    func_002833F0(event.rotation, D_L05_001BFB00.object + 0xF0);
-                    facing = func_00282DB0(event.rotation, moby->forward);
+                    euler_rotation_basis(event.rotation, D_L05_001BFB00.object + 0xF0);
+                    facing = FastVecDot(event.rotation, moby->forward);
                 }
                 if (facing > 0)
                     continue;
@@ -165,13 +165,13 @@ void func_L05_00445338(char *obj, void *target)
                 event.message.amount = D_L05_001B1C14;
                 event.message.enabled = 1;
                 event.message.object = moby;
-                func_00282CF0(&event.message, D_L05_001BFB00.object + 0x10, moby->position);
-                func_00282F20(&event.message, &event.message, 1);
+                FastVecSub(&event.message, D_L05_001BFB00.object + 0x10, moby->position);
+                vec_scale_to_length(&event.message, &event.message, 1);
                 event.message.value = 5627.925f;
                 event.message.a = 1;
                 event.message.b = 1;
                 event.message.type = moby->type;
-                func_002A8E20(D_L05_001BFB00.object, &event.message);
+                QueueMobyImpact(D_L05_001BFB00.object, &event.message);
                 func_L05_0037AC80(D_L05_001B1C18);
                 *(int *)(record + 0x58) = D_L05_001B1AE4;
             }
@@ -180,20 +180,20 @@ void func_L05_00445338(char *obj, void *target)
             func_L00_002E6EF8(func_L05_00445C38, moby);
             continue;
         }
-        func_00282D30(dir, D_L05_001BFB00.normal, 0.0009765625f);
-        func_00282F20(dir, dir, 1);
+        FastVecScale(dir, D_L05_001BFB00.normal, 0.0009765625f);
+        vec_scale_to_length(dir, dir, 1);
         qcopy(hit, D_L05_001BFB00.hit);
         direction = dir;
 impact:
-        if (func_00282C48(func_00282DB0(direction, moby->forward)) > 0.75f) {
+        if (func_00282C48(FastVecDot(direction, moby->forward)) > 0.75f) {
             func_L05_00442398(obj);
             continue;
         }
-        func_00282D30(D_L05_001BFB00.position, direction, D_L05_001B1C1C);
-        func_00282CC0(D_L05_001BFB00.position, D_L05_001BFB00.hit, D_L05_001BFB00.position);
-        func_00282CF0(move, D_L05_001BFB00.position, pos);
-        func_00282CC0(moby->position, moby->position, move);
-        func_00282CC0(obj + 0x30, obj + 0x30, move);
+        FastVecScale(D_L05_001BFB00.position, direction, D_L05_001B1C1C);
+        FastVecAdd(D_L05_001BFB00.position, D_L05_001BFB00.hit, D_L05_001BFB00.position);
+        FastVecSub(move, D_L05_001BFB00.position, pos);
+        FastVecAdd(moby->position, moby->position, move);
+        FastVecAdd(obj + 0x30, obj + 0x30, move);
         qcopy(pos, D_L05_001BFB00.position);
         func_L00_002D6998(D_L05_002B8770);
         if (!(D_L05_001B2048 & 3)) {
@@ -206,11 +206,11 @@ impact:
         {
             char *state = moby->state;
 
-            func_00282D30(move, direction, D_L05_001B1C1C * 0.8f);
-            func_00282CC0(state + 0x90, move, D_L05_001BFB00.hit);
+            FastVecScale(move, direction, D_L05_001B1C1C * 0.8f);
+            FastVecAdd(state + 0x90, move, D_L05_001BFB00.hit);
         }
         func_L00_002E6EF8(func_L05_00445C38, moby);
-        if (func_00282E48(target, moby->position) < 0.1f)
+        if (fast_vec_dist(target, moby->position) < 0.1f)
             func_L05_00442398(obj);
     }
 }

@@ -96,7 +96,7 @@ char *func_L11_004349F8(char *obj, void *a, void *b, float f)
 
     t[0] = *(Quadword *)a;
     *saved = *(Quadword *)b;
-    n = func_0029EFD0(0xD1B);
+    n = CreateMoby(0xD1B);
     if (n != 0) {
         *(unsigned char *)(n + 0x30) = 0xFF;
         *(unsigned short *)(n + 0x32) = 0xFF;
@@ -148,8 +148,8 @@ void func_L11_00434F48(float *pos, int count) {
     int i;
     int sign;
     char *particle;
-    func_00282CF0(direction, (float *)D_L11_001BA8C0, pos);
-    func_00282F20((char *)offset, (char *)direction, 0.3f);
+    FastVecSub(direction, (float *)D_L11_001BA8C0, pos);
+    vec_scale_to_length((char *)offset, (char *)direction, 0.3f);
     direction[2] = 0;
     axis[0] = 0;
     axis[1] = 0;
@@ -161,16 +161,16 @@ void func_L11_00434F48(float *pos, int count) {
         if (!sign) sign--;
         angle = func_002A7878(-1.0471977f, 1.0471977f);
         func_002ACEC0(velocity, direction, axis, angle);
-        func_00282F20((char *)velocity, (char *)velocity, func_002A7878(0.05f, 3.0f) * 0.0166666675f);
+        vec_scale_to_length((char *)velocity, (char *)velocity, func_002A7878(0.05f, 3.0f) * 0.0166666675f);
         velocity[2] = func_002A7878(1.0f, 5.0f) * 0.0166666675f;
-        func_00282CC0((char *)origin, (char *)pos, (char *)offset);
+        FastVecAdd((char *)origin, (char *)pos, (char *)offset);
         pos[0] += func_002A78D8(0, 0.15f);
         pos[1] += func_002A78D8(0, 0.15f);
         pos[2] += func_002A78D8(0, 0.15f);
         particle = func_002C2210(origin, 60, size * 0.1f, size, 0x8020FF20, 0, sign, velocity, 0, 0.002f);
-        if (particle) particle[9] = func_00283CF0(4.0f) + 0x70;
+        if (particle) particle[9] = FloatToInt(4.0f) + 0x70;
         particle = func_002C2210(origin, 60, size * 0.07f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, 0.002f);
-        if (particle) particle[9] = func_00283CF0(4.0f) + 0x70;
+        if (particle) particle[9] = FloatToInt(4.0f) + 0x70;
     }
 }
 
@@ -216,7 +216,7 @@ void func_L11_00435228(char *p)
             char *e = D_00188660 + *(int *)(state + 0x14) * 0x70;
 
             if (*(char **)(e + 0x88) != p || !*(unsigned char *)(e + 0x74))
-                *(int *)(state + 0x14) = func_002E5CF8(0, 4, p);
+                *(int *)(state + 0x14) = PlayMobySound(0, 4, p);
             *(unsigned char *)(p + 0x20) = 2;
             *(float *)(state + 0xC) = 3.1415927f;
             *(float *)(state + 0x10) = 0;
@@ -226,13 +226,13 @@ void func_L11_00435228(char *p)
         break;
     case 2:
         *(float *)(state + 0x10) += 0.026179943f;
-        *(float *)(state + 0xC) = func_00283B98(*(float *)(state + 0xC), 0.026179943f);
+        *(float *)(state + 0xC) = FastAddRotations(*(float *)(state + 0xC), 0.026179943f);
         if (*(float *)(state + 0x10) >= 3.1415927f) {
             stop_owned_sound(state, p);
             *(unsigned char *)(p + 0x20) = 3;
         } else {
-            func_00282F20((char *)offset, p + 0xE0, (func_00283180(*(float *)(state + 0xC)) + 1.0f) * 5.0f);
-            func_00282CC0(p + 0x10, (char *)offset, state + 0x20);
+            vec_scale_to_length((char *)offset, p + 0xE0, (func_00283180(*(float *)(state + 0xC)) + 1.0f) * 5.0f);
+            FastVecAdd(p + 0x10, (char *)offset, state + 0x20);
         }
         break;
     case 3:
@@ -240,16 +240,16 @@ void func_L11_00435228(char *p)
             char *e = D_00188660 + *(int *)(state + 0x14) * 0x70;
 
             if (*(char **)(e + 0x88) != p || !*(unsigned char *)(e + 0x74))
-                *(int *)(state + 0x14) = func_002E5CF8(0, 4, p);
+                *(int *)(state + 0x14) = PlayMobySound(0, 4, p);
             *(unsigned char *)(p + 0x20) = 4;
         } else {
             stop_owned_sound(state, p);
         }
         break;
     case 4:
-        if (func_00282E80(p + 0x10, D_00189EA0) > 6.0f) {
+        if (vec_distance_xy(p + 0x10, D_00189EA0) > 6.0f) {
             *(float *)(state + 0x10) += 0.026179943f;
-            *(float *)(state + 0xC) = func_00283B98(*(float *)(state + 0xC), 0.026179943f);
+            *(float *)(state + 0xC) = FastAddRotations(*(float *)(state + 0xC), 0.026179943f);
             if (*(float *)(state + 0x10) >= 6.2831855f) {
                 stop_owned_sound(state, p);
                 *(unsigned char *)(p + 0x20) = 1;
@@ -257,8 +257,8 @@ void func_L11_00435228(char *p)
                 *(float *)(state + 0x10) = 0;
                 qcopy(p + 0x10, state + 0x20);
             } else {
-                func_00282F20((char *)offset, p + 0xE0, (func_00283180(*(float *)(state + 0xC)) + 1.0f) * 5.0f);
-                func_00282CC0(p + 0x10, (char *)offset, state + 0x20);
+                vec_scale_to_length((char *)offset, p + 0xE0, (func_00283180(*(float *)(state + 0xC)) + 1.0f) * 5.0f);
+                FastVecAdd(p + 0x10, (char *)offset, state + 0x20);
             }
         }
         break;
@@ -282,8 +282,8 @@ void func_L11_00436768(char *obj)
     f0 = *(float *)(state + 0x104);
     *(float *)((char *)&tmp2[1] + 8) = f0 + f1;
     tmp2[0] = tmp2[1];
-    func_00283098((float *)&tmp2[0], (float *)&tmp2[0], (float *)((char *)obj + 0xC0));
-    func_00282CC0((char *)tmp, (char *)obj + 0x10, (char *)&tmp2[0]);
+    matrix_mul_vec3((float *)&tmp2[0], (float *)&tmp2[0], (float *)((char *)obj + 0xC0));
+    FastVecAdd((char *)tmp, (char *)obj + 0x10, (char *)&tmp2[0]);
     if (*(unsigned short *)(obj + 0x96) <= 0xFFFE)
         *(unsigned short *)(obj + 0x96) = *(unsigned short *)(obj + 0x96) + 1;
     func_338398(obj, state + 0x290, 2.5f, 1, 1);
@@ -362,7 +362,7 @@ void func_L11_00436910(char *object, int mode, int active) {
     *(unsigned char *)(state + 0x6A) = 0;
     if (*(short *)(state + 0x50) != 0) {
         *(short *)(state + 0x50) = 0;
-        func_002A0488(object, *(unsigned char *)(state + 0x54),
+        set_moby_color(object, *(unsigned char *)(state + 0x54),
                       *(unsigned char *)(state + 0x55), *(unsigned char *)(state + 0x56));
         *(short *)(state + 0x52) = 1;
     }
@@ -393,7 +393,7 @@ void func_L11_00436A78(char *obj)
     }
     *(short *)(state + 0x282) = 0;
     if (*(unsigned char *)(obj + 0x31)) {
-        func_0032C700(obj + 0x10, 0, 0, 0x1E, 5, 0, 0x32, 1, 0.3f, 0.0f, 0, 0, 0, 0);
+        SpawnExplosion(obj + 0x10, 0, 0, 0x1E, 5, 0, 0x32, 1, 0.3f, 0.0f, 0, 0, 0, 0);
         func_002E5DA0(0, 0, obj, 0xDF7);
     }
     func_002A7470(obj, 0, 0, 3);
@@ -434,7 +434,7 @@ void func_L11_00437CF0(char *p)
 
     if (*(unsigned char *)(p + 0x20) >= 2) {
         func_L11_004395C8(p);
-        func_L11_00437EA8(p);
+        IntegrateVerletChain(p);
         func_L11_00437FD0(p);
         func_L11_00438460(p);
         func_L11_004386B8(p);
@@ -499,15 +499,15 @@ void func_L11_00437EA8(void *object)
     old = state->oldPoints;
     gravity.f[2] = -1.0f / 720.0f;
 
-    t = func_00283CE0(state->ropeCount);
-    damping = func_002AA140(0.97f, 0.98f, (t -= 2.0f) / func_00283CE0(8));
+    t = IntToFloat(state->ropeCount);
+    damping = func_002AA140(0.97f, 0.98f, (t -= 2.0f) / IntToFloat(8));
 
     for (i = 12; i >= 0; i--, pos++, old++) {
         qcopy(&saved, pos);
-        func_00282CF0(delta.f, *pos, *old);
-        func_00282D30(&delta, &delta, damping);
-        func_00282CC0(pos, pos, &delta);
-        func_00282CC0(pos, pos, &gravity);
+        FastVecSub(delta.f, *pos, *old);
+        FastVecScale(&delta, &delta, damping);
+        FastVecAdd(pos, pos, &delta);
+        FastVecAdd(pos, pos, &gravity);
         qcopy(old, &saved);
     }
 }
@@ -530,16 +530,16 @@ void func_L11_00438248(void *object)
     Quad step;
     int i;
 
-    func_002833F0((char *)obj->basis, (char *)obj + 0xF0);
+    euler_rotation_basis((char *)obj->basis, (char *)obj + 0xF0);
     qcopy(state->points[0], obj->pos);
     qcopy(state->oldPoints[0], obj->pos);
-    func_00282D30(&step, obj->basis, -1.0f);
+    FastVecScale(&step, obj->basis, -1.0f);
     pos = state->points;
     old = state->oldPoints;
     for (i = 0; i < 12; i++) {
-        func_00282F20(&step, &step, ((float *)state->pad2F0)[i]);
+        vec_scale_to_length(&step, &step, ((float *)state->pad2F0)[i]);
         next = pos + 1;
-        func_00282CC0(next, pos, &step);
+        FastVecAdd(next, pos, &step);
         nextOld = old + 1;
         qcopy(nextOld, next);
         pos = next;
@@ -560,13 +560,13 @@ void func_L11_00438320(char *obj, char *direction, float a, float b, float c)
     float m[4][4];
     float out[4];
 
-    func_00282F20((char *)m[0], direction, 1.0f);
+    vec_scale_to_length((char *)m[0], direction, 1.0f);
     func_00282C88((TI128 *)m[2]);
     m[2][2] = 1.0f;
-    func_00282DD8((char *)m[1], (char *)m[0], (char *)m[2]);
-    func_00282F20((char *)m[1], (char *)m[1], 1.0f);
-    func_00282DD8((char *)m[2], (char *)m[1], (char *)m[0]);
-    func_00282F20((char *)m[2], (char *)m[2], 1.0f);
+    FastVecCross((char *)m[1], (char *)m[0], (char *)m[2]);
+    vec_scale_to_length((char *)m[1], (char *)m[1], 1.0f);
+    FastVecCross((char *)m[2], (char *)m[1], (char *)m[0]);
+    vec_scale_to_length((char *)m[2], (char *)m[2], 1.0f);
     func_002AB6D8((char *)m[0], (char *)out);
     func_002AAA00(obj + 0xF0, state + 0x2A0, 0, out[0], a, b, c);
     func_002AAA00(obj + 0xF4, state + 0x2A4, 0, out[1], a, b, c);
@@ -596,19 +596,19 @@ void func_L11_00438460(void *object)
             continue;
 
         qcopy_nc(LISTED_STORE(obj, i)->pos, state->points[i + 1]);
-        func_00282CF0(&LISTED_RECORD(obj, i)->basis[0], state->points[i], state->points[i + 1]);
+        FastVecSub(&LISTED_RECORD(obj, i)->basis[0], state->points[i], state->points[i + 1]);
         LISTED_STORE(obj, i)->basis[0].w = 0;
-        func_00282F20(&LISTED_RECORD(obj, i)->basis[0], &LISTED_RECORD(obj, i)->basis[0], 1.0f);
+        vec_scale_to_length(&LISTED_RECORD(obj, i)->basis[0], &LISTED_RECORD(obj, i)->basis[0], 1.0f);
         func_00282C88(&LISTED_RECORD(obj, i)->basis[2]);
         LISTED_STORE(obj, i)->basis[2].z = 1.0f;
-        func_00282DD8(&LISTED_RECORD(obj, i)->basis[1], &LISTED_RECORD(obj, i)->basis[0],
+        FastVecCross(&LISTED_RECORD(obj, i)->basis[1], &LISTED_RECORD(obj, i)->basis[0],
                       &LISTED_RECORD(obj, i)->basis[2]);
         LISTED_STORE(obj, i)->basis[1].w = 0;
-        func_00282F20(&LISTED_RECORD(obj, i)->basis[1], &LISTED_RECORD(obj, i)->basis[1], 1.0f);
-        func_00282DD8(&LISTED_RECORD(obj, i)->basis[2], &LISTED_RECORD(obj, i)->basis[1],
+        vec_scale_to_length(&LISTED_RECORD(obj, i)->basis[1], &LISTED_RECORD(obj, i)->basis[1], 1.0f);
+        FastVecCross(&LISTED_RECORD(obj, i)->basis[2], &LISTED_RECORD(obj, i)->basis[1],
                       &LISTED_RECORD(obj, i)->basis[0]);
         LISTED_STORE(obj, i)->basis[2].w = 0;
-        func_00282F20(&LISTED_RECORD(obj, i)->basis[2], &LISTED_RECORD(obj, i)->basis[2], 1.0f);
+        vec_scale_to_length(&LISTED_RECORD(obj, i)->basis[2], &LISTED_RECORD(obj, i)->basis[2], 1.0f);
         LISTED_STORE(obj, i)->flags |= 0x100;
     }
 }
@@ -620,19 +620,19 @@ void func_L11_004386B8(void *object)
     struct RotorState *state = obj->state;
 
     qcopy_nc(LINKED_STORE(obj)->pos, state->points[11]);
-    func_00282CF0(&LINKED_RECORD(obj)->basis[0], state->points[10], state->points[11]);
+    FastVecSub(&LINKED_RECORD(obj)->basis[0], state->points[10], state->points[11]);
     LINKED_STORE(obj)->basis[0].w = 0;
-    func_00282F20(&LINKED_RECORD(obj)->basis[0], &LINKED_RECORD(obj)->basis[0], 1.0f);
+    vec_scale_to_length(&LINKED_RECORD(obj)->basis[0], &LINKED_RECORD(obj)->basis[0], 1.0f);
     func_00282C88(&LINKED_RECORD(obj)->basis[2]);
     LINKED_STORE(obj)->basis[2].z = 1.0f;
-    func_00282DD8(&LINKED_RECORD(obj)->basis[1], &LINKED_RECORD(obj)->basis[0],
+    FastVecCross(&LINKED_RECORD(obj)->basis[1], &LINKED_RECORD(obj)->basis[0],
                   &LINKED_RECORD(obj)->basis[2]);
     LINKED_STORE(obj)->basis[1].w = 0;
-    func_00282F20(&LINKED_RECORD(obj)->basis[1], &LINKED_RECORD(obj)->basis[1], 1.0f);
-    func_00282DD8(&LINKED_RECORD(obj)->basis[2], &LINKED_RECORD(obj)->basis[1],
+    vec_scale_to_length(&LINKED_RECORD(obj)->basis[1], &LINKED_RECORD(obj)->basis[1], 1.0f);
+    FastVecCross(&LINKED_RECORD(obj)->basis[2], &LINKED_RECORD(obj)->basis[1],
                   &LINKED_RECORD(obj)->basis[0]);
     LINKED_STORE(obj)->basis[2].w = 0;
-    func_00282F20(&LINKED_RECORD(obj)->basis[2], &LINKED_RECORD(obj)->basis[2], 1.0f);
+    vec_scale_to_length(&LINKED_RECORD(obj)->basis[2], &LINKED_RECORD(obj)->basis[2], 1.0f);
     LINKED_STORE(obj)->flags |= 0x100;
 }
 
@@ -674,20 +674,20 @@ void func_L11_00438CE8(struct RotorObject *obj)
         state->projectileIndex = -1;
         return;
     }
-    if (!func_00282978(&state->projectileDelay))
+    if (!FastDecTimer(&state->projectileDelay))
         return;
 
     func_0029FCC0(LISTED_RECORD(obj, state->projectileIndex), 0, pos);
     func_0029FC20(LISTED_RECORD(obj, state->projectileIndex), 0, matrix);
-    func_00282F20(offset, matrix[2], -0.3f);
-    func_00282CC0(pos, pos, offset);
+    vec_scale_to_length(offset, matrix[2], -0.3f);
+    FastVecAdd(pos, pos, offset);
 
     func_002A7A00(jitter, 0.0166666675f, 0.0500000045f);
     jitter[2] = -0.0833333358f;
     qcopy_nc(velocity, jitter);
-    func_00282CF0(toTarget, state->aim, pos);
-    func_00282F20(toTarget, toTarget, 0.333333343f);
-    func_00282CC0(velocity, velocity, toTarget);
+    FastVecSub(toTarget, state->aim, pos);
+    vec_scale_to_length(toTarget, toTarget, 0.333333343f);
+    FastVecAdd(velocity, velocity, toTarget);
 
     projectile = func_L07_003F6B88(state->projectileClass);
     if (projectile)
@@ -730,9 +730,9 @@ void func_L11_00438F18(struct RotorObject *obj)
         break;
     }
     pick = 0;
-    best = func_00282E80(obj->pos, state->path->points[0]);
+    best = vec_distance_xy(obj->pos, state->path->points[0]);
     for (i = 0; i < state->path->count - 1; i++) {
-        d = func_00282E80(obj->pos, state->path->points[i]);
+        d = vec_distance_xy(obj->pos, state->path->points[i]);
         if (d < best) {
             best = d;
             pick = i;
@@ -760,20 +760,20 @@ int func_L11_004390D0(char *object)
     {
         char *entry = D_00188660 + *(int *)(state + 0x38C) * 0x70;
         if (*(char **)(entry + 0x88) != object || !*(unsigned char *)(entry + 0x74))
-            *(int *)(state + 0x38C) = func_002E5CF8(0, 4, object);
+            *(int *)(state + 0x38C) = PlayMobySound(0, 4, object);
     }
     qcopy(target, *(char **)(state + 0x324) + *(short *)(state + 0x370) * 16 + 16);
-    speed = func_00283CE0(*(short *)(state + 0x378));
-    duration = func_00283CE0(8);
+    speed = IntToFloat(*(short *)(state + 0x378));
+    duration = IntToFloat(8);
     speed = func_002AA140(15.0f, 20.0f, (speed - 2.0f) / duration);
-    func_002AA2E8((float *)(state + 0x32C), speed * (1.0f / 60.0f), 1.0f / 180.0f);
-    func_00282CF0(direction, target, (float *)(object + 0x10));
-    func_00282F20((char *)direction, (char *)direction, *(float *)(state + 0x32C));
-    func_00282CC0(object + 0x10, object + 0x10, (char *)direction);
-    func_00282CF0(old, (float *)(state + 0x50), (float *)(object + 0x10));
-    func_00282F20((char *)old, (char *)old, 1.0f);
-    func_00282F20((char *)direction, (char *)direction, 1.0f);
-    if (func_00282DB0(direction, old) > 0.707f) {
+    ApproachValue((float *)(state + 0x32C), speed * (1.0f / 60.0f), 1.0f / 180.0f);
+    FastVecSub(direction, target, (float *)(object + 0x10));
+    vec_scale_to_length((char *)direction, (char *)direction, *(float *)(state + 0x32C));
+    FastVecAdd(object + 0x10, object + 0x10, (char *)direction);
+    FastVecSub(old, (float *)(state + 0x50), (float *)(object + 0x10));
+    vec_scale_to_length((char *)old, (char *)old, 1.0f);
+    vec_scale_to_length((char *)direction, (char *)direction, 1.0f);
+    if (FastVecDot(direction, old) > 0.707f) {
         qcopy(aim, old);
         func_L11_00438320(object, (char *)aim, 0.006981317885220051f,
                          0.006981317885220051f, 0.41887909173965454f);
@@ -782,7 +782,7 @@ int func_L11_004390D0(char *object)
         func_L11_00438320(object, (char *)aim, 0.006981317885220051f,
                          0.006981317885220051f, 0.41887909173965454f);
     }
-    if (func_00282E48(object + 0x10, target) < 4.0f)
+    if (fast_vec_dist(object + 0x10, target) < 4.0f)
         (*(short *)(state + 0x370))++;
     if (*(short *)(state + 0x370) < **(int **)(state + 0x324) - 1)
         return 0;
@@ -868,8 +868,8 @@ void func_L11_0043A3F8(char *object) {
     char *state = *(char **)(object + 0x68);
 
     if (*(unsigned char *)(object + 0x20) == 0) {
-        *(unsigned char *)(state + 0x48) = func_00283CF0(15.0f);
-        *(unsigned char *)(state + 0x4A) = func_00283CF0(12.0f);
+        *(unsigned char *)(state + 0x48) = FloatToInt(15.0f);
+        *(unsigned char *)(state + 0x4A) = FloatToInt(12.0f);
         *(float *)(state + 0x1A0) = 1.0f;
         *(unsigned char *)(state + 0x180) = 6;
         *(int *)(state + 0x1B8) = 2;
@@ -902,7 +902,7 @@ void func_L11_0043A3F8(char *object) {
     *(int *)(state + 0x2D8) = func_002B3BA8(object, *(int *)(state + 0x2E8),
                                          0, 0, 255.0f, 255.0f);
     if (*(unsigned char *)(object + 0x31) != 0) {
-        if (func_00282E48(object + 0x10, D_L11_001BA8C0) < 48.0f) {
+        if (fast_vec_dist(object + 0x10, D_L11_001BA8C0) < 48.0f) {
             func_002A93B0(object);
             *(unsigned char *)(object + 0x6F) = 45;
         }
@@ -953,8 +953,8 @@ void func_L11_0043AB28(char *obj)
         func_002A7A00(v, s, 1.0f / 3.0f);
         v[2] = func_002A7878(1.0f / 12.0f, s);
         func_002B0A68(obj, 3, v, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
-        func_002E5CF8(1, 0, obj);
-        func_0032C700(obj + 0x10, 1, 0x19, 0xA, 0xA, 5, 0, 1, 1.0f, 20.0f, 0, 0, 0, 0);
+        PlayMobySound(1, 0, obj);
+        SpawnExplosion(obj + 0x10, 1, 0x19, 0xA, 0xA, 5, 0, 1, 1.0f, 20.0f, 0, 0, 0, 0);
         func_002E5DA0(0, 0, obj, 0xDF7);
     }
 

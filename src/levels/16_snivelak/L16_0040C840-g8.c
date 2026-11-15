@@ -51,7 +51,7 @@ void func_L16_0040C840(u8 *moby)
     switch (moby[0x95]) {
     case 0:
         *(short *)(state + 0x23e) = func_002A77E0(30);
-        if (*(int *)(state + 0x240) == 1 && func_00282978((short *)(state + 0x23e))) {
+        if (*(int *)(state + 0x240) == 1 && FastDecTimer((short *)(state + 0x23e))) {
             if (moby[0x43] != 1) func_002A7470(moby, 1, 0, 10);
             func_002A7750(moby, 3, 2);
             break;
@@ -81,12 +81,12 @@ void func_L16_0040C840(u8 *moby)
                 func_002A7A00(velocity, 0.13333334f, 0.20000002f);
                 velocity[2] = func_00282C48(velocity[2]);
                 velocity[2] *= 1.5f;
-                func_00282CC0(velocity, velocity, D_L16_001A8F20);
+                FastVecAdd(velocity, velocity, D_L16_001A8F20);
                 child = func_00273730(moby, 1, *(short *)(moby + 0xaa), i,
                     moby + 0x10, moby + 0xf0, velocity, 255, 30.0f, 15.0f);
                 *(void (**)(void *))(child + 0x64) = func_00310C88;
             }
-            child = func_0029EFD0(0x10ce);
+            child = CreateMoby(0x10ce);
             func_002B37E8(child, moby);
             *(float *)(child + 0x18) = func_002A89A8(moby + 0x10, 0, 0.5f);
             func_002AB650(child);
@@ -101,11 +101,11 @@ void func_L16_0040C840(u8 *moby)
             velocity[2] = func_002A7878(7.0f, 9.0f) * 0.016666668f;
             velocity[2] = func_00282C48(velocity[2]);
             velocity[2] *= 3.0f;
-            func_00282CC0(velocity, velocity, D_L16_001A8F20);
+            FastVecAdd(velocity, velocity, D_L16_001A8F20);
             child = func_00273730(moby, 3, 0xecb, 0, moby + 0x10,
                 moby + 0xf0, velocity, 255, 180.0f, 25.0f);
             func_002AB650(child);
-            func_002A6C58(moby, 0, 3);
+            SetDeathBits(moby, 0, 3);
             func_0029F338(moby);
             return;
         }
@@ -128,8 +128,8 @@ void func_L16_0040C840(u8 *moby)
     case 3:
         if (func_002AEB60(moby, 1.0f)) {
             func_0029FCC0((char *)moby, 2, (char *)velocity);
-            func_00282CF0(aim, state + 0x1f0, velocity);
-            func_00282F20(aim, aim, 0.416666687f);
+            FastVecSub(aim, state + 0x1f0, velocity);
+            vec_scale_to_length(aim, aim, 0.416666687f);
             func_L16_00413D10(moby, aim, velocity, 0, 2.0f);
         }
         if (*(int *)(state + 0x24c) != -1)
@@ -149,5 +149,5 @@ void func_L16_0040C840(u8 *moby)
         break;
     }
     func_L16_0040CF98(moby);
-    func_L16_0040D258(moby);
+    EmitSnivelakBoneParticles(moby);
 }

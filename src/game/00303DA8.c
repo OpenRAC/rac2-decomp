@@ -16,7 +16,7 @@ float func_00303DA8(void *obj, float delta)
 
     qcopy(local, obj);
     *f = *f + delta;
-    if (func_002761F8(obj, local, 0x12, 0, 0) != 0)
-        return func_00282E80(obj, ref_00303DA8_00);
+    if (CollLine(obj, local, 0x12, 0, 0) != 0)
+        return vec_distance_xy(obj, ref_00303DA8_00);
     return 9999.0f;
 }

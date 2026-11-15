@@ -109,7 +109,7 @@ extern void func_0027F640(float, float, u64, u8 *, int, float, u64, u8 *);
 extern u8 D_L08_00296CD0[];
 
 /* Scaled FontPrintCenter: x is moved left by half the scaled text width, then
- * the text is drawn with font texture 1. func_0027F640 is declared with its
+ * the text is drawn with font texture 1. FontPrintScaled is declared with its
  * integer and float parameters interleaved; each register bank keeps its
  * order, and the interleaving sets the order of the argument moves. */
 void func_L08_002F5CB8(int x, int y, u64 color, u8 *text, int length, float scale) {
@@ -118,13 +118,13 @@ void func_L08_002F5CB8(int x, int y, u64 color, u8 *text, int length, float scal
 
     fx = x - (func_L00_002E9210(text, length, scale) >> 1);
     fy = y;
-    texture = func_0027C878(1);
-    func_0027F640(fx, fy, color, text, length, scale, texture, D_L08_00296CD0);
+    texture = GetEffectTextureDescriptor(1);
+    FontPrintScaled(fx, fy, color, text, length, scale, texture, D_L08_00296CD0);
 }
 
 void func_L08_00300100(void) {
     D_L08_001BE0B0 = 0.62f;
-    func_0027AB40();
+    UpdateViewContext();
 }
 
 extern void func_00292408();
@@ -135,7 +135,7 @@ extern s32 D_L08_001DAC40[];
 extern s32 D_L08_001BFEF4;
 
 void func_L08_0030A8F8(s32 x) {
-    func_00292408(x);
+    LoadPackSingleTexture(x);
     func_L00_002FE268(x);
     func_002934B8(D_L08_001DAC40[D_L08_001DB5E7], D_L08_001BFEF4);
 }
@@ -248,7 +248,7 @@ void func_L08_0032A4D0(u8 *a0, f32 *a1, f32 *a2, f32 *a3) {
         return;
     }
     *a1 = func_00283248(v[0], v[1]);
-    *a2 = *a2 * func_00282E20(v);
+    *a2 = *a2 * vec_length_xy(v);
     v[3] = 0;
     *a3 = *a3 * v[2];
 }
@@ -284,7 +284,7 @@ void func_L08_0032C0D8(unsigned char *m, struct LaunchState *p, int animation, i
     p->direction[2] = p->height;
     p->direction[3] = 1.0f;
     {
-        float heading = func_00283B98(angle, 3.141593f);
+        float heading = FastAddRotations(angle, 3.141593f);
         short lifetime = 300;
         active = 1;
         p->age = 0;
@@ -363,7 +363,7 @@ void func_L08_0039DBE8(unsigned char *obj) {
     frame.normal.q = 0;
     frame.normal.f[2] = 1.0f;
     qcopy(&frame.old, position);
-    func_00282CC0(position, ctx, position);
+    FastVecAdd(position, ctx, position);
     func_002FEE70(*(int *)(ctx + 0x1C), ctx, 0);
     func_00300190(position, position);
     func_00300248(ctx, ctx);
@@ -383,11 +383,11 @@ void func_L08_0039DBE8(unsigned char *obj) {
     frame.packet.kind = 2;
     frame.packet.class_id = *(unsigned short *)(obj + 0xAA);
     frame.packet.active = 1;
-    if (func_002761F8(&frame.old, position, 0x10, obj, &frame.packet)) {
-        if (!func_00278E78() && *(float *)(ctx + 8) < 0.0f) {
+    if (CollLine(&frame.old, position, 0x10, obj, &frame.packet)) {
+        if (!GetCollHitMaterial() && *(float *)(ctx + 8) < 0.0f) {
             char *effect;
             Vec *spread;
-            func_002FD1B8(ref_L08_0039DBE8_01, ref_L08_0039DBE8_02, 1,
+            RippleDisturb(ref_L08_0039DBE8_01, ref_L08_0039DBE8_02, 1,
                 *(float *)(obj + 0x10), *(float *)(obj + 0x14), 0.5f, -0.35f);
             *(int *)(ctx + 0x14) = 1;
             func_00282C88(ctx);
@@ -428,21 +428,21 @@ void func_L08_0039DBE8(unsigned char *obj) {
                 obj[0xBC] = 1;
                 qcopy(obj + 0x10, &reread->point);
                 func_00283028(&frame.velocity, ctx, &reread->normal);
-                func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-                func_00282F20(&frame.normal, &reread->normal, 1.0f);
+                vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+                vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
             } else {
                 if (collision->count < 1)
                     goto finish;
                 obj[0xBC] = 1;
                 qcopy(obj + 0x10, &collision->point);
                 func_00283028(&frame.velocity, ctx, &collision->normal);
-                func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-                func_00282F20(&frame.normal, &collision->normal, 1.0f);
+                vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+                vec_scale_to_length(&frame.normal, &collision->normal, 1.0f);
             }
         }
     } else if (func_00282948(ctx + 0x18)) {
         obj[0xBC] = 1;
-        func_00282CC0((char *)&frame.velocity, (char *)&frame.velocity, ctx);
+        FastVecAdd((char *)&frame.velocity, (char *)&frame.velocity, ctx);
     }
 finish:
     if (obj[0xBC]) {
@@ -485,9 +485,9 @@ void func_L08_0039E000(char *obj) {
     frame.normal.q = 0;
     frame.normal.f[2] = 1.0f;
     qcopy(&frame.old, position);
-    func_00282CC0(position, position, ctx);
+    FastVecAdd(position, position, ctx);
     func_002AFFD8(position, &frame.surface, 0);
-    func_00282D30(&frame.surface, &frame.surface, 0.0003055556f);
+    FastVecScale(&frame.surface, &frame.surface, 0.0003055556f);
     ref_L08_0039E000_03(obj);
     frame.packet.moby = obj;
     frame.packet.flags = 0x830000;
@@ -503,7 +503,7 @@ void func_L08_0039E000(char *obj) {
     frame.packet.vector.f[2] = 1.0f;
     frame.packet.active = 1;
     (*(int *)(ctx + 0x14))++;
-    if (func_002761F8(&frame.old, position, 0x10, obj, &frame.packet)) {
+    if (CollLine(&frame.old, position, 0x10, obj, &frame.packet)) {
         collision = &ref_L08_0039E000_01;
         hit = collision->hit;
         if (hit) {
@@ -522,8 +522,8 @@ void func_L08_0039E000(char *obj) {
                 qcopy(dest, source);
             }
             func_00283028(&frame.velocity, ctx, &reread->normal);
-            func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-            func_00282F20(&frame.normal, &reread->normal, 1.0f);
+            vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+            vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
         } else {
             collision = &ref_L08_0039E000_01;
             if (collision->count <= 0)
@@ -531,12 +531,12 @@ void func_L08_0039E000(char *obj) {
             obj[0xBC] = 1;
             qcopy(position, &collision->point);
             func_00283028(&frame.velocity, ctx, &collision->normal);
-            func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-            func_00282F20(&frame.normal, &collision->normal, 1.0f);
+            vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+            vec_scale_to_length(&frame.normal, &collision->normal, 1.0f);
         }
     } else if (func_00282948(ctx + 0x18)) {
         obj[0xBC] = 1;
-        func_00282CC0((char *)&frame.velocity, (char *)&frame.velocity, ctx);
+        FastVecAdd((char *)&frame.velocity, (char *)&frame.velocity, ctx);
     }
 finish:
     if (*(unsigned char *)(obj + 0xBC)) {
@@ -562,7 +562,7 @@ Moby_L08_003B2DB0 *func_L08_003B2DB0(int owner, float *pos, float *dir, int life
 
     *(Quad_L08_003B2DB0 *)p = *(Quad_L08_003B2DB0 *)pos;
     *(Quad_L08_003B2DB0 *)d = *(Quad_L08_003B2DB0 *)dir;
-    moby = func_0029EFD0(0x4EA);
+    moby = CreateMoby(0x4EA);
     if (moby) {
         state = moby->state;
         state->owner = owner;
@@ -571,7 +571,7 @@ Moby_L08_003B2DB0 *func_L08_003B2DB0(int owner, float *pos, float *dir, int life
         moby->b30 = 0xFF;
         moby->h32 = 0xFF;
         moby->b31 = 1;
-        moby->fF4 = -func_00283248(func_00282E20(dd), dd[2]);
+        moby->fF4 = -func_00283248(vec_length_xy(dd), dd[2]);
         moby->fF8 = func_00283248(d[0], dd[1]);
         qcopy(moby->pos, pp);
         qcopy(state->dir, dd);
@@ -579,14 +579,14 @@ Moby_L08_003B2DB0 *func_L08_003B2DB0(int owner, float *pos, float *dir, int life
         state->f14 = 0;
         state->h1C = life;
         state->h1E = life;
-        state->f20 = func_00282E48(moby->pos, D_00189EA0);
+        state->f20 = fast_vec_dist(moby->pos, D_00189EA0);
         state->f24 = 0;
         state->f28 = 0;
         n = life * 5 / 4;
         moby->h34 |= 0x200;
         moby->b23 = 0x40;
-        func_L04_00358868(moby, 400000.0f, 0x2F7F4F4F, n, -1);
-        func_L04_00358868(moby, 160000.0f, 0x4F7F7F7F, n, -1);
+        SpawnJointFollowParticle(moby, 400000.0f, 0x2F7F4F4F, n, -1);
+        SpawnJointFollowParticle(moby, 160000.0f, 0x4F7F7F7F, n, -1);
         func_002A0F48(moby);
     }
     return moby;
@@ -615,11 +615,11 @@ void func_L08_003B2F70(char *obj) {
     struct { Vec old; CollisionInput collision; Vec velocity, random; } frame;
     CollisionInput *input;
     Bolt_L08_003B2DB0 *state = *(Bolt_L08_003B2DB0 **)(obj + 0x68);
-    float distance = func_00282E48(obj + 0x10, D_00189EA0);
+    float distance = fast_vec_dist(obj + 0x10, D_00189EA0);
     qcopy(&frame.old, obj + 0x10);
-    func_00282CC0(obj + 0x10, obj + 0x10, (char *)state);
+    FastVecAdd(obj + 0x10, obj + 0x10, (char *)state);
     if (!state->f28 && state->f24 && state->f20 < distance && distance < 3.0f) {
-        func_002E5CF8(0, 0, obj);
+        PlayMobySound(0, 0, obj);
         state->f28 = 1;
     }
     if (distance < state->f20) state->f24 = 1;
@@ -627,7 +627,7 @@ void func_L08_003B2F70(char *obj) {
     if (*(float *)(obj + 0x10) < 2.0f || *(float *)(obj + 0x10) > 1021.0f ||
         *(float *)(obj + 0x14) < 2.0f || *(float *)(obj + 0x14) > 1021.0f ||
         *(float *)(obj + 0x18) < 2.0f || *(float *)(obj + 0x18) > 1021.0f ||
-        func_00282E80(obj + 0x10, &ref_L08_003B2F70_00) > 255.0f) goto destroy;
+        vec_distance_xy(obj + 0x10, &ref_L08_003B2F70_00) > 255.0f) goto destroy;
     input = 0;
     if (!*(u8 *)(obj + 0xBC)) {
         frame.collision.flags = 0x70001;
@@ -635,7 +635,7 @@ void func_L08_003B2F70(char *obj) {
         frame.collision.object = obj;
         frame.collision.active = 1;
         qcopy(&frame.collision.vector, state);
-        func_00282CF0(&frame.collision.vector, obj + 0x10, D_00189EA0);
+        FastVecSub(&frame.collision.vector, obj + 0x10, D_00189EA0);
         func_00282F70(&frame.collision.vector, &frame.collision.vector, 1.0f);
         input = &frame.collision;
         frame.collision.vector.f[2] = 1.0f;
@@ -644,7 +644,7 @@ void func_L08_003B2F70(char *obj) {
         frame.collision.kind = 3;
         frame.collision.group = *(u16 *)(obj + 0xAA);
     }
-    if (func_00282978(&state->h1C) && !*(u8 *)(obj + 0xBC)) {
+    if (FastDecTimer(&state->h1C) && !*(u8 *)(obj + 0xBC)) {
         *(u8 *)(obj + 0xBC) = 1;
         state->h1C = state->h1E / 4;
     } else if (state->h1C <= 0 && *(u8 *)(obj + 0xBC)) {
@@ -652,7 +652,7 @@ destroy:
         func_0029F338(obj);
         return;
     }
-    if (!func_002761F8(&frame.old, obj + 0x10, 0, (void *)state->owner, input)) return;
+    if (!CollLine(&frame.old, obj + 0x10, 0, (void *)state->owner, input)) return;
     qcopy(obj + 0x10, &ref_L08_003B2F70_01);
     if (!*(u8 *)(obj + 0xBC)) {
         int n;
@@ -663,13 +663,13 @@ destroy:
             frame.random.f[2] = func_002A7878(-1.0f, 1.0f);
             frame.velocity.q = frame.random.q;
             func_00283028(&frame.random, state, &ref_L08_003B2F70_02);
-            func_00282F20(&frame.velocity, &frame.velocity, func_00282DF0(&frame.random) * 0.5f);
-            func_00282CC0((char *)&frame.velocity, (char *)&frame.random, (char *)&frame.velocity);
-            func_00282F20(&frame.velocity, &frame.velocity, func_002A7878(0.05000000447034836f, 0.10000000894069672f));
+            vec_scale_to_length(&frame.velocity, &frame.velocity, FastVecLength(&frame.random) * 0.5f);
+            FastVecAdd((char *)&frame.velocity, (char *)&frame.random, (char *)&frame.velocity);
+            vec_scale_to_length(&frame.velocity, &frame.velocity, func_002A7878(0.05000000447034836f, 0.10000000894069672f));
             func_L04_00358AE8(obj + 0x10, &frame.velocity, 0x7F2F4F6F, func_002A7820(10, 15), 60000.0f);
         }
     }
-    func_002ABBB8(obj, state, 0, 0.0f, 0.0f, 4, 3, 6, 1.1f, 0.6f, 1.0f, 0.9f, -1, 0.0f,
+    SpawnExplosionEffects(obj, state, 0, 0.0f, 0.0f, 4, 3, 6, 1.1f, 0.6f, 1.0f, 0.9f, -1, 0.0f,
         0, 1, -1, 0, 0x810001);
     func_00277F48(obj + 0x10, 1.1f, 16, obj, input);
     func_0029F338(obj);
@@ -700,7 +700,7 @@ void func_L08_003C66F0(char *obj) {
             qcopy(child + 0x10, p);
             *(float *)(child + 0xF8) = *(float *)(obj + 0xF8);
             *(float *)(child + 0xF4) = *(float *)(obj + 0xF4);
-            *(float *)(child + 0xF0) = func_00283CE0(i) * 3.1415927410125732f;
+            *(float *)(child + 0xF0) = IntToFloat(i) * 3.1415927410125732f;
         }
     }
 }

@@ -39,8 +39,8 @@ float func_L07_003E5910(Moby_L07_003E5910 *m, float *arg1, float arg2)
     f32 lo, hi, h, floor;
 
     if (v->target != 0) {
-        func_00283098(pos, v->home, m->rot);
-        func_00282CC0(pos, pos, v->target + 0x10);
+        matrix_mul_vec3(pos, v->home, m->rot);
+        FastVecAdd(pos, pos, v->target + 0x10);
     } else {
         qcopy(pos, v->home);
     }

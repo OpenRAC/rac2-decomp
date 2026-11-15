@@ -70,7 +70,7 @@ void func_L15_003DBB08(char *self) {
         if (func_002B3890((u8 *)self)) func_002B60B0((u8 *)self, 0.002222222276031971f, 0.10000001f, 0.0034906589426100254f, 0.41887909173965454f);
         if (*(int *)(state + 0x204) == 1) func_002A7750((u8 *)self, 10, 2);
         else if (!*(short *)(state + 0x374)) {
-            if (func_00282E80(self + 0x10, &((L02_ResidentCombatPrefix *)D_00189E20)->position_80) > 26) func_002A7750((u8 *)self, 1, 0);
+            if (vec_distance_xy(self + 0x10, &((L02_ResidentCombatPrefix *)D_00189E20)->position_80) > 26) func_002A7750((u8 *)self, 1, 0);
             else *(short *)(state + 0x374) = 120;
         }
         break;
@@ -80,7 +80,7 @@ void func_L15_003DBB08(char *self) {
             func_002B60B0((u8 *)self, 0.002222222276031971f, 0.10000001f, 0.0034906589426100254f, 0.41887909173965454f);
         }
         if (*(int *)(state + 0x204) != 1 && (((u8 *)self)[0x60] & 2) && ((u8 *)self)[0x20] != 11) {
-            if (func_00282E48(self + 0x10, state + 0x340) > 4) func_002A7750((u8 *)self, 6, -1);
+            if (fast_vec_dist(self + 0x10, state + 0x340) > 4) func_002A7750((u8 *)self, 6, -1);
             else {
                 switch (func_002A77E0(4)) {
                 case 0: func_002A7750((u8 *)self, 3, 1); break;
@@ -96,7 +96,7 @@ void func_L15_003DBB08(char *self) {
         flags = func_002B1C20(self, state + 0x50);
         if (flags & 1) {
             *(u16 *)(*(char **)(state + 0x370) + 0x34) |= 0x41; *(u16 *)(*(char **)(state + 0x370) + 0x34) &= 0xEFFF; *(int *)(*(char **)(state + 0x370) + 0x98) = 0;
-            func_002A6C58(self, 0, 3); func_L01_003E9CF8(self, 0, func_L02_003CD758); return;
+            SetDeathBits(self, 0, 3); func_L01_003E9CF8(self, 0, func_L02_003CD758); return;
         }
         if (flags & 2) {
             *(int *)(state + 0x33C) = 0;
@@ -128,7 +128,7 @@ void func_L15_003DBB08(char *self) {
     case 3:
         if (func_002B3868((u8 *)self) && ((u8 *)self)[0x43] != 9) func_002A7470(self, 9, 0, 20);
         angle = func_00283248(*(float *)(state + 0x1F0) - *(float *)(self + 0x10), *(float *)(state + 0x1F4) - *(float *)(self + 0x14));
-        if (func_00283C80(*(float *)(self + 0xF8), angle) > 0.26179942f) { func_002A7750((u8 *)self, 9, -1); break; }
+        if (FastDiffRots(*(float *)(self + 0xF8), angle) > 0.26179942f) { func_002A7750((u8 *)self, 9, -1); break; }
         else if ((((u8 *)self)[0x60] & 2) && func_002A77E0(2)) {
             switch (func_002A77E0(3)) {
             case 0: func_002A7750((u8 *)self, 4, -1); break;
@@ -168,7 +168,7 @@ void func_L15_003DBB08(char *self) {
         angle = func_00283248(*(float *)(state + 0x1F0) - *(float *)(self + 0x10), *(float *)(state + 0x1F4) - *(float *)(self + 0x14));
         func_L01_00322288((int)self, angle); func_L02_003CCEA0(self);
         angle = func_00283248(*(float *)(state + 0x1F0) - *(float *)(self + 0x10), *(float *)(state + 0x1F4) - *(float *)(self + 0x14));
-        if (func_00283C80(*(float *)(self + 0xF8), angle) < 0.087266475f) {
+        if (FastDiffRots(*(float *)(self + 0xF8), angle) < 0.087266475f) {
             switch (((u8 *)self)[0x95]) {
             case 2: func_002A7750((u8 *)self, 10, -1); break;
             case 1: func_002A7750((u8 *)self, 3, -1); break;
@@ -186,17 +186,17 @@ void func_L15_003DBB08(char *self) {
         if (func_002B3868((u8 *)self) && ((u8 *)self)[0x43] != 9) func_002A7470(self, 9, 0, 20);
         func_L02_003CCEA0(self);
         angle = func_00283248(*(float *)(state + 0x1F0) - *(float *)(self + 0x10), *(float *)(state + 0x1F4) - *(float *)(self + 0x14));
-        if (func_00283C80(*(float *)(self + 0xF8), angle) > 0.52359885f) { { func_002A7750((u8 *)self, 9, -1); break; } break; }
+        if (FastDiffRots(*(float *)(self + 0xF8), angle) > 0.52359885f) { { func_002A7750((u8 *)self, 9, -1); break; } break; }
         if (!*(short *)(state + 0x378) && *(u16 *)(self + 0x96) > 15) {
             func_0029FCC0(*(char **)(state + 0x370), 0, (char *)&work.aim.muzzle);
-            contact = func_002761F8(&work.aim.muzzle, &((L02_ResidentCombatPrefix *)D_00189E20)->target_d0, 16, self, 0);
+            contact = CollLine(&work.aim.muzzle, &((L02_ResidentCombatPrefix *)D_00189E20)->target_d0, 16, self, 0);
             if (contact && D_L15_001BFC00.hit && *(short *)(D_L15_001BFC00.hit + 0xAA) == 0xC1B) { { func_002A7750((u8 *)self, 13, -1); break; } break; }
             if (contact && (col = &D_L15_001BFC00)->hit != ((L02_ResidentCombatPrefix *)D_00189E20)->pointer_2290 && !*(short *)(state + 0x386)) {
                 if (!col->hit || (!func_002ABB78(col->hit) && (!*(char **)(col->hit + 0x24) || *(short *)(*(char **)(col->hit + 0x24) + 0x46) != 22))) break;
             }
             { func_002A7750((u8 *)self, 11, -1); break; }
         } else {
-            if (func_00282E80(self + 0x10, &((L02_ResidentCombatPrefix *)D_00189E20)->position_80) < 3 && func_00282C48(*(float *)(self + 0x18) - ((L02_ResidentCombatPrefix *)D_00189E20)->position_80.f[2]) < 0.5f) { { func_002A7750((u8 *)self, 14, -1); break; } break; }
+            if (vec_distance_xy(self + 0x10, &((L02_ResidentCombatPrefix *)D_00189E20)->position_80) < 3 && func_00282C48(*(float *)(self + 0x18) - ((L02_ResidentCombatPrefix *)D_00189E20)->position_80.f[2]) < 0.5f) { { func_002A7750((u8 *)self, 14, -1); break; } break; }
             if ((((u8 *)self)[0x60] & 2) && !func_002A77E0(2)) { func_002A7750((u8 *)self, 13, -1); break; }
         }
         break;
@@ -220,8 +220,8 @@ void func_L15_003DBB08(char *self) {
  func_L02_003CD4A8((struct L02GroupObject *)self);
         if (func_002AEB60(self, 5)) {
             func_0029FCC0(*(char **)(state + 0x370), 0, (char *)&work.aim.muzzle);
-            func_00282CF0(&work.aim.velocity, state + 0x360, &work.aim.muzzle); func_00282F20(&work.aim.velocity, &work.aim.velocity, 0.23333334922790527f);
-            func_00282D30(&work.aim.acceleration, &work.aim.velocity, 0.25f);
+            FastVecSub(&work.aim.velocity, state + 0x360, &work.aim.muzzle); vec_scale_to_length(&work.aim.velocity, &work.aim.velocity, 0.23333334922790527f);
+            FastVecScale(&work.aim.acceleration, &work.aim.velocity, 0.25f);
             power = (float)(u8)state[0x34];
             if (*(short *)(state + 0x380) >= 2)
                 func_L02_00401530(&work.aim.muzzle, &work.aim.acceleration, &work.aim.velocity, power, power, 0.0055555556900799274f, 10, 30, 1);
@@ -231,12 +231,12 @@ void func_L15_003DBB08(char *self) {
         }
         if (!(((u8 *)self)[0x60] & 2)) break;
         func_0029FCC0(*(char **)(state + 0x370), 0, (char *)&work.aim.muzzle);
-        collision = func_002761F8(&work.aim.muzzle, &((L02_ResidentCombatPrefix *)D_00189E20)->target_d0, 0, self, 0);
-        if (func_00282978((short *)(state + 0x380)) || (collision && D_L15_001BFC00.hit != ((L02_ResidentCombatPrefix *)D_00189E20)->pointer_2290)) {
+        collision = CollLine(&work.aim.muzzle, &((L02_ResidentCombatPrefix *)D_00189E20)->target_d0, 0, self, 0);
+        if (FastDecTimer((short *)(state + 0x380)) || (collision && D_L15_001BFC00.hit != ((L02_ResidentCombatPrefix *)D_00189E20)->pointer_2290)) {
             *(short *)(state + 0x378) += 15; { if (!func_002A77E0(3)) func_002A7750((u8 *)self, 12, -1); else func_002A7750((u8 *)self, 13, -1); break; }
         } else {
             angle = func_00283248(*(float *)(state + 0x1F0) - *(float *)(self + 0x10), *(float *)(state + 0x1F4) - *(float *)(self + 0x14));
-            if (func_00283C80(*(float *)(self + 0xF8), angle) > 0.52359885f) { func_002A7750((u8 *)self, 9, -1); break; }
+            if (FastDiffRots(*(float *)(self + 0xF8), angle) > 0.52359885f) { func_002A7750((u8 *)self, 9, -1); break; }
             else if (((L02_ResidentCombatPrefix *)D_00189E20)->mode_229c == 7 && ((L02_ResidentCombatPrefix *)D_00189E20)->pointer_249c && *(short *)(((L02_ResidentCombatPrefix *)D_00189E20)->pointer_249c + 0xAA) == 0xB5A) { func_002A7750((u8 *)self, 12, -1); break; }
         }
         break;
@@ -251,7 +251,7 @@ void func_L15_003DBB08(char *self) {
         if (func_002B3868((u8 *)self) && ((u8 *)self)[0x43] != 11) func_002A7470(self, 11, 10, 10);
         func_L02_003CCEA0(self); if (!(((u8 *)self)[0x60] & 2)) break;
         angle = func_00283248(*(float *)(state + 0x1F0) - *(float *)(self + 0x10), *(float *)(state + 0x1F4) - *(float *)(self + 0x14));
-        if (func_00283C80(*(float *)(self + 0xF8), angle) > 0.52359885f) func_002A7750((u8 *)self, 9, -1); else func_002A7750((u8 *)self, 11, -1);
+        if (FastDiffRots(*(float *)(self + 0xF8), angle) > 0.52359885f) func_002A7750((u8 *)self, 9, -1); else func_002A7750((u8 *)self, 11, -1);
         break;
     case 12:
         if (func_002B3868((u8 *)self)) {
@@ -265,11 +265,11 @@ void func_L15_003DBB08(char *self) {
         if (!(*(float *)(state + 0x20) > 0)) {
 
             if (func_002B3868((u8 *)self)) { *(short *)(state + 0x378) = func_002A7820(10, 15); *(short *)(state + 0x384) = func_002A77E0(3) == 0; }
-            if (*(short *)(state + 0x384) && func_00282978((short *)(state + 0x378))) {
+            if (*(short *)(state + 0x384) && FastDecTimer((short *)(state + 0x378))) {
                 func_0029FC20(*(char **)(state + 0x370), 0, (char *)work.aim.transform);
-                func_00282F20(&work.aim.muzzle, work.aim.transform, 0.23333334922790527f);
-                func_00282CF0(&work.aim.velocity, D_00189E20 + 0xE0, &work.aim.transform[3]); func_00282F20(&work.aim.velocity, &work.aim.velocity, 1);
-                if (func_00282DB0(&work.aim.velocity, work.aim.transform) < 0.2f) {
+                vec_scale_to_length(&work.aim.muzzle, work.aim.transform, 0.23333334922790527f);
+                FastVecSub(&work.aim.velocity, D_00189E20 + 0xE0, &work.aim.transform[3]); vec_scale_to_length(&work.aim.velocity, &work.aim.velocity, 1);
+                if (FastVecDot(&work.aim.velocity, work.aim.transform) < 0.2f) {
                 func_L02_00401530(&work.aim.transform[3], &work.aim.muzzle, &work.aim.muzzle, 1.0f, 0.0f, 1.0f, 30, 80, 1);
                     *(short *)(state + 0x378) = func_002A7820(15, 30);
                 }
@@ -278,20 +278,20 @@ void func_L15_003DBB08(char *self) {
         break;
     case 17:
         if (func_002B3868((u8 *)self) && ((u8 *)self)[0x43]) func_002A7470(self, 0, 0, 20);
-        if (func_002ACBC8(&((L02_ResidentCombatPrefix *)D_00189E20)->position_80, *(int *)(state + 0x324)) || *(int *)(state + 0x204) == 1) { func_002A7750((u8 *)self, 18, -1); break; }
+        if (IsPointInCuboid(&((L02_ResidentCombatPrefix *)D_00189E20)->position_80, *(int *)(state + 0x324)) || *(int *)(state + 0x204) == 1) { func_002A7750((u8 *)self, 18, -1); break; }
         break;
     case 18:
         path = D_L15_001FE480[*(int *)(state + 0x320)];
         if (func_002B3868((u8 *)self)) { if (((u8 *)self)[0x43] != 6) func_002A7470(self, 6, 0, 20); func_002B6318((u8 *)self); }
-        if (!(func_00282E80(self + 0x10, path + *(int *)path * 16) < *(float *)(state + 0x134)) && !func_002B6120(self, path)) break;
+        if (!(vec_distance_xy(self + 0x10, path + *(int *)path * 16) < *(float *)(state + 0x134)) && !func_002B6120(self, path)) break;
 
         if (((u8 *)self)[0x43] != 2) {
             angle = func_00283248(*(float *)(state + 0x1F0) - *(float *)(self + 0x10), *(float *)(state + 0x1F4) - *(float *)(self + 0x14));
-            if (func_00283C80(*(float *)(self + 0xF8), angle > 0.3490659f ? 1.0f : 0.0f) != 0 && ((u8 *)self)[0x43] != 2) func_002A7470(self, 2, 5, 10);
+            if (FastDiffRots(*(float *)(self + 0xF8), angle > 0.3490659f ? 1.0f : 0.0f) != 0 && ((u8 *)self)[0x43] != 2) func_002A7470(self, 2, 5, 10);
         }
         func_L02_00332630(self, state + 0x1F0);
         angle = func_00283248(*(float *)(state + 0x1F0) - *(float *)(self + 0x10), *(float *)(state + 0x1F4) - *(float *)(self + 0x14));
-        if (func_00283C80(*(float *)(self + 0xF8), angle) < 0.087266475f && (((u8 *)self)[0x43] != 2 || (((u8 *)self)[0x60] & 2))) {
+        if (FastDiffRots(*(float *)(self + 0xF8), angle) < 0.087266475f && (((u8 *)self)[0x43] != 2 || (((u8 *)self)[0x60] & 2))) {
             *(int *)(state + 0x320) = -1; qcopy(state + 0x340,self + 0x10);
             if (*(int *)(state + 0x328) != -1) func_002A7750((u8 *)self, 19, 4); else func_002A7750((u8 *)self, 1, 0);
 
@@ -303,7 +303,7 @@ void func_L15_003DBB08(char *self) {
         break;
     case 19:
         if (func_002B3868((u8 *)self) && ((u8 *)self)[0x43]) func_002A7470(self, 0, 0, 20);
-        if (*(int *)(state + 0x32C) == -1 || func_002ACBC8(&((L02_ResidentCombatPrefix *)D_00189E20)->position_80, *(int *)(state + 0x32C)) || *(int *)(state + 0x204) == 1) { func_002A7750((u8 *)self, 20, -1); break; }
+        if (*(int *)(state + 0x32C) == -1 || IsPointInCuboid(&((L02_ResidentCombatPrefix *)D_00189E20)->position_80, *(int *)(state + 0x32C)) || *(int *)(state + 0x204) == 1) { func_002A7750((u8 *)self, 20, -1); break; }
         break;
     case 20:
         if (func_002B3868((u8 *)self)) {
@@ -321,7 +321,7 @@ void func_L15_003DBB08(char *self) {
         if (func_002AEB60(self, 5)) {
             if ((other = (char *)func_L02_003CEBB8(*(int *)(state + 0x328))) != 0) {
                 func_0029FC20(*(char **)(state + 0x370), 0, (char *)work.relay.frame);
-                func_00282F20(&work.relay.direction, work.relay.frame, 0.23333334922790527f);
+                vec_scale_to_length(&work.relay.direction, work.relay.frame, 0.23333334922790527f);
                 {
                     Quad q = *(Quad *)&work.relay.frame[3];
                     *(Quad *)&work.relay.origin = q;

@@ -37,7 +37,7 @@ char *func_L00_003EB610(char *owner, Quad *position)
         return 0;
     if (func_L00_002D3F30(0x1F, 1) == 0)
         return 0;
-    moby = func_0029EFD0(0xCB2);
+    moby = CreateMoby(0xCB2);
     if (moby != 0) {
         state = *(char **)(moby + 0x68);
         *(char **)(state + 0x34) = owner;

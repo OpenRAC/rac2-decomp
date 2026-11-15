@@ -59,7 +59,7 @@ void func_L11_003F2F38(u8 *arg0) {
     func_002B3380((char *)m, (char *)(s1 + 0x50), (char *)(s1 + 0x20));
     if (*(s16 *)(s1 + 0x70) != 0) {
         *(s16 *)(s1 + 0x70) = 0;
-        func_002A0488(m, *(u32 *)(s1 + 0x280), *(u32 *)(s1 + 0x284),
+        set_moby_color(m, *(u32 *)(s1 + 0x280), *(u32 *)(s1 + 0x284),
                       *(u32 *)(s1 + 0x288));
         *(s16 *)(s1 + 0x72) = 1;
     }
@@ -75,6 +75,6 @@ void func_L11_003F2F38(u8 *arg0) {
     m->rotX = -1.5707965f;
     m->rotW = 0;
     m->y = y;
-    m->rotZ = func_00283B98(3.1415927f, *(f32 *)(s1 + 0x250));
-    func_002833F0(m->mtx, &m->rotW);
+    m->rotZ = FastAddRotations(3.1415927f, *(f32 *)(s1 + 0x250));
+    euler_rotation_basis(m->mtx, &m->rotW);
 }

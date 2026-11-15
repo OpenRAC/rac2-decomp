@@ -12,7 +12,7 @@ void func_L02_003D0238(char *self)
     char *state = *(char **)(self + 0x68);
 
     *(int *)(state + 0xD8) = 0;
-    *(int *)(self + 0x78) = func_L01_0031BC68(D_L02_001B0138, D_L02_001B013C, *(float *)(state + 0xD8));
+    *(int *)(self + 0x78) = PulseColor(D_L02_001B0138, D_L02_001B013C, *(float *)(state + 0xD8));
     func_002A7750(self, 1, -1);
     qcopy(self + 0x10, state + 0xA0);
     qcopy(state + 0x60, state + 0xA0);

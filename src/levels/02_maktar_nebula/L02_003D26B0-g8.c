@@ -56,7 +56,7 @@ int func_L02_003D4D68(char *arg0) {
     short timer;
     int delta;
 
-    if (func_00282E80(arg0 + 0x10, &D_L02_001B01B0) > 18.0f) {
+    if (vec_distance_xy(arg0 + 0x10, &D_L02_001B01B0) > 18.0f) {
         return 0;
     }
     timer = *(short *)(state + 0x32E);
@@ -97,7 +97,7 @@ void func_L02_003D5F50(char *self, int joint, int mirror) {
     func_0029FCC0(self, joint, origin);
     func_0029FC20(self, joint, matrix);
     qcopy(direction, matrix + 8);
-    strength = func_00282DF0(*(char **)(self + 0x68) + 0x1B0) * 3.333333f +
+    strength = FastVecLength(*(char **)(self + 0x68) + 0x1B0) * 3.333333f +
                func_002A7878(0.0f, 0.1f);
     if (strength > 1.0f) strength = 1.0f;
     else if (strength < 0.0f) strength = 0.0f;
@@ -107,28 +107,28 @@ void func_L02_003D5F50(char *self, int joint, int mirror) {
         offset_a[1] = -offset_a[1];
         offset_b[1] = -offset_b[1];
     }
-    func_002830C0(position, offset_a, matrix);
-    func_00282CC0(position, position, origin);
-    func_00282CF0(delta, D_L02_001BA500, position);
+    transform_vector(position, offset_a, matrix);
+    FastVecAdd(position, position, origin);
+    FastVecSub(delta, D_L02_001BA500, position);
     delta[2] = 0.0f;
-    func_00282F20(delta, delta, D_L02_001B02D0);
-    func_00282CC0(position, position, delta);
+    vec_scale_to_length(delta, delta, D_L02_001B02D0);
+    FastVecAdd(position, position, delta);
     for (i = 0; i < D_L02_001B02B0; i++) {
-        func_00282F20(velocity, direction,
+        vec_scale_to_length(velocity, direction,
                       -((D_L02_001B02A8 + func_002A7878(0.0f, strength * D_L02_001B02AC)) *
                         0.016666668f));
         func_002ACB48(position, D_L02_001B02D4);
         func_L02_003449D8(position, velocity, D_L02_001B0290, func_002A77E0(2), 1);
     }
-    func_002830C0(position, offset_b, matrix);
-    func_00282CC0(position, position, origin);
+    transform_vector(position, offset_b, matrix);
+    FastVecAdd(position, position, origin);
     for (i = 0; (float)i < strength * (float)D_L02_001B01F4 + 2.0f; i++) {
-        func_00282F20(velocity, direction,
+        vec_scale_to_length(velocity, direction,
                       -((D_L02_001B01EC + func_002A7878(0.0f, strength * D_L02_001B01F0)) *
                         0.016666668f));
         func_002ACB48(position, D_L02_001B0214);
         func_L02_003449D8(position, velocity, D_L02_001B0230, func_002A77E0(2), 1);
-        func_00282F20(velocity, direction,
+        vec_scale_to_length(velocity, direction,
                       -((D_L02_001B01EC + func_002A7878(0.0f, strength * D_L02_001B01F0)) *
                         0.016666668f));
         func_002ACB48(position, D_L02_001B0214);

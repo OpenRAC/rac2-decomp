@@ -47,7 +47,7 @@ void func_L00_003B7D48(char *m) {
         *(int *)(d + 0x2C) = 0;
         sweep = sweep_storage;
         height = (*(int *)(g + 0x2294) == 29) ? 11.0f : 4.5f;
-        func_002FDF40(sweep, pos, 0, 0, 1.6f, height, 0.13333334028720856f, 0.003055555745959282f);
+        CalculateAimedLaunchVelocity(sweep, pos, 0, 0, 1.6f, height, 0.13333334028720856f, 0.003055555745959282f);
     }
     *(int *)(d + 0x24) = func_002FE5A0(pos, sweep, d, d + 0x10, m, &hit, &aux, 0.003055555745959282f);
     result = func_00300540(aux);
@@ -71,7 +71,7 @@ void func_L00_003B7D48(char *m) {
             goto blocked;
     }
     func_002FE8D8(d, normal);
-    if (!(func_00282DB0(d + 0x10, normal) < 0.75f))
+    if (!(FastVecDot(d + 0x10, normal) < 0.75f))
         goto timer;
 blocked:
     *(int *)(d + 0x2C) = 1;
@@ -100,14 +100,14 @@ timer:
             !*(int *)(d + 0x2C) && ready) {
             if (func_L00_002D3F30(-1, 1)) {
                 *(short *)(g + 0x1E0) = 120;
-                func_002B0CE0(6, 0, 1);
+                ForceClaimNotice(6, 0, 1);
                 *(short *)(g + 0x1D2) = 0;
-                func_L00_002AF568();
+                start_equipped_item_animation();
                 *(unsigned char *)(m + 0x20) = 2;
                 *(int *)(d + 0x20) = 12;
                 *(int *)(d + 0x28) = 0;
             } else
-                func_002E5CF8(0, 0, m);
+                PlayMobySound(0, 0, m);
         }
         break;
     }
@@ -117,8 +117,8 @@ timer:
 
             if (p)
                 *(char **)(p + 0xB8) = m;
-            func_002E5CF8(1, 0, m);
-            func_L00_002AF7D0();
+            PlayMobySound(1, 0, m);
+            cancel_hero_item_animation();
             *(unsigned char *)(m + 0x20) = 3;
             *(int *)(d + 0x20) = 5;
         }

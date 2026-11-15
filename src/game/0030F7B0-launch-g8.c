@@ -94,13 +94,13 @@ void func_00315E20(u8 *obj)
         p = D_00189E20;
         if (*(u8 *)(p + 0x22BC) != 0)
             break;
-        st->target = func_00315C78(obj);
+        st->target = FindNearestEligibleTarget(obj);
         if (st->target != 0) {
-            d = func_00282E48(D_001B5340, st->target + 0x10) * 0.02f;
+            d = fast_vec_dist(D_001B5340, st->target + 0x10) * 0.02f;
             qcopy(pos, st->target + 0x10);
             func_00273318(func_00282C48(0.9f - d * 0.65f), 0.0f, 90.0f, obj, 0xFF0FFF0F, pos, 0x26,
                           -1, 4);
-            func_00282CF0(dir, st->target + 0x10, aim);
+            FastVecSub(dir, st->target + 0x10, aim);
         }
         if (!(D_00138324 & *(int *)(p + 0x1230)))
             break;
@@ -138,18 +138,18 @@ void func_00315E20(u8 *obj)
         launch.dir[3] = 5627.925f;
         launch.klass = *(u16 *)(obj + 0xAA);
         launch.kind = 3;
-        func_002A8E20(st->target, &launch);
+        QueueMobyImpact(st->target, &launch);
         obj[0x20] = 3;
         if (*(int *)(player + 0x340)) {
             D_001AF548 = 15;
-            func_00316400(obj, st->target, 7);
-            func_00316400(obj, st->target, 7);
-            func_00316400(obj, st->target, 7);
+            AllocEffectSlot(obj, st->target, 7);
+            AllocEffectSlot(obj, st->target, 7);
+            AllocEffectSlot(obj, st->target, 7);
         } else {
             D_001AF548 = 3;
-            func_00316400(obj, st->target, 3);
-            func_00316400(obj, st->target, 3);
-            func_00316400(obj, st->target, 3);
+            AllocEffectSlot(obj, st->target, 3);
+            AllocEffectSlot(obj, st->target, 3);
+            AllocEffectSlot(obj, st->target, 3);
         }
         st->target = 0;
         break;
@@ -170,6 +170,6 @@ void func_00315E20(u8 *obj)
             obj[0x20] = 1;
         break;
     }
-    func_003166C8(obj);
+    UpdateEffectSlots(obj);
     func_0027CFD0(func_00316248, obj);
 }

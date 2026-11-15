@@ -94,19 +94,19 @@ void func_L00_002A4928(void)
         actor = &D_L00_001B1E9C[0][i];
         if (actor->oclass == 0) {
             (((HeroState *)D_00189E20)->m[0x2290 / 4]) = actor;
-            func_002833F0(&actor->basis, &actor->axis);
-            func_00282F20(&far, &(((HeroState *)D_00189E20)->m[0x2290 / 4])->fwd, -3.0f);
-            func_00282F20(&near, &(((HeroState *)D_00189E20)->m[0x2290 / 4])->fwd, 1.0f);
-            func_00282CC0(&near, &near, &((HeroState *)D_00189E20)->q[8]);
-            func_00282CC0(&far, &far, &((HeroState *)D_00189E20)->q[8]);
-            if (func_002761F8(&near, &far, 2, (((HeroState *)D_00189E20)->m[0x2290 / 4]), 0) != 0)
+            euler_rotation_basis(&actor->basis, &actor->axis);
+            vec_scale_to_length(&far, &(((HeroState *)D_00189E20)->m[0x2290 / 4])->fwd, -3.0f);
+            vec_scale_to_length(&near, &(((HeroState *)D_00189E20)->m[0x2290 / 4])->fwd, 1.0f);
+            FastVecAdd(&near, &near, &((HeroState *)D_00189E20)->q[8]);
+            FastVecAdd(&far, &far, &((HeroState *)D_00189E20)->q[8]);
+            if (CollLine(&near, &far, 2, (((HeroState *)D_00189E20)->m[0x2290 / 4]), 0) != 0)
                 qcopy(&((HeroState *)D_00189E20)->q[8], &D_L00_001BF220);
             (((HeroState *)D_00189E20)->m[0x2290 / 4])->flags |= 2;
             ((HeroState *)D_00189E20)->m[0xC18 / 4] = (((HeroState *)D_00189E20)->m[0x2290 / 4]);
             ((HeroState *)D_00189E20)->f[0x98 / 4] = (((HeroState *)D_00189E20)->m[0x2290 / 4])->axis.f[2];
             qcopy(&((HeroState *)D_00189E20)->q[8], &(((HeroState *)D_00189E20)->m[0x2290 / 4])->pos);
             func_L00_002B4900();
-            func_L00_002A9460();
+            update_hero_moby();
             func_L00_002D23C0(0, 0);
             qcopy(&((Placement *)D_00152C70)->pos, &((HeroState *)D_00189E20)->q[8]);
             qcopy(&((Placement *)D_00152C70)->rot, &((HeroState *)D_00189E20)->q[9]);

@@ -136,7 +136,7 @@ void func_L12_003A6E18(u8 *object) {
     if (mode == 0 || mode == 0x12) {
         scale = 1.0f;
     }
-    func_002A8600(&out, object[0x21], 0, 0);
+    GetFirstMobyInGroup(&out, object[0x21], 0, 0);
     while (out != 0) {
         u8 *cur = out;
 
@@ -149,7 +149,7 @@ void func_L12_003A6E18(u8 *object) {
                 func_L00_00325AE8(cur + 0x10, f68[1], scale * ratio, 0.5f);
             }
         }
-        func_002A86E8(&out, (u32)out, 0, 0);
+        GetNextMobyInGroup(&out, (u32)out, 0, 0);
     }
 }
 
@@ -172,7 +172,7 @@ void func_L12_003B5240(u8 *self) {
     switch (self[0x20]) {
     case 0:
         if (!D_001A7AF8[7]) {
-            partner = func_0029EFD0(0x127B);
+            partner = CreateMoby(0x127B);
             v->partner = partner;
             if (partner) {
                 *(u16 *)(partner+0x32) = *(u16 *)(self+0x32);
@@ -226,7 +226,7 @@ void func_L12_003B5240(u8 *self) {
     case 3:
         if (D_001A7AF8[0x31]) func_002A7750(self,4,-1);
         else if (func_L01_003245E0(self,10,2.5f)) {
-            func_L00_0030DD70(func_00288FB8(0x27D3),2);
+            func_L00_0030DD70(GetLocalizedString(0x27D3),2);
             func_L01_003246D0(self);
         }
         break;
@@ -267,7 +267,7 @@ void func_L12_003B5240(u8 *self) {
                 D_001A7AF8[0x69] = 0;
                 func_00288308(7);
                 func_002B0A18(0x1245,-1);
-                func_0029B3E0(0,-1);
+                MemcardSave(0,-1);
                 func_0029F338(self);
                 return;
             }
@@ -276,7 +276,7 @@ void func_L12_003B5240(u8 *self) {
     }
     if (self[0x20] != 0) {
         if (self[0x43] < 2 && func_00282948(&v->timer11C)) {
-            v->timer11C = func_00283CF0(func_002A7878(1200.0f,2400.0f));
+            v->timer11C = FloatToInt(func_002A7878(1200.0f,2400.0f));
             if (self[0x43] != 2) func_002A7470(self,2,0,10);
         }
         else if ((self[0x60] & 2) && self[0x43] == func_002A77E0(2))
@@ -286,9 +286,9 @@ void func_L12_003B5240(u8 *self) {
     active = 0;
     if (self[0x43] == 0 || self[0x43] == 2) {
         active = 1;
-        if (func_00282E80(self+0x10,D_00189E20.pos) < 8.0f &&
-            func_00283C80(*(float *)(self+0xF8),func_00283248(D_00189E20.target[0]-*(float *)(self+0x10),D_00189E20.target[1]-*(float *)(self+0x14))) < 1.5707964897155762f) {
-                if (func_00282DF0(D_00189E20.velocity) > 0.01f) v->timer114 = 120;
+        if (vec_distance_xy(self+0x10,D_00189E20.pos) < 8.0f &&
+            FastDiffRots(*(float *)(self+0xF8),func_00283248(D_00189E20.target[0]-*(float *)(self+0x10),D_00189E20.target[1]-*(float *)(self+0x14))) < 1.5707964897155762f) {
+                if (FastVecLength(D_00189E20.velocity) > 0.01f) v->timer114 = 120;
                 else func_00282948(&v->timer114);
         } else if (v->timer114) {
             v->timer114 = 0;
@@ -296,11 +296,11 @@ void func_L12_003B5240(u8 *self) {
         }
         if (func_00282948(&v->timer118)) {
             float randomTurn;
-            v->timer118 = func_00283CF0(func_002A7878(180.0f,300.0f));
-            randomTurn = func_00283B98(*(float *)(self+0xF8),func_002A7878(-90.0f,90.0f)*0.01745329424738884f);
+            v->timer118 = FloatToInt(func_002A7878(180.0f,300.0f));
+            randomTurn = FastAddRotations(*(float *)(self+0xF8),func_002A7878(-90.0f,90.0f)*0.01745329424738884f);
             pitch = func_002A7878(0.0f,30.0f)*0.01745329424738884f;
             func_002AF000(v->direction,6.0f,randomTurn,pitch);
-            func_00282CC0(v->direction,v->direction,self+0x10);
+            FastVecAdd(v->direction,v->direction,self+0x10);
         }
         if (v->timer114) {
             qcopy(target,D_00189E20.target);
@@ -310,9 +310,9 @@ void func_L12_003B5240(u8 *self) {
     if (active) {
         qcopy(position,self+0x10);
         position[2] += 2.0f;
-        func_00282CF0(delta,target,position);
-        turn = func_00283BE0(func_00283248(delta[0],delta[1]),*(float *)(self+0xF8));
-        pitch = -func_00283248(func_00282E20(delta),delta[2]);
+        FastVecSub(delta,target,position);
+        turn = fast_subtract_rotations(func_00283248(delta[0],delta[1]),*(float *)(self+0xF8));
+        pitch = -func_00283248(vec_length_xy(delta),delta[2]);
         if (turn > 1.5707964897155762f) turn = 1.5707964897155762f;
         else if (turn < -1.5707964897155762f) turn = -1.5707964897155762f;
         if (pitch > 0.523598849773407f) pitch = 0.523598849773407f;
@@ -393,7 +393,7 @@ u8 *func_L12_003E1B28(s32 index, u8 *obj)
             u8 *vars = *(u8 **)(rec + 0x68);
             s32 *zone = D_L12_001FEAC0[*(s32 *)(vars + 0x138)];
 
-            if (func_002A8AF0(obj + 0x10, zone + 4, zone[0]) != 0) {
+            if (point_in_path_xy(obj + 0x10, zone + 4, zone[0]) != 0) {
                 if (rec[0x20] == 9) {
                     *(u16 *)(rec + 0x34) = (*(u16 *)(rec + 0x34) & 0xFFBE) | 0x1000;
                     *(s32 *)(rec + 0x98) = *(s32 *)(*(u8 **)(rec + 0x24) + 0x10);
@@ -440,7 +440,7 @@ u8 *func_L12_003E1B28(s32 index, u8 *obj)
 void func_L12_004141A8(u8 *o) {
     u8 *d = *(u8 **)(o+0x68);
     int old, result;
-    if (!o[0x95]) func_L12_004135A8(o);
+    if (!o[0x95]) InitStateDataWithPartner(o);
     if (o[0xA8] == 255) {
         u8 *partner=*(u8 **)(d+0x2F8);
         if (partner && *(short *)(partner+0xAA)==0x114B && partner[0x20]!=254 && partner[0x20]!=253) {
@@ -470,14 +470,14 @@ void func_L12_004141A8(u8 *o) {
                 *(TodanoPartnerBlock *)(p+0x20)=*(TodanoPartnerBlock *)(d+0x20);
                 func_002B3380(*(u8 **)(d+0x2F8),p+0x50,p+0x20);
                 func_L12_00413CE0(o);
-                func_002ABBB8(*(u8 **)(d+0x2F8),d+0xD0,0,0,0,4,0,0,2,1,9,1,-1,0,0,0,-1,0,0x810001);
+                SpawnExplosionEffects(*(u8 **)(d+0x2F8),d+0xD0,0,0,0,4,0,0,2,1,9,1,-1,0,0,0,-1,0,0x810001);
                 func_L09_003F77D0(o);
                 if (old>=4 && !func_002A77E0(2)) {
                     if (o[0x43]!=17) func_002A7470(o,17,0,5);
                     *(float *)(d+0xB0)=*(s8 *)(d+0xBF);
                     *(float *)(d+0xA4)=*(s8 *)(d+0xBE);
                     *(int *)(d+0xCC)=-1;
-                    func_00282D30(d+0xD0,d+0xD0,0.05f);
+                    FastVecScale(d+0xD0,d+0xD0,0.05f);
                 } else qzero(d+0xD0);
                 alive=1;
                 p=d+0x2F0;
@@ -515,7 +515,7 @@ void func_L12_004141A8(u8 *o) {
             }
         }
     }
-    if(o[0x31] && func_00282E48(o+0x10,D_L12_001B9E00)<24.0f) {
+    if(o[0x31] && fast_vec_dist(o+0x10,D_L12_001B9E00)<24.0f) {
         func_002A93B0(o); o[0x6F]=22;
     }
     func_002B3BA8(o,*(int *)(d+0x2D8),0,0,0,0);
@@ -533,9 +533,9 @@ void func_L12_00414670(u8 *o) {
         if(o[0x20]>=1 && o[0x20]<=3) func_L12_00413108(o);
         if(*(int *)(d+0x204)==1 && !d[0x30F]) {
             func_0029FCC0(*(u8 **)(d+0x2F8),4,v);
-            func_00282CF0(v,d+0x1F0,v);
-            *(float *)(d+0x274)=func_00283BE0(-func_00283248(func_00282E20(v),v[2]),*(float *)(*(u8 **)(d+0x2F8)+0xF4));
-            *(float *)(d+0x278)=func_00283BE0(func_00283248(v[0],v[1]),*(float *)(*(u8 **)(d+0x2F8)+0xF8));
+            FastVecSub(v,d+0x1F0,v);
+            *(float *)(d+0x274)=fast_subtract_rotations(-func_00283248(vec_length_xy(v),v[2]),*(float *)(*(u8 **)(d+0x2F8)+0xF4));
+            *(float *)(d+0x278)=fast_subtract_rotations(func_00283248(v[0],v[1]),*(float *)(*(u8 **)(d+0x2F8)+0xF8));
         }
         func_002AEC48(*(u8 **)(d+0x2F8),d+0x210,3,0.02f,0.3f);
         if(!d[0x30F] && (*(u8 **)(d+0x2F8))[0x42]>=8 && (*(u8 **)(d+0x2F8))[0x42]<11) {
@@ -543,9 +543,9 @@ void func_L12_00414670(u8 *o) {
                     u8 *r=d+i*0x80;
                     if((*(u16 *)(*(u8 **)(d+0x2F8)+0x7C)>>(i+4))&1) {
                         func_0029FCC0(*(u8 **)(d+0x2F8),i,v);
-                        func_00282CF0(v,d+0x1F0,v);
-                        *(float *)(r+0x384)=-func_00283248(func_00282E20(v),v[2]);
-                        *(float *)(r+0x388)=func_00283BE0(func_00283248(v[0],v[1]),*(float *)(*(u8 **)(d+0x2F8)+0xF8));
+                        FastVecSub(v,d+0x1F0,v);
+                        *(float *)(r+0x384)=-func_00283248(vec_length_xy(v),v[2]);
+                        *(float *)(r+0x388)=fast_subtract_rotations(func_00283248(v[0],v[1]),*(float *)(*(u8 **)(d+0x2F8)+0xF8));
                         if(i) { if(*(float *)(r+0x388)>0.087266475f) *(float *)(r+0x388)=0.087266475f; }
                         else { if(*(float *)(d+0x388)<-0.087266475f) *(float *)(d+0x388)=-0.087266475f; }
                     }

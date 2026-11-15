@@ -88,13 +88,13 @@ void func_L16_003C2C08(u8 *object)
         amount=func_L16_003960E8(D_L16_001B2B1C+(state->tableIndex<<8));
         if (amount!=0.0f || state->amount!=0.0f) {
             func_L14_004272D8(object);
-            func_00282F20(point,object+0xE0,D_L16_001B02B0*amount*(F(object,0x2C)/F(*(u8 **)(object+0x24),0x24)));
-            func_00282CC0(object+0x10,state->origin,point);
+            vec_scale_to_length(point,object+0xE0,D_L16_001B02B0*amount*(F(object,0x2C)/F(*(u8 **)(object+0x24),0x24)));
+            FastVecAdd(object+0x10,state->origin,point);
             if (amount<state->amount) func_002A8C28(object,object+0x10,0x10000,0,1,0,2.1f,3.0f,1.0f);
         }
         if (amount!=state->amount && amount!=1.0f && amount!=0.0f) {
             u8 *playingSound=D_00188660+state->sound*0x70;
-            if (*(u8 **)(playingSound+0x88)!=object || !playingSound[0x74]) state->sound=func_002E5CF8(2,4,(char *)object);
+            if (*(u8 **)(playingSound+0x88)!=object || !playingSound[0x74]) state->sound=PlayMobySound(2,4,(char *)object);
         } else {
             int sound=state->sound;
             if (sound!=-1) {
@@ -107,11 +107,11 @@ void func_L16_003C2C08(u8 *object)
         state->amount=amount;
         if (D_L16_001B3814!=D_L16_001B2648) {
             D_L16_001B3814=D_L16_001B2648;
-            func_L00_002E6CF0(func_L16_003C32F8,object);
+            func_L00_002E6CF0(DrawRotatingGroupInstances,object);
         }
         if (amount>=1.0f) {
             if (func_002A9640(object,0x10000,0)) {
-                func_002E5CF8(0,0,(char *)object);
+                PlayMobySound(0,0,(char *)object);
                 object[0xA8]=255;
                 func_002A7750(object,2,-1);
                 D_0018CC7C=65535;
@@ -123,16 +123,16 @@ void func_L16_003C2C08(u8 *object)
         oldTimer=timer++;
         *(u16 *)(object+0x96)=timer;
         if (oldTimer>=60) {
-            func_00282F20(point,object+0xE0,-2.0f);
-            func_00282F20(step,object+0xE0,5.0f);
-            func_00282CC0(point,point,object+0x10);
+            vec_scale_to_length(point,object+0xE0,-2.0f);
+            vec_scale_to_length(step,object+0xE0,5.0f);
+            FastVecAdd(point,point,object+0x10);
             func_002A8C28(object,point,0x10000,0,1,0,6.0f,3.0f,1.0f);
-            func_002E5CF8(1,0,(char *)object);
+            PlayMobySound(1,0,(char *)object);
             for (i=0;i<2;i++) {
-                func_00282CF0(normal,D_L16_001B9B00,point);
-                func_00282F20(normal,normal,1.0f);
+                FastVecSub(normal,D_L16_001B9B00,point);
+                vec_scale_to_length(normal,normal,1.0f);
                 func_0032DA58(object,point,normal,0.0f);
-                func_00282CC0(point,point,step);
+                FastVecAdd(point,point,step);
             }
             D_L16_001B99C0.damping=0.1f;
             D_L16_001B99C0.lifetime=90;
@@ -150,18 +150,18 @@ void func_L16_003C2C08(u8 *object)
             if (count!=0) {
                 char *format=D_L16_001B02D0;
                 char *text=message;
-                string=func_00288FB8(0x2F3A);
+                string=GetLocalizedString(0x2F3A);
                 func_00115DA8(text,format,string,count);
                 string=text;
                 func_002A7750(object,4,-1);
                 func_L00_0030DD70(string,180);
             } else {
-                string=func_00288FB8(0x2F3B);
+                string=GetLocalizedString(0x2F3B);
                 func_L00_0030DD70(string,180);
                 func_002A7750(object,5,-1);
             }
         } else {
-            if (*(u16 *)(object+0x96)%20==10) func_002E5CF8(3,0,(char *)object);
+            if (*(u16 *)(object+0x96)%20==10) PlayMobySound(3,0,(char *)object);
         }
         break;
     case 4:
@@ -181,13 +181,13 @@ remove:
     }
     if (object[0x31]) {
         if (object[0x20]==2) {
-            rate=func_00283B98(state->angle,D_L16_001B02BC*0.00029088825f);
+            rate=FastAddRotations(state->angle,D_L16_001B02BC*0.00029088825f);
             state->angle=rate;
-            *(u32 *)(object+0x78)=func_L01_0031BC68(D_L16_001B02C0[2],D_L16_001B02C0[3],rate);
+            *(u32 *)(object+0x78)=PulseColor(D_L16_001B02C0[2],D_L16_001B02C0[3],rate);
         } else {
-            rate=func_00283B98(state->angle,D_L16_001B02B8*0.00029088825f);
+            rate=FastAddRotations(state->angle,D_L16_001B02B8*0.00029088825f);
             state->angle=rate;
-            *(u32 *)(object+0x78)=func_L01_0031BC68(colorFirst[0],D_L16_001B02C0[1],rate);
+            *(u32 *)(object+0x78)=PulseColor(colorFirst[0],D_L16_001B02C0[1],rate);
         }
     }
 }

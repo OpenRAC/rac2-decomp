@@ -56,14 +56,14 @@ void func_L22_003C9B60(char *obj)
     if (func_002A77E0(D_L22_001AFF50) != 0) {
         qzero_nc(&spark);
         spark.f[2] = func_002A7878(D_L22_001AFF28, D_L22_001AFF2C[0]) * 0.016666668f;
-        func_00283098(&spark, &spark, obj + 0xC0);
+        matrix_mul_vec3(&spark, &spark, obj + 0xC0);
         c = func_002A7940();
         s = func_002A7878(D_L22_001AFF48, D_L22_001AFF4C[0]);
         aim.f[0] = func_00283180(c) * s;
         aim.f[1] = func_00283198(c) * s;
         aim.f[2] = 0.0f;
-        func_00283098(&aim, &aim, obj + 0xC0);
-        func_00282CC0(&aim, &aim, obj + 0x10);
+        matrix_mul_vec3(&aim, &aim, obj + 0xC0);
+        FastVecAdd(&aim, &aim, obj + 0x10);
         color = func_002A7820(D_L22_001AFF40, D_L22_001AFF44[0]);
         t = func_002A7878(D_L22_001AFF30, D_L22_001AFF34[0]);
         if (func_002A77E0(2) != 0)

@@ -67,9 +67,9 @@ void func_L00_00384678(char *obj)
 
     st = *(Board_384678 **)(obj + 0x68);
     if (0.0f < st->drop)
-        func_002AA2E8(&st->drop, 0.0f, 0.004166667f);
+        ApproachValue(&st->drop, 0.0f, 0.004166667f);
     else
-        func_002AA2E8(&st->drop, -0.2f, 0.00033333333f);
+        ApproachValue(&st->drop, -0.2f, 0.00033333333f);
     all = 1;
     for (scan = 0; scan < 24; scan++) {
         if ((((Tile_384678 *)D_L00_00232A60[scan])->flags ^ 1) & 1) {
@@ -88,7 +88,7 @@ void func_L00_00384678(char *obj)
         }
     }
     if (st->timer != 0 && st->timer % 5 == 0)
-        func_002E5CF8(0, 0, D_L00_00232A60[0]);
+        PlayMobySound(0, 0, D_L00_00232A60[0]);
     func_00282948(&st->timer);
     *(TI128 *)base = *(TI128 *)D_L00_001AED40;
     base[1] += st->x - st->drop;
@@ -103,24 +103,24 @@ void func_L00_00384678(char *obj)
 
     hit = 0;
     for (i = 0; i < 24; i++) {
-        func_00282D30(va.f, D_L00_001AEDF0, (float)(i / 8));
-        func_00282D30(vb, D_L00_001AEDE0, (float)(i % 8));
-        func_00282CC0(va.f, va.f, vb);
-        func_00282CC0(va.f, va.f, base);
-        func_00283098(D_L00_00232A60[i] + 0x10, va.f, D_L00_001B8DC0 + 0x230);
-        func_00282CC0(D_L00_00232A60[i] + 0x10, D_L00_00232A60[i] + 0x10, D_L00_001B8DC0);
+        FastVecScale(va.f, D_L00_001AEDF0, (float)(i / 8));
+        FastVecScale(vb, D_L00_001AEDE0, (float)(i % 8));
+        FastVecAdd(va.f, va.f, vb);
+        FastVecAdd(va.f, va.f, base);
+        matrix_mul_vec3(D_L00_00232A60[i] + 0x10, va.f, D_L00_001B8DC0 + 0x230);
+        FastVecAdd(D_L00_00232A60[i] + 0x10, D_L00_00232A60[i] + 0x10, D_L00_001B8DC0);
         *(float *)(D_L00_00232A60[i] + 0x2C) = *(float *)(((Tile_384678 *)D_L00_00232A60[i])->cls + 0x24) * D_L00_001AED60;
         if ((((Tile_384678 *)D_L00_00232A60[i])->flags ^ 1) & 1) {
             hit++;
             if (func_002A9640(D_L00_00232A60[i], -1, 0)) {
                 if (!func_002A77E0(3))
-                    func_002E5CF8(0, 0, D_L00_00232A60[i]);
+                    PlayMobySound(0, 0, D_L00_00232A60[i]);
                 ((Tile_384678 *)D_L00_00232A60[i])->flags |= 0x41;
                 ((Tile_384678 *)D_L00_00232A60[i])->flags &= 0xEFFF;
                 *(s32 *)(D_L00_00232A60[i] + 0x98) = 0;
                 *(u8 *)(D_L00_00232A60[i] + 0xA8) = 0xFF;
-                func_00282F20(vc, D_L00_00232A60[i] + 0xE0, 0.05f);
-                func_00282CC0(vc, vc, D_L00_00232A60[i] + 0x10);
+                vec_scale_to_length(vc, D_L00_00232A60[i] + 0xE0, 0.05f);
+                FastVecAdd(vc, vc, D_L00_00232A60[i] + 0x10);
                 func_L00_003851A0(D_L00_00232A60[i], vc);
             }
             func_002A05A8(D_L00_00232A60[i]);
@@ -144,9 +144,9 @@ void func_L00_00384678(char *obj)
             st->liftTimer = func_L00_0031D620(1, 0xF0, t);
             va.q = 0;
             va.f[2] = 0.05f;
-            func_00283098(va.f, va.f, D_L00_00232A60[count] + 0xC0);
-            func_00282CC0(va.f, va.f, D_L00_00232A60[count] + 0x10);
-            func_00282F20(vb, D_L00_00232A60[count] + 0xC0, D_L00_001AEDB8 * 0.016666668f);
+            matrix_mul_vec3(va.f, va.f, D_L00_00232A60[count] + 0xC0);
+            FastVecAdd(va.f, va.f, D_L00_00232A60[count] + 0x10);
+            vec_scale_to_length(vb, D_L00_00232A60[count] + 0xC0, D_L00_001AEDB8 * 0.016666668f);
             func_L00_00384D40(D_L00_00232A60[count], va.f, vb);
         }
     }

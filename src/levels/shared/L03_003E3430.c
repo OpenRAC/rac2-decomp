@@ -13,20 +13,20 @@ void func_L03_003E3430(u8 *p) {
  case 0: *(short *)(q+0x52)=*(unsigned short *)(q+0x50); break;
  case 1: *(short *)(q+0x52)=q[0x40];break;
  default: {
- func_00283098(v,D_L03_0029BBF0[*(short *)(q+0x52)],p+0xC0);
+ matrix_mul_vec3(v,D_L03_0029BBF0[*(short *)(q+0x52)],p+0xC0);
  score=-10.0f;
- x=func_00282DB0(v,D_L03_001B9BC0[0]);
+ x=FastVecDot(v,D_L03_001B9BC0[0]);
  best=-1;
- y=func_00282DB0(v,D_L03_001B9BC0[1]);
+ y=FastVecDot(v,D_L03_001B9BC0[1]);
  angle=func_00283248(x,y);
  for(i=0;i<count;i++) {
  if(*(q+i+0x40)==*(short *)(q+0x52))continue;
  if(*(q+i+0x40)==255)break;
  {u8 *base=q+0x40; u8 *entry=base+i; float delta;
- func_00283098(v,D_L03_0029BBF0[*entry],p+0xC0);
- x=func_00282DB0(v,D_L03_001B9BC0[0]);
- y=func_00282DB0(v,D_L03_001B9BC0[1]);
- delta=func_00283BE0(func_00283248(x,y),angle);
+ matrix_mul_vec3(v,D_L03_0029BBF0[*entry],p+0xC0);
+ x=FastVecDot(v,D_L03_001B9BC0[0]);
+ y=FastVecDot(v,D_L03_001B9BC0[1]);
+ delta=fast_subtract_rotations(func_00283248(x,y),angle);
  if(delta>0.0f)delta-=6.2831854820251465f;
  if(delta>score){score=delta;best=*entry;}
  }

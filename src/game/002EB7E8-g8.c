@@ -60,13 +60,13 @@ void func_002EB7E8(unsigned int id) {
  D_001B15AC=0x34;
  D_001B15A4=0;
  if(D_001A63A8_3.mode) {
-  func_0027D330(6); func_002B7CE0(1); func_002EB158(0);
- } else { func_002EB158(0); func_0027D330(6); }
+  FadeToBlack(6); func_002B7CE0(1); func_002EB158(0);
+ } else { func_002EB158(0); FadeToBlack(6); }
  if(D_001A63A8_3.mode) func_002B7CE0(1);
  func_002EB598(); func_002ED058();
  D_001A63A8_3.count=0;
  D_001A63A8_3.destination=D_001B8840.selected+4000;
- while(!(D_001A63A8_3.state==3 && D_001A63A8_3.progress<6000)) { func_002E4AC8(); func_001261F0(0); }
+ while(!(D_001A63A8_3.state==3 && D_001A63A8_3.progress<6000)) { UpdateSoundVoices(); func_001261F0(0); }
  D_001B8840.wait=-3;
  count=0;
  do { func_002B6D28(); func_002EB158(1); } while (0);

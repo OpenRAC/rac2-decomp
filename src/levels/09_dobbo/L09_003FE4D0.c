@@ -42,7 +42,7 @@ void func_L09_003FE4D0(unsigned char *a0)
             p++;
             qcopy(&buf, s0 + 0x10);
             buf.f[3] = 4.0f;
-            if (func_00283DB8(&buf, func_00283CE0(*(short *)(s0 + 0x32))) != none) {
+            if (func_00283DB8(&buf, IntToFloat(*(short *)(s0 + 0x32))) != none) {
                 s1 = *(unsigned char **)(s0 + 0x68);
                 if (*(int *)(s1 + 0x42C) & 8)
                     func_L09_003FD460(s0);

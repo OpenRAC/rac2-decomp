@@ -42,7 +42,7 @@ typedef struct {
 char *func_L11_0045FDB0(char *owner, void *velocity, void *position, float paramA, float paramB,
                         float scale, float paramD)
 {
-    SpawnObject *obj = (SpawnObject *)func_0029EFD0(0xE7B);
+    SpawnObject *obj = (SpawnObject *)CreateMoby(0xE7B);
 
     if (obj) {
         SpawnState *state;

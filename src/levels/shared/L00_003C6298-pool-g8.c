@@ -88,7 +88,7 @@ L00PoolMoby *func_L00_003CB980(L00PoolMoby *owner, int value, void *position, vo
 
     for (i = 0; i < 5 && D_L00_002472C0[i].word_00 != 0; i++)
         ;
-    object = func_0029EFD0(0xA9B);
+    object = CreateMoby(0xA9B);
     if (object != 0) {
         object->update_dist = object->draw_dist = 255;
         state = (L00PoolState *)object->pvars;
@@ -100,7 +100,7 @@ L00PoolMoby *func_L00_003CB980(L00PoolMoby *owner, int value, void *position, vo
         *(L00PoolQuad *)object->position = *(L00PoolQuad *)D_00189EA0;
         state->effect_slot = func_002FED90(object, scale, scale, scale, 0);
         *(L00PoolQuad *)object->position = *(L00PoolQuad *)saved;
-        func_00282F20(state, direction, scale);
+        vec_scale_to_length(state, direction, scale);
         state->lifetime = 160;
         state->timer = 20;
         state->slot = i;

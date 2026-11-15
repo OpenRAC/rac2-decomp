@@ -126,7 +126,7 @@ void func_L09_00405610(char *obj)
             FLOAT(data,0x310)=func_00283180(angle)*speed;
             FLOAT(data,0x314)=func_00283198(angle)*speed;
             WORD(data,0x318)=0;
-            func_00282CC0((data+0x310),(data+0x310),data+0x300);
+            FastVecAdd((data+0x310),(data+0x310),data+0x300);
             if (WORD(data,0x234)!=-1) {
                 position=*(DobboQuad *)(data+0x300);
                 func_L02_0032EF10(&position,(data+0x310),(data+0x310),WORD(data,0x234),1.5f);
@@ -139,7 +139,7 @@ void func_L09_00405610(char *obj)
         if (func_002B3868(obj)) {
             if (BYTE(obj,0x43)!=func_002A77E0(2)+4) func_002A7470(obj,func_002A77E0(2)+4,0,10);
         }
-        if (func_00282E48(obj+0x10,D_L09_00189EA0)<D_L09_001B13F8) func_002A7750(obj,4,-1);
+        if (fast_vec_dist(obj+0x10,D_L09_00189EA0)<D_L09_001B13F8) func_002A7750(obj,4,-1);
         else if (BYTE(obj,0x60)&2) {
             switch (func_002A77E0(3)) {
             case 0: func_002A7750(obj,6,-1); break;
@@ -167,7 +167,7 @@ void func_L09_00405610(char *obj)
             func_L09_00404BF0(obj,10);
             FLOAT(data,0x238)=func_002A7878(D_L09_001B13F8,D_L09_001B13F8_1[1])+0.5f;
         }
-        if ((func_L09_00404F90(obj,data+0x300,0)&0x80) || FLOAT(data,0x238)<func_00282E80(obj+0x10,D_L09_00189EA0)) {
+        if ((func_L09_00404F90(obj,data+0x300,0)&0x80) || FLOAT(data,0x238)<vec_distance_xy(obj+0x10,D_L09_00189EA0)) {
             if (func_002A77E0(2)) func_002A7750(obj,6,-1);
             else func_002A7750(obj,7,-1);
         }
@@ -179,7 +179,7 @@ void func_L09_00405610(char *obj)
             FLOAT(data,0x310)=func_00283180(angle)*speed;
             FLOAT(data,0x314)=func_00283198(angle)*speed;
             WORD(data,0x318)=0;
-            func_00282CC0((data+0x310),(data+0x310),data+0x300);
+            FastVecAdd((data+0x310),(data+0x310),data+0x300);
             if (WORD(data,0x234)!=-1) {
                 position=*(DobboQuad *)(data+0x300);
                 func_L02_0032EF10(&position,(data+0x310),(data+0x310),WORD(data,0x234),1.5f);

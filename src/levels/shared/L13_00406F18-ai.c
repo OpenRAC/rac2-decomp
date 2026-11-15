@@ -308,7 +308,7 @@ void func_L13_00406F18(u8 *a0)
         u8 *e;
         r = func_002B1C20(a0, st + 0x140);
         if (r & 1) {
-            func_002A6C58(a0, 0, 3);
+            SetDeathBits(a0, 0, 3);
             func_L01_003E9CF8(a0, 0, 0);
             return;
         }
@@ -359,10 +359,10 @@ void func_L13_00406F18(u8 *a0)
             }
         }
         if (*(float *)(st + 0x20) <= 0.0f && *(u16 *)(a0 + 0x96) == 0x28) {
-            func_0026FEB8(D_L13_001B11C0);
+            STUB_printf(D_L13_001B11C0);
             func_0029FC20(a0, 0, m);
-            func_00282F20(v, &m[4], -0.8333334f);
-            func_L13_0040DC20(a0, v, &m[12], 0, st[0x34]);
+            vec_scale_to_length(v, &m[4], -0.8333334f);
+            SpawnEA7Moby(a0, v, &m[12], 0, st[0x34]);
         }
         break;
     }
@@ -377,13 +377,13 @@ void func_L13_00406F18(u8 *a0)
             }
             if (a0[0x43] == 0x19) {
                 *(s32 *)(st + 0x2CC) = 0;
-                func_0026FEB8(D_L13_001B11C8);
+                STUB_printf(D_L13_001B11C8);
             } else if (a0[0x43] == 0x1B) {
                 *(s32 *)(st + 0x2CC) = 1;
-                func_0026FEB8(D_L13_001B11D0);
+                STUB_printf(D_L13_001B11D0);
             } else {
                 *(s32 *)(st + 0x2CC) = 2;
-                func_0026FEB8(D_L13_001B11D8);
+                STUB_printf(D_L13_001B11D8);
             }
         }
         break;
@@ -395,13 +395,13 @@ void func_L13_00406F18(u8 *a0)
             }
             if (a0[0x43] == 0x19) {
                 *(s32 *)(st + 0x2CC) = 0;
-                func_0026FEB8(D_L13_001B11C8);
+                STUB_printf(D_L13_001B11C8);
             } else if (a0[0x43] == 0x1B) {
                 *(s32 *)(st + 0x2CC) = 1;
-                func_0026FEB8(D_L13_001B11D0);
+                STUB_printf(D_L13_001B11D0);
             } else {
                 *(s32 *)(st + 0x2CC) = 2;
-                func_0026FEB8(D_L13_001B11D8);
+                STUB_printf(D_L13_001B11D8);
             }
         }
         break;
@@ -438,7 +438,7 @@ void func_L13_00406F18(u8 *a0)
         break;
     case 3:
         if (*(s32 *)(st + 0x2A0) != 0) {
-            if (func_L13_00409840(a0, D_L13_001FE580[*(s32 *)(st + 0x2B0)]) != 0) {
+            if (AdvancePathWaypoint(a0, D_L13_001FE580[*(s32 *)(st + 0x2B0)]) != 0) {
                 func_002A7750(a0, 4, -1);
                 if (func_002A77E0(2) == 1) {
                     if (a0[0x43] != 1) {
@@ -480,8 +480,8 @@ void func_L13_00406F18(u8 *a0)
         float d;
         if (a0[0x60] & 2) {
             path = D_L13_001FE580[*(s32 *)(st + 0x2B0)];
-            d = func_00282E80(a0 + 0x10, path + 4);
-            if (func_00282E80(a0 + 0x10, path + *path * 4) < d) {
+            d = vec_distance_xy(a0 + 0x10, path + 4);
+            if (vec_distance_xy(a0 + 0x10, path + *path * 4) < d) {
                 func_002B6228(a0, D_L13_001FE580[*(s32 *)(st + 0x2B0)], 0, *path - 1);
             } else {
                 func_002B6228(a0, D_L13_001FE580[*(s32 *)(st + 0x2B0)], *path - 1, 0);
@@ -503,7 +503,7 @@ void func_L13_00406F18(u8 *a0)
         }
         break;
     case 2:
-        func_0026FEB8(D_L13_001B11E8);
+        STUB_printf(D_L13_001B11E8);
         func_002A7750(a0, 1, -1);
         break;
     case 9:
@@ -524,7 +524,7 @@ void func_L13_00406F18(u8 *a0)
         }
         e = D_L13_001B291C + (*(s32 *)(st + 0x2D4) << 8);
         if (e == 0 || e[0x20] == 0xFE || e[0x20] == 0xFD
-            || func_00283C80(*(float *)(a0 + 0xF8),
+            || FastDiffRots(*(float *)(a0 + 0xF8),
                              func_00283248(*(float *)(st + 0x1F0) - *(float *)(a0 + 0x10),
                                            *(float *)(st + 0x1F4) - *(float *)(a0 + 0x14))) > 1.7453294f) {
             if (a0[0x43] != 5) {
@@ -567,11 +567,11 @@ void func_L13_00406F18(u8 *a0)
     case 28: {
         s32 r;
         if (*(s32 *)(st + 0x2A0) != 0) {
-            r = func_L13_00409840(a0, D_L13_001FE580[*(s32 *)(st + 0x29C)]);
+            r = AdvancePathWaypoint(a0, D_L13_001FE580[*(s32 *)(st + 0x29C)]);
         } else {
             r = func_002B6120(a0, D_L13_001FE580[*(s32 *)(st + 0x29C)]);
         }
-        if (r != 0 || func_00282E80(a0 + 0x10, *(u8 **)(st + 0x200) + 0x10) < 8.0f) {
+        if (r != 0 || vec_distance_xy(a0 + 0x10, *(u8 **)(st + 0x200) + 0x10) < 8.0f) {
             if (a0[0x43] != 5) {
                 func_002A7470(a0, 5, 0, 0xA);
             }
@@ -608,13 +608,13 @@ void func_L13_00406F18(u8 *a0)
             func_L01_00321178(a0, m);
         }
         if (*(s32 *)(st + 0x2A0) != 0) {
-            if (func_00282E80(a0 + 0x10, m) < 0.9f) {
+            if (vec_distance_xy(a0 + 0x10, m) < 0.9f) {
                 func_002A7750(a0, 0x14, -1);
                 if (a0[0x43] != 0x13) {
                     func_002A7470(a0, 0x13, 0, 0xF);
                 }
             }
-        } else if (func_00282E80(a0 + 0x10, m) < 0.5f) {
+        } else if (vec_distance_xy(a0 + 0x10, m) < 0.5f) {
             func_002A7750(a0, 0x14, -1);
             if (a0[0x43] != 0x13) {
                 func_002A7470(a0, 0x13, 0, 0xF);
@@ -636,13 +636,13 @@ void func_L13_00406F18(u8 *a0)
             func_L01_00321178(a0, m);
         }
         if (*(s32 *)(st + 0x2A0) != 0) {
-            if (func_00282E80(a0 + 0x10, m) < 0.9f) {
+            if (vec_distance_xy(a0 + 0x10, m) < 0.9f) {
                 func_002A7750(a0, 0x14, -1);
                 if (a0[0x43] != 0x13) {
                     func_002A7470(a0, 0x13, 0, 0xF);
                 }
             }
-        } else if (func_00282E80(a0 + 0x10, m) < 0.5f) {
+        } else if (vec_distance_xy(a0 + 0x10, m) < 0.5f) {
             func_002A7750(a0, 0x14, -1);
             if (a0[0x43] != 0x13) {
                 func_002A7470(a0, 0x13, 0, 0xF);
@@ -679,7 +679,7 @@ void func_L13_00406F18(u8 *a0)
             }
         } else {
             func_0029FCC0(a0, 0, m);
-            if (func_002761F8(m, st + 0x1F0, 0, a0, 0) == 0) {
+            if (CollLine(m, st + 0x1F0, 0, a0, 0) == 0) {
                 if (a0[0x43] != 5) {
                     func_002A7470(a0, 5, 0, 0xA);
                 }
@@ -719,7 +719,7 @@ void func_L13_00406F18(u8 *a0)
         break;
     case 14:
         if (*(s32 *)(st + 0x2A0) != 0) {
-            if (func_L13_00409840(a0, D_L13_001FE580[*(s32 *)(st + 0x290)]) != 0) {
+            if (AdvancePathWaypoint(a0, D_L13_001FE580[*(s32 *)(st + 0x290)]) != 0) {
                 if (a0[0x43] != 5) {
                     func_002A7470(a0, 5, 0, 0xA);
                 }
@@ -733,7 +733,7 @@ void func_L13_00406F18(u8 *a0)
                 *(s32 *)(st + 0x290) = -1;
             }
         } else if (func_002B6120(a0, D_L13_001FE580[*(s32 *)(st + 0x290)]) != 0
-                   || func_00282E80(a0 + 0x10, *(u8 **)(st + 0x200) + 0x10) < 8.0f) {
+                   || vec_distance_xy(a0 + 0x10, *(u8 **)(st + 0x200) + 0x10) < 8.0f) {
             func_002A7750(a0, 0x18, 2);
             if (a0[0x43] != 6) {
                 func_002A7470(a0, 6, 0, 0xA);
@@ -744,9 +744,9 @@ void func_L13_00406F18(u8 *a0)
     case 19: {
         u8 *hit;
         func_0029FCC0(a0, 0, m);
-        func_00282CF0(&m[4], st + 0x1F0, m);
-        func_00282F20(&m[4], &m[4], 0.6666667f);
-        if (func_002761F8(m, st + 0x1F0, 0, a0, 0) == 0) {
+        FastVecSub(&m[4], st + 0x1F0, m);
+        vec_scale_to_length(&m[4], &m[4], 0.6666667f);
+        if (CollLine(m, st + 0x1F0, 0, a0, 0) == 0) {
             if (a0[0x43] != 5) {
                 func_002A7470(a0, 5, 0, 1);
             }
@@ -807,9 +807,9 @@ void func_L13_00406F18(u8 *a0)
         }
         if (func_002AEB60(a0, 1.0f) != 0) {
             func_0029FCC0(a0, 0, m);
-            func_00282CF0(&m[4], st + 0x1F0, m);
-            func_00282F20(&m[4], &m[4], 0.6666667f);
-            func_L13_0040DC20(a0, &m[4], m, 0, st[0x34]);
+            FastVecSub(&m[4], st + 0x1F0, m);
+            vec_scale_to_length(&m[4], &m[4], 0.6666667f);
+            SpawnEA7Moby(a0, &m[4], m, 0, st[0x34]);
             (*(s32 *)(st + 0x28C))++;
         }
         if (a0[0x60] & 2) {
@@ -834,9 +834,9 @@ void func_L13_00406F18(u8 *a0)
         u8 *hit;
         if (*(u16 *)(a0 + 0x96) >= 0x79) {
             func_0029FCC0(a0, 0, m);
-            func_00282CF0(&m[4], st + 0x1F0, m);
-            func_00282F20(&m[4], &m[4], 0.6666667f);
-            if (func_002761F8(m, st + 0x1F0, 0, a0, 0) == 0) {
+            FastVecSub(&m[4], st + 0x1F0, m);
+            vec_scale_to_length(&m[4], &m[4], 0.6666667f);
+            if (CollLine(m, st + 0x1F0, 0, a0, 0) == 0) {
                 if (a0[0x43] != 5) {
                     func_002A7470(a0, 5, 0, 1);
                 }
@@ -876,9 +876,9 @@ void func_L13_00406F18(u8 *a0)
         }
         if (func_002AEB60(a0, 3.0f) != 0) {
             func_0029FCC0(a0, 0, m);
-            func_00282CF0(&m[4], st + 0x1F0, m);
-            func_00282F20(&m[4], &m[4], 0.6666667f);
-            func_L13_0040DC20(a0, &m[4], m, 0, st[0x34]);
+            FastVecSub(&m[4], st + 0x1F0, m);
+            vec_scale_to_length(&m[4], &m[4], 0.6666667f);
+            SpawnEA7Moby(a0, &m[4], m, 0, st[0x34]);
             (*(s32 *)(st + 0x28C))++;
         }
         if (a0[0x60] & 2) {
@@ -907,9 +907,9 @@ void func_L13_00406F18(u8 *a0)
         }
         if (func_002AEB60(a0, 3.0f) != 0) {
             func_0029FCC0(a0, 0, m);
-            func_00282CF0(&m[4], st + 0x1F0, m);
-            func_00282F20(&m[4], &m[4], 0.6666667f);
-            func_L13_0040DC20(a0, &m[4], m, 0, st[0x34]);
+            FastVecSub(&m[4], st + 0x1F0, m);
+            vec_scale_to_length(&m[4], &m[4], 0.6666667f);
+            SpawnEA7Moby(a0, &m[4], m, 0, st[0x34]);
             (*(s32 *)(st + 0x28C))++;
         }
         if ((a0[0x60] & 2) && *(s32 *)(st + 0x288) == *(s32 *)(st + 0x28C)) {
@@ -926,7 +926,7 @@ void func_L13_00406F18(u8 *a0)
     case 23:
         *(TI128 *)m = ((L13Cam *)D_L13_001B2A0C)[*(s32 *)(st + 0x268)].v;
         func_L01_00321178(a0, m);
-        if (func_00282E80(a0 + 0x10, m) < 0.5f) {
+        if (vec_distance_xy(a0 + 0x10, m) < 0.5f) {
             *(s32 *)(st + 0x26C) = 1;
             func_002A7750(a0, 0x14, 2);
             if (a0[0x43] != 0x13) {
@@ -952,7 +952,7 @@ void func_L13_00406F18(u8 *a0)
                     func_002A7470(a0, 0x11, 0, 0x14);
                 }
             }
-            if (*(s32 *)(st + 0x368) != 0 && func_00282E80(a0 + 0x10, st + 0x370) > 4.0f) {
+            if (*(s32 *)(st + 0x368) != 0 && vec_distance_xy(a0 + 0x10, st + 0x370) > 4.0f) {
                 func_002A7750(a0, 0x1D, -1);
                 if (a0[0x43] != 0xD) {
                     func_002A7470(a0, 0xD, 0, 0xA);

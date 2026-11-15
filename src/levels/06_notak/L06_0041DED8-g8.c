@@ -105,15 +105,15 @@ void func_L06_00443A38(u8 *m)
         char *rec;
 
         if (D_L06_001B2838 < m[0x21]) {
-            func_0026FEB8(D_L06_002E20C8);
-            func_0026FEB8(D_L06_002E2128);
+            STUB_printf(D_L06_002E20C8);
+            STUB_printf(D_L06_002E2128);
             func_00282A28();
         }
         m[0x30] = 0x40;
         qcopy(v + 0x2E0, m + 0x10);
         F(0x324) = 1.0f;
-        B(0x48) = func_00283CF0(15.0f);
-        B(0x4A) = func_00283CF0(4.8f);
+        B(0x48) = FloatToInt(15.0f);
+        B(0x4A) = FloatToInt(4.8f);
         H(0x88) = 0;
         B(0x60) = 8;
         I(0x98) = 3;
@@ -153,7 +153,7 @@ void func_L06_00443A38(u8 *m)
                 func_002A7470((char *)m, 0, 0, 0);
         }
     }
-    if (m[0x31] != 0 && func_00282E48(m + 0x10, D_L06_001B9840) < 24.0f) {
+    if (m[0x31] != 0 && fast_vec_dist(m + 0x10, D_L06_001B9840) < 24.0f) {
         func_002A93B0(m);
         m[0x6F] = 0x16;
     }
@@ -164,7 +164,7 @@ void func_L06_00443A38(u8 *m)
             func_L06_00443F30((char *)m);
     }
     if (*(float *)(m + 0x18) < 48.0f) {
-        func_002A6C58(m, 0, 3);
+        SetDeathBits(m, 0, 3);
         func_002AC728(m, m + 0x10, -1, 1.0f, 13.0f);
         func_0029F338(m);
     } else if (m[0x95] != 3 && m[0x95] != 4) {
@@ -270,11 +270,11 @@ void func_L06_00444168(L06Obj *self)
     float angle;
     float blend;
 
-    angle = func_00283B98(state->angle, 0.20943954f);
+    angle = FastAddRotations(state->angle, 0.20943954f);
     state->angle = angle;
     blend = func_00283198(angle) * 0.5f + 0.5f;
     state->blend = blend;
-    self->tint = func_00283D38(colors.a, colors.b, blend);
+    self->tint = FastTweenColor(colors.a, colors.b, blend);
     if (state->stamp != D_L06_001B2348) {
         for (p = (unsigned short *)D_L06_001FB3A0[self->group];
              self->group != 0xFF && self->group <= D_L06_001B2838 && p != 0 &&
@@ -336,10 +336,10 @@ void func_L06_00444300(L06Obj *self)
                 if (e->kind != 0xFE) {
                     if (e->kind != 0xFD) {
                         s0 = e->cfg;
-                        func_00282D30(buf, &D_L06_001B10A0, s0->scale);
-                        func_002830C0(buf, buf, &s0->vec);
+                        FastVecScale(buf, &D_L06_001B10A0, s0->scale);
+                        transform_vector(buf, buf, &s0->vec);
                         func_L00_00325AE8(buf,
-                                          func_00283D38(D_L06_001B10B0[0], D_L06_001B10B0[1],
+                                          FastTweenColor(D_L06_001B10B0[0], D_L06_001B10B0[1],
                                                         s0->blend),
                                           s0->scale * 0.2f, 0.08f);
                     }
@@ -435,7 +435,7 @@ int func_L06_00420230(unsigned char *obj)
     hit = func_002B0ED8((char *)obj, d + 0x60, 0);
     if (hit) {
         func_L06_0041FD60((char *)obj);
-        if (hit < 4) func_002E5CF8(2, 0, (char *)obj);
+        if (hit < 4) PlayMobySound(2, 0, (char *)obj);
         if (old == 1) *(int *)(d + 0x24C) = func_002A7820(300, 360);
         if ((unsigned int)(hit - 4) < 2) func_002A7750((char *)obj, 8, -1);
     }
@@ -496,12 +496,12 @@ void func_L06_00456BB0(unsigned char *obj)
         break;
     }
     func_L04_003A1FE0(&context);
-    if (*(int *)(d + 0x28) != -1 && !func_002ACBC8(D_L06_001B9840, *(int *)(d + 0x28))) {
+    if (*(int *)(d + 0x28) != -1 && !IsPointInCuboid(D_L06_001B9840, *(int *)(d + 0x28))) {
         allowed = 1;
         if (*(int *)(D_L06_001B9840 + 0x2C0)) {
             qcopy(position, D_L06_001B9840);
             position[2] = *(float *)d;
-            if (func_002ACBC8((char *)position, *(int *)(d + 0x28))) allowed = 0;
+            if (IsPointInCuboid((char *)position, *(int *)(d + 0x28))) allowed = 0;
         }
         if (allowed) {
             for (id = *(int *)(d + 0x10); id < context.count; ++id)

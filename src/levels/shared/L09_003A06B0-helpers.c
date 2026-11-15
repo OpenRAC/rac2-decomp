@@ -15,7 +15,7 @@ extern char *func_L09_003364E0(char *object, int a1, u32 a2, int a3, float f12, 
 
 char *func_L09_003A06B0(char *object, char *a1, char *a2, float f12)
 {
-    char *s1 = func_0029EFD0(0x3A6);
+    char *s1 = CreateMoby(0x3A6);
     char *s0;
     float d;
 
@@ -32,7 +32,7 @@ char *func_L09_003A06B0(char *object, char *a1, char *a2, float f12)
         *(u32 *)(s0 + 0x38) = 0xF0;
         *(float *)(s0 + 0x40) = f12;
         *(float *)(s1 + 0xF8) = func_00283248(*(float *)a1, *(float *)(a1 + 4));
-        d = func_00282E20(a1);
+        d = vec_length_xy(a1);
         *(float *)(s1 + 0xF4) =
             -func_00283248(d, *(float *)(a1 + 8));
         *(char **)(s0 + 0x48) =

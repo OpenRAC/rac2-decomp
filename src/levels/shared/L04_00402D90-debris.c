@@ -14,7 +14,7 @@ extern void func_002A0F48(void *);
 unsigned char *func_L04_00407078(unsigned char *parent, int kind, void *position, void *rotation, int lifetime, int flags, void *velocity, void *spin, void *scale, float gravity, float width)
 {
     float tmp[4];
-    unsigned char *m = func_0029EFD0(kind);
+    unsigned char *m = CreateMoby(kind);
     unsigned char *p;
     float angle, speed, unit;
     if (m) {
@@ -26,11 +26,11 @@ unsigned char *func_L04_00407078(unsigned char *parent, int kind, void *position
         *(unsigned long long *)(m + 0x38) = *(unsigned long long *)(parent + 0x38);
         m[0x20] = 1;
         qcopy((m + 0x10), position);
-        func_002833F0(m + 0xc0, rotation);
+        euler_rotation_basis(m + 0xc0, rotation);
         m[0x30] = 255;
         *(short *)(m + 0x32) = 128;
         *(int *)(m + 0x98) = 0;
-        if (lifetime == 0) *(short *)(p + 0x30) = func_00283CF0(func_002A7878(60.0f, 120.0f));
+        if (lifetime == 0) *(short *)(p + 0x30) = FloatToInt(func_002A7878(60.0f, 120.0f));
         else *(short *)(p + 0x30) = lifetime;
         *(int *)(p + 0x34) = flags;
         *(short *)(p + 0x32) = 0;
@@ -40,7 +40,7 @@ unsigned char *func_L04_00407078(unsigned char *parent, int kind, void *position
             *(float *)(p + 0x3c) = width;
             *(int *)(p + 0x34) |= 4;
         }
-        if (func_00282DF0(velocity) == 0.0f) {
+        if (FastVecLength(velocity) == 0.0f) {
             angle = func_002A7940();
             unit = 0.016666668f;
             speed = func_002A7878(2.0f, 4.0f) * unit;
@@ -50,15 +50,15 @@ unsigned char *func_L04_00407078(unsigned char *parent, int kind, void *position
             tmp[2] = func_002A7878(5.0f, 8.0f) * unit;
             qcopy(p, tmp);
         } else qcopy(p, velocity);
-        if (func_00282DF0(spin) == 0.0f) {
+        if (FastVecLength(spin) == 0.0f) {
             func_002A7A00(tmp, 0.052359886f, 0.10471977f);
             qcopy((p + 0x10), tmp);
         } else qcopy((p + 0x10), spin);
-        if (func_00282DF0(scale) == 0.0f && ((float *)scale)[3] == 0.0f) {
+        if (FastVecLength(scale) == 0.0f && ((float *)scale)[3] == 0.0f) {
             float f;
             qcopy(tmp, (*(unsigned char **)(m + 0x24) + 0x30));
             f = *(float *)(m + 0x2c) * 0.0009765625f;
-            func_00282D30(tmp, tmp, f);
+            FastVecScale(tmp, tmp, f);
             tmp[3] = tmp[3] * f;
             qcopy((p + 0x20), tmp);
         } else qcopy((p + 0x20), scale);

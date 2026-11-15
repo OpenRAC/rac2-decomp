@@ -32,20 +32,20 @@ void func_00274810(OozlaAppendObject164 *object, int index, const float *directi
     int i = 0;
     OozlaAppendDescriptor164 *p = object->descriptor;
 
-    func_00283098(point, p->points[p->indices[index]], object->transform[0]);
+    matrix_mul_vec3(point, p->points[p->indices[index]], object->transform[0]);
     func_00282F20_16(projection, (void *)direction,
                      func_00282DB0_3((void *)direction, point));
-    func_00282CF0(point, point, projection);
+    FastVecSub(point, point, projection);
     for (; i < p->count; i++) {
         if (p->indices[i] == index) {
             qcopy(vectors[i], point);
         } else {
-            func_00282CF0(vectors[i], p->points[p->indices[i]],
+            FastVecSub(vectors[i], p->points[p->indices[i]],
                          p->points[p->indices[index]]);
-            func_00283098(vectors[i], vectors[i], object->transform[0]);
+            matrix_mul_vec3(vectors[i], vectors[i], object->transform[0]);
             func_00282F20_16(projection, (void *)direction,
                              func_00282DB0_3((void *)direction, vectors[i]));
-            func_00282CF0(vectors[i], vectors[i], projection);
+            FastVecSub(vectors[i], vectors[i], projection);
             if (func_00282DB0_3(vectors[i], point) > 0.0f) {
                 p->indices[i] = p->indices[p->count - 1];
                 --p->count;
@@ -53,10 +53,10 @@ void func_00274810(OozlaAppendObject164 *object, int index, const float *directi
         }
     }
     if (p->count == 3) {
-        func_00282DD8(c0, vectors[0], vectors[2]);
-        func_00282DD8(c1, vectors[1], vectors[2]);
-        func_00282DD8(c2, vectors[0], vectors[1]);
-        func_00282DD8(c3, vectors[1], vectors[0]);
+        FastVecCross(c0, vectors[0], vectors[2]);
+        FastVecCross(c1, vectors[1], vectors[2]);
+        FastVecCross(c2, vectors[0], vectors[1]);
+        FastVecCross(c3, vectors[1], vectors[0]);
         if (func_00282DB0_3(c0, c2) < 0.0f) {
             p->indices[1] = p->indices[2];
             --p->count;

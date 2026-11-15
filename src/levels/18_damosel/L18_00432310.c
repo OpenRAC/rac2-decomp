@@ -47,7 +47,7 @@ void func_L18_00432310(unsigned char *object)
             func_002A0F48(*(void **)(state+0x7C4));
             {
                 unsigned char *child=*(unsigned char **)(state+0x7C4);
-                func_002833F0(child+0xC0,child+0xF0);
+                euler_rotation_basis(child+0xC0,child+0xF0);
             }
             func_002A10E8(*(void **)(state+0x7C4));
         }
@@ -55,7 +55,7 @@ void func_L18_00432310(unsigned char *object)
     if(object && object[0x20]!=0xFE && object[0x20]!=0xFD && object[0x20]>=2) {
         if(*(short *)(state+0x7FC)==0 && *(void **)(state+0x7C8)) {
             func_L18_00433460(object);
-            func_L00_002E6EF8(func_L18_00433B70,object);
+            func_L00_002E6EF8(DrawPairedBranchingRibbonEffects,object);
         }
         if(object[0x31])
             func_L00_002E6EF8(func_L18_00432F18,object);
@@ -66,7 +66,7 @@ void func_L18_00432310(unsigned char *object)
             func_L00_002E6EF8(func_L18_00434FC0,object);
         }
     }
-    if(object[0x31] && func_00282E48(object+0x10,D_L18_001B97C0)<24.0f) {
+    if(object[0x31] && fast_vec_dist(object+0x10,D_L18_001B97C0)<24.0f) {
         func_002A93B0(object);
         object[0x6F]=22;
     }

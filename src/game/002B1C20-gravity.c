@@ -55,25 +55,25 @@ int func_002B2A10(char *object, char *state)
     func_002AFFD8(object+0x10, direction, 0);
     func_002B03B8(object+0xC0, direction, 0);
     length = func_002B0178(object+0x10, 0, 0);
-    approach = -func_00282DB0(state+0x80, direction);
+    approach = -FastVecDot(state+0x80, direction);
     if (B(state,0x1A)==0) {
         func_002B0158(object,state+0x80,state+0x80,F(state,0x4C));
-        acceleration = F(state,0x4C)*func_00282DF0(direction);
+        acceleration = F(state,0x4C)*FastVecLength(direction);
     } else {
         func_002B0158(object,state+0x80,state+0x80,F(state,0x50));
-        acceleration = F(state,0x50)*func_00282DF0(direction);
+        acceleration = F(state,0x50)*FastVecLength(direction);
     }
     qcopy(oldPosition,object+0x10);
     func_002B0158(object,oldPosition,oldPosition,-F(state,0x34));
-    func_00282F20(scaled,direction,-approach);
-    func_00282CF0(state+0x80,state+0x80,scaled);
-    speed = func_00282DF0(state+0x80);
+    vec_scale_to_length(scaled,direction,-approach);
+    FastVecSub(state+0x80,state+0x80,scaled);
+    speed = FastVecLength(state+0x80);
     { float target=0.033333335f;
       if (B(state,0x1A)>=2) target=0.0f;
-      func_002AA2E8(&speed,target,F(state,0x2C));
+      ApproachValue(&speed,target,F(state,0x2C));
     }
-    func_00282F20(state+0x80,state+0x80,speed);
-    func_00282CC0(state+0x80,state+0x80,scaled);
+    vec_scale_to_length(state+0x80,state+0x80,speed);
+    FastVecAdd(state+0x80,state+0x80,scaled);
     if (F(object,0x10)<2.0f || F(object,0x10)>1021.0f ||
         F(object,0x14)<2.0f || F(object,0x14)>1021.0f ||
         F(object,0x18)<2.0f || F(object,0x18)>1021.0f) result=1;
@@ -85,7 +85,7 @@ int func_002B2A10(char *object, char *state)
             if (flightTime>2.0f) {
                 float numerator=(F(state,0x54)-func_0029F530(object))*2.0f;
                 float target = numerator / flightTime;
-                if (target>0.0f) func_002AA2E8(object+0x48,target,0.1f);
+                if (target>0.0f) ApproachValue(object+0x48,target,0.1f);
             }
             break;
         case 1:
@@ -100,21 +100,21 @@ int func_002B2A10(char *object, char *state)
                     float target = numerator / acceleration;
                     if (target>2.0f) target=2.0f;
                     else if (target<0.0f) target=0.0f;
-                    func_002AA2E8(object+0x48,target,0.1f);
+                    ApproachValue(object+0x48,target,0.1f);
                 }
             }
             break;
         case 2:
             F(object,0x48)=1.0f;
-            func_00282F20(start,direction,-0.2f);
-            func_00282CC0(start,start,object+0x10);
-            func_00282F20(normal,direction,1.0f);
-            func_00282CC0(normal,normal,object+0x10);
-            if (!func_002761F8(start,normal,2,object,0)) B(state,0x1A)=1;
-            else if (func_00278E78()==1) {
+            vec_scale_to_length(start,direction,-0.2f);
+            FastVecAdd(start,start,object+0x10);
+            vec_scale_to_length(normal,direction,1.0f);
+            FastVecAdd(normal,normal,object+0x10);
+            if (!CollLine(start,normal,2,object,0)) B(state,0x1A)=1;
+            else if (GetCollHitMaterial()==1) {
                 hit=func_002AB1F0(object);
                 if (hit) {
-                    func_00282CC0(temp,object+0xC0,object+0x10);
+                    FastVecAdd(temp,object+0xC0,object+0x10);
                     func_002A90C8(object,0,0x110000,temp,(float)*(short *)(hit+4));
                 }
             }
@@ -127,19 +127,19 @@ int func_002B2A10(char *object, char *state)
     func_002AAA00(&damped,state+0x68,0,angle,0.013962636f,0.003490659f,3.14159274f);
     qzero_nc(normal);
     normal[2]=F(state,0x68);
-    func_002833F0(scratch.rotation,normal);
-    func_00283738(object+0xC0,object+0xC0,scratch.rotation);
-    func_00282CC0(object+0x10,object+0x10,state+0x80);
-    func_00282CC0(predicted,oldPosition,state+0x80);
-    func_00282CC0(start,predicted,state+0x80);
+    euler_rotation_basis(scratch.rotation,normal);
+    multiply_matrix3x3(object+0xC0,object+0xC0,scratch.rotation);
+    FastVecAdd(object+0x10,object+0x10,state+0x80);
+    FastVecAdd(predicted,oldPosition,state+0x80);
+    FastVecAdd(start,predicted,state+0x80);
     func_002A8C28(object,F(state,0x30),start,0x4000000,1.0f,1.0f,0,1,0);
-    if (func_00282DF0(state+0x80)>F(state,0x30)) {
-        if (func_002761F8(oldPosition,predicted,0x24,object,0)) qcopy(predicted,hitPoint);
+    if (FastVecLength(state+0x80)>F(state,0x30)) {
+        if (CollLine(oldPosition,predicted,0x24,object,0)) qcopy(predicted,hitPoint);
     }
     rayHit=func_00277258(predicted,F(state,0x30),0x24,object);
     fallback=0;
     if (!rayHit) {
-        rayHit=func_002761F8(predicted,object+0x10,0x24,object,0);
+        rayHit=CollLine(predicted,object+0x10,0x24,object,0);
         fallback=1;
         if (!rayHit) goto finish;
     }
@@ -147,35 +147,35 @@ int func_002B2A10(char *object, char *state)
     if (fallback) qcopy(object+0x10,hitPoint);
     else {
         qcopy(object+0x10,&D_001BAF80.offset);
-        func_00282F20(temp,direction,F(state,0x34));
-        func_00282CC0(object+0x10,object+0x10,temp);
+        vec_scale_to_length(temp,direction,F(state,0x34));
+        FastVecAdd(object+0x10,object+0x10,temp);
     }
     acceleration=1.0f;
-    func_00282F20(normal,&D_001BAF80.normal,acceleration);
-    if (func_00282DB0(normal,direction)<=-0.707f) {
-        float projection=func_00282DB0(state+0x80,normal);
+    vec_scale_to_length(normal,&D_001BAF80.normal,acceleration);
+    if (FastVecDot(normal,direction)<=-0.707f) {
+        float projection=FastVecDot(state+0x80,normal);
         if (projection<0.0f) {
             if (D_001BAF80.hit==0 || D_001BAF80.flags>0) {
-                func_00282F20(scratch.collision.probeStart,object+0xE0,0.2f);
-                func_00282F20(scratch.collision.probeEnd,object+0xE0,-2.0f);
-                func_00282CC0(scratch.collision.probeStart,scratch.collision.probeStart,object+0x10);
-                func_00282CC0(scratch.collision.probeEnd,scratch.collision.probeEnd,object+0x10);
-                if (func_002761F8(scratch.collision.probeStart,scratch.collision.probeEnd,2,object,0)) B(state,0x1A)=2;
+                vec_scale_to_length(scratch.collision.probeStart,object+0xE0,0.2f);
+                vec_scale_to_length(scratch.collision.probeEnd,object+0xE0,-2.0f);
+                FastVecAdd(scratch.collision.probeStart,scratch.collision.probeStart,object+0x10);
+                FastVecAdd(scratch.collision.probeEnd,scratch.collision.probeEnd,object+0x10);
+                if (CollLine(scratch.collision.probeStart,scratch.collision.probeEnd,2,object,0)) B(state,0x1A)=2;
             }
-            func_00282F20(scratch.collision.impulse,normal,projection);
-            func_00282CF0(state+0x80,state+0x80,scratch.collision.impulse);
+            vec_scale_to_length(scratch.collision.impulse,normal,projection);
+            FastVecSub(state+0x80,state+0x80,scratch.collision.impulse);
             if (B(state,0x1A)==2) {
-                float value=func_00282DF0(state+0x80);
-                func_002AA2E8(&value,0.0f,F(state,0x50));
-                func_00282F20(state+0x80,state+0x80,value);
+                float value=FastVecLength(state+0x80);
+                ApproachValue(&value,0.0f,F(state,0x50));
+                vec_scale_to_length(state+0x80,state+0x80,value);
             }
         }
     } else {
-        float dot=func_00282DB0(state+0x80,normal);
+        float dot=FastVecDot(state+0x80,normal);
         if (dot<0.0f) {
             dot = dot*-(F(state,0x3C)+acceleration);
-            func_00282F20(scratch.collision.impulse,normal,dot);
-            func_00282CC0(state+0x80,state+0x80,scratch.collision.impulse);
+            vec_scale_to_length(scratch.collision.impulse,normal,dot);
+            FastVecAdd(state+0x80,state+0x80,scratch.collision.impulse);
         }
     }
 finish:

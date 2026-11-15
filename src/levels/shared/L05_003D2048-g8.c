@@ -93,5 +93,5 @@ void func_L05_003D2048(char *obj)
    }
   }
  }
- func_002FF698(func_L05_003D2618,obj);
+ func_002FF698(DrawAnimatedMeshAndGlowEffect,obj);
 }

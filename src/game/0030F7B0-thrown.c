@@ -79,10 +79,10 @@ void func_003159D0(float *position, Moby *self, float *velocity)
     spread.q = random.q;
     self->state = 0;
     self->scale *= 1.5384616f;
-    func_00282F20(&spread, &spread, func_002A7878(0.00016666666f, 0.0016666668f));
-    func_00282CC0(vars->velocity, &spread, velocity);
+    vec_scale_to_length(&spread, &spread, func_002A7878(0.00016666666f, 0.0016666668f));
+    FastVecAdd(vars->velocity, &spread, velocity);
     if (D_00189E20.groundMoby != 0 && func_002AD0B0(D_00189E20.groundMoby) != 0)
-        func_00282CC0(vars->velocity, vars->velocity, D_00189E20.velocity);
+        FastVecAdd(vars->velocity, vars->velocity, D_00189E20.velocity);
 
     vars->lifetime = 120;
     count = 0;
@@ -106,11 +106,11 @@ void func_003159D0(float *position, Moby *self, float *velocity)
     /* The line test starts at the hero, at the height of position. */
     random.q = *(Quad *)D_00189E20.moby->position;
     random.f[2] = position[2];
-    if (func_002761F8(&random, position, 0, D_00189E20.moby, 0) != 0) {
+    if (CollLine(&random, position, 0, D_00189E20.moby, 0) != 0) {
         qcopy(self->position, D_001BAF80.point);
-        func_00282F20(offset, D_001BAF80.normal, 0.0026944445f);
-        func_00282CC0(self->position, self->position, offset);
+        vec_scale_to_length(offset, D_001BAF80.normal, 0.0026944445f);
+        FastVecAdd(self->position, self->position, offset);
         func_00283028(vars->velocity, vars->velocity, D_001BAF80.normal);
-        func_00282D30(vars->velocity, vars->velocity, 0.6f);
+        FastVecScale(vars->velocity, vars->velocity, 0.6f);
     }
 }

@@ -30,10 +30,10 @@ L00_0033AA40_Particle *func_L00_0033AA40(Quad *position, Quad *velocity, unsigne
         float *out = p->payload;
 
         qcopy(&p->position, position);
-        if (func_00282E80(D_00189EA0, position) < 80.0f)
-            p->alpha = func_00283CF0(1.0f) + 48;
+        if (vec_distance_xy(D_00189EA0, position) < 80.0f)
+            p->alpha = FloatToInt(1.0f) + 48;
         else
-            p->alpha = func_00283CF0(1.0f) + 32;
+            p->alpha = FloatToInt(1.0f) + 32;
         p->b3 = flag ? 0x48 : 0x44;
         p->b1 = 0;
         p->b2 = ref_L00_0033AA40_00[0][1];

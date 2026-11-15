@@ -39,7 +39,7 @@ void func_L19_00423CC0(char *a0)
     default:
         break;
     case 1:
-        if (func_002ACBC8(D_00189EA0, *(int *)obj) != 0) {
+        if (IsPointInCuboid(D_00189EA0, *(int *)obj) != 0) {
             int h = *(unsigned short *)(a0 + 0xB2);
             if (h & 1) {
                 unsigned char *e = &D_0019B4A8[((short)h >> 1) + (D_001A79F0_gp << 10)];

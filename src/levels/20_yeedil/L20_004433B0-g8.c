@@ -34,7 +34,7 @@ char *func_L20_004433B0(char *object)
         if (e == 0)
             break;
         if (!func_00312B58(e)) {
-            float distance = func_00282E80(e + 0x10, object + 0x10);
+            float distance = vec_distance_xy(e + 0x10, object + 0x10);
             if (distance < closest) {
                 closest = distance;
                 best = e;

@@ -9,7 +9,7 @@ extern void func_002A0F48(void *);
 
 unsigned char *func_00308600(char *position, char *vector, int count, int mode, int flag)
 {
-    unsigned char *p = func_0029EFD0(0x7A);
+    unsigned char *p = CreateMoby(0x7A);
     char *state;
     float lo;
     float hi;
@@ -20,7 +20,7 @@ unsigned char *func_00308600(char *position, char *vector, int count, int mode, 
         p[0x31] = 1;
         p[0x23] = 0x80;
         state = *(char **)(p + 0x68);
-        func_002A0488(p, 0x7F, 0x7F, 0x7F);
+        set_moby_color(p, 0x7F, 0x7F, 0x7F);
         *(TI128 *)(p + 0x10) = *(TI128 *)position;
         *(TI128 *)state = *(TI128 *)vector;
         lo = 0.1047197729f;

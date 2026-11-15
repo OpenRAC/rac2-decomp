@@ -18,9 +18,9 @@ void func_L12_0041E8F8(u8 *a0) {
     f32 buf[4];
     u16 f;
 
-    func_00282CF0(buf, (f32 *)(self + 0x10), (f32 *)D_00189EA0);
+    FastVecSub(buf, (f32 *)(self + 0x10), (f32 *)D_00189EA0);
     func_002AFEB8((char *)self, (char *)buf, (char *)buf, 0, 0.0f);
-    func_00282F20(buf, buf, 0.10000000894069672f);
+    vec_scale_to_length(buf, buf, 0.10000000894069672f);
     func_002B0A68(self, 31, buf, 6.0f, 12.0f, 6.0f, 12.0f, 255);
 
     f = *(u16 *)(self + 0xB2);
@@ -37,7 +37,7 @@ void func_L12_0041E8F8(u8 *a0) {
         if ((c & 7) != 7)
             *p = c + 1;
     }
-    func_002E5CF8(1, 0, self);
+    PlayMobySound(1, 0, self);
 }
 
 /* func_L12_0041EA18 is defined in L12_0041EA18-g8.c. */
@@ -83,7 +83,7 @@ s32 func_L12_00425070(u8 *object)
             continue;
         qcopy(to, (L12_25070Quad *)list + i + 1);
         to[2] += 0.5f;
-        if (func_002761F8(from, to, 2, object, 0) == 0)
+        if (CollLine(from, to, 2, object, 0) == 0)
             return i;
     }
     return *(s32 *)(state + 0x2B0);
@@ -103,7 +103,7 @@ void func_L12_00425348(u8 *a0) {
 
     while (i < *(s32 *)entry) {
         if (func_00282C48(*(f32 *)((u8 *)entry + (i * 16 + 0x18)) - *(f32 *)((u8 *)entry + 0x18)) < 2.0f) {
-            if (func_00282E80(D_00189EA0, (u8 *)entry + (i * 16 + 0x10)) < 6.0f)
+            if (vec_distance_xy(D_00189EA0, (u8 *)entry + (i * 16 + 0x10)) < 6.0f)
                 *(s32 *)(state + 0x2B4) = i;
         }
         i++;
@@ -126,7 +126,7 @@ void func_L12_004254A8(u8 *arg0) {
     if (*(u8 *)(s0 + 0x20) == 0) {
         v = *(s32 **)(s0 + 0x68);
         if (*v != -1) {
-            if (func_002ACBC8(D_00189EA0, *v) != 0) {
+            if (IsPointInCuboid(D_00189EA0, *v) != 0) {
                 D_001395DB = 1;
                 func_L12_0031E1D0(s0, 1, -1);
             }
@@ -155,11 +155,11 @@ void func_L12_004293A0(u8 *self)
     pos[2] = *(f32 *)(state + 0x7C);
     func_L02_0031E9E8(velocity, 0.5f);
     velocity[2] = 0.083333336f;
-    p = func_002BDCE8(pos, 0.1f, 1.0f, 0.9f, func_002A77E0(16), velocity, 420000.0f, 0xDF202020, 0);
+    p = SpawnSpinningSparkParticle(pos, 0.1f, 1.0f, 0.9f, func_002A77E0(16), velocity, 420000.0f, 0xDF202020, 0);
     if (p) {
         u8 *d = p + 0x20;
         *(u16 *)(p + 10) = 10;
-        p[9] = func_00283CF0(4.0f) + 0x70;
+        p[9] = FloatToInt(4.0f) + 0x70;
         *(s32 *)(d + 4) = 2;
         d[10] = 0xDF;
         d[11] = p[10];
@@ -167,11 +167,11 @@ void func_L12_004293A0(u8 *self)
     }
     func_L02_0031E9E8(velocity, 0.5f);
     velocity[2] = 0.083333336f;
-    q = func_002BDCE8(pos, 0.1f, 1.0f, 0.9f, func_002A77E0(16), velocity, 420000.0f, 0xDF208080, 0);
+    q = SpawnSpinningSparkParticle(pos, 0.1f, 1.0f, 0.9f, func_002A77E0(16), velocity, 420000.0f, 0xDF208080, 0);
     if (p) {
         u8 *d = q + 0x20;
         *(u16 *)(q + 10) = 10;
-        q[9] = func_00283CF0(4.0f) + 0x70;
+        q[9] = FloatToInt(4.0f) + 0x70;
         *(s32 *)(d + 4) = 2;
         d[10] = 0xDF;
         d[11] = q[10];
@@ -179,11 +179,11 @@ void func_L12_004293A0(u8 *self)
     }
     func_L02_0031E9E8(velocity, 0.33333334f);
     velocity[2] = 0.083333336f;
-    q = func_002BDCE8(pos, 0.1f, 1.0f, 0.9f, func_002A77E0(16), velocity, 420000.0f, 0xDF808080, 0);
+    q = SpawnSpinningSparkParticle(pos, 0.1f, 1.0f, 0.9f, func_002A77E0(16), velocity, 420000.0f, 0xDF808080, 0);
     if (p) {
         u8 *d = q + 0x20;
         *(u16 *)(q + 10) = 10;
-        q[9] = func_00283CF0(4.0f) + 0x70;
+        q[9] = FloatToInt(4.0f) + 0x70;
         *(s32 *)(d + 4) = 2;
         d[10] = 0xDF;
         d[11] = q[10];

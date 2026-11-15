@@ -66,8 +66,8 @@ void func_L16_00417210(char *object)
         D_L16_001B1B44.filteredY = func_00282C48(D_0018BDD4);
     else if (D_L16_001B1B44.filteredY < -func_00282C48(D_0018BDD4))
         D_L16_001B1B44.filteredY = -func_00282C48(D_0018BDD4);
-    func_002AA2E8(&D_L16_001B1B50, D_0018BDD0, 0.15f);
-    func_002AA2E8(&D_L16_001B1B44.filteredY, D_0018BDD4, 0.15f);
+    ApproachValue(&D_L16_001B1B50, D_0018BDD0, 0.15f);
+    ApproachValue(&D_L16_001B1B44.filteredY, D_0018BDD4, 0.15f);
     deceleration = D_L16_001B1B20*0.000004848137451f;
     if (D_L16_001B1B50 != 0.0f) {
         if (func_00282C48(D_L16_001B1B50) >= 1.0f) {
@@ -85,9 +85,9 @@ void func_L16_00417210(char *object)
         float oldMagnitude = func_00282C48(*(float *)(state + 0x80));
         newMagnitude = func_00282C48(target);
         if (newMagnitude < oldMagnitude)
-            func_002AA2E8((float *)(state + 0x80), target, deceleration);
+            ApproachValue((float *)(state + 0x80), target, deceleration);
         else
-            func_002AA2E8((float *)(state + 0x80), target, acceleration);
+            ApproachValue((float *)(state + 0x80), target, acceleration);
     }
     {
         float inputY = D_L16_001B1B44.filteredY;
@@ -110,19 +110,19 @@ void func_L16_00417210(char *object)
         float oldMagnitude = func_00282C48(*(float *)(state + 0x84));
         newMagnitude = func_00282C48(target);
         if (newMagnitude < oldMagnitude)
-            func_002AA2E8((float *)(state + 0x84), target, deceleration);
+            ApproachValue((float *)(state + 0x84), target, deceleration);
         else
-            func_002AA2E8((float *)(state + 0x84), target, acceleration);
+            ApproachValue((float *)(state + 0x84), target, acceleration);
     }
     if (*(float *)(state + 0x80) != 0.0f)
-        *(float *)(object + 0xf8) = func_00283B98(*(float *)(object + 0xf8), *(float *)(state + 0x80));
+        *(float *)(object + 0xf8) = FastAddRotations(*(float *)(object + 0xf8), *(float *)(state + 0x80));
     if (*(float *)(state + 0x84) != 0.0f) {
         local.limits.high = D_L16_001B1B40*0.017453294f;
         local.limits.low = D_L16_001B1B44.minAngle*0.017453294f;
         local.work.bounds = local.limits;
         func_L16_00317C90((float *)(state + 0x84), local.work.bounds.high - *(float *)(state + 0x90), deceleration);
         func_L16_00317C90((float *)(state + 0x84), local.work.bounds.low - *(float *)(state + 0x90), deceleration);
-        *(float *)(state + 0x90) = func_00283B98(*(float *)(state + 0x90), *(float *)(state + 0x84));
+        *(float *)(state + 0x90) = FastAddRotations(*(float *)(state + 0x90), *(float *)(state + 0x84));
         if (*(float *)(state + 0x90)>local.work.bounds.high) {
             *(float *)(state + 0x90) = local.work.bounds.high;
             *(float *)(state + 0x84) = 0.0f;
@@ -135,7 +135,7 @@ void func_L16_00417210(char *object)
         int handle = *(int *)(state + 0xa4);
         char *sound = D_00188660 + 0x70*handle;
         if ((*(char **)(sound + 0x88)) != object || (*(unsigned char *)(sound + 0x74)) == 0)
-            *(int *)(state + 0xa4) = func_002E5CF8(4, 4, object);
+            *(int *)(state + 0xa4) = PlayMobySound(4, 4, object);
     } else {
         int handle = *(int *)(state + 0xa4);
         if (handle != -1) {
@@ -145,6 +145,6 @@ void func_L16_00417210(char *object)
         }
         *(int *)(state + 0xa4) = -1;
     }
-    func_00282CF0(&local.work.delta, object + 0x10, &local.position);
+    FastVecSub(&local.work.delta, object + 0x10, &local.position);
     func_002AD6F0(state + 0x20, &local.work.delta, &local.angles, object + 0xf0);
 }

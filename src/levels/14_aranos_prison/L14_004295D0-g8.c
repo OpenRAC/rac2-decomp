@@ -50,8 +50,8 @@ int func_L14_004295D0(unsigned char *o)
     unsigned char *p = *(unsigned char **)(o + 0x68);
     float turn;
     if (o[0x20] == 0) {
-        p[0x48] = func_00283CF0(15.0f);
-        p[0x4A] = func_00283CF0(9.6f);
+        p[0x48] = FloatToInt(15.0f);
+        p[0x4A] = FloatToInt(9.6f);
         DAMAGE(p)->hit_anim = 6;
         DAMAGE(p)->f3c = 0.15f;
         DAMAGE(p)->hit_anim_mode = 2;
@@ -86,7 +86,7 @@ int func_L14_004295D0(unsigned char *o)
         if (INT_AT(p, 0x2B8) != -1)
             func_L14_003DF650((char *)D_L14_001B259C + INT_AT(p, 0x2B8) * 256);
     }
-    if (o[0x31] && func_00282E48(o + 0x10, D_L14_001B9500) < 24.0f) {
+    if (o[0x31] && fast_vec_dist(o + 0x10, D_L14_001B9500) < 24.0f) {
         func_002A93B0(o);
         o[0x6F] = 22;
     }

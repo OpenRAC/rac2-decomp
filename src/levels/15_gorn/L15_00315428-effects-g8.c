@@ -63,7 +63,7 @@ void func_L15_00315428(void)
             FIELD(unsigned short, p, 0x34) |= 0x800;
         }
         if (FIELD(short, p, 0xAA) == 0xD54) {
-            func_002E64A0(p);
+            UpdateEquipmentPieces(p);
         }
         if (p && FIELD(short, p, 0xAA) == 0xFA0) {
             if (FIELD(char *, p, 0x68)) {
@@ -79,7 +79,7 @@ void func_L15_00315428(void)
     p = D_L15_001BD4C0.objects[2];
     if (D_L15_001BD4C0.frame == 13) {
         func_00283AF0(FIELD(char *, p, 0x58) + 0x10, &scratch.effect.b);
-        func_00283958(&scratch.effect.b, p + 0xC0);
+        quaternion_to_rotation_basis(&scratch.effect.b, p + 0xC0);
         func_L01_0031A278(p, &scratch.effect.a, 4, 3, 5);
         func_L05_00424990(&scratch.effect.a, 1, 25, 20, 20, 20, 45, 1, 1, 1, 0, 1.5f);
     }
@@ -94,8 +94,8 @@ void func_L15_00315428(void)
         scratch.effect.b.f[0] += func_002A78D8(.5f, 1.5f);
         scratch.effect.b.f[1] += func_002A78D8(.5f, 1.5f);
         scratch.effect.b.f[2] += func_002A78D8(.5f, 1.5f);
-        func_00282CF0(&scratch.effect.c, &scratch.effect.b, &scratch.effect.a);
-        func_00282F20(&scratch.effect.c, &scratch.effect.c, 1.1666667f);
+        FastVecSub(&scratch.effect.c, &scratch.effect.b, &scratch.effect.a);
+        vec_scale_to_length(&scratch.effect.c, &scratch.effect.c, 1.1666667f);
         func_L05_00419CC8(p, &scratch.effect.a, &scratch.effect.c, 0xbe4620, 0x783214, 1, 0, 1, sign);
     }
     if (D_L15_001BD4C0.frame < 140) {
@@ -103,13 +103,13 @@ void func_L15_00315428(void)
         float strength = .4f;
         func_0029FC20(p, 0, scratch.joint);
         /* Only the three rotation rows are needed by the following transforms. */
-        func_00283678(matrix, scratch.joint);
+        copy_matrix3x4(matrix, scratch.joint);
         offset.q = 0;
         offset.f[0] = -.3f;
         offset.f[3] = 1;
         velocity.q = 0;
-        func_00283098(&first, &offset, matrix);
-        func_00282CC0(&first, &first, p + 0x10);
+        matrix_mul_vec3(&first, &offset, matrix);
+        FastVecAdd(&first, &first, p + 0x10);
         first.f[3] = 0;
         second.q = first.q;
         third.q = first.q;
@@ -119,16 +119,16 @@ void func_L15_00315428(void)
         func_002ACB48(&third, .3f);
         func_002ACB48(&fourth, .3f);
         velocity.f[0] = -(func_002A7878(30, 40) * 0.016666668f) * strength;
-        func_00283098(&velocity, &velocity, matrix);
+        matrix_mul_vec3(&velocity, &velocity, matrix);
         func_L00_0033C0D0(p, &first, &velocity, D_L15_001A9420, 1);
         velocity.f[0] = -(func_002A7878(30, 40) * 0.016666668f) * strength;
-        func_00283098(&velocity, &velocity, matrix);
+        matrix_mul_vec3(&velocity, &velocity, matrix);
         func_L00_0033C0D0(p, &second, &velocity, D_L15_001A9420, 1);
         velocity.f[0] = -(func_002A7878(30, 40) * 0.016666668f) * strength;
-        func_00283098(&velocity, &velocity, matrix);
+        matrix_mul_vec3(&velocity, &velocity, matrix);
         func_L00_0033C0D0(p, &third, &velocity, D_L15_001A9430, 1);
         velocity.f[0] = -(func_002A7878(30, 40) * 0.016666668f) * strength;
-        func_00283098(&velocity, &velocity, matrix);
+        matrix_mul_vec3(&velocity, &velocity, matrix);
         func_L00_0033C0D0(p, &fourth, &velocity, D_L15_001A9440, 1);
     }
 }

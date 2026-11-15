@@ -73,8 +73,8 @@ void func_L16_003AA3F0(BeamMoby *object)
     timeStep = frameTime;
     unit = 1.0f;
     for (i = 0; i < 32; i++) {
-        float height = func_00283CE0(i);
-        float last = func_00283CE0(31);
+        float height = IntToFloat(i);
+        float last = IntToFloat(31);
         height = height / last;
         height = (half - height) * spread;
         if ((unsigned)(i - 3) >= 26) {
@@ -97,19 +97,19 @@ void func_L16_003AA3F0(BeamMoby *object)
             qcopy(&beam->positions[smoothIndex], &positions[smoothIndex]);
             qcopy(&beam->velocities[smoothIndex], &velocities[smoothIndex]);
         } else {
-            func_00282CC0(&scratch, &positions[smoothIndex-1], &positions[smoothIndex]);
-            func_00282CC0(&scratch, &scratch, &positions[smoothIndex+1]);
-            func_00282D30(&beam->positions[smoothIndex], &scratch, 0.333f);
-            func_00282CC0(&scratch, &velocities[smoothIndex-1], &velocities[smoothIndex]);
-            func_00282CC0(&scratch, &scratch, &velocities[smoothIndex+1]);
-            func_00282D30(&beam->velocities[smoothIndex], &scratch, 0.333f);
+            FastVecAdd(&scratch, &positions[smoothIndex-1], &positions[smoothIndex]);
+            FastVecAdd(&scratch, &scratch, &positions[smoothIndex+1]);
+            FastVecScale(&beam->positions[smoothIndex], &scratch, 0.333f);
+            FastVecAdd(&scratch, &velocities[smoothIndex-1], &velocities[smoothIndex]);
+            FastVecAdd(&scratch, &scratch, &velocities[smoothIndex+1]);
+            FastVecScale(&beam->velocities[smoothIndex], &scratch, 0.333f);
         }
     }
     for (branchIndex = 0; branchIndex < 4; branchIndex++) {
         if (D_001A79F0 == 0xd5 || D_001A79F0 == 16)
             func_002A7A00(&scratch, 1.0f, 1.0f);
         else func_002A7A00(&scratch, D_L16_001AF908, D_L16_001AF908);
-        selected = func_00283CF0(func_002A7878((float)branchIndex * 6.0f, (float)(branchIndex + 1) * 6.0f)) + 4;
+        selected = FloatToInt(func_002A7878((float)branchIndex * 6.0f, (float)(branchIndex + 1) * 6.0f)) + 4;
         beam->selected[branchIndex] = selected;
         qcopy(&beam->branches[0][branchIndex], &beam->positions[selected]);
         qcopy(&beam->branchVelocities[0][branchIndex], &beam->velocities[selected]);
@@ -123,21 +123,21 @@ void func_L16_003AA3F0(BeamMoby *object)
                 if (D_001A79F0 == 0xd5 || D_001A79F0 == 16)
                     func_002A7A00(((Row *)((char *)beam + velOffset))[j], 0.0f, 0.20000001788139343f);
                 else func_002A7A00(((Row *)((char *)beam + velOffset))[j], 0.0f, D_L16_001AF90C * frameTime);
-                func_00282CC0(((Row *)((char *)beam + curOffset))[j], column->branches[j-1], &scratch);
-                func_00282CC0(((Row *)((char *)beam + curOffset))[j], ((Row *)((char *)beam + curOffset))[j], &jitter);
+                FastVecAdd(((Row *)((char *)beam + curOffset))[j], column->branches[j-1], &scratch);
+                FastVecAdd(((Row *)((char *)beam + curOffset))[j], ((Row *)((char *)beam + curOffset))[j], &jitter);
             }
         }
     }
-    if (func_00282E80(&object->position, D_L16_001B9B00) >= 4.0f) {
+    if (vec_distance_xy(&object->position, D_L16_001B9B00) >= 4.0f) {
         char *definition = (char *)(beam->index * 128 + (int)D_L16_001B2C0C);
         beam->rotation[2] = *(float *)(definition + 0x78);
         beam->rotation[1] = *(float *)(definition + 0x74);
         beam->rotation[0] = func_002A7940();
-        func_00283410(transform, beam->rotation);
+        euler_to_matrix(transform, beam->rotation);
         qcopy(&transform[3], &object->position);
         for (particleIndex = 0; particleIndex < 32; particleIndex += 8) {
             int color, duration;
-            func_002830C0(&scratch, &beam->positions[particleIndex], transform);
+            transform_vector(&scratch, &beam->positions[particleIndex], transform);
             qcopy(&jitter, &beam->velocities[particleIndex]);
             jitter.w = D_L16_001AF920;
             color = func_002A77E0(2) ? D_L16_001AF928 : D_L16_001AF92C;
@@ -146,7 +146,7 @@ void func_L16_003AA3F0(BeamMoby *object)
         }
         for (k = 0; k < 2; k++) {
             int duration, heads;
-            func_002830C0(&scratch, &beam->branches[3][k], transform);
+            transform_vector(&scratch, &beam->branches[3][k], transform);
             qcopy(&jitter, &beam->branchVelocities[3][k]);
             jitter.w = D_L16_001AF920;
             flipCoin(&heads);

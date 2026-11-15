@@ -60,7 +60,7 @@ void func_L16_00417DB0(char *object)
     if (*(unsigned char *)(object + 0x20) == 1) {
         target = D_L16_001B2B1C + *(int *)state*0x100;
         if (target == 0 || *(unsigned char *)(target + 0x20) == 0xfe || *(unsigned char *)(target + 0x20) == 0xfd) {
-            if (func_002ACBC8(&D_00189EA0, *(int *)(state + 8)) != 0) {
+            if (IsPointInCuboid(&D_00189EA0, *(int *)(state + 8)) != 0) {
                 int snapshot = *(int *)(*(char **)(object + 0x24) + 0x10);
                 object[0x20] = 2;
                 *(int *)(object + 0x98) = snapshot;
@@ -92,7 +92,7 @@ void func_L16_00417DB0(char *object)
                 int loopHandle = *(int *)(state + 12);
                 struct SoundAnchor *loopSound = (struct SoundAnchor *)(audioBank + 0x70*loopHandle);
                 if (loopSound->owner != object || loopSound->active == 0)
-                    *(int *)(state + 12) = func_002E5CF8(1, 4, object);
+                    *(int *)(state + 12) = PlayMobySound(1, 4, object);
                 speed = func_002A7878(1.0f, 2.0f);
                 index = func_002A77E0(2);
                 if (index == 0)

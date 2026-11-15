@@ -51,20 +51,20 @@ void func_00329768(char *self)
         }
     case 1:
         qcopy(old, self + 0x10);
-        func_00282CC0(self + 0x10, self + 0x10, state);
+        FastVecAdd(self + 0x10, self + 0x10, state);
         *(float *)(state + 8)-=0.003055555745959282f;
-        *(float *)(self + 0xF4)=func_00283B98(*(float *)(self + 0xF4), *(float *)(state + 0x14));
-        *(float *)(self + 0xF8)=func_00283B98(*(float *)(self + 0xF8), *(float *)(state + 0x18));
+        *(float *)(self + 0xF4)=FastAddRotations(*(float *)(self + 0xF4), *(float *)(state + 0x14));
+        *(float *)(self + 0xF8)=FastAddRotations(*(float *)(self + 0xF8), *(float *)(state + 0x18));
         func_002A90F8(self + 0x10, hit);
         func_00282C88(zero);
         for (i=7;i>=0;i--) {
             random[0]=func_002A78D8(0, D_001B0228);
             random[1]=func_002A78D8(0, D_001B0228);
             random[2]=func_002A78D8(0, D_001B0228);
-            func_00282CC0(random, random, self + 0x10);
+            FastVecAdd(random, random, self + 0x10);
             func_002C7748(random, state, func_002A7820(20, 40));
         }
-        func_00282E48(old, self + 0x10);
+        fast_vec_dist(old, self + 0x10);
         if (func_00329DC0(self, old)) {
             func_00329F40(self);
             if (*(int *)(state + 0x38)==2) self[0x20]=2;
@@ -74,7 +74,7 @@ void func_00329768(char *self)
                     *(EffectVector *)velocity = ((EffectObject *)self)->position;
                     func_002B0668(velocity);
                     *(float *)(self + 0x18)-=1;
-                    func_002FD828(self + 0x18, velocity, *(float *)(self + 0x10), *(float *)(self + 0x14), *(float *)(self + 0x18));
+                    SampleSurfaceHeightMap(self + 0x18, velocity, *(float *)(self + 0x10), *(float *)(self + 0x14), *(float *)(self + 0x18));
                     if (!*(int *)(state + 0x44)) func_00329E60(self);
                 }
                 self[0x20]=3;
@@ -84,32 +84,32 @@ void func_00329768(char *self)
         break;
     case 2:
         qcopy(old, self + 0x10);
-        func_00282CC0(self + 0x10, self + 0x10, state);
+        FastVecAdd(self + 0x10, self + 0x10, state);
         *(float *)(state + 8)-=0.003055555745959282f;
-        *(float *)(self + 0xF4)=func_00283B98(*(float *)(self + 0xF4), *(float *)(state + 0x14));
-        *(float *)(self + 0xF8)=func_00283B98(*(float *)(self + 0xF8), *(float *)(state + 0x18));
+        *(float *)(self + 0xF4)=FastAddRotations(*(float *)(self + 0xF4), *(float *)(state + 0x14));
+        *(float *)(self + 0xF8)=FastAddRotations(*(float *)(self + 0xF8), *(float *)(state + 0x18));
         func_00329F40(self);
         if (*(int *)(state + 0x38)==1) {
-            func_002E5CF8(0, 0, self);
+            PlayMobySound(0, 0, self);
             self[0x20]=3;
             *(int *)(state + 0x34)=80;
             *(float *)(self + 0x18)+=1;
             *(EffectVector *)position = ((EffectObject *)self)->position;
             func_002B0668(position);
             *(float *)(self + 0x18)-=1;
-            func_002FD828(self + 0x18, velocity, *(float *)(self + 0x10), *(float *)(self + 0x14), *(float *)(self + 0x18));
+            SampleSurfaceHeightMap(self + 0x18, velocity, *(float *)(self + 0x10), *(float *)(self + 0x14), *(float *)(self + 0x18));
             if (!*(int *)(state + 0x44)) func_00329E60(self);
         }
         break;
     case 3: {
         float one, low, high, scale;
         qcopy(old, self + 0x10);
-        func_00282CC0(self + 0x10, self + 0x10, state);
-        func_00282D30(state, state, 0.8f);
+        FastVecAdd(self + 0x10, self + 0x10, state);
+        FastVecScale(state, state, 0.8f);
         *(float *)(state + 8)-=0.002444444689899683f;
-        *(float *)(self + 0xF4)=func_00283B98(*(float *)(self + 0xF4), *(float *)(state + 0x14));
-        *(float *)(self + 0xF8)=func_00283B98(*(float *)(self + 0xF8), *(float *)(state + 0x18));
-        func_00282E48(old, self + 0x10);
+        *(float *)(self + 0xF4)=FastAddRotations(*(float *)(self + 0xF4), *(float *)(state + 0x14));
+        *(float *)(self + 0xF8)=FastAddRotations(*(float *)(self + 0xF8), *(float *)(state + 0x18));
+        fast_vec_dist(old, self + 0x10);
         *(float *)(state + 0x14)*=0.8f;
         *(float *)(state + 0x18)*=0.8f;
         if ((unsigned char)self[0x23] >= 3)
@@ -127,7 +127,7 @@ void func_00329768(char *self)
         velocity[1]=func_002A7878(low, high);
         velocity[2]=func_002A7878(low, 2);
         velocity[3]=0;
-        func_00282F20(velocity, velocity, func_002A7878(0.06666667f, 0.13333334f)*scale);
+        vec_scale_to_length(velocity, velocity, func_002A7878(0.06666667f, 0.13333334f)*scale);
         func_002BF728(self + 0x10, velocity, func_002A7878(0.05f, 0.1f)*210000.0f, height);
         if (func_00282948(state + 0x34)) self[0x20]=4;
         break;

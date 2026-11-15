@@ -39,7 +39,7 @@ void func_002729A0(s8 *arg0, f32 fparg0, f32 fparg1)
     f32 k;
 
     k = 40.0f;
-    s2 = func_0027C878((*(s32 *)((s8 *)(arg0) + (0x18))));
+    s2 = GetEffectTextureDescriptor((*(s32 *)((s8 *)(arg0) + (0x18))));
     type = (*(s32 *)((s8 *)(arg0) + (0x2C)));
     x = (*(f32 *)((s8 *)(arg0) + (0x1C)));
     switch (type) {
@@ -47,11 +47,11 @@ void func_002729A0(s8 *arg0, f32 fparg0, f32 fparg1)
         if ((*(s16 *)((s8 *)(arg0) + (0x26))) > 0) {
             i = 0;
             do {
-                func_0027E4A8(fparg0, fparg1, 63, 63, s2, 0xFFFFF3, (*(s32 *)((s8 *)(arg0) + (0x14))),
+                AppendRotatedSpriteQuad(fparg0, fparg1, 63, 63, s2, 0xFFFFF3, (*(s32 *)((s8 *)(arg0) + (0x14))),
                               k * (*(f32 *)((s8 *)(arg0) + (0x10))), k * (*(f32 *)((s8 *)(arg0) + (0x10))), 0, 0,
                               x, 0.0f, 0.0f);
                 i++;
-                x = func_00283B98(x, (*(f32 *)((s8 *)(arg0) + (0x28))));
+                x = FastAddRotations(x, (*(f32 *)((s8 *)(arg0) + (0x28))));
             } while (i < (*(s16 *)((s8 *)(arg0) + (0x26))));
         }
         break;
@@ -60,21 +60,21 @@ void func_002729A0(s8 *arg0, f32 fparg0, f32 fparg1)
         v[0][1] = func_00283180(x) * k * (*(f32 *)((s8 *)(arg0) + (0x10)));
         v[1][0] = func_00283180(x) * k * (*(f32 *)((s8 *)(arg0) + (0x10)));
         v[1][1] = func_00283198(x) * -k * (*(f32 *)((s8 *)(arg0) + (0x10)));
-        ((void (*)(f32, f32, f32, f32, f32, s32, s32, s32, s32, s32, s32, s32, f32, f32))func_0027E4A8)(
+        ((void (*)(f32, f32, f32, f32, f32, s32, s32, s32, s32, s32, s32, s32, f32, f32))AppendRotatedSpriteQuad)(
             fparg0, fparg1, (*(f32 *)((s8 *)(arg0) + (0x10))) * k, (*(f32 *)((s8 *)(arg0) + (0x10))) * k, x,
             63, 63, s2, 0xFFFFF3, (*(s32 *)((s8 *)(arg0) + (0x14))), 0, 0, 0.0f, 0.0f);
-        ((void (*)(f32, f32, f32, f32, f32, s32, s32, s32, s32, s32, s32, s32, f32, f32))func_0027E4A8)(
+        ((void (*)(f32, f32, f32, f32, f32, s32, s32, s32, s32, s32, s32, s32, f32, f32))AppendRotatedSpriteQuad)(
             fparg0 + v[1][0], fparg1 + v[1][1], (*(f32 *)((s8 *)(arg0) + (0x10))) * k, (*(f32 *)((s8 *)(arg0) + (0x10))) * k, x,
             63, 63, s2, 0xFFFFF3, (*(s32 *)((s8 *)(arg0) + (0x14))), 1, 0, 0.0f, 0.0f);
-        ((void (*)(f32, f32, f32, f32, f32, s32, s32, s32, s32, s32, s32, s32, f32, f32))func_0027E4A8)(
+        ((void (*)(f32, f32, f32, f32, f32, s32, s32, s32, s32, s32, s32, s32, f32, f32))AppendRotatedSpriteQuad)(
             fparg0 - v[0][0], fparg1 - v[0][1], (*(f32 *)((s8 *)(arg0) + (0x10))) * k, (*(f32 *)((s8 *)(arg0) + (0x10))) * k, x,
             63, 63, s2, 0xFFFFF3, (*(s32 *)((s8 *)(arg0) + (0x14))), 0, 1, 0.0f, 0.0f);
-        ((void (*)(f32, f32, f32, f32, f32, s32, s32, s32, s32, s32, s32, s32, f32, f32))func_0027E4A8)(
+        ((void (*)(f32, f32, f32, f32, f32, s32, s32, s32, s32, s32, s32, s32, f32, f32))AppendRotatedSpriteQuad)(
             (fparg0 + v[1][0]) - v[0][0], (fparg1 + v[1][1]) - v[0][1], (*(f32 *)((s8 *)(arg0) + (0x10))) * k,
             (*(f32 *)((s8 *)(arg0) + (0x10))) * k, x, 63, 63, s2, 0xFFFFF3, (*(s32 *)((s8 *)(arg0) + (0x14))), 1, 1, 0.0f, 0.0f);
         break;
     case 2:
-        ((void (*)(f32, f32, f32, f32, f32, s32, s32, s32, s32, s32, s32, s32, f32, f32))func_0027E4A8)(
+        ((void (*)(f32, f32, f32, f32, f32, s32, s32, s32, s32, s32, s32, s32, f32, f32))AppendRotatedSpriteQuad)(
             fparg0, fparg1, (*(f32 *)((s8 *)(arg0) + (0x10))) * k, (*(f32 *)((s8 *)(arg0) + (0x10))) * k, x,
             63, 63, s2, 0xFFFFF3, (*(s32 *)((s8 *)(arg0) + (0x14))), 0, 0, 0.5f, 0.5f);
         break;

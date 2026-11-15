@@ -68,7 +68,7 @@ void func_L11_003974A8(u8 *obj) {
         break;
     case 1:
         if (func_002B3868(obj)) {
-            func_00282F20(ctx, ctx->target->points[ctx->point], ctx->speed * 0.016666668f);
+            vec_scale_to_length(ctx, ctx->target->points[ctx->point], ctx->speed * 0.016666668f);
             {
                 f32 delta = D_L11_001AEC64 - D_L11_001AEC60;
                 f32 step = delta / (f32)D_L11_001AEC68;
@@ -78,13 +78,13 @@ void func_L11_003974A8(u8 *obj) {
             ctx->target->modeBits &= 0xFFFE;
             ctx->target->drawn = 1;
         }
-        func_00282CC0(ctx->target->pos, ctx->target->pos, ctx);
-        func_00282F20(ctx->target->points[ctx->point], ctx->target->points[ctx->point], ctx->scale);
+        FastVecAdd(ctx->target->pos, ctx->target->pos, ctx);
+        vec_scale_to_length(ctx->target->points[ctx->point], ctx->target->points[ctx->point], ctx->scale);
         ctx->scale += ctx->scaleStep;
-        t = func_00283CE0(*(u16 *)(obj + 0x96)) / (f32)D_L11_001AEC68;
-        ctx->target->alpha = func_00283CF0(t * 128.0f);
+        t = IntToFloat(*(u16 *)(obj + 0x96)) / (f32)D_L11_001AEC68;
+        ctx->target->alpha = FloatToInt(t * 128.0f);
         ctx->curExtent = ctx->extent * t;
-        ctx->color = func_00283D38(D_L11_001AEC78[0], D_L11_001AEC78[1], t);
+        ctx->color = FastTweenColor(D_L11_001AEC78[0], D_L11_001AEC78[1], t);
         if (*(u16 *)(obj + 0x96) > D_L11_001AEC68)
             func_002A7750(obj, 2, -1);
         break;
@@ -95,16 +95,16 @@ void func_L11_003974A8(u8 *obj) {
             ctx->target->alpha = 0x80;
             ctx->target->modeBits &= 0xFFF7;
         }
-        func_00282F20(ctx->target->points[ctx->point], ctx->target->points[ctx->point], ctx->scale);
+        vec_scale_to_length(ctx->target->points[ctx->point], ctx->target->points[ctx->point], ctx->scale);
         ctx->scale += ctx->scaleStep;
-        fade = func_00283CE0(*(u16 *)(obj + 0x96)) / (f32)D_L11_001AEC6C;
+        fade = IntToFloat(*(u16 *)(obj + 0x96)) / (f32)D_L11_001AEC6C;
         ctx->curExtent = ctx->extent + -ctx->extent * fade;
-        ctx->color = func_00283D38(D_L11_001AEC78[1], D_L11_001AEC78[2], fade);
+        ctx->color = FastTweenColor(D_L11_001AEC78[1], D_L11_001AEC78[2], fade);
         if (*(u16 *)(obj + 0x96) > D_L11_001AEC6C) {
             ctx->target->modeBits = ctx->savedModeBits;
             ctx->target->modeBits &= 0xFFFE;
             ctx->target->drawn = 1;
-            func_00282F20(ctx->target->points[ctx->point], ctx->target->points[ctx->point], 1.0f);
+            vec_scale_to_length(ctx->target->points[ctx->point], ctx->target->points[ctx->point], 1.0f);
             func_0029F338(obj);
             return;
         }

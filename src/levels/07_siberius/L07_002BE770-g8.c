@@ -112,13 +112,13 @@ void func_L07_002F2C70(void) {
     q = (Vec2 *)&D_L07_001A93E0;
 
     func_00283AF0((u8 *)((L07Obj *)obj)->f58 + 0x10, buf);
-    func_00283958(buf, mat);
+    quaternion_to_rotation_basis(buf, mat);
     scale = ((L07Obj *)obj)->f2C / *(f32 *)((u8 *)((L07Obj *)obj)->f24 + 0x24);
 
     for (i = 0; i < 4; i++) {
-        func_00283098(p, q, mat);
-        func_00282D30(p, p, scale);
-        func_00282CC0(p, p, (Vec2 *)((u8 *)obj + 0x10));
+        matrix_mul_vec3(p, q, mat);
+        FastVecScale(p, p, scale);
+        FastVecAdd(p, p, (Vec2 *)((u8 *)obj + 0x10));
         p++;
         q++;
     }

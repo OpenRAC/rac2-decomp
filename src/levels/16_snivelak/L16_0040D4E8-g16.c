@@ -48,7 +48,7 @@ void func_L16_0040D4E8(u8 *moby)
     case 0: {
         u8 *rec = D_00188660 + state->sound * 0x70;
         if (*(u8 **)(rec + 0x88) != moby || !rec[0x74])
-            state->sound = func_002E5CF8(0, 4, moby);
+            state->sound = PlayMobySound(0, 4, moby);
         qcopy(oldPosition, (moby + 0x10));
         qcopy((moby + 0x10), &state->point[0]);
         timing = &state->timing;
@@ -64,16 +64,16 @@ void func_L16_0040D4E8(u8 *moby)
                 if (i == 2 && state->timing.progress[1] > 0.95f && moby[0x43])
                     func_002A7470(moby, 0, 0, 20);
             }
-            func_00282CF0(delta, &segmentEnd[i], &state->point[i]);
-            func_00282D30(delta, delta, timing->progress[i]);
-            func_00282CC0(moby + 0x10, moby + 0x10, delta);
+            FastVecSub(delta, &segmentEnd[i], &state->point[i]);
+            FastVecScale(delta, delta, timing->progress[i]);
+            FastVecAdd(moby + 0x10, moby + 0x10, delta);
         }
-        func_002AA800((float *)(moby + 0xf8), 0,
+        StepAngleTowardTarget((float *)(moby + 0xf8), 0,
             func_00283248(D_00189E20.f[0x80 / 4] - *(float *)(moby + 0x10),
                 D_00189E20.f[0x84 / 4] - *(float *)(moby + 0x14)), 0.20943955f);
         func_L16_0040DC70(moby);
         if (func_002A9640(moby, 0x10000, 0) || D_L16_001A8F00 == 2) {
-            func_002E5CF8(2, 0, moby);
+            PlayMobySound(2, 0, moby);
             handle = state->sound;
             if (handle != -1) {
                 u8 *rec = D_00188660 + handle * 0x70;
@@ -82,20 +82,20 @@ void func_L16_0040D4E8(u8 *moby)
             state->sound = -1;
             for (i = 0; i < 3; i++) {
                 switch (i) {
-                case 0: func_00282D30(velocity, moby + 0xd0, 0.15f); break;
-                case 1: func_00282D30(velocity, moby + 0xd0, -0.15f); break;
-                case 2: func_00282D30(velocity, moby + 0xe0, 0.10000001f); break;
+                case 0: FastVecScale(velocity, moby + 0xd0, 0.15f); break;
+                case 1: FastVecScale(velocity, moby + 0xd0, -0.15f); break;
+                case 2: FastVecScale(velocity, moby + 0xe0, 0.10000001f); break;
                 default: qzero(velocity); break;
                 }
                 func_00273730(moby, 1, *(short *)(moby + 0xaa), i,
                     moby + 0x10, moby + 0xf0, velocity, 255, func_002A78D8(90.0f, 180.0f), func_002A7878(5.0f, 15.0f));
             }
-            func_0032C700(moby + 0x10, 0, 0, 0, 0, 20, 45, 1,
+            SpawnExplosion(moby + 0x10, 0, 0, 0, 0, 20, 45, 1,
                 1.0f, 20.0f, 1, 0, 0, 0);
             func_0029F338(moby);
         } else {
             if (state->timing.progress[2] >= 1.0f) func_002A7750(moby, 1, -1);
-            if (func_002761F8(oldPosition, moby + 0x10, 0, moby, 0)) {
+            if (CollLine(oldPosition, moby + 0x10, 0, moby, 0)) {
                 if (D_L16_001BFF58 &&
                     (*(short *)(D_L16_001BFF58 + 0xaa) == 0xf78 ||
                      *(short *)(D_L16_001BFF58 + 0xaa) == 0x7e8)) return;
@@ -115,9 +115,9 @@ void func_L16_0040D4E8(u8 *moby)
             if (*(u8 **)(rec + 0x88) == moby && rec[0x74]) func_002E59F8(handle);
         }
         state->sound = -1;
-        func_002E5CF8(1, 0, moby);
-        func_00282CF0(oldPosition, D_L16_001B9B00, moby + 0x10);
-        func_00282F20(oldPosition, oldPosition, 1.0f);
+        PlayMobySound(1, 0, moby);
+        FastVecSub(oldPosition, D_L16_001B9B00, moby + 0x10);
+        vec_scale_to_length(oldPosition, oldPosition, 1.0f);
         func_0032DA58(moby, moby + 0x10, oldPosition, 0.0f);
         func_002A8C28(moby, moby + 0x10, 2.0f, 0x10001, 0, 5.0f, 1.0f, 1, 0);
         func_0029F338(moby);

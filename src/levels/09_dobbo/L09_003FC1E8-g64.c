@@ -52,12 +52,12 @@ void func_L09_003FC1E8(int tex0, int tex1, void *points, int inner, int outer, i
     V *vel;
     struct SparkOutput *output;
 
-    packets[0].texture = func_0027C878(tex0);
+    packets[0].texture = GetEffectTextureDescriptor(tex0);
     packets[0].blend = 0x8000000048ULL;
     packets[0].mode = 0xFF9000000260ULL;
     packets[0].flags = 0;
     packets[0].color[0] = packets[0].color[1] = packets[0].color[2] = packets[0].color[3] = (c << 24) | 0x7F3F40;
-    packets[1].texture = func_0027C878(tex1);
+    packets[1].texture = GetEffectTextureDescriptor(tex1);
     flags = packets[0].flags;
     blend = packets[0].blend;
     mode = packets[0].mode;
@@ -91,62 +91,62 @@ void func_L09_003FC1E8(int tex0, int tex1, void *points, int inner, int outer, i
     {
         V *basis = axis;
 
-        func_00282CF0(&delta, &D_L09_00256310[slot], &origin);
-        func_00282F20(basis, &delta, 1);
-        func_00282DD8(&axis[1], &axis[0], D_0018A0E0);
-        func_00282F20(&axis[1], &axis[1], -1.0f);
-        func_00282DD8(&axis[2], &axis[1], &axis[0]);
+        FastVecSub(&delta, &D_L09_00256310[slot], &origin);
+        vec_scale_to_length(basis, &delta, 1);
+        FastVecCross(&axis[1], &axis[0], D_0018A0E0);
+        vec_scale_to_length(&axis[1], &axis[1], -1.0f);
+        FastVecCross(&axis[2], &axis[1], &axis[0]);
         qcopy(&packets[0].vertex[0], &width);
-        func_00282D30(&packets[0].vertex[1], &packets[0].vertex[0], -1.0f);
+        FastVecScale(&packets[0].vertex[1], &packets[0].vertex[0], -1.0f);
         qcopy(&packets[1].vertex[0], &glowWidth);
-        func_00282D30(&packets[1].vertex[1], &packets[1].vertex[0], -1.0f);
-        func_002830C0(&a, &path[1], axis);
-        func_002830C0(&b, path, axis);
-        func_00282CF0(&mat[0], &a, &b);
-        func_00282F20(&mat[0], &mat[0], 1.0f);
-        func_00282CF0(&mat[1], D_L09_001B9A00, &a);
-        func_00282DD8(&mat[2], &mat[1], &mat[0]);
-        func_00282F20(&mat[2], &mat[2], 1.0f);
-        func_00282DD8(&mat[1], &mat[0], &mat[2]);
+        FastVecScale(&packets[1].vertex[1], &packets[1].vertex[0], -1.0f);
+        transform_vector(&a, &path[1], axis);
+        transform_vector(&b, path, axis);
+        FastVecSub(&mat[0], &a, &b);
+        vec_scale_to_length(&mat[0], &mat[0], 1.0f);
+        FastVecSub(&mat[1], D_L09_001B9A00, &a);
+        FastVecCross(&mat[2], &mat[1], &mat[0]);
+        vec_scale_to_length(&mat[2], &mat[2], 1.0f);
+        FastVecCross(&mat[1], &mat[0], &mat[2]);
         qcopy(&mat[3], &b);
-        func_002830C0(&packets[0].vertex[0], &packets[0].vertex[0], mat);
-        func_002830C0(&packets[0].vertex[1], &packets[0].vertex[1], mat);
-        func_002830C0(&packets[1].vertex[0], &packets[1].vertex[0], mat);
-        func_002830C0(&packets[1].vertex[1], &packets[1].vertex[1], mat);
+        transform_vector(&packets[0].vertex[0], &packets[0].vertex[0], mat);
+        transform_vector(&packets[0].vertex[1], &packets[0].vertex[1], mat);
+        transform_vector(&packets[1].vertex[0], &packets[1].vertex[0], mat);
+        transform_vector(&packets[1].vertex[1], &packets[1].vertex[1], mat);
         for (i = 1; i < 6;) {
             qcopy(&packets[0].vertex[2], &width);
-            func_00282D30(&packets[0].vertex[3], &packets[0].vertex[2], -1.0f);
+            FastVecScale(&packets[0].vertex[3], &packets[0].vertex[2], -1.0f);
             qcopy(&packets[1].vertex[2], &glowWidth);
-            func_00282D30(&packets[1].vertex[3], &packets[1].vertex[2], -1.0f);
-            func_002830C0(&a, &path[i], axis);
-            func_002830C0(&b, &path[i - 1], axis);
-            func_00282CF0(&mat[0], &a, &b);
-            func_00282F20(&mat[0], &mat[0], 1.0f);
-            func_00282CF0(&mat[1], D_L09_001B9A00, &a);
-            func_00282DD8(&mat[2], &mat[1], &mat[0]);
-            func_00282F20(&mat[2], &mat[2], 1.0f);
-            func_00282DD8(&mat[1], &mat[0], &mat[2]);
+            FastVecScale(&packets[1].vertex[3], &packets[1].vertex[2], -1.0f);
+            transform_vector(&a, &path[i], axis);
+            transform_vector(&b, &path[i - 1], axis);
+            FastVecSub(&mat[0], &a, &b);
+            vec_scale_to_length(&mat[0], &mat[0], 1.0f);
+            FastVecSub(&mat[1], D_L09_001B9A00, &a);
+            FastVecCross(&mat[2], &mat[1], &mat[0]);
+            vec_scale_to_length(&mat[2], &mat[2], 1.0f);
+            FastVecCross(&mat[1], &mat[0], &mat[2]);
             qcopy(&mat[3], &a);
-            func_002830C0(&packets[0].vertex[2], &packets[0].vertex[2], mat);
-            func_002830C0(&packets[0].vertex[3], &packets[0].vertex[3], mat);
-            func_002830C0(&packets[1].vertex[2], &packets[1].vertex[2], mat);
-            func_002830C0(&packets[1].vertex[3], &packets[1].vertex[3], mat);
+            transform_vector(&packets[0].vertex[2], &packets[0].vertex[2], mat);
+            transform_vector(&packets[0].vertex[3], &packets[0].vertex[3], mat);
+            transform_vector(&packets[1].vertex[2], &packets[1].vertex[2], mat);
+            transform_vector(&packets[1].vertex[3], &packets[1].vertex[3], mat);
             if (i == 1) {
                 /* The glow fades out at both ends of the strip. */
                 saved = packets[1].color[0];
                 packets[1].color[0] = packets[1].color[1] = 0xFFAF10;
-                func_00280B90(&packets[0], 0, 0);
-                func_00280B90(&packets[1], 0, 0);
+                draw_world_quad(&packets[0], 0, 0);
+                draw_world_quad(&packets[1], 0, 0);
                 packets[1].color[0] = packets[1].color[1] = packets[1].color[2] = packets[1].color[3] = saved;
             } else if (i == 5) {
                 saved = packets[1].color[2];
                 packets[1].color[2] = packets[1].color[3] = 0xFFAF10;
-                func_00280B90(&packets[0], 0, 0);
-                func_00280B90(&packets[1], 0, 0);
+                draw_world_quad(&packets[0], 0, 0);
+                draw_world_quad(&packets[1], 0, 0);
                 packets[1].color[0] = packets[1].color[1] = packets[1].color[2] = packets[1].color[3] = saved;
             } else {
-                func_00280B90(&packets[0], 0, 0);
-                func_00280B90(&packets[1], 0, 0);
+                draw_world_quad(&packets[0], 0, 0);
+                draw_world_quad(&packets[1], 0, 0);
             }
             qcopy(&packets[0].vertex[0], &packets[0].vertex[2]);
             qcopy(&packets[0].vertex[1], &packets[0].vertex[3]);
@@ -158,14 +158,14 @@ void func_L09_003FC1E8(int tex0, int tex1, void *points, int inner, int outer, i
                 r1 = func_002A7940();
                 r2 = func_002A7940();
                 func_002AF000(vel, r0, r1, r2 * .25f);
-                func_00283098(vel, vel, &D_L09_00255F10[slot][0]);
+                matrix_mul_vec3(vel, vel, &D_L09_00255F10[slot][0]);
                 func_00282FB8(vel, vel, 1.0f / 30.0f);
                 particle = func_L08_0034A078(&packets[0].vertex[func_001163B0() & 3], vel, alpha * 64 / 100,
                                              D_L09_00255E90[slot][0]);
                 if (particle) {
                     particle[2] = *D_L09_001FF580.bank;
                     output = (struct SparkOutput *)(particle + 0x20);
-                    output->inverse = 1.0f / func_00283CE0(*(short *)(particle + 0xA));
+                    output->inverse = 1.0f / IntToFloat(*(short *)(particle + 0xA));
                     output->color = 0x7F3F20;
                     *(float *)(particle + 0xC) = 150000.0f;
                     particle = func_L08_0034A078(&packets[0].vertex[func_001163B0() & 3], vel, alpha * 127 / 100,
@@ -173,15 +173,15 @@ void func_L09_003FC1E8(int tex0, int tex1, void *points, int inner, int outer, i
                     if (particle) {
                         particle[2] = *D_L09_001FF580.bank;
                         output = (struct SparkOutput *)(particle + 0x20);
-                        output->inverse = 1.0f / func_00283CE0(*(short *)(particle + 0xA));
+                        output->inverse = 1.0f / IntToFloat(*(short *)(particle + 0xA));
                         output->color = 0xFFFFFF;
                         *(float *)(particle + 0xC) = 30000.0f;
                     }
                 }
             }
-            fraction = func_00283CE0(i);
+            fraction = IntToFloat(i);
             i++;
-            fraction /= func_00283CE0(6);
+            fraction /= IntToFloat(6);
             size = initialSize + (D_L09_001B1194 - initialSize) * func_00283198(fraction * 3.1415927f);
             packets[0].uv[1][0] = packets[0].uv[0][0] = D_L09_001B37E0[slot];
             packets[0].uv[3][0] = packets[0].uv[2][0] = D_L09_001B37E0[slot] + 1;

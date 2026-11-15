@@ -87,7 +87,7 @@ block_10:
     func_001333D0((*(s32 *)((s8 *)(arg0) + (0))));
     (*(s16 *)((s8 *)(arg0) + (0xA))) = (s16) ((u16) (*(s16 *)((s8 *)(arg0) + (0xA))) | 0x8000);
 block_13:
-    if (func_00282978(arg0 + 0xE) != 2) {
+    if (FastDecTimer(arg0 + 0xE) != 2) {
         goto block_17;
     }
     (*(s16 *)((s8 *)(arg0) + (0xC))) = 4;

@@ -25,15 +25,15 @@ void func_L06_003E11A0(char *object, char *params) {
     char *candidate;
     if (*(int *)(params + 8) & 0x100)
         return;
-    func_002833F0(matrix, object + 0xF0);
+    euler_rotation_basis(matrix, object + 0xF0);
     radius = *(float *)params > *(float *)(params + 4) ? *(float *)params : *(float *)(params + 4);
     radius *= 0.5f;
     /* Center is initialized here before it escapes to the vector callees. */
     qzero_nc(center);
     center[2] = radius;
     position = object + 0x10;
-    func_00283098(center, center, matrix);
-    func_00282CC0(center, center, position);
+    matrix_mul_vec3(center, center, matrix);
+    FastVecAdd(center, center, position);
     count = func_00277F48(center, 0x10, object, 0, radius);
     if (!count)
         return;
@@ -45,9 +45,9 @@ void func_L06_003E11A0(char *object, char *params) {
             candidate = candidates[i];
             if (!candidate || (u8)candidate[0x20] == 0xFE || (u8)candidate[0x20] == 0xFD)
                 continue;
-            func_00282CF0(delta, candidate + 0x10, object + 0x10);
-            func_00283698(inverse, matrix);
-            func_002830C0(local, delta, inverse);
+            FastVecSub(delta, candidate + 0x10, object + 0x10);
+            matrix_from_basis_rows(inverse, matrix);
+            transform_vector(local, delta, inverse);
             qcopy(point, local);
             if (point[0] < -(*(float *)params * 0.5f + *(float *)(params + 0x48)))
                 point[0] = -*(float *)params * 0.5f;
@@ -58,8 +58,8 @@ void func_L06_003E11A0(char *object, char *params) {
             else if (point[2] > *(float *)(params + 4) * 0.5f + *(float *)(params + 0x4C))
                 point[2] = *(float *)(params + 4) * 0.5f;
             point[1] = 0;
-            func_00283098(point, point, matrix);
-            func_00282CC0(point, point, object + 0x10);
+            matrix_mul_vec3(point, point, matrix);
+            FastVecAdd(point, point, object + 0x10);
             n = func_00277F48(point, 0x10, object, 0, *(float *)(params + 0x48));
             {
                 int j;

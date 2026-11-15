@@ -79,7 +79,7 @@ void func_L11_004618C0(u8 *object) {
         func_L01_003128C0((char *)object);
         break;
     case 1:
-        if (func_002ACBC8((char *)D_00189E20.position, *(int *)(vars + 0x120)) && func_00288AA0(D_L11_001C0AC0, 0x6B)) {
+        if (IsPointInCuboid((char *)D_00189E20.position, *(int *)(vars + 0x120)) && func_00288AA0(D_L11_001C0AC0, 0x6B)) {
             func_L01_003246D0((int)object);
             func_00288BE8((BarlowUtilityQueueView *)D_L11_001C0AC0);
             func_002A7750(object, 2, -1);
@@ -147,15 +147,15 @@ void func_L11_004618C0(u8 *object) {
                 func_L00_002B9D60(record->position, record->rotation, 0, 1);
             }
             func_002B0A18(0x1230, -1);
-            func_0029B3E0(0, -1);
+            MemcardSave(0, -1);
             func_0029F338(object);
             return;
         }
         break;
     }
     if (object[0x20] != 0) {
-        if (object[0x43] == 0 && func_00282978(vars + 0x11E)) {
-            *(short *)(vars + 0x11E) = func_00283CF0(func_002A7878(1200.0f, 2400.0f));
+        if (object[0x43] == 0 && FastDecTimer(vars + 0x11E)) {
+            *(short *)(vars + 0x11E) = FloatToInt(func_002A7878(1200.0f, 2400.0f));
             if (object[0x43] != 1) func_002A7470(object, 1, 0, 10);
         } else if ((object[0x60] & 2) && object[0x43] != 0) {
             func_002A7470(object, 0, 0, 10);
@@ -165,21 +165,21 @@ void func_L11_004618C0(u8 *object) {
     rate = 0.02f;
     if (object[0x43] == 0) {
         tracking = 1;
-        distance = func_00282E80(object + 0x10, D_00189E20.position);
-        if (distance < 8.0f && func_00283C80(*(float *)(object + 0xF8), func_00283248(D_00189E20.aim[0] - *(float *)(object + 0x10), D_00189E20.aim[1] - *(float *)(object + 0x14))) < 1.5707965f) {
-            if (func_00282DF0(D_00189E20.velocity) > 0.01f) *(int *)(vars + 0x114) = 120;
+        distance = vec_distance_xy(object + 0x10, D_00189E20.position);
+        if (distance < 8.0f && FastDiffRots(*(float *)(object + 0xF8), func_00283248(D_00189E20.aim[0] - *(float *)(object + 0x10), D_00189E20.aim[1] - *(float *)(object + 0x14))) < 1.5707965f) {
+            if (FastVecLength(D_00189E20.velocity) > 0.01f) *(int *)(vars + 0x114) = 120;
             else func_00282948(vars + 0x114);
         } else if (*(int *)(vars + 0x114)) {
             *(int *)(vars + 0x114) = 0;
             qcopy(vars + 0x100, D_00189F00);
         }
         if (func_00282948(vars + 0x118)) {
-            *(int *)(vars + 0x118) = func_00283CF0(func_002A7878(180.0f, 300.0f));
+            *(int *)(vars + 0x118) = FloatToInt(func_002A7878(180.0f, 300.0f));
             a = func_002A7878(-90.0f, 90.0f);
-            heading = func_00283B98(*(float *)(object + 0xF8), a * 0.017453294f);
+            heading = FastAddRotations(*(float *)(object + 0xF8), a * 0.017453294f);
             b = func_002A7878(0, 30.0f);
             func_002AF000((float *)(vars + 0x100), 6.0f, heading, b * 0.017453294f);
-            func_00282CC0((float *)(vars + 0x100), (float *)(vars + 0x100), (float *)(object + 0x10));
+            FastVecAdd((float *)(vars + 0x100), (float *)(vars + 0x100), (float *)(object + 0x10));
         }
         if (*(int *)(vars + 0x114)) {
             qcopy(destination, D_00189F00);
@@ -189,9 +189,9 @@ void func_L11_004618C0(u8 *object) {
     if (tracking) {
         qcopy(origin, object + 0x10);
         origin[2] += 2.0f;
-        func_00282CF0(difference, destination, origin);
-        yaw = func_00283BE0(func_00283248(difference[0], difference[1]), *(float *)(object + 0xF8));
-        pitch = -func_00283248(func_00282E20(difference), difference[2]);
+        FastVecSub(difference, destination, origin);
+        yaw = fast_subtract_rotations(func_00283248(difference[0], difference[1]), *(float *)(object + 0xF8));
+        pitch = -func_00283248(vec_length_xy(difference), difference[2]);
         if (yaw > 1.5707965f) yaw = 1.5707965f;
         else if (yaw < -1.5707965f) yaw = -1.5707965f;
         if (pitch > 0.52359885f) pitch = 0.52359885f;

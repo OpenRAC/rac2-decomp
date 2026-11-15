@@ -31,7 +31,7 @@ void func_L08_003D2F50(char *o) {
     float target[4] __attribute__((aligned(16)));
     float velocity[4] __attribute__((aligned(16)));
     float position[4] __attribute__((aligned(16)));
-    if(F(o,u8,0x31) && func_00282E48(o+0x10,D_L08_001B9B00)<48.0f) {
+    if(F(o,u8,0x31) && fast_vec_dist(o+0x10,D_L08_001B9B00)<48.0f) {
         func_002A93B0(o); F(o,u8,0x6F)=45;
     }
     if(F(o,u8,0xB0)!=255) {
@@ -60,13 +60,13 @@ void func_L08_003D2F50(char *o) {
         F(effect,u8,7)=255;F(effect,u8,8)=255;F(effect,u8,9)=255;
         func_002AB800(o,effect);
         func_0029FCC0(o,0,at);
-        func_002A7398(o,3,func_00283CF0(func_00283CE0(F(p,s16,0x24))-F(health,float,0))<16 ? func_00283CF0(func_00283CE0(F(p,s16,0x24))-F(health,float,0)) : 15);
+        func_002A7398(o,3,FloatToInt(IntToFloat(F(p,s16,0x24))-F(health,float,0))<16 ? FloatToInt(IntToFloat(F(p,s16,0x24))-F(health,float,0)) : 15);
         F(o,int,0x48)=0;
         z=F(o,float,0x48);
-        func_002ABBB8(o,D_L08_001A8F20,at,z,z,4,2,5,2,1,9,1,-1,z,0,0,-1,0,0x810001);
+        SpawnExplosionEffects(o,D_L08_001A8F20,at,z,z,4,2,5,2,1,9,1,-1,z,0,0,-1,0,0x810001);
         func_L03_003268C0(o,-1,0,0x96D,1,3,0,D_L08_001A8F20);
         sound=func_002A7820(0,2);
-        if(F(health,float,0)>z)func_002E5CF8(sound,0,o);
+        if(F(health,float,0)>z)PlayMobySound(sound,0,o);
     }
     F(o,u8,0xA8)=255;
     func_002AB8C0(o,effect);
@@ -74,7 +74,7 @@ void func_L08_003D2F50(char *o) {
         qzero(at);at[2]=0.16666667f;
         if(hit)qcopy(target,hit);
         else {qcopy(target,o+0x10);target[2]+=2;}
-        spawn=func_0029EFD0(0x8C4);
+        spawn=CreateMoby(0x8C4);
         if(spawn) {
             F(spawn,u8,0x23)=80;F(spawn,u16,0x34)|=0x800;
             F(spawn,float,0x2C)=F(F(spawn,char *,0x24),float,0x24)*0.65f;
@@ -84,9 +84,9 @@ void func_L08_003D2F50(char *o) {
             qcopy(spawn+0x10,o+0x10);
             func_002A0F48(spawn);func_002AB650(spawn);
             F(F(spawn,char *,0x68),char *,4)=o;
-            func_002ABBB8(o,at,target,0,0,20,6,32,6,4,3,2,-1,20,1,3,-1,0,0x810001);
+            SpawnExplosionEffects(o,at,target,0,0,20,6,32,6,4,3,2,-1,20,1,3,-1,0,0x810001);
             func_L03_003268C0(o,0x96D,3,0,0,0,0,D_L08_001A8F20);
-            func_002E5CF8(3,0,o);
+            PlayMobySound(3,0,o);
             angle=func_002A7940();
             n=0;
             do {
@@ -95,7 +95,7 @@ void func_L08_003D2F50(char *o) {
                 --n;
                 func_002AF000(velocity,speed,angle,t*0.017453294f);
                 angle+=2.0943954f;
-                func_00282CC0(position,target,velocity);
+                FastVecAdd(position,target,velocity);
                 t=func_002A7878(1,10);
                 z=func_002A7878(8,12);
                 func_L08_0040F9D0(o,position,velocity,t,z);

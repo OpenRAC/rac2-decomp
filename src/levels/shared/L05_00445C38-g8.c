@@ -21,17 +21,17 @@ void func_L05_00445C38(unsigned char *object)
     float step[4], position[4], particle[4];
     float fraction, size, heading, inverse;
     int i;
-    func_00282D30(step, D_L05_001B98F0, -D_L05_001B1C38);
+    FastVecScale(step, D_L05_001B98F0, -D_L05_001B1C38);
     qcopy(position, state + 0x90);
-    inverse = 1.0f / func_00283CE0(D_L05_001B1C3C);
+    inverse = 1.0f / IntToFloat(D_L05_001B1C3C);
     for (i = 0; i < D_L05_001B1C3C; i++) {
-        fraction = func_00283CE0(i) * inverse;
+        fraction = IntToFloat(i) * inverse;
         size = D_L05_001B1C2C;
         size += (D_L05_001B1C30 - size) * fraction;
         heading = func_002A7940();
         qcopy(particle, position);
         func_002ACB48(particle, D_L05_001B1C34);
         func_00281EB8(particle, D_L05_001B1C24, D_L05_001B1C28, 1, size, 0.0f, heading);
-        func_00282CC0(position, position, step);
+        FastVecAdd(position, position, step);
     }
 }

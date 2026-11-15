@@ -78,7 +78,7 @@ void func_002E64A0(Object *object)
     unsigned char blocked;
 
     if (!D_00214920[0]) {
-        func_002E6178(object);
+        SpawnEquipmentPieces(object);
         if (!D_001A8BB0[0]) {
             float height = func_002A89A8(object->position, 0, 0.5f);
             if (height != 0.0f)
@@ -90,29 +90,29 @@ void func_002E64A0(Object *object)
     }
     target = 0;
     if (!D_001A8BB0[0]) {
-        func_00282D60(p, object, 0.0009765625f);
+        scale_vector(p, object, 0.0009765625f);
         p[3] += 1.0f;
         if (func_00283DB8(p, 50.0f) == -1)
             return;
         if (!D_001A8BB0_gp) {
             blocked = 0;
-            if (func_00282E80(object->position, HERO) < 6.0f) {
+            if (vec_distance_xy(object->position, HERO) < 6.0f) {
                 if (object->blocked) {
                     qcopy(p, HERO + 0x60);
                     p[2] += 2.0f;
-                    if (func_002761F8(HERO + 0x60, p, 0, D_00189E20.collision, 0))
+                    if (CollLine(HERO + 0x60, p, 0, D_00189E20.collision, 0))
                         blocked = 1;
                     else {
-                        func_00282CF0(old, object->position, HERO);
+                        FastVecSub(old, object->position, HERO);
                         old[2] = 0;
-                        func_00282F20(old, old, 0.4f);
-                        func_00282CC0(p, p, old);
-                        blocked = func_002761F8(HERO + 0x60, p, 0, D_00189E20.collision, 0) != 0;
+                        vec_scale_to_length(old, old, 0.4f);
+                        FastVecAdd(p, p, old);
+                        blocked = CollLine(HERO + 0x60, p, 0, D_00189E20.collision, 0) != 0;
                     }
                 } else {
                     qcopy(p, HERO + 0x60);
                     p[2] += 2.0f;
-                    blocked = func_002761F8(HERO + 0x60, p, 0, *(int *)(HERO + 0x2210), 0) != 0;
+                    blocked = CollLine(HERO + 0x60, p, 0, *(int *)(HERO + 0x2210), 0) != 0;
                 }
             }
             object->blocked = blocked;
@@ -148,15 +148,15 @@ void func_002E64A0(Object *object)
             offset[0] = -0.3372f;
             offset[1] = -0.5364f;
             offset[2] = -1.79489f;
-            func_00283098(offset, offset, D_00214920[i]->basis);
-            func_00282CC0(delta, p, offset);
+            matrix_mul_vec3(offset, offset, D_00214920[i]->basis);
+            FastVecAdd(delta, p, offset);
             qcopy(D_00214920[i]->position, delta);
         }
         func_002AB6D8(D_00214920[i]->basis, D_00214920[i]->previous);
         func_002A10E8(D_00214920[i]);
         {
             char *state = D_00214920[i]->state;
-            func_00282CF0(delta, D_00214920[i]->position, old);
+            FastVecSub(delta, D_00214920[i]->position, old);
             func_002AD6F0(state + 0x20, delta, previous, D_00214920[i]->previous);
         }
         if (D_00189E20.count >= 2 && D_00189E20.selected == D_00214920[i])

@@ -36,10 +36,10 @@ void func_L00_003A3B58(char *moby)
     int mode;
     if (H->h[4726] == 1) {
         func_0029FCC0(moby, 0, (char *)origin);
-        func_00282F20(velocity, moby + 0xD0, -speed);
+        vec_scale_to_length(velocity, moby + 0xD0, -speed);
     } else {
         func_0029FCC0(moby, 0, (char *)origin);
-        func_00282F20(velocity, (&H->f[472]), speed);
+        vec_scale_to_length(velocity, (&H->f[472]), speed);
     }
     *(int *)(state + 0x10) = func_00291308(origin, 15.0f, 0.0f, 0x7F608060);
     *(int *)(state + 0x14) = 30;
@@ -58,10 +58,10 @@ void func_L00_003A3B58(char *moby)
             else
                 /* lq ignores the low four address bits: this reads the quadword holding +0xBF8. */
                 qcopy(targetPosition, &H->ptr[766]);
-            func_00282CF0(delta, targetPosition, origin);
+            FastVecSub(delta, targetPosition, origin);
             mode = 2;
-            func_00282F20(unit, velocity, 1.0f);
-            func_00282D30(velocity, unit, func_00282DB0(unit, delta) + 3.0f);
+            vec_scale_to_length(unit, velocity, 1.0f);
+            FastVecScale(velocity, unit, FastVecDot(unit, delta) + 3.0f);
         }
     }
     beam = func_L00_003A7C30(origin, velocity, *(int *)(state + 0x18), mode);

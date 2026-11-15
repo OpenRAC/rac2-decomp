@@ -67,7 +67,7 @@ void func_L00_00419C98(char *object)
         for (;i<35;i++) { char *p=D_L00_001B144C+i*64; if (*(int *)(p+0x38)>=0) { func_002FEE50(*(int *)(p+0x38)); *(int *)(p+0x38)=-1; } }
     }
     if (!((unsigned char *)object)[0x20]) {
-        *(int *)(state+0x34)=func_L00_00329E90(object,0,&unused);
+        *(int *)(state+0x34)=AcquireEntitySlot(object,0,&unused);
         D_L00_001B1450=func_L00_0032A088(*(short *)(object+0xaa),*(int *)(state+0x34));
         D_L00_001B1448=(char *)func_L00_0041A490((int)D_L00_001B1450+0x33e0);
         D_L00_001B144C=(char *)func_L00_0041A490((int)D_L00_001B1448+0x1f40);
@@ -89,23 +89,23 @@ void func_L00_00419C98(char *object)
     enabled=1;
     if (D_00189E20.i[0x2294/4]==29) { if (!func_00282948(&D_00189E20.i[0x2534/4])) enabled=0; }
     else D_00189E20.i[0x2534/4]=40;
-    if ((D_00138180[0x1a0/4]&D_00189E20.i[0x1230/4]) && enabled && func_L00_002D4040(-1) && !D_00189E20.b[0x22bc]) {
+    if ((D_00138180[0x1a0/4]&D_00189E20.i[0x1230/4]) && enabled && get_ammo(-1) && !D_00189E20.b[0x22bc]) {
         func_002AA3A8((float *)(state+0x50),(float *)(state+0x54),10.0f,0.0075f,0.002f,10.0f);
         { int divisor=10; if (*(int *)(state+0x60)%divisor==0) func_L00_002D3F30(-1,1); }
         ++*(int *)(state+0x60);
-        if (!func_002E59B0(object,*(int *)(state+0x38))) *(int *)(state+0x38)=func_002E5CF8(0,4,object);
+        if (!func_002E59B0(object,*(int *)(state+0x38))) *(int *)(state+0x38)=PlayMobySound(0,4,object);
         if (((unsigned char *)object)[0x43]!=2) func_002A7470(object,2,0,0);
         count=func_00277F48(0.5f,state,16,object,0);
         if (count>0) { int remaining; target=D_L00_001C3280; remaining=count; do {
             if (*target!=D_00189E20.p[0x2290/4]) {
-            func_00282CF0(&direction,*target+0x10,object+0x10);
-            func_00282F20(&direction,&direction,1.0f);
-            func_00282F20(&packet,&packet,1.0f);
-            func_002A8C00(&packet,object,0x910000,&direction,((EffectClassEntry *)((unsigned int)D_L00_00262570+D_00139568[29]*0xe0))->value);
+            FastVecSub(&direction,*target+0x10,object+0x10);
+            vec_scale_to_length(&direction,&direction,1.0f);
+            vec_scale_to_length(&packet,&packet,1.0f);
+            make_hit_descriptor(&packet,object,0x910000,&direction,((EffectClassEntry *)((unsigned int)D_L00_00262570+D_00139568[29]*0xe0))->value);
             packet.u.word=direction.word; packet.u.position[3]=5627.925f;
             packet.flags=1; packet.a=9; packet.b=1; packet.id=*(short *)(*target+0xaa);
-            func_002A8E20(*target,&packet);
-            func_0032D758(*target,29,object); func_002E5CF8(1,0,object);
+            QueueMobyImpact(*target,&packet);
+            StartAttachedEffect(*target,29,object); PlayMobySound(1,0,object);
             }
             target++;
         } while (--remaining); }
@@ -113,25 +113,25 @@ void func_L00_00419C98(char *object)
         { int handle=*(int *)(state+0x38);
         if (handle!=-1 && ((EffectSoundSlot *)((char *)D_00188660+handle*0x70))->owner==object && ((EffectSoundSlot *)((char *)D_00188660+handle*0x70))->active) func_002E59F8(handle); }
         *(int *)(state+0x38)=-1;
-        if ((D_00138180[0x1a4/4]&D_00189E20.i[0x1230/4]) && !func_L00_002D4040(-1) && !D_00189E20.b[0x22bc]) func_002E5CF8(2,0,object);
+        if ((D_00138180[0x1a4/4]&D_00189E20.i[0x1230/4]) && !get_ammo(-1) && !D_00189E20.b[0x22bc]) PlayMobySound(2,0,object);
         func_002AA3A8((float *)(state+0x50),(float *)(state+0x54),0,0.06f,0.01f,0.125f);
         *(int *)(state+0x60)=0;
     }
     if (D_00189E20.i[0x2294/4]==1) func_L00_002C42E0(29,1);
     func_0029FCC0(object,0,state);
     func_00282C88(vector); vector[1]=-1;
-    func_00283098(vector,vector,object+0xc0);
+    matrix_mul_vec3(vector,vector,object+0xc0);
     vector[2]+=0.02f;
-    func_00282F20(vector,vector,*(float *)(state+0x50)*0.05f);
+    vec_scale_to_length(vector,vector,*(float *)(state+0x50)*0.05f);
     if (D_00189E20.p[0x1450/4]) {
         D_00189E20.p[0xbf8/4]=D_00189E20.p[0x1450/4];
         func_L00_0032A1A8(D_00189E20.p[0x1450/4],state,vector,*(float *)(state+0x50)*0.05f);
-        if (D_L00_001A8FF0) { func_00282D30(&direction,object+0xe0,0.02f); func_00282CC0(vector,vector,&direction); }
+        if (D_L00_001A8FF0) { FastVecScale(&direction,object+0xe0,0.02f); FastVecAdd(vector,vector,&direction); }
         else vector[2]+=0.02f;
     }
     qcopy(state+0x10,state);
     if (D_00189E20.i[0x2294/4]) func_002ACEC0(vector,vector,D_00189E20.p[0x2290/4]+0xd0,-0.09817477f);
-    if (*(float *)(state+0x50)!=0) func_L00_0041ABB8(object,state,vector,40);
+    if (*(float *)(state+0x50)!=0) AppendVectorRingEntry(object,state,vector,40);
     *(float *)(state+0x58)-=0.1f; if (*(float *)(state+0x58)<=-8) *(float *)(state+0x58)+=8;
     *(float *)(state+0x5c)-=0.025f; if (*(float *)(state+0x5c)<=-8) *(float *)(state+0x5c)+=8;
     if (*(float *)(state+0x50)!=0) { func_L00_0041A5C0(object); func_L00_0041A500(object); }

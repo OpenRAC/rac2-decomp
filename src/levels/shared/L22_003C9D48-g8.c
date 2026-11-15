@@ -48,14 +48,14 @@ void func_L22_003C9D48(u8 *a0) {
         *(TI128 *)w = 0;
         w[2] = *(f32 *)(p) * *(f32 *)(p - 0x10);
         *(TI128 *)v = *(TI128 *)w;
-        func_00283098(v, v, obj + 0xC0);
-        func_00282CC0(v, v, obj + 0x10);
+        matrix_mul_vec3(v, v, obj + 0xC0);
+        FastVecAdd(v, v, obj + 0x10);
         f = func_002AA140(D_L22_001AFF58, D_L22_001AFF5C, *(f32 *)(p));
         t = *(f32 *)(p);
         if (t < 0.1f)
-            n = func_00283CF0((f32)D_L22_001AFF60 * t * 10.0f);
+            n = FloatToInt((f32)D_L22_001AFF60 * t * 10.0f);
         else
-            n = func_00283CF0((f32)D_L22_001AFF60 * (1.0f - t));
+            n = FloatToInt((f32)D_L22_001AFF60 * (1.0f - t));
         func_002820D0(v, f, n, D_L22_001AFF64, 0.08f, 0);
         p += 4;
     }

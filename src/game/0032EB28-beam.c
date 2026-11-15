@@ -94,7 +94,7 @@ void func_00333AF8(Target *obj)
     }
     v->hit = 0;
     v->valid = 0;
-    func_002FDF40(dir, pos, 0, 0.00001f, distance, 0.25f, 0.0030555558f, 0);
+    CalculateAimedLaunchVelocity(dir, pos, 0, 0.00001f, distance, 0.25f, 0.0030555558f, 0);
     func_002FE5A0(pos, dir, v->endpoint, v->normal, obj, &v->hit, 0, 0.0030555558f);
     hit = v->hit;
     if (hit != 0) {
@@ -104,8 +104,8 @@ void func_00333AF8(Target *obj)
             if (v->hit->slot != 255) {
                 func_00334050(v->hit->slot, 25);
             }
-            ratio = func_00283CE0(v->hit->progress);
-            ratio /= func_00283CE0(target->maximum);
+            ratio = IntToFloat(v->hit->progress);
+            ratio /= IntToFloat(target->maximum);
             v->fraction = ratio;
             if (target->reverse) {
                 v->fraction = 1.0f - ratio;
@@ -151,11 +151,11 @@ void func_00333AF8(Target *obj)
             obj->state = 2;
         } else if (func_00282948(&v->countdown)) {
             qcopy(spread, dir);
-            length = func_00282DF0(spread);
+            length = FastVecLength(spread);
             spread[0] += func_002A7878(-0.005f, 0.005f);
             spread[1] += func_002A7878(-0.005f, 0.005f);
             spread[2] += func_002A7878(-0.005f, 0.005f);
-            func_00282F20(spread, spread, length);
+            vec_scale_to_length(spread, spread, length);
             if (!v->reverse) {
                 func_00329CB8((int)obj, v->position, spread);
             } else {

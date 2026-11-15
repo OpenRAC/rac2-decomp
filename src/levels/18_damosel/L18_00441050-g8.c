@@ -28,10 +28,10 @@ void func_L18_00441050(u8 *o) {
             spread[0]=3.0f;
             spread[1]=3.0f;
             *(float *)(hit+0x18)=1.0f;
-            func_00282D30(a,hit+0x10,func_002A7878(6.0f,8.0f));
+            FastVecScale(a,hit+0x10,func_002A7878(6.0f,8.0f));
             qcopy(b,a);
-            func_00282CF0(a,a,spread);
-            func_00282CC0(b,b,spread);
+            FastVecSub(a,a,spread);
+            FastVecAdd(b,b,spread);
             func_L00_0032A258(o,a,&D_L18_001B1D18,&D_L18_001B1D10,65535,-1,D_L18_001B1D20,9,1,255,0);
             func_002A7750(o,2,-1);
         }
@@ -42,7 +42,7 @@ void func_L18_00441050(u8 *o) {
             func_L00_0032A258(o,&D_L18_001B1CF0,&D_L18_001B1D18,&D_L18_001B1D10,65535,0,D_L18_001B1D20,16,254,255,0);
             if((unsigned)*(int *)(s+4)<8) D_001395B8.bits |= 1<<*(int *)(s+4);
         } else func_L00_0032A258(o,&D_L18_001B1CF0,&D_L18_001B1D18,&D_L18_001B1D10,65535,0,D_L18_001B1D20,0,254,255,0);
-        func_0032C700(o+0x10,0,5,5,5,5,5,0,*(float *)(o+0x2C)*10.0f,20.0f,1,0,1,0);
+        SpawnExplosion(o+0x10,0,5,5,5,5,5,0,*(float *)(o+0x2C)*10.0f,20.0f,1,0,1,0);
         func_0029F338(o);
         break;
     }

@@ -97,7 +97,7 @@ extern void func_00115484(void *, int, int);
 
 int func_0011EAC8(void) {
     D_00134748 = -1;
-    func_00115484(D_00140528, 0, 4);
+    memset(D_00140528, 0, 4);
     return 0;
 }
 

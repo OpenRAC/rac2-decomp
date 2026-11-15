@@ -57,21 +57,21 @@ void func_L01_003973A0(unsigned char *m)
             float step = D_L01_001AF51C*0.0002908882452175021f;
             float angle;
             *(float *)(m+0x18)=height;
-            angle=func_00283B98(*(float *)(m+0xF0),step);
+            angle=FastAddRotations(*(float *)(m+0xF0),step);
             step=D_L01_001AF520*0.0002908882452175021f;
             *(float *)(m+0xF0)=angle;
-            angle=func_00283B98(*(float *)(m+0xF4),step);
+            angle=FastAddRotations(*(float *)(m+0xF4),step);
             step=D_L01_001AF524*0.0002908882452175021f;
             *(float *)(m+0xF4)=angle;
-            angle=func_00283B98(*(float *)(m+0xF8),step);
+            angle=FastAddRotations(*(float *)(m+0xF8),step);
             step=D_L01_001AF528*0.0002908882452175021f;
             *(float *)(m+0xF8)=angle;
-            *(float *)(m+0xFC)=func_00283B98(*(float *)(m+0xFC),step);
+            *(float *)(m+0xFC)=FastAddRotations(*(float *)(m+0xFC),step);
         }
         func_L01_00397A28(m);
         if (!func_002A77E0(D_L01_001AF54C)) func_L01_00397EB0(m);
         player=D_00189E20+0x80;
-        if (!(func_00282E80(m+0x10,player)<3.0f)) break;
+        if (!(vec_distance_xy(m+0x10,player)<3.0f)) break;
         player -= 0x80;
         if (func_00282C48(*(float *)(m+0x18)-*(float *)(player+0x88))<2.0f &&
             *(int *)(player+0x24CC) &&
@@ -81,8 +81,8 @@ void func_L01_003973A0(unsigned char *m)
             func_002B0A18(0x124B,-1);
             D_0019B278[*(int *)p+(D_001A79F0<<2)]=1;
             D_L01_001AF550++;
-            func_0029B3E0(0,-1);
-            func_002E5CF8(1,0,m);
+            MemcardSave(0,-1);
+            PlayMobySound(1,0,m);
         remove:
             func_0029F338(m);
         }
@@ -122,7 +122,7 @@ void func_L01_003973A0(unsigned char *m)
         }
         {
         char *player = D_00189E20;
-        if (*(int *)(player+0xC28)&2) func_L00_002D2168(0,0,30.0f);
+        if (*(int *)(player+0xC28)&2) set_hero_animation(0,0,30.0f);
         if (!m[0x42] && func_00282948(p+0x6C)) {
             D_L01_001B21B0=180;
             func_002B0A18(0x124B,-1);
@@ -131,7 +131,7 @@ void func_L01_003973A0(unsigned char *m)
             D_L01_001B1FA8=0;
             func_L00_002B9D60(player+0x80,player+0x90,0,0);
             func_003355A8(0);
-            func_0029B3E0(0,-1);
+            MemcardSave(0,-1);
             func_0029F338(m);
         }
         }

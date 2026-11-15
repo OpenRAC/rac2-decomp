@@ -51,29 +51,29 @@ void func_002C5120(char *p)
         {
             int c2 = (unsigned char)q[11] >> 1;
             int c = (unsigned char)q[11];
-            alpha = func_00283CF0((float)c + (float)(c2 - c) * t);
+            alpha = FloatToInt((float)c + (float)(c2 - c) * t);
         }
     } else {
-        t = func_00283CE0(*(short *)(q + 8) - 6);
+        t = IntToFloat(*(short *)(q + 8) - 6);
         t = (float)*(short *)(p + 10) / t;
         *(float *)(p + 12) = *(float *)q +
             ((*(float *)q + *(float *)(q + 4)) * 0.5f - *(float *)q) * t;
-        alpha = func_00283CF0((float)((unsigned char)q[11] >> 1) * t);
+        alpha = FloatToInt((float)((unsigned char)q[11] >> 1) * t);
     }
     *(int *)(p + 4) = (alpha << 24) | (*(int *)(p + 4) & 0xffffff);
     particle_copy_xyz(v.f, (float *)(q + 12));
-    func_00282CC0(p + 16, p + 16, (char *)&v);
+    FastVecAdd(p + 16, p + 16, (char *)&v);
     func_00300190(p + 16, p + 16);
     if (*(char **)(q + 24) != 0) {
-        func_00282CF0(delta, *(char **)(q + 24) + 16, p + 16);
+        FastVecSub(delta, *(char **)(q + 24) + 16, p + 16);
         if (delta[0] <= 2.0f && delta[1] <= 2.0f) {
-            func_00282DD8(side, delta, D_0018A0E0);
-            func_00282F20(side, side, D_001AA3C0);
-            func_00282CC0(p + 16, p + 16, side);
+            FastVecCross(side, delta, D_0018A0E0);
+            vec_scale_to_length(side, side, D_001AA3C0);
+            FastVecAdd(p + 16, p + 16, side);
             if (delta[0] <= 0.5f && delta[1] <= 0.5f)
-                func_00282F20(v.f, delta, 0.03f);
+                vec_scale_to_length(v.f, delta, 0.03f);
             else
-                func_00282F20(v.f, delta, func_00282DF0(v.f));
+                vec_scale_to_length(v.f, delta, FastVecLength(v.f));
             v.f[2] += 0.02f;
             vel = (float *)(q + 12);
             vel[0] = v.f[0];
@@ -81,6 +81,6 @@ void func_002C5120(char *p)
             vel[2] = v.f[2];
         }
     }
-    if (func_00282978((short *)(p + 10)))
+    if (FastDecTimer((short *)(p + 10)))
         func_002B9180(p);
 }

@@ -35,7 +35,7 @@ Particle_002C36D0 *func_002C36D0(TI128 *position, int life, int kind, int arg3)
 
         p->position = *position;
         p->colour = 0x7F7F4040;
-        p->unk09 = func_00283CF0(4.0f) + 0x40;
+        p->unk09 = FloatToInt(4.0f) + 0x40;
         p->unk01 = 0;
         p->unk03 = 0x48;
         p->unk0C = 30000.0f;
@@ -46,7 +46,7 @@ Particle_002C36D0 *func_002C36D0(TI128 *position, int life, int kind, int arg3)
             kind = 0;
         }
         p->unk02 = D_001F2638[kind];
-        m->fade = func_00283CF0(127.0f / func_00283CE0(life));
+        m->fade = FloatToInt(127.0f / IntToFloat(life));
         p->life = life;
     }
     return p;

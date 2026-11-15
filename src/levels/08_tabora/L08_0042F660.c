@@ -57,14 +57,14 @@ void func_L08_0042F660(char *a0) {
         func_L00_00324F18(a0,v,0.0f,0.0f,3.0f);
         if (*(u8 *)(a0 + 0x31) != 0 && D_L08_001B250C < 0.9f &&
             D_L08_001B3AA0 < 10) {
-            func_002ABBB8(a0,0.0f,0.0f,1.0f,0.5f,9.0f,*(float *)(a0+0x2C)*1.3f,15.0f,
+            SpawnExplosionEffects(a0,0.0f,0.0f,1.0f,0.5f,9.0f,*(float *)(a0+0x2C)*1.3f,15.0f,
                          D_L08_001A8F20,v,10,3,16,-1,0,1,-1,0,0);
             func_002B0A68(a0, 3.0f, 6.0f, 15, D_L08_001A8F20, 3.0f, 6.0f, 0xFF);
         } else {
             func_002B0A68(a0, 3.0f, 6.0f, 1, D_L08_001A8F20, 3.0f, 6.0f, 0xFF);
         }
         func_L00_00326110(a0, 1, 0.0f);
-        func_002E5CF8(0, 0, a0);
+        PlayMobySound(0, 0, a0);
         func_002A7750(a0, 3, -1);
         return; }
     case 3:

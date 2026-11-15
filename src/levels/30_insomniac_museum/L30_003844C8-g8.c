@@ -15,9 +15,9 @@ void func_L30_003844C8(unsigned char *obj) {
         func_002A7750(obj,1,-1); break;
     case 1: if(func_L30_00384768(obj)!=-1) func_002A7750(obj,2,-1); break;
     case 2:
-        if(!func_002ACBC8(D_00189EA0,*(int *)(st+0x140))) func_002A7750(obj,1,-1);
+        if(!IsPointInCuboid(D_00189EA0,*(int *)(st+0x140))) func_002A7750(obj,1,-1);
         else if(D_00138324&0x10) func_002A7750(obj,3,-1);
-        else func_002B0CE0(12,0x2801,1);
+        else ForceClaimNotice(12,0x2801,1);
         break;
     case 3: if(func_L30_003848B8(obj)) func_002A7750(obj,4,-1);
         func_L08_002F2D10(func_L30_003847F8,obj); break;
@@ -35,7 +35,7 @@ void func_L30_003844C8(unsigned char *obj) {
         func_L08_002F2D10(func_L30_003847F8,obj); break;
     }
     if(obj[0x20]>=3) {
-        func_002B0CE0(1,0,1);
+        ForceClaimNotice(1,0,1);
         if((D_00138324&0x10) && (D_001A63A8.busy!=0 || D_001A63A8.pending!=-1)) {
             if((unsigned)(D_001A63A8.mode-6)>=2) D_001A63A8.mode=5;
             func_002A7750(obj,2,-1);

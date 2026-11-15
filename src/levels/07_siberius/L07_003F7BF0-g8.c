@@ -37,17 +37,17 @@ void func_L07_003F7BF0(u8 *object)
             func_0029F338(object);
             return;
         }
-        state[0x48] = func_00283CF0(30.0f);
-        state[0x4A] = func_00283CF0(11.2f);
+        state[0x48] = FloatToInt(30.0f);
+        state[0x4A] = FloatToInt(11.2f);
         state[0x2E] = 1;
         object[0x30] = 255;
-        child = func_0029EFD0(0xD41);
+        child = CreateMoby(0xD41);
         if (child) {
             func_002B37E8(child, object);
             U(child, 0x34) |= 0x400;
             *(u8 **)(state + 0x410) = child;
         }
-        child = func_0029EFD0(0xD45);
+        child = CreateMoby(0xD45);
         if (child) {
             func_002B37E8(child, object);
             *(u8 **)(state + 0x414) = child;
@@ -58,7 +58,7 @@ void func_L07_003F7BF0(u8 *object)
             F(state, 0x20) = 100.0f;
         } else {
             scale = 1.0f - func_L07_003F90E8(5, 20, 0.0f, 0.5f);
-            H(state, 0x24) = func_00283CF0(scale * (f32)H(state, 0x24));
+            H(state, 0x24) = FloatToInt(scale * (f32)H(state, 0x24));
             F(state, 0x20) *= scale;
         }
         {
@@ -83,9 +83,9 @@ void func_L07_003F7BF0(u8 *object)
         state[0x167] = 150;
         func_002AB800(object, state + 0x160, amount);
         if (I(state, 0x420) < 2)
-            func_002AA2E8((f32 *)(state + 0x20), F(state, 0x430), damage);
+            ApproachValue((f32 *)(state + 0x20), F(state, 0x430), damage);
         else
-            func_002AA2E8((f32 *)(state + 0x20), 0.0f, damage);
+            ApproachValue((f32 *)(state + 0x20), 0.0f, damage);
         if (state[0x2E] == 2) {
             if ((f32)I(state, 0x420) <= 1.0f)
                 F(state, 0x20) = F(state, 0x430);
@@ -96,7 +96,7 @@ void func_L07_003F7BF0(u8 *object)
             F(state, 0x430) = (f32)H(state, 0x24) - (f32)H(state, 0x24) *
                 ((f32)(I(state, 0x420) + 2) * 0.16694492f);
             I(state, 0x420)++;
-            I(state, 0x458) = func_00283CF0(func_L07_003F90E8(3, 7, 1.0f, 4.0f));
+            I(state, 0x458) = FloatToInt(func_L07_003F90E8(3, 7, 1.0f, 4.0f));
             if (F(state, 0x20) - 1.0f < F(state, 0x430))
                 F(state, 0x430) = F(state, 0x20) - 1.0f;
             if (F(state, 0x430) < 0.0f)

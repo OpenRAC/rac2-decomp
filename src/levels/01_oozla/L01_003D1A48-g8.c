@@ -1,7 +1,7 @@
 /* func_L01_003D1A48: builds GS packet words for a quad strip, then for five
  * passes (a switch over i, which owns the unit's five-entry jump table) sets a
  * base point, colour and v offset, and walks t from step to 1 emitting quads
- * through func_00280B90; each colour's top byte comes from func_00283CF0 of
+ * through draw_world_quad; each colour's top byte comes from FloatToInt of
  * func_002A7798(func_00283198(t*pi)). Profile -O2 -G8 -ffunction-sections -g;
  * the copies use qcopy.
  * The RGB mask is a local constant declared inside the inner loop: its set is
@@ -63,7 +63,7 @@ void func_L01_003D1A48(u8 *m)
     long blend;
     int color;
     int i;
-    q.gs[1] = func_0027C878(*(int *)(s+0xB4)+0x3F);
+    q.gs[1] = GetEffectTextureDescriptor(*(int *)(s+0xB4)+0x3F);
     width = D_L01_001B04D4 / D_L01_001B04D8;
     scroll = (D_L01_001B053C * (1.0f/60.0f)) / width;
     halfWidth = -(D_L01_001B04D4*0.5f);
@@ -75,11 +75,11 @@ void func_L01_003D1A48(u8 *m)
     q.gs[3] = blend;
     q.gs[0] = 0;
     *(float *)(s+0xB8) -= scroll;
-    func_00282F20(a,m+0xC0,halfWidth);
-    func_00282CC0(a,a,s+0x60);
-    func_00282F20(b,m+0xC0,width);
-    func_00282F20(d,m+0xD0,-(D_L01_001B04DC*0.5f));
-    func_00282F20(e,m+0xD0,D_L01_001B04DC*((1.0f-D_L01_001B0530)*0.5f));
+    vec_scale_to_length(a,m+0xC0,halfWidth);
+    FastVecAdd(a,a,s+0x60);
+    vec_scale_to_length(b,m+0xC0,width);
+    vec_scale_to_length(d,m+0xD0,-(D_L01_001B04DC*0.5f));
+    vec_scale_to_length(e,m+0xD0,D_L01_001B04DC*((1.0f-D_L01_001B0530)*0.5f));
     step = 1.0f / D_L01_001B04D8;
     for(i=0;i<5;i++) {
         v=0.0f;
@@ -89,39 +89,39 @@ void func_L01_003D1A48(u8 *m)
             qcopy(c,a);
             color=func_002AAE98(D_L01_001B04F8,D_L01_001B04FC,D_L01_001B0500,0.0f);
             q.color[2]=q.color[3]=color;
-            v=func_00283CC8(&phase,*(float *)(s+0xB8));
+            v=SplitFloatFraction(&phase,*(float *)(s+0xB8));
             break;
         case 1:
             qcopy(c,a);
             color=func_002AAE98(D_L01_001B0504,D_L01_001B0508,D_L01_001B050C,0.0f);
             q.color[2]=q.color[3]=color;
-            v=func_00283CC8(&phase,*(float *)(s+0xB8)+0.5f);
+            v=SplitFloatFraction(&phase,*(float *)(s+0xB8)+0.5f);
             break;
         case 2:
             a[2]+=D_L01_001B0528;
             qcopy(c,a);
             color=func_002AAE98(D_L01_001B0510,D_L01_001B0514,D_L01_001B0518,0.0f);
             q.color[2]=q.color[3]=color;
-            func_00282F20(d,d,D_L01_001B04DC*(D_L01_001B052C*0.5f));
+            vec_scale_to_length(d,d,D_L01_001B04DC*(D_L01_001B052C*0.5f));
             width*=D_L01_001B0530;
             step*=D_L01_001B0530;
-            func_00282F20(b,m+0xC0,width);
-            v=func_00283CC8(&phase,(D_L01_001B0534 * *(float *)(s+0xB8))/D_L01_001B0530);
+            vec_scale_to_length(b,m+0xC0,width);
+            v=SplitFloatFraction(&phase,(D_L01_001B0534 * *(float *)(s+0xB8))/D_L01_001B0530);
             break;
         case 3:
-            v=func_00283CC8(&phase,(D_L01_001B0538 * *(float *)(s+0xB8))/D_L01_001B0530);
+            v=SplitFloatFraction(&phase,(D_L01_001B0538 * *(float *)(s+0xB8))/D_L01_001B0530);
             color=func_002AAE98(D_L01_001B051C,D_L01_001B0520,D_L01_001B0524,0.0f);
             q.color[2]=q.color[3]=color;
-            func_00282CC0(c,a,e);
+            FastVecAdd(c,a,e);
             break;
         case 4:
-            func_00282CF0(c,a,e);
+            FastVecSub(c,a,e);
             break;
         }
-        func_00282CF0(q.p[2],c,d);
+        FastVecSub(q.p[2],c,d);
         t=step;
-        func_00282CC0(q.p[3],c,d);
-        func_00282CC0(c,c,b);
+        FastVecAdd(q.p[3],c,d);
+        FastVecAdd(c,c,b);
         q.uv[2][0]=q.uv[0][0]=0.0f;
         q.uv[3][0]=q.uv[1][0]=1.0f;
         q.uv[1][1]=q.uv[0][1]=v;
@@ -130,15 +130,15 @@ void func_L01_003D1A48(u8 *m)
             int rgb = 0xFFFFFF;
             angle=func_002A7798(func_00283198(t*3.14159274f))*128.0f;
             q.color[0]=q.color[1]=q.color[2];
-            color=func_00283CF0((D_L01_001B04F4*angle)* *(float *)(s+0xAC));
+            color=FloatToInt((D_L01_001B04F4*angle)* *(float *)(s+0xAC));
             q.color[2]=q.color[3]=(q.color[0]&rgb)|(color<<24);
             qcopy(q.p[0],q.p[2]);
             qcopy(q.p[1],q.p[3]);
-            func_00282CF0(q.p[2],c,d);
+            FastVecSub(q.p[2],c,d);
             t+=step;
-            func_00282CC0(q.p[3],c,d);
-            func_00282CC0(c,c,b);
-            func_00280B90(&q,0,1);
+            FastVecAdd(q.p[3],c,d);
+            FastVecAdd(c,c,b);
+            draw_world_quad(&q,0,1);
         }
     }
 }

@@ -35,7 +35,7 @@ typedef struct {
     u16 oclass;           /* 0x1A */
     float damage;         /* 0x1C */
     int count;            /* 0x20 */
-    float extra;          /* 0x24: consumed by func_002A8E20 */
+    float extra;          /* 0x24: consumed by QueueMobyImpact */
 } Hit;
 
 typedef struct { u8 pad0[0x28]; int id; u8 pad2C[0x28]; float rate; u8 pad58[0x18]; float damage; u8 pad74[0x6C]; } WeaponEntry;
@@ -126,7 +126,7 @@ void func_L00_003D1D28(u8 *self)
         st->t4C = 0;
     }
     if (self[0x20] == 6) {
-        if (func_00282978(&st->t4))
+        if (FastDecTimer(&st->t4))
             self[0x20] = 1;
     }
     if (((Hero *)D_00189E20)->i[0x2294 / 4] == 1)
@@ -134,14 +134,14 @@ void func_L00_003D1D28(u8 *self)
     func_002829D8(st);
     if (((Hero *)D_00189E20)->i[0x2294 / 4] == 0x1D) {
         u32 color;
-        if (st->timer > 0.0f && func_L00_002D4040(-1))
+        if (st->timer > 0.0f && get_ammo(-1))
             color = 0x600000FF;
         else
             color = 0x600FFF0F;
         func_00273318(self, 1.3f, color, 0, 0x21, 0.0f, -1, 90.0f, 4);
     }
     if (st->t4C != 0 && func_00282948(&st->t4C))
-        func_L00_002AF7D0();
+        cancel_hero_item_animation();
     if (self[0x42] == self[0x43] && (self[0x60] & 2))
         func_002A75E0(self, 1, 0, 2, 0);
     /* moby/state and turret/shot are copies, and large..none are named constants, that gcse's cprop folds back:
@@ -170,26 +170,26 @@ void func_L00_003D1D28(u8 *self)
                     st->t40 = 0;
                     st->t6 = 2;
                 }
-                func_L00_002AF568();
+                start_equipped_item_animation();
                 st->handle = func_L00_002D6998(D_L00_00296120);
                 func_002A75E0(self, 2, 0, 2, 0);
                 st->t4C = D_L00_001B0238;
                 self[0x20] = 2;
                 st->fC = func_002A7940();
                 st->t8 = D_L00_001B01EC;
-                st->f20 = 1.0f / func_00283CE0(st->t8);
+                st->f20 = 1.0f / IntToFloat(st->t8);
                 st->tA = D_L00_001B0214;
                 st->t8 += 2;
-                st->f24 = 1.0f / func_00283CE0(st->tA);
+                st->f24 = 1.0f / IntToFloat(st->tA);
                 st->t28 = D_L00_001B020C;
-                st->f2C = 1.0f / func_00283CE0(st->t28);
+                st->f2C = 1.0f / IntToFloat(st->t28);
                 st->t44 = D_L00_001B021C;
-                st->f48 = 1.0f / func_00283CE0(st->t44);
+                st->f48 = 1.0f / IntToFloat(st->t44);
                 st->t44 += 2;
             } else if (((Hero *)D_00138180)->i[0x1A4 / 4] & ((Hero *)D_00189E20)->i[0x1230 / 4]) {
-                func_002E5CF8(5, 0, self);
+                PlayMobySound(5, 0, self);
             }
-            if (!(((Hero *)D_00138180)->i[0x1A0 / 4] & ((Hero *)D_00189E20)->i[0x1230 / 4]) || !func_L00_002D4040(-1) || ((Hero *)D_00189E20)->b[0x22B8] == 0) {
+            if (!(((Hero *)D_00138180)->i[0x1A0 / 4] & ((Hero *)D_00189E20)->i[0x1230 / 4]) || !get_ammo(-1) || ((Hero *)D_00189E20)->b[0x22B8] == 0) {
                 if (st->handle >= 0) {
                     func_L00_002D6B70(st->handle);
                     st->handle = -1;
@@ -197,18 +197,18 @@ void func_L00_003D1D28(u8 *self)
             }
         }
         if (st->t6 == 0) {
-            func_00282978(&st->tA);
-            func_00282978(&st->t8);
+            FastDecTimer(&st->tA);
+            FastDecTimer(&st->t8);
             func_00282948(&st->t28);
             func_00282948(&st->t44);
             if (st->t8 != 0 || st->tA != 0 || st->t28 != 0 || st->t44 != 0)
-                ref_L00_003D1D28_01(func_L00_003D2ED0, self);
+                ref_L00_003D1D28_01(RenderRadialRingAndQuad, self);
             func_L00_003D3388(self);
         }
         if (self[0x20] == 2 || self[0x20] == 3) {
             u8 *turret = moby;
             TurretState *shot = state;
-            if (func_00282978(&shot->t6)) {
+            if (FastDecTimer(&shot->t6)) {
                 if (turret[0x20] == 2) {
                     turret[0x20] = 3;
                     qcopy(shot->q30, D_0018A580);
@@ -216,8 +216,8 @@ void func_L00_003D1D28(u8 *self)
                     a[1] = D_L00_001B0224 - 0.25f;
                     a[2] = D_L00_001B0228;
                     a[3] = 1.0f;
-                    func_00283098(b, a, turret + 0xC0);
-                    func_00282CC0(b, b, turret + 0x10);
+                    matrix_mul_vec3(b, a, turret + 0xC0);
+                    FastVecAdd(b, b, turret + 0x10);
                     {
                         u8 *q = func_L00_0033EC48(b, large, 0.4f, 8.0f, 0x80FFFFFF, mode, none, D_L00_001A8F20, 0, 0, 6, 0);
                         if (q)
@@ -234,8 +234,8 @@ void func_L00_003D1D28(u8 *self)
                             *(TI128 *)(q + 0x10) = *(TI128 *)(b);
                     }
                     a[2] = -a[2];
-                    func_00283098(b, a, turret + 0xC0);
-                    func_00282CC0(b, b, turret + 0x10);
+                    matrix_mul_vec3(b, a, turret + 0xC0);
+                    FastVecAdd(b, b, turret + 0x10);
                     {
                         u8 *q = func_L00_0033EC48(b, large, 0.4f, 8.0f, 0x80FFFFFF, mode, none, D_L00_001A8F20, 0, 0, 6, 0);
                         if (q)
@@ -253,11 +253,11 @@ void func_L00_003D1D28(u8 *self)
                     }
                     a[2] = 0.0f;
                     a[1] = D_L00_001B0224;
-                    func_00283098(b, a, turret + 0xC0);
-                    func_00282CC0(shot->v10, b, turret + 0x10);
-                    func_L00_003D2C00(turret, shot->v10, 0);
-                    ref_L00_003D1D28_01(func_L00_003D2ED0, turret);
-                    func_002E5CF8(0, 0, turret);
+                    matrix_mul_vec3(b, a, turret + 0xC0);
+                    FastVecAdd(shot->v10, b, turret + 0x10);
+                    InitEffectStrips(turret, shot->v10, 0);
+                    ref_L00_003D1D28_01(RenderRadialRingAndQuad, turret);
+                    PlayMobySound(0, 0, turret);
                     if (shot->t40)
                         SetShake(0.12f);
                     else
@@ -290,32 +290,32 @@ void func_L00_003D1D28(u8 *self)
                     hit.oclass = *(u16 *)(turret + 0xAA);
                     hit.damage = ((WeaponEntry *)((u8 *)D_L00_00262570 + D_00139568[0x1A] * 0xE0))->damage;
                     hit.source = turret;
-                    func_00282D30(a, turret + 0xD0, -1.35f);
-                    func_00282CC0(a, a, turret + 0x10);
-                    func_00282D30(b, turret + 0xC0, 0.275f);
-                    func_00282CC0(a, a, b);
+                    FastVecScale(a, turret + 0xD0, -1.35f);
+                    FastVecAdd(a, a, turret + 0x10);
+                    FastVecScale(b, turret + 0xC0, 0.275f);
+                    FastVecAdd(a, a, b);
                     n = func_00277F48(1.5f, a, 1, ((Hero *)D_00189E20)->ptr[0x2290 / 4], 0);
                     for (h = 0; h < n; h++) {
                         if (D_L00_001C3280[h] != ((Hero *)D_00189E20)->ptr[0x2290 / 4]) {
-                            func_00282D30(hit.pos, turret + 0xD0, -1.5f);
+                            FastVecScale(hit.pos, turret + 0xD0, -1.5f);
                             hit.pos[3] = 5627.925f;
-                            func_002A8E20(D_L00_001C3280[h], &hit);
-                            func_0032D758(D_L00_001C3280[h], 0x44, turret);
+                            QueueMobyImpact(D_L00_001C3280[h], &hit);
+                            StartAttachedEffect(D_L00_001C3280[h], 0x44, turret);
                         }
                     }
-                    func_00283410(mtx, D_L00_001B0190);
-                    func_00283678(inv, mtx);
+                    euler_to_matrix(mtx, D_L00_001B0190);
+                    copy_matrix3x4(inv, mtx);
                     func_0029FCC0(turret, 0, origin);
                     if (((Hero *)D_00189E20)->h[0x24EC / 2] == 1) {
-                        func_00282D30(up, turret + 0xD0, -1.0f);
-                        func_00282D30(side, turret + 0xC0, -1.0f);
-                        func_00282D30(fwd, turret + 0xE0, 0.1f);
-                        func_00283738(basis, turret + 0xC0, inv);
+                        FastVecScale(up, turret + 0xD0, -1.0f);
+                        FastVecScale(side, turret + 0xC0, -1.0f);
+                        FastVecScale(fwd, turret + 0xE0, 0.1f);
+                        multiply_matrix3x3(basis, turret + 0xC0, inv);
                     } else {
                         qcopy(up, ((Hero *)D_00189E20)->b + 0x730);
                         qcopy(side, ((Hero *)D_00189E20)->b + 0x740);
-                        func_00282D30(fwd, ((Hero *)D_00189E20)->b + 0x750, -0.1f);
-                        func_00283738(basis, ((Hero *)D_00189E20)->b + 0x730, inv);
+                        FastVecScale(fwd, ((Hero *)D_00189E20)->b + 0x750, -0.1f);
+                        multiply_matrix3x3(basis, ((Hero *)D_00189E20)->b + 0x730, inv);
                     }
                     qcopy(shot->q30, up);
                     spread = 1.0471977f;
@@ -329,13 +329,13 @@ void func_L00_003D1D28(u8 *self)
                         func_002AB668(rot, side, func_002A7878(0.01f, 0.52359885f));
                         func_002ACDE8(dir, up, rot);
                         func_002ACDE8(offs, fwd, rot);
-                        angle = func_00283B98(func_002A7878(spread * 0.5f, spread * 1.5f), angle);
+                        angle = FastAddRotations(func_002A7878(spread * 0.5f, spread * 1.5f), angle);
                         func_002AB668(rot, up, angle);
                         func_002ACDE8(dir, dir, rot);
                         func_002ACDE8(offs, offs, rot);
-                        func_00282D30(dir, dir, 38.0f);
-                        func_00282CC0(from, origin, offs);
-                        func_00282CC0(to, from, dir);
+                        FastVecScale(dir, dir, 38.0f);
+                        FastVecAdd(from, origin, offs);
+                        FastVecAdd(to, from, dir);
                         p = ((u8 *)func_L00_003D2A00(turret, from, to, &hit));
                         if (p) {
                             saved[count] = *(int *)(p + 0x98);

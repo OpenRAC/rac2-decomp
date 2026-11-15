@@ -79,7 +79,7 @@ int func_L04_002DB970(int reason)
     }
 
     grounded = 0;
-    if (func_00282DB0(D_00189E20.axis20, D_00189E20.axis2C0) > -0.92f)
+    if (FastVecDot(D_00189E20.axis20, D_00189E20.axis2C0) > -0.92f)
         grounded = 1;
 
     if (D_00189E20.control_mode != 0x11) {
@@ -97,7 +97,7 @@ int func_L04_002DB970(int reason)
             move[2] = D_00189E20.f254;
         }
     }
-    func_00282CC0(D_00189E20.position, D_00189E20.position, move);
+    FastVecAdd(D_00189E20.position, D_00189E20.position, move);
 
     for (n = 0; n < 8; n++) {
         if (D_00189E20.control_mode == 0x11) {
@@ -134,9 +134,9 @@ int func_L04_002DB970(int reason)
         }
     }
 
-    func_00282CF0(D_00189E20.position, D_00189E20.position, move);
-    func_00282CF0(delta, D_00189E20.position, old);
-    if (func_00282DF0(delta) > D_00189E20.radius * 1.5f) {
+    FastVecSub(D_00189E20.position, D_00189E20.position, move);
+    FastVecSub(delta, D_00189E20.position, old);
+    if (FastVecLength(delta) > D_00189E20.radius * 1.5f) {
         if (reason == 15) {
             if (delta[0] > 512.0f)
                 delta[0] = 512.0f;
@@ -150,8 +150,8 @@ int func_L04_002DB970(int reason)
                 delta[2] = 512.0f;
             else if (delta[2] < -512.0f)
                 delta[2] = -512.0f;
-            func_00282F20(delta, delta, D_00189E20.radius);
-            func_00282CC0(D_00189E20.position, old, delta);
+            vec_scale_to_length(delta, delta, D_00189E20.radius);
+            FastVecAdd(D_00189E20.position, old, delta);
         }
         return -1;
     }

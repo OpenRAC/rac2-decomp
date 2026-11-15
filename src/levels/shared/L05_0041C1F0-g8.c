@@ -26,7 +26,7 @@ void func_L05_0041C1F0(char *object)
     float scale;
 
     if (D_L05_001B1300 != 0) {
-        scale = func_00282E48((void *)(D_L05_001B1300 + 0x10), object + 0x10);
+        scale = fast_vec_dist((void *)(D_L05_001B1300 + 0x10), object + 0x10);
 
         if (D_001A79F0[0] == 0x14) {
             func_002AA458(object + 0x10, (void *)(D_L05_001B1300 + 0x10), state + 0x40,
@@ -50,7 +50,7 @@ void func_L05_0041C1F0(char *object)
                 if (D_0018D030 == 0 && D_001A79F0[0] == 0x19)
                     func_00288E18(0xA3B, 0x92);
             } else {
-                func_L00_0030DD70(func_00288FB8(0x1282), -1);
+                func_L00_0030DD70(GetLocalizedString(0x1282), -1);
             }
             func_002E5DA0(0xC, 0, object, 0xFBF);
             D_001A79F8.counter = D_001A79F8.counter + 1;
@@ -59,6 +59,6 @@ void func_L05_0041C1F0(char *object)
         }
     }
     func_L05_0041C4E8(object);
-    *(float *)(object + 0xF8) = func_00283B98(*(float *)(object + 0xF8), 0.03f);
-    *(float *)(object + 0xF0) = func_00283B98(*(float *)(object + 0xF0), 0.01f);
+    *(float *)(object + 0xF8) = FastAddRotations(*(float *)(object + 0xF8), 0.03f);
+    *(float *)(object + 0xF0) = FastAddRotations(*(float *)(object + 0xF0), 0.01f);
 }

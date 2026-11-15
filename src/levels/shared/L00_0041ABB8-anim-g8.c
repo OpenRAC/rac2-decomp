@@ -45,8 +45,8 @@ extern float D_L00_001B153C __attribute__((sda)), D_L00_001B154C __attribute__((
 /* Switch to aiming state n: start both blends, play the sound and keep the current pose. */
 #define AIM(n, t2, t, lv, fl, snd, from, to) { float one = 1.0f; \
     s->prev = s->state; s->state = n; \
-    s->timer2 = t2; s->rate2 = one / func_00283CE0(s->timer2); \
-    s->timer = t; s->rate = one / func_00283CE0(s->timer); \
+    s->timer2 = t2; s->rate2 = one / IntToFloat(s->timer2); \
+    s->timer = t; s->rate = one / IntToFloat(s->timer); \
     s->level = lv; s->flag = 0; \
     func_003349E8(snd, fl, lv); \
     qcopy(to, from); return; }
@@ -71,7 +71,7 @@ void func_L00_00420C38(char *moby)
     if (s->state != 9 && s->state != 1 && D_00189E20.state == 0x14) {
         s->prev = s->state; s->state = 9;
         s->timer2 = D_L00_001B1560;
-        s->rate2 = 1.0f / func_00283CE0(s->timer2);
+        s->rate2 = 1.0f / IntToFloat(s->timer2);
         s->timer = 0; s->rate = 1.0f; s->level = D_L00_001B1570; s->flag = 0;
         func_003349E8(s->sound, 1, D_L00_001B1570);
         qcopy(s->b, s->a);
@@ -88,11 +88,11 @@ void func_L00_00420C38(char *moby)
     if (s->state == 4 && D_00189E20.ctrl != 4) {
         if (D_00189E20.ctrl == 2) {
             s->prev = 4; s->state = 1;
-            s->timer = D_L00_001B1548; s->rate = 1.0f / func_00283CE0(s->timer);
+            s->timer = D_L00_001B1548; s->rate = 1.0f / IntToFloat(s->timer);
             return;
         } else {
             s->prev = 4; s->state = 0;
-            s->timer = D_L00_001B1548; s->rate = 1.0f / func_00283CE0(s->timer);
+            s->timer = D_L00_001B1548; s->rate = 1.0f / IntToFloat(s->timer);
             return;
         }
     }
@@ -107,16 +107,16 @@ void func_L00_00420C38(char *moby)
         char *q;
         s->prev = s->state; s->state = 1;
         s->timer = D_L00_001B1548;
-        s->rate = one / func_00283CE0(s->timer);
+        s->rate = one / IntToFloat(s->timer);
         q = *(char **)(moby + 0x70) + 0x20;
         *(short *)q = D_L00_001B1518;
-        *(float *)(q + 0x24) = one / func_00283CE0(*(short *)q);
+        *(float *)(q + 0x24) = one / IntToFloat(*(short *)q);
         qcopy(moby + 0x40, moby);
         return;
     }
     if (s->state == 9 && D_00189E20.state != 0x14) GO(10, D_L00_001B156C)
-    if (s->state == 10 && func_00282978(&s->timer2)) {
+    if (s->state == 10 && FastDecTimer(&s->timer2)) {
         s->prev = s->state; s->state = 0;
-        s->timer = D_L00_001B1548; s->rate = 1.0f / func_00283CE0(s->timer);
+        s->timer = D_L00_001B1548; s->rate = 1.0f / IntToFloat(s->timer);
     }
 }

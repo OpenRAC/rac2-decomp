@@ -20,14 +20,14 @@ void func_002C7050(char *self) {
     char *p = self + 0x20;
     float ratio, speed;
     int life;
-    if (func_00282978((short *)(self + 0xA))) {
+    if (FastDecTimer((short *)(self + 0xA))) {
         func_002B9180(self);
         return;
     }
-    ratio = func_00283CE0(*(short *)(self+0xA));
-    ratio /= func_00283CE0(*(short *)(p+0x18));
+    ratio = IntToFloat(*(short *)(self+0xA));
+    ratio /= IntToFloat(*(short *)(p+0x18));
     *(int *)(self+4) = func_002A9568(*(int *)(p+0x14),*(int *)(p+0x10),ratio);
-    func_00282CC0(self+0x10,self+0x10,p);
+    FastVecAdd(self+0x10,self+0x10,p);
     *(float *)(p+8) -= *(float *)(p+0xC);
     qcopy(&saved,self+0x10);
     if (*(float *)(self+0x1C) != 0.0f) {
@@ -41,13 +41,13 @@ void func_002C7050(char *self) {
         random.f[1] = func_002A7878(-1.0f,1.0f);
         random.f[2] = func_002A7878(-1.0f,1.0f);
         motion.q = random.q;
-        speed = func_00282DF0(p);
-        func_00282F20(&motion,&motion,speed*func_002A7878(0.15f,0.25f));
-        func_00282CC0(&motion,&motion,p);
-        func_00282D30(&motion,&motion,func_002A7878(0.75f,0.95f));
+        speed = FastVecLength(p);
+        vec_scale_to_length(&motion,&motion,speed*func_002A7878(0.15f,0.25f));
+        FastVecAdd(&motion,&motion,p);
+        FastVecScale(&motion,&motion,func_002A7878(0.75f,0.95f));
         life = func_002A7820(15,30);
-        func_002BCB00(self+0x10,&motion,*(int *)(self+4),*(int *)(p+0x14),life,0,*(unsigned char *)(self+2),*(unsigned char *)(self+3),func_00283CF0(*(float *)(self+0x1C)),*(float *)(self+0xC));
+        func_002BCB00(self+0x10,&motion,*(int *)(self+4),*(int *)(p+0x14),life,0,*(unsigned char *)(self+2),*(unsigned char *)(self+3),FloatToInt(*(float *)(self+0x1C)),*(float *)(self+0xC));
     } else {
-        func_00282D30(p,p,0.96f);
+        FastVecScale(p,p,0.96f);
     }
 }

@@ -76,24 +76,24 @@ void func_002FEE70(int index, float *direction, void *position)
     qcopy(oldBasis, effect->basis);
     savedW = direction[3];
     direction[3] = 0.0f;
-    length = func_00282DF0(direction);
+    length = FastVecLength(direction);
     if (D_00189E20.attached && !D_001A8CA4)
         qcopy(effect->basis, D_00189E20.object + 0xE0);
     else
         func_002AFFD8(origin, effect, 1);
-    func_00282F20(direction, direction, 1.0f);
-    func_00282DD8(axis, oldBasis, effect);
-    angle = -func_00282DB0(oldBasis, effect);
+    vec_scale_to_length(direction, direction, 1.0f);
+    FastVecCross(axis, oldBasis, effect);
+    angle = -FastVecDot(oldBasis, effect);
     angle *= weight * 0.5f;
-    func_00282D30(rotation, axis, func_00283198(angle));
+    FastVecScale(rotation, axis, func_00283198(angle));
     cosine = func_00283180(angle);
     conjugate[0] = -rotation[0];
     conjugate[1] = -rotation[1];
     conjugate[2] = -rotation[2];
     rotation[3] = cosine;
     conjugate[3] = cosine;
-    func_002837D0(rotated, rotation, direction);
-    func_002837D0(direction, rotated, conjugate);
-    func_00282F20(direction, direction, length);
+    multiply_quaternions(rotated, rotation, direction);
+    multiply_quaternions(direction, rotated, conjugate);
+    vec_scale_to_length(direction, direction, length);
     direction[3] = savedW;
 }

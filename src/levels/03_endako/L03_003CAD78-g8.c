@@ -42,7 +42,7 @@ void func_L03_003CAD78(char *a0)
     func_00282C88((TI128 *)(work + 0xD0));
     *(f32 *)(work + 0xD8) = func_00283248(D_L03_001B9840[0x140 / 4] - *(f32 *)(a0 + 0x10),
                                           D_L03_001B9840[0x144 / 4] - *(f32 *)(a0 + 0x14));
-    func_00283410(work + 0x90, work + 0xD0);
+    euler_to_matrix(work + 0x90, work + 0xD0);
     qcopy(work + 0xC0, a0 + 0x10);
     *(f32 *)(work + 0xCC) = 1.0f;
 
@@ -59,11 +59,11 @@ void func_L03_003CAD78(char *a0)
         qcopy(&pq[i], &sourceq[i]);
     }
 
-    *(u64 *)(work + 0x78) = func_0027C878(D_L03_001B035C);
+    *(u64 *)(work + 0x78) = GetEffectTextureDescriptor(D_L03_001B035C);
     mode_bits = ((u64)D_L03_001B0360 << 2) | ((u64)D_L03_001B0364 << 6)
                | ((u64)0x8000 << 24);
     *(u64 *)(work + 0x88) = mode_bits;
     *(u64 *)(work + 0x80) = 0x0000FF9000000260ULL;
     *(u64 *)(work + 0x70) = 0;
-    func_00280B90(work, work + 0x90, 1);
+    draw_world_quad(work, work + 0x90, 1);
 }

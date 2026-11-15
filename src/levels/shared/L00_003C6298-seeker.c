@@ -169,18 +169,18 @@ void func_L00_003C9978(Moby_003C9978 *self)
         self->state = 1;
         vars->flip = func_001163B0() % 2;
         vars->spin = 0.0f;
-        func_00282F20(&self->m[0], &vars->vel, 1.0f);
-        func_00282DD8(&self->m[1], &self->m[0], &up);
-        func_00282F20(&self->m[1], &self->m[1], 1.0f);
-        func_00282DD8(&self->m[2], &self->m[1], &self->m[0]);
-        func_00283098(&off, &off, &self->m[0]);
+        vec_scale_to_length(&self->m[0], &vars->vel, 1.0f);
+        FastVecCross(&self->m[1], &self->m[0], &up);
+        vec_scale_to_length(&self->m[1], &self->m[1], 1.0f);
+        FastVecCross(&self->m[2], &self->m[1], &self->m[0]);
+        matrix_mul_vec3(&off, &off, &self->m[0]);
         func_00300190(&self->pos, &self->pos);
         func_00300248(vars, vars);
-        func_00282CC0(&off, &off, &self->pos);
-        func_00282F20(&step, &off, 0.01f);
+        FastVecAdd(&off, &off, &self->pos);
+        vec_scale_to_length(&step, &off, 0.01f);
         qcopy(&vars->trail[0], &off);
         for (i = 0; i < 3; i++)
-            func_00282CC0(&vars->trail[i + 1], &vars->trail[i], &step);
+            FastVecAdd(&vars->trail[i + 1], &vars->trail[i], &step);
         vars->trail_timer = 2;
     case 1: {
         float dist;
@@ -227,11 +227,11 @@ void func_L00_003C9978(Moby_003C9978 *self)
         }
 
         qcopy(&saved, &self->pos);
-        func_00282F20(&self->m[0], &vars->vel, 1.0f);
-        func_00282DD8(&self->m[1], &self->m[0], &up);
-        func_00282F20(&self->m[1], &self->m[1], 1.0f);
-        func_00282DD8(&self->m[2], &self->m[1], &self->m[0]);
-        func_00282CC0(&self->pos, &self->pos, &vars->vel);
+        vec_scale_to_length(&self->m[0], &vars->vel, 1.0f);
+        FastVecCross(&self->m[1], &self->m[0], &up);
+        vec_scale_to_length(&self->m[1], &self->m[1], 1.0f);
+        FastVecCross(&self->m[2], &self->m[1], &self->m[0]);
+        FastVecAdd(&self->pos, &self->pos, &vars->vel);
         life = vars->life;
         if (func_00282948(&life) != 0) {
             self->state = 2;
@@ -250,8 +250,8 @@ void func_L00_003C9978(Moby_003C9978 *self)
         off.v.w = 1.0f;
         off.v.y = 0.0f;
         off.v.z = 0.0f;
-        func_00283098(&off, &off, &self->m[0]);
-        func_00282CC0(&off, &off, &self->pos);
+        matrix_mul_vec3(&off, &off, &self->m[0]);
+        FastVecAdd(&off, &off, &self->pos);
         func_00300190(&off, &off);
         self->m[1].y = self->m[1].y * 0.5f;
         self->m[2].z = self->m[2].z * 0.5f;
@@ -259,7 +259,7 @@ void func_L00_003C9978(Moby_003C9978 *self)
         if (func_00277258(&self->pos, 0x10, self, 0.25f) != 0)
             hit = 1;
         else
-            hit = func_002761F8(&saved, &self->pos, 0x10, self, 0) != 0;
+            hit = CollLine(&saved, &self->pos, 0x10, self, 0) != 0;
         if (hit) {
             if (D_L00_001BF218 != 0 && (D_L00_001BF218->oclass == 0x1366 || D_L00_001BF218->oclass == 0x1367))
                 hit = 0;
@@ -269,11 +269,11 @@ void func_L00_003C9978(Moby_003C9978 *self)
 
                 for (i = 0; i < n; i++) {
                     if (D_L00_001C3280[i]->flags.all & 0x500000000000ULL) {
-                        func_002A8C00(&info, self, 0x210000, vars->damage, vars);
+                        make_hit_descriptor(&info, self, 0x210000, vars->damage, vars);
                         info.hit.oclass = self->oclass;
                         info.hit.kind = 5;
                         info.hit.count = 3;
-                        func_002A8E20(D_L00_001C3280[i], &info);
+                        QueueMobyImpact(D_L00_001C3280[i], &info);
                         func_00334160(D_L00_001C3280[i], 0x40, self->b8);
                     }
                 }
@@ -283,7 +283,7 @@ void func_L00_003C9978(Moby_003C9978 *self)
             }
         }
 
-        func_00282F20(&vars->vel, &vars->vel,
+        vec_scale_to_length(&vars->vel, &vars->vel,
                       (vars->max_speed < vars->speed ? vars->max_speed : vars->speed) * 0.016666668f);
         vars->speed = vars->speed + vars->accel;
 
@@ -294,16 +294,16 @@ void func_L00_003C9978(Moby_003C9978 *self)
 
             func_L00_003252A8(vars->target, &info, 1);
             if (health != 0 && D_L00_001A8FF0 == 0) {
-                func_00282D30(&info.v.b, &vars->target->m[2], health[4]);
-                func_00282CC0(&info.v.b, &info.v.b, &vars->target->pos);
+                FastVecScale(&info.v.b, &vars->target->m[2], health[4]);
+                FastVecAdd(&info.v.b, &info.v.b, &vars->target->pos);
             } else if (D_L00_001A8FF0 != 0) {
                 func_L00_00325300(self, &info.v.direction);
-                func_00282F20(&info.v.direction, &info.v.direction, 1.0f);
-                func_00282CC0(&info.v.b, &info.v.direction, &vars->target->pos);
+                vec_scale_to_length(&info.v.direction, &info.v.direction, 1.0f);
+                FastVecAdd(&info.v.b, &info.v.direction, &vars->target->pos);
             } else {
                 qcopy(&info.v.b, &vars->target->pos);
             }
-            dist = func_00282E48(&self->pos, &info.v.b);
+            dist = fast_vec_dist(&self->pos, &info.v.b);
             if (vars->fast != 0) {
                 if (dist < 1.5f)
                     dist = 0.0f;
@@ -325,7 +325,7 @@ void func_L00_003C9978(Moby_003C9978 *self)
                 func_L00_00320B70(&self->pos, vars, &info.v.b, &vars->f54, &info, 0, 0.03f, 0.2f, 0.0f, 0.25f);
         }
 
-        travelled = func_00282E48(&self->pos, &saved);
+        travelled = fast_vec_dist(&self->pos, &saved);
         info.v.a.w = -1.0f;
         spark = vars->spark;
         if (func_00282948(&spark) != 0 || vars->spark == 0) {
@@ -334,8 +334,8 @@ void func_L00_003C9978(Moby_003C9978 *self)
             vars->flip++;
         }
         vars->spark = spark;
-        vars->wobble = func_00283B98(vars->wobble, func_002A7878(0.01f, 0.1f));
-        vars->wobble_z = func_00283BE0(vars->wobble_z, func_002A7878(0.025f, 0.25f));
+        vars->wobble = FastAddRotations(vars->wobble, func_002A7878(0.01f, 0.1f));
+        vars->wobble_z = fast_subtract_rotations(vars->wobble_z, func_002A7878(0.025f, 0.25f));
         fast_trail = D_L00_001ADB2C;
         trail_timer = vars->trail_timer;
         if (fast_trail != 0) {

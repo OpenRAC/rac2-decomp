@@ -242,7 +242,7 @@ void func_L10_00417C40(u8 *arg0) {
     default:
         return;
     }
-    func_L10_00417F30(arg0);
+    UpdateAttachedObjectTransform(arg0);
     v = (u8 *)func_0037BA88(*(u8 **)(s1 + 0x10));
     if (*(s32 *)(v + 0x120) != 0)
         func_L10_00418088(arg0);
@@ -255,7 +255,7 @@ void func_L10_00417C40(u8 *arg0) {
 Moby *func_L10_00417CE0(Moby *parent, s32 side)
 {
     CarrierVars *parentVars = parent->vars;
-    Moby *moby = func_0029EFD0(0xF86);
+    Moby *moby = CreateMoby(0xF86);
     AttachedVars *vars;
     Manipulator *first;
     Manipulator *second;
@@ -272,7 +272,7 @@ Moby *func_L10_00417CE0(Moby *parent, s32 side)
         moby->scale = mclass->scale * 0.8f;
         mclass->f48[3] = 18855.0f;
         mclass->f3C = 18855.0f;
-        func_00283360(moby->rotation);
+        set_identity_rotation_rows(moby->rotation);
 
         if (side) {
             first = &parentVars->manips[0];
@@ -283,13 +283,13 @@ Moby *func_L10_00417CE0(Moby *parent, s32 side)
         }
         func_0029FCC0(moby, 0, first->translation);
         func_0029FCC0(moby, 1, second->translation);
-        func_00282CF0(first->translation, first->translation, moby->position);
-        func_00282CF0(second->translation, second->translation, moby->position);
-        func_00282CF0(second->translation, second->translation, first->translation);
-        func_00282D30(first->translation, first->translation, (1.0f / moby->scale) * 1024.0f);
-        func_00282D30(second->translation, second->translation, (1.0f / moby->scale) * 1024.0f);
-        func_0029F978(moby, 0, first);
-        func_0029F978(moby, 1, second);
+        FastVecSub(first->translation, first->translation, moby->position);
+        FastVecSub(second->translation, second->translation, moby->position);
+        FastVecSub(second->translation, second->translation, first->translation);
+        FastVecScale(first->translation, first->translation, (1.0f / moby->scale) * 1024.0f);
+        FastVecScale(second->translation, second->translation, (1.0f / moby->scale) * 1024.0f);
+        AttachManipulator(moby, 0, first);
+        AttachManipulator(moby, 1, second);
         first->translation[3] = 1.0f;
         first->interp = 1.0f;
         first->absolute = 1;
@@ -297,12 +297,12 @@ Moby *func_L10_00417CE0(Moby *parent, s32 side)
         second->interp = 1.0f;
         second->absolute = 1;
 
-        func_L10_00417F30((u8 *)moby);
+        UpdateAttachedObjectTransform((u8 *)moby);
         func_002A0F48(moby);
         func_00282C88(vars->aim);
         vars->aim[0] = 1.0f;
 
-        vars->follower = func_0029EFD0(0x134F);
+        vars->follower = CreateMoby(0x134F);
         if (vars->follower != 0) {
             MobyClass *followerClass = vars->follower->mclass;
 
@@ -377,37 +377,37 @@ void func_L10_00418088(u8 *arg0) {
         a = *(u8 **)(*(u8 **)(state + 0x10) + 0x68) + 0x370;
         b = *(u8 **)(*(u8 **)(state + 0x10) + 0x68) + 0x3B0;
     }
-    func_00283098(x,x,arg0+0xC0);
-    func_00283098(y,y,arg0+0xC0);
-    func_00283098(z,z,arg0+0xC0);
+    matrix_mul_vec3(x,x,arg0+0xC0);
+    matrix_mul_vec3(y,y,arg0+0xC0);
+    matrix_mul_vec3(z,z,arg0+0xC0);
     func_0029FC20(arg0,0,ma);
     func_0029FC20(arg0,1,mb);
-    if (func_00282E48(ma+12, *(u8 **)(info+0x120)+0x10) <= 24.0f)
+    if (fast_vec_dist(ma+12, *(u8 **)(info+0x120)+0x10) <= 24.0f)
         qcopy(dir, state);
     else {
-        func_00282CF0((u8 *)dir,D_L10_001B9680,(u8 *)(ma+12));
+        FastVecSub((u8 *)dir,D_L10_001B9680,(u8 *)(ma+12));
         qcopy(state, dir);
     }
-    dot = func_00282DB0(dir,y);
-    func_00282D30((u8 *)tmp,(u8 *)y,dot);
-    func_00282CF0((u8 *)dir,(u8 *)dir,(u8 *)tmp);
-    func_00282F20(dir,dir,1.0f);
-    angle = (1.57079637f-func_002831B0(func_00282DB0(x,dir)))*0.5f;
-    if (func_00282DB0(dir,z)>0.0f) angle=-angle;
-    func_00282D30(a+0x10,(u8 *)qa,func_00283198(angle));
+    dot = FastVecDot(dir,y);
+    FastVecScale((u8 *)tmp,(u8 *)y,dot);
+    FastVecSub((u8 *)dir,(u8 *)dir,(u8 *)tmp);
+    vec_scale_to_length(dir,dir,1.0f);
+    angle = (1.57079637f-func_002831B0(FastVecDot(x,dir)))*0.5f;
+    if (FastVecDot(dir,z)>0.0f) angle=-angle;
+    FastVecScale(a+0x10,(u8 *)qa,func_00283198(angle));
     *(f32 *)(a+0x1C)=func_00283180(angle);
-    func_00282CF0((u8 *)dir,D_L10_001B9680,(u8 *)(mb+12));
-    dot = func_00282DB0(dir,y);
-    func_00282D30((u8 *)tmp,(u8 *)y,dot);
-    func_00282CF0((u8 *)dir,(u8 *)dir,(u8 *)tmp);
-    func_00282F20(dir,x,func_00282DF0(dir));
-    func_00282CC0((u8 *)dir,(u8 *)tmp,(u8 *)dir);
-    func_00282F20(dir,dir,1.0f);
-    dot=func_00282DB0(dir,y);
+    FastVecSub((u8 *)dir,D_L10_001B9680,(u8 *)(mb+12));
+    dot = FastVecDot(dir,y);
+    FastVecScale((u8 *)tmp,(u8 *)y,dot);
+    FastVecSub((u8 *)dir,(u8 *)dir,(u8 *)tmp);
+    vec_scale_to_length(dir,x,FastVecLength(dir));
+    FastVecAdd((u8 *)dir,(u8 *)tmp,(u8 *)dir);
+    vec_scale_to_length(dir,dir,1.0f);
+    dot=FastVecDot(dir,y);
     if(dot<=-0.3f) dot=-0.3f;
     else if(dot>0.3f) dot=0.3f;
     angle=(1.57079637f-func_002831B0(dot))*0.5f;
-    func_00282D30(b+0x10,(u8 *)qb,-func_00283198(angle));
+    FastVecScale(b+0x10,(u8 *)qb,-func_00283198(angle));
     *(f32 *)(b+0x1C)=func_00283180(angle);
 }
 
@@ -498,7 +498,7 @@ void func_L10_004189D8(u8 *arg0) {
     b = func_002A7940();
     c = func_002A7940();
     func_002AF000(arg0 + 0x10, a, b, c);
-    func_00282CC0(arg0 + 0x10, table + 0x30, arg0 + 0x10);
+    FastVecAdd(arg0 + 0x10, table + 0x30, arg0 + 0x10);
 }
 
 /* arms one timed effect slot and records it in the state word, skipping out while the
@@ -590,7 +590,7 @@ void func_L10_0041EC10(u8 *arg0) {
         func_0037D390(arg0, 0, 0, 0);
         f = func_00309B38(*(f32 *)(s1 + 0x268), 0.10471977f);
         *(f32 *)(s1 + 0x268) = f;
-        *(s32 *)(arg0 + 0x78) = func_00283D38(0x20202020, -1, (func_00309120(f) + 1.0f) * 0.5f);
+        *(s32 *)(arg0 + 0x78) = FastTweenColor(0x20202020, -1, (func_00309120(f) + 1.0f) * 0.5f);
         break;
     }
 }

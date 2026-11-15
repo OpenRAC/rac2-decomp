@@ -59,18 +59,18 @@ goto *D_0026CCE0[rc2_selector];
         r = 1;
         D_0018A000.a = 10;
         if (D_001AA420 != 0) {
-            func_0028B338(0);
+            select_moby_context(0);
             ((void (*)(s32))D_001AA420)(0);
-            func_0028B338(1);
+            select_moby_context(1);
         }
         goto rc2_switch_end;
     rc2_case_2:
         r = 1;
         D_0018A000.a = 10;
         if (D_001AA428 != 0) {
-            func_0028B338(0);
+            select_moby_context(0);
             ((void (*)(s32))D_001AA428)(0);
-            func_0028B338(1);
+            select_moby_context(1);
         }
         goto rc2_switch_end;
     rc2_case_3:

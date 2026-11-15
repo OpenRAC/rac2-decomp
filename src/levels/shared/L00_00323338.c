@@ -26,15 +26,15 @@ int func_L00_00323338(void *a0, void *records, int count, void *src0, void *src1
     local.v0 = *(V4TI_F36d8a248 *)src0;
     local.v1 = *(V4TI_F36d8a248 *)src1;
     for (i = 0; i < count; i++) {
-        float f = func_00282E48(lp, (char *)records + i * 0x40 + 0x30);
+        float f = fast_vec_dist(lp, (char *)records + i * 0x40 + 0x30);
         if (f < bestf) {
             bestf = f;
             best = i;
         }
     }
     p = (char *)records + (best << 6);
-    func_00283698(matrix, p);
-    func_00283678(ctx, matrix);
+    matrix_from_basis_rows(matrix, p);
+    copy_matrix3x4(ctx, matrix);
     qcopy(dst, p + 0x30);
     return best;
 }

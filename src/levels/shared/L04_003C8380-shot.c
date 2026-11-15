@@ -40,7 +40,7 @@ unsigned char *func_L04_003F9320(int owner, float *pos, float *velocity, int lif
     float t, alpha, numerator, denominator;
     *(QuadWord *)origin = *(QuadWord *)pos;
     *(QuadWord *)direction = *(QuadWord *)velocity;
-    m = func_0029EFD0(0xABC);
+    m = CreateMoby(0xABC);
     if (m) {
         v = *(unsigned char **)(m + 0x68);
         *(void **)(v + 0x18) = (void *)owner;
@@ -49,7 +49,7 @@ unsigned char *func_L04_003F9320(int owner, float *pos, float *velocity, int lif
         m[0x31] = 1;
         *(long *)(m + 0x38) = *(long *)(owner + 0x38);
         *(float *)(m + 0xF0) = 0;
-        *(float *)(m + 0xF4) = -func_00283248(func_00282E20(direction), direction[2]);
+        *(float *)(m + 0xF4) = -func_00283248(vec_length_xy(direction), direction[2]);
         *(float *)(m + 0xF8) = func_00283248(direction[0], direction[1]);
         qcopy((m + 0x10), origin);
         qcopy(v, direction);
@@ -69,7 +69,7 @@ unsigned char *func_L04_003F9320(int owner, float *pos, float *velocity, int lif
         *(QuadWord *)start = *(QuadWord *)(owner + 0x10);
         probe.kind = kind;
         start[2] = origin[2];
-        if (func_002761F8(start, origin, 0, (void *)owner, &probe)) {
+        if (CollLine(start, origin, 0, (void *)owner, &probe)) {
             qcopy((m + 0x10), D_L04_001BFAE0);
             for (i = 4; i >= 0; i--) {
                 *(QuadWord *)random = 0;
@@ -78,26 +78,26 @@ unsigned char *func_L04_003F9320(int owner, float *pos, float *velocity, int lif
                 random[2] = func_002A7878(-1, 1);
                 *(QuadWord *)temp = *(QuadWord *)random;
                 func_00283028(random, v, D_L04_001BFB00);
-                func_00282F20((char *)temp, (char *)temp, func_00282DF0(random) * 0.5f);
-                func_00282CC0(random, random, temp);
-                func_00282F20((char *)random, (char *)random, func_002A7878(0.050000004f, 0.10000001f));
+                vec_scale_to_length((char *)temp, (char *)temp, FastVecLength(random) * 0.5f);
+                FastVecAdd(random, random, temp);
+                vec_scale_to_length((char *)random, (char *)random, func_002A7878(0.050000004f, 0.10000001f));
                 func_L04_00358AE8(m + 0x10, random, 0x7F2F4F6F, func_002A7820(10, 15), 15000);
             }
             func_L04_003F9C60(m, 0);
             func_0029F338(m);
             return 0;
         }
-        func_L04_00358868(m, 0x2F4F7F7F, *(int *)(v + 0x10), -1, 100000);
+        SpawnJointFollowParticle(m, 0x2F4F7F7F, *(int *)(v + 0x10), -1, 100000);
         for (j = 0; j < 17; j++) {
             particle = func_L04_0035F3E0(m + 0x10, D_L04_001A8F20, 1, 0);
             if (particle) {
                 *(float *)(particle + 0xC) = func_002A7878(15000, 25000);
-                numerator = func_00283CE0(j);
-                denominator = func_00283CE0(16);
-                t = func_002A7AA8(-1.5f, 0, 1, 0, numerator / denominator);
+                numerator = IntToFloat(j);
+                denominator = IntToFloat(16);
+                t = cubic_hermite_scalar(-1.5f, 0, 1, 0, numerator / denominator);
                 *(float *)(particle + 0xC) += (8000.0f - *(float *)(particle + 0xC)) * t;
                 alpha = t * -64.0f + 128.0f;
-                *(unsigned int *)(particle + 4) = (func_00283CF0(alpha) << 24) | 0xFFFFFF;
+                *(unsigned int *)(particle + 4) = (FloatToInt(alpha) << 24) | 0xFFFFFF;
                 *(void **)(v + 0x1C + j * 4) = particle;
             } else *(void **)(v + 0x1C + j * 4) = 0;
         }

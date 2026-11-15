@@ -31,11 +31,11 @@ int func_L02_00333480(char *object, void *target, void *input) {
     if (D_L02_001B30C8 == *(int *)(data + 0xBC))
         return *(int *)(data + 0x94);
     func_L02_00332900();
-    func_00283698(inverse, object + 0xC0);
+    matrix_from_basis_rows(inverse, object + 0xC0);
     m = inverse;
     func_002AFFD8(object + 0x10, (char *)direction, 0);
     func_L00_00325600(object + 0xC0, direction, rotated);
-    func_00283098(data + 0xA0, data + 0xA0, rotated);
+    matrix_mul_vec3(data + 0xA0, data + 0xA0, rotated);
     *(int *)(data + 0x98) = *(int *)(data + 0x94);
     *(int *)(data + 0x94) = 0;
     func_L00_0032C5E8(object, data);

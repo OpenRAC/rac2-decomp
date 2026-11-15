@@ -42,23 +42,23 @@ void func_002BF390(s32 arg0) {
     s32 temp_s3;
 
     temp_v0 = (*(s32 *)((s8 *)(arg0) + (0x30)));
-    if (temp_v0 == 0 || (temp_v1 = (*(u8 *)((s8 *)(temp_v0) + (0x20))), temp_v1 == 0xFE) || temp_v1 == 0xFD || func_00282978(arg0 + 0xA) != 0) {
+    if (temp_v0 == 0 || (temp_v1 = (*(u8 *)((s8 *)(temp_v0) + (0x20))), temp_v1 == 0xFE) || temp_v1 == 0xFD || FastDecTimer(arg0 + 0xA) != 0) {
         func_002B9180(arg0);
         return;
     }
     temp_s3 = arg0 + 0x10;
-    func_00282CF0(&sp10, (*(s32 *)((s8 *)(arg0) + (0x30))) + 0x10, temp_s3);
+    FastVecSub(&sp10, (*(s32 *)((s8 *)(arg0) + (0x30))) + 0x10, temp_s3);
     temp_s1 = arg0 + 0x20;
     *(TI *)sp = sp10;
-    func_00282D30(sp, sp, (D_001AA364 - 1.0f) + 1.0f);
-    func_00282CC0(&sp10, sp, (*(s32 *)((s8 *)(arg0) + (0x30))) + 0x10);
+    FastVecScale(sp, sp, (D_001AA364 - 1.0f) + 1.0f);
+    FastVecAdd(&sp10, sp, (*(s32 *)((s8 *)(arg0) + (0x30))) + 0x10);
     (*(TI *)((s8 *)(arg0) + (0x10))) = sp10;
-    func_00282CF0(&sp10, (*(s32 *)((s8 *)(arg0) + (0x30))) + 0x10, temp_s1);
+    FastVecSub(&sp10, (*(s32 *)((s8 *)(arg0) + (0x30))) + 0x10, temp_s1);
     *(TI *)sp = sp10;
-    func_00282D30(sp, sp, (D_001AA368 - 1.0f) + 1.0f);
-    func_00282CC0(&sp10, sp, (*(s32 *)((s8 *)(arg0) + (0x30))) + 0x10);
+    FastVecScale(sp, sp, (D_001AA368 - 1.0f) + 1.0f);
+    FastVecAdd(&sp10, sp, (*(s32 *)((s8 *)(arg0) + (0x30))) + 0x10);
     (*(TI *)((s8 *)(arg0) + (0x20))) = sp10;
-    if (func_00282E48(temp_s3, temp_s1) < 0.1f || func_00282E48(temp_s3, (*(s32 *)((s8 *)(arg0) + (0x30))) + 0x10) < 1.0f) {
+    if (fast_vec_dist(temp_s3, temp_s1) < 0.1f || fast_vec_dist(temp_s3, (*(s32 *)((s8 *)(arg0) + (0x30))) + 0x10) < 1.0f) {
         func_002B9180(arg0);
     }
 }

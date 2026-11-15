@@ -39,15 +39,15 @@ void func_L01_003C91C8(char *m)
         func_002A7750(m, 1, -1);
         break;
     case 1:
-        if (func_002ACBC8(D_00189EA0, BI(vars, 0xA0))) {
-            if (!BI(vars, 0xB8)) func_002E5CF8(0, 0, m);
+        if (IsPointInCuboid(D_00189EA0, BI(vars, 0xA0))) {
+            if (!BI(vars, 0xB8)) PlayMobySound(0, 0, m);
             func_002A7750(m, 2, -1);
         }
         if (BI(vars, 0xB0) != -1) {
             char *other = D_001B255C + (BI(vars, 0xB0) << 8);
             if (other && BU(other, 0x20) != 254 && BU(other, 0x20) != 253 &&
-                func_002ACBC8(other + 0x10, BI(vars, 0xA0))) {
-                if (!BI(vars, 0xB8)) func_002E5CF8(0, 0, m);
+                IsPointInCuboid(other + 0x10, BI(vars, 0xA0))) {
+                if (!BI(vars, 0xB8)) PlayMobySound(0, 0, m);
                 func_002A7750(m, 2, -1);
             }
         }
@@ -61,26 +61,26 @@ void func_L01_003C91C8(char *m)
         else if (BF(vars, 0xAC) < 0.0f) BF(vars, 0xAC) = 0.0f;
         t = 1.0f - func_00283180(BF(vars, 0xAC) * 3.1415927410125732f);
         t *= 0.5f;
-        func_00282D30(offset, vars + 0x80, t);
-        func_002833F0(rotationMatrix, vars + 0x70);
-        func_00283098(offset, offset, rotationMatrix);
-        func_00282CC0(m + 0x10, vars + 0x60, offset);
-        BF(m, 0xF8) = func_002AA150(BF(vars, 0x78), func_00283B98(BF(vars, 0x78), BF(vars, 0x98)), t);
-        BF(m, 0xF4) = func_002AA150(BF(vars, 0x74), func_00283B98(BF(vars, 0x74), BF(vars, 0x94)), t);
-        BF(m, 0xF0) = func_002AA150(BF(vars, 0x70), func_00283B98(BF(vars, 0x70), BF(vars, 0x90)), t);
+        FastVecScale(offset, vars + 0x80, t);
+        euler_rotation_basis(rotationMatrix, vars + 0x70);
+        matrix_mul_vec3(offset, offset, rotationMatrix);
+        FastVecAdd(m + 0x10, vars + 0x60, offset);
+        BF(m, 0xF8) = func_002AA150(BF(vars, 0x78), FastAddRotations(BF(vars, 0x78), BF(vars, 0x98)), t);
+        BF(m, 0xF4) = func_002AA150(BF(vars, 0x74), FastAddRotations(BF(vars, 0x74), BF(vars, 0x94)), t);
+        BF(m, 0xF0) = func_002AA150(BF(vars, 0x70), FastAddRotations(BF(vars, 0x70), BF(vars, 0x90)), t);
         if (BF(vars, 0xAC) >= 1.0f) func_002A7750(m, 3, -1);
 
         break;
     }
     case 3:
-        if (!BI(vars, 0xA8) && !func_002ACBC8(D_00189EA0, BI(vars, 0xA0))) {
+        if (!BI(vars, 0xA8) && !IsPointInCuboid(D_00189EA0, BI(vars, 0xA0))) {
             if (BI(vars, 0xB0) != -1) {
                 char *other = D_001B255C + (BI(vars, 0xB0) << 8);
                 if (!other || BU(other, 0x20) == 254 || BU(other, 0x20) == 253 ||
-                    func_002ACBC8(other + 0x10, BI(vars, 0xA0)))
+                    IsPointInCuboid(other + 0x10, BI(vars, 0xA0)))
                     goto clear;
             }
-            if (!BI(vars, 0xB8)) func_002E5CF8(0, 0, m);
+            if (!BI(vars, 0xB8)) PlayMobySound(0, 0, m);
             func_002A7750(m, 4, -1);
         }
         break;
@@ -92,24 +92,24 @@ void func_L01_003C91C8(char *m)
         else if (BF(vars, 0xAC) < 0.0f) BF(vars, 0xAC) = 0.0f;
         t = 1.0f - func_00283180(BF(vars, 0xAC) * 3.1415927410125732f);
         t *= 0.5f;
-        func_00282D30(offset, vars + 0x80, t);
-        func_002833F0(rotationMatrix, vars + 0x70);
-        func_00283098(offset, offset, rotationMatrix);
-        func_00282CC0(m + 0x10, vars + 0x60, offset);
-        BF(m, 0xF8) = func_002AA150(BF(vars, 0x78), func_00283B98(BF(vars, 0x78), BF(vars, 0x98)), t);
-        BF(m, 0xF4) = func_002AA150(BF(vars, 0x74), func_00283B98(BF(vars, 0x74), BF(vars, 0x94)), t);
-        BF(m, 0xF0) = func_002AA150(BF(vars, 0x70), func_00283B98(BF(vars, 0x70), BF(vars, 0x90)), t);
+        FastVecScale(offset, vars + 0x80, t);
+        euler_rotation_basis(rotationMatrix, vars + 0x70);
+        matrix_mul_vec3(offset, offset, rotationMatrix);
+        FastVecAdd(m + 0x10, vars + 0x60, offset);
+        BF(m, 0xF8) = func_002AA150(BF(vars, 0x78), FastAddRotations(BF(vars, 0x78), BF(vars, 0x98)), t);
+        BF(m, 0xF4) = func_002AA150(BF(vars, 0x74), FastAddRotations(BF(vars, 0x74), BF(vars, 0x94)), t);
+        BF(m, 0xF0) = func_002AA150(BF(vars, 0x70), FastAddRotations(BF(vars, 0x70), BF(vars, 0x90)), t);
         if (BF(vars, 0xAC) >= 1.0f) func_002A7750(m, 1, -1);
 
-        if (func_002ACBC8(D_00189EA0, BI(vars, 0xA0))) {
-            if (!BI(vars, 0xB8)) func_002E5CF8(0, 0, m);
+        if (IsPointInCuboid(D_00189EA0, BI(vars, 0xA0))) {
+            if (!BI(vars, 0xB8)) PlayMobySound(0, 0, m);
             func_002A7750(m, 2, -1);
         }
         if (BI(vars, 0xB0) != -1) {
             char *other = D_001B255C + (BI(vars, 0xB0) << 8);
             if (other && BU(other, 0x20) != 254 && BU(other, 0x20) != 253 &&
-                func_002ACBC8(other + 0x10, BI(vars, 0xA0))) {
-                if (!BI(vars, 0xB8)) func_002E5CF8(0, 0, m);
+                IsPointInCuboid(other + 0x10, BI(vars, 0xA0))) {
+                if (!BI(vars, 0xB8)) PlayMobySound(0, 0, m);
                 func_002A7750(m, 2, -1);
             }
         }
@@ -126,7 +126,7 @@ clear:
         if (!other || BU(other, 0x20) == 254 || BU(other, 0x20) == 253) BI(vars, 0xB0) = -1;
     }
     if (BU(m, 0x20) < 5) {
-        func_00282CF0(offset, m + 0x10, oldPosition);
+        FastVecSub(offset, m + 0x10, oldPosition);
         func_002AD6F0(vars + 0x20, offset, oldRotation, m + 0xF0);
     }
 }

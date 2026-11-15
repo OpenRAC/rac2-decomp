@@ -64,22 +64,22 @@ void func_L00_003F3518(char *obj)
         *(float *)(c + 4) = *(float *)(st + 0x54);
         *(float *)(c + 8) = *(float *)(st + 0x58);
         *(TI128 *)d = *(TI128 *)c;
-        func_00283098(d, d, (char *)e);
-        func_00282CC0(b, b, d);
+        matrix_mul_vec3(d, d, (char *)e);
+        FastVecAdd(b, b, d);
         if (*(int *)(st + 0x6C) != 0) {
             func_L00_003F34D8(b, (int *)(st + 0x30), buf0, (int *)buf1, &count);
             continue;
         }
-        func_00282CF0(c, (char *)&D_L00_001B8C80.x_140, b);
-        func_00282F20(c, c, 1.0f);
+        FastVecSub(c, (char *)&D_L00_001B8C80.x_140, b);
+        vec_scale_to_length(c, c, 1.0f);
         *(TI128 *)e4 = 0;
         *(float *)(e4 + 0) = *(float *)(st + 0x40);
         *(float *)(e4 + 4) = *(float *)(st + 0x44);
         *(float *)(e4 + 8) = *(float *)(st + 0x48);
         *(TI128 *)f = *(TI128 *)e4;
-        func_00283098(f, f, (char *)e);
-        func_00282F20(f, f, 1.0f);
-        dot = func_00282DB0(c, f);
+        matrix_mul_vec3(f, f, (char *)e);
+        vec_scale_to_length(f, f, 1.0f);
+        dot = FastVecDot(c, f);
         if (*(float *)(st + 0x3C) < dot) {
             dot = dot * 0.5f + 0.5f;
             if (*(int *)(st + 0x38) != 0)
@@ -88,5 +88,5 @@ void func_L00_003F3518(char *obj)
             func_L00_003F34D8(b, &color, buf0, (int *)buf1, &count);
         }
     }
-    func_L00_00325CC0(count, buf0, buf1, *(float *)(st + 0x4C), *(float *)(st + 0x5C));
+    DrawOffsetBillboardBatch(count, buf0, buf1, *(float *)(st + 0x4C), *(float *)(st + 0x5C));
 }

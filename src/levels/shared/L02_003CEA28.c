@@ -29,16 +29,16 @@ void func_L02_003CEA28(char *object)
     if (*(short *)(*(char **)(object + 0x68) + 0x338) != 0)
         func_002AB6D8(object + 0xC0, object + 0xF0);
     origin = object + 0x10;
-    func_002A6C58(object, 0, 3);
-    func_002E5CF8(1, 0, object);
+    SetDeathBits(object, 0, 3);
+    PlayMobySound(1, 0, object);
     offset.q = 0;
     offset.f[2] = 1.0f;
-    func_00283098(&position, &offset, object + 0xC0);
-    func_00282CC0(&position, &position, origin);
-    func_0032C700(origin, 0, 0, 0, 0, 10, 20, 0, 0.333f, 20.0f, 1, 0, 0, 0);
-    func_00282CF0(&impulse, origin, D_00189EA0);
+    matrix_mul_vec3(&position, &offset, object + 0xC0);
+    FastVecAdd(&position, &position, origin);
+    SpawnExplosion(origin, 0, 0, 0, 0, 10, 20, 0, 0.333f, 20.0f, 1, 0, 0, 0);
+    FastVecSub(&impulse, origin, D_00189EA0);
     func_002AFEB8(object, &impulse, &impulse, 0.0f, 0);
-    func_00282F20(&impulse, &impulse, 0.10000001f);
+    vec_scale_to_length(&impulse, &impulse, 0.10000001f);
     if (D_L02_001A8FF0)
         colour = func_002A77E0(255);
     else

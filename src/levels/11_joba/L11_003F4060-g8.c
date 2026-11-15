@@ -30,16 +30,16 @@ void func_L11_003F4060(u8 *arg0) {
         {
             u8 *flagRecord = s3 + i * 2;
             if (*(s16 *)(flagRecord + 0x278) != 1) {
-                func_00282F20(vec, (f32 *)(s4 + 0xE0), D_L11_001B05DC);
+                vec_scale_to_length(vec, (f32 *)(s4 + 0xE0), D_L11_001B05DC);
             }
         }
         next = i + 1;
         i = (s32)rec;
         p = (u8 *)i;
         for (j = 1; j >= 0; j--) {
-            *(f32 *)(p + 0x40) = func_00283B98(*(f32 *)(p + 0x40), *(f32 *)(p + 0x60));
-            *(f32 *)(p + 0x44) = func_00283B98(*(f32 *)(p + 0x44), *(f32 *)(p + 0x64));
-            *(f32 *)(p + 0x48) = func_00283B98(*(f32 *)(p + 0x48), *(f32 *)(p + 0x68));
+            *(f32 *)(p + 0x40) = FastAddRotations(*(f32 *)(p + 0x40), *(f32 *)(p + 0x60));
+            *(f32 *)(p + 0x44) = FastAddRotations(*(f32 *)(p + 0x44), *(f32 *)(p + 0x64));
+            *(f32 *)(p + 0x48) = FastAddRotations(*(f32 *)(p + 0x48), *(f32 *)(p + 0x68));
             *(f32 *)(p + 0x20) = vec[0] + func_00283180(*(f32 *)(p + 0x40)) * *(f32 *)(p + 0x80);
             *(f32 *)(p + 0x24) = vec[1] + func_00283198(*(f32 *)(p + 0x44)) * *(f32 *)(p + 0x84);
             *(f32 *)(p + 0x28) = vec[2] - func_00283198(*(f32 *)(p + 0x48)) * *(f32 *)(p + 0x88);

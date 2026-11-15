@@ -50,7 +50,7 @@ void func_00292408(int index)
     func_0011AEA0(0);
     func_001265B0(packet, clut);
     func_001244B8(0, 0);
-    log = func_00282A18(*(int *)(hdr + 8));
+    log = log2dim(*(int *)(hdr + 8));
     width = *(int *)(hdr + 8) >> 6;
     if (width < 1)
         width = 1;

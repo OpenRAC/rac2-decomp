@@ -37,8 +37,8 @@ int func_L00_00428000(char *self, char *target)
         offset.f[0] = D_L00_001B1630[0];
         offset.f[2] = 0.12f;
         info = *(char **)(target + 0x68);
-        func_00283098(&offset, &offset, target + 0xC0);
-        func_00282CC0(&pos, target + 0x10, &offset);
+        matrix_mul_vec3(&offset, &offset, target + 0xC0);
+        FastVecAdd(&pos, target + 0x10, &offset);
         if (*(int *)(info + 0x10) == -1) {
             func_L00_002D7958(orbit, self + 0x50, 0.0f);
             orbit[2] = 6.0f;
@@ -47,15 +47,15 @@ int func_L00_00428000(char *self, char *target)
             func_L00_00427BE8(self, orbit, 0.0f, &pos);
         }
         if (*(int *)(info + 0x10) <= 0) {
-            *(float *)(cam + 0xAC) = func_00283B98(*(float *)(cam + 0xAC), *(float *)(info + 0x18));
+            *(float *)(cam + 0xAC) = FastAddRotations(*(float *)(cam + 0xAC), *(float *)(info + 0x18));
             *(float *)(info + 0x18) *= 0.97f;
-            angle = func_00283C80(func_00283248(D_L00_001B8C80.pos.f[0] - D_00189E20.pos.f[0],
+            angle = FastDiffRots(func_00283248(D_L00_001B8C80.pos.f[0] - D_00189E20.pos.f[0],
                                                 D_L00_001B8C80.pos.f[1] - D_00189E20.pos.f[1]),
                                   D_L00_001B8C80.yaw);
-            d = func_00282E80(&D_00189E20.pos, &D_L00_001B8C80.pos) <
-                        func_00282E80(D_00189E20.partner + 0x10, &D_L00_001B8C80.pos)
-                    ? func_00282E80(&D_00189E20.pos, &D_L00_001B8C80.pos)
-                    : func_00282E80(D_00189E20.partner + 0x10, &D_L00_001B8C80.pos);
+            d = vec_distance_xy(&D_00189E20.pos, &D_L00_001B8C80.pos) <
+                        vec_distance_xy(D_00189E20.partner + 0x10, &D_L00_001B8C80.pos)
+                    ? vec_distance_xy(&D_00189E20.pos, &D_L00_001B8C80.pos)
+                    : vec_distance_xy(D_00189E20.partner + 0x10, &D_L00_001B8C80.pos);
             if (d < 0.77f) {
                 if (angle < 1.5707965f) {
                     *(float *)(cam + 0x1C) -= 0.7f - d;

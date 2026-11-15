@@ -35,7 +35,7 @@ void func_L08_003C67B8(char *object, void *position, int count,
     int kind, duration, size;
     unsigned char *particle;
 
-    if (!func_00278E78()) {
+    if (!GetCollHitMaterial()) {
         startColor = D_L08_001AFBC8;
         endColor = D_L08_001AFBCC;
     }
@@ -48,23 +48,23 @@ void func_L08_003C67B8(char *object, void *position, int count,
         component *= func_002A7878(innerRadius, outerRadius);
         frame.offset.f[1] = component;
         frame.offset.f[2] = 0.0f;
-        func_00283098(&frame.offset, &frame.offset, object + 0xC0);
-        length = func_00282DF0(&frame.offset);
+        matrix_mul_vec3(&frame.offset, &frame.offset, object + 0xC0);
+        length = FastVecLength(&frame.offset);
         magnitude = speed * ((outerRadius - length) * 0.01666666753590107f) / outerRadius;
-        func_00282F20(&frame.velocity, &frame.offset,
+        vec_scale_to_length(&frame.velocity, &frame.offset,
                      func_002A7878(magnitude / D_L08_001AFB68, magnitude));
         frame.inherited.q = *(ParticleQuad *)state;
         frame.inherited.f[2] *= D_L08_001AFBBC;
-        func_00282CC0(&frame.velocity, &frame.velocity, &frame.inherited);
+        FastVecAdd(&frame.velocity, &frame.velocity, &frame.inherited);
         frame.velocity.f[2] += func_002A7878(rise / D_L08_001AFB6C, rise) * 0.01666666753590107f;
         qzero_nc(&frame.acceleration);
-        func_00282CC0(&frame.offset, &frame.offset, position);
+        FastVecAdd(&frame.offset, &frame.offset, position);
         frame.offset.f[2] += D_L08_001AFBC0;
         frame.velocity.f[3] = startScale;
         frame.acceleration.f[3] = endScale;
-        kind = func_00283CF0(func_002A7878(D_L08_001AFB38, D_L08_001AFB3C));
-        duration = func_00283CF0(func_002A7878(D_L08_001AFB40, D_L08_001AFB44));
-        size = func_00283CF0(func_002A7878(D_L08_001AFB48, D_L08_001AFB4C));
+        kind = FloatToInt(func_002A7878(D_L08_001AFB38, D_L08_001AFB3C));
+        duration = FloatToInt(func_002A7878(D_L08_001AFB40, D_L08_001AFB44));
+        size = FloatToInt(func_002A7878(D_L08_001AFB48, D_L08_001AFB4C));
         particle = func_002BAA28(&frame.offset, &frame.velocity, &frame.acceleration, startColor, endColor,
                                kind, duration, size, -1);
         if (particle && (func_001163B0() & 1))

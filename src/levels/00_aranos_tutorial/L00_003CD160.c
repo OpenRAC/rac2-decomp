@@ -71,7 +71,7 @@ void func_L00_003CD160(unsigned char *obj) {
         angle = 0.0f;
         frame.direction.f[3] = 1.0f;
         frame.direction.f[2] = angle;
-        step = 6.283186f / (func_00283CE0(9) - 1.0f);
+        step = 6.283186f / (IntToFloat(9) - 1.0f);
         p = ctx;
         i = 8;
         do {
@@ -79,7 +79,7 @@ void func_L00_003CD160(unsigned char *obj) {
             angle += step;
             --i;
             func_002ACDE8(p, &frame.offset, &frame.rotated);
-            func_00282CC0(p, p, obj + 0x10);
+            FastVecAdd(p, p, obj + 0x10);
             *(float *)(p + 0xC) = 0.6f;
             p += 0x10;
         } while (i >= 0);
@@ -92,17 +92,17 @@ void func_L00_003CD160(unsigned char *obj) {
         frame.offset.f[0] = func_00283180(*(float *)(obj + 0xF8)) * 0.083333336f;
         frame.offset.f[1] = func_00283198(*(float *)(obj + 0xF8)) * 0.083333336f;
         frame.offset.f[2] = 0.0f;
-        func_00282CC0(obj + 0x10, &frame.offset, obj + 0x10);
+        FastVecAdd(obj + 0x10, &frame.offset, obj + 0x10);
         if (++*(int *)(ctx + 0x204) > 0x207) {
             *(int *)(ctx + 0x204) = 0;
             qcopy(obj + 0x10, ctx + 0x210);
         }
-        if (func_002ACBC8(&D_00189EA0, *(int *)(ctx + 0x220))) {
+        if (IsPointInCuboid(&D_00189EA0, *(int *)(ctx + 0x220))) {
             func_L00_002E6CF0(func_L00_003CD658, obj);
         }
     }
     camera = (char *)&D_00189EA0;
-    if (func_002ACBC8(camera, *(int *)(ctx + 0x20C))) {
+    if (IsPointInCuboid(camera, *(int *)(ctx + 0x20C))) {
         qcopy(&frame.offset, &D_00189EA0);
         frame.offset.f[2] += 0.75f;
         camera -= 0x80;

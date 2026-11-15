@@ -33,17 +33,17 @@ void func_L12_00407DE8(u8 *obj) {
     }
     switch(obj[0x20]) {
     case 0:
-        func_00282CC0(next,obj+0x10,state);
-        func_002A8C00(&hit,obj,1,state,*(float *)(state+0x14));
+        FastVecAdd(next,obj+0x10,state);
+        make_hit_descriptor(&hit,obj,1,state,*(float *)(state+0x14));
         hit.owner=*(u16 *)(obj+0xAA);
-        if (func_002761F8(obj+0x10,next,0,obj,&hit)) {
+        if (CollLine(obj+0x10,next,0,obj,&hit)) {
             if (*(void **)D_L12_001C0258) {
                 if (*(void **)D_L12_001C0258!=*(void **)(state+0x10)) {
                     *(Quadword *)impact=*(Quadword *)state;
-                    func_00282D30(impact,impact,1.5f);
+                    FastVecScale(impact,impact,1.5f);
                     impact[2]=1.0f;
                     impact[3]=5627.9248046875f;
-                    func_002A8C00(&hit2,obj,0x10001,impact,*(float *)(state+0x14));
+                    make_hit_descriptor(&hit2,obj,0x10001,impact,*(float *)(state+0x14));
                     hit2.active=1;
                     hit2.owner=*(u16 *)(obj+0xAA);
                     hit2.mode=0;
@@ -53,10 +53,10 @@ void func_L12_00407DE8(u8 *obj) {
                 }
             } else {
                 *(Quadword *)impact=*(Quadword *)state;
-                func_00282D30(impact,impact,3.0f);
+                FastVecScale(impact,impact,3.0f);
                 impact[2]=1.0f;
                 impact[3]=5627.9248046875f;
-                func_002A8C00(&hit2,obj,0x10001,impact,*(float *)(state+0x14));
+                make_hit_descriptor(&hit2,obj,0x10001,impact,*(float *)(state+0x14));
                 hit2.active=1;
                 hit2.owner=*(u16 *)(obj+0xAA);
                 hit2.mode=0;
@@ -66,10 +66,10 @@ void func_L12_00407DE8(u8 *obj) {
             }
         }
         *(Quadword *)(obj+0x10)=*(Quadword *)next;
-        func_00282D30(impact,state,-0.5f);
+        FastVecScale(impact,state,-0.5f);
         break;
     case 1:
-        func_0032C700(obj+0x10,0,3,3,3,3,3,0,0,0,0,0,0.75f,20.0f);
+        SpawnExplosion(obj+0x10,0,3,3,3,3,3,0,0,0,0,0,0.75f,20.0f);
         func_0029F338(obj);
         return;
     }

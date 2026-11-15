@@ -30,11 +30,11 @@ void func_L06_00456F08(u8 *object)
         {
             u8 *active = D_00188660 + *(s32 *)(state + 0xC) * 0x70;
             if (*(u8 **)(active + 0x88) != object || !active[0x74])
-                *(s32 *)(state + 0xC) = func_002E5CF8(1, 4, (char *)object);
+                *(s32 *)(state + 0xC) = PlayMobySound(1, 4, (char *)object);
         }
-        *(float *)(object + 0xF8) = func_00283B98(*(float *)(object + 0xF8), *(float *)(state + 4) * 0.00029088825f);
+        *(float *)(object + 0xF8) = FastAddRotations(*(float *)(object + 0xF8), *(float *)(state + 4) * 0.00029088825f);
         if (func_002A9640(object, 0x4010000, 0) && *(s32 *)state == 0) {
-            func_002E5CF8(0, 0, (char *)object);
+            PlayMobySound(0, 0, (char *)object);
             func_002A7750(object, 2, -1);
             slot = *(s32 *)(state + 0xC);
             if (slot != -1) {
@@ -51,7 +51,7 @@ void func_L06_00456F08(u8 *object)
             func_L00_00326110(object, 15, 0.0f);
         offset.quad = 0;
         offset.f[0] = -0.116666675f;
-        func_00283098(&offset, &offset, object + 0xC0);
+        matrix_mul_vec3(&offset, &offset, object + 0xC0);
         func_002B0A68((char *)object, 31, &offset, 255, 3.0f, 6.0f, 3.0f, 6.0f);
         func_0029F338(object);
         break;

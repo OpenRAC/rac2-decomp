@@ -102,12 +102,12 @@ void func_L12_003E0BF0(u8 *o) {
         hit=func_002B1C20(o,d+0x60);
         target=*(u8 **)(d+0x38);
         if(target && *(short *)(target+0xAA)==0xFAB) {
-            func_00282CF0(temp,o+0x10,target+0x10);
-            func_00282F20(temp,temp,1.0f);
+            FastVecSub(temp,o+0x10,target+0x10);
+            vec_scale_to_length(temp,temp,1.0f);
             func_002A8F70(o,D_0018C0B0,0x10000,*(u8 **)(d+0x38)+0x10,temp,50.0f);
         }
         if(hit&1) {
-            func_002A6C58(o,0,3);
+            SetDeathBits(o,0,3);
             qcopy(temp,o+0x10);
             temp[2]+=0.25f;
             func_L01_003E9CF8(o,0,0);
@@ -138,7 +138,7 @@ void func_L12_003E0BF0(u8 *o) {
             *(float *)(d+0x350)=func_00283180(angle)*speed;
             *(float *)(d+0x354)=func_00283198(angle)*speed;
             *(int *)(d+0x358)=0;
-            func_00282CC0(d+0x350,d+0x350,d+0x340);
+            FastVecAdd(d+0x350,d+0x350,d+0x340);
             if(o[0x43]!=15) func_002A7470(o,15,0,10);
         }
         func_002B5258(o);
@@ -184,7 +184,7 @@ void func_L12_003E0BF0(u8 *o) {
             u8 *yaw=o+0xF8;
             u8 *target=*(u8 **)(d+0x368);
             angle=func_00283248(*(float *)(target+0x10)-*(float *)(o+0x10),*(float *)(target+0x14)-*(float *)(o+0x14));
-            func_002AA800(yaw,0,angle,0.058177649974823f);
+            StepAngleTowardTarget(yaw,0,angle,0.058177649974823f);
             time=func_0029F530(o);
             if(12.0f<=time && time<=14.0f) func_002A8D70(o,2,1,0,1,0,0.25f,d[0x34],1.0f);
             func_002B5258(o);
@@ -215,8 +215,8 @@ void func_L12_003E0BF0(u8 *o) {
             time=func_0029F530(o);
             if(11.0f<=time) {
                 int release=1;
-                func_00283098(temp,D_L12_001B0A30,o+0xC0);
-                func_00282CC0(temp,temp,o+0x10);
+                matrix_mul_vec3(temp,D_L12_001B0A30,o+0xC0);
+                FastVecAdd(temp,temp,o+0x10);
                 if(!(14.0f<=time)) release=0;
                 func_L12_003E0A38(*(u8 **)(d+0x374),temp,o+0xF0,release);
                 if(release) *(int *)(d+0x374)=0;

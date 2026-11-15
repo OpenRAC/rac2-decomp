@@ -87,7 +87,7 @@ void func_003409C8(struct Obj *o, s32 flags) {
             }
         }
     } else if (flags & 0x40) {
-        func_003407F8(o, D_00259F58, 4);
+        AddMenuItemToRing(o, D_00259F58, 4);
     }
     o->f820 = D_00259F58[o->f814 + o->f818 * 4][3];
 }

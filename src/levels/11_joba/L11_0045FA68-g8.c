@@ -27,17 +27,17 @@ void func_L11_0045FA68(char *p)
     float a, b;
     switch (*(unsigned char *)(p + 0x20)) {
     case 0:
-        *(float *)(p + 0xF0) = func_00283B98(*(float *)(p + 0xF0), *(float *)(q + 0x20) * 0.7f);
-        *(float *)(p + 0xF4) = func_00283B98(*(float *)(p + 0xF4), *(float *)(q + 0x20) * 0.5f);
-        *(float *)(p + 0xF8) = func_00283B98(*(float *)(p + 0xF8), *(float *)(q + 0x20));
-        func_00282CC0(next, p + 0x10, q);
+        *(float *)(p + 0xF0) = FastAddRotations(*(float *)(p + 0xF0), *(float *)(q + 0x20) * 0.7f);
+        *(float *)(p + 0xF4) = FastAddRotations(*(float *)(p + 0xF4), *(float *)(q + 0x20) * 0.5f);
+        *(float *)(p + 0xF8) = FastAddRotations(*(float *)(p + 0xF8), *(float *)(q + 0x20));
+        FastVecAdd(next, p + 0x10, q);
         if (func_00277258(next, 0, p, D_L11_001B22C8) &&
             D_L11_001C0D18 && D_L11_001C0D18 != *(char **)(q + 0x10)) {
             func_002A7750(p, 1, -1);
             return;
         }
         qcopy(p + 0x10, next);
-        func_00282D30(velocity, q, -0.5f);
+        FastVecScale(velocity, q, -0.5f);
         func_00282C88(zero);
         a = func_002A7878(2.5f, 3.0f) * 210000.0f;
         b = func_002A7878(0.2f, 0.4f) * 210000.0f;
@@ -53,11 +53,11 @@ void func_L11_0045FA68(char *p)
         break;
     case 1:
         func_002A8C28(p, p + 0x10, 3.0f, 0x10001, *(float *)(q + 0x18), 1.0f, 0, 1, 0);
-        func_0032C700(p + 0x10, 1, 2, 2, 5, 10, 2, 1, 3.0f, 0.0f, 0, 1, 0, 0);
+        SpawnExplosion(p + 0x10, 1, 2, 2, 5, 10, 2, 1, 3.0f, 0.0f, 0, 1, 0, 0);
         func_0029F338(p);
         return;
     case 2:
-        func_0032C700(p + 0x10, 0, 10, 2, 10, 5, 2, 1, 2.0f, 0.0f, 0, 1, 0, 0);
+        SpawnExplosion(p + 0x10, 0, 10, 2, 10, 5, 2, 1, 2.0f, 0.0f, 0, 1, 0, 0);
         func_0029F338(p);
         return;
     }

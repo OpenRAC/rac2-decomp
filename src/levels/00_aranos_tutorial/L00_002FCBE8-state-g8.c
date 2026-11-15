@@ -19,7 +19,7 @@ void func_L00_002FCBE8(void) {
     for(i=0;i<D_L00_001BCAC0.count;i++) {
             char *obj=(char *)D_L00_001BCAC0.objects[i];
             if (obj && *(short *)(obj+0xAA)==0xE29) *(unsigned short *)(obj+0x34)|=0x800;
-            if (*(short *)(obj+0xAA)==0xD54) func_002E64A0(obj);
+            if (*(short *)(obj+0xAA)==0xD54) UpdateEquipmentPieces(obj);
             if (obj && *(short *)(obj+0xAA)==4000 && *(char **)(obj+0x68)) {
                 func_L00_00326048(obj,*(char **)(obj+0x68)+12,0x80AAAAD2,0x80396464,0.061086535f);
             }

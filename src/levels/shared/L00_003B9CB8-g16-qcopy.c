@@ -97,7 +97,7 @@ void func_L00_003C27A0(u8 *self)
             self[0x30] = stamp;
         }
         if (st->spawn != 0) {
-            moby = func_0029EFD0(0xE9B);
+            moby = CreateMoby(0xE9B);
             st->moby = moby;
             if (moby != 0) {
                 func_002B37E8(moby, self);
@@ -105,7 +105,7 @@ void func_L00_003C27A0(u8 *self)
                 *(u16 *)(st->moby + 0x34) |= 0x5000;
             }
         }
-        func_L00_00323448(self, st->track, 100, st->group_b, st->group, st->x18, 8, 0);
+        BuildObjectAttachmentTransforms(self, st->track, 100, st->group_b, st->group, st->x18, 8, 0);
         if (D_001A79F0[0] == 2 && st->group_b != -1) {
             p = D_L00_001FA920[st->group_b];
             do {
@@ -138,7 +138,7 @@ void func_L00_003C27A0(u8 *self)
             *(f32 *)(st->moby + 0xF8) = func_00283248(*(f32 *)e, *(f32 *)(e + 4));
             if (func_002A9640(st->moby, 0x10000, 0) != 0) {
                 *(f32 *)(st->moby + 0x2C) = *(f32 *)(*(u8 **)(st->moby + 0x24) + 0x24) * 1.35f;
-                func_002833F0(st->moby + 0xC0, st->moby + 0xF0);
+                euler_rotation_basis(st->moby + 0xC0, st->moby + 0xF0);
                 if (func_00282C48(*(f32 *)(st->moby + 0xF8)) > 1.6f) {
                     qcopy_nc(&cols[0], D_L00_001AFEB0);
                     qcopy_nc(&cols[1], &D_L00_001AFEA0);
@@ -146,12 +146,12 @@ void func_L00_003C27A0(u8 *self)
                     qcopy_nc(&cols[0], &D_L00_001AFEA0);
                     qcopy_nc(&cols[1], D_L00_001AFEB0);
                 }
-                func_L00_0032A530(st->moby, cols, D_L00_001AFE98, D_L00_001AFE90, 0, 0, -1, 1, 0xFFFE, 0xFF, 0);
+                ScatterObjectPieces(st->moby, cols, D_L00_001AFE98, D_L00_001AFE90, 0, 0, -1, 1, 0xFFFE, 0xFF, 0);
                 func_L00_00321878(st->moby, 30, 50, 2, -1, func_002A7820(3, 5), 0.0f);
                 func_002E5DA0(0, 0, st->moby, 0xE9B);
                 here = *(Vec_L00_003C27A0 *)(self + 0x10);
                 func_L00_003C2DE8((char *)st->moby, (char *)&here, 1.5f, 0.116666675f);
-                func_0032C700(st->moby + 0x10, 0, 25, 20, 20, 20, 45, 0, 0.85f, 20.0f, 1, 0, 0, 0);
+                SpawnExplosion(st->moby + 0x10, 0, 25, 20, 20, 20, 45, 0, 0.85f, 20.0f, 1, 0, 0, 0);
                 for (r = D_L00_001A9014[st->group];
                      r != 0 && ((s16)r[-1] >= 0 || r == D_L00_001A9014[st->group]); r++) {
                     spot = D_L00_001B2514 + ((*r & 0x7FFF) << 5);
@@ -169,7 +169,7 @@ void func_L00_003C27A0(u8 *self)
                         f += 16;
                     }
                 }
-                func_002E5CF8(0, 0, st->moby);
+                PlayMobySound(0, 0, st->moby);
                 func_0029F338(st->moby);
                 func_0029F338(self);
                 return;
@@ -182,8 +182,8 @@ void func_L00_003C27A0(u8 *self)
         if (st->x3C > 0.0f)
             func_002AEF28(self, &st->x28, &st->x2C, st->x38 * 0.017453294f, st->x3C * 0.000290888245f,
                           0.0058177654f);
-        *(f32 *)(self + 0xF8) = func_00283B98(*(f32 *)(self + 0xF8), st->spin * 0.000290888245f);
-        st->angle = func_00283B98(st->angle, st->spin * 0.000290888245f);
+        *(f32 *)(self + 0xF8) = FastAddRotations(*(f32 *)(self + 0xF8), st->spin * 0.000290888245f);
+        st->angle = FastAddRotations(st->angle, st->spin * 0.000290888245f);
         func_L00_00323958(self, st->track);
         break;
     }

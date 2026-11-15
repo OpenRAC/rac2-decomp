@@ -100,7 +100,7 @@ void func_L11_00453358(u8 *self)
         func_00283248(((Hero *)D_00189E20)->f[0x80 / 4] - *(f32 *)(self + 0x10),
                       ((Hero *)D_00189E20)->f[0x84 / 4] - *(f32 *)(self + 0x14));
     }
-    dist = func_00282E48((self + 0x10), v00);
+    dist = fast_vec_dist((self + 0x10), v00);
     if (self[0x20] == 1)
         return;
     if (*(s16 *)(pv + 0x1FC) != 0 && D_L11_001A8FF4 == 0)
@@ -152,9 +152,9 @@ void func_L11_00453358(u8 *self)
             best = 0;
             turn(self, 0.027777778f, 3.3333335f);
             *(f32 *)(pv + 0x1C8) = func_002A7878(1.0f, 3.0f);
-            d = func_00282E48((self + 0x10), p);
+            d = fast_vec_dist((self + 0x10), p);
             for (i = 0; i < *(s32 *)path - 1; i++, p += 0x10) {
-                f32 e = func_00282E48((self + 0x10), p);
+                f32 e = fast_vec_dist((self + 0x10), p);
                 if (e < d) {
                     d = e;
                     best = i;
@@ -165,27 +165,27 @@ void func_L11_00453358(u8 *self)
         } else {
             qcopy(v10, path + 0x10 + (*(s32 *)(pv + 0x1D4) << 4));
             if (*(s16 *)(pv + 0x1FC) != 0) {
-                func_00282CF0(v30, v10, target);
+                FastVecSub(v30, v10, target);
                 v30[2] = 0.0f;
-                func_00282F20(v30, v30, 15.0f - *(f32 *)(pv + 0x1C8));
+                vec_scale_to_length(v30, v30, 15.0f - *(f32 *)(pv + 0x1C8));
                 v10[0] = *(f32 *)(target + 0) + v30[0];
                 v10[1] = *(f32 *)(target + 4) + v30[1];
             } else {
                 v10[2] = *(f32 *)(pv + 0x1C8) + *(f32 *)(target + 8);
             }
-            func_00282CF0(v20, v10, (self + 0x10));
+            FastVecSub(v20, v10, (self + 0x10));
             lim = 2.0f;
-            func_00282F20(v20, v20, *(f32 *)(pv + 0x1D8));
-            func_00282CC0((self + 0x10), (self + 0x10), v20);
+            vec_scale_to_length(v20, v20, *(f32 *)(pv + 0x1D8));
+            FastVecAdd((self + 0x10), (self + 0x10), v20);
             if (*(s16 *)(pv + 0x1FC) != 0)
                 lim = 4.0f;
             if (*(s16 *)(pv + 0x1E8) != 0) {
-                if (func_00282E48((self + 0x10), v10) < lim)
+                if (fast_vec_dist((self + 0x10), v10) < lim)
                     *(s32 *)(pv + 0x1D4) -= 1;
                 if (*(s32 *)(pv + 0x1D4) < 0)
                     *(s32 *)(pv + 0x1D4) = *(s32 *)path - 1;
             } else {
-                if (func_00282E48((self + 0x10), v10) < lim)
+                if (fast_vec_dist((self + 0x10), v10) < lim)
                     *(s32 *)(pv + 0x1D4) += 1;
                 if (*(s32 *)(pv + 0x1D4) >= *(s32 *)path)
                     *(s32 *)(pv + 0x1D4) = 0;
@@ -212,9 +212,9 @@ void func_L11_00453358(u8 *self)
         flag = 0;
         if (*(s16 *)(pv + 0x1FC) != 0) {
             if (4.0f < dist) {
-                func_00282CF0(v10, v00, (self + 0x10));
-                func_00282F20(v10, v10, 10.0f);
-                func_00282CC0(v10, v10, (self + 0x10));
+                FastVecSub(v10, v00, (self + 0x10));
+                vec_scale_to_length(v10, v10, 10.0f);
+                FastVecAdd(v10, v10, (self + 0x10));
                 func_L02_00333438(self, v10);
             } else {
                 func_L02_00333438(self, v00);
@@ -225,7 +225,7 @@ void func_L11_00453358(u8 *self)
             func_002AA548(self + 0x18, pv + 0x108, height, 0.0055555557f, 0.027777778f, 0.16666667f);
             func_002B4FF0(self, v00, *(f32 *)(pv + 0x1D0));
             if (func_00282C48(*(f32 *)(self + 0x18) - height) < 0.1f &&
-                func_00282E80((self + 0x10), &((Hero *)D_00189E20)->q[0x80 / 16]) < 2.0f)
+                vec_distance_xy((self + 0x10), &((Hero *)D_00189E20)->q[0x80 / 16]) < 2.0f)
                 flag = 1;
         }
         if (flag) {
@@ -255,12 +255,12 @@ void func_L11_00453358(u8 *self)
         for (k = 0; k < 4; k++)
             func_002A8D70(self, k, 1, 0.5f, (f32)pv[0x34], 1.0f, 0, 1, 0);
         lim = 1.8f;
-        if (lim <= func_00282E48((self + 0x10), &((Hero *)D_00189E20)->q[0x80 / 16])) {
+        if (lim <= fast_vec_dist((self + 0x10), &((Hero *)D_00189E20)->q[0x80 / 16])) {
             qcopy(v10, v00);
-        } else if (func_00282E48((self + 0x10), &((Hero *)D_00189E20)->q[0x80 / 16]) < lim) {
-            func_00282CF0(v10, (self + 0x10), v00);
-            func_00282F20(v10, v10, 2.0f);
-            func_00282CC0(v10, v10, (self + 0x10));
+        } else if (fast_vec_dist((self + 0x10), &((Hero *)D_00189E20)->q[0x80 / 16]) < lim) {
+            FastVecSub(v10, (self + 0x10), v00);
+            vec_scale_to_length(v10, v10, 2.0f);
+            FastVecAdd(v10, v10, (self + 0x10));
         } else {
             qcopy(v10, (self + 0x10));
         }
@@ -276,7 +276,7 @@ void func_L11_00453358(u8 *self)
             anim(self, 4, 5);
             *(f32 *)(self + 0x48) = 1.0f;
         }
-        if (func_00282E48((self + 0x10), &((Hero *)D_00189E20)->q[0x80 / 16]) > 4.0f && *(u16 *)(self + 0x96) >= 0x79) {
+        if (fast_vec_dist((self + 0x10), &((Hero *)D_00189E20)->q[0x80 / 16]) > 4.0f && *(u16 *)(self + 0x96) >= 0x79) {
             anim(self, 5, 15);
             func_002A7750(self, 4, -1);
             *(f32 *)(self + 0x48) = 1.0f;
@@ -302,8 +302,8 @@ void func_L11_00453358(u8 *self)
     case 13:
         qcopy_nc(v10, (self + 0x10));
         *(f32 *)(pv + 0x108) = *(f32 *)(pv + 0x108) - *(f32 *)(pv + 0x8C);
-        func_00282CC0((self + 0x10), (self + 0x10), pv + 0x100);
-        if (func_002761F8(v10, (self + 0x10), 0, self, 0) == 0 && func_00277258((self + 0x10), 4, self, 0.3f) == 0 &&
+        FastVecAdd((self + 0x10), (self + 0x10), pv + 0x100);
+        if (CollLine(v10, (self + 0x10), 0, self, 0) == 0 && func_00277258((self + 0x10), 4, self, 0.3f) == 0 &&
             func_002A77E0(0x1E) != 0)
             break;
         func_002A8C28(self, (self + 0x10), 0x10000, 0.5f, (f32)pv[0x34], 1.0f, 0, 1, 0);
@@ -323,9 +323,9 @@ void func_L11_00453358(u8 *self)
         f32 *rot;
         if (func_002B3868(self) != 0) {
             t = func_L11_004417E8(*(u8 **)(self + 0xB8));
-            func_00282CF0(pv + 0x100, t, (self + 0x10));
+            FastVecSub(pv + 0x100, t, (self + 0x10));
             *(f32 *)(pv + 0x108) = 0.0f;
-            func_00282F20(pv + 0x100, pv + 0x100, func_002A7878(3.0f, 5.0f) * 0.016666668f);
+            vec_scale_to_length(pv + 0x100, pv + 0x100, func_002A7878(3.0f, 5.0f) * 0.016666668f);
             *(s16 *)(pv + 0x1FC) = 0;
             for (j = 0; j < 3; j++) {
                 rot = (f32 *)(pv + 0x1B0);
@@ -337,12 +337,12 @@ void func_L11_00453358(u8 *self)
         }
         *(f32 *)(pv + 0x108) = *(f32 *)(pv + 0x108) - *(f32 *)(pv + 0x8C);
         func_L07_00321D68(self, pv + 0x100);
-        func_00282D30(pv + 0x1B0, pv + 0x1B0, 0.98f);
+        FastVecScale(pv + 0x1B0, pv + 0x1B0, 0.98f);
         *(TI128 *)v20 = 0;
         v20[2] = *(f32 *)(pv + 0x30);
         *(TI128 *)v10 = *(TI128 *)v20;
         func_002B4090(self, v10, *(f32 *)(pv + 0x1B0), *(f32 *)(pv + 0x1B4), *(f32 *)(pv + 0x1B8));
-        func_002833F0(self + 0xC0, self + 0xF0);
+        euler_rotation_basis(self + 0xC0, self + 0xF0);
         t = func_L11_004417E8(*(u8 **)(self + 0xB8));
         if (*(f32 *)(self + 0x18) < *(f32 *)(t + 8) + 5.0f || func_002A77E0(0x1C2) == 0 ||
             *(u16 *)(self + 0x96) >= 0x12D) {
@@ -355,19 +355,19 @@ void func_L11_00453358(u8 *self)
 
     if (*(s16 *)(pv + 0x1FC) != 0 && self[0x95] != 4) {
         f32 z = *(f32 *)(self + 0x18);
-        func_00282CF0(v10, (self + 0x10), target);
+        FastVecSub(v10, (self + 0x10), target);
         v10[2] = 0.0f;
-        func_00282F20(v10, v10, 14.3f);
-        func_00282CC0((self + 0x10), v10, target);
+        vec_scale_to_length(v10, v10, 14.3f);
+        FastVecAdd((self + 0x10), v10, target);
         *(f32 *)(self + 0x18) = z;
     }
     if (self[0x20] != 0xE) {
         *(f32 *)(pv + 0x1B0) = func_002AA150(*(f32 *)(pv + 0x1B0), D_L11_001B1D40 * 0.00029088825f, 0.0625f);
         *(f32 *)(pv + 0x1B4) = func_002AA150(*(f32 *)(pv + 0x1B4), D_L11_001B1D44 * 0.00029088825f, 0.0625f);
         *(f32 *)(pv + 0x1B8) = func_002AA150(*(f32 *)(pv + 0x1B8), D_L11_001B1D48 * 0.00029088825f, 0.0625f);
-        *(f32 *)(self + 0xF0) = func_00283B98(*(f32 *)(self + 0xF0), *(f32 *)(pv + 0x1B0));
-        *(f32 *)(self + 0xF4) = func_00283B98(*(f32 *)(self + 0xF4), *(f32 *)(pv + 0x1B4));
-        *(f32 *)(self + 0xF8) = func_00283B98(*(f32 *)(self + 0xF8), *(f32 *)(pv + 0x1B8));
+        *(f32 *)(self + 0xF0) = FastAddRotations(*(f32 *)(self + 0xF0), *(f32 *)(pv + 0x1B0));
+        *(f32 *)(self + 0xF4) = FastAddRotations(*(f32 *)(self + 0xF4), *(f32 *)(pv + 0x1B4));
+        *(f32 *)(self + 0xF8) = FastAddRotations(*(f32 *)(self + 0xF8), *(f32 *)(pv + 0x1B8));
     }
     if (target != 0 && *(s16 *)(pv + 0x1FC) == 0 && *(f32 *)(self + 0x18) <= *(f32 *)(target + 8) + 0.4f) {
         if (self[0x31] == 0) {

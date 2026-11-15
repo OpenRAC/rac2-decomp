@@ -84,10 +84,10 @@ void func_L00_00428588(unsigned char *object)
         *(void **)(tracking+8)=*(void **)(hero+0xAD4);
     } else {
         unsigned char *direction=data+0x70;
-        func_00282CF0(direction,*(unsigned char **)(hero+0xAA4)+0x10,translation);
+        FastVecSub(direction,*(unsigned char **)(hero+0xAA4)+0x10,translation);
         *(int *)(part+0x38)=0;
         *(int *)(part+0x3C)=0;
-        func_00282F20(direction,direction,1.0f);
+        vec_scale_to_length(direction,direction,1.0f);
         *(float *)(updated+0xB8)=func_00283248(*(float *)(part+0x30),*(float *)(part+0x34));
         *(void **)(tracking+8)=*(void **)(hero+0xAA4);
     }

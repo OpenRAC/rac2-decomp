@@ -108,7 +108,7 @@ extern int func_002E5DA0(int, int, void *, int);
 
 #define START_SOUND()                                 \
     if (!func_002E59B0(obj, ctx->soundHandle))        \
-        ctx->soundHandle = func_002E5CF8(0, 4, obj)
+        ctx->soundHandle = PlayMobySound(0, 4, obj)
 
 #define START_MOVING(state)                           \
     func_002A7750(obj, state, -1);                    \
@@ -143,7 +143,7 @@ void func_L00_003D0008(LiftMoby *obj) {
         }
         ctx->travelFrames = 0;
         ctx->soundHandle = -1;
-        made = func_0029EFD0(0xC16);
+        made = CreateMoby(0xC16);
         ctx->child = made;
         if (!made) {
             func_0029F338(obj);
@@ -159,13 +159,13 @@ void func_L00_003D0008(LiftMoby *obj) {
         frame.delta.f[0] = func_00283180(obj->rotation.f[2]);
         frame.delta.f[1] = func_00283198(obj->rotation.f[2]);
         frame.delta.f[2] = 0;
-        func_00282CC0(&ctx->child->position, &ctx->child->position, &frame.delta);
+        FastVecAdd(&ctx->child->position, &ctx->child->position, &frame.delta);
         func_002A0F48(ctx->child);
         ctx->blinkPhase = func_002A7940();
         break;
     case 1:
-        ctx->blinkPhase = func_00283B98(ctx->blinkPhase, 0.10471977f);
-        value = func_00283CF0((func_00283198(ctx->blinkPhase) * 4.0f - 3.0f) * 208.0f);
+        ctx->blinkPhase = FastAddRotations(ctx->blinkPhase, 0.10471977f);
+        value = FloatToInt((func_00283198(ctx->blinkPhase) * 4.0f - 3.0f) * 208.0f);
         if (value > 208)
             value = 208;
         else if (value < 80)
@@ -185,7 +185,7 @@ void func_L00_003D0008(LiftMoby *obj) {
             }
         }
         if (func_00282C48(obj->position.f[2] - PLAYER_POSITION.f[2]) > 6.0f && !ctx->atBottom
-            && func_00282E80(&obj->position, &PLAYER_POSITION) < 25.0f) {
+            && vec_distance_xy(&obj->position, &PLAYER_POSITION) < 25.0f) {
             START_SOUND();
             START_MOVING(3);
         } else if (func_00282C48(obj->position.f[2] - PLAYER_POSITION.f[2]) > 6.0f && ctx->atBottom == 1) {
@@ -196,13 +196,13 @@ void func_L00_003D0008(LiftMoby *obj) {
     case 2:
         qcopy(&frame.delta, &obj->position);
         frame.delta.f[2] = ctx->topHeight;
-        if (func_00282E48(&obj->position, &frame.delta) > 0.25f) {
+        if (fast_vec_dist(&obj->position, &frame.delta) > 0.25f) {
             func_002AA3A8(&obj->position.f[2], ctx->smoothing, frame.delta.f[2], 0.02f, 0.3f, 0.10000001f);
             ++ctx->travelFrames;
             break;
         }
         if (!func_L00_00324120(ctx->child)
-            && (func_00282E80(&obj->position, &PLAYER_POSITION) > 2.0f || obj->position.f[2] > PLAYER_POSITION.f[2])) {
+            && (vec_distance_xy(&obj->position, &PLAYER_POSITION) > 2.0f || obj->position.f[2] > PLAYER_POSITION.f[2])) {
             ctx->atBottom = 0;
             STOP_SOUND();
             func_002A7750(obj, 1, -1);
@@ -210,7 +210,7 @@ void func_L00_003D0008(LiftMoby *obj) {
             ctx->child->f98 = ctx->child->model->f10;
         } else {
             if (ctx->travelFrames > 0) {
-                func_002E5CF8(1, 0, obj);
+                PlayMobySound(1, 0, obj);
                 ctx->travelFrames = 0;
             }
             STOP_SOUND();
@@ -219,7 +219,7 @@ void func_L00_003D0008(LiftMoby *obj) {
     case 3:
         if (obj->position.f[2] > ctx->bottomHeight) {
             if (obj->position.f[2] - PLAYER_POSITION.f[2] < 1.8f && PLAYER_POSITION.f[2] < obj->position.f[2]) {
-                if (func_002ACBC8(&PLAYER_POSITION, ctx->fA4))
+                if (IsPointInCuboid(&PLAYER_POSITION, ctx->fA4))
                     break;
                 func_002AA3A8(&obj->position.f[2], ctx->smoothing, ctx->bottomHeight, 0.02f, 0.3f, 0.10000001f);
                 ++ctx->travelFrames;
@@ -231,7 +231,7 @@ void func_L00_003D0008(LiftMoby *obj) {
             break;
         }
         if (!func_L00_00324120(ctx->child)
-            && (func_00282E80(&obj->position, &PLAYER_POSITION) > 2.0f || obj->position.f[2] > PLAYER_POSITION.f[2])) {
+            && (vec_distance_xy(&obj->position, &PLAYER_POSITION) > 2.0f || obj->position.f[2] > PLAYER_POSITION.f[2])) {
             ctx->atBottom = 1;
             STOP_SOUND();
             func_002A7750(obj, 1, -1);
@@ -240,19 +240,19 @@ void func_L00_003D0008(LiftMoby *obj) {
             ctx->travelFrames = 0;
         } else {
             if (ctx->travelFrames > 0) {
-                func_002E5CF8(1, 0, obj);
+                PlayMobySound(1, 0, obj);
                 ctx->travelFrames = 0;
             }
             STOP_SOUND();
         }
         break;
     }
-    func_00282CF0(&frame.delta, &obj->position, &frame.old);
+    FastVecSub(&frame.delta, &obj->position, &frame.old);
     func_002AD6F0(ctx->mover, &frame.delta, &frame.rotation, &obj->rotation);
     qcopy(&ctx->child->position, &obj->position);
     frame.offset.f[0] = func_00283180(obj->rotation.f[2]);
     frame.offset.f[1] = func_00283198(obj->rotation.f[2]);
     frame.offset.f[2] = 0;
-    func_00282CC0(&ctx->child->position, &ctx->child->position, &frame.offset);
+    FastVecAdd(&ctx->child->position, &ctx->child->position, &frame.offset);
     ctx->child->position.f[2] += 0.25f;
 }

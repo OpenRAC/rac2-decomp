@@ -72,7 +72,7 @@ extern s32 func_L05_0042C928(void *pos, s32 a1, s32 a2, s32 a3);
    dot product with the current gate's forward axis turns positive (and differs from last frame's),
    a pass within 1.25 units of the gate scores, otherwise the miss count rises and the next gate
    takes over. Twelve misses or func_L05_00417748 fail the mission; once no gate is left, the
-   reward is paid through func_L05_00420788. */
+   reward is paid through UpdateFeltzinMissionReward. */
 void func_L05_00421100(u8 *actor)
 {
     struct { Vec up, pos, toward, away; } v;
@@ -147,7 +147,7 @@ void func_L05_00421100(u8 *actor)
         }
     }
     if (!D_L05_001B13B4 && !D_L05_001B13B8 && !D_L05_001B13E4) {
-        func_L05_00420788(actor, 3);
+        UpdateFeltzinMissionReward(actor, 3);
         return;
     }
     if (func_L05_00417748(func_00379ED0(0xF82))) {

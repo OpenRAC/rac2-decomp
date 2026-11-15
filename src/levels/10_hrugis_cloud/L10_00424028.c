@@ -83,7 +83,7 @@ void func_L10_0042BCA0(u8 *object)
         *(f32 *)(object + 0x18) = 512.0f;
         *(s32 *)(object + 0x1C) = 0;
         *(f32 *)(object + 0x2C) = *(f32 *)(*(u8 **)(object + 0x24) + 0x24) * 4.0f;
-        L10_PARTNER(state) = func_0029EFD0(0x11CD);
+        L10_PARTNER(state) = CreateMoby(0x11CD);
         L10_PARTNER(state)[0x30] = 0xFF;
         *(u16 *)(L10_PARTNER(state) + 0x32) = 0x1FF;
         *(f32 *)(L10_PARTNER(state) + 0x2C) =
@@ -96,9 +96,9 @@ void func_L10_0042BCA0(u8 *object)
         }
     case 1:
         if (*(s32 *)state != 0)
-            *(f32 *)(object + 0xF8) = func_00283B98(*(f32 *)(object + 0xF8), 0.0049087391f);
+            *(f32 *)(object + 0xF8) = FastAddRotations(*(f32 *)(object + 0xF8), 0.0049087391f);
         else
-            *(f32 *)(object + 0xF8) = func_00283BE0(*(f32 *)(object + 0xF8), 0.0049087391f);
+            *(f32 *)(object + 0xF8) = fast_subtract_rotations(*(f32 *)(object + 0xF8), 0.0049087391f);
         *(f32 *)(L10_PARTNER(state) + 0xF0) = *(f32 *)(object + 0xF0);
         *(f32 *)(L10_PARTNER(state) + 0xF8) = *(f32 *)(object + 0xF8);
         qcopy(L10_PARTNER(state) + 0x10, object + 0x10);

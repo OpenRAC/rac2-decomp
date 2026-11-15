@@ -32,7 +32,7 @@ void func_L07_003E5FA8(char *arg)
     qzero_nc(angles);
     if (*(void **)(state + 0x260)) {
         func_002AD0E0(arg, *(void **)(state + 0x260), arg + 0x10, angles, carryDelta, angles);
-        func_00282CF0(carryDelta, carryDelta, arg + 0x10);
+        FastVecSub(carryDelta, carryDelta, arg + 0x10);
     } else {
         qzero_nc(carryDelta);
     }
@@ -46,11 +46,11 @@ void func_L07_003E5FA8(char *arg)
             position[2] = -position[2];
         func_002A7A00(velocity, D_L07_001B0AB0 * (1.0f / 60.0f),
                       D_L07_001B0AB4[0] * (1.0f / 60.0f));
-        func_00282CC0(velocity, velocity, carryDelta);
+        FastVecAdd(velocity, velocity, carryDelta);
         randomValue = func_002A7820(D_L07_001B0AD0[0], D_L07_001B0AD0[1]);
-        func_00283098(position, position, arg + 0xC0);
+        matrix_mul_vec3(position, position, arg + 0xC0);
         randomValue = (unsigned char)randomValue;
-        func_00282CC0(position, position, arg + 0x10);
+        FastVecAdd(position, position, arg + 0x10);
         scale = func_002A7878(D_L07_001B0AC0[0], D_L07_001B0AC0[1]);
         randomByte = func_002A77E0(255);
         func_002C3150(position, velocity, D_L07_001B0AC8, scale, randomValue, (unsigned char)randomByte, 0);

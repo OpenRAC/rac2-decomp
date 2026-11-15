@@ -47,26 +47,26 @@ void func_L00_002B39F0(int mode,float scale) {
         if(func_00282C48(v.y)>0.7f && func_00282C48(v.x)<0.12f) v.x=0.0f;
         if(func_00282C48(v.x)>0.7f && func_00282C48(v.y)<0.12f) v.y=0.0f;
     }
-    {float length=func_00282E20(&v);if(length>1.0f) func_00282D90(&v,&v,length);}
+    {float length=vec_length_xy(&v);if(length>1.0f) divide_vector_xyz(&v,&v,length);}
     y=v.y;
     if(v.x==0.0f && y==0.0f) {
         D_00189E20.x1b0=0.0f;
         if(D_00189E20.x22c3) D_00189E20.x1a0=func_L00_002D3290();else D_00189E20.x1a0=D_00189E20.x98;
         *(InputQuad *)z=0;z[0]=1.0f;
-        func_00283098((char *)&D_00189E20+0x190,z,D_00189E20.x2290+0xc0);
+        matrix_mul_vec3((char *)&D_00189E20+0x190,z,D_00189E20.x2290+0xc0);
     } else {
         D_00189E20.x1a0=func_00283248(-y,-v.x);
         if(D_00189E20.x1454) {
             angle=func_00283248(D_00189E20.x1fb0,D_00189E20.x1fb4);dir=2;
-            if(func_00283C80(angle,1.5707964897155762f)<0.7853982448577881f) dir=3;
-            else if(func_00283C80(angle,0.0f)<0.7853982448577881f) dir=1;
-            else if(func_00283C80(angle,3.1415929794311523f)<0.7853982448577881f) dir=0;
+            if(FastDiffRots(angle,1.5707964897155762f)<0.7853982448577881f) dir=3;
+            else if(FastDiffRots(angle,0.0f)<0.7853982448577881f) dir=1;
+            else if(FastDiffRots(angle,3.1415929794311523f)<0.7853982448577881f) dir=0;
             D_00189E20.x1457=dir;
             if(dir==3 && D_00189E20.x24b8>0.15f) D_00189E20.x1456=1;else D_00189E20.x1456=0;
         }
-        D_00189E20.x1a0=func_00283B98(D_00189E20.x1a0,D_L00_001B8C80.angle);
+        D_00189E20.x1a0=FastAddRotations(D_00189E20.x1a0,D_L00_001B8C80.angle);
         {float x=v.x,y=v.y;v.y=-x;v.x=-y;v.z=v.w=0.0f;if(D_001A7A44[0]) v.y=x;}
-        func_00283098((char *)&D_00189E20+0x190,&v,D_L00_001B8C80.matrix);
-        D_00189E20.x1b0=scale*func_00282E20(&v);
+        matrix_mul_vec3((char *)&D_00189E20+0x190,&v,D_L00_001B8C80.matrix);
+        D_00189E20.x1b0=scale*vec_length_xy(&v);
     }
 }

@@ -41,7 +41,7 @@ void func_L06_004012B0(char *obj) {
     case 0:
         qcopy(&frame.pos,obj+0x10);
         frame.pos.f[2] += 10.0f;
-        func_00282CC0(&ctx->velocity,obj+0x10,&frame.pos);
+        FastVecAdd(&ctx->velocity,obj+0x10,&frame.pos);
         ctx->handle=-1;
         obj[0x20]=1;
         return;
@@ -65,11 +65,11 @@ void func_L06_004012B0(char *obj) {
     case 2:
         if (func_00282948(ctx)) {
             float unit = 1.0f;
-            func_002E5CF8(0,0,obj);
+            PlayMobySound(0,0,obj);
             frame.random.q=0;
             frame.random.f[2]=0.050000004f;
-            func_00282CF0(&frame.direction,&D_L06_001B9700.position,&frame.pos);
-            func_00282F20(&frame.direction,&frame.direction,unit);
+            FastVecSub(&frame.direction,&D_L06_001B9700.position,&frame.pos);
+            vec_scale_to_length(&frame.direction,&frame.direction,unit);
             func_0032DA58(obj,obj+0x10,&frame.direction,5.0f);
             D_L06_001B9700.speed=0.1f;
             D_L06_001B9700.limit=90;
@@ -84,11 +84,11 @@ void func_L06_004012B0(char *obj) {
     case 3:
         if (func_00282948(ctx)) {obj[0x20]=2; return;}
         func_002AA548(obj+0x18,ctx->height,&ctx->speed,0.027777778f,0.027777778f,0.33333334f);
-        *(float *)(obj+0xF0)=func_00283B98(*(float *)(obj+0xF0),func_002A7820(-10,10)*0.017453294f);
-        *(float *)(obj+0xF4)=func_00283B98(*(float *)(obj+0xF4),func_002A7820(-10,10)*0.017453294f);
-        *(float *)(obj+0xF8)=func_00283B98(*(float *)(obj+0xF8),func_002A7820(-5,25)*0.017453294f);
+        *(float *)(obj+0xF0)=FastAddRotations(*(float *)(obj+0xF0),func_002A7820(-10,10)*0.017453294f);
+        *(float *)(obj+0xF4)=FastAddRotations(*(float *)(obj+0xF4),func_002A7820(-10,10)*0.017453294f);
+        *(float *)(obj+0xF8)=FastAddRotations(*(float *)(obj+0xF8),func_002A7820(-5,25)*0.017453294f);
         velocity=&ctx->velocity;
-        func_00282F20(velocity,velocity,ctx->speed);
+        vec_scale_to_length(velocity,velocity,ctx->speed);
         break;
     default:
         speed = 0.0f;
@@ -101,11 +101,11 @@ void func_L06_004012B0(char *obj) {
     frame.random.f[1]=func_002A7878(-1.0f,1.0f);
     frame.random.f[2]=func_002A7878(-1.0f,1.0f);
     frame.direction.q=frame.random.q;
-    func_00282F20(&frame.direction,&frame.direction,func_002A7878(0.1f,0.2f)*0.016666668f);
-    func_00282F20(&frame.pos,velocity,-func_002A7878(0.0016666668f,0.016666668f));
-    func_00282CC0(&frame.direction,&frame.direction,&frame.pos);
-    func_00282F20(&frame.pos,velocity,func_002A7878(0.0f,1.0f)*speed);
-    func_00282CC0(&frame.pos,&frame.pos,position);
+    vec_scale_to_length(&frame.direction,&frame.direction,func_002A7878(0.1f,0.2f)*0.016666668f);
+    vec_scale_to_length(&frame.pos,velocity,-func_002A7878(0.0016666668f,0.016666668f));
+    FastVecAdd(&frame.direction,&frame.direction,&frame.pos);
+    vec_scale_to_length(&frame.pos,velocity,func_002A7878(0.0f,1.0f)*speed);
+    FastVecAdd(&frame.pos,&frame.pos,position);
     particle=func_002C16C0(&frame.pos,&frame.direction,20,60,0x606060,3,80000.0f,40000.0f,1.0f,-0.0002f,0.0f);
     if (particle) {
         particle[2]=*D_L06_001FF41C;

@@ -148,8 +148,8 @@ void func_L11_00417340(u8 *arg0) {
     loc[1] = -9.0f;
     loc[2] = -3.0f;
     loc[3] = 0.0f;
-    func_00283098(loc, loc, s0 + 0xC0);
-    func_00282CC0(loc, loc, s0 + 0x10);
+    matrix_mul_vec3(loc, loc, s0 + 0xC0);
+    FastVecAdd(loc, loc, s0 + 0x10);
 
     if (*(u8 **)(s1 + 0x10) != 0) {
         *(f32 *)(*(u8 **)(s1 + 0x10) + 0x10) = loc[0] - 2.0f;
@@ -188,7 +188,7 @@ void func_L11_00417340(u8 *arg0) {
         *(f32 *)(p + 0xF8) = func_00283248(*(f32 *)(base + 0x80) - *(f32 *)(p + 0x10),
                                           *(f32 *)(base + 0x84) - *(f32 *)(p + 0x14));
         *(s32 *)(p + 0xFC) = 0;
-        func_002833F0(p + 0xC0, p + 0xF0);
+        euler_rotation_basis(p + 0xC0, p + 0xF0);
         switch (*(s16 *)(p + 0xAA)) {
         case 0xD98:
             func_L11_004496A0(p, total, 0);
@@ -201,7 +201,7 @@ void func_L11_00417340(u8 *arg0) {
             break;
         case 0xDF7:
             *(f32 *)(p + 0x18) += 0.5f;
-            func_L11_00454C78(p, func_00283CF0((f32)total * 0.16666667f), 0);
+            func_L11_00454C78(p, FloatToInt((f32)total * 0.16666667f), 0);
             break;
         case 0xDF9:
             func_L11_00456438(p, total);

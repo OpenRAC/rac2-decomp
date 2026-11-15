@@ -62,13 +62,13 @@ void func_L00_00395428(char *object)
             if (distance >= 6.0f) {
                 emitting = 1;
                 if (!func_00282948(&D_L00_001B27D4)) {
-                    float elapsed = func_00283CE0(D_L00_001B27D4);
-                    elapsed /= func_00283CE0(D_L00_001AF278);
+                    float elapsed = IntToFloat(D_L00_001B27D4);
+                    elapsed /= IntToFloat(D_L00_001AF278);
                     D_L00_001B27DC = 1.0f - elapsed;
                 } else if (distance >= 12.0f) {
                     if (!func_00282948(&D_L00_001B27D8)) {
-                        float elapsed = func_00283CE0(D_L00_001B27D8);
-                        elapsed /= func_00283CE0(D_L00_001AF27C);
+                        float elapsed = IntToFloat(D_L00_001B27D8);
+                        elapsed /= IntToFloat(D_L00_001AF27C);
                         D_L00_001B27DC = elapsed;
                     } else {
                         D_L00_001B27DC = 0.0f;
@@ -84,8 +84,8 @@ void func_L00_00395428(char *object)
         }
         break;
     }
-    func_00282D30(&origin, object + 0xD0, -0.5f);
-    func_00282CC0(&origin, &origin, object + 0x10);
+    FastVecScale(&origin, object + 0xD0, -0.5f);
+    FastVecAdd(&origin, &origin, object + 0x10);
     active = 0;
     for (k = 0; k < 10; k++) {
         if (D_L00_001B2778[k]) {
@@ -107,11 +107,11 @@ void func_L00_00395428(char *object)
                 {
                     float sign = 1.0f;
                     for (j = 1; j < 5; j++) {
-                        func_00282CF0(&difference, &D_L00_00239EE0[i].p[j - 1], &D_L00_001B8DC0);
+                        FastVecSub(&difference, &D_L00_00239EE0[i].p[j - 1], &D_L00_001B8DC0);
                         func_002ACEC0(&random, &random, &difference,
                                      func_002A7878(0.174532949924469f, 0.7853982448577881f) * sign);
                         sign = -sign;
-                        func_00282CC0(&D_L00_00239EF0[i][j], &D_L00_00239EE0[i].p[j - 1], &random);
+                        FastVecAdd(&D_L00_00239EF0[i][j], &D_L00_00239EE0[i].p[j - 1], &random);
                     }
                 }
             } else {
@@ -121,19 +121,19 @@ void func_L00_00395428(char *object)
             }
         } else {
             for (j = 1; j < 5; j++) {
-                func_00282CF0(&offsets[j], &D_L00_00239EF0[i][j], &D_L00_00239EE0[i].p[j - 1]);
+                FastVecSub(&offsets[j], &D_L00_00239EF0[i][j], &D_L00_00239EE0[i].p[j - 1]);
                 offsets[j].f[0] += func_002A78D8(0.0f, 0.1f);
                 offsets[j].f[1] += func_002A78D8(0.0f, 0.1f);
                 offsets[j].f[2] += func_002A78D8(0.0f, 0.1f);
             }
             qcopy(&D_L00_00239EF0[i][0], &origin);
             for (j = 1; j < 5; j++)
-                func_00282CC0(&D_L00_00239EF0[i][j], &D_L00_00239EE0[i].p[j - 1], &offsets[j]);
+                FastVecAdd(&D_L00_00239EF0[i][j], &D_L00_00239EE0[i].p[j - 1], &offsets[j]);
             if (D_L00_001B2778[i] > 0)
                 D_L00_001B2790[i] = 32;
             else
                 D_L00_001B2790[i] = 0;
         }
     }
-    ref_L00_00395428_00(func_L00_003959C0, object);
+    ref_L00_00395428_00(UpdateScaledRecords, object);
 }

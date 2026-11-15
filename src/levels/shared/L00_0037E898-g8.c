@@ -57,11 +57,11 @@ void func_L00_00385040(char *object)
         vectors[1].f[1]=func_002A78D8(0.0f,D_L00_001AEE58);
         vectors[1].f[2]=func_002A78D8(0.0f,D_L00_001AEE5C);
         vectors[0].q=vectors[1].q;
-        func_00283098(&vectors[0],&vectors[0],D_L00_001B8DC0 + 0x230);
-        func_00282CC0(&vectors[0],&vectors[0],D_L00_001B8DC0);
+        matrix_mul_vec3(&vectors[0],&vectors[0],D_L00_001B8DC0 + 0x230);
+        FastVecAdd(&vectors[0],&vectors[0],D_L00_001B8DC0);
         speed=func_002A7878(D_L00_001AEE60[0],D_L00_001AEE60[1]);
         blend=func_002A7878(0.0f,1.0f);
-        color=func_00283D38(D_L00_001AEE50[0],D_L00_001AEE50[1],blend);
+        color=FastTweenColor(D_L00_001AEE50[0],D_L00_001AEE50[1],blend);
         random=func_002A77E0(255);
         func_002C3150(&vectors[0],D_L00_001A8F20,color,2,speed,random,0);
     }
@@ -160,17 +160,17 @@ void func_L00_00382F28(char *object)
     }
     if (D_L00_001B90C0.intensity <= 0.0f)
         return;
-    distance = func_00282E48(D_L00_001B8DC0, work);
+    distance = fast_vec_dist(D_L00_001B8DC0, work);
     baseSize = D_L00_001AED00;
-    center[0] = func_00283CE0(D_001A7348[0]);
-    center[1] = func_00283CE0(D_001A7348[1]);
+    center[0] = IntToFloat(D_001A7348[0]);
+    center[1] = IntToFloat(D_001A7348[1]);
     func_00279BD8(&screen, work);
-    screen.f[0] = (screen.f[0] - func_00283CE0(D_001A7348[2])) * 0.0625f;
-    screen.f[1] = (screen.f[1] - func_00283CE0(D_001A7348[3])) * 0.0625f;
+    screen.f[0] = (screen.f[0] - IntToFloat(D_001A7348[2])) * 0.0625f;
+    screen.f[1] = (screen.f[1] - IntToFloat(D_001A7348[3])) * 0.0625f;
     delta[0] = center[0] - screen.f[0];
     delta[1] = center[1] - screen.f[1];
     for (i = 0, texBase = D_L00_001B273C; i < 14; ++i) {
-        texture = func_0027C878(*texBase + D_L00_001B90C0.texture[i]);
+        texture = GetEffectTextureDescriptor(*texBase + D_L00_001B90C0.texture[i]);
         offset[0] = delta[0] * D_L00_001B90C0.offset[i];
         offset[1] = delta[1] * D_L00_001B90C0.offset[i];
         location[0] = center[0] + offset[0];
@@ -191,13 +191,13 @@ void func_L00_00382F28(char *object)
         else if (vertical < 0.0f)
             vertical = 0.0f;
         fade *= horizontal * vertical * D_L00_001B90C0.intensity;
-        color = (int)(((unsigned int)func_00283CF0(fade * D_L00_001B90C0.alpha[i]) << 24)
+        color = (int)(((unsigned int)FloatToInt(fade * D_L00_001B90C0.alpha[i]) << 24)
                       | (D_L00_001B90C0.color[i] & 0xFFFFFF));
-        size = func_00283CF0(*baseSize * D_L00_001B90C0.scale[i]);
-        func_002FC560(66, 0x8000000048ULL);
-        left = func_00283CF0(location[0] - (float)(size >> 1));
-        top = func_00283CF0(location[1] - (float)(size >> 1));
-        func_0027E018(left, top, size, size, 0, 0, 64, 64, color, texture);
+        size = FloatToInt(*baseSize * D_L00_001B90C0.scale[i]);
+        VU1_addGSregister(66, 0x8000000048ULL);
+        left = FloatToInt(location[0] - (float)(size >> 1));
+        top = FloatToInt(location[1] - (float)(size >> 1));
+        DrawTexturedQuad(left, top, size, size, 0, 0, 64, 64, color, texture);
     }
     D_L00_001B90C0.intensity = 0.0f;
 }

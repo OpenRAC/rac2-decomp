@@ -45,7 +45,7 @@ void func_L16_00410CC0(u8 *arg0, u8 *arg1)
         do {
             if (v >= row) {
                 f = func_L01_00311C18(&work, fp + (row * 16 + 0x10), fp + (v * 16 + 0x10), arg1);
-                g = func_00282E80(arg1, &work);
+                g = vec_distance_xy(arg1, &work);
                 if (g < best) {
                     best = g;
                     s4[0x7E] = v;

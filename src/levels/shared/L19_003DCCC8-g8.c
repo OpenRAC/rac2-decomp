@@ -140,7 +140,7 @@ void func_L19_003DD9D8(u8 *object)
             D_001395B8[0x9F] = 0;
             D_L19_001B0A60 = 1;
         }
-        if (func_002ACBC8(D_00189EA0, WORD(state, 0x84)))
+        if (IsPointInCuboid(D_00189EA0, WORD(state, 0x84)))
             WORD(state, 0x88) = 5;
     } else {
         if (D_L19_001B2508[0] < 10 && D_L19_001B0A60 == 1) {
@@ -166,22 +166,22 @@ void func_L19_003DD9D8(u8 *object)
                     func_002B0A18(0x129F, -1);
                 }
                 func_002DF3F8(D_00189EA0, D_00189EA0 + 0x10);
-                func_0029B3E0(0, -1);
+                MemcardSave(0, -1);
             }
         }
         if (D_0018C0B4[0] != 0x6F) {
             for (i = 0; i < 4; i++) {
                 if (!*StreamFlag(state, i)) {
-                    if (func_002ACBC8(D_00189EA0, *StateSlot(state, i, 0x30)))
+                    if (IsPointInCuboid(D_00189EA0, *StateSlot(state, i, 0x30)))
                         *StreamFlag(state, i) = 1;
                 } else if (*StreamFlag(state, i) > 0) {
-                    if (func_00282978((s16 *)(state + 0xAA)) &&
-                        func_L18_003FA920(object, i))
+                    if (FastDecTimer((s16 *)(state + 0xAA)) &&
+                        SelectGroupMembersAndTarget(object, i))
                         HALF(state, 0xAA) = func_002A77E0(D_L19_001B09C4);
                 }
             }
         }
-        if (func_002ACBC8(D_00189EA0, *StateSlot(state, WORD(state, 0x88) + 1, 0x40))) {
+        if (IsPointInCuboid(D_00189EA0, *StateSlot(state, WORD(state, 0x88) + 1, 0x40))) {
             WORD(state, 0x88)++;
             if (WORD(state, 0x88) == 6) {
                 func_L18_003F9FB0(object);
@@ -189,13 +189,13 @@ void func_L19_003DD9D8(u8 *object)
             } else {
                 if (!WORD(state, 0x88))
                     func_L01_00323310(WORD(state, 0x100), -1);
-                func_L18_003FA180(object, WORD(state, 0x88));
+                L18_DisableModeGroups(object, WORD(state, 0x88));
             }
         }
-        if (WORD(state, 0x88) == 5 && func_002ACBC8(D_00189EA0, WORD(state, 0x44))) {
+        if (WORD(state, 0x88) == 5 && IsPointInCuboid(D_00189EA0, WORD(state, 0x44))) {
             func_L18_003F9FB0(object);
             WORD(state, 0x88) = 1;
-            func_L18_003FA180(object, 1);
+            L18_DisableModeGroups(object, 1);
         }
         mode = 0;
         switch (WORD(state, 0x88)) {
@@ -214,7 +214,7 @@ void func_L19_003DD9D8(u8 *object)
             for (i = 0; i < 4; i++) {
                 if (*StateSlot(state, i, 0x90) != -1 &&
                     ((u32)i >= 8 || (((D_001395B8[0x94] >> i) ^ 1) & 1)) &&
-                    func_002ACBC8(D_00189EA0, *StateSlot(state, i, 0x90))) {
+                    IsPointInCuboid(D_00189EA0, *StateSlot(state, i, 0x90))) {
                     *StateSlot(state, i, 0x90) = -1;
                     HALF(state, 0xAE) = i;
                     func_L18_003F9E50(object);
@@ -223,7 +223,7 @@ void func_L19_003DD9D8(u8 *object)
             }
         }
     }
-    ref_L19_003DD9D8_00(func_L18_003FAE50, object);
+    ref_L19_003DD9D8_00(DrawSegmentedBeams, object);
     if (TRIGGER(0xBC) || (TRIGGER(0xB0) && !TRIGGER(0xB4))) {
         if (WORD(state, 0xC8) != -1 && WORD(state, 0xCC) != -1) {
             u8 *base = D_L19_001B2A1C[0];

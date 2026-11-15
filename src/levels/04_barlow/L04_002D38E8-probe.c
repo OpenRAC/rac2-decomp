@@ -132,8 +132,8 @@ void func_L04_002DAD10(void)
     if (func_L00_002ADF80()) {
         distance = 0;
     }
-    func_L00_002B47A8(start, end, 1, distance, -48.0f);
-    if (!func_002761F8(start, end, 2, D_00189E20.moby, 0)) {
+    BuildOffsetVectorPair(start, end, 1, distance, -48.0f);
+    if (!CollLine(start, end, 2, D_00189E20.moby, 0)) {
         goto tail;
     }
     D_00189E20.groundSoundClass = func_L00_002E2048();
@@ -143,13 +143,13 @@ void func_L04_002DAD10(void)
     if (D_001A79F0 == 7 && hit->moby) {
         D_00189E20.groundSoundClass = 1;
     }
-    D_00189E20.groundType = func_00278E78();
+    D_00189E20.groundType = GetCollHitMaterial();
     if (D_00189E20.groundType == 0) {
         D_00189E20.waterSurfaceZ = func_002A90F8(hit->point, D_00189E20.waterSurfaceNormal);
         if (D_00189E20.position[2] < D_00189E20.waterSurfaceZ && D_00189E20.inWaterFrames <= 0) {
             D_00189E20.inWaterFrames = 1;
         }
-        if (!func_002761F8(start, end, 0x24, D_00189E20.moby, 0)) {
+        if (!CollLine(start, end, 0x24, D_00189E20.moby, 0)) {
             goto tail;
         }
         D_00189E20.groundSoundClass = func_L00_002E2048();
@@ -157,7 +157,7 @@ void func_L04_002DAD10(void)
     if (D_00189E20.groundType == 13) {
         D_00189E20.waterSurfaceZ = hit->point[2];
         start[2] = hit->point[2] - 0.01f;
-        if (!func_002761F8(start, end, 4, D_00189E20.moby, 0)) {
+        if (!CollLine(start, end, 4, D_00189E20.moby, 0)) {
             goto tail;
         }
     }
@@ -180,13 +180,13 @@ void func_L04_002DAD10(void)
         if (D_L04_001A8FF0) {
             D_00189E20.groundZ = func_002B0360(hit->point);
         }
-        D_00189E20.groundDistance = func_00282E48(D_00189E20.position, D_00189E20.groundPoint);
+        D_00189E20.groundDistance = fast_vec_dist(D_00189E20.position, D_00189E20.groundPoint);
         D_00189E20.groundMoby = (int)hit->moby;
         func_001290E0(D_00189E20.groundNormal, hit->normal);
         D_00189E20.groundSlope = func_L00_002D3EA8(hit->normal);
         D_00189E20.downhillYaw = func_00283248(hit->normal[0], hit->normal[1]);
-        func_00282CF0(geom, D_00189E20.groundPoint, D_00189E20.position);
-        if (func_00282DB0(geom, D_00189E20.groundNormal) > 0.0f) {
+        FastVecSub(geom, D_00189E20.groundPoint, D_00189E20.position);
+        if (FastVecDot(geom, D_00189E20.groundNormal) > 0.0f) {
             D_00189E20.groundDistance = -D_00189E20.groundDistance;
         }
         if (D_00189E20.groundDistance < 0.02f) {
@@ -216,11 +216,11 @@ tail:
         if (D_L04_001A8FF4) {
             func_002AFF60(D_00189E20.position, D_00189E20.gravityDir, 0);
         } else if (D_00189E20.f2fc != 0.0f) {
-            func_002AA2E8(&D_00189E20.f2fc, 0.0f, 1.0f);
+            ApproachValue(&D_00189E20.f2fc, 0.0f, 1.0f);
             qcopy(D_00189E20.gravityDir, D_00189E20.f2f0);
         } else {
             qcopy(D_00189E20.gravityDir, D_00189E20.groundNormal);
-            func_00282D30(D_00189E20.gravityDir, D_00189E20.gravityDir, -1.0f);
+            FastVecScale(D_00189E20.gravityDir, D_00189E20.gravityDir, -1.0f);
         }
         break;
     case 2:
@@ -228,8 +228,8 @@ tail:
         if (D_00189E20.referencePoint[3] > 0) {
             sign = 1.0f;
         }
-        func_00282CF0(D_00189E20.gravityDir, D_00189E20.referencePoint, D_00189E20.position);
-        func_00282F20(D_00189E20.gravityDir, D_00189E20.gravityDir, sign);
+        FastVecSub(D_00189E20.gravityDir, D_00189E20.referencePoint, D_00189E20.position);
+        vec_scale_to_length(D_00189E20.gravityDir, D_00189E20.gravityDir, sign);
         break;
     }
     D_00189E20.groundPitch = 0;
@@ -262,7 +262,7 @@ tail:
         }
         func_L00_002D3638(probe1, 0.2f, angle, 0.45f, 1);
         func_L00_002D3638(probe2, 0.2f, angle, -0.45f, 1);
-        if (func_002761F8(probe1, probe2, 0x22, D_00189E20.moby, 0)) {
+        if (CollLine(probe1, probe2, 0x22, D_00189E20.moby, 0)) {
             if (D_L04_001A8FF0_gp) {
                 D_00189E20.sideHeight.f[i] = func_002B0360(hit->point) - func_002B0360(D_00189E20.groundPoint);
             } else {

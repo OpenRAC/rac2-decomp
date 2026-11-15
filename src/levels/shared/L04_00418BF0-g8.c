@@ -81,10 +81,10 @@ void func_L04_00418BF0(u8 *self, u8 *s)
     if (I(0x724) != 1) {
         return;
     }
-    func_00282CF0(delta, self + 0x10, P(0x730) + 0x10);
+    FastVecSub(delta, self + 0x10, P(0x730) + 0x10);
     height = F(0x310) - *(float *)(*(u8 **)(P(0x730) + 0x68) + 0x11C);
     if (I(0x728) < 5
-        && (height < 0.1f || func_00282DB0(delta, delta) > 500.0f || func_00282C48(F(0x6A4)) > 0.55f)) {
+        && (height < 0.1f || FastVecDot(delta, delta) > 500.0f || func_00282C48(F(0x6A4)) > 0.55f)) {
         if (func_00282C48(F(0x6A4)) > 0.55f) {
             D_L04_001B0938 = 4;
         }
@@ -95,7 +95,7 @@ void func_L04_00418BF0(u8 *self, u8 *s)
     if (I(0x73C) == -1 && (0.9f < stick || (stick < 0.4f && (D_00138334 & 0xF000)))) {
         if (F(0x740) == -999.0f) {
             if (0.9f < stick) {
-                F(0x740) = func_L00_0032F038(1);
+                F(0x740) = ReadPadFloatHistory(1);
                 I(0x758) = 0;
             } else {
                 unsigned int pressed = D_00138330;
@@ -128,9 +128,9 @@ void func_L04_00418BF0(u8 *self, u8 *s)
         } else if (held & 0x2000) {
             stick = 0.0f;
         } else if (I(0x758) == 0) {
-            stick = func_L00_0032F038(1);
+            stick = ReadPadFloatHistory(1);
         }
-        turn = func_00283C80(F(0x740), stick);
+        turn = FastDiffRots(F(0x740), stick);
         if (I(0x758) != 0 ? 1.3f < turn : 2.0f < turn) {
             F(0x740) = stick;
             if (I(0x728) >= 5) {
@@ -171,11 +171,11 @@ void func_L04_00418BF0(u8 *self, u8 *s)
             I(0x73C) = -1;
         }
     }
-    func_002AA2E8((float *)(s + 0x6A0), 0.0f, 0.008333334f);
+    ApproachValue((float *)(s + 0x6A0), 0.0f, 0.008333334f);
     if (F(0x6A0) != 0.0f) {
-        func_002AA2E8((float *)(s + 0x6A4), F(0x6A0), 0.031666666f);
+        ApproachValue((float *)(s + 0x6A4), F(0x6A0), 0.031666666f);
     } else {
-        func_002AA2E8((float *)(s + 0x6A4), F(0x6A0), 0.008333334f);
+        ApproachValue((float *)(s + 0x6A4), F(0x6A0), 0.008333334f);
     }
     if (I(0x728) >= 41) {
         float yaw, pitch;
@@ -189,15 +189,15 @@ void func_L04_00418BF0(u8 *self, u8 *s)
         } else {
             offset[1] += 2.0f;
         }
-        func_00283098(point, rest.f, self + 0xC0);
-        func_00282CC0(point, point, self + 0x10);
+        matrix_mul_vec3(point, rest.f, self + 0xC0);
+        FastVecAdd(point, point, self + 0x10);
         yaw = func_00283248(*(float *)(self + 0x10) - point[0], *(float *)(self + 0x14) - point[1]);
-        pitch = -func_00283248(func_00282E80(point, self + 0x10), *(float *)(self + 0x18) - point[2]);
+        pitch = -func_00283248(vec_distance_xy(point, self + 0x10), *(float *)(self + 0x18) - point[2]);
         func_L04_003FA5A8(P(0x730), point, self, yaw, pitch, 0.0f, yaw, pitch);
         I(0x724) = 2;
     }
-    func_00282D30(offset, D_L04_001B98C0, F(0x6A4));
-    func_00282CC0(offset, offset, self + 0x10);
+    FastVecScale(offset, D_L04_001B98C0, F(0x6A4));
+    FastVecAdd(offset, offset, self + 0x10);
     func_L04_002FB920(self);
     {
         int combo = I(0x728);
@@ -206,22 +206,22 @@ void func_L04_00418BF0(u8 *self, u8 *s)
             stick = (float)combo * 0.1f;
             if (1.0f < stick) stick = 1.0f;
             if (stick < 0.0f) stick = 0.0f;
-            limit = func_00283D38(0x500FFF0F, 0x500000EE, stick);
+            limit = FastTweenColor(0x500FFF0F, 0x500000EE, stick);
         } else if (combo < 20) {
             stick = (float)(combo - 10) * 0.1f;
             if (1.0f < stick) stick = 1.0f;
             if (stick < 0.0f) stick = 0.0f;
-            limit = func_00283D38(0x500000EE, 0x800000FF, stick);
+            limit = FastTweenColor(0x500000EE, 0x800000FF, stick);
         } else if (combo < 30) {
             stick = (float)(combo - 20) * 0.1f;
             if (1.0f < stick) stick = 1.0f;
             if (stick < 0.0f) stick = 0.0f;
-            limit = func_00283D38(0x800000FF, 0x50000033, stick);
+            limit = FastTweenColor(0x800000FF, 0x50000033, stick);
         } else if (combo < 41) {
             stick = (float)(combo - 30) * 0.1f;
             if (1.0f < stick) stick = 1.0f;
             if (stick < 0.0f) stick = 0.0f;
-            limit = func_00283D38(0x50000033, 0x800000FF, stick);
+            limit = FastTweenColor(0x50000033, 0x800000FF, stick);
         } else {
             limit = 0x800000FF;
         }

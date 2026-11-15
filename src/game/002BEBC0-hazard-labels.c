@@ -35,7 +35,7 @@ void func_002BEBC0(char *p)
     if (p == 0)
         return;
     q = p + 0x20;
-    if (func_00282978(p + 0xA) || *(char **)q == 0 || *(signed char *)(*(char **)q + 0x20) < 0) {
+    if (FastDecTimer(p + 0xA) || *(char **)q == 0 || *(signed char *)(*(char **)q + 0x20) < 0) {
         func_002B9180(p);
         return;
     }
@@ -50,7 +50,7 @@ void func_002BEBC0(char *p)
             SIZE = 159600.0f;
     }
     SPIN += 0.001f;
-    p[8] = func_00283CF0(SPIN * 255.0f);
+    p[8] = FloatToInt(SPIN * 255.0f);
     p[2] = D_001F25B4[FRAME];
     if (SIZE <= 159600.0f || SPEED > 0.0f)
         ALPHA += SPEED;
@@ -71,12 +71,12 @@ void func_002BEBC0(char *p)
             return;
         }
     }
-    *(int *)(p + 4) = (*(int *)(p + 4) & 0xFFFFFF) + (func_00283CF0(ALPHA * 256.0f) << 24);
+    *(int *)(p + 4) = (*(int *)(p + 4) & 0xFFFFFF) + (FloatToInt(ALPHA * 256.0f) << 24);
     EASE += (1.0f - EASE) * 0.175f;
     if (JOINT != -1) {
         func_0029FCC0(*(void **)q, JOINT, pos);
-        func_00282CF0(delta, D_001B5340, pos);
-        func_00282F20(delta, delta, EASE);
-        func_00282CC0(p + 0x10, pos, delta);
+        FastVecSub(delta, D_001B5340, pos);
+        vec_scale_to_length(delta, delta, EASE);
+        FastVecAdd(p + 0x10, pos, delta);
     }
 }

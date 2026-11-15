@@ -41,7 +41,7 @@ void func_L22_002B7328(void)
     hero2 = D_00189E20;
     if (*(unsigned char *)(hero2 + 0x22B4) == 2) {
         if (*(short *)(hero2 + 0x1878) != -1) {
-            func_0028B6C8(*(short *)(hero2 + 0x1878), 0);
+            set_animation_parameter(*(short *)(hero2 + 0x1878), 0);
             *(short *)(hero2 + 0x1878) = -1;
         }
     }

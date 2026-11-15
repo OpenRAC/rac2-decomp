@@ -49,5 +49,5 @@ void func_L11_0043A680(void *obj, void *arg1, float f12, float f13)
     limit = D_L11_001B133C + (D_L11_001B1340 - D_L11_001B133C) * f13;
     duration = D_L11_001B1344 + (D_L11_001B1348 - D_L11_001B1344) * f13;
     *(float *)(state + 0x2E0) = limit;
-    *(int *)(state + 0x2E4) = func_00283CF0(duration);
+    *(int *)(state + 0x2E4) = FloatToInt(duration);
 }

@@ -26,8 +26,8 @@ int func_L08_00423010(char *object, float turn, float turnAccel, float turnDamp,
     int result = 0;
     heading=func_00283248(*(float *)(state+0x160)-*(float *)(object+0x10),
                           *(float *)(state+0x164)-*(float *)(object+0x14));
-    func_00282CF0(delta,state+0x160,object+0x10);
-    distance = func_00282E20(delta);
+    FastVecSub(delta,state+0x160,object+0x10);
+    distance = vec_length_xy(delta);
     distance -= stop;
     if (distance < 0)
         distance = 0;
@@ -47,28 +47,28 @@ int func_L08_00423010(char *object, float turn, float turnAccel, float turnDamp,
         speed = limit;
     else if (speed < -limit)
         speed = -limit;
-    func_002A7CA0(object,heading,turn*4.848137450608192e-06f,
+    MobySpringTurn(object,heading,turn*4.848137450608192e-06f,
                   turnAccel*4.848137450608192e-06f,turnDamp*0.0002908882452175021f,state+0x1C4);
     point[0]=func_00283180(heading)*speed*10.0f;
     point[1]=func_00283198(heading)*speed*10.0f;
     point[2]=0;
-    func_00282CC0(point,point,object+0x10);
+    FastVecAdd(point,point,object+0x10);
     height=*(float *)(state+0x1D4);
     if ((unsigned char)object[0x20] == 8)
         height = height > D_00189EA8 ? height : D_00189EA8;
     point[2]=func_L08_00422850((Quad *)point,*(float *)(state+0x158)+3.0f,
                               *(float *)(state+0x158)-10.0f,height,*(float *)(state+0x1D0));
-    if (func_00282E80(object+0x10,D_00189EA0)<5.0f && point[2]>*(float *)(D_00189EA0+8))
+    if (vec_distance_xy(object+0x10,D_00189EA0)<5.0f && point[2]>*(float *)(D_00189EA0+8))
         point[2]=*(float *)(D_00189EA0+8);
     point[2]+=rise;
-    pitch=func_00283248(func_00282E80(object+0x10,point),point[2]-*(float *)(object+0x18));
+    pitch=func_00283248(vec_distance_xy(object+0x10,point),point[2]-*(float *)(object+0x18));
     func_002AF000(state+0x170,speed,*(float *)(object+0xF8),pitch);
     *(float *)(object+0x18)+=0.4f;
     result |= func_002A8240(object,state+0x170,0,0.0f,0.75f,0.0f);
     *(float *)(object+0x18)-=0.4f;
     *(float *)(object+0xF4)=func_L01_00310BC0(state+0x1C8,*(float *)(object+0xF4),pitch,
                                           0.0017453294713050127f,0.0008726647356525064f,0.0008726647356525064f);
-    if (result&7) func_002A7CA0(object,heading,turn*1.4544411897077225e-05f,
+    if (result&7) MobySpringTurn(object,heading,turn*1.4544411897077225e-05f,
                                 turnAccel*4.848137450608192e-06f,turnDamp*0.0008726647356525064f,state+0x1C4);
     *(float *)(state+0x1C0)=speed;
     return result;

@@ -35,7 +35,7 @@ void func_L00_00325CC0(int count, BillboardBatchVec *positions, int *colors,
     up.word = 0;
     up.v.z = 1.0f;
     up.v.w = 1.0f;
-    packet.tag[1] = func_0027C878(11);
+    packet.tag[1] = GetEffectTextureDescriptor(11);
     color = colors[0];
     packet.tag[3] = 0x8000000048ULL;
     packet.tag[2] = 0xff9000000260ULL;
@@ -50,13 +50,13 @@ void func_L00_00325CC0(int count, BillboardBatchVec *positions, int *colors,
     packet.color[0] = color;
     for (i = 0; i < count; ++i) {
         qcopy(&matrix[3], &positions[i]);
-        func_00282CF0(&matrix[0], &D_L00_001B8DC0, &matrix[3]);
-        func_00282F20(&matrix[0], &matrix[0], 1.0f);
-        func_00282DD8(&matrix[1], &matrix[0], &up);
-        func_00282F20(&matrix[1], &matrix[1], 1.0f);
-        func_00282DD8(&matrix[2], &matrix[1], &matrix[0]);
-        func_00282D30(&shift, &matrix[0], offset);
-        func_00282CC0(&matrix[3], &matrix[3], &shift);
+        FastVecSub(&matrix[0], &D_L00_001B8DC0, &matrix[3]);
+        vec_scale_to_length(&matrix[0], &matrix[0], 1.0f);
+        FastVecCross(&matrix[1], &matrix[0], &up);
+        vec_scale_to_length(&matrix[1], &matrix[1], 1.0f);
+        FastVecCross(&matrix[2], &matrix[1], &matrix[0]);
+        FastVecScale(&shift, &matrix[0], offset);
+        FastVecAdd(&matrix[3], &matrix[3], &shift);
         if (colors[i] != color) {
             packet.color[0] = packet.color[1] = packet.color[2] = packet.color[3] = colors[i];
             color = colors[i];
@@ -64,11 +64,11 @@ void func_L00_00325CC0(int count, BillboardBatchVec *positions, int *colors,
         dst = packet.vertex;
         src = D_L00_001AA310;
         for (j = 3; j >= 0; --j) {
-            func_00282D30(dst, src, size);
+            FastVecScale(dst, src, size);
             ++src;
-            func_002830C0(dst, dst, matrix);
+            transform_vector(dst, dst, matrix);
             ++dst;
         }
-        func_00280B90(&packet, 0, 0);
+        draw_world_quad(&packet, 0, 0);
     }
 }

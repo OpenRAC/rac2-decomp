@@ -100,7 +100,7 @@ void func_L10_00424528(GateObject *p)
         D_L10_001B141C = 0;
         D_L10_001B3550 = 0;
         D_L10_00221CD0.field2c = 0;
-        func_002B7320();
+        music_Unpause();
         func_L10_00425798();
         if (D_L10_001B1408)
             func_0029F338(D_L10_001B1408);
@@ -118,7 +118,7 @@ void func_L10_00424528(GateObject *p)
         path = D_L10_001FE340[*(int *)(st + 0x20)];
         while ((!D_L10_001B1400 || !D_L10_001B1404) && D_L10_001B1418 != path->count) {
             if (path->points[D_L10_001B1418].v.w != -1) {
-                obj = func_0029EFD0(0x114a);
+                obj = CreateMoby(0x114a);
                 obj->opacity = 255;
                 obj->drawFlags = 0x1ff;
                 obj->flags |= 0x100;
@@ -127,19 +127,19 @@ void func_L10_00424528(GateObject *p)
                 else
                     D_L10_001B1404 = obj;
                 if (D_L10_001B1418 == path->count - 1) {
-                    func_00282CF0(&obj->forward, (char *)path + D_L10_001B1418 * 16,
+                    FastVecSub(&obj->forward, (char *)path + D_L10_001B1418 * 16,
                                   (char *)path + (D_L10_001B1418 * 16 + 0x10));
                     obj->forward.v.w = 0;
-                    func_00282F20(&obj->forward, &obj->forward, -1);
+                    vec_scale_to_length(&obj->forward, &obj->forward, -1);
                 } else {
-                    func_00282CF0(&obj->forward, (char *)path + (D_L10_001B1418 * 16 + 0x20),
+                    FastVecSub(&obj->forward, (char *)path + (D_L10_001B1418 * 16 + 0x20),
                                   (char *)path + (D_L10_001B1418 * 16 + 0x10));
                     obj->forward.v.w = 0;
-                    func_00282F20(&obj->forward, &obj->forward, 1);
+                    vec_scale_to_length(&obj->forward, &obj->forward, 1);
                 }
-                func_00282DD8(&obj->right, &obj->forward, &up);
-                func_00282F20(&obj->right, &obj->right, 1);
-                func_00282DD8(&obj->up, &obj->right, &obj->forward);
+                FastVecCross(&obj->right, &obj->forward, &up);
+                vec_scale_to_length(&obj->right, &obj->right, 1);
+                FastVecCross(&obj->up, &obj->right, &obj->forward);
                 qcopy(&obj->position, (char *)path + (D_L10_001B1418 * 16 + 0x10));
                 obj->position.v.w = 0;
             }
@@ -165,7 +165,7 @@ void func_L10_00424528(GateObject *p)
         D_L10_001B1434 = 1;
         if (!func_00282948((int *)(st + 0x50))) {
         warning:
-            func_L00_0030DD70(func_00288FB8(0x31de), -1);
+            func_L00_0030DD70(GetLocalizedString(0x31de), -1);
         } else {
             D_L10_001B1434 = 0;
             func_L10_00423500(p);
@@ -182,17 +182,17 @@ void func_L10_00424528(GateObject *p)
 
     other = D_L10_001B251C[0] + (*(int *)(st + 0x24) << 8);
     qcopy(&pos, D_L10_001B9680);
-    func_00282CF0(&v2, &pos, &D_L10_001B1400->position);
-    func_00282F20(&v2, &v2, 1);
-    func_00282CF0(&v1, other + 0x10, &D_L10_001B1400->position);
-    func_00282F20(&v1, &v1, 1);
-    d1 = func_00282DB0(&D_L10_001B1400->forward, &v1);
-    d2 = func_00282DB0(&D_L10_001B1400->forward, &v2);
+    FastVecSub(&v2, &pos, &D_L10_001B1400->position);
+    vec_scale_to_length(&v2, &v2, 1);
+    FastVecSub(&v1, other + 0x10, &D_L10_001B1400->position);
+    vec_scale_to_length(&v1, &v1, 1);
+    d1 = FastVecDot(&D_L10_001B1400->forward, &v1);
+    d2 = FastVecDot(&D_L10_001B1400->forward, &v2);
 
     if ((d1 != D_L10_001B140C && d1 > 0) || (d2 != D_L10_001B1410 && d2 > 0)) {
         path = D_L10_001FE340[*(int *)(st + 0x20)];
-        if (func_00282E48(&pos, &D_L10_001B1400->position) <= 1.25f
-            || func_00282E48(other + 0x10, &D_L10_001B1400->position) <= 1.25f) {
+        if (fast_vec_dist(&pos, &D_L10_001B1400->position) <= 1.25f
+            || fast_vec_dist(other + 0x10, &D_L10_001B1400->position) <= 1.25f) {
             func_002E5DA0(15, 0, p, 0xfbf);
             func_L05_0037ADD8(0.5f);
         } else {
@@ -204,25 +204,25 @@ void func_L10_00424528(GateObject *p)
         D_L10_001B1404 = 0;
         while (!D_L10_001B1404 && D_L10_001B1418 != path->count) {
             if (path->points[D_L10_001B1418].v.w != -1) {
-                obj = func_0029EFD0(0x114a);
+                obj = CreateMoby(0x114a);
                 obj->opacity = 255;
                 obj->drawFlags = 0x1ff;
                 obj->flags |= 0x100;
                 D_L10_001B1404 = obj;
                 if (D_L10_001B1418 == path->count - 1) {
-                    func_00282CF0(&obj->forward, (char *)path + D_L10_001B1418 * 16,
+                    FastVecSub(&obj->forward, (char *)path + D_L10_001B1418 * 16,
                                   (char *)path + (D_L10_001B1418 * 16 + 0x10));
                     obj->forward.v.w = 0;
-                    func_00282F20(&obj->forward, &obj->forward, -1);
+                    vec_scale_to_length(&obj->forward, &obj->forward, -1);
                 } else {
-                    func_00282CF0(&obj->forward, (char *)path + (D_L10_001B1418 * 16 + 0x20),
+                    FastVecSub(&obj->forward, (char *)path + (D_L10_001B1418 * 16 + 0x20),
                                   (char *)path + (D_L10_001B1418 * 16 + 0x10));
                     obj->forward.v.w = 0;
-                    func_00282F20(&obj->forward, &obj->forward, 1);
+                    vec_scale_to_length(&obj->forward, &obj->forward, 1);
                 }
-                func_00282DD8(&obj->right, &obj->forward, &up);
-                func_00282F20(&obj->right, &obj->right, 1);
-                func_00282DD8(&obj->up, &obj->right, &obj->forward);
+                FastVecCross(&obj->right, &obj->forward, &up);
+                vec_scale_to_length(&obj->right, &obj->right, 1);
+                FastVecCross(&obj->up, &obj->right, &obj->forward);
                 qcopy(&obj->position, (char *)path + (D_L10_001B1418 * 16 + 0x10));
                 obj->position.v.w = 0;
             }

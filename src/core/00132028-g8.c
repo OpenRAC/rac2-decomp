@@ -35,7 +35,7 @@ extern long D_001A74E8 __attribute__((sda));                /* its argument */
 /* The CD read callback's argument. No second context is known to write it: this pump
    runs in its callers' thread (func_00132498's commit, d71286afe). The volatile is
    kept only because the unit needs it: without it, or as an incomplete sda array
-   (D_001A74D8[0]), func_00132028 is 16 bytes short and matches 0 of 1 in USA v1.01,
+   (D_001A74D8[0]), snd_Pump is 16 bytes short and matches 0 of 1 in USA v1.01,
    PAL and v2.00 (the accesses become $gp-relative and retail's beql into this block
    is lost). Measured 8 November 2026 with both set-side volatile rules, the EE tree's
    and GCC 2.95's. */
@@ -88,7 +88,7 @@ int func_00132028(void)
             func_00133108();
     }
     if (D_001A7494 != 0) {
-        func_00133580(1);
+        snd_CheckLoadInProgress(1);
         if (D_001A7498 != 0) {
             D_001A7494 = 0;
             D_001A7498 = 0;

@@ -17,7 +17,7 @@ int func_L00_003F6168(char *object)
     char *base = func_L00_0032A088(0xc04,*(short *)(state + 0x1a));
     base += *(int *)func_L00_0032A0B8(0xc04,*(short *)(state + 0x1a));
     if (*(short *)(RECORD + 0x50) == 0) return 0;
-    if (func_00282978(RECORD + 0x52) != 0) {
+    if (FastDecTimer(RECORD + 0x52) != 0) {
         *(short *)(RECORD + 0x50) = 0;
         return 0;
     }
@@ -27,9 +27,9 @@ int func_L00_003F6168(char *object)
     if (*(float *)(RECORD + 0x54) >= 4.0f) *(float *)(RECORD + 0x54) -= 4.0f;
     *(float *)(RECORD + 0x58) += D_L00_001B09C0;
     if (*(float *)(RECORD + 0x58) >= 4.0f) *(float *)(RECORD + 0x58) -= 4.0f;
-    func_00282F20((char *)&step,state,D_L00_001B099C * 0.016666668f);
-    func_00282CC0(RECORD,RECORD,(char *)&step);
-    func_00282CC0(RECORD+0x10,RECORD+0x10,(char *)&step);
+    vec_scale_to_length((char *)&step,state,D_L00_001B099C * 0.016666668f);
+    FastVecAdd(RECORD,RECORD,(char *)&step);
+    FastVecAdd(RECORD+0x10,RECORD+0x10,(char *)&step);
     return 1;
 }
 #undef RECORD

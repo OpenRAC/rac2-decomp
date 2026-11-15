@@ -12,7 +12,7 @@ float func_L08_00425328(void *position, float first, float second, float floor)
     endpoints[0][2] = second;
     qcopy(endpoints[1], position);
     endpoints[1][2] = first;
-    if (func_002761F8(endpoints[1], endpoints[0], 2, 0, 0)) {
+    if (CollLine(endpoints[1], endpoints[0], 2, 0, 0)) {
         return D_L08_001BFF68 > floor ? D_L08_001BFF68 : floor;
     }
     return floor;

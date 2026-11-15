@@ -23,7 +23,7 @@ char *func_L02_00401530(TI128 *a0, TI128 *a1, TI128 *a2, unsigned char a3,
     char *v1;
     struct SpawnHeader *header;
 
-    s0 = func_0029EFD0(0xB5A);
+    s0 = CreateMoby(0xB5A);
     if (s0 == 0)
         goto end;
     qcopy(s0 + 0x10, a0);

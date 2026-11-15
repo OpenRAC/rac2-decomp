@@ -33,33 +33,33 @@ void func_L05_00428518(char *obj)
     int i;
     if (*(short *)(s+4)) {
         if (*(int *)(s+0x1c)) {
-            int intensity=128-func_00283CF0((float)*(short *)(s+4));
+            int intensity=128-FloatToInt((float)*(short *)(s+4));
             int color=(intensity<<24)|(intensity<<16);
             color |= intensity << 8;
             color |= intensity;
-            func_002FC560(0x42,0x48);
+            VU1_addGSregister(0x42,0x48);
             func_0027DE50(0,D_001A6480.height,0,D_001A6480.width,color);
         }
         if (*(short *)(s+4) && *(int *)(s+0x38)) {
             float alpha;
             unsigned int color;
             qcopy_nc(v.a,obj+0xe0);
-            alpha=func_00283CE0(*(short *)(s+4)) * *(float *)(s+0x10);
+            alpha=IntToFloat(*(short *)(s+4)) * *(float *)(s+0x10);
             func_00281DE8(&p,11,4,128);
-            color=(func_00283CF0(alpha*255.0f)<<24)|0xffffff;
+            color=(FloatToInt(alpha*255.0f)<<24)|0xffffff;
             p.color[0]=p.color[1]=p.color[2]=p.color[3]=color;
             p.uv[0][0]=0; p.uv[0][1]=0; p.uv[1][0]=0; p.uv[1][1]=1;
             p.uv[2][0]=1; p.uv[2][1]=0; p.uv[3][0]=1; p.uv[3][1]=1;
-            func_00282CF0(v.b,obj+0x10,D_L05_001B96C0);
-            func_00282F20(v.c,v.b,0.1f);
-            func_00282CC0(v.d,D_L05_001B96C0,v.c);
-            func_00282DD8(v.e,v.b,v.a); func_00282F20(v.e,v.e,0.075f);
-            func_00282DD8(v.f,v.e,v.b); func_00282F20(v.f,v.f,0.075f);
-            func_00282CC0(v.g,v.d,v.f);
-            func_00282CC0(p.vertex[0],v.g,v.e); func_00282CF0(p.vertex[1],v.g,v.e);
-            func_00282CF0(v.g,v.d,v.f);
-            func_00282CC0(p.vertex[2],v.g,v.e); func_00282CF0(p.vertex[3],v.g,v.e);
-            func_00280B90(&p,0,0);
+            FastVecSub(v.b,obj+0x10,D_L05_001B96C0);
+            vec_scale_to_length(v.c,v.b,0.1f);
+            FastVecAdd(v.d,D_L05_001B96C0,v.c);
+            FastVecCross(v.e,v.b,v.a); vec_scale_to_length(v.e,v.e,0.075f);
+            FastVecCross(v.f,v.e,v.b); vec_scale_to_length(v.f,v.f,0.075f);
+            FastVecAdd(v.g,v.d,v.f);
+            FastVecAdd(p.vertex[0],v.g,v.e); FastVecSub(p.vertex[1],v.g,v.e);
+            FastVecSub(v.g,v.d,v.f);
+            FastVecAdd(p.vertex[2],v.g,v.e); FastVecSub(p.vertex[3],v.g,v.e);
+            draw_world_quad(&p,0,0);
         }
     }
     {
@@ -73,20 +73,20 @@ void func_L05_00428518(char *obj)
     p.uv[0][0]=0; p.uv[0][1]=0; p.uv[1][0]=0; p.uv[1][1]=1;
     p.uv[2][0]=1; p.uv[2][1]=0; p.uv[3][0]=1; p.uv[3][1]=1;
     qcopy(v.d,obj+0x10);
-    func_00282CF0(v.a,D_L05_001B96C0,v.d); func_00282F20(v.a,v.a,1);
-    func_00282DD8(v.b,v.a,D_0018A0E0); func_00282F20(v.b,v.b,1);
-    func_00282DD8(v.c,v.b,v.a);
+    FastVecSub(v.a,D_L05_001B96C0,v.d); vec_scale_to_length(v.a,v.a,1);
+    FastVecCross(v.b,v.a,D_0018A0E0); vec_scale_to_length(v.b,v.b,1);
+    FastVecCross(v.c,v.b,v.a);
     *(QW *)v.f = 0;
     v.f[2] = *(float *)(s + 0x44) * 0.017453294f;
     *(QW *)v.e = *(QW *)v.f;
-    func_002833F0(v.matrix,v.e); func_00283738(v.a,v.a,v.matrix);
+    euler_rotation_basis(v.matrix,v.e); multiply_matrix3x3(v.a,v.a,v.matrix);
     for(i=0;i<4;i++) {
-        func_00282D30(p.vertex[i],D_L05_001AA250+i*16,(D_L05_001B1580*D_L05_001B3580[*(int *)(s+0x3c)])**(float *)(s+0x40));
-        func_002830C0(p.vertex[i],p.vertex[i],v.a);
+        FastVecScale(p.vertex[i],D_L05_001AA250+i*16,(D_L05_001B1580*D_L05_001B3580[*(int *)(s+0x3c)])**(float *)(s+0x40));
+        transform_vector(p.vertex[i],p.vertex[i],v.a);
         p.color[i]=i<=1?0x70804040:0x50204090;
     }
     p.tail[3]=((unsigned long long)D_L05_001B3598[*(int *)(s+0x3c)]<<32)|0x68;
-    func_00280B90(&p,0,0);
+    draw_world_quad(&p,0,0);
     D_L05_001B3580[*(int *)(s+0x3c)]+=0.3f;
     D_L05_001B3598[*(int *)(s+0x3c)]-=4;
     if(D_L05_001B3598[*(int *)(s+0x3c)]<0) D_L05_001B3598[*(int *)(s+0x3c)]=0;

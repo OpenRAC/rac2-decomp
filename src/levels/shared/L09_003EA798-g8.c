@@ -88,8 +88,8 @@ void func_L09_003EA798(char *object) {
 
     qcopy((char *)state + 0x330, pos);
     qcopy((char *)state + 0x340, object + 0xF0);
-    state->f48 = func_00283CF0(25.0f);
-    state->f4A = func_00283CF0(19.2f);
+    state->f48 = FloatToInt(25.0f);
+    state->f4A = FloatToInt(19.2f);
     state->f1EC = 4;
     state->f1EE = 4;
     state->f191 = 2;

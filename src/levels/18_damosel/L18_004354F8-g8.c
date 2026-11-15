@@ -72,12 +72,12 @@ void func_L18_004354F8(DamoselObject *o) {
     case 2:
         if(func_002B3868(o)) {
             o->enabled=1; o->flags&=0xFFFE;
-            s->step=func_00283C80(D_L18_001B1638,D_L18_001B1634);
+            s->step=FastDiffRots(D_L18_001B1638,D_L18_001B1634);
             s->step /= (float)D_L18_001B1630;
         }
-        t=func_00283CE0(o->timer);
+        t=IntToFloat(o->timer);
         t /= (float)D_L18_001B1630;
-        o->angle=func_00283B98(o->angle,s->step);
+        o->angle=FastAddRotations(o->angle,s->step);
         o->alpha=func_L00_0031C998(D_L18_001B163C,D_L18_001B163D,t);
         s->color[0]=func_L00_0031C998(D_L18_001B1668_GP,D_L18_001B1670_GP,t);
         s->color[1]=func_L00_0031C998(D_L18_001B1668[1],D_L18_001B1670[1],t);
@@ -103,13 +103,13 @@ void func_L18_004354F8(DamoselObject *o) {
     case 4:
         if(func_002B3868(o)) {
             o->animation=0;
-            s->step=-func_00283C80(D_L18_001B1638,D_L18_001B1634);
+            s->step=-FastDiffRots(D_L18_001B1638,D_L18_001B1634);
             s->step /= (float)D_L18_001B1630;
             s->sound=func_L00_0035F5A0(16,4,o);
         }
-        t=func_00283CE0(o->timer);
+        t=IntToFloat(o->timer);
         t /= (float)D_L18_001B1630;
-        o->angle=func_00283B98(o->angle,s->step);
+        o->angle=FastAddRotations(o->angle,s->step);
         o->alpha=func_L00_0031C998(D_L18_001B163D,D_L18_001B163C,t);
         s->color[0]=func_L00_0031C998(D_L18_001B1670_GP,D_L18_001B1668_GP,t);
         s->color[1]=func_L00_0031C998(D_L18_001B1670[1],D_L18_001B1668[1],t);

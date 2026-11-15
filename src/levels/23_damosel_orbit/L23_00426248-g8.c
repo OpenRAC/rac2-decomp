@@ -45,7 +45,7 @@ void *func_L23_00426248(u8 *pos, u8 *parent, s32 flag, float scale, s32 a3, s32 
     }
     D_L23_001B19FC += 1.0f;
     D_L23_001B3918[i] = 1;
-    obj = func_0029EFD0(0x11DF);
+    obj = CreateMoby(0x11DF);
     if (obj != 0) {
         vars = *(u8 **)(obj + 0x68);
         obj[0x30] = 0xFF;
@@ -79,16 +79,16 @@ void *func_L23_00426248(u8 *pos, u8 *parent, s32 flag, float scale, s32 a3, s32 
         if (func_00283DB8(&sphere, 128.0f) == 1) {
             *(s16 *)(vars + 4) = 0x19;
             *(float *)(vars + 0x10) = 0.04f;
-            if (func_00282E48(pos, D_L23_001BA500 + 0x140) < 48.0f && flag != 0) {
+            if (fast_vec_dist(pos, D_L23_001BA500 + 0x140) < 48.0f && flag != 0) {
                 u8 *ref = D_L23_001BA500;
                 *(s32 *)(ref + 0x16C) = 0;
                 *(s32 *)(ref + 0x168) = 0x28;
                 *(float *)(ref + 0x160) = 0.075f;
             }
             if (*(s32 *)(vars + 0x18) != 0) {
-                func_00282CF0(&dir, obj + 0x10, D_L23_001BA500 + 0x140);
-                func_00282F20(&dir, &dir, 1.0f);
-                angle = func_002831B0(func_00282DB0(&dir, D_L23_001BA500 + 0x370));
+                FastVecSub(&dir, obj + 0x10, D_L23_001BA500 + 0x140);
+                vec_scale_to_length(&dir, &dir, 1.0f);
+                angle = func_002831B0(FastVecDot(&dir, D_L23_001BA500 + 0x370));
                 if (1.5707964f - angle < 0.45378566f) {
                     *(s32 *)(vars + 0x18) = 1;
                 } else {

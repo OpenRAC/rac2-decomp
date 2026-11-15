@@ -52,8 +52,8 @@ void func_L02_003CD758(Moby_L02_003CD758 *m)
     }
     func_00282948(&v->timer);
     if (v->link != 0 && !(v->link->type == 0xA20 || v->link->type == 0xA21)) {
-        if (v->h310 == 0) v->link = func_0029EFD0(0xA20);
-        else v->link = func_0029EFD0(0xA21);
+        if (v->h310 == 0) v->link = CreateMoby(0xA20);
+        else v->link = CreateMoby(0xA21);
         if (v->link == 0) {
             func_0029F338(m);
             return;

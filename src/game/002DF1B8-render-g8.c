@@ -53,9 +53,9 @@ void func_002DFBB0(RenderDFBB0 *data) {
         }
         current = next;
     }
-    func_002FC560(0x4C, (D_001A72DC[0] >> 13) | 0x80000);
-    func_002FC560(0x42, 0x2000000064L);
+    VU1_addGSregister(0x4C, (D_001A72DC[0] >> 13) | 0x80000);
+    VU1_addGSregister(0x42, 0x2000000064L);
     func_002DF9E0(0);
-    func_002FC560(0x47, 0x5360B);
-    func_002FC560(0x42, 0x8000000044L);
+    VU1_addGSregister(0x47, 0x5360B);
+    VU1_addGSregister(0x42, 0x8000000044L);
 }

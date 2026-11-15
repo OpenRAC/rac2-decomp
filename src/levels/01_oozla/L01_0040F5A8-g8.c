@@ -65,13 +65,13 @@ void func_L01_0040F5A8(char *obj)
             jitter.q = 0;
             jitter.f[1] = -0.015000000596046448f;
             func_L00_00324F18(obj, &position, D_L01_001B1620, D_L01_001B1624, D_L01_001B1628);
-            func_00283098(&jitter, &jitter, obj + 0xc0);
+            matrix_mul_vec3(&jitter, &jitter, obj + 0xc0);
             func_L01_002E1680(0.0066666672937572f, 1.0f, 1.0299999713897705f, &position, &jitter, 10, 0x80808080, 0);
             func_002A7750(obj, 3, -1);
         } else {
             func_002B0A68(obj, 17, D_L01_001A8F60, 255, 1.0f, 3.0f, 2.0f, 5.0f);
             func_L00_00326110(obj, 1, 0.0f);
-            func_002E5CF8(0, 0, obj);
+            PlayMobySound(0, 0, obj);
         }
         func_002A7750(obj, 3, -1);
         break;

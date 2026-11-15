@@ -25,7 +25,7 @@ extern int D_L20_001B2388 __attribute__((sda));
 extern float D_L20_001B2378 __attribute__((sda));
 
 char *func_L20_00448A18(char *arg0, char *arg1, char *arg2, char *arg3) {
-    char *obj = (char *)func_0029EFD0(0x125A);
+    char *obj = (char *)CreateMoby(0x125A);
     char *state;
     float f;
 

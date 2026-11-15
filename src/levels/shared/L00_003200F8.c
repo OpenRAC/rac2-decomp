@@ -57,13 +57,13 @@ void func_L00_003200F8(char *parent, char *position, float scale, float flash)
     }
     if (parent) {
         rgb[0] = 127; rgb[1] = 64; rgb[2] = 0;
-        func_002AAF40(rgb, rgb + 1, rgb + 2, 1);
+        swap_color_channel_words(rgb, rgb + 1, rgb + 2, 1);
         glow = scale * 4.0f;
         func_00308408(parent, position, (char *)&zero, glow, 20,
                       *(unsigned char *)&rgb[0], *(unsigned char *)&rgb[1],
                       *(unsigned char *)&rgb[2], 48);
         rgb[0] = 96; rgb[1] = 32; rgb[2] = 0;
-        func_002AAF40(rgb, rgb + 1, rgb + 2, 1);
+        swap_color_channel_words(rgb, rgb + 1, rgb + 2, 1);
         glow = scale * 3.0f;
         func_00308408(parent, position, (char *)&zero, glow, 29,
                       *(unsigned char *)&rgb[0], *(unsigned char *)&rgb[1],

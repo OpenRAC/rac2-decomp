@@ -27,5 +27,5 @@
 extern s32 func_00132C48();
 
 void func_001337C8(void) {
-    func_00132C48(0x4A, 0, 0);
+    snd_SendCommandSync(0x4A, 0, 0);
 }

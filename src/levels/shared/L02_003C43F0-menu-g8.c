@@ -72,15 +72,15 @@ void func_L02_003C43F0(char *obj) {
     y = menu_coord(D_L02_001B3E04, k, half, on);
     s = one;
     func_00300A00(id, 0x55F0C070, 258.0f, (float)y, s, s, zero);
-    func_002FC560(0x47, 0x5360BUL);
+    VU1_addGSregister(0x47, 0x5360BUL);
     state = *(unsigned char *)(obj + 0x20);
     if (state == 7) {
-        text = func_00288FB8(0x2F5C);
+        text = GetLocalizedString(0x2F5C);
         func_0027FBD8(254, menu_coord2(D_L02_001B3E04, 23.0f, half), 0x88FFFFFF, text, -1);
     } else if (state != 8 && state != 5) {
-        text = func_00288FB8(0x2F5B);
+        text = GetLocalizedString(0x2F5B);
         func_0027FBD8(262, menu_coord2(D_L02_001B3E04, 23.0f, half), 0x88FFFFFF, text, -1);
     }
-    text = func_00288FB8(0x2F5A);
+    text = GetLocalizedString(0x2F5A);
     func_0027FBD8(254, label_y(text, 373.0f, D_L02_001B3E04, 0.5f, 1), 0x88FFFFFF, text, -1);
 }

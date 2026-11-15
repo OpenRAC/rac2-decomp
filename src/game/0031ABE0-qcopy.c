@@ -220,7 +220,7 @@ void func_0031ABE0(Object *self)
         if (self->pos[2] - ground > 0.05f) {
             func_002AA548(&self->pos[2], vars->height, drop, 0.016666668f, 0.16333334f, 0.16666667f);
         } else {
-            func_0026FEB8(D_001AFAE0, vars->ticks);
+            STUB_printf(D_001AFAE0, vars->ticks);
             func_002A7750(self, 8, -1);
             if (self->animNext != 15) func_002A7470(self, 15, 0, 3);
         }
@@ -233,7 +233,7 @@ void func_0031ABE0(Object *self)
         break;
     case 7:
         func_002AA3A8((s32)&self->rot[1], 0.0f, (s32)vars->pitch, 0.016666668f, 0.0f, 0.06666667f);
-        func_002833F0(self->basis, self->rot);
+        euler_rotation_basis(self->basis, self->rot);
         func_002A7E08(self, D_00189E20.f2290, vars->turn, 0.001f, 0.01f, 0.1f);
         ground = func_002A89A8(self->pos, 0, 0.5f);
         drop = ground - 3.0f;
@@ -254,12 +254,12 @@ void func_0031ABE0(Object *self)
     case 10:
         target.q = vars->home.q;
         target.v[2] -= 3.0f;
-        func_00282CF0(&delta, &target, self->pos);
+        FastVecSub(&delta, &target, self->pos);
         self->rot[2] = func_00283248(delta.v[0], delta.v[1]);
-        self->rot[1] = func_00283248(func_00282E20(&delta), delta.v[2]);
-        func_002833F0(self->basis, self->rot);
+        self->rot[1] = func_00283248(vec_length_xy(&delta), delta.v[2]);
+        euler_rotation_basis(self->basis, self->rot);
         func_002AA458((s32)self->pos, (s32)&target, (s32)vars->height, 0.016666668f, 0.0f, 0.33333334f);
-        if (func_00282E48(self->pos, &target) < 0.4f) {
+        if (fast_vec_dist(self->pos, &target) < 0.4f) {
             if (self->animNext != 14) func_002A7470(self, 14, 0, 10);
             func_002A7750(self, 7, -1);
         }
@@ -272,17 +272,17 @@ void func_0031ABE0(Object *self)
         }
         break;
     case 12:
-        if (func_00282E80(self->pos, D_00189E20.pos) < 2.8f
-            && func_00283C80(self->rot[2], func_00283248(D_00189E20.pos[0] - self->pos[0], D_00189E20.pos[1] - self->pos[1])) < 0.38397247f) {
+        if (vec_distance_xy(self->pos, D_00189E20.pos) < 2.8f
+            && FastDiffRots(self->rot[2], func_00283248(D_00189E20.pos[0] - self->pos[0], D_00189E20.pos[1] - self->pos[1])) < 0.38397247f) {
             func_002A7750(self, 13, -1);
             if (self->animNext != 16) func_002A7470(self, 16, 4, 3);
             vars->hold = 0;
-        } else if (func_00282E80(self->pos, D_00189E20.pos) > 2.8f) {
+        } else if (vec_distance_xy(self->pos, D_00189E20.pos) > 2.8f) {
             func_002B4FF0(self, D_00189E20.pos, vars->range);
         } else {
             func_002B50E0(self, self->pos, func_00283248(D_00189E20.pos[0] - self->pos[0], D_00189E20.pos[1] - self->pos[1]));
         }
-        if (func_00282E80(self->pos, D_00189E20.pos) > 5.0f && self->anim == 8) {
+        if (vec_distance_xy(self->pos, D_00189E20.pos) > 5.0f && self->anim == 8) {
             if (self->animNext != 11) func_002A7470(self, 11, 0, 4);
             func_002B60B0(self, 0.0044444446f, 0.13333334f, 0.001163553f, 0.10471977f);
         }
@@ -292,7 +292,7 @@ void func_0031ABE0(Object *self)
             if (D_00189E20.target == self) {
                 func_002A7750(self, 14, -1);
                 if (self->animNext != 17) func_002A7470(self, 17, 0, 7);
-            } else if (func_00282E80(self->pos, D_00189E20.pos) > 4.0f) {
+            } else if (vec_distance_xy(self->pos, D_00189E20.pos) > 4.0f) {
                 func_002B60B0(self, 0.0044444446f, 0.13333334f, 0.001163553f, 0.10471977f);
                 func_002A7750(self, 12, -1);
                 if (self->animNext != 11) func_002A7470(self, 11, 0, 10);
@@ -318,7 +318,7 @@ void func_0031ABE0(Object *self)
         break;
     case 14:
         if (self->flags & 2) {
-            if (func_00282E80(self->pos, D_00189E20.pos) > 4.0f) {
+            if (vec_distance_xy(self->pos, D_00189E20.pos) > 4.0f) {
                 func_002B60B0(self, 0.0044444446f, 0.13333334f, 0.001163553f, 0.10471977f);
                 func_002A7750(self, 12, -1);
                 if (self->animNext != 11) func_002A7470(self, 11, 0, 10);

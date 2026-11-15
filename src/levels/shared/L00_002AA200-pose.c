@@ -26,7 +26,7 @@ void func_L00_002AA200(int *indices, PackedTransformPacket *out, unsigned char *
     /* 0x70000000 is the EE scratchpad, not a level address. */
     count = 1;
     for (i = 1; indices[i] >= 0; i++) {
-        *entry++ = func_L00_002EE660((void *)((indices[i] << 6) + 0x70000000), 32768.0f);
+        *entry++ = pack_vector_s16((void *)((indices[i] << 6) + 0x70000000), 32768.0f);
         count++;
     }
     if (padding > 0) {
@@ -42,7 +42,7 @@ void func_L00_002AA200(int *indices, PackedTransformPacket *out, unsigned char *
     i = 1;
     firstBytes = count << 3;
     for (; indices[i] >= 0; i++) {
-        value = func_L00_002EE660((void *)(0x70000010 + (indices[i] << 6)), 4096.0f);
+        value = pack_vector_s16((void *)(0x70000010 + (indices[i] << 6)), 4096.0f);
         if ((value & 0xFFFFFFFFFFFFUL) != 0x100010001000UL) {
             *entry = value & 0xFFFFFFFFFFFFUL;
             scales++;
@@ -52,9 +52,9 @@ void func_L00_002AA200(int *indices, PackedTransformPacket *out, unsigned char *
     }
     positions = 0;
     for (ordinal = 1; indices[ordinal] >= 0; ordinal++) {
-        value = func_L00_002EE660((void *)(0x70000020 + (indices[ordinal] << 6)), 1.0f);
+        value = pack_vector_s16((void *)(0x70000020 + (indices[ordinal] << 6)), 1.0f);
         if ((value & 0xFFFFFFFFFFFFUL) !=
-            (func_L00_002EE660(*(unsigned char **)(baseline + 0x18) + (ordinal << 4), 1.0f) & 0xFFFFFFFFFFFFUL)) {
+            (pack_vector_s16(*(unsigned char **)(baseline + 0x18) + (ordinal << 4), 1.0f) & 0xFFFFFFFFFFFFUL)) {
             *entry = value & 0xFFFFFFFFFFFFUL;
             positions++;
             *(unsigned short *)((unsigned char *)entry + 6) = ordinal;

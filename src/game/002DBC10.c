@@ -31,19 +31,19 @@ int func_002DBC10(PromptMenuPrefix *menu)
 {
     unsigned char *text;
     int kind;
-    func_002FC560(0x42, 0x44ULL);
-    func_002FC560(0x47, 0x2004BULL);
-    func_0027C540(0);
+    VU1_addGSregister(0x42, 0x44ULL);
+    VU1_addGSregister(0x47, 0x2004BULL);
+    SetupGifPaging(0);
     text = D_001ABB78;
     kind = D_001F2924;
     switch (kind) {
     case 0:
     case 1:
     case 2:
-        text = (unsigned char *)func_00288FB8(0x2DF9);
+        text = (unsigned char *)GetLocalizedString(0x2DF9);
         break;
     case 3:
-        text = (unsigned char *)func_00288FB8(0x2DFC);
+        text = (unsigned char *)GetLocalizedString(0x2DFC);
         break;
     }
     {
@@ -73,6 +73,6 @@ int func_002DBC10(PromptMenuPrefix *menu)
         box.s[5]--;
         func_00280200((unsigned short *)&box, 0x80F0F0F0UL, text, -1);
     }
-    func_0027C660();
+    DoGifPaging();
     return 2;
 }

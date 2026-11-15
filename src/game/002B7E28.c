@@ -262,7 +262,7 @@ void func_002B7FF0(int value, long address)
     if (p == 0)
         return;
     if (*(unsigned int *)p != 0xFFFFFFFFU) {
-        func_0026FEB8(D_001AA220);
+        STUB_printf(D_001AA220);
         return;
     }
     *(int *)p = value;
@@ -313,8 +313,8 @@ void func_002B8888(u8 *a0) {
 void func_002B9000(void) {
     extern void func_002B85F8(void *);
     extern State_2B8518 D_00138500;
-    func_002B85F8(&D_00138180);
-    func_002B85F8(&D_00138500);
+    poll_pad_device_state(&D_00138180);
+    poll_pad_device_state(&D_00138500);
 }
 
 /* Original assembly: a `j` with a trapping `addi $a1,$zero,0` in its delay slot; the compiler emits only addiu. */
@@ -360,9 +360,9 @@ void func_002BA6A0(char *p)
     }
     x = (int)f[8];
     y = (int)f[9];
-    func_00282CC0((char *)tmp, (char *)s, (char *)D_001B1DC0);
-    func_00282CC0((char *)(f + 8), (char *)(f + 8), (char *)tmp);
-    func_00282CC0((char *)(f + 4), (char *)(f + 4), (char *)tmp);
+    FastVecAdd((char *)tmp, (char *)s, (char *)D_001B1DC0);
+    FastVecAdd((char *)(f + 8), (char *)(f + 8), (char *)tmp);
+    FastVecAdd((char *)(f + 4), (char *)(f + 4), (char *)tmp);
     if (*(short *)(p + 0xA) != 2 && (x != (int)f[8] || y != (int)f[9])) {
         c1 = *(TI *)(f + 8);
         h = func_002B0520(&c1);
@@ -476,7 +476,7 @@ void func_002BB928(char *a0)
     }
     *(float *)(s0 + 12) = *(float *)(s0 + 12) + *(float *)(s1 + 0x1C);
     f = Fe617c30b_FUN_00283CE0(*(int *)(s1 + 0x18));
-    r = func_00283D38(*(int *)(s1 + 0x14), *(int *)(s1 + 0x10),
+    r = FastTweenColor(*(int *)(s1 + 0x14), *(int *)(s1 + 0x10),
                       (float)*(short *)(s0 + 0xA) / f);
     *(int *)(s0 + 4) = r;
     if (*(short *)(s0 + 0xA) < 6) {
@@ -525,7 +525,7 @@ char *func_002BC768(char *pos, int spin, int color, float spread, float low, flo
         qcopy(p + 16, pos);
         q = p + 32;
         *(int *)(p + 4) = color;
-        p[9] = func_00283CF0(4.0f) + 64;
+        p[9] = FloatToInt(4.0f) + 64;
         p[3] = 0x48;
         *(float *)(p + 12) = size;
         p[1] = 0;
@@ -626,11 +626,11 @@ void func_002BD500(char *a)
     char *p3 = a + 48;
     int v;
 
-    func_00282CC0(p1, p1, p3);
-    func_00282CC0(p2, p2, p3);
+    FastVecAdd(p1, p1, p3);
+    FastVecAdd(p2, p2, p3);
     func_00300190(p1, p1);
     func_00300190(p2, p2);
-    v = *(int *)(a + 4) - (func_00283CF0(*(float *)(p3 + 12)) << 24);
+    v = *(int *)(a + 4) - (FloatToInt(*(float *)(p3 + 12)) << 24);
     *(int *)(a + 4) = v;
     *(int *)(a + 12) = v;
     if (v < 0)
@@ -733,6 +733,6 @@ void func_002BF518(char *o)
     s[3] += 0.0011f;
     if (s[3] > 1.0f)
         s[3] -= 1.0f;
-    *(char *)(o + 8) = func_00283CF0(s[3] * 255.0f);
+    *(char *)(o + 8) = FloatToInt(s[3] * 255.0f);
     *(float *)(o + 0xC) = (*(float **)(o + 0x20))[0xB] * 3000000.0f + 50000.0f;
 }

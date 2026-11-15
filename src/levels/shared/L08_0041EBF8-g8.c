@@ -354,7 +354,7 @@ void func_L08_0041EBF8(VehicleMoby *moby)
         if (!p->rotor[0].hdr[1]) {
             s32 j;
             for (j = 0; j < 3; j++)
-                func_0029F978(moby, j + 2, &p->rotor[j]);
+                AttachManipulator(moby, j + 2, &p->rotor[j]);
         }
         p->fa4 = 0;
         p->fa8 = 255;
@@ -393,14 +393,14 @@ void func_L08_0041EBF8(VehicleMoby *moby)
                                     *(s16 *)(PLAYER.attachment + 0xaa) != 0x46f)) &&
             func_002A0558(moby, PLAYER.moby) < D_L08_001B18E0 &&
             PLAYER.animationState != 49) {
-            s32 ready = func_002B0C28(7, 0x2798, 1) != 0;
+            s32 ready = TryClaimNotice(7, 0x2798, 1) != 0;
             if ((D_00138180[0x69] & 16) && ready) {
                 p->f190 = 0;
                 fresh = 1;
                 func_L08_00318F90(0, ref_L08_0041EBF8_00, 1);
                 func_L01_00323310(p->f194, p->f19c);
                 func_L08_002D2ED8(49, 0);
-                func_L00_002D2168(D_L08_001B1918, 0, 15.0f);
+                set_hero_animation(D_L08_001B1918, 0, 15.0f);
                 qcopy(PLAYER.rotation, moby->rot);
                 qcopy(PLAYER.position, moby->pos);
                 PLAYER.vehicle = moby;
@@ -417,7 +417,7 @@ void func_L08_0041EBF8(VehicleMoby *moby)
         /* Activation continues through the control/movement path this frame. */
     case 3:
         moby->collData = 0;
-        func_00282978(&p->timer7c);
+        FastDecTimer(&p->timer7c);
         inputStrafe = inputBrake = inputPitch = inputThrottle = inputTurn = 0.0f;
         if (moby->state == 3) {
             PLAYER.vehicleControl = 1;
@@ -451,7 +451,7 @@ void func_L08_0041EBF8(VehicleMoby *moby)
                 p->power += D_L08_001B1A18;
             }
             if (D_L08_001B191C != D_L08_001B1918 && D_L08_001B1918 != -1)
-                func_L00_002D2168(D_L08_001B1918, 0, 15.0f);
+                set_hero_animation(D_L08_001B1918, 0, 15.0f);
             func_L08_0041E630(&inputTurn, &inputThrottle, &inputPitch, &inputBrake, &inputStrafe);
             inputTurn *= p->power;
         } else {
@@ -486,13 +486,13 @@ void func_L08_0041EBF8(VehicleMoby *moby)
             p->throttle = inputThrottle;
             inputPitch *= 0.017453294f;
             inputPitch *= D_L08_001B1948;
-            speed = func_00282DF0(p) * p->power;
+            speed = FastVecLength(p) * p->power;
             speedMax = D_L08_001B1908 * 0.016666668f;
             rate = D_L08_001B1950 * 0.016666668f;
             steer = (speed < rate ? speed : rate) / rate * D_L08_001B194C + (1.0f - D_L08_001B194C) +
                     D_L08_001B1A24 * (1.0f - p->power);
             turn = inputTurn * steer * 0.000290888244f;
-            p->yaw = func_00283B98(p->yaw, D_L08_001B18F8 * turn);
+            p->yaw = FastAddRotations(p->yaw, D_L08_001B18F8 * turn);
             turnRad = inputTurn * 0.017453294f;
             bank = D_L08_001B1930 * turnRad;
             bank *= p->power;
@@ -507,7 +507,7 @@ void func_L08_0041EBF8(VehicleMoby *moby)
                 inputThrottle *= D_L08_001B1934;
             if (inputThrottle < 0.0f)
                 sign = -1.0f;
-            turnFactor = func_00282C48(inputTurn), damping = func_L08_003277C0(2, (speedMax - speed) / speedMax);
+            turnFactor = func_00282C48(inputTurn), damping = IntegerPower(2, (speedMax - speed) / speedMax);
             push = inputThrottle + D_L08_001B1938 * turnFactor * sign;
             push *= 0.00027777778f;
             push *= D_L08_001B1904;
@@ -535,36 +535,36 @@ void func_L08_0041EBF8(VehicleMoby *moby)
             {
                 s32 k;
                 for (k = 0; k < 3; k++) {
-                    angle[k] = func_00283B98(angle[k], rates[k]);
-                    func_00283898(p->rotor[k].mtx, k == 0 ? 2 : 0, angle[k]);
+                    angle[k] = FastAddRotations(angle[k], rates[k]);
+                    build_axis_rotation_quaternion(p->rotor[k].mtx, k == 0 ? 2 : 0, angle[k]);
                 }
             }
-            func_00282CC0(nextPos, moby->pos, p->vel);
+            FastVecAdd(nextPos, moby->pos, p->vel);
             height = func_002A89A8(nextPos, 0, 0.5f);
             special = 0;
-            if (func_00278E78() == 1 || func_00278E78() == 11)
+            if (GetCollHitMaterial() == 1 || GetCollHitMaterial() == 11)
                 special = 1;
             if (moby->pos[2] < height + hoverHeight + 0.3f && special)
                 moby->state = 5;
             grounded = 1;
             p->vel[2] -= D_L08_001B1920 * 0.00027777778f;
             if (height != 0.0f) {
-                func_00282F20(basis[2], HIT.normal, 1.0f);
-                func_00282DD8(basis[1], moby->mtx, basis[2]);
-                func_00282DD8(basis[0], basis[1], basis[2]);
+                vec_scale_to_length(basis[2], HIT.normal, 1.0f);
+                FastVecCross(basis[1], moby->mtx, basis[2]);
+                FastVecCross(basis[0], basis[1], basis[2]);
                 qzero_nc(basis[3]);
                 func_002AB6D8(basis, angles);
                 {
                     float tilt = inputPitch * 0.5f;
-                    p->pitch = func_00283B98(p->pitch,
-                        func_00283BE0(func_00283B98(-angles[1], tilt * (D_L08_001B1A28 * (p->power + 1.0f))),
+                    p->pitch = FastAddRotations(p->pitch,
+                        fast_subtract_rotations(FastAddRotations(-angles[1], tilt * (D_L08_001B1A28 * (p->power + 1.0f))),
                                       p->pitch) * D_L08_001B1940);
                 }
                 if (nextPos[2] < height + hoverHeight + 0.2f) {
                     grounded = 0;
                     if (nextPos[2] + 0.1f < height || special) {
                         nextPos[2] = height;
-                        func_00282D30(p, p, D_L08_001B1928);
+                        FastVecScale(p, p, D_L08_001B1928);
                     }
                     p->vel[2] += ((height + hoverHeight - nextPos[2]) * D_L08_001B1910 - p->vel[2]) *
                                  D_L08_001B1910;
@@ -573,34 +573,34 @@ void func_L08_0041EBF8(VehicleMoby *moby)
                         p->vel[0] *= brake;
                         p->vel[1] *= brake;
                     }
-                    func_00282D30(p, p, D_L08_001B18FC);
-                    func_00283698(scratch, moby->mtx);
-                    func_002830C0(p, p, scratch);
+                    FastVecScale(p, p, D_L08_001B18FC);
+                    matrix_from_basis_rows(scratch, moby->mtx);
+                    transform_vector(p, p, scratch);
                     p->vel[1] *= D_L08_001B1900;
-                    func_00283098(p, p, moby->mtx);
+                    matrix_mul_vec3(p, p, moby->mtx);
                 }
-                func_00282F20(thrust, moby->mtx, acceleration);
+                vec_scale_to_length(thrust, moby->mtx, acceleration);
                 if (p->pitch < -0.78539824f) {
                     if (thrust[2] > 0.0f)
                         thrust[2] = 0.0f;
-                    func_00282F20(thrust, thrust, acceleration);
+                    vec_scale_to_length(thrust, thrust, acceleration);
                 } else {
                     float climb = D_L08_001B1920 * 0.000069444446f;
                     if (thrust[2] > climb)
                         thrust[2] = climb;
-                    func_00282F20(thrust, thrust, acceleration);
+                    vec_scale_to_length(thrust, thrust, acceleration);
                 }
                 {
                     float side = inputStrafe * 0.00027777778f;
-                    func_00282F20(scratch, moby->mtx[1], D_L08_001B1A30 * side * p->power);
+                    vec_scale_to_length(scratch, moby->mtx[1], D_L08_001B1A30 * side * p->power);
                 }
-                func_00282CC0(thrust, thrust, scratch);
-                func_00282CC0(p, p, thrust);
+                FastVecAdd(thrust, thrust, scratch);
+                FastVecAdd(p, p, thrust);
             }
             qcopy(moby->pos, nextPos);
             func_0029FCC0(moby, 0, basis[0]);
             basis[0][2] += D_L08_001B1914 - D_L08_001B1A1C;
-            func_00282CF0(basis[1], moby->pos, basis[0]);
+            FastVecSub(basis[1], moby->pos, basis[0]);
             moby->collData = 0;
             collision = func_00278870(basis[0], D_L08_001B1914);
             if (!collision) {
@@ -615,7 +615,7 @@ void func_L08_0041EBF8(VehicleMoby *moby)
             }
             moby->collData = *(s32 *)(moby->pClass + 0x10);
             if (collision) {
-                if (func_00278E78() == 1 || func_00278E78() == 11)
+                if (GetCollHitMaterial() == 1 || GetCollHitMaterial() == 11)
                     moby->state = 5;
                 if (HIT.moby != PLAYER.moby) {
                     float give = 1.0f;
@@ -631,12 +631,12 @@ void func_L08_0041EBF8(VehicleMoby *moby)
                     } else {
                         give = p->power;
                     }
-                    func_00282CC0(moby->pos, HIT.point, basis[1]);
-                    func_00282DD8(basis[3], HIT.normal, p);
-                    func_00282DD8(basis[2], basis[3], HIT.normal);
-                    func_00282F20(basis[2], basis[2], 1.0f);
-                    func_00282F20(p, basis[2], func_00282DB0(p, basis[2]) * give);
-                    func_00282D30(p, p, D_L08_001B1924);
+                    FastVecAdd(moby->pos, HIT.point, basis[1]);
+                    FastVecCross(basis[3], HIT.normal, p);
+                    FastVecCross(basis[2], basis[3], HIT.normal);
+                    vec_scale_to_length(basis[2], basis[2], 1.0f);
+                    vec_scale_to_length(p, basis[2], FastVecDot(p, basis[2]) * give);
+                    FastVecScale(p, p, D_L08_001B1924);
                     if (moby->pos[2] < p->f17c)
                         moby->state = 5;
                 }
@@ -703,10 +703,10 @@ void func_L08_0041EBF8(VehicleMoby *moby)
                 reach = D_L08_001B19C0;
                 break;
             }
-            func_002A8C00(basis[2], moby, 0x10000, p, reach);
+            make_hit_descriptor(basis[2], moby, 0x10000, p, reach);
         }
         func_00277F48(basis[0], 0, moby, basis[2], D_L08_001B1958);
-        if (func_00282DF0(p) > D_L08_001B19CC * 0.016666668f) {
+        if (FastVecLength(p) > D_L08_001B19CC * 0.016666668f) {
             func_0029FCC0(moby, 1, scratch);
             func_00277F48(scratch, 0, moby, basis[2], D_L08_001B19C4);
         }
@@ -724,7 +724,7 @@ void func_L08_0041EBF8(VehicleMoby *moby)
     case 5:
         func_L08_0041EA88(moby);
         func_0029FCC0(moby, 0, forward);
-        func_002ABBB8(moby, p, forward, 0.0f, 0.0f, 10, 3, 16, 4.0f, 2.0f, 9.0f, 1.0f, -1, 15.0f,
+        SpawnExplosionEffects(moby, p, forward, 0.0f, 0.0f, 10, 3, 16, 4.0f, 2.0f, 9.0f, 1.0f, -1, 15.0f,
                       1, 1, -1, 0, 0x810001);
         qcopy(moby->pos, p->home);
         moby->state = 0;
@@ -733,7 +733,7 @@ void func_L08_0041EBF8(VehicleMoby *moby)
     p->lastZ = moby->pos[2];
     {
         float step = p->power * 0.000290888244f;
-        p->bobPhase = func_00283B98(p->bobPhase, D_L08_001B18E8 * step);
+        p->bobPhase = FastAddRotations(p->bobPhase, D_L08_001B18E8 * step);
     }
     p->bobOffset = func_00283198(p->bobPhase) * D_L08_001B18E4 * p->power;
     moby->pos[2] += p->bobOffset * p->power;
@@ -743,8 +743,8 @@ void func_L08_0041EBF8(VehicleMoby *moby)
                       D_L08_001B18F0 * k, D_L08_001B18F4 * k);
     }
     moby->rot[2] = p->yaw;
-    moby->rot[0] = func_00283B98(moby->rot[0], p->roll);
-    moby->rot[1] = func_00283B98(moby->rot[1], p->pitch);
+    moby->rot[0] = FastAddRotations(moby->rot[0], p->roll);
+    moby->rot[1] = FastAddRotations(moby->rot[1], p->pitch);
     if (moby->state == 3) {
         if (D_001A79F0 == 8 || D_001A79F0 == 19) {
             switch (p->mode8a) {
@@ -768,7 +768,7 @@ void func_L08_0041EBF8(VehicleMoby *moby)
                     p->mode8a = 3;
                 break;
             case 3:
-                func_00282978(&p->timer88);
+                FastDecTimer(&p->timer88);
                 if (p->f68 < D_L08_001B031C[0])
                     p->mode8a = 1;
                 else if (p->timer88 == 0)
@@ -777,9 +777,9 @@ void func_L08_0041EBF8(VehicleMoby *moby)
             }
             if (p->mode8a && p->f6c) {
                 u8 *other = *(u8 **)(p->f6c + 0x68);
-                float num = func_00283CE0(*(s32 *)(other + 4));
+                float num = IntToFloat(*(s32 *)(other + 4));
                 p->f8c =
-                    func_00283CF0(D_L08_001B19E4 * num / (func_00283CE0(*(s32 *)other) * 60.0f));
+                    FloatToInt(D_L08_001B19E4 * num / (IntToFloat(*(s32 *)other) * 60.0f));
             } else {
                 p->f8c = 0x200;
             }
@@ -793,17 +793,17 @@ void func_L08_0041EBF8(VehicleMoby *moby)
                 p->f74 = 0;
             }
         }
-        func_00282F20(forward, moby->mtx, -0.5f);
+        vec_scale_to_length(forward, moby->mtx, -0.5f);
         if (forward[2] < 0.0f)
             forward[2] = 0.0f;
         forward[2] += 1.5f;
-        func_00282CC0(PLAYER.position, forward, moby->pos);
+        FastVecAdd(PLAYER.position, forward, moby->pos);
         qcopy(PLAYER.cameraPosition, PLAYER.position);
         PLAYER.cameraPosition[2] = moby->pos[2];
         qcopy(PLAYER.rotation, moby->rot);
     }
     moby->collData = *(s32 *)(moby->pClass + 0x10);
-    if (moby->drawn && func_00282E48(moby->pos, D_L08_001B9B00) < 64.0f) {
+    if (moby->drawn && fast_vec_dist(moby->pos, D_L08_001B9B00) < 64.0f) {
         func_002A93B0(moby);
         moby->f6f = 60;
     }
@@ -814,9 +814,9 @@ void func_L08_0041EBF8(VehicleMoby *moby)
             p->fx1a4 = func_002E5DA0(0, 4, moby, 0x85c);
             func_L08_003391C0(moby, p->fx1a4, 0, p->trail, D_L08_001B1B7C, D_L08_001B1B80);
         } else {
-            func_00282CF0(forward, moby->pos, p->trail);
+            FastVecSub(forward, moby->pos, p->trail);
             forward[2] = 0.0f;
-            func_L08_00339220(moby, p->trail, D_L08_001B1A44, D_L08_001B1A48, func_00282DF0(forward));
+            func_L08_00339220(moby, p->trail, D_L08_001B1A44, D_L08_001B1A48, FastVecLength(forward));
             if (p->fx1b4 != -1 && EFFECT_LIVE(p->fx1b4))
                 func_002E59F8(p->fx1b4);
             p->fx1b4 = -1;

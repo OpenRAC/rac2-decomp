@@ -15,9 +15,9 @@ long func_0011B140(void)
     int old;
 
     flag = 0;
-    func_0011AF90(&flag, &result);
+    SetVSyncFlag(&flag, &result);
 
-    old = func_0011F5E0();
+    old = DIntr();
     I_STAT = 4;
     CpuSync();
     if (old) {
@@ -26,7 +26,7 @@ long func_0011B140(void)
     while ((I_STAT & 4) == 0 && flag == 0) {
     }
 
-    old = func_0011F5E0();
+    old = DIntr();
     I_STAT = 4;
     CpuSync();
     if (old) {

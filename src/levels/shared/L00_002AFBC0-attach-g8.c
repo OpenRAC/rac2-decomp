@@ -109,33 +109,33 @@ void func_L00_002B0968(int value)
                         qcopy(moby + 0x10, (u8 *)&D_00189E20 + 0xC80 + joint * 64);
                         if (!D_L00_001A7CEC || !*(int *)(def + 0x1C)) {
                             if (i == 0)
-                                func_L00_002B0528(moby, (u8 *)(joint * 64 + (int)joint_mtx), 0);
+                                FilterTransformHistory(moby, (u8 *)(joint * 64 + (int)joint_mtx), 0);
                             first = func_L00_002ADED8(i);
                             second = func_L00_002ADF10(i);
                             third = func_L00_002ADF38(i);
                             if (!first && !second && !third)
                                 func_002A05A8(moby);
                             func_002A0F48(moby);
-                            func_00283678(moby + 0xC0, (u8 *)(joint * 64 + (int)joint_mtx));
+                            copy_matrix3x4(moby + 0xC0, (u8 *)(joint * 64 + (int)joint_mtx));
                             if (!first && !second && !third)
                                 func_002AB028(moby + 0xC0);
                             scratch.direction[0] = 1.0f;
                             scratch.direction[1] = 0;
                             scratch.direction[2] = 0;
-                            func_00283098(scratch.direction, scratch.direction, moby + 0xC0);
+                            matrix_mul_vec3(scratch.direction, scratch.direction, moby + 0xC0);
                             *(float *)(moby + 0xF4) =
-                                -func_00283248(func_00282E20(scratch.direction), scratch.direction[2]);
+                                -func_00283248(vec_length_xy(scratch.direction), scratch.direction[2]);
                             *(float *)(moby + 0xF8) = func_00283248(scratch.direction[0], scratch.direction[1]);
                             func_002A10E8(moby);
                             *(u16 *)(moby + 0x34) |= 6;
                             if (first) {
-                                func_L00_002AA200(D_L00_0025BDC0, D_L00_001B2E00, *(int *)(moby + 0x24), 0, value);
+                                PackPose(D_L00_0025BDC0, D_L00_001B2E00, *(int *)(moby + 0x24), 0, value);
                                 *(int *)(moby + 0x44) = 0;
                                 *(int *)(moby + 0x40) = 0;
                                 *(u8 **)(moby + 0x58) = D_L00_001B2E00;
                                 *(u8 **)(moby + 0x5C) = D_L00_001B2E00;
                             } else if (second) {
-                                func_L00_002AA200(D_L00_001A7D08, D_L00_001B3000, *(int *)(moby + 0x24), 0, value);
+                                PackPose(D_L00_001A7D08, D_L00_001B3000, *(int *)(moby + 0x24), 0, value);
                                 *(int *)(moby + 0x44) = 0;
                                 *(int *)(moby + 0x40) = 0;
                                 *(u8 **)(moby + 0x58) = D_L00_001B3000;
@@ -161,11 +161,11 @@ void func_L00_002B0968(int value)
                                     D_L00_0025BE10.scale1[2] = 1;
                                 }
                                 if (!j) {
-                                    func_L00_002AA200(D_L00_001A7D18, D_L00_001B3200, *(int *)(moby + 0x24), 0, value);
+                                    PackPose(D_L00_001A7D18, D_L00_001B3200, *(int *)(moby + 0x24), 0, value);
                                     *(u8 **)(moby + 0x58) = D_L00_001B3200;
                                     *(u8 **)(moby + 0x5C) = D_L00_001B3200;
                                 } else {
-                                    func_L00_002AA200(D_L00_001A7D30, D_L00_001B3300, *(int *)(moby + 0x24), 0, value);
+                                    PackPose(D_L00_001A7D30, D_L00_001B3300, *(int *)(moby + 0x24), 0, value);
                                     *(u8 **)(moby + 0x58) = D_L00_001B3300;
                                     *(u8 **)(moby + 0x5C) = D_L00_001B3300;
                                 }
@@ -189,18 +189,18 @@ void func_L00_002B0968(int value)
                             if (!D_L00_001A7CEC || i != 0)
                                 func_002AB6D8((u8 *)(joint * 64 + (int)joint_mtx), moby + 0xF0);
                             else
-                                func_L00_002B0528(moby, (u8 *)(joint * 64 + (int)joint_mtx), 1);
+                                FilterTransformHistory(moby, (u8 *)(joint * 64 + (int)joint_mtx), 1);
                             p = (u8 *)&D_00189E20;
                             if (*(float *)(p + 0x14F8) > 0 && !*(int *)(p + 0x1500)) {
                                 float step = D_L00_001A7CE4 * 0.00027777778f;
                                 func_002AA548((float *)(p + 0x14F8), (float *)(p + 0x14FC), 0.0f, step, step,
                                               D_L00_001A7CE0 * 0.016666668f);
-                                func_00283098(scratch.direction, p + 0x14A0, p);
-                                func_00282CC0(scratch.direction, scratch.direction, p + 0x80);
-                                func_00282D08(moby + 0x10, moby + 0x10, scratch.direction, *(float *)(p + 0x14F8));
+                                matrix_mul_vec3(scratch.direction, p + 0x14A0, p);
+                                FastVecAdd(scratch.direction, scratch.direction, p + 0x80);
+                                lerp_vector(moby + 0x10, moby + 0x10, scratch.direction, *(float *)(p + 0x14F8));
                                 func_002A91F0(&scratch.saved[1], moby + 0xF0);
                                 func_00283810(quaternion, &scratch.saved[1], p + 0x14C0, *(float *)(p + 0x14F8));
-                                func_00283958(quaternion, moby + 0xC0);
+                                quaternion_to_rotation_basis(quaternion, moby + 0xC0);
                                 func_002AB6D8(moby + 0xC0, moby + 0xF0);
                             }
                             func_002A0F48(moby);
@@ -215,7 +215,7 @@ void func_L00_002B0968(int value)
                 u8 *effect;
                 u8 *created;
                 if (!*(u8 **)(p + 0x131C)) {
-                    *(u8 **)(p + 0x131C) = func_0029EFD0(0x4B4);
+                    *(u8 **)(p + 0x131C) = CreateMoby(0x4B4);
                     if (*(u8 **)(p + 0x131C)) {
                         *(int *)(*(u8 **)(p + 0x131C) + 0x78) = 0x801432D7;
                         created = *(u8 **)(p + 0x131C);
@@ -241,14 +241,14 @@ void func_L00_002B0968(int value)
                             func_L00_002A7A10();
                         }
                         qcopy(effect + 0x10, matrix[3]);
-                        func_00283678(effect + 0xC0, matrix);
+                        copy_matrix3x4(effect + 0xC0, matrix);
                         func_002A0F48(effect);
                         *(u64 *)(effect + 0x38) = *(u64 *)(*(u8 **)(p + 0x2290) + 0x38);
-                        angle = func_00283198(((float)(D_L00_001B19C8[0] % random_range) / func_00283CE0(random_range)
+                        angle = func_00283198(((float)(D_L00_001B19C8[0] % random_range) / IntToFloat(random_range)
                                                * 2.0f) * 3.1415927f + (-3.1415927f));
-                        color_red = func_00283CF0(angle * 90.0f);
-                        green = func_00283CF0(angle * 50.0f);
-                        blue = func_00283CF0(angle * 10.0f);
+                        color_red = FloatToInt(angle * 90.0f);
+                        green = FloatToInt(angle * 50.0f);
+                        blue = FloatToInt(angle * 10.0f);
                         blue = ((blue + 20) << 16) | 0x80000000;
                         red = color_red + 215;
                         if (red > 255)

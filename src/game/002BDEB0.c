@@ -16,40 +16,40 @@ void func_002BDEB0(char *p)
  float f,denom;
  int color, rgb, alpha;
  p[8]=(unsigned char)p[8]+(unsigned char)q[8];
- func_00282CC0(pos,pos,p+48);
+ FastVecAdd(pos,pos,p+48);
  if (*(float *)(p+28)!=0.0f) {
   if (*(float *)(p+28)==2.0f) func_00300190(pos,pos);
   *(float *)(p+28)=2.0f;
  }
  *(float *)(p+12) *= 1.0f+(*(float *)(q+12)-1.0f);
  if (*(int *)(q+4)==0) {
-  if (func_00282978(p+10)) {
+  if (FastDecTimer(p+10)) {
    *(int *)(q+4)=1; *(short *)(p+10)=20;
    color=*(int *)q|0x7f000000;
   } else {
-   alpha=func_00283CF0((float)(10-*(short *)(p+10))*9.6f);
+   alpha=FloatToInt((float)(10-*(short *)(p+10))*9.6f);
    rgb=*(int *)q;
    color=((alpha+32)<<24)|rgb;
   }
  } else if (*(int *)(q+4)==2) {
-  if (func_00282978(p+10)) { func_002B9180(p); return; }
+  if (FastDecTimer(p+10)) { func_002B9180(p); return; }
   else {
-   denom=func_00283CE0((unsigned char)q[11]);
-   color=(func_00283CF0((float)(unsigned char)q[10] * ParticleLifetimeFraction((float)*(short *)(p+10),denom))<<24)|(*(int *)q&0xffffff);
+   denom=IntToFloat((unsigned char)q[11]);
+   color=(FloatToInt((float)(unsigned char)q[10] * ParticleLifetimeFraction((float)*(short *)(p+10),denom))<<24)|(*(int *)q&0xffffff);
   }
  } else if (*(int *)(q+4)==3) {
-  func_00282978(p+10);
-  f=func_00283CE0((unsigned char)q[11]-*(short *)(p+10))/ *(float *)(q+28);
+  FastDecTimer(p+10);
+  f=IntToFloat((unsigned char)q[11]-*(short *)(p+10))/ *(float *)(q+28);
   if (f>1.0f) f=1.0f;
-  *(int *)(p+4)=(func_00283CF0((float)(unsigned char)q[10]*f)<<24)|(*(int *)q&0xffffff);
-  if ((unsigned char)q[11]-*(short *)(p+10)>=func_00283CF0(*(float *)(q+28))) {
-   alpha=func_00283CF0(*(float *)(q+28));
+  *(int *)(p+4)=(FloatToInt((float)(unsigned char)q[10]*f)<<24)|(*(int *)q&0xffffff);
+  if ((unsigned char)q[11]-*(short *)(p+10)>=FloatToInt(*(float *)(q+28))) {
+   alpha=FloatToInt(*(float *)(q+28));
    *(int *)(q+4)=2; q[11]=(unsigned char)q[11]-alpha;
   }
   return;
  } else {
-  if (func_00282978(p+10)) { func_002B9180(p); return; }
-  else color=(func_00283CF0((float)*(short *)(p+10)*6.35f)<<24)|*(int *)q;
+  if (FastDecTimer(p+10)) { func_002B9180(p); return; }
+  else color=(FloatToInt((float)*(short *)(p+10)*6.35f)<<24)|*(int *)q;
  }
  *(int *)(p+4)=color;
 }

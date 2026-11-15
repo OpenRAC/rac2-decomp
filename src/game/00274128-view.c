@@ -36,8 +36,8 @@ void func_00279D18(void) {
     *(int *)&g->f[0xC / 4] = 0;
     *(int *)&g->f[0x1C / 4] = 0;
     *(int *)&g->f[0x2C / 4] = 0;
-    func_00283788(&g->f[0x40 / 4], x, g);
-    func_00283788(&g->f[0x80 / 4], x + 0x40, g);
+    multiply_matrix(&g->f[0x40 / 4], x, g);
+    multiply_matrix(&g->f[0x80 / 4], x + 0x40, g);
     a = xf[0x1A0 / 4];
     b = xf[0x1A4 / 4];
     c = xf[0x1A8 / 4];
@@ -53,15 +53,15 @@ void func_00279D18(void) {
     g->f[0xB0 / 4] += g->f[0xBC / 4] * a;
     g->f[0xB4 / 4] += g->f[0xBC / 4] * b;
     g->f[0xB8 / 4] += g->f[0xBC / 4] * c;
-    func_00283788(&g->f[0xC0 / 4], x + 0x80, g);
-    func_00282D60(&g->f[0x100 / 4], x + 0x80, xf[0x1C0 / 4]);
-    func_00282D60(&g->f[0x110 / 4], x + 0x90, xf[0x1C0 / 4]);
+    multiply_matrix(&g->f[0xC0 / 4], x + 0x80, g);
+    scale_vector(&g->f[0x100 / 4], x + 0x80, xf[0x1C0 / 4]);
+    scale_vector(&g->f[0x110 / 4], x + 0x90, xf[0x1C0 / 4]);
     qcopy(&g->f[0x120 / 4], x + 0xA0);
     qcopy(&g->f[0x130 / 4], x + 0xB0);
-    func_00283788(&g->f[0x100 / 4], &g->f[0x100 / 4], g);
+    multiply_matrix(&g->f[0x100 / 4], &g->f[0x100 / 4], g);
     qcopy(D_001B92C0, g);
     qcopy(D_001B92C0 + 0x10, &g->f[0x10 / 4]);
     qcopy(D_001B92C0 + 0x20, &g->f[0x20 / 4]);
-    func_00282D30(D_001B92C0 + 0x30, &g->f[0x140 / 4], 1024.0f);
+    FastVecScale(D_001B92C0 + 0x30, &g->f[0x140 / 4], 1024.0f);
     *(float *)(D_001B92C0 + 0x3C) = 1024.0f;
 }

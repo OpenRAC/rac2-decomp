@@ -104,14 +104,14 @@ s32 func_L16_00404E40(u8 *moby)
     if (*(s32 *)(state + 0x2A4) >= *(s32 *)path)
         return 1;
     qcopy(point, path + 16 + *(s32 *)(state + 0x2A4) * 16);
-    func_00282CF0(step, point, moby + 0x10);
-    func_00282F20(step, step, 0.20000002f);
+    FastVecSub(step, point, moby + 0x10);
+    vec_scale_to_length(step, step, 0.20000002f);
     func_L07_00321D68(moby, step);
     if (*(s32 *)(state + 0x2AC) != 0) {
-        if (func_00282E48(moby + 0x10, point) < 0.5f)
+        if (fast_vec_dist(moby + 0x10, point) < 0.5f)
             (*(s32 *)(state + 0x2A4))++;
     } else {
-        if (func_00282E80(moby + 0x10, point) < 0.5f)
+        if (vec_distance_xy(moby + 0x10, point) < 0.5f)
             (*(s32 *)(state + 0x2A4))++;
     }
     return 0;
@@ -169,11 +169,11 @@ void func_L16_0040CD88(u8 *arg)
         func_002A7750(arg, 1, 0);
         if (arg[0x43])
             func_002A7470(arg, 0, 0, 0);
-        state[0x48] = func_00283CF0(18.0f);
-        state[0x4A] = func_00283CF0(16.0f);
+        state[0x48] = FloatToInt(18.0f);
+        state[0x4A] = FloatToInt(16.0f);
         *(float *)(state + 0x358) = *(float *)(arg + 0x18);
     }
-    if (arg[0x31] && func_00282E48(arg + 0x10, D_L16_001B9B00) < 32.0f) {
+    if (arg[0x31] && fast_vec_dist(arg + 0x10, D_L16_001B9B00) < 32.0f) {
         func_002A93B0(arg);
         arg[0x6F] = 30;
     }
@@ -271,7 +271,7 @@ void func_L16_00410E40(u8 *arg0)
     target = func_L16_00417788(*(void **)(state + 0x24C));
     p = table + 0x10;
     do {
-        f = func_00282E80(arg0 + 0x10, p);
+        f = vec_distance_xy(arg0 + 0x10, p);
         if (f < bestf) {
             bestf = f;
             best = i;
@@ -287,7 +287,7 @@ void func_L16_00410E40(u8 *arg0)
            it on the loop's entry path, which keeps loop.c off this loop (phony). */
         slot = state + 0x200;
         rem = (i + start) % 8;
-        result = func_002ACBC8(table + (rem * 16 + 0x10), target);
+        result = IsPointInCuboid(table + (rem * 16 + 0x10), target);
         if (result == 0) {
             i++;
             continue;
@@ -318,7 +318,7 @@ void func_L16_00411368(u8 *arg)
     f20 = 10.0f;
     if (s0[0x20] == 0xD || s0[0x20] == 0xF || s0[0x20] == 0xE || s0[0x20] == 0x11)
         f20 = 25.0f;
-    f20 = f20 + func_00283198((float)(D_L16_001B2648 % func_00283CF0(120.0f)) / period * 6.2831855f - 3.1415927f);
+    f20 = f20 + func_00283198((float)(D_L16_001B2648 % FloatToInt(120.0f)) / period * 6.2831855f - 3.1415927f);
     func_002AA548(s0 + 0x18, s1 + 0x268, *(float *)(s1 + 0x264) + f20,
                   0.0083333338f, 0.0027777778f, 0.16666667f);
     func_L16_00412F48(s0);
@@ -423,14 +423,14 @@ void func_L16_00412C58(u8 *arg, s32 start, s32 end)
         u8 *tbl = s3 + 0x310;
 
         if (tbl[start + k] == 0) {
-            func_L16_00412BA8(arg, start + k);
+            RequestVoiceLine(arg, start + k);
             return;
         }
         k = (k + 1) % n;
     }
     for (i = 0; i < n; i++)
         s3[0x310 + start + i] = 0;
-    func_L16_00412BA8(arg, start + k);
+    RequestVoiceLine(arg, start + k);
 }
 
 /* Finishes the pending entry (its two saved vectors are copied back), then resets the
@@ -458,12 +458,12 @@ void func_L16_00412D48(u8 *arg)
     }
     D_0013963B = 1;
     func_L16_004117A8(arg);
-    func_L16_00411F80(arg, 1);
+    SetMobyAndGroupsEnabled(arg, 1);
     func_L00_003294F0(D_L16_001B2B1C[0] + (*(s32 *)(s0 + 0x190) << 8), 1);
     func_002DF3F8(D_L16_001B2C0C[0] + (*(s32 *)(s0 + 0x198) << 7) + 0x30,
                   D_L16_001B2C0C[0] + (*(s32 *)(s0 + 0x198) << 7) + 0x70);
     func_L16_00412C58(arg, 0, 2);
-    func_0029B3E0(0, -1);
+    MemcardSave(0, -1);
     func_002A7750(arg, 2, 1);
 }
 
@@ -485,7 +485,7 @@ void func_L16_00412E70(char *arg0) {
     if (*(s32 *)(s0 + 0x23C) != 0)
         func_0029F338((void *)*(s32 *)(s0 + 0x23C));
     func_L01_00323310(*(s32 *)(s0 + 0x1A0), -1);
-    func_0029B3E0(0, -1);
+    MemcardSave(0, -1);
     func_0029F338(arg0);
 }
 
@@ -529,16 +529,16 @@ void func_L16_004133B0(u8 *arg)
     state = *(u8 **)(arg + 0x68);
     switch (arg[0x20]) {
     case 0:
-        func_00282CC0(arg + 0x10, arg + 0x10, state);
+        FastVecAdd(arg + 0x10, arg + 0x10, state);
         if (func_00282948(state + 0x30) && !arg[0x31])
             func_0029F338(arg);
         break;
     case 2:
-        func_00282CC0(arg + 0x10, arg + 0x10, state);
+        FastVecAdd(arg + 0x10, arg + 0x10, state);
         basis = arg + 0xC0;
         *(float *)(state + 8) -= *(float *)(state + 0x34);
-        func_00283958(state + 0x20, rotation);
-        func_00283738(basis, rotation, basis);
+        quaternion_to_rotation_basis(state + 0x20, rotation);
+        multiply_matrix3x3(basis, rotation, basis);
         hit = 0;
         if (func_002A9640(arg, 0x10000, 0))
             hit = 1;
@@ -548,15 +548,15 @@ void func_L16_004133B0(u8 *arg)
         if (old > 90 && func_00277258(arg + 0x10, 0, arg, 1.0f))
             hit = 1;
         if (hit) {
-            func_00282CF0(toward, D_L16_001B9B00, arg + 0x10);
+            FastVecSub(toward, D_L16_001B9B00, arg + 0x10);
             angles = arg + 0xF0;
-            func_00282F20(toward, toward, 1.0f);
+            vec_scale_to_length(toward, toward, 1.0f);
             func_0032DA58(arg, arg + 0x10, toward, 0.0f);
             func_002A8C28(arg, arg + 0x10, 0x10001, 0, 1, 0, 4.0f, 20.0f, 2.0f);
             func_002AB6D8(basis, angles);
             for (i = 0; i < 6; i++) {
                 func_002A7A00(velocity, 0.0f, 0.33333334f);
-                func_00282CC0(velocity, velocity, state);
+                FastVecAdd(velocity, velocity, state);
                 kind = *(s16 *)(arg + 0xAA);
                 speed = func_002A7878(180.0f, 720.0f);
                 life = func_002A7878(5.0f, 15.0f);

@@ -34,8 +34,8 @@ void func_L00_00417A40(char *owner, char *vel, int life)
             offset.f[0] = -0.15f;
             offset.f[1] = -0.8f;
             offset.f[3] = 1.0f;
-            func_00283098(&pos, &offset, *(char **)(info + 8) + 0xC0);
-            func_00282CC0(&pos, &pos, *(char **)(info + 8) + 0x10);
+            matrix_mul_vec3(&pos, &offset, *(char **)(info + 8) + 0xC0);
+            FastVecAdd(&pos, &pos, *(char **)(info + 8) + 0x10);
             *(Q16_F417A40 *)(slot + 0x20) = pos.q;
         }
         *(Q16_F417A40 *)(slot + 0x40) = *(Q16_F417A40 *)vel;

@@ -39,7 +39,7 @@ void func_00292B20(s32 arg0, s32 arg1) {
     if (temp_a1 != 0) {
         temp_a0 = D_001A7288;
         tmp1 = temp_a0 + (arg0 * 8);
-        func_0029D4D0((*(s32 *)((char *)(tmp1) + (0x20))) + temp_a0, temp_a1);
+        fast_decompress((*(s32 *)((char *)(tmp1) + (0x20))) + temp_a0, temp_a1);
     }
     tmp0 = D_001B1888[0] + (arg0 * 4);
     (*(s32 *)((char *)(tmp0) + (0x74))) = 0;

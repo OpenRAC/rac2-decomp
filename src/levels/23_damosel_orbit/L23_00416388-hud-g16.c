@@ -1,13 +1,13 @@
 /* Level 23 encounter HUD: three backing sprites, two EAA4 icons, the two ratio bars, the
  * EAA5 icon with its counter text and up to two counter icons, a pending prompt message and the
- * optional prompt panel. It is the one-sided counterpart of func_L22_003A5018 (levels 22 and
+ * optional prompt panel. It is the one-sided counterpart of DrawSpaceCombatHud (levels 22 and
  * 23), whose layout and helpers it follows. Its 16-byte colour block D_L23_001B1770 is reached
  * through $gp, hence -G16 (with -g, which keeps the nop pairs before each div.s) in a unit of
  * its own.
  *
  * NOTE REVIEW: three sites use the accepted dead-test HUD idioms as written: label_y at the two
  * EAA4 icon y coordinates, and upstream's scaled_coord at the counter text y and at the panel's
- * box coordinate (the same func_002802E0 argument upstream rounds with it). Their tests leave no
+ * box coordinate (the same FontSetWindow argument upstream rounds with it). Their tests leave no
  * instruction, but retail allocates and schedules those sites as if a block ended there. The
  * plain conversion and a one-pass group were measured at each site and do not match.
  */
@@ -174,12 +174,12 @@ int func_L23_0041DA48(void) {
         func_00300A00((char *)sprite, 0x55F0C070, D_L23_001B16D4, sy, unit, unit, 0.0f);
     }
     {
-        int sprite = func_0028E588(0xEAA4, one);
+        int sprite = GetIconFrame(0xEAA4, one);
         int v = label_y((void *)sprite, (float)D_L23_001B1720, D_L23_001B3004, half, 1);
         func_0028EA58(sprite, D_L23_001B171C, v, D_L23_001B1724, D_L23_001B1728, D_L23_001B1770);
     }
     {
-        int sprite = func_0028E588(0xEAA4, 2);
+        int sprite = GetIconFrame(0xEAA4, 2);
         int v = label_y((void *)sprite, (float)D_L23_001B1730, D_L23_001B3004, half, 1);
         func_0028EA58(sprite, D_L23_001B172C, v, D_L23_001B1734, D_L23_001B1738, D_L23_001B1770);
     }
@@ -200,7 +200,7 @@ int func_L23_0041DA48(void) {
     color.word[0] = (color.word[1] & 0xFFFF00FF) | ((int)(ratio2 * 255.0f) << 8);
     func_0027EAE8(right - (int)(ratio2 * (float)width2), y, right, y + D_L23_001B1710, 0xFFFFF1, &color);
     {
-        int sprite = func_0028E588(0xEAA5, 0);
+        int sprite = GetIconFrame(0xEAA5, 0);
         float sy = (float)D_L23_001B1740 * D_L23_001B3004 + half;
         func_0028EA58(sprite, D_L23_001B173C, Y1x(sy, one, unit), D_L23_001B1744, D_L23_001B1748, D_L23_001B1770);
     }
@@ -212,26 +212,26 @@ int func_L23_0041DA48(void) {
     func_0027FB40(D_L23_001B1754, scaled_coord(D_L23_001B1758, D_L23_001B3004, half2, 1),
                   D_L23_001B174C, (unsigned char *)text, func_001157AC(text));
     if (hud->icons) {
-        int sprite = func_0028E588(0xEAA5, one2);
+        int sprite = GetIconFrame(0xEAA5, one2);
         float sy = (float)D_L23_001B1760 * D_L23_001B3004 + half2;
         func_0028EA58(sprite, D_L23_001B175C, Y1x(sy, one2, 1.0f), D_L23_001B1764, D_L23_001B1768, D_L23_001B1770);
     }
     if (D_L23_001B1F90.icons >= 2) {
-        int sprite = func_0028E588(0xEAA5, 1);
+        int sprite = GetIconFrame(0xEAA5, 1);
         int x2 = D_L23_001B175C + D_L23_001B176C;
         func_0028EA58(sprite, x2, Coord((float)D_L23_001B1760, 1.0f), D_L23_001B1764, D_L23_001B1768, D_L23_001B1770);
     }
     if (D_L23_001B374C != -1 && D_L23_001B3748 == 0) {
         switch (D_L23_001B374C) {
         case 0:
-            func_L00_0030DD70(func_00288FB8(0x2FA3), -1);
+            func_L00_0030DD70(GetLocalizedString(0x2FA3), -1);
             break;
         case 2:
-            func_00288FB8(0x1241);
+            GetLocalizedString(0x1241);
             func_0029CC50(0x1241, *(short *)(state + 0x2FC), -1);
             break;
         case 1:
-            func_00288FB8(0x1240);
+            GetLocalizedString(0x1240);
             func_0029CC50(0x1240, D_L23_001B3750, -1);
             break;
         }
@@ -242,9 +242,9 @@ int func_L23_0041DA48(void) {
     }
     round = 0.5f;
     if (D_L23_001B1424) {
-        func_002802E0(panel, 240, 480, 44, 468, 256, scaled_coord(320, D_L23_001B3004, round, 1), 16, 3);
-        label = func_00288FB8(0x9FC);
-        hint = func_00288FB8(0x2F2C);
+        FontSetWindow(panel, 240, 480, 44, 468, 256, scaled_coord(320, D_L23_001B3004, round, 1), 16, 3);
+        label = GetLocalizedString(0x9FC);
+        hint = GetLocalizedString(0x2F2C);
         func_0029B888((int)panel, 0x80F0F0F0, label, 0, 0, -1, 0, hint, 0, 0);
     }
     func_L00_0030CF60();

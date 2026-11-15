@@ -65,14 +65,14 @@ void func_L12_00424370(u8 *self)
     if (SI(st,0x2c8)!=-1) func_L12_0041BDF8(D_L12_001B2E9C_gp+(SI(st,0x2c8)<<8));
     SF(self,0x2c)=SF(*(u8 **)(self+0x24),0x24)*D_L12_001B20A0;
     qcopy(oldpos,self+0x10);
-    if (self[0x31] && func_00282E48(self+0x10,D_L12_001B9E00)<24.0f) {
+    if (self[0x31] && fast_vec_dist(self+0x10,D_L12_001B9E00)<24.0f) {
         func_002A93B0(self); self[0x6f]=22;
     }
     if (!self[0x95]) {
         if (self==D_00189E20.target) {
             func_002A7750(self,5,1); qcopy(st+0x150,self+0x10);
         } else {
-            if (func_00282E80(self+0x10,D_00189E20.pos)<SF(st,0x178)) SH(self,0x34)|=0x1000;
+            if (vec_distance_xy(self+0x10,D_00189E20.pos)<SF(st,0x178)) SH(self,0x34)|=0x1000;
             else SH(self,0x34)&=0xefff;
         }
     }
@@ -89,10 +89,10 @@ void func_L12_00424370(u8 *self)
     case 1:
         if (func_002B3868(self)) {
             s32 anim=self[0x43]; if(anim!=func_002A77E0(2)) func_002A7470(self,func_002A77E0(2),0,10);
-            SI(st,0x2b8)=func_00282E80(self+0x10,(SI(st,0x2b4)*16+0x10)+(u8 *)path)>24.0f?30:180;
+            SI(st,0x2b8)=vec_distance_xy(self+0x10,(SI(st,0x2b4)*16+0x10)+(u8 *)path)>24.0f?30:180;
         }
         if (SI(st,0x2b8)<SH(self,0x96)) {
-            if (SI(st,0x2b0)<SI(st,0x2b4) && func_00282E80(self+0x10,(SI(st,0x2b4)*16+0x10)+(u8 *)path)>20.0f)
+            if (SI(st,0x2b0)<SI(st,0x2b4) && vec_distance_xy(self+0x10,(SI(st,0x2b4)*16+0x10)+(u8 *)path)>20.0f)
                 func_002A7750(self,4,-1);
             else func_002A7750(self,2,-1);
         }
@@ -107,10 +107,10 @@ void func_L12_00424370(u8 *self)
         if(SI(st,0x2b0)<SI(st,0x2b4)) {
             qcopy(from,self+0x10); from[2]+=0.5f;
             qcopy(to,(SI(st,0x2b0)*16)+(u8 *)path+0x20); to[2]+=0.5f;
-            if(!func_002761F8(from,to,2,self,0)) SI(st,0x2b0)++;
+            if(!CollLine(from,to,2,self,0)) SI(st,0x2b0)++;
         }
         func_L01_00321178(self,(SI(st,0x2b0)*16+0x10)+(u8 *)path);
-        if(func_00282E80(self+0x10,(SI(st,0x2b4)*16+0x10)+(u8 *)path)<8.0f) func_002A7750(self,1,-1);
+        if(vec_distance_xy(self+0x10,(SI(st,0x2b4)*16+0x10)+(u8 *)path)<8.0f) func_002A7750(self,1,-1);
         break;
     case 2:
         if(func_002B3868(self)) {
@@ -118,7 +118,7 @@ void func_L12_00424370(u8 *self)
             { s32 next=func_L12_00425178(self,1);
             f32 rate=D_L12_001B20A8*0.016666668f; SI(st,0x2b0)=next;
             func_002B60B0(self,0.0011111111380159855f,rate,0.0008726647356525064f,0.10471977f); }
-            SI(st,0x2b8)=func_00282E80(self+0x10,(SI(st,0x2b4)*16+0x10)+(u8 *)path)>24.0f?900:300;
+            SI(st,0x2b8)=vec_distance_xy(self+0x10,(SI(st,0x2b4)*16+0x10)+(u8 *)path)>24.0f?900:300;
         }
         if((func_L01_00321178(self,(SI(st,0x2b0)*16+0x10)+(u8 *)path)&128)||SH(self,0x96)>=300) func_002A7750(self,1,-1);
         break;
@@ -138,7 +138,7 @@ void func_L12_00424370(u8 *self)
             if(self[0x43]!=7) func_002A7470(self,7,0,10);
             SI(st,0x2c0)=0;
         }
-        dot=func_00282DB0(self+0xc0,st+0x140);
+        dot=FastVecDot(self+0xc0,st+0x140);
         if(dot< -0.033333335f) { if(self[0x43]!=10) func_002A7470(self,10,0,10); }
         else if(dot>0.033333335f) { if(self[0x43]!=9) func_002A7470(self,9,0,10); }
         else { if(self[0x43]!=7) func_002A7470(self,7,0,10); }
@@ -160,7 +160,7 @@ void func_L12_00424370(u8 *self)
         break;
     case 8:
         if(func_002B3868(self)) {
-            u8 *p=func_0029EFD0(0x9bb);
+            u8 *p=CreateMoby(0x9bb);
             if(p) {
                 u8 *ps;
                 *(u8 **)(p+0xb8)=self; p[0x30]=255; qcopy(p+0x10,self+0x10);
@@ -179,21 +179,21 @@ void func_L12_00424370(u8 *self)
         }
         break;
     case 7:
-        func_00282CC0(self+0x10,self+0x10,st+0x2a0);
+        FastVecAdd(self+0x10,self+0x10,st+0x2a0);
         SF(st,0x2a8)-=D_L12_001B20A4*0.00027777778f;
         func_L12_00425448(self);
-        if(func_002ACBC8(self+0x10,SI(st,0x29c))) {
-            f32 len=func_00282E20(st+0x2a0);
+        if(IsPointInCuboid(self+0x10,SI(st,0x29c))) {
+            f32 len=vec_length_xy(st+0x2a0);
             if(len>0.016666668f) len=0.016666668f;
             func_00282F70(st+0x2a0,st+0x2a0,len);
         }
         qcopy(from,self+0x10); from[2]+=0.5f;
         if(func_00277258(from,0,self,0.5f)) {
             qcopy(self+0x10,D_L12_001C0270); SF(self,0x18)-=0.5f;
-            func_00282F20(D_L12_001C0270+0x10,D_L12_001C0270+0x10,1.0f);
-            if(func_00282DB0(D_L12_001C0270+0x10,st+0x2a0)<0.0f) {
+            vec_scale_to_length(D_L12_001C0270+0x10,D_L12_001C0270+0x10,1.0f);
+            if(FastVecDot(D_L12_001C0270+0x10,st+0x2a0)<0.0f) {
                 func_00283028(st+0x2a0,st+0x2a0,D_L12_001C0270+0x10);
-                func_00282D30(st+0x2a0,st+0x2a0,0.5f);
+                FastVecScale(st+0x2a0,st+0x2a0,0.5f);
             }
             if(SF(D_L12_001C0270,0x18)>=0.95f) {
                 SH(self,0x34)|=0x1000; func_002A7750(self,1,0);
@@ -208,8 +208,8 @@ void func_L12_00424370(u8 *self)
     if(SI(st,0x2c8)!=-1 && !was1) func_L12_0041BDA8(D_L12_001B2E9C+(SI(st,0x2c8)<<8));
     if(!(D_L12_001B29C8&15)) func_L12_00425348(self);
     if(self[0x31]) {
-        SF(st,0x2bc)=func_00283B98(SF(st,0x2bc),D_L12_001B20B0*0.00029088825f);
-        SI(self,0x78)=func_L01_0031BC68(D_L12_001B20B8[0],D_L12_001B20B8[1],SF(st,0x2bc));
+        SF(st,0x2bc)=FastAddRotations(SF(st,0x2bc),D_L12_001B20B0*0.00029088825f);
+        SI(self,0x78)=PulseColor(D_L12_001B20B8[0],D_L12_001B20B8[1],SF(st,0x2bc));
     }
     SH(self,0x96)++;
     qcopy(st+0x2d0,self+0x10);

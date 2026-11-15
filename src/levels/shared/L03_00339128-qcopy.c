@@ -14,7 +14,7 @@ unsigned char *func_L03_00339128(void *position, void *data, int type, int owner
         *(Quad *)(effect + 0x10) = *(Quad *)position;
         *(int *)(effect + 4) = owner;
         if (marker == 0xFF) {
-            effect[9] = ((flags >> 5) << 4) + func_00283CF0(4.0f);
+            effect[9] = ((flags >> 5) << 4) + FloatToInt(4.0f);
             if (flags & 1)
                 effect[3] = 0x48;
             else

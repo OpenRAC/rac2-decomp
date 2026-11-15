@@ -30,7 +30,7 @@ extern int D_001B1688;
 extern void func_002A0F48(void *moby);
 
 unsigned char *func_003158A8(int owner, void *pos) {
-    unsigned char *obj = (unsigned char *)func_0029EFD0(0x81F);
+    unsigned char *obj = (unsigned char *)CreateMoby(0x81F);
     Vars003158A8 *data;
 
     if (obj) {

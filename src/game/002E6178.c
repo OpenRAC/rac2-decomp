@@ -46,31 +46,31 @@ void func_002E6178(EquipPiece *base)
     partD = (equipment >> 9) & 1;
     partE = (equipment >> 10) & 3;
     partF = (equipment >> 14) & 3;
-    parts[0] = func_0029EFD0(D_001A8C28[chassis]);
-    parts[1] = func_0029EFD0(D_001A8C28[chassis]);
+    parts[0] = CreateMoby(D_001A8C28[chassis]);
+    parts[1] = CreateMoby(D_001A8C28[chassis]);
     parts[1]->flags |= 0x8000;
-    parts[2] = func_0029EFD0(D_001A8C30[partA]);
-    parts[3] = func_0029EFD0(D_001A8C38[partB]);
-    parts[4] = func_0029EFD0(D_001A8C38[partB]);
+    parts[2] = CreateMoby(D_001A8C30[partA]);
+    parts[3] = CreateMoby(D_001A8C38[partB]);
+    parts[4] = CreateMoby(D_001A8C38[partB]);
     parts[4]->flags |= 0x8000;
     if (D_001A8C40[partC]) {
-        parts[5] = func_0029EFD0(D_001A8C40[partC]);
-        parts[6] = func_0029EFD0(D_001A8C40[partC]);
+        parts[5] = CreateMoby(D_001A8C40[partC]);
+        parts[6] = CreateMoby(D_001A8C40[partC]);
         count = 7;
         parts[6]->flags |= 0x8000;
     }
-    parts[count++] = func_0029EFD0(D_001A8C48[partD]);
-    piece = parts[count++] = func_0029EFD0(D_001A8C48[partD]);
+    parts[count++] = CreateMoby(D_001A8C48[partD]);
+    piece = parts[count++] = CreateMoby(D_001A8C48[partD]);
     piece->flags |= 0x8000;
-    parts[count++] = func_0029EFD0(D_001A8C50[partE]);
-    piece = parts[count++] = func_0029EFD0(D_001A8C50[partE]);
+    parts[count++] = CreateMoby(D_001A8C50[partE]);
+    piece = parts[count++] = CreateMoby(D_001A8C50[partE]);
     piece->flags |= 0x8000;
     if ((D_001A7AF0 >> 12) & 1)
-        parts[count++] = func_0029EFD0(0x10E2);
+        parts[count++] = CreateMoby(0x10E2);
     if ((D_001A7AF0 >> 13) & 1)
-        parts[count++] = func_0029EFD0(0x10E4);
+        parts[count++] = CreateMoby(0x10E4);
     if (partF)
-        parts[count] = func_0029EFD0(D_001A8C58[partF]);
+        parts[count] = CreateMoby(D_001A8C58[partF]);
     if (*parts) {
         p = parts;
         do {

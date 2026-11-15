@@ -57,13 +57,13 @@ void func_L00_002A7A50(void)
         return;
     }
     if (D_00189E20.f21C) {
-        value = func_00283CE0(D_00189E20.f21C);
-        divisor = func_00283CE0(18);
+        value = IntToFloat(D_00189E20.f21C);
+        divisor = IntToFloat(18);
         value = value * 3.1415927f;
         value = func_00283198(value / divisor);
-        alpha = func_00283CF0((value * 0.5f + 0.5f) * 80.0f);
+        alpha = FloatToInt((value * 0.5f + 0.5f) * 80.0f);
         func_0027DDC0(0xAA, 0, 0, alpha);
-        func_002FC560(0x47, 0x5360B);
+        VU1_addGSregister(0x47, 0x5360B);
     }
     if (D_00189E20.mode == 3) {
         unsigned int tint = D_00189E20.f2508;
@@ -75,13 +75,13 @@ void func_L00_002A7A50(void)
             remaining--;
         }
     } else if (D_00189E20.mode == 0) {
-        if ((func_L00_002ADEA0(3) == 3 || func_L00_002ADEA0(3) == 2) && !D_00189E20.f24FC) {
+        if ((hero_slot_item_id(3) == 3 || hero_slot_item_id(3) == 2) && !D_00189E20.f24FC) {
             if (D_00189E20.f2500) {
                 peak = 1.0f;
                 if (peak < D_00189E20.v2020[0]) peak = D_00189E20.v2020[0];
                 if (peak < D_00189E20.v2020[1]) peak = D_00189E20.v2020[1];
                 if (peak < D_00189E20.v2020[2]) peak = D_00189E20.v2020[2];
-                func_00283D38(0xC0000028U, 0x28, peak);
+                FastTweenColor(0xC0000028U, 0x28, peak);
             }
             func_L00_00325AE8(D_00189E20.v2010, 0xC0000028U, 0.05700000002980232f, 0.08f);
         }
@@ -98,7 +98,7 @@ void func_L00_002A7A50(void)
         } else {
             D_00189E20.v2010[2] -= 0.02f;
         }
-        func_002AA2E8(&D_00189E20.f186C, size, 0.003f);
+        ApproachValue(&D_00189E20.f186C, size, 0.003f);
         func_L00_00325AE8(D_00189E20.v2010, D_00189E20.f2524, D_00189E20.f186C, 0.08f);
     }
 }

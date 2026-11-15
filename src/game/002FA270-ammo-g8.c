@@ -74,17 +74,17 @@ void func_002FA270(void)
     i = -5;
     left = 233;
     b = 4;
-    pulse = ((func_00282C30(((D_0021F240.tick*4)&63)-32)+64)*0x10202)|0x80000000;
-    func_00285548(left-(D_001AD3A0+b),screen_y(325-D_001AD3A4),D_001AD3A8+285,screen_y(D_001AD3AC+381),D_001A7340,D_001A7344,
+    pulse = ((subtract_integer_with_clamp(((D_0021F240.tick*4)&63)-32)+64)*0x10202)|0x80000000;
+    DrawFramebufferRect(left-(D_001AD3A0+b),screen_y(325-D_001AD3A4),D_001AD3A8+285,screen_y(D_001AD3AC+381),D_001A7340,D_001A7344,
         pulse);
     b = 2;
-    func_00285548(left-(D_001AD3A0+b),screen_y(327-D_001AD3A4),D_001AD3A8+283,screen_y(D_001AD3AC+379),D_001A7340,D_001A7344,0x80442d00);
+    DrawFramebufferRect(left-(D_001AD3A0+b),screen_y(327-D_001AD3A4),D_001AD3A8+283,screen_y(D_001AD3AC+379),D_001A7340,D_001A7344,0x80442d00);
     y = D_0021F240.scroll - 47;
     do {
         index = i + D_0021F240.selected;
         if (index >= 0 && index < *(int *)((char *)&D_0021F240+0x740)) {
-            icon = func_0028E588(((IconInfo *)((char *)D_00239BA0 + D_00139568[D_0021F240.rows.ammo[index].id] * 224))->icon,0);
-            overlay = func_0028E588(0xeaa3,D_0021F240.rows.ammo[index].frame);
+            icon = GetIconFrame(((IconInfo *)((char *)D_00239BA0 + D_00139568[D_0021F240.rows.ammo[index].id] * 224))->icon,0);
+            overlay = GetIconFrame(0xeaa3,D_0021F240.rows.ammo[index].frame);
             special = 0;
             kind = D_00239BA0[D_00139568[D_0021F240.rows.ammo[index].id]].color;
             switch (D_0021F240.rows.ammo[index].id) {
@@ -106,7 +106,7 @@ void func_002FA270(void)
             x = y+(D_001AD3B4+b);
             draw_icon(icon,x+D_001AD3C8,D_001AD3B0+D_001AD3CC,D_001AD3C0,colors);
             draw_icon(overlay,y+(D_001AD3B4+b),D_001AD3B0-D_001AD3B8,D_001AD3B8,colors);
-            icon = func_0028E588(0xeaa3,3);
+            icon = GetIconFrame(0xeaa3,3);
             draw_icon(icon,y+(D_001AD3B4+b),(D_001AD3B0-D_001AD3B8)+D_001AD3BC,D_001AD3B8,colors);
         }
         i++;

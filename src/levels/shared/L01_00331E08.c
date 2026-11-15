@@ -27,8 +27,8 @@ void func_L01_00331E08(char *object)
     x = (int)*(float *)(object + 0x10);
     y = (int)*(float *)(object + 0x14);
     offset[3] = 0.0f;
-    func_00282CC0(position, position, offset);
-    func_00282CC0(position, position, D_L01_001B27A0);
+    FastVecAdd(position, position, offset);
+    FastVecAdd(position, position, D_L01_001B27A0);
     if (x != (int)*(float *)(object + 0x10) || y != (int)*(float *)(object + 0x14)) {
         *(Quad *)test1 = *(Quad *)position;
         measured = func_002B0520(test1);
@@ -47,6 +47,6 @@ void func_L01_00331E08(char *object)
     offset[1] = 0.0f;
     offset[2] = -0.00013888889225199819f;
     offset[3] = 0.0f;
-    func_00282CC0(velocity, offset, velocity);
+    FastVecAdd(velocity, offset, velocity);
     velocity[3] = height + D_L01_001B27A8;
 }

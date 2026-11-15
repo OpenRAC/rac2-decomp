@@ -40,18 +40,18 @@ s32 func_002E45C8(s32 arg0, f32 fparg0, f32 fparg1, f32 fparg2) {
         if (fparg2 <= fparg0) {
             return (*(s32 *)((s8 *)(arg0) + (8)));
         }
-        var_f0 = func_00283CE0((*(s32 *)((s8 *)(arg0) + (0xC))) - (*(s32 *)((s8 *)(arg0) + (8))));
+        var_f0 = IntToFloat((*(s32 *)((s8 *)(arg0) + (0xC))) - (*(s32 *)((s8 *)(arg0) + (8))));
         temp_f12 = fparg2 - fparg0;
         temp_f1 = fparg2 - fparg1;
-        return (*(s32 *)((s8 *)(arg0) + (8))) + func_00283CF0(((temp_f12 * temp_f12) * var_f0) / (temp_f1 * temp_f1));
+        return (*(s32 *)((s8 *)(arg0) + (8))) + FloatToInt(((temp_f12 * temp_f12) * var_f0) / (temp_f1 * temp_f1));
     }
     if (fparg0 <= fparg1) {
         return (*(s32 *)((s8 *)(arg0) + (0xC)));
     }
     if (!(fparg2 <= fparg0)) {
-        var_f0 = func_00283CE0((*(s32 *)((s8 *)(arg0) + (0xC))) - (*(s32 *)((s8 *)(arg0) + (8))));
+        var_f0 = IntToFloat((*(s32 *)((s8 *)(arg0) + (0xC))) - (*(s32 *)((s8 *)(arg0) + (8))));
         var_f12 = fparg2 - fparg0;
-        return (*(s32 *)((s8 *)(arg0) + (8))) + func_00283CF0((var_f12 * var_f0) / (fparg2 - fparg1));
+        return (*(s32 *)((s8 *)(arg0) + (8))) + FloatToInt((var_f12 * var_f0) / (fparg2 - fparg1));
     }
     return (*(s32 *)((s8 *)(arg0) + (8)));
 }

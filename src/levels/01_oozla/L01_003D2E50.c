@@ -130,7 +130,7 @@ void func_L01_003D2E50(PurchaseMoby *moby)
             func_002A7750(moby, 1, -1);
         }
         func_L01_003128C0(moby);
-        child = func_0029EFD0(0xD7E);
+        child = CreateMoby(0xD7E);
         STATE_CHILD = child;
         if (child) {
             child[0x30] = moby->field30;
@@ -141,7 +141,7 @@ void func_L01_003D2E50(PurchaseMoby *moby)
         }
         break;
     case 1:
-        if (func_002ACBC8(D_00189EA0, *(s32 *)(state + 0x120)) && func_00288AA0(D_L01_001BF6C0, 0x27)) {
+        if (IsPointInCuboid(D_00189EA0, *(s32 *)(state + 0x120)) && func_00288AA0(D_L01_001BF6C0, 0x27)) {
             func_L01_003246D0(moby);
             func_00288BE8(D_L01_001BF6C0);
             func_002A7750(moby, 2, -1);
@@ -220,7 +220,7 @@ void func_L01_003D2E50(PurchaseMoby *moby)
                 func_00288E18(0x9BC, 19);
                 if (*(s32 *)(state + 0x12C) != -1)
                     func_L00_00429020(*(s32 *)(state + 0x12C));
-                func_0029B3E0(0, -1);
+                MemcardSave(0, -1);
                 if (STATE_CHILD) {
                     func_0029F338(STATE_CHILD);
                     STATE_CHILD = 0;
@@ -233,8 +233,8 @@ remove_self:
         break;
     }
     if (moby->state) {
-        if (!moby->animation && func_00282978(state + 0x11E)) {
-            *(u16 *)(state + 0x11E) = func_00283CF0(func_002A7878(1200.0f, 2400.0f));
+        if (!moby->animation && FastDecTimer(state + 0x11E)) {
+            *(u16 *)(state + 0x11E) = FloatToInt(func_002A7878(1200.0f, 2400.0f));
         } else if ((moby->animFlags & 2) && moby->animation) {
             func_002A7470(moby, 0, 0, 10);
         }
@@ -243,10 +243,10 @@ remove_self:
     active = 0;
     if (!moby->animation) {
         active = 1;
-        if (func_00282E80(moby->position, D_00189EA0) < 8.0f &&
-            func_00283C80(moby->yaw, func_00283248(((HeroView *)(D_00189EA0 - 0x80))->position[0] - moby->position[0],
+        if (vec_distance_xy(moby->position, D_00189EA0) < 8.0f &&
+            FastDiffRots(moby->yaw, func_00283248(((HeroView *)(D_00189EA0 - 0x80))->position[0] - moby->position[0],
                                                    ((HeroView *)(D_00189EA0 - 0x80))->position[1] - moby->position[1])) < 1.5707965f) {
-            if (0.01f < func_00282DF0(D_00189EA0 + 0x90))
+            if (0.01f < FastVecLength(D_00189EA0 + 0x90))
                 *(s32 *)(state + 0x114) = 120;
             else
                 func_00282948(state + 0x114);
@@ -255,10 +255,10 @@ remove_self:
             qcopy(state + 0x100, D_00189F00);
         }
         if (func_00282948(state + 0x118)) {
-            *(s32 *)(state + 0x118) = func_00283CF0(func_002A7878(180.0f, 300.0f));
-            angle = func_00283B98(moby->yaw, func_002A7878(-90.0f, 90.0f) * 0.017453294f);
+            *(s32 *)(state + 0x118) = FloatToInt(func_002A7878(180.0f, 300.0f));
+            angle = FastAddRotations(moby->yaw, func_002A7878(-90.0f, 90.0f) * 0.017453294f);
             func_002AF000(state + 0x100, 6.0f, angle, func_002A7878(0.0f, 30.0f) * 0.017453294f);
-            func_00282CC0(state + 0x100, state + 0x100, moby->position);
+            FastVecAdd(state + 0x100, state + 0x100, moby->position);
         }
         if (*(s32 *)(state + 0x114)) {
             qcopy(target, D_00189F00);
@@ -270,9 +270,9 @@ remove_self:
     if (active) {
         qcopy(origin, moby->position);
         ((f32 *)origin)[2] += 2.0f;
-        func_00282CF0(delta, target, origin);
-        yaw = func_00283BE0(func_00283248(delta[0], delta[1]), moby->yaw);
-        pitch = -func_00283248(func_00282E20(delta), delta[2]);
+        FastVecSub(delta, target, origin);
+        yaw = fast_subtract_rotations(func_00283248(delta[0], delta[1]), moby->yaw);
+        pitch = -func_00283248(vec_length_xy(delta), delta[2]);
         if (1.5707965f < yaw)
             yaw = 1.5707965f;
         else if (yaw < -1.5707965f)

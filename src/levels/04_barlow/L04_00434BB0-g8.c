@@ -110,7 +110,7 @@ void func_L04_00434BB0(char *object)
             func_002A7750(object,2,-1);
         }
         func_L01_003128C0(object);
-        *(char **)(vars+0x11c) = func_0029EFD0(0xd99);
+        *(char **)(vars+0x11c) = CreateMoby(0xd99);
         child = *(char **)(vars+0x11c);
         if (child) {
             (*(char **)(vars+0x11c))[0x30] = object[0x30];
@@ -152,7 +152,7 @@ void func_L04_00434BB0(char *object)
             target.f[1] = 366.81f;
             target.f[2] = 63.0f;
             qcopy(&rotation, (object+0xf0));
-            rotation.f[2] = func_00283B98(rotation.f[2],3.1415929794311523f);
+            rotation.f[2] = FastAddRotations(rotation.f[2],3.1415929794311523f);
             func_L00_002B9D60(&target,&rotation,0,1);
             D_L04_001B2224[1] = 0;
             object[0x31] = 1;
@@ -174,7 +174,7 @@ void func_L04_00434BB0(char *object)
         if (D_001A79F8[0] < COST) {
             func_L00_0030C710(180);
             func_002A7750(object,3,-1);
-        } else if (func_L01_003245E0((u8 *)object,10,2.5f) && func_002ACBC8(D_00189E20.position,INT(vars,0x120))) {
+        } else if (func_L01_003245E0((u8 *)object,10,2.5f) && IsPointInCuboid(D_00189E20.position,INT(vars,0x120))) {
             func_L00_0030C710(180);
             func_L01_00324550(0x279f,COST,-1);
             func_L01_003246D0((int)object);
@@ -199,7 +199,7 @@ void func_L04_00434BB0(char *object)
             target.f[1] = 366.81f;
             target.f[2] = 63.0f;
             qcopy(&rotation, (object+0xf0));
-            rotation.f[2] = func_00283B98(rotation.f[2],-1.5707964897155762f);
+            rotation.f[2] = FastAddRotations(rotation.f[2],-1.5707964897155762f);
             func_L00_002B9D60(&target,&rotation,0,1);
             D_L04_001B2224[1] = 0;
             object[0x31] = 1;
@@ -228,7 +228,7 @@ void func_L04_00434BB0(char *object)
                 *entry = value;
             }
             func_00288E18(0x9dc,0x33);
-            func_0029B3E0(0,-1);
+            MemcardSave(0,-1);
             func_0029F338(object);
             return;
         }
@@ -242,11 +242,11 @@ void func_L04_00434BB0(char *object)
         if (((u8 *)object)[0x43] == 1) {
             float distance, angle;
             facing = 1;
-            distance = func_00282E80(object+0x10,D_00189E20.position);
+            distance = vec_distance_xy(object+0x10,D_00189E20.position);
             if (distance < 8.0f) {
                 angle = func_00283248(D_00189E20.target[0]-FLOAT(object,0x10),D_00189E20.target[1]-FLOAT(object,0x14));
-                if (func_00283C80(FLOAT(object,0xf8),angle) < 1.5707964897155762f) {
-                    if (func_00282DF0(D_00189E20.velocity) > 0.01f) INT(vars,0x114) = 120;
+                if (FastDiffRots(FLOAT(object,0xf8),angle) < 1.5707964897155762f) {
+                    if (FastVecLength(D_00189E20.velocity) > 0.01f) INT(vars,0x114) = 120;
                     else func_00282948((int *)(vars+0x114));
                 } else goto stopTracking;
             } else {
@@ -258,10 +258,10 @@ stopTracking:
             }
             if (func_00282948((int *)(vars+0x118))) {
                 float turn = 0.01745329424738884f;
-                INT(vars,0x118) = func_00283CF0(func_002A7878(180.0f,300.0f));
-                angle = func_00283B98(FLOAT(object,0xf8),func_002A7878(-90.0f,90.0f)*turn);
+                INT(vars,0x118) = FloatToInt(func_002A7878(180.0f,300.0f));
+                angle = FastAddRotations(FLOAT(object,0xf8),func_002A7878(-90.0f,90.0f)*turn);
                 func_002AF000((float *)(vars+0x100),6.0f,angle,func_002A7878(0.0f,30.0f)*turn);
-                func_00282CC0(vars+0x100,vars+0x100,object+0x10);
+                FastVecAdd(vars+0x100,vars+0x100,object+0x10);
             }
             if (INT(vars,0x114) != 0) {
                 qcopy(&target, (D_00189E20.target));
@@ -276,9 +276,9 @@ stopTracking:
         float yaw, pitch;
         qcopy(&rotation, (object+0x10));
         rotation.f[2] += 2.0f;
-        func_00282CF0(&difference,&target,&rotation);
-        yaw = func_00283BE0(func_00283248(difference.f[0],difference.f[1]),FLOAT(object,0xf8));
-        pitch = -func_00283248(func_00282E20(&difference),difference.f[2]);
+        FastVecSub(&difference,&target,&rotation);
+        yaw = fast_subtract_rotations(func_00283248(difference.f[0],difference.f[1]),FLOAT(object,0xf8));
+        pitch = -func_00283248(vec_length_xy(&difference),difference.f[2]);
         if (yaw > 1.5707964897155762f) yaw = 1.5707964897155762f;
         else if (yaw < -1.5707964897155762f) yaw = -1.5707964897155762f;
         if (pitch > 0.523598849773407f) pitch = 0.523598849773407f;

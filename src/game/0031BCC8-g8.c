@@ -104,7 +104,7 @@ void func_0031BCC8(unsigned char *self)
         func_0029FCC0(self, 3, data + 0x350);
         *(float *)(data + 0x358) += 20.0f;
         func_0029FCC0(self, 3, data + 0x360);
-        if (func_002761F8(data + 0x360, data + 0x350, 0, self, 0))
+        if (CollLine(data + 0x360, data + 0x350, 0, self, 0))
             qcopy(data + 0x350, D_001BAFA0);
         if (*(int *)(data + 0x24C) == 0 && *(int *)(data + 0x258) == -1) {
             *(float *)(self + 0x18) = func_002A89A8(position, 0, 0.5f);
@@ -119,7 +119,7 @@ void func_0031BCC8(unsigned char *self)
             qcopy(data + 0x350, D_001B1C4C + (*(int *)(data + 0x258) << 7) + 0x30);
             *(unsigned char *)(self + 0x30) = 0x80;
         }
-        *(char **)(data + 0x270) = func_0029EFD0(0xAA2);
+        *(char **)(data + 0x270) = CreateMoby(0xAA2);
         (*(char **)(data + 0x270))[0x30] = self[0x30];
         *(short *)(*(char **)(data + 0x270) + 0x32) = *(short *)(self + 0x32);
         (*(char **)(data + 0x270))[0x31] = 1;
@@ -127,7 +127,7 @@ void func_0031BCC8(unsigned char *self)
         *(float *)(*(char **)(data + 0x270) + 0x2C) *= D_001AFAF8;
         func_002A0F48(*(char **)(data + 0x270));
         func_002AF1D0(self, *(char **)(data + 0x270), 0, 0);
-        *(char **)(data + 0x274) = func_0029EFD0(0xAA2);
+        *(char **)(data + 0x274) = CreateMoby(0xAA2);
         (*(char **)(data + 0x274))[0x30] = self[0x30];
         *(short *)(*(char **)(data + 0x274) + 0x32) = *(short *)(self + 0x32);
         (*(char **)(data + 0x274))[0x31] = 1;
@@ -135,7 +135,7 @@ void func_0031BCC8(unsigned char *self)
         *(float *)(*(char **)(data + 0x274) + 0x2C) *= D_001AFAF8;
         func_002A0F48(*(char **)(data + 0x274));
         func_002AF1D0(self, *(char **)(data + 0x274), 1, 0);
-        *(char **)(data + 0x278) = func_0029EFD0(0xAA2);
+        *(char **)(data + 0x278) = CreateMoby(0xAA2);
         (*(char **)(data + 0x278))[0x30] = self[0x30];
         *(short *)(*(char **)(data + 0x278) + 0x32) = *(short *)(self + 0x32);
         (*(char **)(data + 0x278))[0x31] = 1;
@@ -154,8 +154,8 @@ void func_0031BCC8(unsigned char *self)
     func_00282C88(data + 0x390);
     *(int *)(data + 0x398) = 0;
     *(float *)(data + 0x390) = 0.25f;
-    func_002830C0(data + 0x390, data + 0x390, local);
-    func_00282CC0(data + 0x390, data + 0x390, local + 0x30);
+    transform_vector(data + 0x390, data + 0x390, local);
+    FastVecAdd(data + 0x390, data + 0x390, local + 0x30);
     func_002AF1D0(self, *(char **)(data + 0x270), 0, 0);
     func_002AF1D0(self, *(char **)(data + 0x274), 1, 0);
     func_002AF1D0(self, *(char **)(data + 0x278), 2, 0);

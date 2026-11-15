@@ -17,7 +17,7 @@ float func_002A89A8(char *object, int mode, float amount)
     local.f[2] = 0.01f;
     qcopy(&query, object);
     query.f[2] += amount;
-    if (func_002761F8(query.f, local.f, mode | 2, 0, 0))
+    if (CollLine(query.f, local.f, mode | 2, 0, 0))
         return D_001BAFA8;
     return 0.0f;
 }

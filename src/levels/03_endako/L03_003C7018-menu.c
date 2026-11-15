@@ -113,15 +113,15 @@ int func_L03_003C7018(void)
             do {
                 int shift = 5;
                 int x;
-                unsigned char *label = func_00288FB8(keys[i]);
+                unsigned char *label = GetLocalizedString(keys[i]);
                 if (i == one) {
                     func_00115DA8((char *)buf, D_L03_001B0190, label, D_L03_001B0140 + 1);
                     shift = -4;
                 } else {
                     func_00115DA8((char *)buf, D_L03_001B0198, label);
                 }
-                x = func_00283CF0(D_L03_001B0160[i].x);
-                func_0027FB40(x, func_00283CF0((float)screen_coord(D_L03_001B3280, D_L03_001B0160[i].y, (float)shift, one)), 0x80808080UL, buf, 0x80);
+                x = FloatToInt(D_L03_001B0160[i].x);
+                func_0027FB40(x, FloatToInt((float)screen_coord(D_L03_001B3280, D_L03_001B0160[i].y, (float)shift, one)), 0x80808080UL, buf, 0x80);
                 i++;
             } while (i < 4);
         }

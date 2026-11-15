@@ -43,9 +43,9 @@ void func_L00_004287E8(char *a)
   v/=D_00189E20_6.max_height;
   height=v+3.65f; dist=v+v;
  } else {height=4.64f;dist=2.0f;}
- func_002AA2E8(*(char **)(D_L00_001B8C80_1.follow+0x70)+0xA0,height,0.13333334f);
- func_002AA2E8(*(char **)(D_L00_001B8C80_1.follow+0x70)+0xB0,dist,0.06666667f);
- func_002AA2E8(*(char **)(D_L00_001B8C80_1.follow+0x70)+0x8C,dist-0.5f,0.13333334f);
+ ApproachValue(*(char **)(D_L00_001B8C80_1.follow+0x70)+0xA0,height,0.13333334f);
+ ApproachValue(*(char **)(D_L00_001B8C80_1.follow+0x70)+0xB0,dist,0.06666667f);
+ ApproachValue(*(char **)(D_L00_001B8C80_1.follow+0x70)+0x8C,dist-0.5f,0.13333334f);
  if(D_00189E20_6.state==0x2B) {
   if((D_001A79F0!=14 && D_001A79F0!=7 && D_001A79F0!=9) || (D_00189E20_6.swing && *(unsigned char *)(D_00189E20_6.swing+0x21)==255)) {
    *(float *)angle=func_002703B0(*(float *)angle,D_00189E20_6.yaw,angle+4,0.00125f,0.175f,0.0f);
@@ -56,16 +56,16 @@ void func_L00_004287E8(char *a)
    if(list) do {
     obj=D_L00_001B1E9C+(*list&0x7FFF)*0x100;
     if(obj!=p && (*(short *)(obj+0xAA)==0x323 || *(short *)(obj+0xAA)==0x2F6)) {
-     func_00282CF0(diff,obj+0x10,p+0x10);
-     func_00282F20(unit,diff,1.0f);
+     FastVecSub(diff,obj+0x10,p+0x10);
+     vec_scale_to_length(unit,diff,1.0f);
      axis[0]=func_00283180(D_00189E20_6.yaw);
      axis[1]=func_00283198(D_00189E20_6.yaw);axis[2]=0.0f;
-     v=func_00282DB0(unit,(char *)axis);
-     if(v>0.0f) {score=func_00282DF0(diff)-v*10.0f;if(score<closest){best=obj;closest=score;}}
+     v=FastVecDot(unit,(char *)axis);
+     if(v>0.0f) {score=FastVecLength(diff)-v*10.0f;if(score<closest){best=obj;closest=score;}}
     }
    } while(*list++>=0);
    if(best) {
-    func_00282CF0(diff,best+0x10,p+0x10);
+    FastVecSub(diff,best+0x10,p+0x10);
     *(float *)angle=func_002703B0(*(float *)angle,func_00283248(*(float *)diff,*(float *)(diff+4)),turn,0.00125f,0.175f,0.0f);
    } else if(*(int *)(part+0x40)==1)
     *(float *)angle=func_002703B0(*(float *)angle,*(float *)(*(char **)(part+0x44)+0xF8),turn,0.00125f,0.175f,0.0f);
@@ -81,8 +81,8 @@ void func_L00_004287E8(char *a)
  *(float *)(part+0x30)=func_00283180(*(float *)angle);
  *(float *)(part+0x34)=func_00283198(*(float *)angle);
  *(float *)(part+0x38)=0.0f;*(float *)(part+0x3C)=*(float *)(part+0x38);
- func_00282F20(out,part+0x30,-*(float *)cfg);
+ vec_scale_to_length(out,part+0x30,-*(float *)cfg);
  *(float *)(out+8)+=*(float *)(cfg+0x10);
  func_00282CC0_4(out,out,D_00189EA0);
- if(func_00282978(s+0x1E)) {qcopy(a+0x30,out);} else {qcopy(a+0x30,out);}
+ if(FastDecTimer(s+0x1E)) {qcopy(a+0x30,out);} else {qcopy(a+0x30,out);}
 }

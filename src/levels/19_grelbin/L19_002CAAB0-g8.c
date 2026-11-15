@@ -66,7 +66,7 @@ void func_L19_003D2E38(char *m)
             func_002A7750(m, 0, -1);
         return;
     }
-    func_002AA2E8(D_L19_001B2424, 0.0f, 1.0f / 6.0f);
+    ApproachValue(D_L19_001B2424, 0.0f, 1.0f / 6.0f);
     D_L19_001B2728[0] = 1;
     switch (*(unsigned char *)(m + 0x20)) {
     case 0:
@@ -92,7 +92,7 @@ void func_L19_003D2E38(char *m)
         if (func_L19_003D4490(m)) {
             p->field6a = 1;
             func_L19_003D3B58(m);
-            func_002E5CF8(4, 0, m);
+            PlayMobySound(4, 0, m);
             func_002A7750(m, 3, -1);
         }
         break;
@@ -108,12 +108,12 @@ void func_L19_003D2E38(char *m)
             kind = p->kind;
             kind ^= 255;
             if (kind == 0) {
-                func_002E5CF8(0, 0, m);
+                PlayMobySound(0, 0, m);
             } else {
-                sound = func_002E5CF8(1, 0, m);
+                sound = PlayMobySound(1, 0, m);
                 if (sound != -1)
-                    func_002E5F40(sound, func_00283CF0(
-                        func_00283CE0(p->field5e) / func_00283CE0(D_L19_001B06E8)
+                    func_002E5F40(sound, FloatToInt(
+                        IntToFloat(p->field5e) / IntToFloat(D_L19_001B06E8)
                         * 1024.0f) + 1024);
             }
             if (p->field5e > p->field60) {
@@ -123,7 +123,7 @@ void func_L19_003D2E38(char *m)
                     p->field68 = D_L19_001B06F0;
             }
             if (p->field5e == D_L19_001B06E8) {
-                func_002E5CF8(5, 0, m);
+                PlayMobySound(5, 0, m);
                 func_002A7750(m, 5, -1);
             } else {
                 func_002A7750(m, 2, -1);
@@ -135,7 +135,7 @@ void func_L19_003D2E38(char *m)
             if (p->field5c != p->field50) {
                 p->field52 = (unsigned short)p->field5c;
                 func_L19_003D3B58(m);
-                func_002E5CF8(2, 0, m);
+                PlayMobySound(2, 0, m);
             } else {
                 p->field6a = 0;
                 p->field60 = 0;
@@ -166,11 +166,11 @@ void func_L19_003D2E38(char *m)
         return;
     }
     if (*(unsigned char *)(m + 0x20) != 5 && p->field6a)
-        func_00282978(&p->field68);
+        FastDecTimer(&p->field68);
     if (p->field6a && p->field68) {
         char *s = D_00188660 + p->sound * 0x70;
         if (*(char **)(s + 0x88) != m || !*(unsigned char *)(s + 0x74))
-            p->sound = func_002E5CF8(3, 4, m);
+            p->sound = PlayMobySound(3, 4, m);
     } else {
         if (p->sound != -1) {
             char *s = D_00188660 + p->sound * 0x70;
@@ -183,5 +183,5 @@ void func_L19_003D2E38(char *m)
     p->field58 -= D_L19_001B070C * (1.0f / 60.0f);
     if (p->field58 < -1.0f)
         p->field58 += 1.0f;
-    func_L00_002E6CF0(func_L03_003E3A00, m);
+    func_L00_002E6CF0(DrawPathPuzzleHud, m);
 }

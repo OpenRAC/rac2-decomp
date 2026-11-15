@@ -69,8 +69,8 @@ void func_L09_00404C50(char *obj)
     size = func_002A7878(1.0f, 1.333f);
     rec->f_344 = size;
     *(float *)(obj + 0x2C) = *(float *)(*(char **)(obj + 0x24) + 0x24) * size;
-    rec->f_48 = func_00283CF0(15.0f);
-    rec->f_4A = func_00283CF0(4.0f);
+    rec->f_48 = FloatToInt(15.0f);
+    rec->f_4A = FloatToInt(4.0f);
     count = 3;
     rec->f_98 = count;
     rec->f_8C = 0.4f;

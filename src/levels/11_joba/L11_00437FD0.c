@@ -50,13 +50,13 @@ void func_L11_00437FD0(u8 *object)
                     previous[2] = current[2];
                 }
                 next = current + 4;
-                func_00282CF0(delta, next, current);
+                FastVecSub(delta, next, current);
                 previous += 4;
-                distance = func_00282DF0(delta);
+                distance = FastVecLength(delta);
                 length = ((float *)(state + 0x2F0))[i];
-                func_00282D30(delta, delta, length / (distance + length) - 0.5f);
-                func_00282CF0(current, current, delta);
-                func_00282CC0(next, next, delta);
+                FastVecScale(delta, delta, length / (distance + length) - 0.5f);
+                FastVecSub(current, current, delta);
+                FastVecAdd(next, next, delta);
                 current = next;
             }
         } else {
@@ -71,13 +71,13 @@ void func_L11_00437FD0(u8 *object)
                     previous[2] = current[2];
                 }
                 next = current - 4;
-                func_00282CF0(delta, next, current);
+                FastVecSub(delta, next, current);
                 previous -= 4;
-                distance = func_00282DF0(delta);
+                distance = FastVecLength(delta);
                 length = ((float *)(state + 0x2F0))[i];
-                func_00282D30(delta, delta, length / (distance + length) - 0.5f);
-                func_00282CF0(current, current, delta);
-                func_00282CC0(next, next, delta);
+                FastVecScale(delta, delta, length / (distance + length) - 0.5f);
+                FastVecSub(current, current, delta);
+                FastVecAdd(next, next, delta);
                 current = next;
             }
         }

@@ -39,17 +39,17 @@ void func_L00_003FBF78(void)
         return;
     }
     func_00282948(&D_L00_001B0B64);
-    ratio = func_00283CE0(D_L00_001B0B64) / func_00283CE0(D_L00_001B0B60);
+    ratio = IntToFloat(D_L00_001B0B64) / IntToFloat(D_L00_001B0B60);
     D_L00_001BD2C0.i230 =
-        func_00283CF0(func_00283CE0(D_L00_001B1980[0]) + (255.0f - func_00283CE0(D_L00_001B1980[0])) * ratio);
+        FloatToInt(IntToFloat(D_L00_001B1980[0]) + (255.0f - IntToFloat(D_L00_001B1980[0])) * ratio);
     D_L00_001BD2C0.i234 =
-        func_00283CF0(func_00283CE0(D_L00_001B1981[0]) + (255.0f - func_00283CE0(D_L00_001B1981[0])) * ratio);
+        FloatToInt(IntToFloat(D_L00_001B1981[0]) + (255.0f - IntToFloat(D_L00_001B1981[0])) * ratio);
     D_L00_001BD2C0.i238 =
-        func_00283CF0(func_00283CE0(D_L00_001B1982[0]) + (255.0f - func_00283CE0(D_L00_001B1982[0])) * ratio);
+        FloatToInt(IntToFloat(D_L00_001B1982[0]) + (255.0f - IntToFloat(D_L00_001B1982[0])) * ratio);
     D_L00_001BD2C0.f218 = D_L00_001B1984[0] + -D_L00_001B1984[0] * ratio;
     D_L00_001BD2C0.f21C =
         D_L00_001B1988[0] + (D_L00_001B2BE0[0] * (D_L00_001B0BB0 * 1024.0f) - D_L00_001B1988[0]) * ratio;
     D_L00_001BD2C0.f228 = D_L00_001B198C[0] + (255.0f - D_L00_001B198C[0]) * ratio;
     D_L00_001BD2C0.f22C = D_L00_001B1990[0] + (100.0f - D_L00_001B1990[0]) * ratio;
-    func_0027AB40();
+    UpdateViewContext();
 }

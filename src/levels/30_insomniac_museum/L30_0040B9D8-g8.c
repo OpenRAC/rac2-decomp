@@ -122,18 +122,18 @@ void func_L30_0040B9D8(MuseumVehicle *obj) {
         s->power.bits=0;s->count=0;
         break; }
     case 1:
-        if (func_00282E20(s)>0.004166667f) func_L30_0040C270(obj,0);
+        if (vec_length_xy(s)>0.004166667f) UpdateHoverVehicleMotion(obj,0);
         if (D_00189E20.state==28 || D_00189E20.state==22 || D_00189E20.state==57 || D_00189E20.state==111 ||
             D_00189E20.mode==2 || D_00189E20.mode==4 || D_00189E20.mode==3 || D_00189E20.mode>=13 ||
             D_00189E20.mode==7 || D_00189E20.mode==10 || D_00189E20.mode==16 || D_00189E20.mode==5 || D_00189E20.state==98 ||
             D_00189E20.heroHealth<=0 || D_L30_001A8F00 || !D_00189E20.groundFlag) break;
         if (D_00189E20.ground && (*(short *)(D_00189E20.ground+0xAA)==0x13E || *(short *)(D_00189E20.ground+0xAA)==0x46F)) break;
         if (func_002A0558(obj,D_00189E20.hero)<D_L30_001B16CC && D_00189E20.state!=49) {
-            int v=func_002B0C28(7,0x2798,1)!=0;
+            int v=TryClaimNotice(7,0x2798,1)!=0;
             if (D_00138180.pressed&16) activate=v;
         }
         if (activate) {
-            func_L00_002C42E0(49,0);func_L00_002D2168(D_L30_001B1704,0,15.0f);
+            func_L00_002C42E0(49,0);set_hero_animation(D_L30_001B1704,0,15.0f);
             qcopy(D_00189E20.rotation,obj->rotation);qcopy(D_00189E20.position,obj->position);
             D_00189E20.vehicle=obj;obj->state=3;obj->flags=0;I(D_00189E20.hero,0x9C)=-1;
         }
@@ -143,8 +143,8 @@ void func_L30_0040B9D8(MuseumVehicle *obj) {
             s->power.throttle-=D_L30_001B17E8;
             if (!func_002A77E0(9) || (D_00138180.pressed&4)) func_L08_0041E4F8(obj);
         } else s->power.throttle+=D_L30_001B17EC;
-        if (D_L30_001B1708!=D_L30_001B1704 && D_L30_001B1704!=-1) func_L00_002D2168(D_L30_001B1704,0,15.0f);
-        func_L30_0040C270(obj,1);
+        if (D_L30_001B1708!=D_L30_001B1704 && D_L30_001B1704!=-1) set_hero_animation(D_L30_001B1704,0,15.0f);
+        UpdateHoverVehicleMotion(obj,1);
         if (s->power.throttle>1.0f) s->power.throttle=1.0f; else if (s->power.throttle<0.0f) s->power.throttle=0.0f;
         if (D_00189E20.vehicle==obj) {
             if (D_00138180.pressed&16) func_002A7750(obj,4,-1);
@@ -156,7 +156,7 @@ void func_L30_0040B9D8(MuseumVehicle *obj) {
             D_00189E20.cameraX=0;D_00189E20.cameraY=-1.0f;func_L00_002C42E0(11,1);
             D_00189E20.vehicle=0;D_00189E20.vehicleId=-1;
         }
-        obj->flags=0;I(D_00189E20.hero,0x9C)=0;func_L30_0040C270(obj,0);
+        obj->flags=0;I(D_00189E20.hero,0x9C)=0;UpdateHoverVehicleMotion(obj,0);
         { unsigned int timer=obj->timer; unsigned int old=timer++; obj->timer=timer;
         if (old>=31) {obj->flags=I(obj->classData,0x10);obj->state=1;} }
         break;
@@ -164,7 +164,7 @@ void func_L30_0040B9D8(MuseumVehicle *obj) {
     case 5:
         obj->flags=I(obj->classData,0x10);I(D_00189E20.hero,0x9C)=0;
         func_L00_002C42E0(0,1);func_0029FCC0(obj,0,pos);
-        func_002ABBB8(obj,s,pos,0.0f,0.0f,10,3,16,4.0f,2.0f,9.0f,1.0f,-1,15.0f,1,1,-1,0,0x810001);
+        SpawnExplosionEffects(obj,s,pos,0.0f,0.0f,10,3,16,4.0f,2.0f,9.0f,1.0f,-1,15.0f,1,1,-1,0,0x810001);
         qcopy(obj->position,&s->spawn);D_00189E20.vehicleId=-1;D_00189E20.vehicle=0;obj->state=0;
         break;
     }
@@ -172,15 +172,15 @@ void func_L30_0040B9D8(MuseumVehicle *obj) {
     k=0.00029088824f;
     scaled=D_L30_001B16D4*(scaled*k);
     s->height=obj->position[2];
-    s->phase=func_00283B98(s->phase,scaled);
+    s->phase=FastAddRotations(s->phase,scaled);
     bob=func_00283198(s->phase)*D_L30_001B16D0*s->power.throttle;
     rollRate=D_L30_001B16D8; yawRate=D_L30_001B16DC; pitchRate=D_L30_001B16E0;
     s->bob=bob;
     obj->position[2]+=s->bob*s->power.throttle;
     func_002AEF28(obj,&s->yawRate,&s->pitchRate,rollRate*0.017453294f,yawRate*(s->power.throttle*k),pitchRate*(s->power.throttle*k));
-    obj->rotation[2]=s->roll;obj->rotation[0]=func_00283B98(obj->rotation[0],s->pitch);obj->rotation[1]=func_00283B98(obj->rotation[1],s->yaw);
+    obj->rotation[2]=s->roll;obj->rotation[0]=FastAddRotations(obj->rotation[0],s->pitch);obj->rotation[1]=FastAddRotations(obj->rotation[1],s->yaw);
     if (obj->state==3) {func_0029FCC0(obj,(int)D_L30_001B17B4,D_00189E20.position);{char *h=(char *)&D_00189E20;F(h,0x88)+=D_L30_001B17B8;}qcopy(D_00189E20.rotation,obj->rotation);
-        func_L00_002E6EF8(func_L30_0040AE38,obj);
+        func_L00_002E6EF8(DrawMuseumStatusGauge,obj);
     }
-    if (obj->visible && func_00282E48(obj->position,D_L30_001B9DC0)<64.0f) {func_002A93B0(obj);obj->delay=60;}
+    if (obj->visible && fast_vec_dist(obj->position,D_L30_001B9DC0)<64.0f) {func_002A93B0(obj);obj->delay=60;}
 }

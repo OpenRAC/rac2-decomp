@@ -22,14 +22,14 @@ void func_L01_00399170(char *a0)
         *(unsigned char *)(a0 + 0x20) = 1;
         *(unsigned char *)(a0 + 0x63) = 0x20;
         *(float *)(s1 + 0x40) = func_002A7940();
-        func_0029F978(a0, 1, s1);
+        AttachManipulator(a0, 1, s1);
         break;
     case 1: {
         float f = D_L01_001AF628 * 0.000290888245f;
 
-        *(float *)(a0 + 0xF8) = func_00283B98(*(float *)(a0 + 0xF8), f);
-        *(float *)(s1 + 0x40) = func_00283B98(*(float *)(s1 + 0x40), f * -2.0f);
-        func_00283898(s1 + 0x10, 2, *(float *)(s1 + 0x40));
+        *(float *)(a0 + 0xF8) = FastAddRotations(*(float *)(a0 + 0xF8), f);
+        *(float *)(s1 + 0x40) = FastAddRotations(*(float *)(s1 + 0x40), f * -2.0f);
+        build_axis_rotation_quaternion(s1 + 0x10, 2, *(float *)(s1 + 0x40));
         break;
     }
     }
@@ -115,12 +115,12 @@ void func_L01_00398938(Moby_00398938 *a0)
             rot = &list[i]->rot;
             rot->y = ref_L01_00398938_01 * 0.017453294f;
             pitch = d->swing * 2.4f - 1.2f;
-            func_002833F0(&list[i]->mtx, &list[i]->rot);
-            func_00282F20(&v, &list[i]->mtx, pitch);
-            func_00282CC0(&list[i]->pos, &list[i]->pos, &v);
+            euler_rotation_basis(&list[i]->mtx, &list[i]->rot);
+            vec_scale_to_length(&v, &list[i]->mtx, pitch);
+            FastVecAdd(&list[i]->pos, &list[i]->pos, &v);
             rot = &list[i]->rot;
             rot->y = d->t * -1.0471977f - 0.3490659f;
-            func_002833F0(&list[i]->mtx, &list[i]->rot);
+            euler_rotation_basis(&list[i]->mtx, &list[i]->rot);
             func_002A0F48(list[i]);
         }
     }
@@ -165,7 +165,7 @@ void func_L01_00417090(char *a0)
     int b;
 
     if (*(unsigned char *)(a0 + 0x20) == 1) {
-        func_00282D30(&m, a0, 0.0009765625f);
+        FastVecScale(&m, a0, 0.0009765625f);
     } else {
         func_0029FCC0(a0, 0, &m);
     }
@@ -176,7 +176,7 @@ void func_L01_00417090(char *a0)
     do {
         i--;
         func_002A7A00(&v2, D_L01_001B1AA4 * 0.016666668f, D_L01_001B1AA8 * 0.016666668f);
-        func_00282CC0(&v1, &v1, &v2);
+        FastVecAdd(&v1, &v1, &v2);
         b = D_L01_001B1AAC;
         func_002C3150(&m, &v1, D_L01_001B1AB4, b, func_002A77E0(255), 0, D_L01_001B1ABC);
     } while (i >= 0);
@@ -201,7 +201,7 @@ void func_L01_00397EB0(char *a0)
     int b;
 
     if (*(unsigned char *)(a0 + 0x20) == 1) {
-        func_00282D30(&m, a0, 0.0009765625f);
+        FastVecScale(&m, a0, 0.0009765625f);
     } else {
         func_0029FCC0(a0, 0, &m);
         if (((float *)&m)[2] < D_00189F08) return;
@@ -213,7 +213,7 @@ void func_L01_00397EB0(char *a0)
     do {
         i--;
         func_002A7A00(&v2, ref_L01_00397EB0_05 * 0.016666668f, ref_L01_00397EB0_06 * 0.016666668f);
-        func_00282CC0(&v1, &v1, &v2);
+        FastVecAdd(&v1, &v1, &v2);
         b = ref_L01_00397EB0_02;
         func_002C3150(&m, &v1, ref_L01_00397EB0_07, b, func_002A77E0(255), 0, ref_L01_00397EB0_08);
     } while (i >= 0);
@@ -269,7 +269,7 @@ void func_L01_003E9CF8(char *a0, int a1, void (*a2)(char *))
     int count;
     if (p == 0 || *(short *)(p + 0xAA) != 0xC41 ||
         *(unsigned char *)(p + 0x20) == 0xFE || *(unsigned char *)(p + 0x20) == 0xFD) {
-        char *q = func_0029EFD0(0xC41);
+        char *q = CreateMoby(0xC41);
         ref_L01_003E9CF8_00 = q;
         *(unsigned char *)(q + 0x30) = 0xFF;
     }
@@ -279,7 +279,7 @@ void func_L01_003E9CF8(char *a0, int a1, void (*a2)(char *))
     *(int *)(a0 + 0x44) = 0;
     if (count < 0x40) {
         int n;
-        func_002A04B8(a0, &x, &y, &z);
+        get_moby_color(a0, &x, &y, &z);
         n = ref_L01_003E9CF8_01;
         ref_L01_003E9CF8_02[n].obj = a0;
         ref_L01_003E9CF8_02[n].rgb = (z << 16) | (y << 8) | x;
@@ -418,7 +418,7 @@ void func_L01_003B2598(char *m) {
         *(int *)(d + 0x2C) = 0;
         sweep = sweep_storage;
         height = (*(int *)(g + 0x2294) == 29) ? 11.0f : 4.5f;
-        func_002FDF40(sweep, pos, 0, 0, 1.6f, height, 0.13333334028720856f, 0.003055555745959282f);
+        CalculateAimedLaunchVelocity(sweep, pos, 0, 0, 1.6f, height, 0.13333334028720856f, 0.003055555745959282f);
     }
     *(int *)(d + 0x24) = func_002FE5A0(pos, sweep, d, d + 0x10, m, &hit, &aux, 0.003055555745959282f);
     result = func_00300540(aux);
@@ -442,7 +442,7 @@ void func_L01_003B2598(char *m) {
             goto blocked;
     }
     func_002FE8D8(d, normal);
-    if (!(func_00282DB0(d + 0x10, normal) < 0.75f))
+    if (!(FastVecDot(d + 0x10, normal) < 0.75f))
         goto timer;
 blocked:
     *(int *)(d + 0x2C) = 1;
@@ -471,14 +471,14 @@ timer:
             !*(int *)(d + 0x2C) && ready) {
             if (func_L00_002D3F30(-1, 1)) {
                 *(short *)(g + 0x1E0) = 120;
-                func_002B0CE0(6, 0, 1);
+                ForceClaimNotice(6, 0, 1);
                 *(short *)(g + 0x1D2) = 0;
-                func_L00_002AF568();
+                start_equipped_item_animation();
                 *(unsigned char *)(m + 0x20) = 2;
                 *(int *)(d + 0x20) = 12;
                 *(int *)(d + 0x28) = 0;
             } else
-                func_002E5CF8(0, 0, m);
+                PlayMobySound(0, 0, m);
         }
         break;
     }
@@ -488,8 +488,8 @@ timer:
 
             if (p)
                 *(char **)(p + 0xB8) = m;
-            func_002E5CF8(1, 0, m);
-            func_L00_002AF7D0();
+            PlayMobySound(1, 0, m);
+            cancel_hero_item_animation();
             *(unsigned char *)(m + 0x20) = 3;
             *(int *)(d + 0x20) = 5;
         }

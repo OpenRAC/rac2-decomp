@@ -1,6 +1,6 @@
 /* func_L11_00438880: skips set entries in the 13-byte flag table at state+0x380,
  * then for each pair of points state+0x100+prev*16 / state+0x100+next*16
- * fills a four-corner quad record twice (func_00281DE8 setup, func_00280B90
+ * fills a four-corner quad record twice (func_00281DE8 setup, draw_world_quad
  * submit) with different widths, colours and UVs, and
  * finally advances the scrolling UV offset at state+0x35C, wrapping to [-1,1].
  * Built -G8 -g -mno-split-addresses in its own unit (SDATA UV base, absolute
@@ -51,35 +51,35 @@ void func_L11_00438880(char *obj) {
         qcopy(end,st+0x100+next*16);
         qcopy(start,st+0x100+prev*16);
         following=next+1;
-        func_00282CF0(inset,start,end);
-        func_00282F20(inset,inset,D_L11_001B12C0);
-        func_00282CC0(end,end,inset);
-        func_00282CF0(span,end,start);
-        func_00282CF0(a,end,D_L11_001BA8C0);
-        func_00282CF0(b,start,D_L11_001BA8C0);
-        func_00282DD8(a,a,span);
-        func_00282DD8(b,b,span);
-        func_00282F20(a,a,D_L11_001B12B8);
-        func_00282F20(b,b,D_L11_001B12B8);
+        FastVecSub(inset,start,end);
+        vec_scale_to_length(inset,inset,D_L11_001B12C0);
+        FastVecAdd(end,end,inset);
+        FastVecSub(span,end,start);
+        FastVecSub(a,end,D_L11_001BA8C0);
+        FastVecSub(b,start,D_L11_001BA8C0);
+        FastVecCross(a,a,span);
+        FastVecCross(b,b,span);
+        vec_scale_to_length(a,a,D_L11_001B12B8);
+        vec_scale_to_length(b,b,D_L11_001B12B8);
         func_00281DE8(&quad,23,1,128);
         color=(D_L11_001B12A0 & 0xFFFFFF) | ((int)(func_002A7878(D_L11_001B12B0,D_L11_001B12B4[0])*(int)(D_L11_001B12A0>>24))<<24);
         quad.color[0]=quad.color[1]=quad.color[2]=quad.color[3]=color;
         uv0=&quad.uv[0][0]; uv1=&quad.uv[0][1];
         for(i=0;i<4;i++) { uv0[i*2]=D_L11_001B1280[i*2]+*(float *)(st+0x35C); uv1[i*2]=D_L11_001B1284[i*2]; }
-        func_00282CF0(&corner,end,a); quad.pos[0]=corner;
-        func_00282CC0(&corner,end,a); quad.pos[1]=corner;
-        func_00282CF0(&corner,start,b); quad.pos[2]=corner;
-        func_00282CC0(&corner,start,b); quad.pos[3]=corner;
-        func_00280B90(&quad,0,0);
-        func_00282F20(a,a,D_L11_001B12BC);
-        func_00282F20(b,b,D_L11_001B12BC);
-        func_00282CF0(&corner,end,a); quad.pos[0]=corner;
-        func_00282CC0(&corner,end,a); quad.pos[1]=corner;
-        func_00282CF0(&corner,start,b); quad.pos[2]=corner;
-        func_00282CC0(&corner,start,b); quad.pos[3]=corner;
+        FastVecSub(&corner,end,a); quad.pos[0]=corner;
+        FastVecAdd(&corner,end,a); quad.pos[1]=corner;
+        FastVecSub(&corner,start,b); quad.pos[2]=corner;
+        FastVecAdd(&corner,start,b); quad.pos[3]=corner;
+        draw_world_quad(&quad,0,0);
+        vec_scale_to_length(a,a,D_L11_001B12BC);
+        vec_scale_to_length(b,b,D_L11_001B12BC);
+        FastVecSub(&corner,end,a); quad.pos[0]=corner;
+        FastVecAdd(&corner,end,a); quad.pos[1]=corner;
+        FastVecSub(&corner,start,b); quad.pos[2]=corner;
+        FastVecAdd(&corner,start,b); quad.pos[3]=corner;
         func_00281DE8(&quad,43,1,128);
         quad.color[0]=quad.color[1]=quad.color[2]=quad.color[3]=D_L11_001B12A4;
-        func_00280B90(&quad,0,0);
+        draw_world_quad(&quad,0,0);
         prev=next; next=following;
         while(next<13) { int j=next-1; if(!flags[j]) break; next++; }
     }

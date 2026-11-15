@@ -42,10 +42,10 @@ char *func_002FFB68(char *obj)
         func_0029F338(obj);
         rec = D_00239BA0 + id * 0xE0;
         if (func_00294630(*(s32 *)(rec + 0x14)) == 0) {
-            func_00294420(*(s32 *)(rec + 0x14));
+            LoadClassIntoFreeCacheSlot(*(s32 *)(rec + 0x14));
             func_002B7CE0(1);
         }
-        func_00294988(*(s32 *)(rec + 0x14));
+        SwitchCachedDiscAsset(*(s32 *)(rec + 0x14));
     }
     rec = D_00239BA0 + id * 0xE0;
     spawned = func_002FF300(*(s32 *)(rec + 0x14), mode);

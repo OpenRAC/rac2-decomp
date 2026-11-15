@@ -39,9 +39,9 @@ Particle_C65A0 *func_002C65A0(const float *position, const float *velocity,
         float duration;
         qcopy(self->position, position);
         context = &self->context;
-        self->position[3] = func_00283CE0(transform_mode);
+        self->position[3] = IntToFloat(transform_mode);
         self->color = ((unsigned int)alpha_start << 24) | color;
-        variation = func_00283CF0(4.0f) + 0x40;
+        variation = FloatToInt(4.0f) + 0x40;
         self->byte1 = 0;
         self->size = start_size;
         self->kind = 0x48;
@@ -57,9 +57,9 @@ Particle_C65A0 *func_002C65A0(const float *position, const float *velocity,
         delta = difference / steps;
         if (delta != 0) steps = difference / delta;
         context->alpha_delta = delta;
-        duration = func_00283CE0(steps);
+        duration = IntToFloat(steps);
         context->size_delta = (end_size - start_size) / duration;
-        self->timer = func_00282C30(steps);
+        self->timer = subtract_integer_with_clamp(steps);
         context->update = func_002C6748;
     }
     return self;

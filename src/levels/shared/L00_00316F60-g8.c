@@ -121,27 +121,27 @@ void func_L00_00323958(char *object, B1320Entry *entries)
     int sx, sy, active;
     if (!entries->end) return;
     if (entries->copy_matrix) func_00282B50(matrix, object + 0xC0, 48);
-    else func_002833F0(matrix, object + 0xF0);
+    else euler_rotation_basis(matrix, object + 0xF0);
     qcopy_nc(matrix + 48, object + 0x10);
     *(int *)(matrix + 60) = 0;
     i = 0;
     do {
         if (entries[i].attachment) {
             func_0029FC20(entries[i].attachment, entries[i].joint, temp);
-            func_00283678(matrix, temp);
+            copy_matrix3x4(matrix, temp);
         }
         switch (entries[i].type) {
         case 0:
-            func_00283098(temp, entries[i].position, matrix);
-            func_00282CC0(D_L00_001B1E9C + entries[i].index * 256 + 0x10, matrix + 48, temp);
-            if (entries[i].offset) func_00282CC0(D_L00_001B1E9C + entries[i].index * 256 + 0x10, D_L00_001B1E9C + entries[i].index * 256 + 0x10, (char *)entries[i].offset + 0x10);
+            matrix_mul_vec3(temp, entries[i].position, matrix);
+            FastVecAdd(D_L00_001B1E9C + entries[i].index * 256 + 0x10, matrix + 48, temp);
+            if (entries[i].offset) FastVecAdd(D_L00_001B1E9C + entries[i].index * 256 + 0x10, D_L00_001B1E9C + entries[i].index * 256 + 0x10, (char *)entries[i].offset + 0x10);
             break;
         case 1:
-            func_00283098(temp, entries[i].position, matrix);
+            matrix_mul_vec3(temp, entries[i].position, matrix);
             func_00282CA8(D_L00_001B251C + entries[i].index * 64 + 0x30, matrix + 48, temp);
             break;
         case 2:
-            func_00283098(temp, entries[i].position, matrix);
+            matrix_mul_vec3(temp, entries[i].position, matrix);
             func_00282CA8(D_L00_001B2400 + entries[i].index * 64 + 0x30, matrix + 48, temp);
             break;
         }
@@ -149,14 +149,14 @@ void func_L00_00323958(char *object, B1320Entry *entries)
         case 0: {
             char *item;
             item = D_L00_001B1E9C + entries[i].index * 256;
-            if (!*(int *)(item + 0x24)) func_002833F0(item + 0xC0, item + 0xF0);
-            func_00283738(item + 0xC0, matrix, &entries[i]);
+            if (!*(int *)(item + 0x24)) euler_rotation_basis(item + 0xC0, item + 0xF0);
+            multiply_matrix3x3(item + 0xC0, matrix, &entries[i]);
             if (entries[i].offset) {
-                func_002833F0(temp + 16, entries[i].offset);
-                func_00283738(item + 0xC0, item + 0xC0, temp + 16);
+                euler_rotation_basis(temp + 16, entries[i].offset);
+                multiply_matrix3x3(item + 0xC0, item + 0xC0, temp + 16);
             }
             if (!*(int *)(item + 0x24)) {
-                func_00283658(rotation, item + 0xC0);
+                copy_matrix_rotation(rotation, item + 0xC0);
                 func_002AB6D8(rotation, item + 0xF0);
             }
             break;
@@ -164,15 +164,15 @@ void func_L00_00323958(char *object, B1320Entry *entries)
         case 1: {
             char *item;
             item = D_L00_001B251C + entries[i].index * 64;
-            func_00283738(item, matrix, &entries[i]);
+            multiply_matrix3x3(item, matrix, &entries[i]);
             if (entries[i].offset) {
-                func_002833F0(temp + 16, entries[i].offset);
-                func_00283738(item, item, temp + 16);
+                euler_rotation_basis(temp + 16, entries[i].offset);
+                multiply_matrix3x3(item, item, temp + 16);
             }
             break;
         }
         case 2:
-            func_00283738(D_L00_001B2400 + entries[i].index * 64, matrix, &entries[i]);
+            multiply_matrix3x3(D_L00_001B2400 + entries[i].index * 64, matrix, &entries[i]);
             break;
         }
         switch (entries[i].type) {
@@ -193,19 +193,19 @@ void func_L00_00323958(char *object, B1320Entry *entries)
             char *item, *data;
             item = D_L00_001B2400 + entries[i].index * 64;
             data = D_L00_001B23F8 + entries[i].index * 32;
-            x = func_00282DF0(item);
-            x += func_00282DF0(item + 0x10);
+            x = FastVecLength(item);
+            x += FastVecLength(item + 0x10);
             x *= 0.5f;
-            y = func_00282DF0(item + 0x20);
-            sx = func_00283CF0(x * 4096.0f);
-            sy = func_00283CF0(y * 4096.0f);
+            y = FastVecLength(item + 0x20);
+            sx = FloatToInt(x * 4096.0f);
+            sy = FloatToInt(y * 4096.0f);
             sy = sy <= 65536 ? sy : 65536;
             sy <<= 16;
             if (sx > 65536) sx = 65536;
             *(int *)(item + 0x2C) = sx | sy;
-            func_00283098(data, D_L00_0021EA20[(unsigned char)data[0x1A]], item);
-            func_00282D60(data, data, *(float *)(item + 0x3C));
-            func_00282CC0(data, data, item + 0x30);
+            matrix_mul_vec3(data, D_L00_0021EA20[(unsigned char)data[0x1A]], item);
+            scale_vector(data, data, *(float *)(item + 0x3C));
+            FastVecAdd(data, data, item + 0x30);
             break;
         }
         }

@@ -148,22 +148,22 @@ void func_L19_00423548(u8 *object)
         if (object[0x43]) func_002A7470(object, 0, 0, 0);
         break;
     case 1:
-        if (func_00282E80(object + 0x10, D_00189EA0) < D_L19_001B1EB0 &&
+        if (vec_distance_xy(object + 0x10, D_00189EA0) < D_L19_001B1EB0 &&
             func_00282C48(*(float *)(object + 0x18) - *(float *)(D_00189EA0 + 8)) < D_L19_001B1EC0) {
             *(float *)state = D_L19_001B1EC4;
             if (object[0x43] != 1) func_002A7470(object, 1, 0, 20);
             *(float *)(object + 0x48) = *(float *)state + *(float *)state;
             object[0x20] = 2;
         }
-        if (object[0x31]) func_L19_00423270(object);
+        if (object[0x31]) EmitGrelbinGlowSprites(object);
         break;
     case 2:
         if (object[0x43] != 1) func_002A7470(object, 1, 0, 20);
         *(float *)state += (1.0f - *(float *)state) * D_L19_001B1EBC;
         *(float *)(object + 0x48) = *(float *)state + *(float *)state;
-        func_00282CF0(direction, D_00189EA0, object + 0x10);
+        FastVecSub(direction, D_00189EA0, object + 0x10);
         direction[2] += 0.6f;
-        distance = func_00282E20(direction);
+        distance = vec_length_xy(direction);
         threshold = 0.12f;
         if (*(int *)(D_00189EA0 + 0x2214) != 0x31)
             movement = D_L19_001B1EB4 * (*(float *)state * 0.016666668f);
@@ -172,7 +172,7 @@ void func_L19_00423548(u8 *object)
             threshold = 0.8f;
         }
         func_00282FB8(direction, direction, movement);
-        func_00282CC0(object + 0x10, object + 0x10, direction);
+        FastVecAdd(object + 0x10, object + 0x10, direction);
         if (*(float *)(object + 0x2C) > 0.1f || distance < threshold || distance < movement)
             *(float *)(object + 0x2C) -= D_L19_001B1EC8 * *(float *)(*(u8 **)(object + 0x24) + 0x24);
         if ((distance < movement &&
@@ -205,7 +205,7 @@ void func_L19_00423548(u8 *object)
                 D_L19_001A903C[0] = 1;
             }
             func_0029F338(object);
-        } else func_L19_00423270(object);
+        } else EmitGrelbinGlowSprites(object);
         break;
     }
 }

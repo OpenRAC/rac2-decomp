@@ -46,7 +46,7 @@ void func_L00_00300090(TfragRenderHeader *hdr, char *tbl) {
     D_L00_001B24E0[0] = scale * 6.0f;
     D_L00_001B24E0[1] = scale * 4.0f;
     D_L00_001B24E0[2] = scale + scale;
-    func_002EF080();
+    SetTfragDists();
     base = (char *)hdr + *(int *)hdr;
     D_L00_001B24D0 = base;
     n = D_L00_001B24D4;
@@ -77,12 +77,12 @@ void func_L00_00300090(TfragRenderHeader *hdr, char *tbl) {
             if (!(0 < a19)) {
                 a19 = 1;
             }
-            u = func_00282A18(t >> 16);
-            v = func_00282A18(m->x6);
+            u = log2dim(t >> 16);
+            v = log2dim(m->x6);
             gs = D_001A72F4 >> 8;
             /* The s64/u64 casts keep every OR chain at three operands of one type, so
                fold's reduce_expression_tree_depth leaves the left-to-right GS word trees
-               as written (the same idiom as func_L00_002FFAB8). */
+               as written (the same idiom as RegisterShrubRenderClass). */
             tex0 = (s64)((u64)((s64)a17 << 14 | (s64)0x13 << 20 | (s64)u << 26)
                          | (u64)v << 30 | (u64)1 << 34 | (u64)(m->xA + gs) << 37)
                    | (s64)4 << 61;

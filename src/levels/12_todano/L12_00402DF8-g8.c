@@ -74,7 +74,7 @@ kill:
 
 update:
     func_L12_00402B48(object);
-    if (func_00282E80(object + 0x10, D_00189EA0) < 1.5f) {
+    if (vec_distance_xy(object + 0x10, D_00189EA0) < 1.5f) {
         func_002B0A18(0x1246, 0x1F4);
         func_00288308(0x10);
         func_L00_003294F0(D_L12_001B2E9C + (*(s32 *)state << 8), 1);

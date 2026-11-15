@@ -39,10 +39,10 @@ void func_L20_00449BB0(char *arg0) {
         char *p = arg0 + 0x10;
 
         func_L20_00444C18(*(char **)(state + 0xA4), (char *)&a);
-        func_00282CF0(&b, p, (char *)&a);
-        if (func_00282E20(&b) < D_L20_001B23F0) {
+        FastVecSub(&b, p, (char *)&a);
+        if (vec_length_xy(&b) < D_L20_001B23F0) {
             func_00282F70(&b, &b, D_L20_001B23F0);
-            func_00282CC0(p, &b, &a);
+            FastVecAdd(p, &b, &a);
             qcopy(state + 0x60, p);
             func_002C9218(*(int *)(state + 0xA0), p, p, 0.5f);
         }

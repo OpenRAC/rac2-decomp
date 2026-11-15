@@ -36,23 +36,23 @@ void func_00281EB8(void *position, s32 texture, u32 color, s32 kind,
     frame.packet.uv[6] = 1.0f;
     frame.packet.uv[7] = 1.0f;
     qcopy(&frame.position, position);
-    func_00282CF0(&frame.basis[0], D_001B5340, &frame.position);
-    func_00282F20(&frame.basis[0], &frame.basis[0], 1.0f);
-    func_00282DD8(&frame.basis[1], &frame.basis[0], D_0018A0E0);
-    func_00282F20(&frame.basis[1], &frame.basis[1], 1.0f);
-    func_00282DD8(&frame.basis[2], &frame.basis[1], &frame.basis[0]);
+    FastVecSub(&frame.basis[0], D_001B5340, &frame.position);
+    vec_scale_to_length(&frame.basis[0], &frame.basis[0], 1.0f);
+    FastVecCross(&frame.basis[1], &frame.basis[0], D_0018A0E0);
+    vec_scale_to_length(&frame.basis[1], &frame.basis[1], 1.0f);
+    FastVecCross(&frame.basis[2], &frame.basis[1], &frame.basis[0]);
     if (angle != 0.0f) {
         frame.euler.q = 0;
         frame.euler.f[0] = angle;
-        func_002833F0(frame.rotation, &frame.euler);
-        func_00283738(frame.basis, frame.basis, frame.rotation);
+        euler_rotation_basis(frame.rotation, &frame.euler);
+        multiply_matrix3x3(frame.basis, frame.basis, frame.rotation);
     }
-    func_00282D30(&frame.euler, &frame.basis[0], offset);
-    func_00282CC0(&frame.position, &frame.position, &frame.euler);
+    FastVecScale(&frame.euler, &frame.basis[0], offset);
+    FastVecAdd(&frame.position, &frame.position, &frame.euler);
     for (i = 3; i >= 0; i--) {
         s32 row = 3 - i;
-        func_00282D30(frame.packet.matrix + row * 4, D_001A9FD0[row], scale);
-        func_002830C0(frame.packet.matrix + row * 4, frame.packet.matrix + row * 4, frame.basis);
+        FastVecScale(frame.packet.matrix + row * 4, D_001A9FD0[row], scale);
+        transform_vector(frame.packet.matrix + row * 4, frame.packet.matrix + row * 4, frame.basis);
     }
-    func_00280B90(&frame.packet, 0, 0);
+    draw_world_quad(&frame.packet, 0, 0);
 }

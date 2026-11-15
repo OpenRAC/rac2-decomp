@@ -84,13 +84,13 @@ void func_L12_0041A790(Obj *self)
         f32 distance;
         distance = 100000;
         if (func_L12_003DE4B0())
-            distance = func_00282E48(&self->position, D_L12_001B090C + 0x10);
+            distance = fast_vec_dist(&self->position, D_L12_001B090C + 0x10);
         else if (func_L12_00404778())
-            distance = func_00282E48(&self->position, D_L12_001B1360 + 0x10);
-        if (func_00282E80(&self->position, &D_00189EA0) < D_L12_001B1C7C ||
+            distance = fast_vec_dist(&self->position, D_L12_001B1360 + 0x10);
+        if (vec_distance_xy(&self->position, &D_00189EA0) < D_L12_001B1C7C ||
            func_002A9640(self, 0x30000, 0) || distance < D_L12_001B1C7C * 0.5f) {
             self->state = 2;
-            s->timer = func_00283CF0(D_L12_001B1C84 * 60);
+            s->timer = FloatToInt(D_L12_001B1C84 * 60);
             s->radius = D_L12_001B1C78;
             s->age = 0;
         }
@@ -101,12 +101,12 @@ void func_L12_0041A790(Obj *self)
         s32 color, i;
         u8 life, alpha;
         if (func_002B3868(self))
-            func_002E5CF8(0, 0, self);
-        func_L00_002E6CF0(func_L12_0041AEF0, self);
+            PlayMobySound(0, 0, self);
+        func_L00_002E6CF0(DrawAnimatedRings, self);
         s->age += D_L12_001B1C88 * 0.016666668f;
         func_002AA548(&self->position.z, &s->heightSpeed, s->origin.z + 0.5f, 1, 0.008333334f, 1);
-        func_002AA2E8(&s->angularSpeed, 0.4188791f, 0.1f);
-        self->rotation[2] = func_00283B98(self->rotation[2], s->angularSpeed);
+        ApproachValue(&s->angularSpeed, 0.4188791f, 0.1f);
+        self->rotation[2] = FastAddRotations(self->rotation[2], s->angularSpeed);
         step = D_L12_001B1C88 * 0.016666668f;
         ratio = D_L12_001B1C80 / step;
         angle = func_002A7878(-15, 15) * 0.017453294f;
@@ -116,10 +116,10 @@ void func_L12_0041A790(Obj *self)
         v.x = func_00283180(angle) * cosine;
         v.y = func_00283198(angle) * cosine;
         v.z = sine;
-        func_00282F20(&v, &v, step);
-        color = func_00283D38(D_L12_001B1C94, D_L12_001B1C98, func_002A7878(0, 1));
+        vec_scale_to_length(&v, &v, step);
+        color = FastTweenColor(D_L12_001B1C94, D_L12_001B1C98, func_002A7878(0, 1));
         size = func_002A7878(D_L12_001B1C9C, D_L12_001B1CA0);
-        life = func_00283CF0(func_002A7878(1, 1.5f) * 7) & 255;
+        life = FloatToInt(func_002A7878(1, 1.5f) * 7) & 255;
         alpha = func_002A77E0(255) & 255;
         func_002C3150(&self->position, &v, color, size, life, alpha, 0);
         if (func_00282948(&s->timer)) {
@@ -136,10 +136,10 @@ void func_L12_0041A790(Obj *self)
                 v.x = func_00283180(angle) * cosine;
                 v.y = func_00283198(angle) * cosine;
                 v.z = sine;
-                func_00282F20(&v, &v, step);
-                color = func_00283D38(D_L12_001B1C94, D_L12_001B1C98, func_002A7878(0, 1));
+                vec_scale_to_length(&v, &v, step);
+                color = FastTweenColor(D_L12_001B1C94, D_L12_001B1C98, func_002A7878(0, 1));
                 size = func_002A7878(D_L12_001B1C9C, D_L12_001B1CA0);
-                life = func_00283CF0(ratio * func_002A7878(1, 1.5f)) & 255;
+                life = FloatToInt(ratio * func_002A7878(1, 1.5f)) & 255;
                 alpha = func_002A77E0(255) & 255;
                 func_002C3150(&self->position, &v, color, size, life, alpha, 0);
             }
@@ -165,29 +165,29 @@ void func_L12_0041A790(Obj *self)
             }
             break;
         }
-        func_L00_002E6CF0(func_L12_0041AEF0, self);
+        func_L00_002E6CF0(DrawAnimatedRings, self);
         step = D_L12_001B1C88 * 0.016666668f;
         s->radius += step;
         s->age += step;
-        func_002A8C00(damage, self, 0x10001, (f32)s->damage, &D_L12_001A8F20);
+        make_hit_descriptor(damage, self, 0x10001, (f32)s->damage, &D_L12_001A8F20);
         angle = 0;
         v.x = func_00283180(angle) * s->radius;
         v.y = func_00283198(angle) * s->radius;
         v.z = 0;
-        func_00282CC0(&v, &v, &self->position);
+        FastVecAdd(&v, &v, &self->position);
         angle = 0.52359885f;
         for (i = 11; i >= 0; i--) {
             next.x = func_00283180(angle) * s->radius;
             next.y = func_00283198(angle) * s->radius;
             next.z = 0;
-            func_00282CC0(&next, &next, &self->position);
-            func_002761F8(&next, &v, 9, self, damage);
-            angle = func_00283B98(angle, 0.52359885f);
+            FastVecAdd(&next, &next, &self->position);
+            CollLine(&next, &v, 9, self, damage);
+            angle = FastAddRotations(angle, 0.52359885f);
             qcopy(&v, &next);
         }
-        if (func_L12_003DE4B0() && func_00282E48(&self->position, D_L12_001B090C + 0x10) < s->radius)
+        if (func_L12_003DE4B0() && fast_vec_dist(&self->position, D_L12_001B090C + 0x10) < s->radius)
             func_L00_003DF6B0(1, 0);
-        if (func_L12_00404778() && func_00282E48(&self->position, D_L12_001B1360 + 0x10) < s->radius)
+        if (func_L12_00404778() && fast_vec_dist(&self->position, D_L12_001B1360 + 0x10) < s->radius)
             func_L00_004028C0(1, 0);
         break;
     }

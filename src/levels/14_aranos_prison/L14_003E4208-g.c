@@ -115,10 +115,10 @@ void func_L14_003E4208(char *self)
                 qcopy(&vel, D_L14_001A8F20);
                 qcopy(&tmp, D_L14_001A8F20);
                 tmp.f[0] += 1.1f;
-                func_00283098(&tmp, &tmp, self + 0xC0);
-                func_00282CC0(&pos, &pos, &tmp);
-                a = func_00283D38(st->color[0], st->color[2], func_002A7878(0.0f, 1.0f));
-                color = func_00283D38(func_00283D38(st->color[1], st->color[3], func_002A7878(0.0f, 1.0f)), a,
+                matrix_mul_vec3(&tmp, &tmp, self + 0xC0);
+                FastVecAdd(&pos, &pos, &tmp);
+                a = FastTweenColor(st->color[0], st->color[2], func_002A7878(0.0f, 1.0f));
+                color = FastTweenColor(FastTweenColor(st->color[1], st->color[3], func_002A7878(0.0f, 1.0f)), a,
                                       (float)st->remaining / (float)st->total);
                 value = color & 0xFFFFFF;
                 life = func_002A7878(func_002AA140(st->life_max[0], st->life_min[0], (float)st->remaining / (float)st->total),
@@ -135,7 +135,7 @@ void func_L14_003E4208(char *self)
                     vel.f[2] += func_002A7878(-st->spread[2], 0.0f);
                     rotation = st->rotation;
                 }
-                func_00283098(&vel, &vel, self + 0xC0);
+                matrix_mul_vec3(&vel, &vel, self + 0xC0);
                 func_L00_0033E888(&pos, &vel, color, value, life, st->size, 0, rotation, 2, -1, 0);
                 st->accum -= 1.0f;
             }
@@ -150,7 +150,7 @@ void func_L14_003E4208(char *self)
         func_002B3868(self);
         e = D_00188660 + st->entry * 0x70;
         if (*(int *)(e + 0x88) != (int)self || *(unsigned char *)(e + 0x74) == 0) {
-            st->entry = func_002E5CF8(0, 4, self);
+            st->entry = PlayMobySound(0, 4, self);
         }
         if (st->trigger == 0.0f) {
             rate = (st->rate_end - st->rate_start) / (float)st->total;
@@ -166,9 +166,9 @@ void func_L14_003E4208(char *self)
                 qcopy(&vel, D_L14_001A8F20);
                 qcopy(&tmp, D_L14_001A8F20);
                 tmp.f[0] += 1.1f;
-                func_00283098(&tmp, &tmp, self + 0xC0);
-                func_00282CC0(&pos, &pos, &tmp);
-                color = func_00283D38(st->color[1], st->color[3], func_002A7878(0.0f, 1.0f));
+                matrix_mul_vec3(&tmp, &tmp, self + 0xC0);
+                FastVecAdd(&pos, &pos, &tmp);
+                color = FastTweenColor(st->color[1], st->color[3], func_002A7878(0.0f, 1.0f));
                 value = color & 0xFFFFFF;
                 life = func_002A7878(func_002AA140(st->life_max[0], st->life_min[0], (float)st->remaining / (float)st->total),
                                      func_002AA140(st->life_max[1], st->life_min[1], (float)st->remaining / (float)st->total));
@@ -176,7 +176,7 @@ void func_L14_003E4208(char *self)
                 vel.f[1] += func_002A7878(0.0f, st->spread[1] * 2.0f);
                 vel.f[2] += func_002A7878(-st->spread[2], 0.0f);
                 life *= 1.5f;
-                func_00283098(&vel, &vel, self + 0xC0);
+                matrix_mul_vec3(&vel, &vel, self + 0xC0);
                 func_L00_0033E888(&pos, &vel, color, value, life, st->size, 0, 0.0f, 2, -1, 0);
                 st->accum -= 1.0f;
             }

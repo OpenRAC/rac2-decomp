@@ -21,7 +21,7 @@ void func_L07_003F8010(u8 *self)
     func_002A0F48(*(u8 **)(state + 0x410));
     if (*(u8 **)(state + 0x414) != 0) {
         func_0029FC20((char *)self, 0, (char *)&transform);
-        func_00283678(*(u8 **)(state + 0x414) + 0xC0, transform.basis);
+        copy_matrix3x4(*(u8 **)(state + 0x414) + 0xC0, transform.basis);
         qcopy(*(u8 **)(state + 0x414) + 0x10, transform.translation);
     }
     func_002A0F48(*(u8 **)(state + 0x414));

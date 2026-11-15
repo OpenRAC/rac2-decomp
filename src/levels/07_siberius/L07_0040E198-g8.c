@@ -164,7 +164,7 @@ void func_L07_0040E198(ShipObject *o)
         }
         if (D_L07_001C9780) {
             func_002A7750(o, 1, -1);
-            s->f16CC = func_002E5CF8(2, 4, o);
+            s->f16CC = PlayMobySound(2, 4, o);
             s->f16C8 = 6.0f;
         }
         break;
@@ -176,7 +176,7 @@ void func_L07_0040E198(ShipObject *o)
         break;
     case 3:
         if (func_002B3868(o))
-            func_002E5CF8(1, 0, o);
+            PlayMobySound(1, 0, o);
         func_L07_0040F0D0(o);
         if (D_001A7BD0 || (D_0019B2E8[D_001A79F0][o->fB0] & 0x80)) {
             func_L07_0040F0D0(o);
@@ -185,7 +185,7 @@ void func_L07_0040E198(ShipObject *o)
         }
         if (D_0018A15C[0] == o) {
             if (s->f110 >= 0.5f)
-                func_002E5CF8(1, 0, o);
+                PlayMobySound(1, 0, o);
             func_002AAA00(&s->f110, &s->f118, -1.0f, 0.0017453294713050127f,
                           0.0017453294713050127f, 0.10471977f, 0);
             if (s->f110 <= -1.0f) {
@@ -223,7 +223,7 @@ void func_L07_0040E198(ShipObject *o)
             o->rot[0] = func_002AA140(0.7853975296020508f, 0.0f, s->f16B8);
             o->pos[2] = 213.0f - s->f16B8 * 3.0f;
         } else if ((m = D_L07_001B1D20) == 0.0f) {
-            func_00283098(&v, D_L07_001B1760, o->mtx);
+            matrix_mul_vec3(&v, D_L07_001B1760, o->mtx);
             s->f16B4 += o->rot[0] * 7.272206130437553e-05f + 7.272206130437553e-05f;
             o->rot[0] += s->f16B4;
             if (o->rot[0] > 1.5707964f) {
@@ -240,17 +240,17 @@ void func_L07_0040E198(ShipObject *o)
                     s->f16BC = 1;
                 }
             }
-            func_002833F0(o->mtx, o->rot);
-            func_00283098(&w, D_L07_001B1760, o->mtx);
-            func_00282CF0(&v, &w, &v);
-            func_00282CF0(o->pos, o->pos, &v);
+            euler_rotation_basis(o->mtx, o->rot);
+            matrix_mul_vec3(&w, D_L07_001B1760, o->mtx);
+            FastVecSub(&v, &w, &v);
+            FastVecSub(o->pos, o->pos, &v);
         } else if (m >= 1.0f) {
             func_L07_00410930(o);
             break;
         }
 
         D_L07_001B2024.f4 = 1;
-        func_002AA2E8(&s->f16B0, 1.0f, D_L07_001B174C * 0.00027777778f);
+        ApproachValue(&s->f16B0, 1.0f, D_L07_001B174C * 0.00027777778f);
         k = s->f11C + s->f16B0;
         if (k > 0.0f)
             k = 0.0f;
@@ -263,7 +263,7 @@ void func_L07_0040E198(ShipObject *o)
         x.q = *(TI128 *)o->pos;
         x.f[2] += 6.0f;
         w.f[2] = func_00283248(o->pos[0] - D_L07_001B90C0.pos[0], o->pos[1] - D_L07_001B90C0.pos[1]);
-        w.f[1] = func_00283248(func_00282E80(&x, D_L07_001B90C0.pos), D_L07_001B90C0.pos[2] - x.f[2]);
+        w.f[1] = func_00283248(vec_distance_xy(&x, D_L07_001B90C0.pos), D_L07_001B90C0.pos[2] - x.f[2]);
         w.f[0] = D_L07_001B1758 * 0.017453294f;
         func_L07_00423B80(&w);
 
@@ -271,9 +271,9 @@ void func_L07_0040E198(ShipObject *o)
 
         z = s->f16B8 * 0.04363323748111725f + 0.008726648f;
         for (i = 0; i < 8; i++)
-            *(float *)((u8 *)s + 0x15B4 + i * 0x20) = func_00283B98(*(float *)((u8 *)s + 0x15B4 + i * 0x20), z);
+            *(float *)((u8 *)s + 0x15B4 + i * 0x20) = FastAddRotations(*(float *)((u8 *)s + 0x15B4 + i * 0x20), z);
 
-        func_00282CF0(&y, o->pos, &p);
+        FastVecSub(&y, o->pos, &p);
         func_002AD6F0((u8 *)s + 0x20, &y, &r, o->rot);
         break;
     }

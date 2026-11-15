@@ -39,19 +39,19 @@ void func_L05_00443D08(char *m, char *driver)
     if (H(driverState, 0xd8) && (D_L05_001B2048 & 1))
         return;
 
-    if (func_00282978(s + 8) && (D_00138320[0] & 0x40)) {
+    if (FastDecTimer(s + 8) && (D_00138320[0] & 0x40)) {
         H(s, 8) = D_L05_001B1AA0;
-        func_00282CF0(&a, s + 0x20, driver + 0x30);
-        func_00282F20(&a, &a, D_L05_001B1A9C);
-        func_00282CC0(&b, &a, driver + 0x30);
+        FastVecSub(&a, s + 0x20, driver + 0x30);
+        vec_scale_to_length(&a, &a, D_L05_001B1A9C);
+        FastVecAdd(&b, &a, driver + 0x30);
         mode = D_L05_002A1940[0];
         if (mode)
-            func_00283098(&c, &D_L05_001B1B50, m + 0xc0);
+            matrix_mul_vec3(&c, &D_L05_001B1B50, m + 0xc0);
         else
-            func_00283098(&c, &D_L05_001B1B30, m + 0xc0);
-        func_00282CC0(&c, &c, m + 0x10);
-        func_00282CF0(&d, &b, &c);
-        func_002E5CF8(3, 0, m);
+            matrix_mul_vec3(&c, &D_L05_001B1B30, m + 0xc0);
+        FastVecAdd(&c, &c, m + 0x10);
+        FastVecSub(&d, &b, &c);
+        PlayMobySound(3, 0, m);
         shot = func_L05_00419CC8(m, &c, -1.0f, &d, 0x2020ff, 0x20207f, 0, mode, 0);
         if (shot) {
             char *v = P(shot, 0x68);
@@ -60,16 +60,16 @@ void func_L05_00443D08(char *m, char *driver)
             F(v, 0x14) += F(driverState, 0x34);
             F(v, 0x18) += F(driverState, 0x38);
             if (mode) {
-                func_00282D30(&e, m + 0xd0, D_L05_001B1B70 * 0.01666666753590107f);
-                func_00282CC0(v + 0x10, v + 0x10, &e);
+                FastVecScale(&e, m + 0xd0, D_L05_001B1B70 * 0.01666666753590107f);
+                FastVecAdd(v + 0x10, v + 0x10, &e);
             }
         }
         if (mode)
-            func_00283098(&e, &D_L05_001B1B60, m + 0xc0);
+            matrix_mul_vec3(&e, &D_L05_001B1B60, m + 0xc0);
         else
-            func_00283098(&e, &D_L05_001B1B40, m + 0xc0);
-        func_00282CC0(&e, &e, m + 0x10);
-        func_00282CF0(&d, &b, &e);
+            matrix_mul_vec3(&e, &D_L05_001B1B40, m + 0xc0);
+        FastVecAdd(&e, &e, m + 0x10);
+        FastVecSub(&d, &b, &e);
         shot = func_L05_00419CC8(m, &e, 1.0f, &d, 0x2020ff, 0x20207f, 0, mode, 0);
         if (shot) {
             char *v = P(shot, 0x68);
@@ -78,23 +78,23 @@ void func_L05_00443D08(char *m, char *driver)
             F(v, 0x14) += F(driverState, 0x34);
             F(v, 0x18) += F(driverState, 0x38);
             if (mode) {
-                func_00282D30(&f, m + 0xd0, -(D_L05_001B1B70 * 0.01666666753590107f));
-                func_00282CC0(v + 0x10, v + 0x10, &f);
+                FastVecScale(&f, m + 0xd0, -(D_L05_001B1B70 * 0.01666666753590107f));
+                FastVecAdd(v + 0x10, v + 0x10, &f);
             }
         }
     }
 
     {
         int slot = func_L05_0037AA88(1);
-        if (slot >= 0 && D_L05_002A1800[slot].ammo != 0 && func_00282978(s + 0xa)
+        if (slot >= 0 && D_L05_002A1800[slot].ammo != 0 && FastDecTimer(s + 0xa)
             && (D_00138320[0] & 0x20)) {
             func_L05_0037AB18(1, 1);
             a.q = 0;
             a.f[2] = -0.1f;
             a.f[3] = 1.0f;
-            func_00283098(&b, &a, m + 0xc0);
-            func_00282CC0(&b, &b, m + 0x10);
-            func_002E5CF8(2, 0, m);
+            matrix_mul_vec3(&b, &a, m + 0xc0);
+            FastVecAdd(&b, &b, m + 0x10);
+            PlayMobySound(2, 0, m);
             func_L05_003D0960(&b, m + 0xc0, I(s, 0x18), m, D_L05_002A1800[9].upgrade);
             H(s, 0xa) = D_L05_001B1AA4;
             I(s, 0x218) = 5;
@@ -103,15 +103,15 @@ void func_L05_00443D08(char *m, char *driver)
 
     {
         int slot = func_L05_0037AA88(3);
-        if (slot >= 0 && D_L05_002A1800[slot].ammo != 0 && func_00282978(s + 0xa8)
+        if (slot >= 0 && D_L05_002A1800[slot].ammo != 0 && FastDecTimer(s + 0xa8)
             && (D_00138320[0] & 0x20)) {
             func_L05_0037AB18(3, 1);
             a.q = 0;
             a.f[2] = -0.1f;
             a.f[3] = 1.0f;
-            func_00283098(&b, &a, m + 0xc0);
-            func_00282CC0(&b, &b, m + 0x10);
-            func_002E5CF8(2, 0, m);
+            matrix_mul_vec3(&b, &a, m + 0xc0);
+            FastVecAdd(&b, &b, m + 0x10);
+            PlayMobySound(2, 0, m);
             func_L05_003979B0(&b, m + 0xc0, I(s, 0x18), m, D_L05_002A1800[11].upgrade);
             H(s, 0xa8) = D_L05_001B1AA8;
             I(s, 0x218) = 5;
@@ -126,22 +126,22 @@ void func_L05_00443D08(char *m, char *driver)
             a.q = 0;
             a.f[2] = -0.2f;
             a.f[3] = 1.0f;
-            func_00283098(&b, &a, m + 0xc0);
-            func_00282CC0(&b, &b, m + 0x10);
-            func_002E5CF8(2, 0, m);
+            matrix_mul_vec3(&b, &a, m + 0xc0);
+            FastVecAdd(&b, &b, m + 0x10);
+            PlayMobySound(2, 0, m);
             func_L05_00427090(&b, m + 0xc0, I(s, 0x18), m, D_L05_002A1800[10].upgrade, 1);
             if (D_L05_002A1800[10].upgrade) {
                 c.q = 0;
                 c.f[1] = -0.275f;
                 c.f[3] = 1.0f;
-                func_00283098(&b, &c, m + 0xc0);
-                func_00282CC0(&b, &b, m + 0x10);
+                matrix_mul_vec3(&b, &c, m + 0xc0);
+                FastVecAdd(&b, &b, m + 0x10);
                 func_L05_00427090(&b, m + 0xc0, I(s, 0x18), m, D_L05_002A1800[10].upgrade, 0);
                 d.q = 0;
                 d.f[1] = 0.275f;
                 d.f[3] = 1.0f;
-                func_00283098(&b, &d, m + 0xc0);
-                func_00282CC0(&b, &b, m + 0x10);
+                matrix_mul_vec3(&b, &d, m + 0xc0);
+                FastVecAdd(&b, &b, m + 0x10);
                 func_L05_00427090(&b, m + 0xc0, I(s, 0x18), m, D_L05_002A1800[10].upgrade, 0);
             }
             I(s, 0x20c) = D_L05_001B1AAC;
@@ -157,9 +157,9 @@ void func_L05_00443D08(char *m, char *driver)
             a.q = 0;
             a.f[2] = -0.1f;
             a.f[3] = 1.0f;
-            func_00283098(&b, &a, m + 0xc0);
-            func_00282CC0(&b, &b, m + 0x10);
-            func_002E5CF8(2, 0, m);
+            matrix_mul_vec3(&b, &a, m + 0xc0);
+            FastVecAdd(&b, &b, m + 0x10);
+            PlayMobySound(2, 0, m);
             func_L05_00427988(&b, m + 0xc0, I(s, 0x18), m, 0);
             I(s, 0x210) = D_L05_001B1AB0;
             I(s, 0x218) = 10;

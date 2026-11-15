@@ -14,10 +14,10 @@ void func_L07_003F67B8(u8 *self)
     float zero = 0.0f;
     float step = func_002A96A0(self, func_002A9640(self, 0x10000, 0));
     u16 flags;
-    func_002AA2E8((float *)(state + 0x20), zero, step);
+    ApproachValue((float *)(state + 0x20), zero, step);
     if (*(float *)(state + 0x20) <= zero) {
-        func_002A6C58(self, 0, 3);
-        func_002E5CF8(1, 0, (char *)self);
+        SetDeathBits(self, 0, 3);
+        PlayMobySound(1, 0, (char *)self);
         func_002A7750(self, 1, -1);
         flags = *(u16 *)(self + 0x34);
         self[0xA8] = 255;
@@ -27,7 +27,7 @@ void func_L07_003F67B8(u8 *self)
         *(u16 *)(self + 0x34) = flags;
         qcopy(position, self + 0x10);
         position[2] += 0.5f;
-        func_0032C700(self + 0x10, 0, 0, 0, 0, 10, 20, 0, 1.0f, 20.0f, 1, 0, 0, 0);
+        SpawnExplosion(self + 0x10, 0, 0, 0, 0, 10, 20, 0, 1.0f, 20.0f, 1, 0, 0, 0);
         func_002A7398(self, 2, 0);
     }
 }

@@ -54,7 +54,7 @@ void func_L05_00420788(u8 *actor, int mission)
         int previous;
         int rank;
         int reward;
-        func_0027D330(30);
+        FadeToBlack(30);
         func_0029B758(0, (int)func_L05_00420360);
         count = &D_L05_001B1350_gp[mission];
         previous = *count;
@@ -69,7 +69,7 @@ void func_L05_00420788(u8 *actor, int mission)
         D_001A79F8_gp = D_001A79F8 + reward;
         *count = previous + 1;
         func_L05_004222D8();
-        func_0029B3E0(0, -1);
+        MemcardSave(0, -1);
     }
     func_L05_00379F48(1);
     if (func_00282948(state + 0x40) == 0) {
@@ -78,7 +78,7 @@ void func_L05_00420788(u8 *actor, int mission)
         if (completed) {
             D_L05_001B13F0 = 0;
             *(int *)(state + 0x40) = 5400;
-            func_0027D330(30);
+            FadeToBlack(30);
             func_L05_00379F48(0);
             *(int *)(state + 0x58) = 120;
             *(int *)(state + 0x44) = 7200;

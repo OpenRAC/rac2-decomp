@@ -1,5 +1,5 @@
 /* func_L11_00443940: the help-prompt HUD lines (labels 0x49/0x48, then a pulsing colour
- * from func_00283D38, the 0x4b line when the selection is nonzero and the first available
+ * from FastTweenColor, the 0x4b line when the selection is nonzero and the first available
  * 0x4a entry after it). Twin of func_L02_003FDDE8.
  * one/k3 are set-once label_y actives (k3 only in the 0x4b draw, which local-alloc keeps beside
  * the label copy); x3 is that draw's own x. The label_y dead-test helper, set-once constant
@@ -90,7 +90,7 @@ void func_L11_00443940(u8 *object, int enabled)
     phase = D_L11_001B30C8 % 50;
     if (phase >= 25) pulse = sc - (float)(phase - 25) * 0.04f;
     else pulse = (float)phase * 0.04f;
-    color = func_00283D38(D_L11_001B1638, D_L11_001B163C, pulse);
+    color = FastTweenColor(D_L11_001B1638, D_L11_001B163C, pulse);
     if (enabled) {
         if (*(short *)(state + 0x1e8) != 0) {
             label = func_00336D50(D_L11_001A904C + 0x8710, 0x4b);
@@ -116,5 +116,5 @@ void func_L11_00443940(u8 *object, int enabled)
             break;
         }
     }
-    func_002FC560(0x47, 0x5360b);
+    VU1_addGSregister(0x47, 0x5360b);
 }

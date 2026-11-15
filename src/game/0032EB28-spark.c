@@ -37,8 +37,8 @@ void func_00331238(TI128 *a0, void *velocity)
     float size = 35700.0f;
 
     qcopy(&base, a0);
-    func_00282D30(vel, velocity, 0.5f);
-    func_00282CC0(&base, &base, vel);
+    FastVecScale(vel, velocity, 0.5f);
+    FastVecAdd(&base, &base, vel);
     i = 8;
     do {
         i--;

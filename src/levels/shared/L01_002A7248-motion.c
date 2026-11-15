@@ -27,13 +27,13 @@ float func_L01_002C81D0(float time, float acceleration, float height)
         float half;
         if (height < 0.0f) {
             char *pos = state + 0x80;
-            func_00282D30(end, state + 0xF0, time);
+            FastVecScale(end, state + 0xF0, time);
             end[2] -= (time * time + time) * (acceleration * 0.5f);
-            func_00282CC0(end, end, pos);
+            FastVecAdd(end, end, pos);
             *(MotionQuad *)direction = *(MotionQuad *)(state + 0x80);
             func_L00_0031EC88(direction, end);
             qcopy(direction, pos);
-            if (func_002761F8(direction, end, 0x322, 0, 0)) {
+            if (CollLine(direction, end, 0x322, 0, 0)) {
                 if (func_L00_002D3EA8(D_L01_001BF940) <= 0.8726647f)
                     height = *(float *)(D_L01_001BF940 - 0x18);
             }
@@ -54,16 +54,16 @@ float func_L01_002C81D0(float time, float acceleration, float height)
         char *pos;
         qcopy(direction, state + 0x2A0);
         velocity = state + 0xF0;
-        func_00282F20(direction, direction, acceleration);
+        vec_scale_to_length(direction, direction, acceleration);
         pos = state + 0x80;
-        func_00282D30(direction, direction, -1.0f);
-        func_00282D30(end, velocity, time);
-        func_00282D30(curve, direction, (time * time + time) * (acceleration * 0.5f));
-        func_00282CC0(end, curve, end);
-        func_00282CC0(end, pos, end);
+        FastVecScale(direction, direction, -1.0f);
+        FastVecScale(end, velocity, time);
+        FastVecScale(curve, direction, (time * time + time) * (acceleration * 0.5f));
+        FastVecAdd(end, curve, end);
+        FastVecAdd(end, pos, end);
         *(MotionQuad *)start = *(MotionQuad *)(pos);
         func_L00_0031EC88(start, end);
-        if (func_002761F8(pos, end, 0x322, 0, 0)) {
+        if (CollLine(pos, end, 0x322, 0, 0)) {
             half = acceleration * -0.5f;
             speed = func_L00_002D3B00(velocity) - half;
             position = func_L00_002D3B00(pos);
@@ -80,16 +80,16 @@ float func_L01_002C81D0(float time, float acceleration, float height)
         curve[2] = 100.0f;
         curve[1] = 100.0f;
         curve[0] = 100.0f;
-        func_00282CF0(direction, pos, curve);
-        func_00282F20(direction, direction, acceleration);
-        func_00282D30(direction, direction, -1.0f);
-        func_00282D30(end, velocity, time);
-        func_00282D30(curve, direction, (time * time + time) * (acceleration * 0.5f));
-        func_00282CC0(end, curve, end);
-        func_00282CC0(end, pos, end);
+        FastVecSub(direction, pos, curve);
+        vec_scale_to_length(direction, direction, acceleration);
+        FastVecScale(direction, direction, -1.0f);
+        FastVecScale(end, velocity, time);
+        FastVecScale(curve, direction, (time * time + time) * (acceleration * 0.5f));
+        FastVecAdd(end, curve, end);
+        FastVecAdd(end, pos, end);
         *(MotionQuad *)start = *(MotionQuad *)(pos);
         func_L00_0031EC88(start, end);
-        if (func_002761F8(pos, end, 0x322, 0, 0)) {
+        if (CollLine(pos, end, 0x322, 0, 0)) {
             half = acceleration * -0.5f;
             speed = func_L00_002D3B00(velocity) - half;
             position = func_L00_002D3B00(pos);

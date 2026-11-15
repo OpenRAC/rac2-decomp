@@ -57,17 +57,17 @@ Moby *func_00315C78(Moby *self)
             sphere[3] = 0.5f;
             if (func_00283DB8(sphere, *(float *)(moby->vars + 8)) != -1) {
                 accept = 1;
-                if (func_002761F8(D_001B5340, moby->position, 6, moby, 0)) {
+                if (CollLine(D_001B5340, moby->position, 6, moby, 0)) {
                     Moby *hit = D_001BAF80.moby;
 
                     if (hit == 0 || (hit->oClass != 0xCB5 && D_00189E20.moby != hit))
                         accept = 0;
                     if (moby->oClass == 0x12EA &&
-                        func_00282E80(D_001BAF80.point, moby->position) < 1.0f)
+                        vec_distance_xy(D_001BAF80.point, moby->position) < 1.0f)
                         accept = 1;
                 }
                 if (accept) {
-                    float distance = func_00282E48(moby->position, D_00189E20.moby->position);
+                    float distance = fast_vec_dist(moby->position, D_00189E20.moby->position);
 
                     if (distance < nearest) {
                         nearest = distance;

@@ -61,7 +61,7 @@ void func_L01_003BE628(u8 *object)
             F32(entry, 0x18) = F32(object, 0x18) + 1.0f;
         }
         if (*(u8 **)(state + 0x290) == 0)
-            *(u8 **)(state + 0x290) = func_L01_00333FA8(210000.0f, object, 0x40105070, -1);
+            *(u8 **)(state + 0x290) = CreateAttachedType57Effect(210000.0f, object, 0x40105070, -1);
     } else {
         effect = *(u8 **)(state + 0x290);
         if (effect && effect[0] == 0x57 && effect + 0x20) {

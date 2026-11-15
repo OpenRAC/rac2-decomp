@@ -20,7 +20,7 @@ int func_002E6A60(void)
     int result = *(unsigned char *)(rec + 12);
     float *out;
     ref_L00_002E6A60_01 = *(float *)(angles + 12);
-    func_0027AB40();
+    UpdateViewContext();
     out = (float *)&ref_L00_002E6A60_02.position;
     qcopy(out, rec);
     func_00129178(m);

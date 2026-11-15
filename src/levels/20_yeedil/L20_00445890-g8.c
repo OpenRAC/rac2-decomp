@@ -41,8 +41,8 @@ void func_L20_00445890(unsigned char *object)
     YeedilActivation *state = *(YeedilActivation **)(object + 0x68);
     int color;
     if (!state) return;
-    state->angle = func_00283B98(state->angle, 0.10471977f);
-    color = func_00283CF0((func_00283198(state->angle) * 4.0f - 3.0f) * 128.0f);
+    state->angle = FastAddRotations(state->angle, 0.10471977f);
+    color = FloatToInt((func_00283198(state->angle) * 4.0f - 3.0f) * 128.0f);
     if (color > 128) color = 128;
     else if (color < 32) color = 32;
     if (object[0x20] == 0) {
@@ -51,7 +51,7 @@ void func_L20_00445890(unsigned char *object)
     } else if (object[0x20] == 1) {
         float distance;
         func_0029FCC0((char *)object, 0, (char *)point);
-        distance = func_00282E80(D_00189E20.position, point);
+        distance = vec_distance_xy(D_00189E20.position, point);
         state->activated = 0;
         if (D_00189E20.owner == object && D_00189E20.active &&
             distance < *(float *)(object + 0x2C) * 0.5f / *(float *)(*(char **)(object + 0x24) + 0x24)) {

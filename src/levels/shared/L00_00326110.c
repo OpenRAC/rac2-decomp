@@ -11,7 +11,7 @@ void func_L00_00326110(u8 *a0, s32 a1, f32 f12) {
     u32 i;
     s32 v;
 
-    if (func_00282E48(a0 + 0x10, D_00189EA0) < 7.0f)
+    if (fast_vec_dist(a0 + 0x10, D_00189EA0) < 7.0f)
         mode = 3;
     i = D_001A79F0;
     if (i > 25)

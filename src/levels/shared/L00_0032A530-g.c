@@ -33,14 +33,14 @@ void func_L00_0032A530(char *object, float *box, float *speed, float *spread,
     high.q = 0;
     low.f[2] = low.f[1] = low.f[0] = 10000.0f;
     high.f[2] = high.f[1] = high.f[0] = -10000.0f;
-    func_00282D30(&scaled, object, 1.0f / 1024.0f);
-    func_00283698(inverse, object + 0xC0);
+    FastVecScale(&scaled, object, 1.0f / 1024.0f);
+    matrix_from_basis_rows(inverse, object + 0xC0);
     *(short *)(object + 0x7C) = 0;
     *(int *)(object + 0x98) = 0;
     if ((flags ^ 1) & 1) func_L00_00326110(object, 1, 0.0f);
     if (flags & 16) func_L00_00326110(object, 9, 0.0f);
     func_0029F648(object, &first, &count);
-    if (event != -1) func_002E5CF8(event, 0, object);
+    if (event != -1) PlayMobySound(event, 0, object);
     for (i = 0; i < count; ++i) {
         piece = &storage.pieces[i];
         *piece = 0;
@@ -55,9 +55,9 @@ void func_L00_0032A530(char *object, float *box, float *speed, float *spread,
                                    object + 0xF0, &position, selector, b, a);
         if (owner) *(void **)((*piece) + 0x64) = owner;
         state = *(char **)((*piece) + 0x68);
-        func_00282CC0(&delta, state + 0x20, (*piece) + 0x10);
-        func_00282CF0(&position, &delta, &scaled);
-        if (!(flags & 8)) func_002830C0(&position, &position, inverse);
+        FastVecAdd(&delta, state + 0x20, (*piece) + 0x10);
+        FastVecSub(&position, &delta, &scaled);
+        if (!(flags & 8)) transform_vector(&position, &position, inverse);
         func_L00_002EE078(&low, &low, &position);
         func_L00_002EE058(&high, &high, &position);
     }
@@ -65,15 +65,15 @@ void func_L00_0032A530(char *object, float *box, float *speed, float *spread,
         char *current = storage.pieces[i];
         if (!current) continue;
         state = *(char **)(current + 0x68);
-        func_00282CC0(&delta, state + 0x20, current + 0x10);
-        func_00282CF0(&position, &delta, &scaled);
-        func_002830C0(&position, &position, inverse);
+        FastVecAdd(&delta, state + 0x20, current + 0x10);
+        FastVecSub(&position, &delta, &scaled);
+        transform_vector(&position, &position, inverse);
         position.f[0] = (box[0] + (position.f[0] - low.f[0]) / (high.f[0] - low.f[0]) * (box[4] - box[0])) * (1.0f / 60.0f);
         position.f[1] = (box[1] + (position.f[1] - low.f[1]) / (high.f[1] - low.f[1]) * (box[5] - box[1])) * (1.0f / 60.0f);
         position.f[2] = (box[2] + (position.f[2] - low.f[2]) / (high.f[2] - low.f[2]) * (box[6] - box[2])) * (1.0f / 60.0f);
-        if (!(flags & 8)) func_00283098(&position, &position, object + 0xC0);
+        if (!(flags & 8)) matrix_mul_vec3(&position, &position, object + 0xC0);
         a = func_002A7878(0.25f, 1.0f);
-        func_00282D30(&position, &position, a);
+        FastVecScale(&position, &position, a);
         qcopy(state, &position);
     }
 }

@@ -31,17 +31,17 @@ void func_L05_0037C160(char *obj)
     ((float *)&axes[0])[2] = 1.0f;
     ((float *)&axes[1])[0] = 1.0f;
     qcopy(s + 0xB0, obj + 0x10);
-    if (func_002EE6A8(obj) != 8) func_00282CC0(obj + 0x10, s + 0x90, obj + 0x10);
+    if (func_002EE6A8(obj) != 8) FastVecAdd(obj + 0x10, s + 0x90, obj + 0x10);
     func_002ED6B0(obj);
     func_002EE6E0(obj);
     func_002EE238(obj);
     func_002EE610(obj);
-    func_002EE000(obj);
+    UpdateBankedOrientation(obj);
     player = D_L05_001B9710;
     switch (func_002EE6A8(obj)) {
     case 7:
-        func_00282F20(v, *(char **)(s + 0x120) + 0xC0, -50.0f);
-        func_00282CC0(v, *(char **)(s + 0x120) + 0x10, v);
+        vec_scale_to_length(v, *(char **)(s + 0x120) + 0xC0, -50.0f);
+        FastVecAdd(v, *(char **)(s + 0x120) + 0x10, v);
         func_002EE920(obj, v);
         if (func_002EEB00(obj)) {
             func_002EE678(obj, 8);
@@ -58,14 +58,14 @@ void func_L05_0037C160(char *obj)
             v[0] = func_00283198(*(float *)(s + 0x134)) * *(float *)(s + 0x144);
             v[1] = -func_00283180(*(float *)(s + 0x134)) * *(float *)(s + 0x144);
             v[3] = 0;
-            *(float *)(s + 0x134) = func_00283B98(*(float *)(s + 0x134), *(float *)(s + 0x140) * 0.013089972f);
+            *(float *)(s + 0x134) = FastAddRotations(*(float *)(s + 0x134), *(float *)(s + 0x140) * 0.013089972f);
             qcopy(v9, player + 0x20);
             basis = v7;
-            func_00282DD8(v8, &axes[1], v9);
-            func_00282F20(v8, v8, 1.0f);
-            func_00282DD8(basis, v9, v8);
-            func_00283098(v, v, basis);
-            func_00282CC0(obj + 0x10, *(char **)(s + 0x120) + 0x10, v);
+            FastVecCross(v8, &axes[1], v9);
+            vec_scale_to_length(v8, v8, 1.0f);
+            FastVecCross(basis, v9, v8);
+            matrix_mul_vec3(v, v, basis);
+            FastVecAdd(obj + 0x10, *(char **)(s + 0x120) + 0x10, v);
             func_002EE920(obj, v);
             if (func_002ED948(obj))func_002EE678(obj, 9);
             if (func_002EEB00(obj)) {
@@ -92,12 +92,12 @@ void func_L05_0037C160(char *obj)
             func_002EE678(obj, 1);
             break;
         }
-        func_00282F20(v, *(char **)(s + 0x120) + 0xC0, 25.0f);
+        vec_scale_to_length(v, *(char **)(s + 0x120) + 0xC0, 25.0f);
         if (*(int *)(s + 0xFC)) {
-            func_00283098(tmp, s + 0x70, *(char **)(s + 0x120) + 0xC0);
-            func_00282CC0(v, tmp, v);
+            matrix_mul_vec3(tmp, s + 0x70, *(char **)(s + 0x120) + 0xC0);
+            FastVecAdd(v, tmp, v);
         }
-        func_00282CC0(v, *(char **)(s + 0x120) + 0x10, v);
+        FastVecAdd(v, *(char **)(s + 0x120) + 0x10, v);
         func_002EE920(obj, v);
         if (func_002EEB00(obj)) {
             func_002EE678(obj, 5);
@@ -110,12 +110,12 @@ void func_L05_0037C160(char *obj)
             func_002EE678(obj, 1);
             break;
         }
-        func_00282F20(v, *(char **)(s + 0x120) + 0xC0, 5.0f);
+        vec_scale_to_length(v, *(char **)(s + 0x120) + 0xC0, 5.0f);
         if (*(int *)(s + 0xFC)) {
-            func_00283098(tmp, s + 0x70, *(char **)(s + 0x120) + 0xC0);
-            func_00282CC0(v, tmp, v);
+            matrix_mul_vec3(tmp, s + 0x70, *(char **)(s + 0x120) + 0xC0);
+            FastVecAdd(v, tmp, v);
         }
-        func_00282CC0(v, *(char **)(s + 0x120) + 0x10, v);
+        FastVecAdd(v, *(char **)(s + 0x120) + 0x10, v);
         func_002EE920(obj, v);
         if (func_002EEB00(obj)) {
             func_002ED9C0(obj);
@@ -128,14 +128,14 @@ void func_L05_0037C160(char *obj)
             func_002EE678(obj, 1);
             break;
         }
-        func_00282F20(v, *(char **)(s + 0x120) + 0xC0, 10.0f);
-        func_00282F20(v1, *(char **)(s + 0x120) + 0xE0, 0.05f);
+        vec_scale_to_length(v, *(char **)(s + 0x120) + 0xC0, 10.0f);
+        vec_scale_to_length(v1, *(char **)(s + 0x120) + 0xE0, 0.05f);
         if (*(int *)(s + 0xFC)) {
-            func_00283098(tmp, s + 0x70, *(char **)(s + 0x120) + 0xC0);
-            func_00282CC0(v, tmp, v);
+            matrix_mul_vec3(tmp, s + 0x70, *(char **)(s + 0x120) + 0xC0);
+            FastVecAdd(v, tmp, v);
         }
-        func_00282CC0(v, v1, v);
-        func_00282CC0(v, *(char **)(s + 0x120) + 0x10, v);
+        FastVecAdd(v, v1, v);
+        FastVecAdd(v, *(char **)(s + 0x120) + 0x10, v);
         func_002EE920(obj, v);
         if (func_002EEB00(obj)) {
             func_002ED9C0(obj);
@@ -145,11 +145,11 @@ void func_L05_0037C160(char *obj)
     case 3:
         p = *(char **)(s + 0x10);
         qcopy(v2, p + 0xC0);
-        func_00282DD8(v3, v2, &axes[0]);
-        func_00282F20(v3, v3, 1.0f);
-        func_00282DD8(v4, v3, v2);
-        func_00283098(v, s, v2);
-        func_00282CC0(v, p + 0x10, v);
+        FastVecCross(v3, v2, &axes[0]);
+        vec_scale_to_length(v3, v3, 1.0f);
+        FastVecCross(v4, v3, v2);
+        matrix_mul_vec3(v, s, v2);
+        FastVecAdd(v, p + 0x10, v);
         func_002EE920(obj, v);
         break;
     case 1: if (func_002EEB00(obj))func_002EE7B8(obj);

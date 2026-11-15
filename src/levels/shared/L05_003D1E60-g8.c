@@ -52,7 +52,7 @@ unsigned char *func_L05_003D1E60(void *position, int value, int evict)
         }
     }
     for (i = 0; i < 5 && D_L05_001B3018[i] != 0; i++) {}
-    object = func_0029EFD0(0x986);
+    object = CreateMoby(0x986);
     if (object) {
         state = *(char **)(object + 0x68);
         object[0x30] = 255;

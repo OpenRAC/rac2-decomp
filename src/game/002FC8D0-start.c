@@ -48,7 +48,7 @@ extern char *func_002FF300(int, int);
 void func_002FF0D8(void)
 {
     D_001B2310.count = D_001AD7F8;
-    D_001B2310.rate = 1.0f / func_00283CE0(D_001B2310.count);
+    D_001B2310.rate = 1.0f / IntToFloat(D_001B2310.count);
     qcopy(D_001B2310.from, ((ResidentPreviewPrefix *)D_00189E20)->previewFrom);
     qcopy(D_001B2310.to, ((ResidentPreviewPrefix *)D_00189E20)->previewTo);
     D_001B2310.elapsed = 0;

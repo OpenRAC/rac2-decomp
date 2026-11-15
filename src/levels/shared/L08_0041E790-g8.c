@@ -38,7 +38,7 @@ void func_L08_0041E790(char *m, void *position, int count,
     char *state = *(char **)(m + 0x68);
     int col1 = D_L08_001B1ADC;
     int col2 = D_L08_001B1AE0;
-    if (!func_00278E78()) {
+    if (!GetCollHitMaterial()) {
         col1 = D_L08_001B1B74;
         col2 = D_L08_001B1B78;
     }
@@ -53,23 +53,23 @@ void func_L08_0041E790(char *m, void *position, int count,
         y *= func_002A7878(minRadius,maxRadius);
         offset[1] = y;
         offset[2] = 0;
-        func_00283098(offset,offset,m+0xC0);
-        range = (speed * ((maxRadius-func_00282DF0(offset))*0.01666666753590107f))/maxRadius;
-        func_00282F20(velocity,offset,func_002A7878(range / D_L08_001B1B14,range));
+        matrix_mul_vec3(offset,offset,m+0xC0);
+        range = (speed * ((maxRadius-FastVecLength(offset))*0.01666666753590107f))/maxRadius;
+        vec_scale_to_length(velocity,offset,func_002A7878(range / D_L08_001B1B14,range));
         qcopy(boost,state);
         boost[2] *= D_L08_001B1B68;
-        func_00282CC0(velocity,velocity,boost);
+        FastVecAdd(velocity,velocity,boost);
         {
             velocity[2] += func_002A7878(rise / D_L08_001B1B18,rise)*0.01666666753590107f;
         }
         qzero_nc(accel);
-        func_00282CC0(offset,offset,position);
+        FastVecAdd(offset,offset,position);
         offset[2] += D_L08_001B1B6C;
         velocity[3] = size;
         accel[3] = endSize;
-        a = func_00283CF0(func_002A7878(D_L08_001B1AE4,D_L08_001B1AE8));
-        b = func_00283CF0(func_002A7878(D_L08_001B1AEC,D_L08_001B1AF0));
-        c = func_00283CF0(func_002A7878(D_L08_001B1AF4,D_L08_001B1AF8));
+        a = FloatToInt(func_002A7878(D_L08_001B1AE4,D_L08_001B1AE8));
+        b = FloatToInt(func_002A7878(D_L08_001B1AEC,D_L08_001B1AF0));
+        c = FloatToInt(func_002A7878(D_L08_001B1AF4,D_L08_001B1AF8));
         particle = func_002BAA28(offset,velocity,accel,col1,col2,a,b,c,-1);
         if (particle && (func_001163B0() & 1)) particle[3] = 0x48;
     }

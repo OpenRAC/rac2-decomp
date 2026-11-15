@@ -30,20 +30,20 @@ void func_00273978(char *obj, int mode, int index, void *a, void *b, unsigned ch
         *(short *)(p+0x36) = index;
         *(short *)(obj+0x7c) = (1<<index)|0x8000;
         p[0x58] = func_0029F840(obj, p+0x20, *(int *)(p+0x30), index);
-        func_00282CF0(p+0x20, p+0x20, obj+0x10);
+        FastVecSub(p+0x20, p+0x20, obj+0x10);
         func_002AFDD8(obj, p+0x20, p+0x20, 0);
         break;
         case 0: case 3:
-        func_00282D30(p+0x20, obj, 0.0009765625f);
+        FastVecScale(p+0x20, obj, 0.0009765625f);
         *(float *)(p+0x2c) = *(float *)(obj+0xc)*0.0009765625f;
-        func_00282CF0(p+0x20, p+0x20, obj+0x10);
+        FastVecSub(p+0x20, p+0x20, obj+0x10);
         func_002AFDD8(obj, p+0x20, p+0x20, 0);
         break;
         case 1:
         *(short *)(p+0x36) = index;
         *(short *)(obj+0x7c) = (mode<<index)|0x8000;
         func_0029F6A0(obj, index, local);
-        func_00282CF0(p+0x20, local, obj+0x10);
+        FastVecSub(p+0x20, local, obj+0x10);
         func_002AFDD8(obj, p+0x20, p+0x20, 0);
         break;
     }

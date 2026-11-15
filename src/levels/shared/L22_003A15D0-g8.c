@@ -250,8 +250,8 @@ health_done:
         vec.q=0; vec.f[0]=0.00161f; vec.f[1]=0.29459f; vec.f[2]=1.57105f;
         qcopy(&D_00189E20.rotation,&vec); qcopy(&D_00189E20.position,(char *)found+0x10);
         D_00189E20.health=p->f324;
-        func_00282CF0(&vec,(char *)obj+0x10,(char *)&D_00189E20.rotation+0x20);
-        D_L22_001B2AA4=func_00282DF0(&vec);
+        FastVecSub(&vec,(char *)obj+0x10,(char *)&D_00189E20.rotation+0x20);
+        D_L22_001B2AA4=FastVecLength(&vec);
         obj->f34|=0x100;
         x380=func_002A77E0(30);
         eight=8;
@@ -283,11 +283,11 @@ health_done:
         obj->f34|=0x4000;
         obj->f2C=obj->f24->f24*D_L22_001AF39C;
         func_L22_003A3368(obj); func_L22_003A36A0((char *)obj);
-        p->f440=func_0029EFD0(0xE0A); func_00283360((char *)p->f440+0xC0);
-        p->f444=func_0029EFD0(0xE0C); p->f448=func_0029EFD0(0xF8F);
+        p->f440=CreateMoby(0xE0A); set_identity_rotation_rows((char *)p->f440+0xC0);
+        p->f444=CreateMoby(0xE0C); p->f448=CreateMoby(0xF8F);
         p->f384=30; p->f43A=0;
     }
-    func_0029B758(func_L22_003A4FF8,func_L22_003A5018);
+    func_0029B758(func_L22_003A4FF8,DrawSpaceCombatHud);
     if(p->f440) {
         p->f440->f32=obj->f32; p->f440->f30=obj->f30;
         p->f440->f38=obj->f38;
@@ -295,7 +295,7 @@ health_done:
         p->f440->f31=1;
         it=p->f440; it->f2C=it->f24->f24*D_L22_001AF39C;
         it=p->f440;
-        if(it->f31 && func_00282E48((char *)it+0x10,D_L22_001B9C80)<24.0f) {
+        if(it->f31 && fast_vec_dist((char *)it+0x10,D_L22_001B9C80)<24.0f) {
             func_002A93B0(p->f440); p->f440->f6F=22;
         }
     }
@@ -325,15 +325,15 @@ health_done:
         if(D_00138180.buttons&0x50) {
             D_L22_001AF304=0; func_002A7750(obj,5,0); D_00138180.buttons=0; D_00189E20.mode=20;
         } else if(D_L22_001AF304<30) {
-            D_00189E20.field2294=0; func_L00_002AF7D0();
-            func_L00_00310C88(D_00189E20.field2290,&D_00189E20.field1870);
+            D_00189E20.field2294=0; cancel_hero_item_animation();
+            release_moby_animation_slot(D_00189E20.field2290,&D_00189E20.field1870);
             D_00189E20.field187C=0; func_L22_002C9898(0,1);
         }
     } else if(D_00189E20.health<=0 && obj->f95!=1) {
         p->f350=0; p->f3E4=p->f3E8=0.0f;
         func_002A7750(obj,2,1); p->f384=30;
     }
-    if(obj->f31 && func_00282E48((char *)obj+0x10,D_L22_001B9C80)<24.0f) {
+    if(obj->f31 && fast_vec_dist((char *)obj+0x10,D_L22_001B9C80)<24.0f) {
         func_002A93B0(obj); obj->f6F=22;
     }
 }

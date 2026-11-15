@@ -272,7 +272,7 @@ void func_L06_0041EF08(u8 *m)
 
     if (m[0x20] == 0) {
         I(0x480) = func_L02_0032E508(m, I(0x230), v + 0x260, 16);
-        func_0026FEB8(D_L06_001B0820, I(0x480));
+        STUB_printf(D_L06_001B0820, I(0x480));
         qcopy(v + 0x460, m + 0x10);
         F(0x46C) = *(float *)(m + 0xF8);
         B(0x70) = 15;
@@ -310,16 +310,16 @@ void func_L06_0041EF08(u8 *m)
         func_002A7750(m, 1, 0);
         if (m[0x43] != 1)
             func_002A7470(m, 1, 0, 0);
-        B(0x48) = func_00283CF0(20.0f);
-        B(0x4A) = func_00283CF0(8.0f);
+        B(0x48) = FloatToInt(20.0f);
+        B(0x4A) = FloatToInt(8.0f);
         if (H(0x492) != 0) {
             if (m[0x43] != 3)
                 func_002A7470(m, 3, 0, 0);
-            B(0x48) = func_00283CF0(20.0f);
-            B(0x4A) = func_00283CF0(24.0f);
+            B(0x48) = FloatToInt(20.0f);
+            B(0x4A) = FloatToInt(24.0f);
         }
     }
-    if (m[0x31] != 0 && func_00282E48(m + 0x10, D_L06_001B9840) < 24.0f) {
+    if (m[0x31] != 0 && fast_vec_dist(m + 0x10, D_L06_001B9840) < 24.0f) {
         func_002A93B0(m);
         m[0x6F] = 0x16;
     }
@@ -337,7 +337,7 @@ void func_L06_0041EF08(u8 *m)
     I(0x228) = func_002B3BA8(m, I(0x220), F(0x240), 10.0f, 0, 0);
     I(0x22C) = func_002B3BA8(m, I(0x224), F(0x244), 10.0f, 0, 0);
     if (*(float *)(m + 0x18) < 48.0f) {
-        func_002A6C58(m, 0, 3);
+        SetDeathBits(m, 0, 3);
         func_002AC728(m, m + 0x10, -1, 1.0f, 13.0f);
         func_0029F338(m);
     }
@@ -362,19 +362,19 @@ int func_L06_0041F2A0(char *a0, char *a1, float f1, float f2, float f3, float f4
     float t;
     int ret = 0;
 
-    func_00282CF0(v, (float *)a1, (float *)(a0 + 0x10));
+    FastVecSub(v, (float *)a1, (float *)(a0 + 0x10));
     v[2] = 0.0f;
-    f24 = func_00282DF0(v);
+    f24 = FastVecLength(v);
     t = f2 * 0.0008333333535119891f;
     if (f3 < f24) {
         int c = *(int *)(st + 0x480);
 
         out = 0.0f;
-        func_L02_0032E998(a0 + 0x10, (int)a1, &out, st + 0x260, c, st + 0x488,
+        ComputeRegionRouteHeading(a0 + 0x10, (int)a1, &out, st + 0x260, c, st + 0x488,
                           st + 0x48C, f4, 0.5f);
         func_002AAA00(a0 + 0xF8, out, 0.0037815470714122057f,
                       0.0037815470714122057f, 0.29670602083206177f, st + 0x474, 0);
-        if (func_00283C80(*(float *)(a0 + 0xF8), out) < 1.3089970350265503f) {
+        if (FastDiffRots(*(float *)(a0 + 0xF8), out) < 1.3089970350265503f) {
             func_002AA548(&d, st + 0x470, f24, t, t, f2 * 0.01666666753590107f);
         } else {
             *(float *)(st + 0x470) = 0.0f;
@@ -382,16 +382,16 @@ int func_L06_0041F2A0(char *a0, char *a1, float f1, float f2, float f3, float f4
     } else {
         func_002AAA00(a0 + 0xF8, f1, 0.0037815470714122057f,
                       0.0037815470714122057f, 0.29670602083206177f, st + 0x474, 0);
-        func_002AA2E8((float *)(st + 0x470), 0.0f, t);
+        ApproachValue((float *)(st + 0x470), 0.0f, t);
         if (*(float *)(st + 0x470) == 0.0f) {
-            if (func_00283C80(*(float *)(a0 + 0xF8), f1) < 0.0872664749622345f) {
+            if (FastDiffRots(*(float *)(a0 + 0xF8), f1) < 0.0872664749622345f) {
                 *(float *)(st + 0x474) = 0.0f;
                 ret = 1;
             }
         }
     }
-    func_00282F20(w, (float *)(a0 + 0xC0), *(float *)(st + 0x470));
-    func_00282CC0(x, w, (float *)(a0 + 0x10));
+    vec_scale_to_length(w, (float *)(a0 + 0xC0), *(float *)(st + 0x470));
+    FastVecAdd(x, w, (float *)(a0 + 0x10));
     if (func_002A7EA0(a0, a0 + 0x10, (char *)x, 0, 0.8999999761581421f, 1.0f, 0.5f,
                      0.7853982448577881f) == 0) {
         *(int *)(st + 0x5A8) = *(int *)(st + 0x5A8) + 1;
@@ -477,33 +477,33 @@ void func_L06_0041FD90(unsigned char *obj)
     if (func_002A77E0(2)) count = -count;
     qcopy(position, obj + 0x10);
     position[2] -= 0.2f;
-    first = func_002BDCE8((char *)position, .1f, 1, .9f, count, (char *)velocity, 315000, 0xDF204080, 0);
+    first = SpawnSpinningSparkParticle((char *)position, .1f, 1, .9f, count, (char *)velocity, 315000, 0xDF204080, 0);
     if (first) {
         unsigned char *state;
         *(short *)(first + 0xA) = 9;
         state = first + 0x20;
-        first[9] = func_00283CF0(4) + 0x70;
+        first[9] = FloatToInt(4) + 0x70;
         *(int *)(state + 4) = 2;
         state[0xA] = 0xDF;
         state[0xB] = first[0xA];
     }
     {
-        unsigned char *second = func_002BDCE8((char *)position, .1f, 1, .9f, count, (char *)velocity, 315000, 0xDF204080, 0);
+        unsigned char *second = SpawnSpinningSparkParticle((char *)position, .1f, 1, .9f, count, (char *)velocity, 315000, 0xDF204080, 0);
         if (second) {
             unsigned char *state = second + 0x20;
             /* Retail reuses the first particle header here. */
             *(short *)(first + 0xA) = 9;
-            first[9] = func_00283CF0(4) + 0x70;
+            first[9] = FloatToInt(4) + 0x70;
             *(int *)(state + 4) = 2;
             state[0xA] = 0xDF;
             state[0xB] = first[0xA];
         }
     }
-    particle = func_002BDCE8((char *)position, .05f, 1, .97f, 16, (char *)velocity, 157500, 0x8FFFFFFF, 0);
+    particle = SpawnSpinningSparkParticle((char *)position, .05f, 1, .97f, 16, (char *)velocity, 157500, 0x8FFFFFFF, 0);
     if (particle) {
         unsigned char *state;
         state = particle + 0x20;
-        particle[9] = func_00283CF0(4) + 0x70;
+        particle[9] = FloatToInt(4) + 0x70;
         *(short *)(particle + 0xA) = 23;
         particle[8] = func_002A77E0(255);
         *(int *)(state + 4) = 2;
@@ -733,7 +733,7 @@ void func_L06_00457C00(char *object, int mask, void *offset, int color,
         velocity[1] = func_00283198(angle) * speed;
         velocity[2] = 0.0f;
         velocity[2] = func_002A7878(vertical_min, vertical_max) * (1.0f / 60.0f);
-        func_00282CC0(velocity, velocity, offset);
+        FastVecAdd(velocity, velocity, offset);
         life = func_002A7878(90.0f, 270.0f);
         size = func_002A7878(10.0f, 20.0f);
         particle = func_00273730(object, 2, *(short *)(object + 0xAA), i,

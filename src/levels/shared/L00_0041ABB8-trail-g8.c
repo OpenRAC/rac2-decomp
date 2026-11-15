@@ -53,7 +53,7 @@ extern void ref_L00_0041B1B8_00(void *packet);
 void func_L00_0041B1B8(char *self, float width)
 {
     TrailPacket core, streak, glow;
-    /* func_002830C0 consumes all four consecutive columns. */
+    /* transform_vector consumes all four consecutive columns. */
     TrailVector basis[4], narrowOffset, wideOffset, first, second;
     TrailState *p = *(TrailState **)(self + 0x68);
     int index, next;
@@ -63,19 +63,19 @@ void func_L00_0041B1B8(char *self, float width)
         return;
     }
 
-    core.tag[1] = func_0027C878(10);
+    core.tag[1] = GetEffectTextureDescriptor(10);
     core.tag[2] = 0xFF9000000260LL;
     core.tag[3] = 0x4000000064LL;
     core.color[0] = core.color[1] = core.color[2] = core.color[3] = 0x609F9F9F;
     core.tag[0] = 0;
 
-    streak.tag[1] = func_0027C878(14);
+    streak.tag[1] = GetEffectTextureDescriptor(14);
     streak.tag[2] = 0xFF9000000260LL;
     streak.tag[3] = 0x4000000068LL;
     streak.color[0] = streak.color[1] = streak.color[2] = streak.color[3] = 0x507F7F7F;
     streak.tag[0] = 0;
 
-    glow.tag[1] = func_0027C878(43);
+    glow.tag[1] = GetEffectTextureDescriptor(43);
     glow.tag[2] = 0xFF9000000260LL;
     glow.tag[3] = 0x5000000068LL;
     glow.tag[0] = 0;
@@ -121,34 +121,34 @@ void func_L00_0041B1B8(char *self, float width)
     qcopy_nc(&first, &p->position);
     index = p->index;
     qcopy_nc(&second, &D_L00_001B144C[index].position);
-    func_00282CF0(&basis[0], &second, &first);
-    func_00282F20(&basis[0], &basis[0], 1.0f);
-    func_00282CF0(&basis[1], &D_L00_001B8DC0, &first);
-    func_00282DD8(&basis[2], &basis[1], &basis[0]);
-    func_00282F20(&basis[2], &basis[2], 1.0f);
-    func_00282DD8(&basis[1], &basis[0], &basis[2]);
+    FastVecSub(&basis[0], &second, &first);
+    vec_scale_to_length(&basis[0], &basis[0], 1.0f);
+    FastVecSub(&basis[1], &D_L00_001B8DC0, &first);
+    FastVecCross(&basis[2], &basis[1], &basis[0]);
+    vec_scale_to_length(&basis[2], &basis[2], 1.0f);
+    FastVecCross(&basis[1], &basis[0], &basis[2]);
     qcopy_nc(&basis[3], &first);
 
     core.v[0].q = narrowOffset.q;
-    func_00282D30(&core.v[1], &core.v[0], -1.0f);
-    func_002830C0(&core.v[0], &core.v[0], &basis[0]);
-    func_002830C0(&core.v[1], &core.v[1], &basis[0]);
+    FastVecScale(&core.v[1], &core.v[0], -1.0f);
+    transform_vector(&core.v[0], &core.v[0], &basis[0]);
+    transform_vector(&core.v[1], &core.v[1], &basis[0]);
     streak.v[0].q = core.v[0].q;
     streak.v[1].q = core.v[1].q;
 
     glow.v[0].q = wideOffset.q;
-    func_00282D30(&glow.v[1], &glow.v[0], -1.0f);
-    func_002830C0(&glow.v[0], &glow.v[0], &basis[0]);
-    func_002830C0(&glow.v[1], &glow.v[1], &basis[0]);
+    FastVecScale(&glow.v[1], &glow.v[0], -1.0f);
+    transform_vector(&glow.v[0], &glow.v[0], &basis[0]);
+    transform_vector(&glow.v[1], &glow.v[1], &basis[0]);
 
     {
         int i;
 
         for (i = 1; i < p->count; i++) {
             core.v[2].q = narrowOffset.q;
-            func_00282D30(&core.v[3], &core.v[2], -1.0f);
+            FastVecScale(&core.v[3], &core.v[2], -1.0f);
             glow.v[2].q = wideOffset.q;
-            func_00282D30(&glow.v[3], &glow.v[2], -1.0f);
+            FastVecScale(&glow.v[3], &glow.v[2], -1.0f);
 
             next = index - 1;
             if (next < 0) {
@@ -157,24 +157,24 @@ void func_L00_0041B1B8(char *self, float width)
             first.q = D_L00_001B144C[index].position.q;
             second.q = D_L00_001B144C[next].position.q;
 
-            func_00282CF0(&basis[0], &second, &first);
-            func_00282F20(&basis[0], &basis[0], 1.0f);
-            func_00282CF0(&basis[1], &D_L00_001B8DC0, &first);
-            func_00282DD8(&basis[2], &basis[1], &basis[0]);
-            func_00282F20(&basis[2], &basis[2], 1.0f);
-            func_00282DD8(&basis[1], &basis[0], &basis[2]);
+            FastVecSub(&basis[0], &second, &first);
+            vec_scale_to_length(&basis[0], &basis[0], 1.0f);
+            FastVecSub(&basis[1], &D_L00_001B8DC0, &first);
+            FastVecCross(&basis[2], &basis[1], &basis[0]);
+            vec_scale_to_length(&basis[2], &basis[2], 1.0f);
+            FastVecCross(&basis[1], &basis[0], &basis[2]);
             basis[3].q = first.q;
 
-            func_002830C0(&core.v[2], &core.v[2], &basis[0]);
-            func_002830C0(&core.v[3], &core.v[3], &basis[0]);
-            func_002830C0(&glow.v[2], &glow.v[2], &basis[0]);
-            func_002830C0(&glow.v[3], &glow.v[3], &basis[0]);
+            transform_vector(&core.v[2], &core.v[2], &basis[0]);
+            transform_vector(&core.v[3], &core.v[3], &basis[0]);
+            transform_vector(&glow.v[2], &glow.v[2], &basis[0]);
+            transform_vector(&glow.v[3], &glow.v[3], &basis[0]);
             streak.v[2].q = core.v[2].q;
             streak.v[3].q = core.v[3].q;
 
-            func_00280B90(&core, 0, 0);
-            func_00280B90(&streak, 0, 0);
-            func_00280B90(&glow, 0, 0);
+            draw_world_quad(&core, 0, 0);
+            draw_world_quad(&streak, 0, 0);
+            draw_world_quad(&glow, 0, 0);
 
             /* Each draw may change its packet; advance each layer separately. */
             core.v[0].q = core.v[2].q;
@@ -196,6 +196,6 @@ void func_L00_0041B1B8(char *self, float width)
     }
 
     basis[3].q = second.q;
-    func_002830C0(&core.v[2], &core.v[2], &basis[0]);
-    func_002830C0(&core.v[3], &core.v[3], &basis[0]);
+    transform_vector(&core.v[2], &core.v[2], &basis[0]);
+    transform_vector(&core.v[3], &core.v[3], &basis[0]);
 }

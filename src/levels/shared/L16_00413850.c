@@ -51,43 +51,43 @@ void func_L16_00413850(u8 *object)
     switch (object[0x20]) {
     case 0: {
         qcopy(backward,object+0xE0);
-        func_00282D30(backward,backward,-1.0f);
+        FastVecScale(backward,backward,-1.0f);
         savedW=*(float *)(state+0xC);
         *(float *)(state+0xC)=0.0f;
-        speed=func_00282DF0(state);
-        func_00282F20(start,object+0xE0,0.1f);
-        func_00282F20(finish,object+0xE0,-3.0f);
-        func_00282CC0(start,start,object+0x10);
-        func_00282CC0(finish,finish,object+0x10);
-        if (func_002761F8(start,finish,2,object,0)) func_00282F20(normal,D_L16_001BFF80,1.0f);
-        else func_00282F20(normal,object+0xE0,-1.0f);
-        func_00282D30(normal,normal,-1.0f);
-        func_00282F20(state,state,1.0f);
-        func_00282DD8(normal,backward,normal);
-        angle=-func_00282DB0(backward,normal)*0.5f;
-        func_00282D30(quaternion,normal,func_00283198(angle));
+        speed=FastVecLength(state);
+        vec_scale_to_length(start,object+0xE0,0.1f);
+        vec_scale_to_length(finish,object+0xE0,-3.0f);
+        FastVecAdd(start,start,object+0x10);
+        FastVecAdd(finish,finish,object+0x10);
+        if (CollLine(start,finish,2,object,0)) vec_scale_to_length(normal,D_L16_001BFF80,1.0f);
+        else vec_scale_to_length(normal,object+0xE0,-1.0f);
+        FastVecScale(normal,normal,-1.0f);
+        vec_scale_to_length(state,state,1.0f);
+        FastVecCross(normal,backward,normal);
+        angle=-FastVecDot(backward,normal)*0.5f;
+        FastVecScale(quaternion,normal,func_00283198(angle));
         quaternion[3]=func_00283180(angle);
         inverse[0]=-quaternion[0];
         inverse[1]=-quaternion[1];
         inverse[2]=-quaternion[2];
         inverse[3]=quaternion[3];
-        func_002837D0(rotated,quaternion,state);
-        func_002837D0(state,rotated,inverse);
-        func_00282F20(state,state,speed);
+        multiply_quaternions(rotated,quaternion,state);
+        multiply_quaternions(state,rotated,inverse);
+        vec_scale_to_length(state,state,speed);
         *(float *)(state+0xC)=savedW;
-        func_00282D30(normal,normal,-1.0f);
+        FastVecScale(normal,normal,-1.0f);
         qcopy(object+0xE0,normal);
-        func_00282CC0(destination,object+0x10,state);
-        func_002A8C00((char *)&hit,(int)object,1,*(float *)(state+0x14),(Quad16 *)state);
+        FastVecAdd(destination,object+0x10,state);
+        make_hit_descriptor((char *)&hit,(int)object,1,*(float *)(state+0x14),(Quad16 *)state);
         hit.oclass=*(u16 *)(object+0xAA);
-        if (func_002761F8(object+0x10,destination,0,object,&hit) || func_00277258(object+0x10,0,object,0.3f)) {
+        if (CollLine(object+0x10,destination,0,object,&hit) || func_00277258(object+0x10,0,object,0.3f)) {
             if (D_L16_001BFF58) {
                 if (D_L16_001BFF58 != *(u8 **)(state+0x10)) {
                     qcopy(impact,state);
-                    func_00282D30(impact,impact,1.5f);
+                    FastVecScale(impact,impact,1.5f);
                     impact[2]=1.0f;
                     impact[3]=5627.9248046875f;
-                    func_002A8C00((char *)&blast,(int)object,0x10001,*(float *)(state+0x14),(Quad16 *)impact);
+                    make_hit_descriptor((char *)&blast,(int)object,0x10001,*(float *)(state+0x14),(Quad16 *)impact);
                     blast.active=1;
                     blast.oclass=*(u16 *)(object+0xAA);
                     blast.kind=0;
@@ -97,10 +97,10 @@ void func_L16_00413850(u8 *object)
                 }
             } else {
                 qcopy(impact,state);
-                func_00282D30(impact,impact,3.0f);
+                FastVecScale(impact,impact,3.0f);
                 impact[2]=1.0f;
                 impact[3]=5627.9248046875f;
-                func_002A8C00((char *)&blast,(int)object,0x10001,*(float *)(state+0x14),(Quad16 *)impact);
+                make_hit_descriptor((char *)&blast,(int)object,0x10001,*(float *)(state+0x14),(Quad16 *)impact);
                 blast.active=1;
                 blast.oclass=*(u16 *)(object+0xAA);
                 blast.kind=0;
@@ -110,11 +110,11 @@ void func_L16_00413850(u8 *object)
             }
         }
         qcopy(object+0x10,destination);
-        func_00282D30(impact,state,-0.5f);
+        FastVecScale(impact,state,-0.5f);
     break;
     }
     case 1: {
-        func_0032C700(object+0x10,0,25,20,20,20,45,0,0,0,0,0,0.25f,20.0f);
+        SpawnExplosion(object+0x10,0,25,20,20,20,45,0,0,0,0,0,0.25f,20.0f);
         func_0029F338(object);
         return;
     }

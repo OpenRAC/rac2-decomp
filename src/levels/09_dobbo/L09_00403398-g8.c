@@ -67,18 +67,18 @@ void func_L09_00403398(u8 *a0)
             e = D_L09_001B285C + ((*p & 0x7FFF) << 8);
             if (e == 0)
                 break;
-            func_00282CF0(C, a0 + 0x10, e + 0x10);
-            len = func_00282DF0(C);
+            FastVecSub(C, a0 + 0x10, e + 0x10);
+            len = FastVecLength(C);
             if (len > D_L09_001B13D0)
                 len = D_L09_001B13D0;
             else if (len < 0.0f)
                 len = 0.0f;
             w = 1.0f - len / D_L09_001B13D0;
             func_002A7790(w);
-            func_00282F20(C, C, len * w);
-            func_00282CC0(B, B, C);
+            vec_scale_to_length(C, C, len * w);
+            FastVecAdd(B, B, C);
         }
-        func_00282CC0(a0 + 0x10, a0 + 0x10, B);
+        FastVecAdd(a0 + 0x10, a0 + 0x10, B);
         func_002AEE70(a0, state + 0x278, state + 0x27C, 0.1f, 0.087266475f, *(f32 *)(a0 + 0x18));
         func_002AEF28(a0, state + 0x280, state + 0x284, 0.13962635f, 0.026179943f, 0.026179943f);
     } else {

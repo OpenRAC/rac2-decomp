@@ -25,7 +25,7 @@ extern int func_0027FB40(int x, int y, unsigned long style, u8 *text, int length
     int baseRow = (int)(D_L00_001B25E0 * 164.0f + 0.5f); \
     int row = baseRow - 1; \
     if (!D_001A7B90) row = baseRow; \
-    func_0027FB40((X), row, 0x80f0f0f0UL, (u8 *)func_00288FB8((ID)), -1); \
+    func_0027FB40((X), row, 0x80f0f0f0UL, (u8 *)GetLocalizedString((ID)), -1); \
 }
 
 void func_L00_00377C50(void)
@@ -39,7 +39,7 @@ void func_L00_00377C50(void)
             } else {
                 DRAW(420, 0x1124);
             }
-        } else if (D_001A79F8 >= func_002F6510()) {
+        } else if (D_001A79F8 >= GetSelectedShopItemPrice()) {
             DRAW(80, 0x113b);
         } else {
             DRAW(420, 0x1124);
@@ -51,14 +51,14 @@ void func_L00_00377C50(void)
                 return;
             DRAW(420, 0x1124);
         } else {
-            if (D_001A79F8 < func_002F6510())
+            if (D_001A79F8 < GetSelectedShopItemPrice())
                 return;
             DRAW(420, 0x1138);
         }
     } else {
         int stride = 24;
         u8 *kindBase = MODEL + 0x144;
-        if ((*(int *)(kindBase + D_L00_0022F7C0.index * stride) == 0 && D_001A79F8 >= func_002F6510()) ||
+        if ((*(int *)(kindBase + D_L00_0022F7C0.index * stride) == 0 && D_001A79F8 >= GetSelectedShopItemPrice()) ||
             (*(int *)(kindBase + D_L00_0022F7C0.index * stride) == 1 && !CAPPED && AFFORDABLE)) {
             DRAW(80, 0x1125);
         }

@@ -104,18 +104,18 @@ void func_L00_003F4210(char *object)
     switch (*(unsigned char *)(object + 0x20)) {
     case 0:
     case 1:
-        func_00282CC0(&scratch.motion.end, (Vector *)(object + 0x10), (&state->velocity));
+        FastVecAdd(&scratch.motion.end, (Vector *)(object + 0x10), (&state->velocity));
         func_L00_003252A8(object, &scratch.motion.normal, 0);
-        func_00282D30(&scratch.motion.scaled, &scratch.motion.normal, state->velocity.v[3]);
-        func_00282CC0((&state->velocity), (&state->velocity), &scratch.motion.scaled);
+        FastVecScale(&scratch.motion.scaled, &scratch.motion.normal, state->velocity.v[3]);
+        FastVecAdd((&state->velocity), (&state->velocity), &scratch.motion.scaled);
         if (D_L00_001A8FF0 != 0) {
-            if (*(unsigned char *)(object + 0x20) == 1 && func_00282DB0((&state->velocity), &scratch.motion.normal) > 0.0f)
+            if (*(unsigned char *)(object + 0x20) == 1 && FastVecDot((&state->velocity), &scratch.motion.normal) > 0.0f)
                 *(unsigned char *)(object + 0x20) = 0;
         } else if (*(unsigned char *)(object + 0x20) == 1) {
             if (state->velocity.v[2] < 0.0f)
                 *(unsigned char *)(object + 0x20) = 0;
         }
-        func_00282978(&state->particle_timer);
+        FastDecTimer(&state->particle_timer);
         if (state->particle_timer != 0) {
             for (i = 0; i < 3; ++i) {
                 float third = 0.3333f;
@@ -125,13 +125,13 @@ void func_L00_003F4210(char *object)
                 float life;
                 QuadWord copy = ((Vector *)(object + 0x10))->word;
                 temporary.word = copy;
-                func_L00_0031D670(&point, &temporary, &scratch.motion.end, (float)i * third);
+                LerpVector4(&point, &temporary, &scratch.motion.end, (float)i * third);
                 spin = func_002A77E0(6);
                 if (func_002A77E0(2) != 0) spin = -spin;
-                fade = func_00283CE0(D_L00_001B0904);
+                fade = IntToFloat(D_L00_001B0904);
                 life = (float)state->particle_timer;
                 life /= fade;
-                particle = func_002BDCE8(&point, 0.025f, one, one, spin, &D_L00_001A8F20,
+                particle = SpawnSpinningSparkParticle(&point, 0.025f, one, one, spin, &D_L00_001A8F20,
                                         life * life_range + life_min, (int)0x80808080, 1);
                 if (particle != 0) {
                     char *properties;
@@ -143,51 +143,51 @@ void func_L00_003F4210(char *object)
                 }
             }
         }
-        if (func_002761F8((Vector *)(object + 0x10), &scratch.motion.end, 0, object, 0) != 0 &&
+        if (CollLine((Vector *)(object + 0x10), &scratch.motion.end, 0, object, 0) != 0 &&
             (D_L00_001BF200.owner == 0 || D_L00_001BF200.owner != state->owner))
             qcopy((Vector *)(object + 0x10), &D_L00_001BF200.position);
         else
             qcopy((Vector *)(object + 0x10), &scratch.motion.end);
         if (D_L00_001A8FF0 != 0) {
-            func_00282CF0(&point, (Vector *)(object + 0x10), &D_L00_001BF200.position);
-            crossed = func_00282DB0(&point, &scratch.motion.normal) > 0.0f;
+            FastVecSub(&point, (Vector *)(object + 0x10), &D_L00_001BF200.position);
+            crossed = FastVecDot(&point, &scratch.motion.normal) > 0.0f;
         } else {
             crossed = ((Vector *)(object + 0x10))->v[2] - D_L00_001BF200.position.v[2] < 0.0f;
         }
         if (func_00277258((Vector *)(object + 0x10), 0, object, D_L00_001B0900) == 0) break;
         if (*(unsigned char *)(object + 0x20) != 0 && !crossed) break;
         if (D_L00_001BF200.owner != 0 && D_L00_001BF200.owner == state->owner) break;
-        func_00282F20(&point, &D_L00_001BF200.normal, D_L00_001B0900);
-        func_00282CC0((Vector *)(object + 0x10), &D_L00_001BF200.position, &point);
+        vec_scale_to_length(&point, &D_L00_001BF200.normal, D_L00_001B0900);
+        FastVecAdd((Vector *)(object + 0x10), &D_L00_001BF200.position, &point);
         func_00283028((&state->velocity), (&state->velocity), &D_L00_001BF200.normal);
-        func_002E5CF8(1, 0, object);
+        PlayMobySound(1, 0, object);
         if (*(unsigned char *)(object + 0x20) == 0) {
             *(unsigned char *)(object + 0x20) = 3;
             ++state->bounces;
             if (state->bounces == 1) {
                 func_00282F70((&state->velocity), (&state->velocity), D_L00_001B091C * 0.016666668f);
                 if (D_L00_001A8FF0 != 0) {
-                    dot = func_00282DB0((&state->velocity), &scratch.motion.normal);
-                    func_00282D30(&temporary, &scratch.motion.normal, -dot);
-                    func_00282CF0(&vertical, (&state->velocity), &temporary);
-                    func_00282D30(&temporary, &temporary, D_L00_001B0918);
-                    func_00282CC0((&state->velocity), &vertical, &temporary);
+                    dot = FastVecDot((&state->velocity), &scratch.motion.normal);
+                    FastVecScale(&temporary, &scratch.motion.normal, -dot);
+                    FastVecSub(&vertical, (&state->velocity), &temporary);
+                    FastVecScale(&temporary, &temporary, D_L00_001B0918);
+                    FastVecAdd((&state->velocity), &vertical, &temporary);
                 } else {
                     state->velocity.v[2] *= D_L00_001B0918;
                 }
                 func_003001E0((&state->velocity), (&state->velocity), (Vector *)(object + 0x10));
             } else {
-                func_00282D30(&temporary, (&state->velocity), D_L00_001B0918);
-                speed = func_00282E20(&temporary);
+                FastVecScale(&temporary, (&state->velocity), D_L00_001B0918);
+                speed = vec_length_xy(&temporary);
                 minimum = D_L00_001B0908 * 0.016666668f;
                 if (speed < minimum) {
                     func_00282F70((&state->velocity), (&state->velocity), minimum);
                     if (D_L00_001A8FF0 != 0) {
-                        dot = func_00282DB0((&state->velocity), &scratch.motion.normal);
-                        func_00282D30(&vertical, &scratch.motion.normal, -dot);
-                        func_00282CF0(&tangent, (&state->velocity), &vertical);
-                        func_00282D30(&vertical, &vertical, D_L00_001B0918);
-                        func_00282CC0((&state->velocity), &tangent, &vertical);
+                        dot = FastVecDot((&state->velocity), &scratch.motion.normal);
+                        FastVecScale(&vertical, &scratch.motion.normal, -dot);
+                        FastVecSub(&tangent, (&state->velocity), &vertical);
+                        FastVecScale(&vertical, &vertical, D_L00_001B0918);
+                        FastVecAdd((&state->velocity), &tangent, &vertical);
                     } else {
                         state->velocity.v[2] *= D_L00_001B0918;
                     }
@@ -200,29 +200,29 @@ void func_L00_003F4210(char *object)
         if (state->bounces >= 4) {
             *(unsigned char *)(object + 0x20) = 2;
             if (D_L00_001A8FF0 != 0) {
-                dot = func_00282DB0((&state->velocity), &scratch.motion.normal);
-                func_00282D30(&temporary, &scratch.motion.normal, -dot);
-                func_00282CF0((&state->velocity), (&state->velocity), &temporary);
+                dot = FastVecDot((&state->velocity), &scratch.motion.normal);
+                FastVecScale(&temporary, &scratch.motion.normal, -dot);
+                FastVecSub((&state->velocity), (&state->velocity), &temporary);
             } else state->velocity.v[2] = 0.0f;
             {
                 float min;
-                state->velocity.v[3] = func_00282E20(&state->velocity);
+                state->velocity.v[3] = vec_length_xy(&state->velocity);
                 state->velocity.v[3] *= D_L00_001B0918;
                 min = D_L00_001B0908 * 0.016666668f;
                 if (state->velocity.v[3] < min)
                     state->velocity.v[3] = min;
             }
-            func_00282F20((&state->velocity), (&state->velocity), state->velocity.v[3]);
+            vec_scale_to_length((&state->velocity), (&state->velocity), state->velocity.v[3]);
             func_003001E0((&state->velocity), (&state->velocity), (Vector *)(object + 0x10));
-            state->fade_scale = 1.0f / func_00283CE0(state->timer);
+            state->fade_scale = 1.0f / IntToFloat(state->timer);
         }
         break;
     case 2:
         scratch.color = D_L00_001B0920;
         fade = (float)state->timer * state->fade_scale;
-        red = func_00283CF0((scratch.color.r - 255.0f) * fade + 255.0f);
-        green = func_00283CF0(scratch.color.g * fade);
-        blue = func_00283CF0(scratch.color.b * fade);
+        red = FloatToInt((scratch.color.r - 255.0f) * fade + 255.0f);
+        green = FloatToInt(scratch.color.g * fade);
+        blue = FloatToInt(scratch.color.b * fade);
         {
             float slowdown = (D_L00_001B090C - 1.0f) + 1.0f;
             float min = D_L00_001B0908 * 0.016666668f;
@@ -235,14 +235,14 @@ void func_L00_003F4210(char *object)
             if (state->velocity.v[3] < min)
                 state->velocity.v[3] = min;
         }
-        func_00282F20((&state->velocity), (&state->velocity), state->velocity.v[3]);
-        func_00282CC0((Vector *)(object + 0x10), (Vector *)(object + 0x10), (&state->velocity));
+        vec_scale_to_length((&state->velocity), (&state->velocity), state->velocity.v[3]);
+        FastVecAdd((Vector *)(object + 0x10), (Vector *)(object + 0x10), (&state->velocity));
         func_00300190((Vector *)(object + 0x10), (Vector *)(object + 0x10));
         break;
     case 3:
         damage = ((DamageTableRow *)(D_00139587 * 0xe0 + (int)D_L00_00262570))->damage;
         func_002E5DA0(5, 0, object, 0xb02);
-        func_002ABBB8(object, 0.0f, (&state->velocity), 0.0f, (Vector *)(object + 0x10), 5, 2, 4,
+        SpawnExplosionEffects(object, 0.0f, (&state->velocity), 0.0f, (Vector *)(object + 0x10), 5, 2, 4,
                      6.0f, 2.0f, 9.0f, 1.0f, 0, 15.0f, 1, 1, -1, 0, 0x810001);
         func_002A8BD0((char *)&scratch.request, (int)object, 0x810000, damage);
         scratch.request.enabled = 2;
@@ -261,7 +261,7 @@ void func_L00_003F4210(char *object)
         func_0029F338(object);
         return;
     }
-    if (*(unsigned char *)(object + 0x20) < 2) speed = func_00282E20(&state->velocity);
+    if (*(unsigned char *)(object + 0x20) < 2) speed = vec_length_xy(&state->velocity);
     else if (*(unsigned char *)(object + 0x20) == 2) speed = state->velocity.v[3];
     else return;
     {
@@ -272,7 +272,7 @@ void func_L00_003F4210(char *object)
         if (speed > hi) speed = hi;
         speed -= lo;
         ratio = speed / (hi - lo);
-        *(float *)(object + 0xf4) = func_00283B98((ratio * 7.0f + 1.0f) * 0.017453294f,
+        *(float *)(object + 0xf4) = FastAddRotations((ratio * 7.0f + 1.0f) * 0.017453294f,
                                                *(float *)(object + 0xf4));
     }
 }

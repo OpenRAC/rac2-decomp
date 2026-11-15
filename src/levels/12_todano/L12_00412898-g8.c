@@ -81,7 +81,7 @@ dispatch:
         *(u16 *)(object + 0x34) |= 0xA08;
         *(s16 *)(state + 0xE) = -1;
         *(f32 *)(state + 4) = 1.0f;
-        func_002A0488(object, 0x80, 0x80, 0x80);
+        set_moby_color(object, 0x80, 0x80, 0x80);
         break;
     case 1: {
         u8 *effect;
@@ -90,7 +90,7 @@ dispatch:
 
         effect = D_00188660 + *(s32 *)(state + 0x10) * 0x70;
         if (*(u8 **)(effect + 0x88) != object || !effect[0x74])
-            *(s32 *)(state + 0x10) = func_002E5CF8(0, 4, object);
+            *(s32 *)(state + 0x10) = PlayMobySound(0, 4, object);
         {
             s32 id = *(s32 *)state;
             u8 *linked;
@@ -123,7 +123,7 @@ update:
         if (*(f32 *)(state + 4) < 0.0f)
             object[0x20] = 3;
         else
-            object[0x23] = func_00283CF0(*(f32 *)(state + 4) * 20.0f);
+            object[0x23] = FloatToInt(*(f32 *)(state + 4) * 20.0f);
         break;
     case 3: {
         s32 id;
@@ -154,5 +154,5 @@ update:
         delta = 0x10C0;
     }
     if (!(D_L12_001B29C8 << D_L12_001B17E0))
-        func_L00_00310838(*(void **)(object + 0x24), delta, 0);
+        offset_moby_class_point_pairs(*(void **)(object + 0x24), delta, 0);
 }

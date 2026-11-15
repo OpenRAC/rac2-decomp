@@ -29,7 +29,7 @@ void func_L02_003F52B0(char *arg0) {
         qcopy(dst, src);
         *(u8 *)(arg0 + 0x30) = 0xFF;
         func_L02_003F5390(arg0);
-        func_002833B8(D_L02_001AD410 + 0x40, 1.0f);
+        set_scale_matrix(D_L02_001AD410 + 0x40, 1.0f);
         func_002A7750(arg0, 1, -1);
         break;
     }

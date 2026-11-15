@@ -34,12 +34,12 @@ void func_L00_003C6A88(char *owner)
     if (D_L00_001B2A00[0] == 0)
         return;
     D_L00_001B2A00[0] = 0;
-    rate = D_L00_001AFFA4 / func_00283CE0(12);
+    rate = D_L00_001AFFA4 / IntToFloat(12);
     D_L00_001B2A10 = rate;
-    func_00282D30(&local, owner + 0xC0, -rate);
+    FastVecScale(&local, owner + 0xC0, -rate);
     qcopy(&D_L00_002403C0[0], inner);
     for (i = 10; i >= 0; i--) {
-        func_00282CC0(&D_L00_002403C0[11 - i], &D_L00_002403B0[11 - i], &local);
+        FastVecAdd(&D_L00_002403C0[11 - i], &D_L00_002403B0[11 - i], &local);
     }
     *(int *)&D_L00_001AFFF4 = 0;
     *(int *)&D_L00_001AFFFC = 0;

@@ -46,10 +46,10 @@ s32 func_L18_00426AB0(void)
         func_00300A00((char *)handle, 0x55F0C070, (float)(D_001A7340[0] / 2),
                       (float)(D_L18_001B12D8 + D_L18_001B12E8), 1.0f, 1.0f, 0.0f);
         state = *(u8 **)(*(u8 **)(hero + 0x2290) + 0x68);
-        amount = func_00283CE0(*(s16 *)(state + 0x3BC));
-        ratio = amount / func_00283CE0(*(s16 *)(state + 0x3BE));
-        colors[0] = func_00283D38(D_L18_001B12C4, D_L18_001B12CC, ratio);
-        colors[1] = func_00283D38(D_L18_001B12C8, D_L18_001B12D0, ratio);
+        amount = IntToFloat(*(s16 *)(state + 0x3BC));
+        ratio = amount / IntToFloat(*(s16 *)(state + 0x3BE));
+        colors[0] = FastTweenColor(D_L18_001B12C4, D_L18_001B12CC, ratio);
+        colors[1] = FastTweenColor(D_L18_001B12C8, D_L18_001B12D0, ratio);
         middle = D_001A7340[0] / 2;
         func_0027EAE8(middle + D_L18_001B12D4, D_L18_001B12D8,
                       (s32)((float)(middle + D_L18_001B12D4) + (float)D_L18_001B12DC * ratio),
@@ -60,9 +60,9 @@ s32 func_L18_00426AB0(void)
         remaining = *(u16 *)(state + 0x3BC);
         if (remaining < 32 || remaining > 300 || (remaining & 24)) {
             func_00115DA8(text, D_L18_001B1300, (s16)remaining / 60);
-            func_L18_003044B8(middle, D_L18_001B12E4 + 1, 0xFF000000, text, 3, 0.96f);
-            func_L18_003044B8(middle, D_L18_001B12E4 - 1, 0xFF000000, text, 3, 1.04f);
-            func_L18_003044B8(middle, D_L18_001B12E4, colors[0], text, 3, 1.0f);
+            FontPrintCenterScaled(middle, D_L18_001B12E4 + 1, 0xFF000000, text, 3, 0.96f);
+            FontPrintCenterScaled(middle, D_L18_001B12E4 - 1, 0xFF000000, text, 3, 1.04f);
+            FontPrintCenterScaled(middle, D_L18_001B12E4, colors[0], text, 3, 1.0f);
         }
         result = 1;
     }

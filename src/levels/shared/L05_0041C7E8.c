@@ -1,6 +1,6 @@
 /* Copies the quad at +0x10 and the three quads at +0xC0 of a into b with the approved
    qcopy helper, then, when the word at +4 of b's state is set, hands b's +0xD0 vector (as
-   both arguments) and -1.0f to func_00282D30. */
+   both arguments) and -1.0f to FastVecScale. */
 #include "common.h"
 
 typedef int TI128 __attribute__((mode(TI)));
@@ -16,5 +16,5 @@ void func_L05_0041C7E8(char *a, char *b)
     for (i = 0; i < 3; i++)
         qcopy(b + 0xC0 + i * 16, a + 0xC0 + i * 16);
     if (*(int *)(state + 4) != 0)
-        func_00282D30(b + 0xD0, b + 0xD0, -1.0f);
+        FastVecScale(b + 0xD0, b + 0xD0, -1.0f);
 }

@@ -24,9 +24,9 @@ void func_L17_003E4560(char *obj) {
     if(B(obj,0x20)==4 && B(obj,0x42)==9) {
         target=*(char **)(state+0x408);
         angle=func_00283248(F(target,0x10)-F(obj,0x10),F(target,0x14)-F(obj,0x14));
-        angle=func_00283B98(angle,F(state,0x414));
-        func_002A7CA0(obj,state+0x410,angle,0.05f,0.3f,0.10471977f);
-        frames=func_00283CF0(D_L17_001B0CA8*1024.0f);
+        angle=FastAddRotations(angle,F(state,0x414));
+        MobySpringTurn(obj,state+0x410,angle,0.05f,0.3f,0.10471977f);
+        frames=FloatToInt(D_L17_001B0CA8*1024.0f);
         frame=D_L17_001B0CA8;
         I(state,0x140)=frames;
         F(state,0x144)=frame;
@@ -35,8 +35,8 @@ void func_L17_003E4560(char *obj) {
     } else if(B(obj,0x20)==5) {
         target=*(char **)(state+0x408);
         angle=func_00283248(F(target,0x10)-F(obj,0x10),F(target,0x14)-F(obj,0x14));
-        angle=func_00283B98(angle,F(state,0x414));
-        func_002A7CA0(obj,state+0x410,angle,0.05f,0.3f,0.10471977f);
+        angle=FastAddRotations(angle,F(state,0x414));
+        MobySpringTurn(obj,state+0x410,angle,0.05f,0.3f,0.10471977f);
     }
     if(I(state,0x420)) {
         *(Quad *)tmp=0;

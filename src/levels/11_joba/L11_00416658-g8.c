@@ -35,9 +35,9 @@ void func_L11_00416658(u8 *arg0) {
             entry = (u8 *)(*(s32 *)(state + 0x74) * 0x70 + (s32)D_00188660);
             if (*(u8 **)(entry + 0x88) == entity) {
                 if (!*(u8 *)(entry + 0x74))
-                    *(s32 *)(state + 0x74) = func_002E5CF8(0, 4, entity);
+                    *(s32 *)(state + 0x74) = PlayMobySound(0, 4, entity);
             } else {
-                *(s32 *)(state + 0x74) = func_002E5CF8(0, 4, entity);
+                *(s32 *)(state + 0x74) = PlayMobySound(0, 4, entity);
             }
             *(u8 *)(entity + 0x20) = 2;
             *(f32 *)(state + 0x6C) = 3.1415927410125732f;
@@ -48,7 +48,7 @@ void func_L11_00416658(u8 *arg0) {
     case 2: {
         u8 *entry;
         *(f32 *)(state + 0x70) += 0.05235988646745682f;
-        *(f32 *)(state + 0x6C) = func_00283B98(*(f32 *)(state + 0x6C), 0.05235988646745682f);
+        *(f32 *)(state + 0x6C) = FastAddRotations(*(f32 *)(state + 0x6C), 0.05235988646745682f);
         if (*(f32 *)(state + 0x70) >= 3.1415927410125732f) {
             if (*(s32 *)(state + 0x74) != -1) {
                 entry = (u8 *)(*(s32 *)(state + 0x74) * 0x70 + (s32)D_00188660);
@@ -58,8 +58,8 @@ void func_L11_00416658(u8 *arg0) {
             *(s32 *)(state + 0x74) = -1;
             *(u8 *)(entity + 0x20) = 3;
         } else {
-            func_00282F20(tmp, entity + 0xD0, -(func_00283180(*(f32 *)(state + 0x6C)) + 1.0f) * 4.0f);
-            func_00282CC0(entity + 0x10, tmp, state + 0x80);
+            vec_scale_to_length(tmp, entity + 0xD0, -(func_00283180(*(f32 *)(state + 0x6C)) + 1.0f) * 4.0f);
+            FastVecAdd(entity + 0x10, tmp, state + 0x80);
         }
         break;
     }
@@ -69,9 +69,9 @@ void func_L11_00416658(u8 *arg0) {
             entry = (u8 *)(*(s32 *)(state + 0x74) * 0x70 + (s32)D_00188660);
             if (*(u8 **)(entry + 0x88) == entity) {
                 if (!*(u8 *)(entry + 0x74))
-                    *(s32 *)(state + 0x74) = func_002E5CF8(0, 4, entity);
+                    *(s32 *)(state + 0x74) = PlayMobySound(0, 4, entity);
             } else {
-                *(s32 *)(state + 0x74) = func_002E5CF8(0, 4, entity);
+                *(s32 *)(state + 0x74) = PlayMobySound(0, 4, entity);
             }
             *(u8 *)(entity + 0x20) = 4;
         }
@@ -80,7 +80,7 @@ void func_L11_00416658(u8 *arg0) {
     case 4: {
         u8 *entry;
         *(f32 *)(state + 0x70) += 0.05235988646745682f;
-        *(f32 *)(state + 0x6C) = func_00283B98(*(f32 *)(state + 0x6C), 0.05235988646745682f);
+        *(f32 *)(state + 0x6C) = FastAddRotations(*(f32 *)(state + 0x6C), 0.05235988646745682f);
         if (*(f32 *)(state + 0x70) >= 6.2831854820251465f) {
             if (*(s32 *)(state + 0x74) != -1) {
                 entry = (u8 *)(*(s32 *)(state + 0x74) * 0x70 + (s32)D_00188660);
@@ -93,8 +93,8 @@ void func_L11_00416658(u8 *arg0) {
             *(s32 *)(state + 0x70) = 0;
             qcopy(entity + 0x10, state + 0x80);
         } else {
-            func_00282F20(tmp, entity + 0xD0, -(func_00283180(*(f32 *)(state + 0x6C)) + 1.0f) * 4.0f);
-            func_00282CC0(entity + 0x10, tmp, state + 0x80);
+            vec_scale_to_length(tmp, entity + 0xD0, -(func_00283180(*(f32 *)(state + 0x6C)) + 1.0f) * 4.0f);
+            FastVecAdd(entity + 0x10, tmp, state + 0x80);
         }
         break;
     }

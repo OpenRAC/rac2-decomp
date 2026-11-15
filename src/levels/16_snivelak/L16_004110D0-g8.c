@@ -38,14 +38,14 @@ void func_L16_004110D0(u8 *moby, float dt)
         finalPoint = 0;
     }
     orientation = (float *)(moby + 0xf8);
-    func_00282CF0(delta, point, moby + 0x10);
+    FastVecSub(delta, point, moby + 0x10);
     delta[2] = 0.0f;
-    distance = func_00282DF0(delta);
+    distance = FastVecLength(delta);
     func_002AAC80((float *)(state + 0x230), distance, D_L16_001B1750 * 0.00027777778f, D_L16_001B1750 * 0.00027777778f, dt);
     heading = func_00283248(delta[0], delta[1]);
     func_002AAA00(orientation, (float *)(state + 0x234), 0, heading, 0.00174532947f, 0.00174532947f, 0.104719773f);
-    func_00282F20(step, delta, *(float *)(state + 0x230));
-    func_00282CC0(moby + 0x10, moby + 0x10, step);
+    vec_scale_to_length(step, delta, *(float *)(state + 0x230));
+    FastVecAdd(moby + 0x10, moby + 0x10, step);
     if (!*(int *)(state + 0x26c)) {
         func_002A8D70(moby, 6.0f, 0, 0x90000, 50.0f, 1.0f, 0, 1, 0);
         func_002A8D70(moby, 6.0f, 1, 0x90000, 50.0f, 1.0f, 0, 1, 0);

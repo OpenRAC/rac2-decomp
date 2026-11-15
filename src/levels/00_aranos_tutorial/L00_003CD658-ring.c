@@ -23,18 +23,18 @@ void func_L00_003CD658(char *obj) {
     frame.axis.f[1]=func_00283198(*(float *)(obj+0xF8));
     frame.axis.f[2]=0.0f;
     frame.axis.f[3]=1.0f;
-    step=6.283186f/(func_00283CE0(9)-1.0f);
+    step=6.283186f/(IntToFloat(9)-1.0f);
     do {
         func_002AB668(&frame.offset,&frame.axis,angle);
         angle+=step;
         func_002ACDE8(point,&frame.initial,&frame.offset);
-        func_00282CC0(point,point,obj+0x10);
+        FastVecAdd(point,point,obj+0x10);
         *(float *)(point+12)=0.6f;
         point+=16;
     } while(--n>=0);
     *(float *)(ctx+0x200)+=-0.1f;
     if(*(float *)(ctx+0x200)<=-7.0f) *(float *)(ctx+0x200)+=7.0f;
-    func_L00_002EBE88(ctx,0x2B,0x2B,9,0x10400000,0x10400000,0.3f,0.6f,*(float *)(ctx+0x200));
+    DrawTwoLayerPolylineRibbon(ctx,0x2B,0x2B,9,0x10400000,0x10400000,0.3f,0.6f,*(float *)(ctx+0x200));
     i=0;
     point=(char *)frame.ring;
     frame.offset.f[0]=func_00283180(*(float *)(obj+0xF8)+3.141593f)*0.65f;
@@ -43,10 +43,10 @@ void func_L00_003CD658(char *obj) {
     { char *input=ctx;
     for(;i<9;i++) {
         qcopy(&frame.ring[i],input);
-        func_00282CC0(point,&frame.offset,point);
+        FastVecAdd(point,&frame.offset,point);
         ((float *)point)[3]=1.0f;
         point+=16; input+=16;
     }
     }
-    func_L00_002EBE88(frame.ring,0x2B,0x2B,9,0x2200000,0x2200000,0.3f,0.6f,*(float *)(ctx+0x200));
+    DrawTwoLayerPolylineRibbon(frame.ring,0x2B,0x2B,9,0x2200000,0x2200000,0.3f,0.6f,*(float *)(ctx+0x200));
 }

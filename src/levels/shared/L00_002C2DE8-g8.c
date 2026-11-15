@@ -42,7 +42,7 @@ void func_L00_002C2DE8(void)
         D_00189E20.first_flag = 0;
         D_00189E20.second_flag = 0;
         if (func_L00_002AB108(&D_00189E20.height, 0.7f, 4.0f)) {
-            D_00189E20.angle = func_00283248(D_L00_001BF200.direction[2], func_00282E20(D_L00_001BF200.direction));
+            D_00189E20.angle = func_00283248(D_L00_001BF200.direction[2], vec_length_xy(D_L00_001BF200.direction));
             if (D_L00_001BF200.object) {
                 D_00189E20.second_flag = 1;
                 if (func_002ABB78(D_L00_001BF200.object)) D_00189E20.first_flag = 1;
@@ -59,8 +59,8 @@ void func_L00_002C2DE8(void)
         func_L00_002D36E0(second, 1.1f, 0.0f, 1, -20.0f);
         if (second[2] < 0.5f) second[2] = 0.5f;
         distance = 20.0f;
-        hit = func_002761F8(first, second, 2, D_00189E20.object, 0);
-        if (hit) distance = func_00282E48(first, D_L00_001BF200.hit_position);
+        hit = CollLine(first, second, 2, D_00189E20.object, 0);
+        if (hit) distance = fast_vec_dist(first, D_L00_001BF200.hit_position);
         if (!hit || 3.0f < distance) {
             offset = -0.4f;
             do {

@@ -48,7 +48,7 @@ void func_L00_00373F48(int *answer) {
     } else if (state == 3) {
         *answer = 0;
         if (func_002B0D70() < cost) {
-            func_002E5CF8(2, 17, *(char **)((char *)model + 0x28));
+            PlayMobySound(2, 17, *(char **)((char *)model + 0x28));
             D_L00_0022F7C0.head.state = 4;
         } else {
             int g = D_L00_0022F7C0.group.rows[model->head.index].value;
@@ -60,8 +60,8 @@ void func_L00_00373F48(int *answer) {
     } else if (state == 4) {
         if (*answer != 0) {
         if (func_002B0D70() >= cost) {
-            func_002F88D8((void *)func_00288FB8(0x2DCB));
-            func_002E5CF8(7, 17, *(char **)((char *)model + 0x28));
+            func_002F88D8((void *)GetLocalizedString(0x2DCB));
+            PlayMobySound(7, 17, *(char **)((char *)model + 0x28));
             func_L00_00326950(cost);
             func_L00_002F5890(D_L00_001AD4F0[model->head.index]);
             category = D_L00_0022F7C0.category.rows[D_L00_0022F7C0.head.index].value;
@@ -91,13 +91,13 @@ void func_L00_00373F48(int *answer) {
                 }
             }
             }
-            func_002F73A8();
+            BuildShopChannelList();
         } else {
-            func_002F88D8((void *)func_00288FB8(0x2DCC));
-            func_002E5CF8(0, 17, *(char **)((char *)model + 0x28));
+            func_002F88D8((void *)GetLocalizedString(0x2DCC));
+            PlayMobySound(0, 17, *(char **)((char *)model + 0x28));
         }
-        } else func_002E5CF8(0, 17, *(char **)((char *)model + 0x28));
+        } else PlayMobySound(0, 17, *(char **)((char *)model + 0x28));
         D_L00_0022F7C0.head.state = 0;
-        func_002FB1A0();
+        PrepareVendorSelectionPreview();
     }
 }

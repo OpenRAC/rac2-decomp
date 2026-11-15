@@ -23,7 +23,7 @@ int func_L02_003C4068(char *object) {
                 {
                     char *linked = *(char **)(*(char **)(state + 8) + 0x1C);
                     qcopy(linked + 0xF0, other + 0xF0);
-                    func_002833F0(linked + 0xC0, linked + 0xF0);
+                    euler_rotation_basis(linked + 0xC0, linked + 0xF0);
                 }
                 {
                     char *linked2 = *(char **)(*(char **)(state + 8) + 0x1C);
@@ -40,10 +40,10 @@ int func_L02_003C4068(char *object) {
         else
             *(float *)(state + 0x10) += (0.03333f / *(float *)(state + 0x10)) * 0.00008333333244081587f;
 
-        func_00282CF0(delta, (float *)(*(char **)(state + 0x18) + ((*(int *)(state + 0x14) << 4) + 0x20)), (float *)(object + 0x10));
-        func_00282F20(delta, delta, *(float *)(state + 0x10));
-        func_00282CC0(object + 0x10, object + 0x10, delta);
-        if (func_00282E80(object + 0x10, *(char **)(state + 0x18) + ((*(int *)(state + 0x14) << 4) + 0x20)) <= *(float *)(state + 0x10) * 0.88f)
+        FastVecSub(delta, (float *)(*(char **)(state + 0x18) + ((*(int *)(state + 0x14) << 4) + 0x20)), (float *)(object + 0x10));
+        vec_scale_to_length(delta, delta, *(float *)(state + 0x10));
+        FastVecAdd(object + 0x10, object + 0x10, delta);
+        if (vec_distance_xy(object + 0x10, *(char **)(state + 0x18) + ((*(int *)(state + 0x14) << 4) + 0x20)) <= *(float *)(state + 0x10) * 0.88f)
             ++*(int *)(state + 0x14);
     } else return 3;
     return 0;

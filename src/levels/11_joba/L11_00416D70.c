@@ -40,17 +40,17 @@ void func_L11_00416D70(char *self) {
         func_002A7750(self, 2, -1);
         if (*(unsigned char *)(self + 0x43) != 0) func_002A7470(self, 0, 0, 0);
         ((Obj48 *)self)->f48 = 0.0f;
-        func_00282F20(updated, self + 0xD0, D_L11_001B0D94);
-        func_00282CC0(self + 0x10, self + 0x10, updated);
+        vec_scale_to_length(updated, self + 0xD0, D_L11_001B0D94);
+        FastVecAdd(self + 0x10, self + 0x10, updated);
         qcopy(state, self + 0x10);
-        *(char **)(state + 0x1C) = func_0029EFD0(0x1172);
+        *(char **)(state + 0x1C) = CreateMoby(0x1172);
         if (*(char **)(state + 0x1C) == 0) return;
         *(unsigned short *)(*(char **)(state + 0x1C) + 0x34) |= 0x41;
         *(unsigned char *)(*(char **)(state + 0x1C) + 0x30) = *(unsigned char *)(self + 0x30);
         *(short *)(*(char **)(state + 0x1C) + 0x32) = 0;
         func_0029FCC0(self, 0, (char *)position);
-        func_00283098(transformed, D_L11_001B0DA0, self + 0xC0);
-        func_00282CC0(position, transformed, position);
+        matrix_mul_vec3(transformed, D_L11_001B0DA0, self + 0xC0);
+        FastVecAdd(position, transformed, position);
         {
             char *child = *(char **)(state + 0x1C);
             qcopy(child + 0x10, position);
@@ -73,9 +73,9 @@ void func_L11_00416D70(char *self) {
         break;
     case 1:
         if (func_002B3868(self)) *(short *)(state + 0x22) = D_L11_001B0D98;
-        if (!func_00282978(state + 0x22)) {
-            func_00282F20(updated, self + 0xD0, D_L11_001B0D94 / (float)D_L11_001B0D98);
-            func_00282CC0(self + 0x10, self + 0x10, updated);
+        if (!FastDecTimer(state + 0x22)) {
+            vec_scale_to_length(updated, self + 0xD0, D_L11_001B0D94 / (float)D_L11_001B0D98);
+            FastVecAdd(self + 0x10, self + 0x10, updated);
         }
         if (*(unsigned char *)(self + 0x60) & 2) {
             qcopy(self + 0x10, state);
@@ -85,9 +85,9 @@ void func_L11_00416D70(char *self) {
         break;
     case 3:
         if (func_002B3868(self)) *(short *)(state + 0x22) = D_L11_001B0D98;
-        if (!func_00282978(state + 0x22)) {
-            func_00282F20(updated, self + 0xD0, -D_L11_001B0D94 / (float)D_L11_001B0D98);
-            func_00282CC0(self + 0x10, self + 0x10, updated);
+        if (!FastDecTimer(state + 0x22)) {
+            vec_scale_to_length(updated, self + 0xD0, -D_L11_001B0D94 / (float)D_L11_001B0D98);
+            FastVecAdd(self + 0x10, self + 0x10, updated);
         }
         if (*(unsigned char *)(self + 0x60) & 2) {
             ((Obj48 *)self)->f48 = 0.0f;
@@ -113,7 +113,7 @@ void func_L11_00416D70(char *self) {
         if (*(unsigned char *)(self + 0x43) != 2) func_002A7470(self, 2, 0, 0);
         func_002A7750(self, 7, -1);
         } else {
-            func_00282978(state + 0x20);
+            FastDecTimer(state + 0x20);
         }
         break;
     case 7:
@@ -125,8 +125,8 @@ void func_L11_00416D70(char *self) {
     }
     if (*(char **)(state + 0x1C) && ((Obj48 *)self)->f48 != 0.0f) {
         func_0029FCC0(self, 0, (char *)updated);
-        func_00283098(position, D_L11_001B0DA0, self + 0xC0);
-        func_00282CC0(updated, position, updated);
+        matrix_mul_vec3(position, D_L11_001B0DA0, self + 0xC0);
+        FastVecAdd(updated, position, updated);
         {
             char *child = *(char **)(state + 0x1C);
             qcopy(child + 0x10, updated);

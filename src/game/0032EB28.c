@@ -223,8 +223,8 @@ void func_003313E0(TI128 *a0, void *dir)
     unsigned char *p;
 
     qcopy(&base, a0);
-    func_00282D30(vel, dir, 0.5f);
-    func_00282CC0(&base, &base, vel);
+    FastVecScale(vel, dir, 0.5f);
+    FastVecAdd(&base, &base, vel);
     i = 8;
     do {
         i--;
@@ -254,9 +254,9 @@ void func_00331580(f32 *pos, f32 scale)
     v[0] = pos[0] + func_002A78D8(0.0f, 0.04f);
     v[1] = pos[1] + func_002A78D8(0.0f, 0.04f);
     v[2] = pos[2] + func_002A78D8(0.0f, 0.04f);
-    func_002C16C0(v, D_001A8BD0, 15, 0x5F, 0x7F7F7F, func_00283CF0(func_002A78D8(1.0f, 3.0f)), size, 500.0f, 1.0f, 0.0f, 0.0f);
+    func_002C16C0(v, D_001A8BD0, 15, 0x5F, 0x7F7F7F, FloatToInt(func_002A78D8(1.0f, 3.0f)), size, 500.0f, 1.0f, 0.0f, 0.0f);
     }
-    effect = func_002C16C0(v, D_001A8BD0, 15, 0x7F, 0x407FFF, func_00283CF0(func_002A78D8(1.0f, -1.0f)), size * 0.8f, 500.0f, 1.0f, 0.0f, 0.0f);
+    effect = func_002C16C0(v, D_001A8BD0, 15, 0x7F, 0x407FFF, FloatToInt(func_002A78D8(1.0f, -1.0f)), size * 0.8f, 500.0f, 1.0f, 0.0f, 0.0f);
     if (effect != 0) {
         effect[2] = D_001F26B0[5];
     }
@@ -275,7 +275,7 @@ void func_003323F0(int a0) {
             return;
         }
     }
-    func_0026FEB8(D_001B0A88);
+    STUB_printf(D_001B0A88);
 }
 
 char *func_00332440(void *a0, void *a1, void *a2)
@@ -287,7 +287,7 @@ char *func_00332440(void *a0, void *a1, void *a2)
     int result;
 
     func_002AFFD8(a1, &localA, 1);
-    object = func_0029EFD0(0xEAA);
+    object = CreateMoby(0xEAA);
     if (object != 0) {
         state = *(State_332440 **)(object + 0x68);
         state->f10 = 0x50;
@@ -298,11 +298,11 @@ char *func_00332440(void *a0, void *a1, void *a2)
         qcopy(state, a2);
         state->f18 = 0;
         state->f14 = 0;
-        func_00282F20(&localB, a2, 1.0f);
+        vec_scale_to_length(&localB, a2, 1.0f);
         qcopy(object + 0xC0, &localB);
-        func_00282DD8(object + 0xD0, object + 0xC0, &localA);
-        func_00282F20(object + 0xD0, object + 0xD0, 1.0f);
-        func_00282DD8(object + 0xE0, object + 0xD0, object + 0xC0);
+        FastVecCross(object + 0xD0, object + 0xC0, &localA);
+        vec_scale_to_length(object + 0xD0, object + 0xD0, 1.0f);
+        FastVecCross(object + 0xE0, object + 0xD0, object + 0xC0);
         *(float *)(object + 0xCC) = *(float *)(object + 0xDC) = *(float *)(object + 0xEC) = 0.0f;
         result = func_002FED90(object, 1.0f, 1.0f, 1.0f, 0);
         state->f1C = result;
@@ -399,19 +399,19 @@ int func_00334730(float *out, int flag)
     func_00334710(((int *)cam)[-4], (L_34730TI *)base);
     f = hero->f[0x31C / 4];
     if (f >= 30.0f || flag == 0) {
-        func_00282D30(ofs, cam + 0x30, 0.2f);
-        func_00282CC0(near, base, ofs);
-        func_00282D30(ofs, cam + 0x30, -30.0f);
-        func_00282CC0(far, base, ofs);
-        if (func_002761F8(near, far, 0x12, (void *)hero->i[0x2290 / 4], 0) != 0) {
+        FastVecScale(ofs, cam + 0x30, 0.2f);
+        FastVecAdd(near, base, ofs);
+        FastVecScale(ofs, cam + 0x30, -30.0f);
+        FastVecAdd(far, base, ofs);
+        if (CollLine(near, far, 0x12, (void *)hero->i[0x2290 / 4], 0) != 0) {
             qcopy(out, D_001BAFA0);
             return 0;
         }
         qcopy(out, base);
         return -1;
     }
-    func_00282D30(near, cam + 0x30, -f);
-    func_00282CC0(out, base, near);
+    FastVecScale(near, cam + 0x30, -f);
+    FastVecAdd(out, base, near);
     return 1;
 }
 
@@ -446,15 +446,15 @@ int func_003351B0(char *self, void *src, void *dst, int mode)
     if ((unsigned int)(mode - 1) >= 7) goto direct;
     goto *D_0026E810[mode - 1];
 zero:
-    func_00282CC0(dst, src, vector);
+    FastVecAdd(dst, src, vector);
     ret = 0;
     goto done;
 transformed:
     func_00334710((int)self, &local);
-    func_00282CC0(dst, src, &local);
+    FastVecAdd(dst, src, &local);
     goto done;
 direct:
-    func_00282CC0(dst, src, vector);
+    FastVecAdd(dst, src, vector);
 done:
     return ret;
 }
@@ -477,12 +477,12 @@ void func_003355A8(int mode)
     func_002704D0();
     if (mode == 0) {
         char *position = camera + 0x30;
-        func_00283410(work.matrix, D_00189EA0 + 4);
-        func_00283678(camera, work.matrix);
-        func_00282F20(work.negative, work.matrix, -1.0f);
-        func_00282F20(work.scaled, work.matrix + 8, 1.2f);
-        func_00282CC0(position, D_00189EA0, work.scaled);
-        func_00282CC0(position, position, work.negative);
+        euler_to_matrix(work.matrix, D_00189EA0 + 4);
+        copy_matrix3x4(camera, work.matrix);
+        vec_scale_to_length(work.negative, work.matrix, -1.0f);
+        vec_scale_to_length(work.scaled, work.matrix + 8, 1.2f);
+        FastVecAdd(position, D_00189EA0, work.scaled);
+        FastVecAdd(position, position, work.negative);
         *(short *)(*(char **)(state + 0x190) + 0x8A) = 1;
     } else if (mode == 2) {
         state[0x293] = 0;
@@ -547,10 +547,10 @@ void func_00335B10(float factor, void *context,
 
 /* calls one four-argument helper four times, left[i] and right[i] with the float scale, storing each result into dst[i]; the first pointer parameter is unused. */
 void func_00335B80(s32 *unused, s32 *dst, s32 *left, s32 *right, f32 scale) {
-    dst[0] = func_00283D38(left[0], right[0], scale);
-    dst[1] = func_00283D38(left[1], right[1], scale);
-    dst[2] = func_00283D38(left[2], right[2], scale);
-    dst[3] = func_00283D38(left[3], right[3], scale);
+    dst[0] = FastTweenColor(left[0], right[0], scale);
+    dst[1] = FastTweenColor(left[1], right[1], scale);
+    dst[2] = FastTweenColor(left[2], right[2], scale);
+    dst[3] = FastTweenColor(left[3], right[3], scale);
 }
 
 

@@ -32,8 +32,8 @@ void func_L07_003EB2C0(unsigned char *o)
     char *hit;
     float turn;
     if (!o[0x20]) {
-        p[0x48]=func_00283CF0(15.0f);
-        p[0x4A]=func_00283CF0(9.6f);
+        p[0x48]=FloatToInt(15.0f);
+        p[0x4A]=FloatToInt(9.6f);
 
         if (func_002A77E0(2)) U16_AT(o,0x34)|=0x8000;
         else U16_AT(o,0x34)&=0x7FFF;
@@ -84,19 +84,19 @@ void func_L07_003EB2C0(unsigned char *o)
             if (o[0x43]) func_002A7470(o,0,0,0);
         }
     }
-    if (o[0x31] && func_00282E48(o+0x10,D_L07_001B9200)<24.0f) {
+    if (o[0x31] && fast_vec_dist(o+0x10,D_L07_001B9200)<24.0f) {
         func_002A93B0(o);
         o[0x6F]=22;
     }
     hit=func_002A9640(o,0x10000,0);
     if (hit && *(char **)(hit+0x20)) {
         if (*(short *)(*(char **)(hit+0x20)+0xAA)==0xB7F) o[0xA8]=255;
-        else if (func_00282E48(*(char **)(hit+0x20)+0x10,o+0x10)<32.0f) {
+        else if (fast_vec_dist(*(char **)(hit+0x20)+0x10,o+0x10)<32.0f) {
             qcopy(from,*(char **)(hit+0x20)+0x10);
             from[2]+=0.5f;
             qcopy(to,o+0x10);
             to[2]+=0.5f;
-            if (func_002761F8(from,to,2,o,0)) o[0xA8]=255;
+            if (CollLine(from,to,2,o,0)) o[0xA8]=255;
         }
     }
     if (func_002B0ED8(o,p+0x140,0)) {

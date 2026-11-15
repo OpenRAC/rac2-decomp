@@ -255,7 +255,7 @@ void func_L07_003FF618(u8 *a0)
         *(u16 *)(a0 + 0x34) |= 0x2;
         return;
     }
-    func_L01_003C91C8(a0);
+    UpdateCuboidTriggeredMoby(a0);
 }
 
 extern void func_310D80(void *a, f32 b, f32 c);
@@ -449,7 +449,7 @@ void func_L07_004106B8(u8 *a0)
 {
     u8 *s1 = *(u8 **)(a0 + 0x68);
 
-    func_002833F0(a0 + 0xC0, a0 + 0xF0);
+    euler_rotation_basis(a0 + 0xC0, a0 + 0xF0);
     func_L00_00323958(a0, s1 + 0x1B0);
 }
 

@@ -50,13 +50,13 @@ void func_L09_002F89F8(void) {
             D_L09_001BD700.dest = D_L09_00281210;
             qzero_nc(&rotation);
             rotation.z = D_L09_001A93E0;
-            func_002833F0(matrix, &rotation);
+            euler_rotation_basis(matrix, &rotation);
             for (i = 0; i < 4; i++) {
-                func_00283098(D_L09_001BD700.dest + 0x20 + i * 16, &D_L09_001A93F0[i], matrix);
-                func_00282CC0(D_L09_001BD700.dest + 0x20 + i * 16, D_L09_001BD700.dest + 0x20 + i * 16, object + 0x10);
-                func_00282CF0(&temp, &D_L09_001B9A00, D_L09_001BD700.dest + 0x20 + i * 16);
-                func_00282F20(&temp, &temp, 0.05f);
-                func_00282CC0(D_L09_001BD700.dest + 0x20 + i * 16, D_L09_001BD700.dest + 0x20 + i * 16, &temp);
+                matrix_mul_vec3(D_L09_001BD700.dest + 0x20 + i * 16, &D_L09_001A93F0[i], matrix);
+                FastVecAdd(D_L09_001BD700.dest + 0x20 + i * 16, D_L09_001BD700.dest + 0x20 + i * 16, object + 0x10);
+                FastVecSub(&temp, &D_L09_001B9A00, D_L09_001BD700.dest + 0x20 + i * 16);
+                vec_scale_to_length(&temp, &temp, 0.05f);
+                FastVecAdd(D_L09_001BD700.dest + 0x20 + i * 16, D_L09_001BD700.dest + 0x20 + i * 16, &temp);
             }
             *(int *)(D_L09_001BD700.dest + 0x68) = D_L09_001BD700.values[index];
         }

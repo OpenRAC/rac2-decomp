@@ -44,18 +44,18 @@ char *func_L20_00443DF0(char *arg0)
         else if (t < 0.52359885f)
             t = 0.52359885f;
     }
-    f = func_00283B98(t, *(float *)(arg0 + 0xF8));
+    f = FastAddRotations(t, *(float *)(arg0 + 0xF8));
     v[0] = func_00283180(f) * 0.16666667f;
     v[1] = func_00283198(f) * 0.16666667f;
     v[2] = -0.033333335f;
     if (func_002A77E0(2) != 0) {
-        func_00282D30(w, v, 90.0f);
+        FastVecScale(w, v, 90.0f);
     } else {
-        func_00282D30(w, v, func_002A7878(0.4f, 0.6f) * 180.0f);
+        FastVecScale(w, v, func_002A7878(0.4f, 0.6f) * 180.0f);
     }
-    func_00282CC0(w, w, ang);
-    func_00282CF0(w, D_00189EA0, w);
+    FastVecAdd(w, w, ang);
+    FastVecSub(w, D_00189EA0, w);
     w[2] = 0.0f;
-    func_00282F20(w, w, 0.16666667f);
+    vec_scale_to_length(w, w, 0.16666667f);
     return func_L03_003D09D0((int)arg0, 0, ang, v, w, 0xB4, 0x258, *(unsigned char *)(state + 0x36));
 }

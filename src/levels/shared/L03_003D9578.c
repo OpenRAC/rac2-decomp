@@ -10,22 +10,22 @@ void func_L03_003D9578(u8 *p) {
  u8 *q=*(u8 **)(p+0x68);int i,color;float size;
  switch(p[0x20]) {
  case 0:
- func_00282CC0(next,p+0x10,q);
+ FastVecAdd(next,p+0x10,q);
  if(*(short *)(q+0x12)<12)(*(short *)(q+0x12))++;
- func_002A8C00(matrix,p,0x10001,D_L03_001A8F20,(float)*(int *)(q+0x18));
- if(func_002761F8(p+0x10,next,0,*(int *)(q+0x14),matrix)){
+ make_hit_descriptor(matrix,p,0x10001,D_L03_001A8F20,(float)*(int *)(q+0x18));
+ if(CollLine(p+0x10,next,0,*(int *)(q+0x14),matrix)){
  *(int *)(p+0x98)=0;*(u16 *)(p+0x34)=(*(u16 *)(p+0x34)|0x41)&0xEFFF;func_002A7750(p,1,-1);
  func_L00_003E3258(D_L03_001BFDE0,10,1);goto finishmove;
  }
- if(func_00282978(q+0x10)){
+ if(FastDecTimer(q+0x10)){
  *(int *)(p+0x98)=0;*(u16 *)(p+0x34)=(*(u16 *)(p+0x34)|0x41)&0xEFFF;func_002A7750(p,1,-1);goto finishmove;
  }
- qcopy(pos,p+0x10);func_00282D30(step,q,0.2f);
+ qcopy(pos,p+0x10);FastVecScale(step,q,0.2f);
  for(i=4;i>=0;i--){
  size=func_002A7878(0.1f,0.3f);color=func_002A77E0(255);
- func_002A7A00(particle,0.0f,0.1f);func_00282CC0(particle,particle,pos);
+ func_002A7A00(particle,0.0f,0.1f);FastVecAdd(particle,particle,pos);
  func_002C65A0(particle,D_L03_001A8F20,15,0x808080,color,32,0,size*210000.0f,size*42000.0f,0.0f,0);
- func_00282CC0(pos,pos,step);
+ FastVecAdd(pos,pos,step);
  }
  finishmove:
  qcopy(p+0x10,next);break;

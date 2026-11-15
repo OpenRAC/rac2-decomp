@@ -63,9 +63,9 @@ int func_002EBC70(int unused)
     }
     D_001A8BB0 = 2;
     do {
-        func_002FC280();
+        SubmitBufferedDmaChain();
         func_002FC220();
-        func_00284FC0();
+        PutDrawBufferSmall();
         func_00285338();
         func_00284EA8();
         func_00298F00();
@@ -77,7 +77,7 @@ int func_002EBC70(int unused)
         value = func_002EB1E0();
         func_00284F40(0);
         D_001B1594 = 0x131;
-        func_0027BD70();
+        RenderFrame();
         if (D_001A8BB8 != -2) {
             D_001A8BB0 = D_001A8BB8;
             D_001A8BB8 = -2;

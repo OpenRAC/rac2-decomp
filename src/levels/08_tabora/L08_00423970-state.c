@@ -72,7 +72,7 @@ void func_L08_00426730(char *actor) {
         }
         func_L08_00425AA8(actor);
     }
-    if (func_00282E80(actor + 0x10, D_L08_001B9B00) > (float)FIELD(actor, u8, 0x30)) return;
+    if (vec_distance_xy(actor + 0x10, D_L08_001B9B00) > (float)FIELD(actor, u8, 0x30)) return;
     func_L08_00425F28(actor);
     switch (FIELD(actor, u8, 0x20)) {
     case 0: break;
@@ -83,7 +83,7 @@ void func_L08_00426730(char *actor) {
         case 0:
         case 1:
             if (!func_002A77E0(7)) {
-                func_L08_0032F898(actor, p + 0x120, (float)FIELD(actor, s16, 0x32), 0.0f,
+                SelectNearestListedMoby(actor, p + 0x120, (float)FIELD(actor, s16, 0x32), 0.0f,
                     FIELD(p, int, 0x1D0), -1, FIELD(p, int, 0x1D4), -1);
                 if (FIELD(p, int, 0x164) != 2)
                     condition = ~func_L04_00343498(actor, (float)FIELD(actor, s16, 0x32));
@@ -127,7 +127,7 @@ ready_nonzero:
     }
     case 2: {
         float height;
-        if (func_002B3868(actor)) func_002E5CF8(0, 0, actor);
+        if (func_002B3868(actor)) PlayMobySound(0, 0, actor);
         func_002AA548(actor + 0x18, FIELD(p, float, 0x1C8), p + 0x198,
             0.0083333338f, 0.0041666669f, 0.53333336f);
         height = FIELD(p, float, 0x1C4);
@@ -150,10 +150,10 @@ ready_nonzero:
         float height;
         func_002AA548(actor + 0x18, FIELD(p, float, 0x1C4) - 1.5f, p + 0x198,
             0.0083333338f, 0.0041666669f, 0.53333336f);
-        func_00282CF0(local, p + 0x170, actor + 0x10);
-        func_00282D30(local, local, 0.025f);
+        FastVecSub(local, p + 0x170, actor + 0x10);
+        FastVecScale(local, local, 0.025f);
         local[2] = 0.0f;
-        func_00282CC0(actor + 0x10, actor + 0x10, local);
+        FastVecAdd(actor + 0x10, actor + 0x10, local);
         height = FIELD(p, float, 0x1C4);
         if (FIELD(actor, float, 0x18) < height + 1.5f) {
             qcopy(local2, actor + 0x10);
@@ -173,9 +173,9 @@ ready_nonzero:
     }
     case 4:
         if (!func_002A77E0(7))
-            func_L08_0032F898(actor, p + 0x120, (float)FIELD(actor, s16, 0x32), 60.0f,
+            SelectNearestListedMoby(actor, p + 0x120, (float)FIELD(actor, s16, 0x32), 60.0f,
                 FIELD(p, int, 0x1D8), FIELD(p, int, 0x1E0), FIELD(p, int, 0x1DC), -1);
-        if (func_00282E80(actor + 0x10, p + 0x120) < 8.0f) FIELD(p, s16, 0x1B8) = 120;
+        if (vec_distance_xy(actor + 0x10, p + 0x120) < 8.0f) FIELD(p, s16, 0x1B8) = 120;
         switch (FIELD(actor, u8, 0x95)) {
         case 1:
             if (!FIELD(p, s16, 0x1B0)) {
@@ -236,7 +236,7 @@ ready_nonzero:
         case 2:
             func_L08_004258D0(actor);
             FIELD(p, float, 0x188) = FIELD(p, float, 0x1C8);
-            if (func_00282978(p + 0x1B8)) {
+            if (FastDecTimer(p + 0x1B8)) {
                 func_L08_00425FE8(actor, 5.5f, 5.5f, 1,
                     func_00283248(FIELD(p, float, 0x120) - FIELD(actor, float, 0x10),
                                  FIELD(p, float, 0x124) - FIELD(actor, float, 0x14)), 0.0f, 0.0f);
@@ -246,13 +246,13 @@ ready_nonzero:
                                  FIELD(p, float, 0x124) - FIELD(actor, float, 0x14)), 0.0f, 0.0f);
             }
             if (FIELD(actor, u8, 0x60) & 2) {
-                if (func_00282DF0(p + 0x190) < 0.016666668f) {
+                if (FastVecLength(p + 0x190) < 0.016666668f) {
                     if (FIELD(actor, u8, 0x43) != (func_001163B0() & 1) + 4)
                         func_002A7470(actor, (func_001163B0() & 1) | 4, 0, 10);
                 } else if (FIELD(actor, u8, 0x43) != 6) func_002A7470(actor, 6, 0, 10);
             }
             if (FIELD(p, int, 0x164) == 2) {
-                if (!func_00282978(p + 0x1B4)) goto patrol_heading;
+                if (!FastDecTimer(p + 0x1B4)) goto patrol_heading;
                 goto resume_patrol;
             }
             if (FIELD(p, s16, 0x1BC) >= 240) {
@@ -266,7 +266,7 @@ resume_patrol:
                 FIELD(p, s16, 0x1B4) = 240;
                 if ((FIELD(actor, u8, 0x21) != 255 &&
                         FIELD(FIELD(p, char *, 0x1F8), int, 0) != FIELD(p, u8, 0x20D)) ||
-                    !func_00282978(p + 0x1B6) || !func_L08_00429238(actor, 1, 0) ||
+                    !FastDecTimer(p + 0x1B6) || !ClaimTaboraSlot(actor, 1, 0) ||
                     FIELD(p, s16, 0x1BC)) goto patrol_heading;
                 FIELD(p, float, 0x1F4) = -0.78539824f;
                 FIELD(p, float, 0x1F0) = 1.0f;
@@ -284,18 +284,18 @@ resume_patrol:
             func_L08_004258D0(actor);
             angle = func_00283248(FIELD(p, float, 0x120) - FIELD(actor, float, 0x10),
                                  FIELD(p, float, 0x124) - FIELD(actor, float, 0x14));
-            if (func_00282978(p + 0x1B8)) {
+            if (FastDecTimer(p + 0x1B8)) {
                 func_L08_00425FE8(actor, 5.5f, 5.5f, 1, angle, 0.0f,
-                    -func_00283248(func_00282E80(actor + 0x10, p + 0x140),
+                    -func_00283248(vec_distance_xy(actor + 0x10, p + 0x140),
                         FIELD(p, float, 0x148) - FIELD(actor, float, 0x18)));
             } else {
                 func_L08_00425FE8(actor, 32.0f, 12.0f, 1, angle, 0.0f,
-                    -func_00283248(func_00282E80(actor + 0x10, p + 0x140),
+                    -func_00283248(vec_distance_xy(actor + 0x10, p + 0x140),
                         FIELD(p, float, 0x148) - FIELD(actor, float, 0x18)));
             }
             switch (FIELD(p, u8, 0x218)) {
             case 0:
-                if (func_00283C80(angle, FIELD(p, float, 0x208)) < 0.6981318f) {
+                if (FastDiffRots(angle, FIELD(p, float, 0x208)) < 0.6981318f) {
                     FIELD(p, float, 0x1F4) = -0.78539824f;
                     FIELD(p, float, 0x1F0) = 1.0f;
                     if (FIELD(actor, u8, 0x43) != 7) func_002A7470(actor, 7, 0, func_002A7820(8, 15));
@@ -312,7 +312,7 @@ resume_patrol:
                 goto attack_move;
             case 2: {
                 float sweep, direction;
-                FIELD(p, float, 0x1F4) = func_00283B98(FIELD(p, float, 0x1F4), FIELD(p, float, 0x1F0) * 0.0203621779f);
+                FIELD(p, float, 0x1F4) = FastAddRotations(FIELD(p, float, 0x1F4), FIELD(p, float, 0x1F0) * 0.0203621779f);
                 sweep = FIELD(p, float, 0x1F4);
                 direction = FIELD(p, float, 0x1F0);
                 if (direction > 0.0f) {
@@ -329,7 +329,7 @@ sweep_done:
                 goto attack_move;
             }
             case 3:
-                if (func_00282978(p + 0x21A)) FIELD(p, u8, 0x218) = 2;
+                if (FastDecTimer(p + 0x21A)) FIELD(p, u8, 0x218) = 2;
                 goto attack_move;
             case 4:
                 FIELD(p, float, 0x21C) -= 0.01f;
@@ -398,7 +398,7 @@ patrol_heading:
         u16 id;
         u8 *bits;
         func_L08_00429350(actor);
-        child = func_0029EFD0(0x8C4);
+        child = CreateMoby(0x8C4);
         if (!child) break;
         FIELD(child, u8, 0x23) = 80;
         FIELD(child, u16, 0x34) |= 0x800;
@@ -413,10 +413,10 @@ patrol_heading:
         func_002A0F48(child);
         func_002AB650(child);
         if (FIELD(actor, u8, 0x20) == 7)
-            func_002ABBB8(actor, p + 0x190, 0, 0.0f, 0.0f, 20, 6, 32,
+            SpawnExplosionEffects(actor, p + 0x190, 0, 0.0f, 0.0f, 20, 6, 32,
                 8.0f, 4.0f, 9.0f, 2.0f, -1, 30.0f, 1, 2, -1, 0, 0x810001);
         func_L08_00424F40(actor);
-        func_002A6C58(actor, 0, 3);
+        SetDeathBits(actor, 0, 3);
         D_L08_0021DE80.flags[FIELD(actor, s16, 0xB2)] = 0;
         D_L08_0021EAF0.flags[FIELD(actor, s16, 0xB2)] = 0;
         id = FIELD(actor, u16, 0xB2);
@@ -439,9 +439,9 @@ patrol_heading:
         if (index != -1 && FIELD(FIELD(p, char *, 0x1FC), int, 0)) {
             char *target = (char *)(D_L08_001B29DC + (index << 8));
             if (!target || FIELD(target, u8, 0x20) == 0xFE || FIELD(target, u8, 0x20) == 0xFD)
-                func_L08_003D3928(actor, actor + 0x10);
-            else func_L08_003D3928(actor, target + 0x10);
-        } else func_L08_003D3928(actor, actor + 0x10);
+                UpdateNearestTarget(actor, actor + 0x10);
+            else UpdateNearestTarget(actor, target + 0x10);
+        } else UpdateNearestTarget(actor, actor + 0x10);
     }
     if (FIELD(actor, float, 0x10) < 30.0f || FIELD(actor, float, 0x10) > 993.0f ||
         FIELD(actor, float, 0x14) < 30.0f || FIELD(actor, float, 0x14) > 993.0f ||

@@ -31,8 +31,8 @@ void func_L00_003ACC88(char *a0, char *a1)
     local[0] = D_L00_001AF7A4;
     local[3] = 1.0f;
     *(TI128 *)other = *(TI128 *)local;
-    func_00283098(other, other, a0 + 0xC0);
-    func_00282CC0(a1, other, a0 + 0x10);
+    matrix_mul_vec3(other, other, a0 + 0xC0);
+    FastVecAdd(a1, other, a0 + 0x10);
 }
 
 /* Resets the two slot cursors, then releases the 256-entry slot table. */
@@ -133,7 +133,7 @@ extern void ref_L00_003B1270_0(int,int,int,void *,int);
 
 /* Releases slot-table entries taken 480 or more frames ago, steps the moby's state 0, 1, 2, and in
    state 2 spawns a particle at the hero when the hero's button word has a bit of D_00138320 set
-   (recording it in a new slot when func_L00_003B0DA0 gives one); then hands both slot cursors to
+   (recording it in a new slot when RecordHeroTrailNode gives one); then hands both slot cursors to
    ref_L00_003B1270_0. */
 void func_L00_003B1270(char *m)
 {
@@ -158,7 +158,7 @@ void func_L00_003B1270(char *m)
         break;
     case 2:
         if (D_00138320 & D_00189E20.buttons) {
-            entry = func_L00_003B0DA0(D_00189E20.position);
+            entry = RecordHeroTrailNode(D_00189E20.position);
             if (entry) {
                 slot = D_L00_001AF810 - 1;
                 random = D_L00_001AF82C + (func_001163B0() & 7);
@@ -198,7 +198,7 @@ extern void func_L00_003ADA30(char *);
 
 /* Once per frame, links each listed active moby to every other active moby of class 0x81F within
    12 units and in line of sight (up to eight, in the moby's row of ref_L00_003ADEA0_3), registers
-   func_L00_003ADA30 to draw the links, and when a flagged moby of another class (not the hero's)
+   DrawMobyLinkQuads to draw the links, and when a flagged moby of another class (not the hero's)
    blocks a link, marks whichever end of it is nearer to that moby and records the blocker. */
 void func_L00_003ADEA0(void)
 {
@@ -225,29 +225,29 @@ void func_L00_003ADEA0(void)
             other = ref_L00_003ADEA0_1 + (ref_L00_003ADEA0_0[j] << 8);
             if (*(unsigned char *)(other + 0x20) != 6 || other == moby || *(short *)(other + 0xAA) != 0x81F)
                 continue;
-            if (!(func_00282E48(moby + 0x10, other + 0x10) < 12.0f))
+            if (!(fast_vec_dist(moby + 0x10, other + 0x10) < 12.0f))
                 continue;
             if (*(int *)(*(char **)(other + 0x68) + 0x7C) == ref_L00_003ADEA0_2)
                 continue;
-            if (func_002761F8(other + 0x10, moby + 0x10, 2, 0, 0))
+            if (CollLine(other + 0x10, moby + 0x10, 2, 0, 0))
                 continue;
             func_L00_003ADCD8(moby, other);
             if (n >= 8)
                 func_00282A28();
             ref_L00_003ADEA0_3[row][n++] = other;
             ref_L00_003ADEA0_3[row][n] = 0;
-            if (!func_002761F8(moby + 0x10, other + 0x10, 0, moby, 0))
+            if (!CollLine(moby + 0x10, other + 0x10, 0, moby, 0))
                 continue;
             hit = ref_L00_003ADEA0_4.hit;
             if (!hit || *(short *)(hit + 0xAA) == *(short *)(moby + 0xAA) || hit == D_00189E20.moby
                 || !(*(unsigned short *)(hit + 0x34) & 0x1000))
                 continue;
-            if (func_00282E48(hit + 0x10, moby + 0x10) < func_00282E48(hit + 0x10, other + 0x10))
+            if (fast_vec_dist(hit + 0x10, moby + 0x10) < fast_vec_dist(hit + 0x10, other + 0x10))
                 other = moby;
             *(unsigned char *)(other + 0x20) |= 8;
             vars = *(char **)(other + 0x68);
             func_002A7470(other, 1, 0, 3);
-            func_002E5CF8(0, 0, other);
+            PlayMobySound(0, 0, other);
             *(char **)(vars + 0x54) = hit;
             *(int *)(vars + 0x58) = 600;
             *(short *)(vars + 0x52) = 1;
@@ -255,6 +255,6 @@ void func_L00_003ADEA0(void)
             *(int *)(vars + 0x40) = 0;
         }
         if (n)
-            func_L00_002E6CF0(func_L00_003ADA30, moby);
+            func_L00_002E6CF0(DrawMobyLinkQuads, moby);
     }
 }

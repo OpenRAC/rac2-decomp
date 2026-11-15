@@ -23,7 +23,7 @@ void func_L00_00382910(unsigned char *object)
     velocity.bits=0; velocity.f[2]=-23;
     switch(object[0x20]) {
     case 0:
-        func_00282D30(&velocity,&velocity,FIELD(float,object,0x2C));
+        FastVecScale(&velocity,&velocity,FIELD(float,object,0x2C));
         func_L00_0033E220(&velocity,object,0x32608080,-1,1,-1,0,96,FIELD(float,object,0x2C)*5250000,FIELD(float,object,0x2C)*15);
         func_002A7750(object,1,-1); break;
     case 1:

@@ -35,7 +35,7 @@ void func_L07_003EECE0(char *arg)
     *(unsigned short *)(arg + 0x32) = 0xFF;
 
     if (*(int *)(s1 + 0x98) != 0) {
-        func_00282D60(&tmp, s0, 0.0009765625f);
+        scale_vector(&tmp, s0, 0.0009765625f);
         r = func_00283DB8(&tmp, 128.0f);
         if (r != -1) {
             qcopy(arg + 0x10, &D_L07_001B23CC[*(int *)(s1 + 0x98)].bytes[0x30]);

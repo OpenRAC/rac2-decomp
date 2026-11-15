@@ -113,7 +113,7 @@ extern void func_002AD6F0(void *, void *, void *, void *);
 
 /* A two-position mover. State 0 stores its two end points (which one is the current
    position depends on word 0x70) and each linked entity's distance to them; state 1 waits on
-   func_002ACBC8; states 3 and 4 re-arm the timer at 0x8C and, once func_L00_00324120 says so
+   IsPointInCuboid; states 3 and 4 re-arm the timer at 0x8C and, once func_L00_00324120 says so
    or the player has moved to the other side of the object, start the turn (states 5 and 6),
    which steps func_L14_003DE360 until the angle at 0x80 reaches 0 or pi/2 and then stops the
    object's sound. */
@@ -154,11 +154,11 @@ void func_L14_003DDD38(char *self)
         }
         qcopy(st + 0xB0, st + 0xA0);
         *(float *)(st + 0xB8) = *(float *)(st + 0x98);
-        func_00282CF0(d1, st + 0xA0, st + 0xB0);
-        *(float *)(st + 0x84) = func_00282DF0(d1);
-        func_00282CF0(d2, st + 0x90, st + 0xB0);
-        *(float *)(st + 0x88) = func_00282DF0(d2);
-        func_00282DD8(st + 0xC0, d2, d1);
+        FastVecSub(d1, st + 0xA0, st + 0xB0);
+        *(float *)(st + 0x84) = FastVecLength(d1);
+        FastVecSub(d2, st + 0x90, st + 0xB0);
+        *(float *)(st + 0x88) = FastVecLength(d2);
+        FastVecCross(st + 0xC0, d2, d1);
         ent = (char **)(st + 0xE0);
         dist = (float *)(st + 0xF0);
         /* The four linked-entity ids are the words at st+0xD0, just before the distances at
@@ -166,8 +166,8 @@ void func_L14_003DDD38(char *self)
         for (i = 3; i >= 0; i--) {
             if (*(int *)(dist - 8) > 0) {
                 *ent = D_L14_001B259C + (*(int *)(dist - 8) << 8);
-                func_00282CF0(d1, *ent + 0x10, st + 0xB0);
-                f = func_00282DF0(d1);
+                FastVecSub(d1, *ent + 0x10, st + 0xB0);
+                f = FastVecLength(d1);
                 if ((unsigned char)self[0x20] == 4) {
                     dist[0] = f;
                     dist[4] = *(float *)(st + 0x84) - *(float *)(st + 0x88) + f;
@@ -187,7 +187,7 @@ void func_L14_003DDD38(char *self)
         break;
     case 1:
         func_002B3868(self);
-        if (func_002ACBC8(D_00189EA0, *(int *)(st + 0x74)) != 0) {
+        if (IsPointInCuboid(D_00189EA0, *(int *)(st + 0x74)) != 0) {
             func_002A7750(self, 2, -1);
         }
         break;
@@ -201,12 +201,12 @@ void func_L14_003DDD38(char *self)
         }
         func_00282948((int *)(st + 0x8C));
         if (func_L00_00324120(self) == 0) {
-            if (!(func_00282E48(D_00189EA0, self + 0x10) < 30.0f)) {
+            if (!(fast_vec_dist(D_00189EA0, self + 0x10) < 30.0f)) {
                 break;
             }
             /* Which end the player is nearer; the object's own nearer end must differ. */
-            side = func_00282E48(D_00189EA0, st + 0x90) > func_00282E48(D_00189EA0, st + 0xA0);
-            if ((side ^ (func_00282E48(self + 0x10, st + 0x90) > func_00282E48(self + 0x10, st + 0xA0))) == 0) {
+            side = fast_vec_dist(D_00189EA0, st + 0x90) > fast_vec_dist(D_00189EA0, st + 0xA0);
+            if ((side ^ (fast_vec_dist(self + 0x10, st + 0x90) > fast_vec_dist(self + 0x10, st + 0xA0))) == 0) {
                 break;
             }
         }
@@ -220,7 +220,7 @@ void func_L14_003DDD38(char *self)
         break;
     case 5:
         if (func_002B3868(self) != 0) {
-            *(int *)(st + 0x78) = func_002E5CF8(0, 4, self);
+            *(int *)(st + 0x78) = PlayMobySound(0, 4, self);
         }
         if (*(float *)(st + 0x80) > 0.0f) {
             func_L14_003DE360(self, -*(float *)(st + 0x7C));
@@ -241,7 +241,7 @@ void func_L14_003DDD38(char *self)
         break;
     case 6:
         if (func_002B3868(self) != 0) {
-            *(int *)(st + 0x78) = func_002E5CF8(0, 4, self);
+            *(int *)(st + 0x78) = PlayMobySound(0, 4, self);
         }
         if (*(float *)(st + 0x80) < 1.5707964f) {
             func_L14_003DE360(self, *(float *)(st + 0x7C));
@@ -262,7 +262,7 @@ void func_L14_003DDD38(char *self)
         break;
     }
     func_L14_003DE310(self);
-    func_00282CF0(delta, self + 0x10, pos);
+    FastVecSub(delta, self + 0x10, pos);
     func_002AD6F0(st + 0x20, delta, rot, self + 0xF0);
 }
 
@@ -454,7 +454,7 @@ void func_L14_003F0F38(char *arg0, char *arg1, float unused_scale, int arg2, int
 
     s3 = *(char **)(arg0 + 0x68);
 
-    arg3 = arg3 - ((int)func_00283CF0(func_002A78D8(0.0f, 5.0f)) << 24);
+    arg3 = arg3 - ((int)FloatToInt(func_002A78D8(0.0f, 5.0f)) << 24);
     func_L14_003F0E98(&fr.rec);
 
     fr.rec.f[0] = *(float *)s3;
@@ -466,35 +466,35 @@ void func_L14_003F0F38(char *arg0, char *arg1, float unused_scale, int arg2, int
     fr.rec.f[6] = *(float *)s3 + 1.0f;
     fr.rec.f[7] = 1.0f;
 
-    id = func_0027C878(D_L14_001B092C);
+    id = GetEffectTextureDescriptor(D_L14_001B092C);
     fr.rec.r = id;
     fr.rec.s = 280993940374112LL;
     fr.t = 0x8000000048LL;
     fr.rec.p[0] = arg2 + arg3;
     fr.rec.q = 0LL;
 
-    arg3 = arg3 - ((int)func_00283CF0(func_002A78D8(0.0f, 9.0f)) << 24);
+    arg3 = arg3 - ((int)FloatToInt(func_002A78D8(0.0f, 9.0f)) << 24);
     fr.rec.p[1] = arg2 + arg3;
-    arg3 = arg3 - ((int)func_00283CF0(func_002A78D8(0.0f, 9.0f)) << 24);
+    arg3 = arg3 - ((int)FloatToInt(func_002A78D8(0.0f, 9.0f)) << 24);
     fr.rec.p[2] = arg2 + arg3;
-    arg3 = arg3 - ((int)func_00283CF0(func_002A78D8(0.0f, 9.0f)) << 24);
+    arg3 = arg3 - ((int)FloatToInt(func_002A78D8(0.0f, 9.0f)) << 24);
     fr.rec.p[3] = arg2 + arg3;
 
     fr.dir[2] = *(float *)(arg0 + 0xF8);
     fr.dir[1] = *(float *)(arg0 + 0xF4);
     fr.dir[0] = 1.5707965f;
     fr.dir[3] = 0.0f;
-    func_00283410(fr.mat, fr.dir);
+    euler_to_matrix(fr.mat, fr.dir);
 
     fr.vec[0] = *(float *)arg1;
     fr.vec[1] = *(float *)(arg1 + 4);
     fr.vec[2] = *(float *)(arg1 + 8);
     fr.vec[3] = 1.0f;
-    func_00282D30(&fr.rec.v[0], &fr.rec.v[0], 1.0f);
-    func_00282D30(&fr.rec.v[1], &fr.rec.v[1], 1.0f);
-    func_00282D30(&fr.rec.v[2], &fr.rec.v[2], 1.0f);
-    func_00282D30(&fr.rec.v[3], &fr.rec.v[3], 1.0f);
-    func_00280B90(&fr.rec, fr.mat, 0);
+    FastVecScale(&fr.rec.v[0], &fr.rec.v[0], 1.0f);
+    FastVecScale(&fr.rec.v[1], &fr.rec.v[1], 1.0f);
+    FastVecScale(&fr.rec.v[2], &fr.rec.v[2], 1.0f);
+    FastVecScale(&fr.rec.v[3], &fr.rec.v[3], 1.0f);
+    draw_world_quad(&fr.rec, fr.mat, 0);
 
     tv = 0x8000000044LL;
     fr.rec.f[0] = *(float *)(s3 + 8);
@@ -502,19 +502,19 @@ void func_L14_003F0F38(char *arg0, char *arg1, float unused_scale, int arg2, int
     fr.rec.f[2] = *(float *)(s3 + 8);
     fr.rec.f[3] = 1.0f;
     fr.t = tv;
-    arg4 = arg4 - ((int)func_00283CF0(func_002A78D8(0.0f, 9.0f)) << 24);
+    arg4 = arg4 - ((int)FloatToInt(func_002A78D8(0.0f, 9.0f)) << 24);
     fr.rec.p[0] = arg2 + arg4;
-    arg4 = arg4 - ((int)func_00283CF0(func_002A78D8(0.0f, 9.0f)) << 24);
+    arg4 = arg4 - ((int)FloatToInt(func_002A78D8(0.0f, 9.0f)) << 24);
     fr.rec.p[1] = arg2 + arg4;
-    arg4 = arg4 - ((int)func_00283CF0(func_002A78D8(0.0f, 9.0f)) << 24);
+    arg4 = arg4 - ((int)FloatToInt(func_002A78D8(0.0f, 9.0f)) << 24);
     fr.rec.p[2] = arg2 + arg4;
-    arg4 = arg4 - ((int)func_00283CF0(func_002A78D8(0.0f, 9.0f)) << 24);
+    arg4 = arg4 - ((int)FloatToInt(func_002A78D8(0.0f, 9.0f)) << 24);
     fr.rec.p[3] = arg2 + arg4;
     fr.rec.f[4] = *(float *)(s3 + 8) + 1.0f;
     fr.rec.f[5] = 0.0f;
     fr.rec.f[6] = *(float *)(s3 + 8) + 1.0f;
     fr.rec.f[7] = 1.0f;
-    func_00280B90(&fr.rec, fr.mat, 0);
+    draw_world_quad(&fr.rec, fr.mat, 0);
 }
 
 extern float D_L14_001B04B0 __attribute__((sda));
@@ -539,10 +539,10 @@ void func_L14_003E2688(char *object, L14Swing *base, int index, float *a, float 
 {
     float v[4];
 
-    func_00282D30(v, b, (float)phase1 * 0.125f);
-    func_00282CC0(base->rows[index], a, v);
-    func_00282D30(v, c, (float)phase0 * 0.125f);
-    func_00282CC0(base->rows[index], base->rows[index], v);
+    FastVecScale(v, b, (float)phase1 * 0.125f);
+    FastVecAdd(base->rows[index], a, v);
+    FastVecScale(v, c, (float)phase0 * 0.125f);
+    FastVecAdd(base->rows[index], base->rows[index], v);
     func_0027C768(base->rows[index], &base->pairs[index][0], &base->pairs[index][1]);
     base->pairs[index][0] += (1.0f - func_L14_003E22A8(object)) * D_L14_001B04B0
         * func_00283198(func_L14_003E28E8((D_L14_001B04B4 + D_L14_001B04B4) * (func_L14_003E22A8(object) * 3.1415927f)
@@ -597,7 +597,7 @@ void func_L14_003E2980(char *obj)
     green = func_002A7820(0, D_L14_001B04E8);
     blue = func_002A7820(0, D_L14_001B04E4);
     argb = 0xFF000000 | (green << 8);
-    color = func_00283D38((red << 16) | argb | blue, *(int *)(rec + 0x84), func_L14_003E22A8(obj));
+    color = FastTweenColor((red << 16) | argb | blue, *(int *)(rec + 0x84), func_L14_003E22A8(obj));
     life = func_002A7820(D_L14_001B04D4 / 2, D_L14_001B04D4);
     func_002C7BB8((char *)pos, (char *)vel, life, color, func_002A7820(0, D_L14_001B04E0), 0x80, 0,
                   D_L14_001B04D8, D_L14_001B04DC, D_L14_001B04F4, D_L14_001B04F0);

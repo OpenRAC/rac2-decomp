@@ -33,7 +33,7 @@ void func_L09_003B6550(u8 *self)
     case 1:
         if (*(short *)(self + 0xAA) == 0x852) {
             if (func_002A9640(self, 0x4010000, 0)) {
-                func_002E5CF8(0, 0, self);
+                PlayMobySound(0, 0, self);
                 func_002A7750(self, 2, -1);
             }
             self[0xA8] = 0xFF;
@@ -44,10 +44,10 @@ void func_L09_003B6550(u8 *self)
         if (effect)
             func_L00_0032A258(effect, D_L09_001AF9E0, D_L09_001AF9D8, D_L09_001AF9D0, 0xFFFF, 0,
                               -1, 0x16, 0xFFFF, 0xFF, 0);
-        func_0032C700(self + 0x10, 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 1.0f, 20.0f, 1, 1, 0, 0);
+        SpawnExplosion(self + 0x10, 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 1.0f, 20.0f, 1, 1, 0, 0);
         v.bits = 0;
         v.value[2] = 0.20000002f;
-        func_L00_003263D0(self, self + 0x10, 0x14, 0, &v, 0x80804040, 0, 6.0f, 3.0f, 1.5f, 7.0f);
+        SpawnTintedEffects(self, self + 0x10, 0x14, 0, &v, 0x80804040, 0, 6.0f, 3.0f, 1.5f, 7.0f);
         func_0029F338(effect);
         func_0029F338(self);
         break;

@@ -40,7 +40,7 @@ void func_002E48E8(void)
         slot[0x74] = 0;
         slot += 0x70;
     } while ((int)slot < (int)(D_00188660 + 0x16C0));
-    func_00131DE8(2);
+    snd_StartSoundSystem(2);
     func_00132938(!D_001A7B98);
     func_00132978(0, 1);
     func_001329B0(1, 24, 47);

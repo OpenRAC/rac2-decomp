@@ -38,12 +38,12 @@ void func_0030CAD0(char *obj) {
         D_001B24A0 = D_001AF040;
         D_001AEFA0 = 0;
         D_001B24A4 = 0;
-        func_00282CF0(&delta, state + 1, state);
-        func_00282F20(&step, &delta, D_001AEFA4 * 0.05f);
+        FastVecSub(&delta, state + 1, state);
+        vec_scale_to_length(&step, &delta, D_001AEFA4 * 0.05f);
         points = D_00229710;
         qcopy(points, state);
         for (i = 1; i < 20; i++) {
-            func_00282CC0(&points[i], &points[i - 1], &step);
+            FastVecAdd(&points[i], &points[i - 1], &step);
             D_00229990[i] = 0;
             func_00282C88(&D_002299E0[i]);
             D_00229B20[i] = 0;

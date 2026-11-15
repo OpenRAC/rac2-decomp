@@ -106,7 +106,7 @@ void func_L12_004190A8(DriverObject *self)
             break;
         }
         initialPath = D_L12_001FEAC0[state->path0];
-        state->length = func_00282E48(initialPath+0x10,initialPath+0x20);
+        state->length = fast_vec_dist(initialPath+0x10,initialPath+0x20);
         func_002A7750(self,3,-1);
         self->f30 = 0xff;
         self->f32 = 0xff;
@@ -132,22 +132,22 @@ void func_L12_004190A8(DriverObject *self)
         func_L12_00418D20(self);
         state->rotation[1] *= -0.333f;
         if (!SOUND_LIVE(state->sound))
-            state->sound = func_002E5CF8(0,4,self);
+            state->sound = PlayMobySound(0,4,self);
         if (state->progress >= (float)(*(int *)path-1)) {
             func_002A7750(self,3,-1);
             state->timer = 60;
             if (self->nextAnimation != 1) func_002A7470(self,1,0,30);
             CLEAR_SOUND();
-            state->sound = func_002E5CF8(1,0,self);
+            state->sound = PlayMobySound(1,0,self);
         }
         break;
     case 3:
         if (func_002B3868(self)) CLEAR_SOUND();
         if (func_00282948(&state->timer)) {
-            func_00283098(a,D_L12_001B1C00,(u8 *)self+0xC0);
-            func_00282CC0(a,a,self->position);
-            func_00283098(b,D_L12_001B1C10,(u8 *)self+0xC0);
-            func_00282CC0(b,b,self->position);
+            matrix_mul_vec3(a,D_L12_001B1C00,(u8 *)self+0xC0);
+            FastVecAdd(a,a,self->position);
+            matrix_mul_vec3(b,D_L12_001B1C10,(u8 *)self+0xC0);
+            FastVecAdd(b,b,self->position);
             b[2] += 2.0f;
             b[2] = func_002A89A8(0.5f,b,0);
             if (!func_L12_003E0858(state->trigger,a,b)) {
@@ -155,7 +155,7 @@ void func_L12_004190A8(DriverObject *self)
                 func_002A7750(self,4,-1);
                 if (self->nextAnimation != 0) func_002A7470(self,0,0,30);
                 CLEAR_SOUND();
-                state->sound = func_002E5CF8(2,0,self);
+                state->sound = PlayMobySound(2,0,self);
                 state->soundTimer = 15;
                 state->progress = 0;
                 state->velocity = 0;
@@ -163,7 +163,7 @@ void func_L12_004190A8(DriverObject *self)
         } else if (state->timer >= 46) {
             if (state->sound == -1 || !SOUND_LIVE(state->sound) ||
                 SOUND_ENTRY(state->sound)->kind != 1)
-                state->sound = func_002E5CF8(1,0,self);
+                state->sound = PlayMobySound(1,0,self);
         }
         break;
     case 4:
@@ -176,7 +176,7 @@ void func_L12_004190A8(DriverObject *self)
         state->rotation[1] *= -0.333f;
         if (!func_00282948(&state->soundTimer)) {
             if (state->sound == -1 || !SOUND_LIVE(state->sound))
-                state->sound = func_002E5CF8(2,0,self);
+                state->sound = PlayMobySound(2,0,self);
         }
         if (state->progress >= (float)(*(int *)path-1)) {
             func_002A7750(self,5,-1);
@@ -190,17 +190,17 @@ void func_L12_004190A8(DriverObject *self)
             if (self->nextAnimation != 1) func_002A7470(self,1,0,30);
             state->soundTimer = 15;
             CLEAR_SOUND();
-            state->sound = func_002E5CF8(1,0,self);
+            state->sound = PlayMobySound(1,0,self);
         } else if (func_L12_003E09C8(state->trigger)) {
             func_002A7750(self,6,-1);
             if (self->nextAnimation != 0) func_002A7470(self,0,0,30);
             CLEAR_SOUND();
             if (!SOUND_LIVE(state->sound))
-                state->sound = func_002E5CF8(2,4,self);
+                state->sound = PlayMobySound(2,4,self);
         } else if (self->animation == 1 && !func_00282948(&state->soundTimer)) {
             if (state->sound == -1 || !SOUND_LIVE(state->sound) ||
                 SOUND_ENTRY(state->sound)->kind != 1)
-                state->sound = func_002E5CF8(1,0,self);
+                state->sound = PlayMobySound(1,0,self);
         }
         break;
     case 6:
@@ -213,7 +213,7 @@ void func_L12_004190A8(DriverObject *self)
         func_002C9828(path,0,state->position,state->rotation,0,state->progress);
         func_L12_00418D20(self);
         state->rotation[1] *= -0.333f;
-        if (!SOUND_LIVE(state->sound)) state->sound = func_002E5CF8(0,4,self);
+        if (!SOUND_LIVE(state->sound)) state->sound = PlayMobySound(0,4,self);
         if (state->progress >= (float)(*(int *)path-1)) {
             func_002A7750(self,1,-1);
             state->progress = 0;
@@ -228,8 +228,8 @@ void func_L12_004190A8(DriverObject *self)
             if (owner && (*(s16 *)(owner+0xAA) == 0xB69 || *(s16 *)(owner+0xAA) == 0xF9E))
                 accepted = 1;
             if (!accepted) {
-                func_002ABBB8(self,self->position,0,0,0,10,3,9,4,2,9,0,-1,15,1,1,-1,0,0x810001);
-                func_002A6C58(self,0,3);
+                SpawnExplosionEffects(self,self->position,0,0,0,10,3,9,4,2,9,0,-1,15,1,1,-1,0,0x810001);
+                SetDeathBits(self,0,3);
                 func_0029F338(self);
                 return;
             }
@@ -239,11 +239,11 @@ void func_L12_004190A8(DriverObject *self)
     if (self->state != 7) {
         qcopy(self->position,state->position);
         qcopy(self->rotation,state->rotation);
-        state->phase0 = func_00283B98(state->phase0,D_L12_001B1C38*0.00029088825f);
-        self->rotation[0] = func_00283B98(D_L12_001B1C34*(func_00283198(state->phase0)*0.017453294f),state->rotation[0]);
-        state->phase1 = func_00283B98(state->phase1,D_L12_001B1C30*0.00029088825f);
-        self->rotation[1] = func_00283B98(D_L12_001B1C2C*(func_00283198(state->phase1)*0.017453294f),state->rotation[1]);
-        state->phase2 = func_00283B98(state->phase2,D_L12_001B1C28*0.00029088825f);
+        state->phase0 = FastAddRotations(state->phase0,D_L12_001B1C38*0.00029088825f);
+        self->rotation[0] = FastAddRotations(D_L12_001B1C34*(func_00283198(state->phase0)*0.017453294f),state->rotation[0]);
+        state->phase1 = FastAddRotations(state->phase1,D_L12_001B1C30*0.00029088825f);
+        self->rotation[1] = FastAddRotations(D_L12_001B1C2C*(func_00283198(state->phase1)*0.017453294f),state->rotation[1]);
+        state->phase2 = FastAddRotations(state->phase2,D_L12_001B1C28*0.00029088825f);
         self->position[2] += D_L12_001B1C24*func_00283198(state->phase2);
     }
 }

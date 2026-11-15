@@ -60,7 +60,7 @@ void func_L02_00410450(u8 *object)
     switch(object[0x20]) {
     case 0:
         object[0x30]=0xFF;object[0x20]=1;
-        func_L02_00410E58(object);
+        SpawnOrbitingChildren(object);
         func_L02_00410D00(object);
         break;
     case 1:
@@ -89,7 +89,7 @@ void func_L02_00410450(u8 *object)
             if(D_00189E20.busy) goto propagate;
             func_L02_004114A0(object);
             if((D_00138324&0x10) && D_L02_001A8FB4==11) {
-                func_002E5CF8(0,0,(char *)object);
+                PlayMobySound(0,0,(char *)object);
                 object[0x20]=2;state->rateA=0;state->rateB=0;
                 func_L00_002D40A0((Quad *)(object+0x10),0,*(float *)(object+0xF8));
                 func_002A8C28(object,1.5f,(float *)(object+0x10),0x10000,20.0f,1.0f,0,1,0);
@@ -126,8 +126,8 @@ void func_L02_00410450(u8 *object)
             *(int *)(*slot+0x98)=*(int *)(*(u8 **)(*slot+0x24)+0x10);slot++;
         } while(--left>=0);
         if(state->timer!=0.0f) {
-            func_L00_002E6CF0((DrawCallback)func_L02_00410F68,object);
-            func_002AA2E8(&state->timer,0,0.06666667f);
+            func_L00_002E6CF0((DrawCallback)DrawAnimatedEffectQuads,object);
+            ApproachValue(&state->timer,0,0.06666667f);
             break;
         }
             D_00189E20.active=1;
@@ -141,7 +141,7 @@ void func_L02_00410450(u8 *object)
                 actor[0x20]=4;
                 *(float *)(data+0x34)=0;*(float *)(data+0x28)=0;*(float *)(data+0x2C)=0;
                 *(float *)(data+0x20)=1;*(float *)(data+0x24)=1;
-                func_002E5CF8(1,0,(char *)actor);
+                PlayMobySound(1,0,(char *)actor);
                 object[0x20]=1;state->orbitA=0;state->orbitB=0;state->rateA=0;state->rateB=0;state->timer=1.95f;
                 func_L02_00410D00(object);
             }
@@ -157,8 +157,8 @@ void func_L02_00410450(u8 *object)
             *(int *)(*slot+0x98)=*(int *)(*(u8 **)(*slot+0x24)+0x10);slot++;
         } while(--left>=0);
         if(state->timer<1.95f) {
-            func_L00_002E6CF0((DrawCallback)func_L02_00410F68,object);
-            func_002AA2E8(&state->timer,1.95f,0.06666667f);
+            func_L00_002E6CF0((DrawCallback)DrawAnimatedEffectQuads,object);
+            ApproachValue(&state->timer,1.95f,0.06666667f);
         } else {
             if(state->orbitB>0.0f) {
                 func_002AA548(&state->orbitB,&state->rateA,0.0f,D_L02_001B1A58*0.00027777778f,D_L02_001B1A5C*0.00027777778f,D_L02_001B1A60*0.016666668f);
@@ -176,7 +176,7 @@ void func_L02_00410450(u8 *object)
         if(state->opacity>=1.2f) {
             func_L00_002C8BA8(0);object[0x20]=4;
             state->rateA=0;state->rateB=0;state->timer=0;state->orbitA=1;state->orbitB=1;
-            func_002E5CF8(1,0,(char *)object);
+            PlayMobySound(1,0,(char *)object);
         }
         func_L00_002E6EF8((DrawCallback)func_L02_00411530,object);
         break;

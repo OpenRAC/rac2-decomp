@@ -16,7 +16,7 @@ char *func_L00_00409558(Quad *position,Quad *velocity,int lifetime,int mode)
     char *state;
     float rotation;
     int duration;
-    object=func_0029EFD0(3790);
+    object=CreateMoby(3790);
     if(object) {
         state=*(char **)(object+0x68);
         *(short *)(object+0x32)=255; *(unsigned char *)(object+0x30)=255; object[0x20]=0;
@@ -26,7 +26,7 @@ char *func_L00_00409558(Quad *position,Quad *velocity,int lifetime,int mode)
         *(float *)(object+0xF0)=func_002A7940();
         *(float *)(object+0xF4)=func_002A7940();
         *(float *)(object+0xF8)=func_002A7940();
-        func_002833F0(object+0xC0,object+0xF0);
+        euler_rotation_basis(object+0xC0,object+0xF0);
         rotation=func_002A7878(0.05235988646745682f,0.10471977293491364f);
         func_002AB668(state+0x10,object+0xD0,rotation);
         duration=D_L00_001B0FC4;

@@ -202,7 +202,7 @@ extern char D_L00_001B1FB0[] MACRO_ADDR;
 char *func_L00_00409E48(char *owner, void *position, char *target, void *color, float height)
 {
     Vector aim, offset, tmp1, tmp2, tmp3, tmp4;
-    ProjectileObject *m = (ProjectileObject *)func_0029EFD0(0xed7);
+    ProjectileObject *m = (ProjectileObject *)CreateMoby(0xed7);
     ProjectileState *s;
     char *hit;
     float scale;
@@ -222,8 +222,8 @@ char *func_L00_00409E48(char *owner, void *position, char *target, void *color, 
         scale = (D_L00_00262570 + D_00139583)->value * (1.0f / 60.0f);
         qcopy(m->position, position);
         if (target) {
-            func_00282D30(offset, target + 0xe0, height);
-            func_00282CC0(aim, target + 0x10, offset);
+            FastVecScale(offset, target + 0xe0, height);
+            FastVecAdd(aim, target + 0x10, offset);
         } else {
             qzero(aim);
         }
@@ -233,44 +233,44 @@ char *func_L00_00409E48(char *owner, void *position, char *target, void *color, 
             qcopy(m->right, D_L00_001B8FF0[1]);
             qcopy(m->up, D_L00_001B8FF0[2]);
             qcopy(m->position, D_L00_001B8DC0);
-            func_00282D30(offset, D_L00_001B8FF0[2], -0.2f);
-            func_00282CC0(m->position, m->position, offset);
-            func_00282D30(tmp1, D_L00_001B8FF0[1], -0.25f);
-            func_00282CC0(m->position, m->position, tmp1);
-            func_00282D30(tmp2, D_L00_001B8FF0[0], 0.0f);
-            func_00282CC0(m->position, m->position, tmp2);
+            FastVecScale(offset, D_L00_001B8FF0[2], -0.2f);
+            FastVecAdd(m->position, m->position, offset);
+            FastVecScale(tmp1, D_L00_001B8FF0[1], -0.25f);
+            FastVecAdd(m->position, m->position, tmp1);
+            FastVecScale(tmp2, D_L00_001B8FF0[0], 0.0f);
+            FastVecAdd(m->position, m->position, tmp2);
             if (target) {
-                func_00282CF0(m->forward, aim, m->position);
-                func_00282F20(m->forward, m->forward, 1.0f);
-                func_00282DD8(m->right, m->forward, D_00189E20.object + 0xe0);
-                func_00282F20(m->right, m->right, 1.0f);
-                func_00282DD8(m->up, m->right, m->forward);
+                FastVecSub(m->forward, aim, m->position);
+                vec_scale_to_length(m->forward, m->forward, 1.0f);
+                FastVecCross(m->right, m->forward, D_00189E20.object + 0xe0);
+                vec_scale_to_length(m->right, m->right, 1.0f);
+                FastVecCross(m->up, m->right, m->forward);
             } else {
-                func_00282D30(tmp3, D_L00_001B8FF0[0], 30.0f);
-                func_00282CC0(tmp3, D_L00_001B8DC0, tmp3);
-                if (func_002761F8(D_L00_001B8DC0, tmp3, 0, D_00189E20.object, 0))
+                FastVecScale(tmp3, D_L00_001B8FF0[0], 30.0f);
+                FastVecAdd(tmp3, D_L00_001B8DC0, tmp3);
+                if (CollLine(D_L00_001B8DC0, tmp3, 0, D_00189E20.object, 0))
                     qcopy(tmp3, D_L00_001BF220);
-                func_00282CF0(tmp4, tmp3, m->position);
-                func_00282F20(m->forward, tmp4, 1.0f);
-                func_00282DD8(m->right, m->forward, D_00189E20.object + 0xe0);
-                func_00282F20(m->right, m->right, 1.0f);
-                func_00282DD8(m->up, m->right, m->forward);
+                FastVecSub(tmp4, tmp3, m->position);
+                vec_scale_to_length(m->forward, tmp4, 1.0f);
+                FastVecCross(m->right, m->forward, D_00189E20.object + 0xe0);
+                vec_scale_to_length(m->right, m->right, 1.0f);
+                FastVecCross(m->up, m->right, m->forward);
             }
         } else if (D_00189E20.orientation == 1) {
-            func_00282F20(m->forward, owner + 0xd0, -1.0f);
-            func_00282D30(m->right, owner + 0xc0, -1.0f);
+            vec_scale_to_length(m->forward, owner + 0xd0, -1.0f);
+            FastVecScale(m->right, owner + 0xc0, -1.0f);
             qcopy(m->up, owner + 0xe0);
         } else if (target) {
-            func_00282CF0(m->forward, aim, m->position);
-            func_00282F20(m->forward, m->forward, 1.0f);
-            func_00282DD8(m->right, m->forward, D_00189E20.object + 0xe0);
-            func_00282F20(m->right, m->right, 1.0f);
-            func_00282DD8(m->up, m->right, m->forward);
+            FastVecSub(m->forward, aim, m->position);
+            vec_scale_to_length(m->forward, m->forward, 1.0f);
+            FastVecCross(m->right, m->forward, D_00189E20.object + 0xe0);
+            vec_scale_to_length(m->right, m->right, 1.0f);
+            FastVecCross(m->up, m->right, m->forward);
         } else {
             qcopy(m->forward, D_00189E20.forward);
-            func_00282DD8(m->right, m->forward, D_00189E20.up);
-            func_00282F20(m->right, m->right, 1.0f);
-            func_00282DD8(m->up, m->right, m->forward);
+            FastVecCross(m->right, m->forward, D_00189E20.up);
+            vec_scale_to_length(m->right, m->right, 1.0f);
+            FastVecCross(m->up, m->right, m->forward);
         }
         m->forward[3] = m->right[3] = m->up[3] = 0;
 
@@ -307,13 +307,13 @@ char *func_L00_00409E48(char *owner, void *position, char *target, void *color, 
         /* Trace from the owner (at the spawn height) to the spawn point. */
         *(Quadword *)offset = *(Quadword *)(owner + 0x10);
         offset[2] = ((float *)position)[2];
-        if (func_002761F8(offset, position, 0, D_00189E20.object, 0)) {
+        if (CollLine(offset, position, 0, D_00189E20.object, 0)) {
             m->hit = 1;
             qcopy(m->position, D_L00_001BF220);
         }
         func_L00_0040B2C0(m, D_L00_00255BA0 + s->index * 64);
         func_002A0F48(m);
-        func_002ACA50(m, D_L00_001B1FB0, 31);
+        AddMobyToIndexList(m, D_L00_001B1FB0, 31);
         s->handle = func_002FED90(m, 0, 1.0f, 1.0f, 1.0f);
         m->radius *= 2.5f;
     }
@@ -337,16 +337,16 @@ void func_L00_0040B398(char *object)
     int g, i, j, k, l, n;
 
     for (g = 0; g < 4; g++) {
-        if (func_00282978(&D_L00_001B2D40[g])) {
+        if (FastDecTimer(&D_L00_001B2D40[g])) {
             D_L00_001B2D48[g] = 0;
             D_L00_001B2D40[g] = D_L00_001B2D50[g];
             qcopy(p, state + 0x30);
             p[0] += func_002A7878(-0.5f, 0.5f);
             p[1] += func_002A7878(-0.5f, 0.5f);
             p[2] += func_002A7878(-0.5f, 0.5f);
-            func_00282CF0(delta, p, D_0018BE30);
-            func_00282F20(delta, delta, D_L00_001B100C);
-            func_00282CC0(delta, p, delta);
+            FastVecSub(delta, p, D_0018BE30);
+            vec_scale_to_length(delta, delta, D_L00_001B100C);
+            FastVecAdd(delta, p, delta);
             for (i = 0; i < 10; i++) {
                 float t = i * 0.1f;
                 if (i == 9)
@@ -356,14 +356,14 @@ void func_L00_0040B398(char *object)
             }
         } else {
             for (j = 1; j < 10; j++) {
-                func_00282CF0(diffs[j], D_L00_002563A0[g][j], (&((Vector *)D_L00_002563A0)[g * 10 + j])[-1]);
+                FastVecSub(diffs[j], D_L00_002563A0[g][j], (&((Vector *)D_L00_002563A0)[g * 10 + j])[-1]);
                 diffs[j][0] += func_002A78D8(0.0f, 0.05f);
                 diffs[j][1] += func_002A78D8(0.0f, 0.05f);
                 diffs[j][2] += func_002A78D8(0.0f, 0.05f);
             }
             qcopy(D_L00_002563A0[g][0], D_0018BE30);
             for (k = 1; k < 10; k++)
-                func_00282CC0(D_L00_002563A0[g][k], (&((Vector *)D_L00_002563A0)[g * 10 + k])[-1], diffs[k]);
+                FastVecAdd(D_L00_002563A0[g][k], (&((Vector *)D_L00_002563A0)[g * 10 + k])[-1], diffs[k]);
         }
         for (l = 2; l < 9; l++) {
             qcopy(p, D_L00_002563A0[0][l]);

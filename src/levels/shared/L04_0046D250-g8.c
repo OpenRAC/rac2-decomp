@@ -83,45 +83,45 @@ void func_L04_0046D250(CameraObject *obj) {
         if (D_L04_001B1CCC == -1 && (*(int *)(state + 0x278) > 0 || *(int *)(state + 0x338) > 0)) D_L04_001B1CCC = 90;
         if (*(int *)(state + 0x278) <= 0 && *(int *)(state + 0x338) <= 0) D_L04_001B1CCC = -1;
     }
-    func_00282D30(&negative, &D_00189E20, -1.0f);
+    FastVecScale(&negative, &D_00189E20, -1.0f);
     qcopy(&center, &D_00189E20.position);
     velocity.q = 0;
     velocity.f[2] = 1.0f;
     velocity.f[3] = 1.0f;
     qcopy(&axis, &velocity);
-    func_00282DD8(&projection, &negative, &velocity);
-    func_00282F20(&projection, &projection, 1.0f);
-    func_00282DD8(&negative, &axis, &projection);
-    func_002830C0(&rotated, &offset, &negative);
-    func_00282CF0(&delta, &rotated, &D_00189E20.position);
-    func_00282D08(motion, motion, &delta, smoothing);
+    FastVecCross(&projection, &negative, &velocity);
+    vec_scale_to_length(&projection, &projection, 1.0f);
+    FastVecCross(&negative, &axis, &projection);
+    transform_vector(&rotated, &offset, &negative);
+    FastVecSub(&delta, &rotated, &D_00189E20.position);
+    lerp_vector(motion, motion, &delta, smoothing);
     velocity.q = motion->q;
     if (D_L04_001B1CCC > 0) {
-        if (D_L04_001B1CCC >= 76) func_002AA2E8(&D_L04_001B1CD0, 1.0f, 0.0416666679f);
-        else func_002AA2E8(&D_L04_001B1CD0, 0.0f, 0.0125000011f);
+        if (D_L04_001B1CCC >= 76) ApproachValue(&D_L04_001B1CD0, 1.0f, 0.0416666679f);
+        else ApproachValue(&D_L04_001B1CD0, 0.0f, 0.0125000011f);
         if (D_L04_001B1CD0 > 0) {
-            scale = func_00282E20(&velocity);
+            scale = vec_length_xy(&velocity);
             scale = (scale + D_L04_001B1CD0) / scale;
             velocity.f[0] *= scale;
             velocity.f[1] *= scale;
         }
         func_00282948(&D_L04_001B1CCC);
     }
-    func_00282CC0(&obj->position, &D_00189E20.position, &velocity);
-    if (func_002761F8(&old, &obj->position, 4, 0, 0)) {
+    FastVecAdd(&obj->position, &D_00189E20.position, &velocity);
+    if (CollLine(&old, &obj->position, 4, 0, 0)) {
         hit = D_L04_001BFAC0.hit;
         if (!hit || (*(short *)(hit + 0xAA) != 0xB2D && *(short *)(hit + 0xAA) != 0xBBC && *(short *)(hit + 0xAA) != 0xA1F)) {
-            func_00282CF0(&rotated, &D_L04_001BFAC0.point, &old);
-            func_00282D30(&velocity, &rotated, 0.95f);
-            func_00282CC0(&obj->position, &old, &velocity);
+            FastVecSub(&rotated, &D_L04_001BFAC0.point, &old);
+            FastVecScale(&velocity, &rotated, 0.95f);
+            FastVecAdd(&obj->position, &old, &velocity);
         }
     }
-    if (func_002761F8(&D_00189E20.position, &obj->position, 2, 0, 0)) {
+    if (CollLine(&D_00189E20.position, &obj->position, 2, 0, 0)) {
         hit = D_L04_001BFAC0.hit;
         if (!hit || (*(short *)(hit + 0xAA) != 0xB2D && *(short *)(hit + 0xAA) != 0xBBC && *(short *)(hit + 0xAA) != 0xA1F)) {
-            func_00282CF0(&rotated, &D_L04_001BFAC0.point, &D_00189E20.position);
-            func_00282D30(&velocity, &rotated, 0.95f);
-            func_00282CC0(&obj->position, &D_00189E20.position, &velocity);
+            FastVecSub(&rotated, &D_L04_001BFAC0.point, &D_00189E20.position);
+            FastVecScale(&velocity, &rotated, 0.95f);
+            FastVecAdd(&obj->position, &D_00189E20.position, &velocity);
         }
     }
     if (func_00277258(&obj->position, 4, 0, 0.15f)) {

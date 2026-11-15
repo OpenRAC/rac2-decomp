@@ -20,7 +20,7 @@ u8 *func_L01_003DA300(u8 *a0, u8 *a1, u8 *a2, f32 f12)
     u8 *s1;
     struct SpawnState *state;
 
-    s1 = func_0029EFD0(0xB24);
+    s1 = CreateMoby(0xB24);
     if (s1 != 0) {
         *(u8 *)(s1 + 0x30) = 0xFF;
         *(u16 *)(s1 + 0x32) = 0xFF;

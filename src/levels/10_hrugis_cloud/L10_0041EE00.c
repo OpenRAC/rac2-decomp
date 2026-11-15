@@ -40,9 +40,9 @@ void func_L10_0041EE00(u8 *m)
             o = (Moby_L10_0041EE00 *)(D_L10_001B251C[0] + ((*list & 0x7FFF) << 8));
             if (*(s32 *)(func_002ED688(o) + 0x110) != 0) {
                 vars = o->vars;
-                func_00282D30(v, o->axis, 0.25f);
-                func_00282CC0(v, o->pos, v);
-                color = (func_00283CF0((func_00283180(vars->phase) + 1.0f) * 0.5f * 64.0f) << 24) | 0x63B4FF;
+                FastVecScale(v, o->axis, 0.25f);
+                FastVecAdd(v, o->pos, v);
+                color = (FloatToInt((func_00283180(vars->phase) + 1.0f) * 0.5f * 64.0f) << 24) | 0x63B4FF;
                 func_00281EB8(v, 0x31, color, 1, 7.5f, 2.0f, func_002A7940());
             }
         } while ((s16)*list++ >= 0);

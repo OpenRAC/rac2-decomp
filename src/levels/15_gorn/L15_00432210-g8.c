@@ -15,7 +15,7 @@ void func_L15_00432210(void *obj)
     char *state = *(char **)((char *)obj + 0x68);
     int channel;
     for (channel = 0; channel < 4; channel++) {
-        if (!func_00282978(&D_L15_001B36A8[channel]))
+        if (!FastDecTimer(&D_L15_001B36A8[channel]))
             continue;
         D_L15_001B36B0[channel] = 0;
         D_L15_001B36A8[channel] = D_L15_001B36B8[channel];
@@ -38,9 +38,9 @@ void func_L15_00432210(void *obj)
             *(float *)(state + 0x44) += func_002A7878(negative, positive);
             *(float *)(state + 0x48) += func_002A7878(negative, positive);
         }
-        func_00282CF0(&tangent, &origin, state);
-        func_00282F20(&tangent, &tangent, D_L15_001B16C0);
-        func_00282CC0(&tangent, &origin, &tangent);
+        FastVecSub(&tangent, &origin, state);
+        vec_scale_to_length(&tangent, &tangent, D_L15_001B16C0);
+        FastVecAdd(&tangent, &origin, &tangent);
         {
             int i;
 

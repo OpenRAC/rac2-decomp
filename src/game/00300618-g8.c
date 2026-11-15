@@ -60,10 +60,10 @@ void func_00302848(char *obj, s32 quiet)
         puff[2] = *D_001F0000[0x98E];
     if (quiet == 0 && (D_001B1688[0] & 1)) {
         func_002A7A00(&vec, 0.0f, 0.05f);
-        func_00282CC0(&vec, &vec, pos);
+        FastVecAdd(&vec, &vec, pos);
         zero.f[2] = -(func_002A7878(D_001AE8E8, D_001AE8E8_blk[1]) * 0.016666668f);
         tint = func_002A7820(D_001AE900_blk[5], D_001AE900_blk[6]);
-        color = func_00283D38(D_001AE900_blk[2], D_001AE900_blk[3], func_002A7878(0.0f, 1.0f));
+        color = FastTweenColor(D_001AE900_blk[2], D_001AE900_blk[3], func_002A7878(0.0f, 1.0f));
         func_002C3150(&vec, &zero, color, tint, func_002A77E0(0xFF), 0, D_001AE8F0_blk[2]);
     }
 }

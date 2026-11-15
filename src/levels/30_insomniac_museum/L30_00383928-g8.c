@@ -33,16 +33,16 @@ void func_L30_00383928(char *obj)
     unsigned long tex0, tex1, alpha, alpha01, alpha012, alpha0123;
     int row, col;
 
-    tex0 = func_0027C878(0x47);
-    tex1 = func_0027C878(0x48);
+    tex0 = GetEffectTextureDescriptor(0x47);
+    tex1 = GetEffectTextureDescriptor(0x48);
     alpha01 = (unsigned long)D_L30_001AEBF8 | ((unsigned long)D_L30_001AEBFC << 2);
     alpha012 = alpha01 | ((unsigned long)D_L30_001AEC00 << 4);
     alpha0123 = alpha012 | ((unsigned long)D_L30_001AEC04 << 6);
     alpha = alpha0123 | ((unsigned long)D_L30_001AEBF4 << 32);
     q.blend = 0xFF9000000260UL;
     q.flags = 0;
-    func_L30_00383398(obj + 0x10);
-    func_002FC560(0x47, 0x53001);
+    UpdateMuseumWaterGridOptics(obj + 0x10);
+    VU1_addGSregister(0x47, 0x53001);
     q.alpha = 0x80000000A8UL;
     q.texture = tex1;
     row = 0;
@@ -77,10 +77,10 @@ void func_L30_00383928(char *obj)
             q.uv[2][1] = D_L30_00236760[row][col + 1][1];
             q.uv[3][0] = D_L30_00236760[row + 1][col + 1][0];
             q.uv[3][1] = D_L30_00236760[row + 1][col + 1][1];
-            func_00280B90(&q, 0, 0);
+            draw_world_quad(&q, 0, 0);
         }
     }
-    func_002FC560(0x47, 0x5360B);
+    VU1_addGSregister(0x47, 0x5360B);
     q.alpha = alpha;
     q.texture = tex0;
     for (row = 0; row < 23; row++) {
@@ -113,7 +113,7 @@ void func_L30_00383928(char *obj)
             q.uv[2][1] = D_L30_00237960[row][col + 1][1];
             q.uv[3][0] = D_L30_00237960[row + 1][col + 1][0];
             q.uv[3][1] = D_L30_00237960[row + 1][col + 1][1];
-            func_00280B90(&q, 0, 0);
+            draw_world_quad(&q, 0, 0);
         }
     }
 }

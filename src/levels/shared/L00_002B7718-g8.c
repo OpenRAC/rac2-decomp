@@ -63,7 +63,7 @@ void func_L00_002B7718(void)
     if (D_00189E20.f348 && !D_00189E20.f22ba) {
         vector.q = 0;
         vector.f[2] = -1.0f;
-        func_002830C0(&vector, &vector, (char *)&D_00189E20 + 0x40);
+        transform_vector(&vector, &vector, (char *)&D_00189E20 + 0x40);
         func_L00_002AB0C0(0.013f, 0.3f);
         limit = 0.36651918292045593f;
         if (D_00189E20.f2294 == 109)
@@ -116,7 +116,7 @@ void func_L00_002B7718(void)
         vector.f[1] = 245.0f;
         vector.f[2] = 138.0f;
         flag = 0;
-        if (func_00282E48((char *)&D_00189E20 + 0x80, &vector) < 35.0f)
+        if (fast_vec_dist((char *)&D_00189E20 + 0x80, &vector) < 35.0f)
             flag = 1;
         if (D_L00_001A8FF4) flag = 1;
         if (D_00189E20.f22bb && flag) {

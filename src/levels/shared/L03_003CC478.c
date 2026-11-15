@@ -6,7 +6,7 @@ extern u8 *func_0029EFD0(s32);
 extern void func_002B37E8(void *,void *),func_002A7750(u8 *,s32,s32);
 void func_L03_003CC478(u8 *owner,void *unused,Vector4 *velocity,s32 index)
 {
-    u8 *object=func_0029EFD0(FIELD(s16,owner,0xAA));
+    u8 *object=CreateMoby(FIELD(s16,owner,0xAA));
     char *work;
     if(!object)return;
     func_002B37E8(object,owner);

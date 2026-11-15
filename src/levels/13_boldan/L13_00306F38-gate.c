@@ -20,7 +20,7 @@ void func_L13_003FE420(char *obj) {
         break;
     case 1:
         if (func_L00_00324120(obj)) {
-            if (D_00189E20.state==1 && func_002ACBC8((char *)&D_00189E20+0x80,*(int *)(rec+8))) {
+            if (D_00189E20.state==1 && IsPointInCuboid((char *)&D_00189E20+0x80,*(int *)(rec+8))) {
                 *(u16 *)(obj+0x96)=0;
                 func_L13_002CEF00(0x6F,1);
                 *(u8 *)(obj+0x20)=2;
@@ -66,7 +66,7 @@ opened:
         }
         break;
     case 7:
-        if (func_00282E80(obj+0x10,D_00189EA0)<4.0f) *(short *)(D_00189EA0+0x194)=2;
+        if (vec_distance_xy(obj+0x10,D_00189EA0)<4.0f) *(short *)(D_00189EA0+0x194)=2;
         else *(short *)(D_00189EA0+0x194)=0;
     case 6:
         if (D_00189E20.state!=1) *(u8 *)(obj+0x20)=5;

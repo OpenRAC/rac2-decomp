@@ -73,15 +73,15 @@ void func_L00_00322BE0(TransformHistory *history, int fade)
                 follower->frameData = history->source->frameData;
                 follower->previousFrameData = history->source->previousFrameData;
             } else {
-                func_0029F390((unsigned char *)follower);
+                update_moby_animation_state((unsigned char *)follower);
             }
             qcopy(&follower->position, &history->positions[sample]);
             qcopy(&follower->rotation, &history->rotations[sample]);
             if (history->blend[i] != 0.0f) {
                 HistoryVector delta;
-                func_00282CF0(&delta, &follower->position, &history->source->position);
-                func_00282D30(&delta, &delta, history->blend[i]);
-                func_00282CC0(&follower->position, &follower->position, &delta);
+                FastVecSub(&delta, &follower->position, &history->source->position);
+                FastVecScale(&delta, &delta, history->blend[i]);
+                FastVecAdd(&follower->position, &follower->position, &delta);
             }
             func_002A0F48(follower);
             {

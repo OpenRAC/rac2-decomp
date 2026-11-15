@@ -56,9 +56,9 @@ void func_L01_002A8C48(void) {
         return;
     }
     func_2C7CA8();
-    func_L00_002B36E0();
+    UpdateHeroInputAndHistory();
     func_L01_002ADDC8();
-    func_L01_002AE128(p + 0x80, p + 0x90, p + 0x550);
+    ProbeLedgeGrab(p + 0x80, p + 0x90, p + 0x550);
     func_L01_002C37C8();
     if (D_L01_001A8F40 == 2 || D_L01_001A8F40 == 6) {
         if (*(unsigned char *)(p + 0x22B5) != 0)
@@ -71,14 +71,14 @@ void func_L01_002A8C48(void) {
     if (*(unsigned char *)(p + 0x22B4) != 0)
         return;
     func_2B9878();
-    func_L00_002AC1A0();
+    UpdateHeroEasingTargetsAndPointEffects();
     func_L00_002AB1D8();
-    func_L00_002AB420();
-    func_L00_002ABBA0();
-    func_L00_002AB948();
-    func_L00_002A5518();
-    func_L00_002A5840();
-    func_L00_002B7718();
+    UpdateHeroPitchAndYawEasingTargets();
+    UpdateHeroAutoAimAngles();
+    UpdateHeroIdleRandomRotationTargets();
+    ClampHeroControlAndUpdateEffects();
+    UpdateHeroGlowAndExtraManipulators();
+    UpdateHeroTiltPoseTargets();
     func_2A7740();
     func_2AB028();
     func_L00_002AA178(0);
@@ -95,7 +95,7 @@ void func_L01_002A8C48(void) {
     func_L00_002A67F8();
     func_L00_002D5EB8();
     func_L00_002A6420();
-    func_L00_002D5158();
+    UpdateHeroAimAndTransitions();
     {
         char *q = D_00189E20;
         if ((*(int *)(q + 0x229C) != 0x16 && *(int *)(q + 0x229C) != 0x1F

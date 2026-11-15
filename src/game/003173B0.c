@@ -272,7 +272,7 @@ void func_003173B0(char *self)
             FH(d,0x276)=0;
             if (FH(d,0x270)<300) FH(d,0x270)=func_002A7820(480,600);
         }
-        FF(self,0xF8)=func_00283B98(FF(self,0xF8),0.03490659f);
+        FF(self,0xF8)=FastAddRotations(FF(self,0xF8),0.03490659f);
         break;
     case 1:
         if (func_002B3890(self))
@@ -285,7 +285,7 @@ void func_003173B0(char *self)
                 if (FB(self,0x43)!=2) func_002A7470(self,2,0,5);
             }
         }
-        FF(self,0xF8)=func_00283B98(FF(self,0xF8),0.03490659f);
+        FF(self,0xF8)=FastAddRotations(FF(self,0xF8),0.03490659f);
         break;
     case 2:
         if (func_002B3890(self))
@@ -305,9 +305,9 @@ void func_003173B0(char *self)
                 if (FP(sound,0x88)==self && FB(sound,0x74)) func_002E59F8(n);
             }
             FI(d,0x2A8)=-1;
-            func_0032C700(self+0x10,0,0,0,0,20,45,1,0.3f,20.0f,1,0,0,0);
-            func_002E5CF8(0,0,self);
-            func_002A6C58(self,0,3);
+            SpawnExplosion(self+0x10,0,0,0,0,20,45,1,0.3f,20.0f,1,0,0,0);
+            PlayMobySound(0,0,self);
+            SetDeathBits(self,0,3);
             func_0029F338(self);
             return;
         }
@@ -343,10 +343,10 @@ void func_003173B0(char *self)
             func_002A7750(self,5,-1);
         } else {
             qcopy(target,path+0x10+FI(d,0x298)*16);
-            func_00282CF0(delta,target,self+0x10);
-            func_00282F20(delta,delta,FF(d,0x1C0));
-            func_00282CC0(self+0x10,self+0x10,delta);
-            if (func_00282E80(self+0x10,target)<0.5f) FI(d,0x298)++;
+            FastVecSub(delta,target,self+0x10);
+            vec_scale_to_length(delta,delta,FF(d,0x1C0));
+            FastVecAdd(self+0x10,self+0x10,delta);
+            if (vec_distance_xy(self+0x10,target)<0.5f) FI(d,0x298)++;
             if (FI(d,0x298)>=FI(path,0)-6 && FF(d,0x1C0)>=0.10000001f)
                 FF(d,0x1C0)-=0.0022222223f;
             height=func_002A89A8(self+0x10,0,0.5f)+0.5f;
@@ -354,14 +354,14 @@ void func_003173B0(char *self)
             FF(d,0x28C)=FF(self,0x18);
             func_002A677C(self);
         }
-        FF(self,0xF8)=func_00283B98(FF(self,0xF8),0.03490659f);
+        FF(self,0xF8)=FastAddRotations(FF(self,0xF8),0.03490659f);
         break;
     case 5:
         savedHeight=FF(self,0x18);
         func_002B4FF0(self,d+0x230,FF(d,0x290));
         FF(self,0x18)=savedHeight;
-        if (func_00282E80(self+0x10,FP(d,0x240)+0x10)<1.3f) func_002A7750(self,7,-1);
-        FF(self,0xF8)=func_00283B98(FF(self,0xF8),0.03490659f);
+        if (vec_distance_xy(self+0x10,FP(d,0x240)+0x10)<1.3f) func_002A7750(self,7,-1);
+        FF(self,0xF8)=FastAddRotations(FF(self,0xF8),0.03490659f);
         break;
     case 6:
         if (FB(self,0x60)&2) {
@@ -374,7 +374,7 @@ void func_003173B0(char *self)
         FF(self,0x48)=height;
         for (i=0;i<4;i++) func_002A8D70(self,i,0.17f,FF(d,0x2B0),1,1.0f,0,1,0);
         if (((Hero3173 *)D_00189E20)->target==self) func_002A7750(self,9,-1);
-        if (func_00282E80(self+0x10,FP(d,0x240)+0x10)>1.3f && (float)FU(self,0x96)>120.0f) {
+        if (vec_distance_xy(self+0x10,FP(d,0x240)+0x10)>1.3f && (float)FU(self,0x96)>120.0f) {
             if (FB(self,0x43)) func_002A7470(self,0,0,15);
             func_002A7750(self,5,-1);
             FF(self,0x48)=1.0f;
@@ -426,8 +426,8 @@ void func_00318200(char *object)
 {
     char *data = *(char **)(object + 0x68);
     func_002AB8C0(object, data + 0x50);
-    func_00282978(data + 0x270);
-    if (func_00282978(data + 0x272)) {
+    FastDecTimer(data + 0x270);
+    if (FastDecTimer(data + 0x272)) {
         func_002AEE70(object, 0.1f, 0.08726647496223449707f, data + 0x27C, -1.0f, data + 0x280);
         func_002AEF28(0.13962635397911071777f, 0.026179943233728408813f, object, data + 0x284, 0.026179943233728408813f, data + 0x288);
     }
@@ -441,8 +441,8 @@ void func_00318200(char *object)
 void func_00319B38(char *self)
 {
     char *d = *(char **)(self + 0x68);
-    *(u8 *)(d+0x68) = func_00283CF0(15.0f);
-    *(u8 *)(d+0x6A) = func_00283CF0(12.0f);
+    *(u8 *)(d+0x68) = FloatToInt(15.0f);
+    *(u8 *)(d+0x6A) = FloatToInt(12.0f);
     *(float *)(self+0x2C) *= 1.1f;
     *(u16 *)(self+0x34) |= 0x8100;
     *(char **)(d+0x18) = d+0x130;
@@ -490,7 +490,7 @@ void func_00319B38(char *self)
     func_0029FCC0(self,0,d+0x2F0);
     qcopy(d+0x300,d+0x2F0);
     *(float *)(d+0x2F8)+=20.0f;
-    if (func_002761F8(d+0x300,d+0x2F0,0,self,0))
+    if (CollLine(d+0x300,d+0x2F0,0,self,0))
         *(float *)(d+0x2F8)=D_001BAFA8;
     *(int *)(d+0x168)|=4;
     *(u16 *)(self+0x34)|=0x100;
@@ -518,8 +518,8 @@ void func_00319EC0(char *object)
 {
     char *data = *(char **)(object + 0x68);
     func_002AB8C0(object, data + 0x70);
-    func_00282978(data + 0x280);
-    func_00282978(data + 0x282);
+    FastDecTimer(data + 0x280);
+    FastDecTimer(data + 0x282);
     if (*(unsigned short *)(object + 0x96) < 65535)
         (*(unsigned short *)(object + 0x96))++;
     func_002B0990(object, data + 0x380, 5, 1, 2.0f);
@@ -568,31 +568,31 @@ void func_0031A340(char *unused, char *p1, float scale, int col0, int col1, int 
     local.v220 = 0.0f;
     local.f216 = func_00283248(D_001B5200.pos[0] - *(float *)p1,
                                 D_001B5200.pos[1] - *(float *)(p1 + 4));
-    x = func_00283248(func_00282E80(p1, &D_001B5200.pos),
+    x = func_00283248(vec_distance_xy(p1, &D_001B5200.pos),
                       D_001B5200.pos[2] - *(float *)(p1 + 8));
     local.f212 = -x;
     local.v208 = func_002A7940();
-    func_00283410(&local.m00, &local.v208);
-    func_00282CF0(&local.e0, &D_001B5200.pos, p1);
-    func_00282F20(&local.e0, &local.e0, 0.5f);
+    euler_to_matrix(&local.m00, &local.v208);
+    FastVecSub(&local.e0, &D_001B5200.pos, p1);
+    vec_scale_to_length(&local.e0, &local.e0, 0.5f);
     local.v192 = *(float *)p1 + local.e0;
     local.v196 = *(float *)(p1 + 4) + local.e1;
     local.v200 = *(float *)(p1 + 8) + local.e2;
     local.v204 = 1.0f;
-    func_00282D30(&local.b0, &local.b0, scale);
-    func_00282D30(&local.b1, &local.b1, scale);
-    func_00282D30(&local.b2, &local.b2, scale);
-    func_00282D30(&local.b3, &local.b3, scale);
-    func_00280B90(&local, &local.m00, 0);
+    FastVecScale(&local.b0, &local.b0, scale);
+    FastVecScale(&local.b1, &local.b1, scale);
+    FastVecScale(&local.b2, &local.b2, scale);
+    FastVecScale(&local.b3, &local.b3, scale);
+    draw_world_quad(&local, &local.m00, 0);
     local.k3 = col0 + col2;
     local.k2 = col0 + col2;
     local.k1 = col0 + col2;
     local.k0 = col0 + col2;
-    func_00282D30(&local.b0, &local.b0, 0.5f);
-    func_00282D30(&local.b1, &local.b1, 0.5f);
-    func_00282D30(&local.b2, &local.b2, 0.5f);
-    func_00282D30(&local.b3, &local.b3, 0.5f);
-    func_00280B90(&local, &local.m00, 0);
+    FastVecScale(&local.b0, &local.b0, 0.5f);
+    FastVecScale(&local.b1, &local.b1, 0.5f);
+    FastVecScale(&local.b2, &local.b2, 0.5f);
+    FastVecScale(&local.b3, &local.b3, 0.5f);
+    draw_world_quad(&local, &local.m00, 0);
 }
 
 int func_0031A708(unsigned char *object) {
@@ -615,16 +615,16 @@ void func_0031A718(u8 *self)
     u8 *moby;
     float best;
 
-    best = func_00282E48(self + 0x10, &((Hero_0031A718 *)D_00189E20)->b[0x80]);
+    best = fast_vec_dist(self + 0x10, &((Hero_0031A718 *)D_00189E20)->b[0x80]);
     if (self[0x21] == 0xFF && D_001EE5A0[self[0x21]] == 0 && *(int *)(vars + 0x350) == 0)
         return;
     list = D_001EE5A0[self[0x21]];
     do {
         moby = D_001B1B5C + ((*list & 0x7FFF) << 8);
         if (*(s8 *)(moby + 0x20) >= 0 && *(s16 *)(moby + 0xAA) != 0x9B4) {
-            if (func_00282E48(self + 0x10, moby + 0x10) < best) {
+            if (fast_vec_dist(self + 0x10, moby + 0x10) < best) {
                 *(u8 **)(vars + 0x30) = moby;
-                best = func_00282E48(self + 0x10, moby + 0x10);
+                best = fast_vec_dist(self + 0x10, moby + 0x10);
             }
         }
     } while (*list++ >= 0);
@@ -796,8 +796,8 @@ void func_0031DC18(char *self, char *target, int count)
             info = func_002AB1F0(target);
             if (info) {
                 func_002B00B0(target, v, 1);
-                func_00282D30(v, v, *(float *)(info + 0x10));
-                func_00282CC0(p + 0x30, v, target + 0x10);
+                FastVecScale(v, v, *(float *)(info + 0x10));
+                FastVecAdd(p + 0x30, v, target + 0x10);
             } else {
                 qcopy(p + 0x30, target_position);
             }
@@ -814,7 +814,7 @@ static inline Class31DEE8 *Class31DEE8At(int index)
 /* Steps every record the owner holds: refreshes its start from the owner, advances the two
    angle triples (faster while the approach timer runs), and while it has a target moves its
    position towards it. When the approach timer expires and the target is still live, it
-   sends one hit packet (func_002A8C00/func_002A8E20) and marks the record; when the life
+   sends one hit packet (make_hit_descriptor/QueueMobyImpact) and marks the record; when the life
    timer expires the record is released and the owner's count drops. */
 void func_0031DEE8(char *owner)
 {
@@ -840,19 +840,19 @@ void func_0031DEE8(char *owner)
         slot = &((Slot31DEE8 *)D_001B2758)[i];
         qcopy(slot->start, owner + 0x10);
         if (slot->time) {
-            slot->ang0[0] = func_00283B98(slot->ang0[0], slot->rate0[0] * boost);
-            slot->ang0[1] = func_00283B98(slot->ang0[1], slot->rate0[1] * boost);
-            slot->ang0[2] = func_00283B98(slot->ang0[2], slot->rate0[2] * boost);
-            slot->ang1[0] = func_00283B98(slot->ang1[0], slot->rate1[0] * boost);
-            slot->ang1[1] = func_00283B98(slot->ang1[1], slot->rate1[1] * boost);
-            slot->ang1[2] = func_00283B98(slot->ang1[2], slot->rate1[2] * boost);
+            slot->ang0[0] = FastAddRotations(slot->ang0[0], slot->rate0[0] * boost);
+            slot->ang0[1] = FastAddRotations(slot->ang0[1], slot->rate0[1] * boost);
+            slot->ang0[2] = FastAddRotations(slot->ang0[2], slot->rate0[2] * boost);
+            slot->ang1[0] = FastAddRotations(slot->ang1[0], slot->rate1[0] * boost);
+            slot->ang1[1] = FastAddRotations(slot->ang1[1], slot->rate1[1] * boost);
+            slot->ang1[2] = FastAddRotations(slot->ang1[2], slot->rate1[2] * boost);
         } else {
-            slot->ang0[0] = func_00283B98(slot->ang0[0], slot->rate0[0]);
-            slot->ang0[1] = func_00283B98(slot->ang0[1], slot->rate0[1]);
-            slot->ang0[2] = func_00283B98(slot->ang0[2], slot->rate0[2]);
-            slot->ang1[0] = func_00283B98(slot->ang1[0], slot->rate1[0]);
-            slot->ang1[1] = func_00283B98(slot->ang1[1], slot->rate1[1]);
-            slot->ang1[2] = func_00283B98(slot->ang1[2], slot->rate1[2]);
+            slot->ang0[0] = FastAddRotations(slot->ang0[0], slot->rate0[0]);
+            slot->ang0[1] = FastAddRotations(slot->ang0[1], slot->rate0[1]);
+            slot->ang0[2] = FastAddRotations(slot->ang0[2], slot->rate0[2]);
+            slot->ang1[0] = FastAddRotations(slot->ang1[0], slot->rate1[0]);
+            slot->ang1[1] = FastAddRotations(slot->ang1[1], slot->rate1[1]);
+            slot->ang1[2] = FastAddRotations(slot->ang1[2], slot->rate1[2]);
         }
         slot->out0[0] = func_00283180(slot->ang0[0]) * slot->amp0[0];
         slot->out0[1] = func_00283198(slot->ang0[1]) * slot->amp0[1];
@@ -864,29 +864,29 @@ void func_0031DEE8(char *owner)
             other = func_002AB1F0(slot->target);
             if (other) {
                 func_002B00B0(slot->target, v, 1);
-                func_00282D30(v, v, *(float *)(other + 0x10));
-                func_00282CC0(slot->pos, v, slot->target + 0x10);
+                FastVecScale(v, v, *(float *)(other + 0x10));
+                FastVecAdd(slot->pos, v, slot->target + 0x10);
             } else {
                 qcopy(slot->pos, slot->target + 0x10);
             }
-            ratio = func_00283CE0(slot->time);
-            ratio /= func_00283CE0(slot->duration);
-            func_00282D08(slot->pos, slot->start, slot->pos, 1.0f - ratio);
+            ratio = IntToFloat(slot->time);
+            ratio /= IntToFloat(slot->duration);
+            lerp_vector(slot->pos, slot->start, slot->pos, 1.0f - ratio);
         }
         if (!func_00282948(&slot->time))
             continue;
         if (*(int *)(slot->target + 0x98) && !slot->hit) {
-            func_00282CF0(v, slot->pos, slot->start);
-            func_00282F20(v, v, 0.033333335f);
+            FastVecSub(v, slot->pos, slot->start);
+            vec_scale_to_length(v, v, 0.033333335f);
             damage = Class31DEE8At(D_00139568[0x1C])->f74;
-            func_002A8C00(&packet, owner, 0x210000, v, damage);
+            make_hit_descriptor(&packet, owner, 0x210000, v, damage);
             packet.kind = 1;
             packet.mode = 3;
             packet.id = *(short *)(owner + 0xAA);
-            func_002A8E20(slot->target, &packet);
+            QueueMobyImpact(slot->target, &packet);
             slot->hit = 1;
             func_0031F6E8(slot->pos, 10, 1);
-            func_0032D758(slot->target, 28, *(int *)(owner + 0xB8));
+            StartAttachedEffect(slot->target, 28, *(int *)(owner + 0xB8));
         }
         if (func_00282948(&slot->life)) {
             slot->owner = 0;
@@ -1014,7 +1014,7 @@ void func_0031EB00(char *position, int color, float scale, char *resource, float
     float distance;
 
     func_0031E750((char *)work);
-    *(long long *)(work + 0x78) = func_0027C878(mode);
+    *(long long *)(work + 0x78) = GetEffectTextureDescriptor(mode);
 
     mode_bits = ((unsigned long long)flag << 2) | 0x0000008000000040ULL;
     *(long long *)(work + 0x88) = mode_bits;
@@ -1032,18 +1032,18 @@ void func_0031EB00(char *position, int color, float scale, char *resource, float
                                 D_FLT_001B5200[0x144 / 4] - *(float *)(position + 4));
     *(float *)(work + 0xD8) = first_angle;
 
-    distance = func_00282E80(position, &D_FLT_001B5200[0x140 / 4]);
+    distance = vec_distance_xy(position, &D_FLT_001B5200[0x140 / 4]);
     second_angle = func_00283248(distance, D_FLT_001B5200[0x148 / 4] - *(float *)(position + 8));
     *(float *)(work + 0xD0) = alpha;
     *(float *)(work + 0xD4) = -second_angle;
 
-    func_00283410(work + 0x90, work + 0xD0);
+    euler_to_matrix(work + 0x90, work + 0xD0);
     *(float *)(work + 0xC0) = *(float *)(position + 0);
     *(float *)(work + 0xC4) = *(float *)(position + 4);
     *(float *)(work + 0xC8) = *(float *)(position + 8);
     *(float *)(work + 0xCC) = 1.0f;
     func_0031E8F8((char *)work, scale);
-    func_00280B90(work, work + 0x90, 0);
+    draw_world_quad(work, work + 0x90, 0);
 }
 
 

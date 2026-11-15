@@ -15,7 +15,7 @@ void func_L14_00427250(char *a0)
     int s0;
 
     v0 = *(char **)(a0 + 0x68);
-    s0 = func_00283D38(D_L14_001B17D8, D_L14_001B17DC, *(float *)v0);
+    s0 = FastTweenColor(D_L14_001B17D8, D_L14_001B17DC, *(float *)v0);
     func_385CB8(0x42, 0x8000000044UL);
     func_3030C0(0, 0, 600, 500, s0, 0);
     func_385CB8(0x4E, 0x1000000UL | (D_001A72E0 >> 13));
@@ -47,7 +47,7 @@ void func_L14_00426E60(char *a0)
     int i;
 
     for (i = 0; i < 4; i++, slot++) {
-        if (*slot != -1 && func_002ACBC8(D_00189EA0, *slot) != 0) {
+        if (*slot != -1 && IsPointInCuboid(D_00189EA0, *slot) != 0) {
             if (*(EffectPair **)(state + 0x14) == 0) {
                 *(EffectPair **)(state + 0x14) = func_L00_002D70A0(5);
             }
@@ -135,17 +135,17 @@ void func_L14_00426F28(PrisonLight *object)
             func_002A7750(object, 2, -1);
         }
         if (((PrisonSoundAnchor *)(D_00188660 + state->sound * 112))->owner != object || !((PrisonSoundAnchor *)(D_00188660 + state->sound * 112))->active)
-            state->sound = func_002E5CF8(0, 4, object);
+            state->sound = PlayMobySound(0, 4, object);
         break;
     case 2:
         ticks = D_L14_001B20C8;
         period = D_L14_001B17C0;
-        angle = func_00283CE0(ticks % period);
-        denominator = func_00283CE0(period);
+        angle = IntToFloat(ticks % period);
+        denominator = IntToFloat(period);
         angle *= 6.2831855f;
         angle /= denominator;
         angle = func_00283198(angle - 3.1415927f);
-        func_002AA2E8(&state->level, D_L14_001B17C4 * angle + D_L14_001B17C8, D_L14_001B17D0 * 0.016666668f);
+        ApproachValue(&state->level, D_L14_001B17C4 * angle + D_L14_001B17C8, D_L14_001B17D0 * 0.016666668f);
         func_L00_002E6CF0((void *)func_L14_00427250, object);
         counter = object->frames;
         previous = counter++;
@@ -167,7 +167,7 @@ void func_L14_00426F28(PrisonLight *object)
         break;
     case 3:
         func_L00_002E6CF0((void *)func_L14_00427250, object);
-        func_002AA2E8(&state->level, 0.0f, D_L14_001B17D4 * 0.016666668f);
+        ApproachValue(&state->level, 0.0f, D_L14_001B17D4 * 0.016666668f);
         if (state->level == 0.0f)
             func_0029F338(object);
         break;
@@ -201,10 +201,10 @@ void func_L14_00423240(char *a0)
     func_002B0ED8(s0, s1 + 0x60, 0);
     if (*(float *)(s1 + 0x20) <= 0.0f) {
         func_002AC728(s0, s0 + 0x10, 1.0f, 13.0f, -1);
-        func_002A6C58(s0, 0, 3);
+        SetDeathBits(s0, 0, 3);
         func_0029F338(s0);
     } else if (*(float *)(s0 + 0x18) < D_L14_001B16B0) {
-        func_002A6C58(s0, 0, 3);
+        SetDeathBits(s0, 0, 3);
         func_0029F338(s0);
     }
 }
@@ -228,10 +228,10 @@ void func_L14_004228C0(char *object) {
     D_L14_001B1678 -= D_L14_001B167C;
     if (D_L14_001B1678 <= -8.0f)
         D_L14_001B1678 += 8.0f;
-    func_L14_004229A0(object, D_L14_002594F0[*(int *)(state + 0x38)],
+    DrawPrisonScrollingRibbonWithHalo(object, D_L14_002594F0[*(int *)(state + 0x38)],
         D_L14_001B1660, D_L14_001B1668, *(int *)(state + 0x2C) - 2,
         *(float *)(state + 0x40), *(float *)(state + 0x44), D_L14_001B16A0);
-    func_L14_004229A0(object, D_L14_002594F0[*(int *)(state + 0x38)] + 0x140,
+    DrawPrisonScrollingRibbonWithHalo(object, D_L14_002594F0[*(int *)(state + 0x38)] + 0x140,
         D_L14_001B1690, D_L14_001B1694, *(int *)(state + 0x2C),
         D_L14_001B1698, D_L14_001B169C, D_L14_001B16A4);
 }
@@ -267,16 +267,16 @@ void func_L14_00409B20(char *self)
         break;
     case 1:
         if (func_002B3868(self) != 0) {
-            func_002E5CF8(0, 0, self);
+            PlayMobySound(0, 0, self);
         }
         c1 = 0x80468CDC;
         c2 = 0x801E78AA;
         break;
     }
-    f = func_00283B98(*(float *)(v + 4), 0.10762865f);
+    f = FastAddRotations(*(float *)(v + 4), 0.10762865f);
     *(float *)(v + 4) = f;
-    r = func_00283D38(c1, c2, func_00283198(f) * 0.5f + 0.5f);
-    *(int *)(self + 0x78) = func_00283D38(*(int *)(self + 0x78), r, 0.15f);
+    r = FastTweenColor(c1, c2, func_00283198(f) * 0.5f + 0.5f);
+    *(int *)(self + 0x78) = FastTweenColor(*(int *)(self + 0x78), r, 0.15f);
 }
 
 /* The id-list walks below (func_L14_00426D18, func_L14_00428A08, func_L14_00428BA0) read
@@ -361,11 +361,11 @@ void func_L14_00428A08(L14Obj *self)
     float angle;
     float blend;
 
-    angle = func_00283B98(state->angle, 0.20943954f);
+    angle = FastAddRotations(state->angle, 0.20943954f);
     state->angle = angle;
     blend = func_00283198(angle) * 0.5f + 0.5f;
     state->blend = blend;
-    self->tint = func_00283D38(colors.a, colors.b, blend);
+    self->tint = FastTweenColor(colors.a, colors.b, blend);
     if (state->stamp != D_L14_001B20C8) {
         for (p = D_L14_001FB060[self->group];
              self->group != 0xFF && self->group <= D_L14_001B25B8 && p != 0 &&
@@ -427,10 +427,10 @@ void func_L14_00428BA0(L14Obj *self)
                 if (e->kind != 0xFE) {
                     if (e->kind != 0xFD) {
                         s0 = e->cfg;
-                        func_00282D30(buf, &D_L14_001B18D0, s0->scale);
-                        func_002830C0(buf, buf, &s0->vec);
+                        FastVecScale(buf, &D_L14_001B18D0, s0->scale);
+                        transform_vector(buf, buf, &s0->vec);
                         func_L00_00325AE8(buf,
-                                          func_00283D38(D_L14_001B18E0[0], D_L14_001B18E0[1],
+                                          FastTweenColor(D_L14_001B18E0[0], D_L14_001B18E0[1],
                                                         s0->blend),
                                           s0->scale * 0.2f, 0.08f);
                     }

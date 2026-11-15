@@ -73,15 +73,15 @@ void func_L26_003DB818(unsigned char *object) {
         flags = func_002B1C20(object, private + 0x50);
         if (((flags & 1UL) == 1UL) || *(float *)(private + 0x20) <= 0.0f) {
             func_00325D30((char *)object, private + 0x270);
-            func_002A6C58(object, 0, 3);
+            SetDeathBits(object, 0, 3);
             seed.q = 0;
             seed.f[2] = 1.0f;
-            func_00283098(&workspace.position, &seed, object + 0xC0);
-            func_00282CC0(&workspace.position, &workspace.position, object + 0x10);
-            func_002E5CF8(13, 0, (char *)object);
-            func_0032C700(&workspace.position, 0, 25, 20, 20, 20, 45, 0, 0, 1, 0, 0, 0.8f, 20.0f);
+            matrix_mul_vec3(&workspace.position, &seed, object + 0xC0);
+            FastVecAdd(&workspace.position, &workspace.position, object + 0x10);
+            PlayMobySound(13, 0, (char *)object);
+            SpawnExplosion(&workspace.position, 0, 25, 20, 20, 20, 45, 0, 0, 1, 0, 0, 0.8f, 20.0f);
             func_002AB6D8((float *)(object + 0xC0), (float *)(object + 0xF0));
-            func_00282F20(&velocity, private + 0xD0, 0.083333336f);
+            vec_scale_to_length(&velocity, private + 0xD0, 0.083333336f);
             func_002B0A68((char *)object, 0x3F8, velocity.f, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
             func_0029F338(object);
             return;

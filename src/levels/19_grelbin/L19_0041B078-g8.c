@@ -54,7 +54,7 @@ typedef struct { char pad[0x34]; u16 flags; } GrelbinObjectFlags;
     distance=func_002A7878(6.0f,8.0f); \
     angle=func_002A7940(); \
     func_002AF000(vec,distance,angle,0.0f); \
-    func_00282CC0(data+0x290,data+0x290,vec); \
+    FastVecAdd(data+0x290,data+0x290,vec); \
     { int timer=func_002A7820(580,600); int active=D_L19_001B1D20; \
       I(data,0x230)=timer; D_L19_001B1D20=active-1; } }
 #define DISABLE_COLLISION() { B(obj,0x31)=1; H(obj)&=0xFFFE; I(obj,0x98)=I(*(char **)(obj+0x24),0x10); SOLID(); }
@@ -112,7 +112,7 @@ void func_L19_0041B078(char *obj)
     case 3:
         result=func_002B1C20(obj,data+0x140);
         if(result&1) {
-            func_002A6C58(obj,0,3); func_L01_003E9CF8(obj,0,0); D_L19_001B1D20--;
+            SetDeathBits(obj,0,3); func_L01_003E9CF8(obj,0,0); D_L19_001B1D20--;
         } else if(result&2) {
             if(I(data,0x204)==1 && D_L19_001B1D20<=D_L19_001B1D24) {
                 ANIM(3,0,10); func_002A7750(obj,14,2);
@@ -134,7 +134,7 @@ void func_L19_0041B078(char *obj)
     case 8:
         if(func_002B3868(obj)) func_002B60B0(obj,0.0016666667f,0.050000004f,0.0069813179f,0.8377582f);
         func_L01_00321178(obj,data+0x290);
-        if(func_00282E80(obj+0x10,data+0x290)<0.5f) {func_002A7750(obj,3,-1); ANIM(1,0,10);}
+        if(vec_distance_xy(obj+0x10,data+0x290)<0.5f) {func_002A7750(obj,3,-1); ANIM(1,0,10);}
         break;
     case 3:
         if(B(obj,0x60)&2) {
@@ -161,11 +161,11 @@ void func_L19_0041B078(char *obj)
         if(func_002B3868(obj)) {
             func_002B60B0(obj,0.0033333334f,0.10000001f,0.0069813179f,0.8377582f); SOLID();
         }
-        if(func_00282E80(obj+0x10,*(char **)(data+0x200)+0x10)<7.0f && func_00282E80(obj+0x10,*(char **)(data+0x200)+0x10)>4.0f &&
-            func_00283C80(F(obj,0xF8),func_00283248(F(data,0x1F0)-F(obj,0x10),F(data,0x1F4)-F(obj,0x14)))<0.52359885f) {
+        if(vec_distance_xy(obj+0x10,*(char **)(data+0x200)+0x10)<7.0f && vec_distance_xy(obj+0x10,*(char **)(data+0x200)+0x10)>4.0f &&
+            FastDiffRots(F(obj,0xF8),func_00283248(F(data,0x1F0)-F(obj,0x10),F(data,0x1F4)-F(obj,0x14)))<0.52359885f) {
             func_002B60B0(obj,0.02f,0.6f,0.0069813179f,0.8377582f);ANIM(4,0,10);func_002A7750(obj,15,-1);
-        } else if(func_00282E80(obj+0x10,*(char **)(data+0x200)+0x10)<=3.0f &&
-            func_00283C80(F(obj,0xF8),func_00283248(F(data,0x1F0)-F(obj,0x10),F(data,0x1F4)-F(obj,0x14)))<0.52359885f) {
+        } else if(vec_distance_xy(obj+0x10,*(char **)(data+0x200)+0x10)<=3.0f &&
+            FastDiffRots(F(obj,0xF8),func_00283248(F(data,0x1F0)-F(obj,0x10),F(data,0x1F4)-F(obj,0x14)))<0.52359885f) {
             ANIM(10,0,10);func_002A7750(obj,16,-1);
         } else func_002B4FF0(obj,data+0x1F0,F(data,0x270));
         break;
@@ -198,10 +198,10 @@ void func_L19_0041B078(char *obj)
     case 17: {
         char *target;
         if(func_002B3868(obj)) {
-            vec[0]=func_00283180(func_00283B98(F(obj,0xF8),3.141593f))*18.0f;
-            vec[1]=func_00283198(func_00283B98(F(obj,0xF8),3.141593f))*18.0f;
+            vec[0]=func_00283180(FastAddRotations(F(obj,0xF8),3.141593f))*18.0f;
+            vec[1]=func_00283198(FastAddRotations(F(obj,0xF8),3.141593f))*18.0f;
             vec[2]=0.0f;
-            func_00282CC0(data+0x280,vec,obj+0x10);
+            FastVecAdd(data+0x280,vec,obj+0x10);
             func_002B60B0(obj,0.023333333f,0.8000001f,0.0069813179f,0.8377582f);
         }
         { float range=func_0029F530(obj);

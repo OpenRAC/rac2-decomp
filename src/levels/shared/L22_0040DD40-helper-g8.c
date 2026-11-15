@@ -31,7 +31,7 @@ void func_L22_0040DD40(char *a0)
         char *p = a0 + 0x10;
 
         qcopy(local, p);
-        func_00282CC0(p, handle, p);
+        FastVecAdd(p, handle, p);
         func_L22_0040DF28(a0, local);
         if (func_00282948(handle + 0x10) != 0)
             *(unsigned char *)(a0 + 0x20) = 2;

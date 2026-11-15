@@ -44,23 +44,23 @@ void func_L02_003E91F0(char *actor) {
     float length = D_L02_001B0BA8 * 0.05f;
     float phase, span, distance, oscillation, lateral, radius;
     int spin;
-    D_L02_001B0C28 = func_00283B98(D_L02_001B0C28, D_L02_001B0C2C);
-    D_L02_001B0C30 = func_00283BE0(D_L02_001B0C30, D_L02_001B0C34);
-    D_L02_001B0C44 = func_00283B98(D_L02_001B0C44, D_L02_001B0C48);
+    D_L02_001B0C28 = FastAddRotations(D_L02_001B0C28, D_L02_001B0C2C);
+    D_L02_001B0C30 = fast_subtract_rotations(D_L02_001B0C30, D_L02_001B0C34);
+    D_L02_001B0C44 = FastAddRotations(D_L02_001B0C44, D_L02_001B0C48);
     if (state->target) {
         char *settings = (char *)func_002AB1F0(state->target);
         qcopy(endpoint, state->target + 0x10);
         endpoint[2] += *(float *)(settings + 0x10);
-        length = func_00282E48(state->start, endpoint) * 0.05f;
+        length = fast_vec_dist(state->start, endpoint) * 0.05f;
     }
     state->count = 20;
-    func_00282CF0(direction, state->end, state->start);
-    func_00282F20(direction, direction, 1.0f);
+    FastVecSub(direction, state->end, state->start);
+    vec_scale_to_length(direction, direction, 1.0f);
     if (state->target) {
-        func_00282DD8(delta, direction, &((Hero *)D_00189E20)->q[0x2C0 / 16]);
+        FastVecCross(delta, direction, &((Hero *)D_00189E20)->q[0x2C0 / 16]);
         func_002ACEC0(direction, direction, delta, 0.17453295f);
     }
-    func_00282D30(tangent, direction, length);
+    FastVecScale(tangent, direction, length);
     qcopy(D_L02_00249090[0][0], state->start);
     qcopy(D_L02_00249090[1][0], state->start);
     {
@@ -69,37 +69,37 @@ void func_L02_003E91F0(char *actor) {
     for (i = 1; i < 20; i++) {
         float value, height, zero;
         float *point;
-        height = func_00283CE0(i);
+        height = IntToFloat(i);
         height = D_L02_001B0C20 + (D_L02_001B0C24 - D_L02_001B0C20) * (height * 0.05f);
         height *= func_00283198(func_002ABB18(D_L02_001B0C28 + (float)i * D_L02_001B0C1C));
         height += func_002A78D8(D_L02_001B0C60, D_L02_001B0C64);
         D_L02_00249090[0][i][2] -= D_L02_00249310[i];
         D_L02_00249310[i] = height;
-        func_00282CF0(delta, D_L02_00249090[0][i], D_L02_00249090[0][i - 1]);
-        func_00282D08(blended, delta, tangent, 0.85f);
-        span = func_00282DF0(blended);
+        FastVecSub(delta, D_L02_00249090[0][i], D_L02_00249090[0][i - 1]);
+        lerp_vector(blended, delta, tangent, 0.85f);
+        span = FastVecLength(blended);
         zero = 0.0f;
         if (span == zero) qcopy(D_L02_00249090[0][i], D_L02_00249090[0][i - 1]);
         else {
-            func_00282D30(blended, blended, length / span);
-            func_00282CC0(D_L02_00249090[0][i], D_L02_00249090[0][i - 1], blended);
+            FastVecScale(blended, blended, length / span);
+            FastVecAdd(D_L02_00249090[0][i], D_L02_00249090[0][i - 1], blended);
             qcopy(tangent, blended);
         }
         D_L02_00249090[0][i][2] += height;
-        func_00282CF0(delta, D_L02_00249090[0][i], D_L02_00249090[0][i - 1]);
+        FastVecSub(delta, D_L02_00249090[0][i], D_L02_00249090[0][i - 1]);
         if (state->target) {
-            func_00282CF0(toward, endpoint, D_L02_00249090[0][i]);
-            distance = func_00282DF0(toward);
+            FastVecSub(toward, endpoint, D_L02_00249090[0][i]);
+            distance = FastVecLength(toward);
             if (distance != zero) {
                 if (i == 19) { length = distance; height = 0.5f; }
                 else if (i >= 16) {
-                    float remaining = func_00283CE0(19 - i);
+                    float remaining = IntToFloat(19 - i);
                     height = 0.5f;
                     length = distance / remaining;
                 }
                 else height = 0.1f;
-                func_00282D30(toward, toward, length / distance);
-                func_00282D08(tangent, tangent, toward, height);
+                FastVecScale(toward, toward, length / distance);
+                lerp_vector(tangent, tangent, toward, height);
             }
         }
         value = func_002ABB18(D_L02_001B0C30 + (float)i * D_L02_001B0C38);
@@ -110,19 +110,19 @@ void func_L02_003E91F0(char *actor) {
         D_L02_002494A0[i] = height;
         point = D_L02_00249090[0][i];
         point[82] += height;
-        height = func_00283B98(func_00283248(delta[0], delta[1]), 1.5707965f);
+        height = FastAddRotations(func_00283248(delta[0], delta[1]), 1.5707965f);
         lateral = D_L02_001B0C40 * func_00283180(value);
         sideways[0] = func_00283180(height) * lateral;
         sideways[1] = func_00283198(height) * lateral;
         sideways[2] = 0;
         qcopy(D_L02_00249360[i], sideways);
-        func_00282CC0(D_L02_00249090[1][i], D_L02_00249090[1][i], sideways);
+        FastVecAdd(D_L02_00249090[1][i], D_L02_00249090[1][i], sideways);
     }
     }
     qcopy(state->end, D_L02_00249090[0][19]);
     oscillation = func_002A78D8(0.52359885f, 1.0471977f);
     phase = func_002A7878(-0.52359885f, 1.0471977f);
-    func_00282D30(toward, direction, D_L02_001B0CAC);
+    FastVecScale(toward, direction, D_L02_001B0CAC);
     func_002ACEC0(toward, toward, &((Hero *)D_00189E20)->q[0x740 / 16], phase);
     func_002ACEC0(toward, toward, &((Hero *)D_00189E20)->q[0x750 / 16], oscillation);
     spin = func_002A7820(1, 8);

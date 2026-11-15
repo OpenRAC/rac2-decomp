@@ -33,7 +33,7 @@ void func_L09_0040AC48(char *obj) {
             *(unsigned short *)(obj+0x34) = (*(unsigned short *)(obj+0x34) & 0xFFBE) | 0x1000;
             *(int *)(obj+0x98) = *(int *)(*(char **)(obj+0x24)+0x10);
             func_L09_0040B008(obj);
-            *(int *)(data+0x1C) = func_002E5CF8(0,4,obj);
+            *(int *)(data+0x1C) = PlayMobySound(0,4,obj);
         }
         next = (*(int *)(data+0x14)+1)&1;
         speed = D_L09_001B15A8 * 0.000277777785f;

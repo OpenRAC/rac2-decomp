@@ -30,7 +30,7 @@ void func_L14_003DF6A0(char *self) {
     if (0.01f < func_00282C48(*(float *)(state + 0x74))) {
         char *entry = D_00188660 + *(int *)(state + 0x78) * 0x70;
         if (*(char **)(entry + 0x88) != self || *(unsigned char *)(entry + 0x74) == 0)
-            *(int *)(state + 0x78) = func_002E5CF8(0, 4, self);
+            *(int *)(state + 0x78) = PlayMobySound(0, 4, self);
     } else {
         index = *(int *)(state + 0x78);
         if (index != -1) {

@@ -24,8 +24,8 @@ void func_L05_00417550(char *obj)
     dir.f[0] = -0.503f;
     dir.f[3] = 1.0f;
     drift.q = 0;
-    func_00283098(&tail, &dir, obj + 0xC0);
-    func_00282CC0(&tail, &tail, obj + 0x10);
+    matrix_mul_vec3(&tail, &dir, obj + 0xC0);
+    FastVecAdd(&tail, &tail, obj + 0x10);
     k = 0.4f;
     tail.w[3] = 0;
     qcopy(&mark1, &tail);

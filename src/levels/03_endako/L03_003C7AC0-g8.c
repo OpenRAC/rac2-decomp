@@ -32,14 +32,14 @@ void func_L03_003C7AC0(char *obj)
     int id;
     if(*(u8 *)(obj+0x20)==2) {
         *(TI128 *)c=0;
-        c[2]=func_00283B98(D_L03_001B9998,D_L03_001B01BC*0.017453294f);
+        c[2]=FastAddRotations(D_L03_001B9998,D_L03_001B01BC*0.017453294f);
         *(TI128 *)(b)=*(TI128 *)(c);
-        func_002833F0(scratch.m,b);
+        euler_rotation_basis(scratch.m,b);
         qcopy(a,D_0018BDD0.vec);
-        if(func_00282DF0(a)>0.0f && D_0018BDD0.mode==0x31) {
+        if(FastVecLength(a)>0.0f && D_0018BDD0.mode==0x31) {
             L03ControlEntry *entry=(L03ControlEntry *)(D_00188660+*(int *)(state+0x108)*0x70);
             if(entry->owner!=obj || !entry->active)
-                *(int *)(state+0x108)=func_002E5CF8(0,4,obj);
+                *(int *)(state+0x108)=PlayMobySound(0,4,obj);
         } else {
             id=*(int *)(state+0x108);
             if(id!=-1) {
@@ -49,12 +49,12 @@ void func_L03_003C7AC0(char *obj)
             *(int *)(state+0x108)=-1;
         }
         a[0]=-a[0];
-        func_00283098(a,a,scratch.m);
+        matrix_mul_vec3(a,a,scratch.m);
         other=*(char **)(state+0xf0);
         if(other) {
-            if(*(short *)(other+0xaa)==0xb85) func_00282D30(a,a,D_L03_001B01AC*(1.0f/60.0f));
-            else func_00282D30(a,a,D_L03_001B01B4*(1.0f/60.0f));
-        } else func_00282D30(a,a,D_L03_001B01A4*(1.0f/60.0f));
+            if(*(short *)(other+0xaa)==0xb85) FastVecScale(a,a,D_L03_001B01AC*(1.0f/60.0f));
+            else FastVecScale(a,a,D_L03_001B01B4*(1.0f/60.0f));
+        } else FastVecScale(a,a,D_L03_001B01A4*(1.0f/60.0f));
     } else {
         id=*(int *)(state+0x108);
         if(id!=-1) {
@@ -64,7 +64,7 @@ void func_L03_003C7AC0(char *obj)
         *(int *)(state+0x108)=-1;
         func_00282C88(a);
     }
-    func_00282CF0(b,a,state+0xe0);
+    FastVecSub(b,a,state+0xe0);
     b[2]=0;
     other=*(char **)(state+0xf0);
     if(other) {
@@ -73,15 +73,15 @@ void func_L03_003C7AC0(char *obj)
     } else {
         func_002AC9F8(b,D_L03_001B01A8*0.000277777785f);
     }
-    func_00282CC0(state+0xe0,state+0xe0,b);
-    func_00282CC0(obj+0x10,obj+0x10,state+0xe0);
+    FastVecAdd(state+0xe0,state+0xe0,b);
+    FastVecAdd(obj+0x10,obj+0x10,state+0xe0);
     func_002C9218(*(int *)state,obj+0x10,obj+0x10,1.25f);
     func_0029FCC0(obj,2,c);
     qcopy(scratch.m,c);
     scratch.m[2]+=20.0f;
     qcopy(scratch.v.d,c);
     scratch.v.d[2]+=0.5f;
-    if(func_002761F8(scratch.v.d,scratch.m,2,obj,0)) *(float *)(state+0xf4)=D_L03_001BFDE8;
+    if(CollLine(scratch.v.d,scratch.m,2,obj,0)) *(float *)(state+0xf4)=D_L03_001BFDE8;
     func_002A93B0(obj);
     *(u8 *)(obj+0xbd)=D_L03_001B01D4;
 }

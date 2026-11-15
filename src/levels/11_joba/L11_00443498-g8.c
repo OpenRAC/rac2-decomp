@@ -81,7 +81,7 @@ void func_L11_00443498(u8 *object)
             H(0x1f6)=15;
             func_002E5E58(3,0,0);
         }
-    } else func_00282978((short *)(state+0x1ea));
+    } else FastDecTimer((short *)(state+0x1ea));
     input = (InputView *)D_00138180;
     if (input->field1c4&0x40) {
         if (H(0x1e8)==0) {
@@ -121,8 +121,8 @@ clear_buttons:
         func_002B8518();
         return;
     } else if (D_L11_00200864[0] &&
-               func_L00_0032EF10(1,60,0) && func_L00_0032EF10(2,60,0) &&
-               func_L00_0032EF10(4,60,0) && func_L00_0032EF10(8,60,0)) {
+               PadPressedWithin(1,60,0) && PadPressedWithin(2,60,0) &&
+               PadPressedWithin(4,60,0) && PadPressedWithin(8,60,0)) {
         H(0x1f0)=*(unsigned short *)(state+0x1e8);
         func_002A7750(object,5,-1);
         return;

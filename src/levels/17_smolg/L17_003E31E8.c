@@ -128,7 +128,7 @@ restoreCollision:
             } else if(H(vars,0x406)) {
                 func_002A7750(object,2,1);
                 H(vars,0x406)=0;
-                I(vars,0x3FC)=func_00283CF0(func_002A7878(F(vars,0x3F8)*0.8f,F(vars,0x3F8)*1.2f)*60.0f);
+                I(vars,0x3FC)=FloatToInt(func_002A7878(F(vars,0x3F8)*0.8f,F(vars,0x3F8)*1.2f)*60.0f);
                 H(vars,0x400)=0;
             }
         }
@@ -146,7 +146,7 @@ restoreCollision:
     case 2:
         if(H(vars,0x404)!=1 && func_002A77E0(19)==0) {
             func_002A7750(object,2,1);
-            I(vars,0x3FC)=func_00283CF0(func_002A7878(F(vars,0x3F8)*0.8f,F(vars,0x3F8)*1.2f)*60.0f);
+            I(vars,0x3FC)=FloatToInt(func_002A7878(F(vars,0x3F8)*0.8f,F(vars,0x3F8)*1.2f)*60.0f);
             H(vars,0x400)=0;
         }
         break;
@@ -156,7 +156,7 @@ restoreCollision:
             flags=func_002B1C20(object,vars+0x60);
             if(flags&1) {
                 H(vars,0x98)=0;
-                func_002A6C58(object,0,3);
+                SetDeathBits(object,0,3);
                 func_L01_003E9CF8(object,0,0);
                 return;
             }
@@ -167,7 +167,7 @@ restoreCollision:
                     if(B(object,0x43)!=9) func_002A7470(object,9,0,14);
                 } else {
                     func_002A7750(object,2,1);
-                    I(vars,0x3FC)=func_00283CF0(func_002A7878(F(vars,0x3F8)*0.8f,F(vars,0x3F8)*1.2f)*60.0f);
+                    I(vars,0x3FC)=FloatToInt(func_002A7878(F(vars,0x3F8)*0.8f,F(vars,0x3F8)*1.2f)*60.0f);
                     H(vars,0x400)=func_002A7820(120,700);
                 }
             }
@@ -177,25 +177,25 @@ restoreCollision:
     if(F(object,0x18)-F(vars,0x3D8)>10.0f || F(object,0x18)<10.0f) {
         H(vars,0x98)=0;
         qzero(object+0xF0);
-        func_002A6C58(object,0,3);
+        SetDeathBits(object,0,3);
         func_0029F338(object);
         return;
     }
     if(F(object,0x18)<75.0f && D_001A79F0==11) {
         H(vars,0x98)=0;
         qzero(object+0xF0);
-        func_002A6C58(object,0,3);
+        SetDeathBits(object,0,3);
         func_0029F338(object);
         return;
     }
     switch(B(object,0x20)) {
     case 1:
-        func_00282978((short *)(vars+0x400));
+        FastDecTimer((short *)(vars+0x400));
         if(B(object,0x43)==0 && H(vars,0x400)!=0) {
             if(B(object,0x43)!=9) func_002A7470(object,9,0,14);
         }
-        if(H(vars,0x400)>20) func_002AA2E8((float *)(vars+0x124),D_L17_001B0CB0*(1.0f/60.0f),0.0019444445f);
-        else func_002AA2E8((float *)(vars+0x124),0.0f,0.0019444445f);
+        if(H(vars,0x400)>20) ApproachValue((float *)(vars+0x124),D_L17_001B0CB0*(1.0f/60.0f),0.0019444445f);
+        else ApproachValue((float *)(vars+0x124),0.0f,0.0019444445f);
         if(B(object,0x43)==9) {
             F(object,0x48)=0.8f;
             if(H(vars,0x400)==0) {
@@ -208,12 +208,12 @@ restoreCollision:
         }
         break;
     case 2:
-        func_00282978((short *)(vars+0x400));
+        FastDecTimer((short *)(vars+0x400));
         if(B(object,0x43)!=9 && B(object,0x43)!=5 && B(object,0x43)!=4) {
             if(B(object,0x43)!=9) func_002A7470(object,9,0,14);
         }
-        if(H(vars,0x400)>20) func_002AA2E8((float *)(vars+0x124),D_L17_001B0CB4*(1.0f/60.0f),0.0019444445f);
-        else func_002AA2E8((float *)(vars+0x124),0.0f,0.0019444445f);
+        if(H(vars,0x400)>20) ApproachValue((float *)(vars+0x124),D_L17_001B0CB4*(1.0f/60.0f),0.0019444445f);
+        else ApproachValue((float *)(vars+0x124),0.0f,0.0019444445f);
         if(B(object,0x43)==9) {
             if(H(vars,0x400)==0) {
                 func_002A7470(object,5,0,12);
@@ -230,12 +230,12 @@ restoreCollision:
             func_002A7750(object,4,-1);
             if(B(object,0x43)!=9) func_002A7470(object,9,0,14);
         }
-        func_002AA800((float *)(object+0xF8),0,func_00283248(D_00189E20.x-F(object,0x10),D_00189E20.y-F(object,0x14)),0.10471977f);
+        StepAngleTowardTarget((float *)(object+0xF8),0,func_00283248(D_00189E20.x-F(object,0x10),D_00189E20.y-F(object,0x14)),0.10471977f);
         break;
     case 4:
         if(func_002B3868(object)) I(vars,0x418)=func_002A7820(80,100);
         F(object,0x48)=1.0f;
-        if(func_00282E80(object+0x10,P(vars,0x408)+0x10)<=D_L17_001B0CAC) {
+        if(vec_distance_xy(object+0x10,P(vars,0x408)+0x10)<=D_L17_001B0CAC) {
             func_002A7750(object,5,2);
             if(B(object,0x43)!=6) func_002A7470(object,6,2,6);
             F(vars,0x414)=0;
@@ -256,14 +256,14 @@ restoreCollision:
         break;
     case 5:
         if(B(object,0x42)==6) {
-            if(func_002AEB60(object,8.0f)) func_002E5CF8(3,0,object);
+            if(func_002AEB60(object,8.0f)) PlayMobySound(3,0,object);
             if(B(object,0x42)==6) {
                 if(func_002AEB60(object,10.0f)) {
                     if(func_002A8C28(object,1.0f,object+0x10,0x4000001,F(vars,0x430),1.0f,0,1,0)>0) I(vars,0x448)=1;
                     else I(vars,0x448)=0;
                 } else if(B(object,0x42)==6 && ((B(object,0x60)&2) || func_002AEB60(object,11.0f))) {
-                    if(func_00282E80(object+0x10,P(vars,0x408)+0x10)>D_L17_001B0CAC) {
-                        if((func_00282E80(object+0x10,P(vars,0x408)+0x10)==0.0f ? 1.0f : 0.0f)>D_L17_001B0CAC) {
+                    if(vec_distance_xy(object+0x10,P(vars,0x408)+0x10)>D_L17_001B0CAC) {
+                        if((vec_distance_xy(object+0x10,P(vars,0x408)+0x10)==0.0f ? 1.0f : 0.0f)>D_L17_001B0CAC) {
                             if(func_002A7820(0,7)>0) {
                                 func_002A7750(object,11,2);
                                 if(B(object,0x43)!=7) func_002A7470(object,7,0,14);
@@ -286,10 +286,10 @@ restoreCollision:
     case 6:
         func_002B60B0(object,0.005f,0.10000001f,0.017453294f,1.0471977f);
         if(func_002B3868(object)) {
-            func_00282CF0(vars+0x3E0,object+0x10,P(vars,0x408)+0x10);
+            FastVecSub(vars+0x3E0,object+0x10,P(vars,0x408)+0x10);
             F(vars,0x3E8)=0;
-            func_00282F20(vars+0x3E0,vars+0x3E0,10.0f);
-            func_00282CC0(vars+0x3E0,vars+0x3E0,object+0x10);
+            vec_scale_to_length(vars+0x3E0,vars+0x3E0,10.0f);
+            FastVecAdd(vars+0x3E0,vars+0x3E0,object+0x10);
             F(object,0x48)=-1.0f;
         }
         func_L02_00331440(object,vars+0x3E0,16,func_00283248(F(vars,0x3E0)-F(object,0x10),F(vars,0x3E4)-F(object,0x14)),-1.0f,-1.0f);
@@ -314,12 +314,12 @@ restoreAnimationSpeed:
         movement[0]=func_00283180(F(object,0xF8))*(1.0f/60.0f)*(F(vars,0x40C)+F(vars,0x40C));
         movement[1]=func_00283198(F(object,0xF8))*(1.0f/60.0f)*(F(vars,0x40C)+F(vars,0x40C));
         movement[2]=0;
-        func_00282CD8(position,object+0x10,movement);
-        if(func_00282E80(object+0x10,vars+0x3D0)>6.0f) func_002A7750(object,4,2);
+        add_vectors(position,object+0x10,movement);
+        if(vec_distance_xy(object+0x10,vars+0x3D0)>6.0f) func_002A7750(object,4,2);
         break;
     case 3:
-        angle=func_00283B98(func_00283248(F(P(vars,0x408),0x10)-F(object,0x10),F(P(vars,0x408),0x14)-F(object,0x14)),F(vars,0x414));
-        func_002A7CA0(object,angle,(float *)(vars+0x410),0.05f,0.3f,0.10471977f);
+        angle=FastAddRotations(func_00283248(F(P(vars,0x408),0x10)-F(object,0x10),F(P(vars,0x408),0x14)-F(object,0x14)),F(vars,0x414));
+        MobySpringTurn(object,angle,(float *)(vars+0x410),0.05f,0.3f,0.10471977f);
         if(B(object,0x60)&2) {
             func_002A7750(object,4,-1);
             if(B(object,0x43)!=9) func_002A7470(object,9,0,15);
@@ -327,7 +327,7 @@ restoreAnimationSpeed:
         break;
     case 9:
         if(func_L17_003E48E0(object)) {
-            func_002A6C58(object,0,3);
+            SetDeathBits(object,0,3);
             func_0029F338(object);
             return;
         }

@@ -30,10 +30,10 @@ void func_L18_0043CAF8(u8 *o) {
             spread[0]=3.0f;
             spread[1]=3.0f;
             *(float *)(hit+0x18)=0.75f;
-            func_00282D30(a,hit+0x10,func_002A7878(6.0f,8.0f));
+            FastVecScale(a,hit+0x10,func_002A7878(6.0f,8.0f));
             qcopy(b,a);
-            func_00282CF0(a,a,spread);
-            func_00282CC0(b,b,spread);
+            FastVecSub(a,a,spread);
+            FastVecAdd(b,b,spread);
             func_L00_0032A258(o,a,&D_L18_001B1B88,&D_L18_001B1B80,65535,-1,D_L18_001B1BB0,9,2,255,0);
             func_002A7750(o,2,-1);
         }
@@ -48,7 +48,7 @@ void func_L18_0043CAF8(u8 *o) {
             b[0]=func_002A7878(8.0f,12.0f)*(1.0f/60.0f);
             b[1]=(2*i-n+1)*(1.0f/15.0f);
             b[2]=func_002A7878(0.0f,2.0f)*(1.0f/60.0f);
-            func_00283098(b,b,o+0xC0);
+            matrix_mul_vec3(b,b,o+0xC0);
             x=func_002A7878(0.75f,1.25f);
             y=func_002A7878(0.75f,1.25f);
             func_L06_00463D40(o,a,b,1,x,y);

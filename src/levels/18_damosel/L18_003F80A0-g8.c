@@ -26,24 +26,24 @@ void func_L18_00432FB8(u8 *a0) {
     u8 buf[0x50];
     u8 *s0 = buf + 0x10;
     func_0029FC20(*(s32 *)(*(u8 **)(a0 + 0x68) + 0x7C0), 1, s0);
-    func_002830C0(buf, &D_L18_001B15C0, s0);
-    func_00282CC0(buf, buf, buf + 0x40);
+    transform_vector(buf, &D_L18_001B15C0, s0);
+    FastVecAdd(buf, buf, buf + 0x40);
     func_L00_00325AE8(buf, D_L18_001B15B0, D_L18_001B15B8, D_L18_001B15B4);
 }
 void func_L18_00433020(u8 *a0) {
     u8 buf[0x50];
     u8 *s0 = buf + 0x10;
     func_0029FC20(*(s32 *)(*(u8 **)(a0 + 0x68) + 0x7C0), 1, s0);
-    func_002830C0(buf, &D_L18_001B15E0, s0);
-    func_00282CC0(buf, buf, buf + 0x40);
+    transform_vector(buf, &D_L18_001B15E0, s0);
+    FastVecAdd(buf, buf, buf + 0x40);
     func_L00_00325AE8(buf, D_L18_001B15D0, D_L18_001B15D8, D_L18_001B15D4);
 }
 void func_L18_00433168(u8 *a0, s32 a1) {
     u8 buf[0x50];
     u8 *s0 = buf + 0x10;
     func_0029FC20(*(s32 *)(*(u8 **)(a0 + 0x68) + 0x7C4), a1, s0);
-    func_002830C0(buf, &D_L18_001B1620, s0);
-    func_00282CC0(buf, buf, buf + 0x40);
+    transform_vector(buf, &D_L18_001B1620, s0);
+    FastVecAdd(buf, buf, buf + 0x40);
     func_L00_00325AE8(buf, D_L18_001B1614, D_L18_001B161C, D_L18_001B1618);
 }
 
@@ -105,7 +105,7 @@ void func_L18_0042FAE0(u8 *a0, void *a1) {
     u8 *s0;
     u8 *s2 = a0 + 0xC0;
     float t;
-    func_00283098(buf, a1, s2);
+    matrix_mul_vec3(buf, a1, s2);
     func_003088F0(buf, a0 + 0x10, buf);
     s0 = buf + 0x10;
     func_00308920(s0, D_001C97C0, buf);

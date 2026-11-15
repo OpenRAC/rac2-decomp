@@ -26,7 +26,7 @@ void func_L16_0041C990(char *obj) {
     case 1:
         first = D_L16_001B2B1C + (p[0] << 8);
         if (first == 0 || *(u8 *)(first + 0x20) == 0xFE || *(u8 *)(first + 0x20) == 0xFD) {
-            if (func_002ACBC8(D_00189EA0, p[1]) != 0) {
+            if (IsPointInCuboid(D_00189EA0, p[1]) != 0) {
                 for (i = 0; i < 8; i++) {
                     if (p[4 + i] != -1) {
                         char *entry = D_L16_001B2B1C + (p[4 + i] << 8);

@@ -45,56 +45,56 @@ void func_L06_0041CB10(char *object)
     switch (*(unsigned char *)(object + 0x20)) {
     case 0:
         *(float *)(object + 0x2c) += (*(float *)(*(char **)(object + 0x24) + 0x24) - *(float *)(object + 0x2c)) * 0.05f;
-        func_00282CC0(object + 0x10, object + 0x10, state);
-        func_00282F20(&work.probe, state, 0.2f);
-        func_00282CC0(&work.probe, &work.probe, object + 0x10);
+        FastVecAdd(object + 0x10, object + 0x10, state);
+        vec_scale_to_length(&work.probe, state, 0.2f);
+        FastVecAdd(&work.probe, &work.probe, object + 0x10);
         *(int *)(object + 0x98) = 0;
         *(int *)(state->owner + 0x98) = 0;
-        if (func_002761F8(&work.old_position, &work.probe, 4, object, 0)) {
-            func_00282CF0(&work.probe, &COLLISION.point, &work.probe);
-            func_00282F20(&work.probe, &work.probe, 0.215f);
-            func_00282CC0(object + 0x10, object + 0x10, &work.probe);
+        if (CollLine(&work.old_position, &work.probe, 4, object, 0)) {
+            FastVecSub(&work.probe, &COLLISION.point, &work.probe);
+            vec_scale_to_length(&work.probe, &work.probe, 0.215f);
+            FastVecAdd(object + 0x10, object + 0x10, &work.probe);
             if (COLLISION.polygon >= 0) {
                 func_00283028(state, state, &COLLISION.normal);
-                if (func_00283248(COLLISION.normal.f[2], func_00282E20(&COLLISION.normal)) < 0.69813179969787597656f && func_00278E78() == -1) {
-                    func_00282D30(state, state, 0.5f);
-                    if (func_00282DF0(state) < 0.025f)
+                if (func_00283248(COLLISION.normal.f[2], vec_length_xy(&COLLISION.normal)) < 0.69813179969787597656f && GetCollHitMaterial() == -1) {
+                    FastVecScale(state, state, 0.5f);
+                    if (FastVecLength(state) < 0.025f)
                         *(unsigned char *)(object + 0x20) = 1;
                 }
             } else {
                 if (*(short *)(COLLISION.object + 0xaa) != 0xb66) {
                     func_00283028(state, state, &COLLISION.normal);
-                    if (func_00283248(COLLISION.normal.f[2], func_00282E20(&COLLISION.normal)) < 0.69813179969787597656f && func_00278E78() == -1)
-                        func_00282D30(state, state, 1.2f);
+                    if (func_00283248(COLLISION.normal.f[2], vec_length_xy(&COLLISION.normal)) < 0.69813179969787597656f && GetCollHitMaterial() == -1)
+                        FastVecScale(state, state, 1.2f);
                 } else {
                     state->velocity.f[2] *= func_002A7878(0.9f, 1.1f);
                 }
             }
             if (state->cooldown == 0) {
-                func_002E5CF8(0, 0, object);
+                PlayMobySound(0, 0, object);
                 state->cooldown = 12;
             }
         }
         if (func_00277258((object + 0x10), 4, object, 0.2f)) {
-            func_00282CF0(&work.probe, &COLLISION.point, &COLLISION.offset);
-            func_00282F20(&work.probe, &work.probe, 0.015f);
-            func_00282CC0((object + 0x10), &COLLISION.offset, &work.probe);
+            FastVecSub(&work.probe, &COLLISION.point, &COLLISION.offset);
+            vec_scale_to_length(&work.probe, &work.probe, 0.015f);
+            FastVecAdd((object + 0x10), &COLLISION.offset, &work.probe);
             if (COLLISION.object == 0) {
                 func_00283028(state, state, &COLLISION.normal);
-                if (func_00283248(COLLISION.normal.f[2], func_00282E20(&COLLISION.normal)) < 0.69813179969787597656f && func_00278E78() == -1) {
-                    func_00282D30(state, state, 0.5f);
-                    if (func_00282DF0(state) < 0.025f)
+                if (func_00283248(COLLISION.normal.f[2], vec_length_xy(&COLLISION.normal)) < 0.69813179969787597656f && GetCollHitMaterial() == -1) {
+                    FastVecScale(state, state, 0.5f);
+                    if (FastVecLength(state) < 0.025f)
                         *(unsigned char *)(object + 0x20) = 1;
                 }
             } else if (*(short *)(COLLISION.object + 0xaa) != 0xb66) {
                 func_00283028(state, state, &COLLISION.normal);
-                if (func_00283248(COLLISION.normal.f[2], func_00282E20(&COLLISION.normal)) < 0.69813179969787597656f && func_00278E78() == -1)
-                    func_00282D30(state, state, 1.2f);
+                if (func_00283248(COLLISION.normal.f[2], vec_length_xy(&COLLISION.normal)) < 0.69813179969787597656f && GetCollHitMaterial() == -1)
+                    FastVecScale(state, state, 1.2f);
             } else {
                 state->velocity.f[2] *= func_002A7878(0.9f, 1.1f);
             }
             if (state->cooldown == 0) {
-                func_002E5CF8(0, 0, object);
+                PlayMobySound(0, 0, object);
                 state->cooldown = 12;
             }
         }
@@ -102,16 +102,16 @@ void func_L06_0041CB10(char *object)
         for (i = 0; i < 20; i++, siblings++) {
             other = *siblings;
             if (other != object && other != 0 && *(short *)(other + 0xaa) == 0xb66 && *(unsigned char *)(other + 0x20) != 0xfe && *(unsigned char *)(other + 0x20) != 0xfd) {
-                func_00282CF0(&work.separation, (object + 0x10), other + 0x10);
+                FastVecSub(&work.separation, (object + 0x10), other + 0x10);
                 work.separation.f[2] = 0;
-                distance = func_00282DF0(&work.separation);
+                distance = FastVecLength(&work.separation);
                 if (distance < 1.8f) {
-                    func_00282D30(&work.separation, &work.separation, (1.8f - distance) * 0.5f);
-                    func_00282CC0((object + 0x10), (object + 0x10), &work.separation);
+                    FastVecScale(&work.separation, &work.separation, (1.8f - distance) * 0.5f);
+                    FastVecAdd((object + 0x10), (object + 0x10), &work.separation);
                 }
             }
         }
-        if (func_00282978((unsigned char *)state + 0x18))
+        if (FastDecTimer((unsigned char *)state + 0x18))
             *(unsigned char *)(object + 0x20) = 2;
         *(float *)(object + 0xf0) = func_002ABB18(state->velocity.f[0]);
         *(float *)(object + 0xf4) = func_002ABB18(state->velocity.f[1]);
@@ -125,7 +125,7 @@ void func_L06_0041CB10(char *object)
         *(float *)(object + 0x18) = func_002A89A8(object + 0x10, 0, 0.5f) + 0.2f;
         *(int *)(object + 0x1c) = 0;
         work.probe.whole = ((Vector *)(object + 0x10))->whole;
-        state->successor = func_L04_003EDD40(state->owner, &work.probe);
+        state->successor = SpawnChildMoby(state->owner, &work.probe);
         *(unsigned char *)(object + 0x20) = 2;
         break;
     case 2: {

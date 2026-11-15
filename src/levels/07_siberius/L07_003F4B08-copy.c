@@ -34,7 +34,7 @@ u8 *func_L07_003F4B08(u8 *owner, u8 *support, void *first, void *second, float s
     u8 *record;
     u8 *next;
     u8 *supportPosition;
-    u8 *created = func_0029EFD0(0xE28);
+    u8 *created = CreateMoby(0xE28);
     if (created != 0) {
         qcopy(created + 0x10, owner + 0x10);
         record = *(u8 **)(created + 0x68);
@@ -48,12 +48,12 @@ u8 *func_L07_003F4B08(u8 *owner, u8 *support, void *first, void *second, float s
         *(float *)(record + 0x28) = func_002A7940();
         *(float *)(record + 0x2C) = scale;
         if (support != 0) {
-            func_00283698(inverse, support + 0xC0);
+            matrix_from_basis_rows(inverse, support + 0xC0);
             supportPosition = support + 0x10;
-            func_00282CF0(record, record, supportPosition);
-            func_00282CF0(next, next, supportPosition);
-            func_00283098(record, record, inverse);
-            func_00283098(next, next, inverse);
+            FastVecSub(record, record, supportPosition);
+            FastVecSub(next, next, supportPosition);
+            matrix_mul_vec3(record, record, inverse);
+            matrix_mul_vec3(next, next, inverse);
         }
     }
     return created;

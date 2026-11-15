@@ -81,22 +81,22 @@ void func_L00_003F9A30(Emitter *self)
 
     func_00300190(self->pos, self->pos);
     func_L00_003FBF78();
-    state->angles[0] = func_00283B98(state->angles[0], D_L00_001B0AA0 * 0.01745329424738884f);
-    state->angles[1] = func_00283B98(state->angles[1], D_L00_001B0AB4 * 0.01745329424738884f);
-    state->angles[2] = func_00283B98(state->angles[2], 0.00436332356184721f);
-    state->angles[3] = func_00283B98(state->angles[3], -0.00436332356184721f);
-    state->angles[4] = func_00283B98(state->angles[4], D_L00_001B0AAC * 0.01745329424738884f);
-    state->angles[5] = func_00283B98(state->angles[5], D_L00_001B0AB0 * 0.01745329424738884f);
-    func_00282978(&state->timer2);
-    func_00282978(&state->timer3);
+    state->angles[0] = FastAddRotations(state->angles[0], D_L00_001B0AA0 * 0.01745329424738884f);
+    state->angles[1] = FastAddRotations(state->angles[1], D_L00_001B0AB4 * 0.01745329424738884f);
+    state->angles[2] = FastAddRotations(state->angles[2], 0.00436332356184721f);
+    state->angles[3] = FastAddRotations(state->angles[3], -0.00436332356184721f);
+    state->angles[4] = FastAddRotations(state->angles[4], D_L00_001B0AAC * 0.01745329424738884f);
+    state->angles[5] = FastAddRotations(state->angles[5], D_L00_001B0AB0 * 0.01745329424738884f);
+    FastDecTimer(&state->timer2);
+    FastDecTimer(&state->timer3);
     func_00282948(&state->f40);
-    if (func_00282978(&state->timer1) && state->timer2 == 0) {
+    if (FastDecTimer(&state->timer1) && state->timer2 == 0) {
         if (!D_L00_001B0B64)
             func_0029F338(self);
         return;
     }
 
-    func_0027D098((void *)func_L00_003FA858, self);
+    func_0027D098((void *)draw_moby_glow_sprites, self);
 
     if (state->timer2 >= D_L00_001B0AB8 - 6) {
         float frameScale = 0.01666666753590107f;
@@ -104,7 +104,7 @@ void func_L00_003F9A30(Emitter *self)
         for (i = 0; i < 20; i++) {
             float angle1, angle2;
 
-            func_00282D30(a, self->dirC0, func_002A7878(D_L00_001B0B04, D_L00_001B0B08) * frameScale);
+            FastVecScale(a, self->dirC0, func_002A7878(D_L00_001B0B04, D_L00_001B0B08) * frameScale);
             angle1 = func_002A78D8(0.2617994248867035f, 1.396263599395752f);
             angle2 = func_002A78D8(0.2617994248867035f, 1.396263599395752f);
             func_002AB668(c, self->dirD0, angle1);
@@ -124,8 +124,8 @@ void func_L00_003F9A30(Emitter *self)
         x = func_002A7940();
         func_002AF000(a, func_002A7878(0.0f, 0.5f) * 0.01666666753590107f, x, z);
         speed = func_002A7878(0.25f, 0.75f) * 210000.0f;
-        func_00282D30(b, self->dirC0, -0.45f);
-        func_00282CC0(b, self->pos, b);
+        FastVecScale(b, self->dirC0, -0.45f);
+        FastVecAdd(b, self->pos, b);
         c[0] = b[0] + func_002A78D8(0.0f, 0.25f);
         c[1] = b[1] + func_002A78D8(0.0f, 0.25f);
         c[2] = b[2] + func_002A78D8(0.0f, 0.25f);
@@ -133,7 +133,7 @@ void func_L00_003F9A30(Emitter *self)
         func_L00_0033E888(c, a, 0x4F93E5FF, 0x102434EE, speed, func_002A7820(30, 45), 1, -1, -1, 0, 0.5f);
     }
 
-    x = func_00283CE0(state->timer2);
+    x = IntToFloat(state->timer2);
     radius = (D_L00_001B0B5C + (D_L00_001B0B58 - D_L00_001B0B5C) * (x * state->scale)) * 1.5f;
     height = state->height;
     y = self->pos[2] - height;
@@ -142,21 +142,21 @@ void func_L00_003F9A30(Emitter *self)
 
         ratio = y / radius;
         factor = ratio * -0.65f + 0.75f;
-        count = func_00283CF0((1.0f - ratio) * 30.0f);
+        count = FloatToInt((1.0f - ratio) * 30.0f);
         if (count <= 0)
             count = 1;
 
         *(EffectQuad *)a = 0;
         a[2] = 1.0f;
         a[3] = 1.0f;
-        func_00282DD8(b, a, self->dirC0);
-        func_00282F20(b, b, radius * factor);
+        FastVecCross(b, a, self->dirC0);
+        vec_scale_to_length(b, b, radius * factor);
         qcopy(c, self->pos);
         c[2] = height + 0.25f;
-        func_00282CC0(d, c, b);
-        func_00282CF0(e, c, b);
-        func_00282CF0(f, e, d);
-        func_00282D30(f, f, 1.0f / (float)count);
+        FastVecAdd(d, c, b);
+        FastVecSub(e, c, b);
+        FastVecSub(f, e, d);
+        FastVecScale(f, f, 1.0f / (float)count);
 
         for (remaining = 0; remaining < count; remaining++) {
             float speed;
@@ -165,13 +165,13 @@ void func_L00_003F9A30(Emitter *self)
             if (func_002A77E0(2))
                 id = -id;
             speed = func_002A7878(0.2f, 1.5f) * 210000.0f;
-            spark = func_002BDCE8(0.3f, 1.0f, d, id, D_L00_001A8F20, 0x7F204080, 1, 0.9f, speed);
-            func_00282CC0(d, d, f);
+            spark = SpawnSpinningSparkParticle(0.3f, 1.0f, d, id, D_L00_001A8F20, 0x7F204080, 1, 0.9f, speed);
+            FastVecAdd(d, d, f);
             if (spark) {
                 char *ext = spark + 0x20;
 
                 *(short *)(spark + 0xA) = func_002A7820(8, 25);
-                spark[9] = func_00283CF0(4.0f) + 64;
+                spark[9] = FloatToInt(4.0f) + 64;
                 *(int *)(ext + 4) = 2;
                 ext[0xA] = func_002A7820(80, 127);
                 ext[0xB] = *(unsigned char *)(spark + 0xA);

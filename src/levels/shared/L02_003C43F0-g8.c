@@ -74,11 +74,11 @@ void func_L02_003D28E0(void *a0)
     int a2;
     int a3;
 
-    func_00282D30(&v0, s2, D_L02_001B0180);
-    func_00282CC0(&v0, &v0, (char *)s1 + 0x10);
-    func_00282CF0(&v1, D_L02_001BA500, (char *)s1 + 0x10);
-    func_00282F20(&v1, &v1, 1.0f);
-    f2 = func_00282DB0(&v1, s2);
+    FastVecScale(&v0, s2, D_L02_001B0180);
+    FastVecAdd(&v0, &v0, (char *)s1 + 0x10);
+    FastVecSub(&v1, D_L02_001BA500, (char *)s1 + 0x10);
+    vec_scale_to_length(&v1, &v1, 1.0f);
+    f2 = FastVecDot(&v1, s2);
     if (D_L02_001B0188 < f2) {
         a2 = D_L02_001B0184;
         f2 = f2 * f2;
@@ -101,7 +101,7 @@ int func_L02_003FCDF8(int a0) {
     float f20;
     int i = 0;
 
-    f20 = func_00283CE0(*(int *)(D_L02_001B1190[a0] + 0xC));
+    f20 = IntToFloat(*(int *)(D_L02_001B1190[a0] + 0xC));
     while (i < D_001395B8[func_L02_003F9B70(a0)]) {
         f20 *= 0.3f;
         i++;
@@ -116,7 +116,7 @@ int func_L02_003FCDF8(int a0) {
     }
     if (func_00288D58() != 0)
         f20 *= 10.0f;
-    return func_00283CF0(f20);
+    return FloatToInt(f20);
 }
 
 /* Near miss: same body with the other entry parameter (draft beside this one). */
@@ -124,7 +124,7 @@ int func_L02_003FCF08(int a0) {
     float f20;
     int i = 0;
 
-    f20 = func_00283CE0(*(int *)(D_L02_001B1190[a0] + 0x10));
+    f20 = IntToFloat(*(int *)(D_L02_001B1190[a0] + 0x10));
     while (i < D_001395B8[func_L02_003F9B70(a0)]) {
         f20 *= 0.33333f;
         i++;
@@ -137,7 +137,7 @@ int func_L02_003FCF08(int a0) {
         else if (f20 < 5.0f)
             f20 = 5.0f;
     }
-    return func_00283CF0(f20) << 5;
+    return FloatToInt(f20) << 5;
 }
 
 extern void func_00282C98(void *);
@@ -160,28 +160,28 @@ int func_L02_003CCFE8(char *a0, char *a1)
     int ret;
 
     if (*(int *)(st + 0x334) == -1) {
-        func_00282CF0((float *)&a, (float *)(st + 0x1F0), (float *)(st + 0x340));
+        FastVecSub((float *)&a, (float *)(st + 0x1F0), (float *)(st + 0x340));
         func_00282C98(&b);
-        func_00282DD8(&c, &a, &b);
-        func_00282F20((char *)&c, (char *)&c, 1.5f);
-        func_00282D30(&d, &c, -1.0f);
-        func_00282CF0((float *)&e, a0 + 0x10, (float *)(st + 0x340));
-        if (func_00282DB0(&e, &c) < 0.0f) {
-            func_00282CC0(a1, &c, st + 0x340);
+        FastVecCross(&c, &a, &b);
+        vec_scale_to_length((char *)&c, (char *)&c, 1.5f);
+        FastVecScale(&d, &c, -1.0f);
+        FastVecSub((float *)&e, a0 + 0x10, (float *)(st + 0x340));
+        if (FastVecDot(&e, &c) < 0.0f) {
+            FastVecAdd(a1, &c, st + 0x340);
             ret = 1;
         } else {
-            func_00282CC0(a1, &d, st + 0x340);
+            FastVecAdd(a1, &d, st + 0x340);
             ret = 0;
         }
     } else {
-        func_00282CF0((float *)&a, (float *)(st + 0x1F0),
+        FastVecSub((float *)&a, (float *)(st + 0x1F0),
                       (float *)(D_L02_001B368C + (*(int *)(st + 0x334) << 7) + 0x30));
         ret = 1;
         func_00282F70((char *)&a, (char *)&a,
-                      func_00282DF0(D_L02_001B368C + (*(int *)(st + 0x334) << 7)));
-        func_00282CC0(a1, &a, D_L02_001B368C + (*(int *)(st + 0x334) << 7) + 0x30);
-        func_00282CF0((float *)&b, a1, a0 + 0x10);
-        if (!(0.0f <= func_00282DB0(&b, a0 + 0xD0)))
+                      FastVecLength(D_L02_001B368C + (*(int *)(st + 0x334) << 7)));
+        FastVecAdd(a1, &a, D_L02_001B368C + (*(int *)(st + 0x334) << 7) + 0x30);
+        FastVecSub((float *)&b, a1, a0 + 0x10);
+        if (!(0.0f <= FastVecDot(&b, a0 + 0xD0)))
             ret = 0;
     }
     a = *(TI128 *)(st + 0x340);
@@ -259,7 +259,7 @@ void func_L02_00404410(char *obj) {
     }
     case 1:
         if (D_00189E20.portal == obj && D_00189E20.active) {
-            func_00282CF0(v, D_00189E20.pos, obj + 0x10);
+            FastVecSub(v, D_00189E20.pos, obj + 0x10);
             func_002AFDD8(obj, v, v, 0);
             if (v[2] < -0.6f) {
                 int currentLevel;
@@ -267,9 +267,9 @@ void func_L02_00404410(char *obj) {
                 D_00189E20.state = 2;
                 dest = 2;
                 if (currentLevel == 26) {
-                    func_002B0C28(8, 0x27b1, 1);
+                    TryClaimNotice(8, 0x27b1, 1);
                 } else {
-                    func_002B0C28(8, D_0019B2E8[*(unsigned char *)(obj + 0xb0) + (currentLevel << 4)] & 0x80 ? 0x27cd : 0x27b0, 1);
+                    TryClaimNotice(8, D_0019B2E8[*(unsigned char *)(obj + 0xb0) + (currentLevel << 4)] & 0x80 ? 0x27cd : 0x27b0, 1);
                     dest = 26;
                 }
                 if (D_00138324 & 0x10) {

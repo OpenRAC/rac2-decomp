@@ -42,20 +42,20 @@ void func_L07_003EE3B0(char *arg)
         break;
     case 1:
         if (func_002B38B8(arg)) {
-            func_00283098(v, D_L07_001B0C20, arg + 0xC0);
-            func_00282CC0(v, v, arg + 0x10);
+            matrix_mul_vec3(v, D_L07_001B0C20, arg + 0xC0);
+            FastVecAdd(v, v, arg + 0x10);
             func_0032DA58(arg, v, arg + 0xD0, 0.0f);
             func_002A7750(arg, 2, -1);
         }
         break;
     case 2:
         if (func_002B3868(arg))
-            func_002E5CF8(0, 0, arg);
+            PlayMobySound(0, 0, arg);
         for (i = 0; i < 9; i++) {
             v[0] = func_002A7878(D_L07_001B0C00[0], D_L07_001B0C00[4]) * 0.016666667f;
             v[1] = func_002A7878(D_L07_001B0C00[1], D_L07_001B0C00[5]) * 0.016666667f;
             v[2] = func_002A7878(D_L07_001B0C00[2], D_L07_001B0C00[6]) * 0.016666667f;
-            func_00283098(v, v, arg + 0xC0);
+            matrix_mul_vec3(v, v, arg + 0xC0);
             f = func_002A78D8(D_L07_001B0C30[0], D_L07_001B0C30[1]);
             g = func_002A7878(D_L07_001B0C30_gp[2], D_L07_001B0C30[3]);
             e = func_00273730(arg, 2, *(short *)(arg + 0xAA), i, arg + 0x10, arg + 0xF0, v, 255, f, g);

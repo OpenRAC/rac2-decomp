@@ -22,13 +22,13 @@ s32 func_L14_00423CD0(char *self, char *point, s32 route, s16 *index, s32 revers
     char *path = D_L14_001FE1C0[route];
     qcopy(point, path + 16 + (*index << 4));
     if (reverse) {
-        if (func_00282E80(self + 16, point) < radius) --*index;
+        if (vec_distance_xy(self + 16, point) < radius) --*index;
         if (*index < 0) {
             *index = *(u16 *)path - 1;
             return 0;
         }
     } else {
-        if (func_00282E80(self + 16, point) < radius) ++*index;
+        if (vec_distance_xy(self + 16, point) < radius) ++*index;
         if (*index >= *(s32 *)path) {
             *index = 0;
             return 0;

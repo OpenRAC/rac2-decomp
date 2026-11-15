@@ -81,7 +81,7 @@ void func_L09_003FA080(char *self)
 
     switch (*(u8 *)(self + 0x95)) {
     case 0:
-        func_0026FEB8(D_L09_001B10F8, *(s16 *)(self + 0xB2), *(s16 *)(self + 0xAA));
+        STUB_printf(D_L09_001B10F8, *(s16 *)(self + 0xB2), *(s16 *)(self + 0xAA));
         break;
     case 1: {
         int k;
@@ -103,7 +103,7 @@ void func_L09_003FA080(char *self)
         break;
     }
     case 2:
-        if (func_00282978(vars + 0x300) != 0) {
+        if (FastDecTimer(vars + 0x300) != 0) {
             *(int *)(vars + 0x2D8) = *(int *)(vars + 0x2D4);
             if (*(int *)(vars + 0x2B0) != -1) {
                 func_L09_003F7C50(self, *(int *)(vars + 0x2B0), -1);
@@ -172,8 +172,8 @@ void func_L09_003FA080(char *self)
                                                  *(float *)(*(char **)(vars + 0x200) + 0x14) - *(float *)(self + 0x14));
         break;
     case 8:
-        *(float *)(vars + 0x2EC) = func_00283B98(*(float *)(vars + 0x2EC),
-            (func_00283198(func_002ABB18(func_00283CE0(D_L09_001B2388) * 0.02f)) + 2.0f) * 0.023271061f);
+        *(float *)(vars + 0x2EC) = FastAddRotations(*(float *)(vars + 0x2EC),
+            (func_00283198(func_002ABB18(IntToFloat(D_L09_001B2388) * 0.02f)) + 2.0f) * 0.023271061f);
         break;
     case 9: {
         int flags;
@@ -185,7 +185,7 @@ void func_L09_003FA080(char *self)
             func_002A7750(self, 0xF, -1);
         if (flags & 1) {
             if (*(float *)(vars + 0x20) > 0.0f)
-                func_L09_003F8598(self);
+                TransferStateToNearestEligibleObject(self);
             func_L09_003F73E8(self);
             func_002A7750(self, 0xF, -1);
         } else if (flags & 2) {
@@ -283,7 +283,7 @@ void func_L09_003FA080(char *self)
         int tried;
         float d;
         near = 1;
-        d = func_00282E80(self + 0x10, *(char **)(vars + 0x200) + 0x10);
+        d = vec_distance_xy(self + 0x10, *(char **)(vars + 0x200) + 0x10);
         if (!(d <= *(float *)(vars + 0x4BC)))
             near = 0;
         close = 1;
@@ -307,7 +307,7 @@ void func_L09_003FA080(char *self)
             *(int *)(vars + 0x138) &= ~0x10;
             func_L09_003F7430(self);
             func_L09_003F7518(self, 8, 0, 7);
-            func_0026FEB8(D_L09_001B1128);
+            STUB_printf(D_L09_001B1128);
             func_002A7750(self, 0xA, -1);
         }
         if (tried && !got)
@@ -330,7 +330,7 @@ void func_L09_003FA080(char *self)
         float a = func_00283248(*(float *)(vars + 0x1F0) - *(float *)(self + 0x10),
                                 *(float *)(vars + 0x1F4) - *(float *)(self + 0x14));
         func_002B5278(self, a);
-        if (func_00283C80(a, *(float *)(self + 0xF8)) < 0.17453295f) {
+        if (FastDiffRots(a, *(float *)(self + 0xF8)) < 0.17453295f) {
             func_L09_003F7518(self, 5, 0, func_002A7820(7, 0xC));
             *(u8 *)(vars + 0x30C) = 0;
             *(u8 *)(vars + 0x30D) = 0;
@@ -344,7 +344,7 @@ void func_L09_003FA080(char *self)
         int lt;
         float d;
         near = 1;
-        d = func_00282E80(self + 0x10, *(char **)(vars + 0x200) + 0x10);
+        d = vec_distance_xy(self + 0x10, *(char **)(vars + 0x200) + 0x10);
         if (!(d <= *(float *)(vars + 0x4BC)))
             near = 0;
         close = 1;
@@ -396,7 +396,7 @@ void func_L09_003FA080(char *self)
         if (D_L09_001B0F3C < *(u16 *)(self + 0x96))
             func_L09_003F9708(self);
         if ((D_L09_001B0F38 < *(u16 *)(self + 0x96)
-             && D_L09_001B0F2C < func_00282E80(self + 0x10, *(char **)(vars + 0x200) + 0x10))
+             && D_L09_001B0F2C < vec_distance_xy(self + 0x10, *(char **)(vars + 0x200) + 0x10))
             || *(char **)(vars + 0x2F8) == 0) {
             *(s16 *)(vars + 0x2E6) = func_002A7820(D_L09_001B0F44, D_L09_001B0F48);
             func_L09_003F73E8(self);
@@ -432,9 +432,9 @@ void func_L09_003FA080(char *self)
         func_002B3380(self, vars + 0x290, vars + 0x20);
         func_L09_003F73E8(self);
         func_L09_003F77D0(self);
-        func_002A6C58(self, 0, 3);
+        SetDeathBits(self, 0, 3);
         func_L09_003F7370(self, 0.4f);
-        func_002E5CF8(3, 0, self);
+        PlayMobySound(3, 0, self);
         func_0029F338(self);
         return;
     }
@@ -443,7 +443,7 @@ void func_L09_003FA080(char *self)
     func_L09_003F8898(self);
     func_L09_003F74A8(self);
     if (*(int *)(vars + 0x1D8) != -1 && *(u8 *)(self + 0x20) != 0 && *(u8 *)(self + 0x20) < 0xE) {
-        func_L09_003F8598(self);
+        TransferStateToNearestEligibleObject(self);
         func_L09_003F73E8(self);
         func_002A7750(self, 0xF, 0xA);
     }

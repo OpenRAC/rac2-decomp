@@ -50,7 +50,7 @@ void func_00132DF0(int cmd, int size, unsigned char *data, int cb, long cb_data)
         while (func_0011D810(D_001A7040) != 0) {
             if (D_001A74F8 == 0)
                 func_00115D48(D_001A7578);
-            func_00132028();
+            snd_Pump();
             func_0011AEA0(0);
         }
         func_0011D620(D_001A7040, cmd, 1, 0, 0, D_001A7080, 0xC, 0, 0);
@@ -65,7 +65,7 @@ void func_00132DF0(int cmd, int size, unsigned char *data, int cb, long cb_data)
             D_001A74C4 = 0;
             held = 1;
         }
-        func_00132028();
+        snd_Pump();
         if (tries == 1 && D_001A74F8 == 0)
             func_00115D48(D_0013BFF8, D_001A74C0, *D_001A74A0[D_001A74C0]);
         tries++;

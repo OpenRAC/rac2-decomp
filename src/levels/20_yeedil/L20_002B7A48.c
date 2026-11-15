@@ -113,9 +113,9 @@ void func_L20_002C57D0(s32 a0, s32 a1, char *a2)
     s32 p1 = a1;
     char *block;
 
-    func_L00_002AF7D0();
+    cancel_hero_item_animation();
     *(u8 *)(D + 0x22B6) = 1;
-    func_L00_002B1F90();
+    UpdateHeroSlotCallbacks();
     *(s32 *)(D + 0x2290) = *(s32 *)(D + 0xC18);
     func_L00_00322EC8(D + 0x18E0);
     func_L00_00322EC8(D + 0x1A30);
@@ -130,12 +130,12 @@ void func_L20_002C57D0(s32 a0, s32 a1, char *a2)
     *(s32 *)(block + 0x2290) = (s32)p2;
     if ((p0 & 0xFF) == 1) {
         if (D_00138320[0] & 0x10) {
-            func_0028B3D0(0x23, 0, (void *)func_0028CC98, (void *)func_0028CCE0,
-                          (void *)func_0028D1E8, 0, 0);
+            func_0028B3D0(0x23, 0, (void *)func_0028CC98, (void *)UpdateRadialMenuSelection,
+                          (void *)DrawRadialSelectorPanel, 0, 0);
             func_L00_002F6B90(3);
         }
     }
-    func_L20_002C63F0();
+    UpdateYeedilHeroCollisionCapsule();
     D = D_00189E20;
     *(f32 *)(D + 0x250) = *(f32 *)(D + 0x258);
     *(f32 *)(D + 0x254) = *(f32 *)(D + 0x25C);
@@ -160,7 +160,7 @@ void func_L20_002C57D0(s32 a0, s32 a1, char *a2)
     }
     func_L20_002D7730(p1, 2);
     if (p0 == 4)
-        func_L00_002D2168(5.0f, 0xF, 0);
+        set_hero_animation(5.0f, 0xF, 0);
 }
 
 
@@ -204,10 +204,10 @@ void func_L20_002C63F0(void)
         CAPSULE.field22b0 == 18 ||
         (CAPSULE.vehicle_mode == 0 && CAPSULE.capsule_bottom < 0.53f) ||
         CAPSULE.control_mode == 17 || CAPSULE.base_condition ||
-        func_00282E80((char *)&CAPSULE + 0x240, (char *)&CAPSULE + 0x80) >
+        vec_distance_xy((char *)&CAPSULE + 0x240, (char *)&CAPSULE + 0x80) >
             CAPSULE.radius * 0.5f) {
-        func_002AA2E8(&CAPSULE.capsule_top, CAPSULE.top_target, 0.02f);
-        func_002AA2E8(&CAPSULE.capsule_bottom, CAPSULE.bottom_target, 0.02f);
+        ApproachValue(&CAPSULE.capsule_top, CAPSULE.top_target, 0.02f);
+        ApproachValue(&CAPSULE.capsule_bottom, CAPSULE.bottom_target, 0.02f);
         func_002AA3A8(&CAPSULE.radius, &CAPSULE.radius_velocity,
                      CAPSULE.radius_target, 0.02f, 0.3f, 0.0666666701f);
     }
@@ -232,31 +232,31 @@ void func_L20_002C7588(int force)
     func_L00_002D36E0(&offset.x, 0.0f, 0.0f, 1, height);
     lowerHeight = height * 0.3f;
     func_L00_002D36E0(&lowerOffset.x, 0.0f, 0.0f, 1, lowerHeight);
-    if (force || func_00282E20(VELOCITY) < 0.01f) {
-        func_00282F20(&start, D_00189E20, radius);
-        func_00282F20(&lowerStart, D_00189E20, radius * 1.4f);
+    if (force || vec_length_xy(VELOCITY) < 0.01f) {
+        vec_scale_to_length(&start, D_00189E20, radius);
+        vec_scale_to_length(&lowerStart, D_00189E20, radius * 1.4f);
     } else {
         func_L00_002D3B58((V4_F6a70b950 *)&start, (V4_F6a70b950 *)VELOCITY, 0.0f);
-        func_00282F20(&start, &start, radius);
-        func_00282D30(&lowerStart, &start, 1.4f);
+        vec_scale_to_length(&start, &start, radius);
+        FastVecScale(&lowerStart, &start, 1.4f);
     }
     kind = -1;
-    func_00282CC0(&start, &start, &offset);
-    func_00282CC0(&lowerStart, &lowerStart, &lowerOffset);
-    if (func_002761F8(&lowerOffset, &lowerStart, 2, PLAYER->object, 0) && CONTACT->count > 0)
-        kind = func_00278E78();
+    FastVecAdd(&start, &start, &offset);
+    FastVecAdd(&lowerStart, &lowerStart, &lowerOffset);
+    if (CollLine(&lowerOffset, &lowerStart, 2, PLAYER->object, 0) && CONTACT->count > 0)
+        kind = GetCollHitMaterial();
     angle = 0.0f;
-    if (func_002761F8(&offset, &start, 2, PLAYER->object, 0) && CONTACT->count > 0)
+    if (CollLine(&offset, &start, 2, PLAYER->object, 0) && CONTACT->count > 0)
         angle = func_L00_002D3EA8((char *)&CONTACT->normal);
     if (angle >= 0.8726647f || kind == 8 || kind == 12) {
         float dot;
         PLAYER->contact = CONTACT->contact;
         func_L00_002D3B58((V4_F6a70b950 *)&CONTACT->normal, (V4_F6a70b950 *)&CONTACT->normal, 0.0f);
-        func_00282F20(&CONTACT->normal, &CONTACT->normal, 1.0f);
-        dot = func_00282DB0(&CONTACT->normal, VELOCITY);
+        vec_scale_to_length(&CONTACT->normal, &CONTACT->normal, 1.0f);
+        dot = FastVecDot(&CONTACT->normal, VELOCITY);
         if (dot < 0.0f) {
-            func_00282D30(&CONTACT->normal, &CONTACT->normal, -dot);
-            func_00282CC0(VELOCITY, VELOCITY, &CONTACT->normal);
+            FastVecScale(&CONTACT->normal, &CONTACT->normal, -dot);
+            FastVecAdd(VELOCITY, VELOCITY, &CONTACT->normal);
         }
     }
 }

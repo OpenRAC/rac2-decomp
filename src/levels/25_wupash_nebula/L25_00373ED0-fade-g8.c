@@ -98,7 +98,7 @@ void func_L25_0040DE40(s32 first, s32 second, s32 third, s32 fourth)
     if (second && D_L25_001B3058 < D_001A79F0[3]) {
         if (func_00282948(state + 0x30) == 0) {
             if (*(s32 *)(state + 0x30) >= 291) {
-                fade = func_00283CE0(300 - *(s32 *)(state + 0x30)) * 0.1f;
+                fade = IntToFloat(300 - *(s32 *)(state + 0x30)) * 0.1f;
                 if (fade > 1.0f)
                     fade = 1.0f;
                 else if (fade < 0.0f)
@@ -106,7 +106,7 @@ void func_L25_0040DE40(s32 first, s32 second, s32 third, s32 fourth)
                 HUD_SPRITE(0xBF, 0x60442D00, D_L25_001B0D08, D_L25_001B0D0C, fade, fade, 0.0f);
                 HUD_SPRITE(0xC0, 0x55F0C070, D_L25_001B0D08, D_L25_001B0D0C, fade, fade, 0.0f);
             } else if (*(s32 *)(state + 0x30) < 10) {
-                fade = func_00283CE0(*(s32 *)(state + 0x30)) * 0.1f;
+                fade = IntToFloat(*(s32 *)(state + 0x30)) * 0.1f;
                 if (fade > 1.0f)
                     fade = 1.0f;
                 else if (fade < 0.0f)
@@ -119,7 +119,7 @@ void func_L25_0040DE40(s32 first, s32 second, s32 third, s32 fourth)
                 HUD_SPRITE(0xBF, 0x60442D00, D_L25_001B0D08, D_L25_001B0D0C, 1.0f, 1.0f, 0.0f);
                 HUD_SPRITE(0xC0, 0x55F0C070, D_L25_001B0D08, D_L25_001B0D0C, 1.0f, 1.0f, 0.0f);
                 color = D_L25_001B0D60;
-                func_0028EA58(func_0028E588(0xEAA2, 3), D_L25_001B0D08 - 51,
+                func_0028EA58(GetIconFrame(0xEAA2, 3), D_L25_001B0D08 - 51,
                               screen_coord(D_L25_001B2900, (f32)(D_L25_001B0D0C - 13), 1.0f), 28, 28, &color);
                 func_00115DA8(text, D_L25_001B0D70, D_001A79F0[3]);
                 textX = D_L25_001B0D08 + 5;

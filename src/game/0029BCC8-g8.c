@@ -35,7 +35,7 @@ void func_0029BCD8(void)
 
     if (D_001A8CFC[0] == 0)
         goto states;
-    func_0029BB30();
+    UpdateMissionSelectionMenu();
     fn = (Fn)((Sub *)(D_001A8CFC[0] + 0x38000))->cb2;
     if (fn != 0) {
         if (fn() != 0)
@@ -154,10 +154,10 @@ states:
         ((Cb)g)();
         saved = ref_L00_0030CFE0_01.scale;
         ref_L00_0030CFE0_01.scale = 0.62f;
-        func_0027AB40();
+        UpdateViewContext();
         func_0029BE88();
         ref_L00_0030CFE0_01.scale = saved;
-        func_0027AB40();
+        UpdateViewContext();
     }
 }
 

@@ -29,7 +29,7 @@ void func_L00_003FC228(char *object) {
     func_00300190(position, position);
     func_00300190(state + 0x50, state + 0x50);
     if (*(unsigned char *)(object + 0x20) == 0) {
-        func_00282CC0(state + 0x50, state + 0x50, state + 0x20);
+        FastVecAdd(state + 0x50, state + 0x50, state + 0x20);
         if (func_00282948((int *)(state + 0x38))) {
             func_0029F338(object);
             return;

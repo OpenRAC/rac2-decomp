@@ -37,7 +37,7 @@ void func_L00_003CF610(unsigned char *obj) {
             if(ctx[2]) { obj[0x20]=3; return; }
             if(!ctx[5]) { obj[0x20]=2; return; }
             *(float *)(ctx+6)=*(float *)(obj+0xF4);
-            *(float *)(obj+0xF4)=func_00283B98(*(float *)(obj+0xF4),-1.5707965f);
+            *(float *)(obj+0xF4)=FastAddRotations(*(float *)(obj+0xF4),-1.5707965f);
             func_002A7750(obj,4,-1);
             return;
         }
@@ -68,23 +68,23 @@ void func_L00_003CF610(unsigned char *obj) {
         }
     }
     if((unsigned char)obj[0x20]==3) {
-        if(*(float *)(ctx+1)==0.0f) func_002E5CF8(0,0,obj);
+        if(*(float *)(ctx+1)==0.0f) PlayMobySound(0,0,obj);
         *(float *)(obj+0xF4)+=-0.017453294f;
-        func_002833F0(obj+0xC0,obj+0xF0);
+        euler_rotation_basis(obj+0xC0,obj+0xF0);
         *(float *)(ctx+1)+=1.0f;
-        if(*(float *)(ctx+1)>135.0f) { func_002E5CF8(1,0,obj); obj[0x20]=2; }
+        if(*(float *)(ctx+1)>135.0f) { PlayMobySound(1,0,obj); obj[0x20]=2; }
     }
     if((unsigned char)obj[0x20]!=4) return;
     if(D_L00_001A8F00) return;
     if(func_002B3868(obj)) {
-        func_002E5CF8(1,0,obj);
+        PlayMobySound(1,0,obj);
         qcopy(&second,D_00189EA0);
-        func_00283410(D_00189E20,D_00189EB0);
-        func_00282F20(&first,D_00189E20,-2.5f);
-        func_00282CC0(&first,&second,&first);
+        euler_to_matrix(D_00189E20,D_00189EB0);
+        vec_scale_to_length(&first,D_00189E20,-2.5f);
+        FastVecAdd(&first,&second,&first);
         func_L00_002B9D60(&first,D_00189EB0,0,1);
         func_L00_002D40A0(&second,1,*(float *)(D_00189EB0+8));
     }
-    func_002AA800(obj+0xF4,0,*(float *)(ctx+6),0.02617994323372841f);
-    if(func_00283C80(*(float *)(obj+0xF4),*(float *)(ctx+6))<0.001f) obj[0x20]=2;
+    StepAngleTowardTarget(obj+0xF4,0,*(float *)(ctx+6),0.02617994323372841f);
+    if(FastDiffRots(*(float *)(obj+0xF4),*(float *)(ctx+6))<0.001f) obj[0x20]=2;
 }

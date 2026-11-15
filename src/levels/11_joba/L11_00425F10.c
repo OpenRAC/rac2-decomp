@@ -50,30 +50,30 @@ int func_L11_0042A158(u8 *object, void *target, f32 desiredHeading, f32 speed, f
     u8 *data = *(u8 **)(object + 0x68);
     int done = 0;
     f32 distance, acceleration;
-    func_00282CF0(delta, target, object + 0x10);
+    FastVecSub(delta, target, object + 0x10);
     delta[2] = 0.0f;
-    distance = func_00282DF0(delta);
+    distance = FastVecLength(delta);
     acceleration = speed * 0.0008333333535119891f;
     if (stopDistance < distance) {
         int collision = *(int *)(data + 0x520);
         angle = 0.0f;
-        func_L02_0032E998(object + 0x10, target, &angle, data + 0x320, collision, data + 0x530, data + 0x534, margin, 0.4f);
+        ComputeRegionRouteHeading(object + 0x10, target, &angle, data + 0x320, collision, data + 0x530, data + 0x534, margin, 0.4f);
         func_002AAA00(object + 0xF8, angle, 0.006981317885220051f, 0.0034906589426100254f, 0.20943954586982727f, data + 0x27C, 0);
-        if (func_00283C80(*(f32 *)(object + 0xF8), angle) < 0.523598849773407f) {
+        if (FastDiffRots(*(f32 *)(object + 0xF8), angle) < 0.523598849773407f) {
             func_002AA548(&frameSpeed, data + 0x538, distance, acceleration, acceleration, speed * 0.01666666753590107f);
         } else {
             *(f32 *)(data + 0x538) = 0.0f;
         }
     } else {
         func_002AAA00(object + 0xF8, desiredHeading, 0.006981317885220051f, 0.2f, 0.20943954586982727f, data + 0x27C, 0);
-        func_002AA2E8((f32 *)(data + 0x538), 0.0f, acceleration);
-        if (*(f32 *)(data + 0x538) == 0.0f && func_00283C80(*(f32 *)(object + 0xF8), desiredHeading) < 0.0872664749622345f) {
+        ApproachValue((f32 *)(data + 0x538), 0.0f, acceleration);
+        if (*(f32 *)(data + 0x538) == 0.0f && FastDiffRots(*(f32 *)(object + 0xF8), desiredHeading) < 0.0872664749622345f) {
             *(f32 *)(data + 0x27C) = 0.0f;
             done = 1;
         }
     }
-    func_00282F20(displacement, object + 0xC0, *(f32 *)(data + 0x538));
-    func_00282CC0(destination, displacement, object + 0x10);
+    vec_scale_to_length(displacement, object + 0xC0, *(f32 *)(data + 0x538));
+    FastVecAdd(destination, displacement, object + 0x10);
     if (!func_002A7EA0(object, object + 0x10, destination, 0.75f, 0.75f, 0.4f, 0.523598849773407f, 0))
         *(int *)(data + 0x53C) += 1;
     if (*(int *)(data + 0x53C) >= 30) {
@@ -89,8 +89,8 @@ void func_L11_0042A420(u8 *arg0) {
     u8 *s0 = *(u8 **)(arg0 + 0x68);
 
     func_002AB8C0(arg0, s0 + 0x50);
-    func_00282978(s0 + 0x260);
-    func_00282978(s0 + 0x26);
+    FastDecTimer(s0 + 0x260);
+    FastDecTimer(s0 + 0x26);
     if (*(u16 *)(arg0 + 0x96) <= 0xFFFE)
         (*(u16 *)(arg0 + 0x96))++;
     func_002AEC48(arg0, s0 + 0x2A0, 0.03f, 0.3f, 4);
@@ -144,8 +144,8 @@ void func_L11_0042A5B0(float *pos, int count) {
     int i;
     int sign;
     char *particle;
-    func_00282CF0(direction, (float *)D_L11_001BA8C0, pos);
-    func_00282F20((char *)offset, (char *)direction, 0.3f);
+    FastVecSub(direction, (float *)D_L11_001BA8C0, pos);
+    vec_scale_to_length((char *)offset, (char *)direction, 0.3f);
     direction[2] = 0;
     axis[0] = 0;
     axis[1] = 0;
@@ -157,16 +157,16 @@ void func_L11_0042A5B0(float *pos, int count) {
         if (!sign) sign--;
         angle = func_002A7878_range(-1.0471977f, 1.0471977f);
         func_002ACEC0(velocity, direction, axis, angle);
-        func_00282F20((char *)velocity, (char *)velocity, func_002A7878_range(0.05f, 3.0f) * 0.0166666675f);
+        vec_scale_to_length((char *)velocity, (char *)velocity, func_002A7878_range(0.05f, 3.0f) * 0.0166666675f);
         velocity[2] = func_002A7878_range(1.0f, 5.0f) * 0.0166666675f;
-        func_00282CC0(origin, pos, offset);
+        FastVecAdd(origin, pos, offset);
         pos[0] += func_002A78D8(0, 0.15f);
         pos[1] += func_002A78D8(0, 0.15f);
         pos[2] += func_002A78D8(0, 0.15f);
         particle = func_002C2210(origin, 60, size * 0.1f, size, 0x7F207F7F, 0, sign, velocity, 0, 0.002f);
-        if (particle) particle[9] = func_00283CF0(4.0f) + 0x70;
+        if (particle) particle[9] = FloatToInt(4.0f) + 0x70;
         particle = func_002C2210(origin, 60, size * 0.07f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, 0.002f);
-        if (particle) particle[9] = func_00283CF0(4.0f) + 0x70;
+        if (particle) particle[9] = FloatToInt(4.0f) + 0x70;
     }
 }
 
@@ -192,8 +192,8 @@ void func_L11_00431D50(u8 *arg0) {
     u8 *s0 = *(u8 **)(arg0 + 0x68);
 
     func_002AB8C0(arg0, s0 + 0x50);
-    func_00282978(s0 + 0x270);
-    func_00282978(s0 + 0x272);
+    FastDecTimer(s0 + 0x270);
+    FastDecTimer(s0 + 0x272);
     if (*(u16 *)(arg0 + 0x96) <= 0xFFFE)
         (*(u16 *)(arg0 + 0x96))++;
 }
@@ -218,7 +218,7 @@ void func_L11_00431E30(u8 *arg0) {
     w[0] = func_00283180(*(f32 *)(s0 + 0xF8)) * 0.1f;
     w[1] = func_00283198(*(f32 *)(s0 + 0xF8)) * 0.1f;
     w[2] = 0.0f;
-    func_00282CC0(v, v, w);
+    FastVecAdd(v, v, w);
     v[2] = v[2] - 0.05f;
     func_L11_00431EE8(s0, v);
     func_L11_004320F8(s0, v);

@@ -37,10 +37,10 @@ int func_L20_00442550(char *arg0) {
     int v0;
     Rec_42550 *p;
 
-    func_002AA2E8((float *)(s0 + 0x48), 1.0f, 0.033333335f);
+    ApproachValue((float *)(s0 + 0x48), 1.0f, 0.033333335f);
 
     if (*(u8 *)(s0 + 0x94) == 2) {
-        func_002AA800(s2 + 0x1804, 1, 0.0f, D_L20_001B2124 * 0.00014544412f);
+        StepAngleTowardTarget(s2 + 0x1804, 1, 0.0f, D_L20_001B2124 * 0.00014544412f);
     }
     f0 = *(float *)(s2 + 0xF8);
     s1 = D_00189E20;
@@ -51,7 +51,7 @@ int func_L20_00442550(char *arg0) {
     if (*(int *)(s1 + 0x2294) == 0x8C) {
         float f0;
         s3 = s1 + 0x80;
-        f0 = func_00282E80(s3, s0 + 0x10);
+        f0 = vec_distance_xy(s3, s0 + 0x10);
         if (f0 <= 4.0f) {
             f0 = *(float *)(s1 + 0x88);
             f0 += 5.0f;
@@ -75,7 +75,7 @@ int func_L20_00442550(char *arg0) {
     if (*(float *)(s0 + 0x18) <= *(float *)(s2 + 0xE0)) {
         float velocity;
         *(float *)(s0 + 0x18) = *(float *)(s2 + 0xE0);
-        func_002E5CF8(0, 0, s0);
+        PlayMobySound(0, 0, s0);
         velocity = *(float *)(s2 + 0xF8) * -D_L20_001B2134;
         *(float *)(s2 + 0xF8) = velocity;
         if (velocity < 0.016666668f) {

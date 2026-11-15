@@ -25,19 +25,19 @@ float func_003348A8(u8 *self, float t) {
     float r;
 
     func_00334710((int)self, (TI *)m);
-    func_00282D30(a, root + 8, t);
-    func_00282CC0(a, a, m);
-    func_00282CF0(b, a, self + 0x30);
-    along = func_00282DB0(b, self + 0x10);
-    func_00282D30(c, self + 0x10, along);
-    func_00282CF0(b, b, c);
-    d = func_00282DB0(b, self);
-    len = func_00282DF0(b);
+    FastVecScale(a, root + 8, t);
+    FastVecAdd(a, a, m);
+    FastVecSub(b, a, self + 0x30);
+    along = FastVecDot(b, self + 0x10);
+    FastVecScale(c, self + 0x10, along);
+    FastVecSub(b, b, c);
+    d = FastVecDot(b, self);
+    len = FastVecLength(b);
     if (len == 0.0f) {
         return 0.0f;
     }
     r = 1.5707964f - func_002831B0(d / len);
-    if (func_00282DB0(b, self + 0x20) < 0.0f) {
+    if (FastVecDot(b, self + 0x20) < 0.0f) {
         r = -r;
     }
     return r;

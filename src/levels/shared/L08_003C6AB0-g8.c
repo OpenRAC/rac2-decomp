@@ -348,7 +348,7 @@ void func_L08_003C6AB0(RideMoby *moby)
         }
         if (func_002A0558(moby, ((Hero *)D_00189E20)->ptr[0x2290 / 4]) < D_L08_001AF99C
             && ((Hero *)D_00189E20)->i[0x2294 / 4] != 0x31) {
-            s32 t = func_002B0C28(7, 0x2798, 1) != 0;
+            s32 t = TryClaimNotice(7, 0x2798, 1) != 0;
             if (((Pad *)D_00138180)->w[0x1A4 / 4] & 0x10) {
                 fire = t;
             } else {
@@ -357,7 +357,7 @@ void func_L08_003C6AB0(RideMoby *moby)
         }
         if (fire != 0) {
             func_L08_002D2ED8(0x31, 0);
-            func_L00_002D2168(D_L08_001AF9D4, 0, 15.0f);
+            set_hero_animation(D_L08_001AF9D4, 0, 15.0f);
             *(TI128 *)(D_00189E20 + 0x90) = moby->rot.q;
             *(TI128 *)(D_00189E20 + 0x80) = moby->pos.q;
             ((Hero *)D_00189E20)->ptr[0x1830 / 4] = (u8 *)moby;
@@ -376,7 +376,7 @@ void func_L08_003C6AB0(RideMoby *moby)
         f32 scale;
 
         moby->x98 = 0;
-        func_00282978((u8 *)vars + 0x7C);
+        FastDecTimer((u8 *)vars + 0x7C);
         func_00282948((u8 *)vars + 0xAC);
         {
             f32 zero = 0.0f;
@@ -406,7 +406,7 @@ void func_L08_003C6AB0(RideMoby *moby)
                 vars->x78 += D_L08_001AFABC;
             }
             if (D_L08_001AF9D8 != D_L08_001AF9D4 && D_L08_001AF9D4 != -1) {
-                func_L00_002D2168(D_L08_001AF9D4, 0, 15.0f);
+                set_hero_animation(D_L08_001AF9D4, 0, 15.0f);
             }
             func_L08_003C6528(&turn, &speed, &pitch, &bank, &lift, &thrust);
         } else {
@@ -428,7 +428,7 @@ void func_L08_003C6AB0(RideMoby *moby)
         pitch = pitch * 0.017453294f;
         pitch *= D_L08_001AFA04;
         {
-            f32 raw = func_00282DF0(vars);
+            f32 raw = FastVecLength(vars);
             f32 frame = 0.016666668f;
             f32 cur = raw * vars->x78;
             f32 top = D_L08_001AFA0C * frame;
@@ -439,7 +439,7 @@ void func_L08_003C6AB0(RideMoby *moby)
                 + D_L08_001AFAC4 * (1.0f - vars->x78));
             slew = rate * 0.000290888245f;
             cruise = D_L08_001AF9C4 * frame;
-            vars->x28 = func_00283B98(vars->x28, D_L08_001AF9B4 * slew);
+            vars->x28 = FastAddRotations(vars->x28, D_L08_001AF9B4 * slew);
             gain = D_L08_001AF9F8 * speed + (1.0f - D_L08_001AF9F8);
             rad = turn * 0.017453294f;
             target = D_L08_001AF9EC * rad * vars->x78;
@@ -458,7 +458,7 @@ void func_L08_003C6AB0(RideMoby *moby)
             }
             landed = 0;
             {
-                f32 s = func_00282C48(turn), k = func_L08_003277C0(2, (cruise - cur) / cruise);
+                f32 s = func_00282C48(turn), k = IntegerPower(2, (cruise - cur) / cruise);
                 {
                     f32 t = speed + D_L08_001AF9F4 * s * sign;
                     t *= 0.00027777778f;
@@ -468,9 +468,9 @@ void func_L08_003C6AB0(RideMoby *moby)
                 }
             }
         }
-        func_00282CC0(v40, (u8 *)moby + 0x10, vars);
+        FastVecAdd(v40, (u8 *)moby + 0x10, vars);
         ground = func_002A89A8(v40, 0, 0.5f);
-        if (func_00278E78() == 1 || func_00278E78() == 0xB) {
+        if (GetCollHitMaterial() == 1 || GetCollHitMaterial() == 0xB) {
             landed = 1;
         }
         if (moby->pos.f[2] < ground + blend + 0.3f) {
@@ -486,8 +486,8 @@ void func_L08_003C6AB0(RideMoby *moby)
         if (ground != 0.0f) {
             steer = 1;
             if (ground + blend < v40[2]) {
-                vars->x24 = func_00283B98(vars->x24,
-                    func_00283BE0(pitch, vars->x24) * D_L08_001AFA00);
+                vars->x24 = FastAddRotations(vars->x24,
+                    fast_subtract_rotations(pitch, vars->x24) * D_L08_001AFA00);
                 if (D_001A79F0 == 8) {
                     steer = 0;
                 }
@@ -497,7 +497,7 @@ void func_L08_003C6AB0(RideMoby *moby)
                 }
                 if (v40[2] + 0.1f < ground || landed) {
                     v40[2] = ground;
-                    func_00282D30(vars, vars, D_L08_001AF9E4);
+                    FastVecScale(vars, vars, D_L08_001AF9E4);
                 }
                 vars->x8 += ((ground + blend - v40[2]) * D_L08_001AF9CC - vars->x8) * D_L08_001AF9CC;
                 if (bank > 0.0f) {
@@ -505,43 +505,43 @@ void func_L08_003C6AB0(RideMoby *moby)
                     vars->x0 *= damp;
                     vars->x4 *= damp;
                 }
-                func_00282F20(work.basis[2], D_L08_001BFF80, 1.0f);
-                func_00282DD8(work.basis[1], (u8 *)moby + 0xC0, work.basis[2]);
-                func_00282DD8(work.basis[0], work.basis[1], work.basis[2]);
+                vec_scale_to_length(work.basis[2], D_L08_001BFF80, 1.0f);
+                FastVecCross(work.basis[1], (u8 *)moby + 0xC0, work.basis[2]);
+                FastVecCross(work.basis[0], work.basis[1], work.basis[2]);
                 qzero_nc(work.basis[3]);
                 func_002AB6D8(work.basis, v90);
                 {
                     f32 half = pitch * 0.5f;
                     f32 rise = D_L08_001AFAC8 * (vars->x78 + 1.0f);
-                    vars->x24 = func_00283B98(vars->x24,
-                        func_00283BE0(func_00283B98(-v90[1], half * rise),
+                    vars->x24 = FastAddRotations(vars->x24,
+                        fast_subtract_rotations(FastAddRotations(-v90[1], half * rise),
                             vars->x24) * D_L08_001AF9FC);
                 }
-                func_00282D30(vars, vars, D_L08_001AF9B8);
+                FastVecScale(vars, vars, D_L08_001AF9B8);
                 {
                     f32 inverse[4][4] __attribute__((aligned(16)));
 
-                    func_00283698(inverse, (u8 *)moby + 0xC0);
-                    func_002830C0(vars, vars, inverse);
+                    matrix_from_basis_rows(inverse, (u8 *)moby + 0xC0);
+                    transform_vector(vars, vars, inverse);
                 }
                 vars->x4 *= D_L08_001AF9BC;
-                func_00283098(vars, vars, (u8 *)moby + 0xC0);
+                matrix_mul_vec3(vars, vars, (u8 *)moby + 0xC0);
             }
             if (steer) {
-                func_00282F20(v30, (u8 *)moby + 0xC0, roll);
+                vec_scale_to_length(v30, (u8 *)moby + 0xC0, roll);
                 {
                     f32 climb = lift * 0.00027777778f;
-                    func_00282F20(work.basis[0], (u8 *)moby + 0xD0, D_L08_001AFAD4 * climb * vars->x78);
+                    vec_scale_to_length(work.basis[0], (u8 *)moby + 0xD0, D_L08_001AFAD4 * climb * vars->x78);
                 }
-                func_00282CC0(v30, v30, work.basis[0]);
-                func_00282CC0(vars, vars, v30);
+                FastVecAdd(v30, v30, work.basis[0]);
+                FastVecAdd(vars, vars, v30);
             }
         }
-        func_002A8C00(D_L08_001AFA70, &work.query.request, moby, 0x10000, vars);
+        make_hit_descriptor(D_L08_001AFA70, &work.query.request, moby, 0x10000, vars);
         moby->pos.q = *(TI128 *)v40;
         func_0029FCC0(moby, 0, work.query.position.f);
         work.query.position.f[2] += D_L08_001AF9D0 - D_L08_001AFAC0;
-        func_00282CF0(v90, (u8 *)moby + 0x10, work.query.position.f);
+        FastVecSub(v90, (u8 *)moby + 0x10, work.query.position.f);
         moby->x98 = 0;
         {
             s32 found = func_00278870(work.query.position.f, D_L08_001AF9D0);
@@ -551,7 +551,7 @@ void func_L08_003C6AB0(RideMoby *moby)
             moby->x98 = *(s32 *)(moby->x24 + 0x10);
             if (found != 0) {
                 u8 *col;
-                if (func_00278E78() == 1 || func_00278E78() == 0xB) {
+                if (GetCollHitMaterial() == 1 || GetCollHitMaterial() == 0xB) {
                     moby->x20 = 5;
                 }
                 col = D_L08_001BFF40;
@@ -565,12 +565,12 @@ void func_L08_003C6AB0(RideMoby *moby)
                     *(f32 *)(col + 0x34) *= vars->x78;
                     *(f32 *)(col + 0x30) += work.query.position.f[0];
                     *(f32 *)(col + 0x34) += work.query.position.f[1];
-                    func_00282CC0((u8 *)moby + 0x10, col + 0x30, v90);
-                    func_00282DD8(vB0, col + 0x40, vars);
-                    func_00282DD8(vA0, vB0, col + 0x40);
-                    func_00282F20(vA0, vA0, 1.0f);
-                    func_00282F20(vars, vA0, func_00282DB0(vars, vA0) * vars->x78);
-                    func_00282D30(vars, vars, D_L08_001AF9E0);
+                    FastVecAdd((u8 *)moby + 0x10, col + 0x30, v90);
+                    FastVecCross(vB0, col + 0x40, vars);
+                    FastVecCross(vA0, vB0, col + 0x40);
+                    vec_scale_to_length(vA0, vA0, 1.0f);
+                    vec_scale_to_length(vars, vA0, FastVecDot(vars, vA0) * vars->x78);
+                    FastVecScale(vars, vars, D_L08_001AF9E0);
                 }
             }
         }
@@ -597,7 +597,7 @@ void func_L08_003C6AB0(RideMoby *moby)
         func_0029FCC0(moby, 0, work.query.position.f);
         work.query.position.f[2] += D_L08_001AFA78;
         func_00277F48(D_L08_001AFA14, work.query.position.f, 0, moby, &work.query.request);
-        if (func_00282DF0(vars) > D_L08_001AFA7C * 0.016666668f) {
+        if (FastVecLength(vars) > D_L08_001AFA7C * 0.016666668f) {
             f32 vA0[4] __attribute__((aligned(16)));
 
             func_0029FCC0(moby, 3, vA0);
@@ -629,7 +629,7 @@ void func_L08_003C6AB0(RideMoby *moby)
         *(s32 *)(((Hero *)D_00189E20)->ptr[0x2290 / 4] + 0x9C) = 0;
         func_L08_002D2ED8(0, 1);
         func_0029FCC0(moby, 0, dir);
-        func_002ABBB8(moby, vars, dir, 0.0f, 0.0f, 10, 3, 16, 4.0f, 2.0f, 9.0f, 1.0f, -1, 15.0f, 1, 1, -1, 0, 0x810001);
+        SpawnExplosionEffects(moby, vars, dir, 0.0f, 0.0f, 10, 3, 16, 4.0f, 2.0f, 9.0f, 1.0f, -1, 15.0f, 1, 1, -1, 0, 0x810001);
         moby->pos.q = vars->x30;
         ((Hero *)D_00189E20)->h[0x1834 / 2] = -1;
         ((Hero *)D_00189E20)->ptr[0x1830 / 4] = 0;
@@ -647,7 +647,7 @@ void func_L08_003C6AB0(RideMoby *moby)
     vars->x58 = moby->pos.f[2];
     {
         f32 t = vars->x78 * 0.000290888245f;
-        vars->x48 = func_00283B98(vars->x48, D_L08_001AF9A4 * t);
+        vars->x48 = FastAddRotations(vars->x48, D_L08_001AF9A4 * t);
     }
     {
         f32 t;
@@ -658,8 +658,8 @@ void func_L08_003C6AB0(RideMoby *moby)
             D_L08_001AF9AC * t, D_L08_001AF9B0 * t);
     }
     moby->rot.f[2] = vars->x28;
-    moby->rot.f[0] = func_00283B98(moby->rot.f[0], vars->x20);
-    moby->rot.f[1] = func_00283B98(moby->rot.f[1], vars->x24);
+    moby->rot.f[0] = FastAddRotations(moby->rot.f[0], vars->x20);
+    moby->rot.f[1] = FastAddRotations(moby->rot.f[1], vars->x24);
     if (moby->x20 == 3) {
         if (D_001A79F0 == 8) {
             switch (vars->x8A) {
@@ -688,7 +688,7 @@ void func_L08_003C6AB0(RideMoby *moby)
                 }
                 break;
             case 3:
-                func_00282978((u8 *)vars + 0x88);
+                FastDecTimer((u8 *)vars + 0x88);
                 if (vars->x68 < D_L08_001B031C) {
                     vars->x8A = 1;
                 } else if (vars->x88 == 0) {
@@ -698,8 +698,8 @@ void func_L08_003C6AB0(RideMoby *moby)
             }
             if (vars->x8A != 0 && vars->x6C != 0) {
                 u8 *anim = *(u8 **)(vars->x6C + 0x68);
-                vars->x8C = func_00283CF0(func_00283CE0((D_L08_001AFB18 - 1) << 5)
-                    * func_00283CE0(*(s32 *)(anim + 0x4)) / (func_00283CE0(*(s32 *)(anim + 0x0)) * 60.0f));
+                vars->x8C = FloatToInt(IntToFloat((D_L08_001AFB18 - 1) << 5)
+                    * IntToFloat(*(s32 *)(anim + 0x4)) / (IntToFloat(*(s32 *)(anim + 0x0)) * 60.0f));
             } else {
                 vars->x8C = 0x200;
             }
@@ -720,11 +720,11 @@ void func_L08_003C6AB0(RideMoby *moby)
         func_L00_002E6EF8(func_L08_003C5940, moby);
     }
     moby->x98 = *(s32 *)(moby->x24 + 0x10);
-    if (moby->x31 != 0 && func_00282E48((u8 *)moby + 0x10, D_L08_001B9B00) < 64.0f) {
+    if (moby->x31 != 0 && fast_vec_dist((u8 *)moby + 0x10, D_L08_001B9B00) < 64.0f) {
         func_002A93B0(moby);
         moby->x6F = 0x3C;
     }
     vars->x6C = 0;
     vars->x68 = 1000000.0f;
-    func_L08_003C66F0(moby);
+    UpdateAttachedChildObjects(moby);
 }

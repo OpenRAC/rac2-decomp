@@ -6,7 +6,7 @@
 
    D_001A7100 and D_001A7110 are the count and error fields of RAC1's CdSafeState
    (sound_read_work), which declares them volatile with these types at offsets 0 and
-   0x10; func_00133580 polls the count. Two volatile stores depend on each other, which
+   0x10; snd_CheckLoadInProgress polls the count. Two volatile stores depend on each other, which
    raises the first store's scheduling priority above the two address loads, so it goes
    first; the second then ranks behind the remaining load, having fewer dependents.
    Without volatile all four tie on priority and the loads, with more dependents, go
@@ -29,7 +29,7 @@ int func_001334B8(int lba, int sectors, void *buf, unsigned char *mode) {
     if (D_001A748C == 0) {
         return func_001253A8(lba, sectors, buf, mode);
     }
-    if (func_00133580(1) == 1) {
+    if (snd_CheckLoadInProgress(1) == 1) {
         return 0;
     }
     D_001A7100 = 1;

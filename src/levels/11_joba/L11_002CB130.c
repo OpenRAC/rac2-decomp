@@ -114,7 +114,7 @@ int func_L11_002CB130(long apply)
         direction.word = entry->direction.word;
         if (entry->direction.f[3] == 5627.9248046875f) special = 1;
     } else if (entry->object) {
-        func_00282CF0(&direction, &D_00189E20.position, entry->object+0x10);
+        FastVecSub(&direction, &D_00189E20.position, entry->object+0x10);
     } else func_L00_002D36E0((float *)&direction, 0, -1.0f, 0.0f, 0.0f);
     switch (D_00189E20.mode) {
     case 0:
@@ -124,7 +124,7 @@ int func_L11_002CB130(long apply)
         }
         if ((D_00189E20.state == 1 || D_00189E20.state == 0x1d || D_00189E20.interrupted) && !(entry->flags & 8)) {
             u8 *hit = func_002A9640(D_00189E20.object, 1, 0);
-            if (hit) func_L00_002A4EF8(func_00283CF0(*(float *)(hit+0x2c)));
+            if (hit) AdjustPlayerHealth(FloatToInt(*(float *)(hit+0x2c)));
             if (!D_00189E20.health) func_L11_002D8EF8(0x16, 1);
             D_00189E20.timer = 0x4d;
             if (!D_00189E20.soundTimer) D_00189E20.soundTimer = 0x12;
@@ -143,7 +143,7 @@ int func_L11_002CB130(long apply)
         func_L00_002B2C58((int)&direction, special, 0.083333336f, 0.050000004f);
         break;
     }
-    func_00282CC0(&D_00189E20.velocity, &D_00189E20.velocity, &direction);
-    func_00282CC0(&D_00189E20.motion, &D_00189E20.motion, &direction);
+    FastVecAdd(&D_00189E20.velocity, &D_00189E20.velocity, &direction);
+    FastVecAdd(&D_00189E20.motion, &D_00189E20.motion, &direction);
     return 1;
 }

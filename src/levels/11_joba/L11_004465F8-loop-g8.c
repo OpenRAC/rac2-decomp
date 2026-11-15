@@ -46,14 +46,14 @@ void func_L11_00446EB8(char *obj)
         *(TI128 *)t = 0;
         t[2] = state->level[i] * state->scale[i];
         *(TI128 *)v = *(TI128 *)t;
-        func_00283098(v, v, D_L11_001B359C[0] + (state->entity << 8) + 0xC0);
-        func_00282CC0(v, v, D_L11_001B359C[0] + (state->entity << 8) + 0x10);
+        matrix_mul_vec3(v, v, D_L11_001B359C[0] + (state->entity << 8) + 0xC0);
+        FastVecAdd(v, v, D_L11_001B359C[0] + (state->entity << 8) + 0x10);
         angle = func_002AA140(D_L11_001B1940, D_L11_001B1944[0], state->level[i]);
         f = state->level[i];
         if (f < 0.1f)
-            n = func_00283CF0((float)D_L11_001B1948 * f * 10.0f);
+            n = FloatToInt((float)D_L11_001B1948 * f * 10.0f);
         else
-            n = func_00283CF0((float)D_L11_001B1948 * (1.0f - f));
+            n = FloatToInt((float)D_L11_001B1948 * (1.0f - f));
         func_002820D0(v, n, 0, angle, D_L11_001B194C, 0.08f);
     }
 }

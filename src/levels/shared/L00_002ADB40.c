@@ -33,7 +33,7 @@ void func_L00_002ADB40(void)
             return;
 call:
             *(s128 *)fr.position = *(s128 *)D_00189EA0;
-            if (func_L00_002AD868(fr.position, &fr.rail, fr.contact, &fr.segment, &fr.parameter, &fr.kind, 0, 0, 0) != 0) {
+            if (nearest_rail_point(fr.position, &fr.rail, fr.contact, &fr.segment, &fr.parameter, &fr.kind, 0, 0, 0) != 0) {
                 b = D_00189EA0 - 0x80;
                 if (*(s32 *)(b + 0x2294) == 0x28 && *(s32 *)(b + 0x694) != 0 && fr.rail == *(s32 *)(b + 0x630))
                     return;

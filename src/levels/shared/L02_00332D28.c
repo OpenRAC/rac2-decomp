@@ -17,7 +17,7 @@ void func_L02_00332D28(char *object, char *data, void *originalPosition, void *s
     TI128 before;
     int hit, i;
     float speed, height;
-    func_00282CC0(object + 0x10, object + 0x10, data + 0xA0);
+    FastVecAdd(object + 0x10, object + 0x10, data + 0xA0);
     qcopy(&before, object + 0x10);
     *(int *)(data + 0x84) = 0;
     qzero(data + 0x60);
@@ -30,7 +30,7 @@ void func_L02_00332D28(char *object, char *data, void *originalPosition, void *s
                 break;
         }
         if (changed) {
-            func_00282CF0(data + 0xA0, object + 0x10, originalPosition);
+            FastVecSub(data + 0xA0, object + 0x10, originalPosition);
             speed = func_002AFF08(object, data + 0xA0, transform);
             if (*(float *)(data + 0xB0) < speed)
                 func_002AFE58(object, data + 0xA0, data + 0xA0, *(float *)(data + 0xB0), transform);
@@ -49,6 +49,6 @@ void func_L02_00332D28(char *object, char *data, void *originalPosition, void *s
         } else {
             func_00282948(data + 0x80);
         }
-        func_00282CF0(data + 0x70, object + 0x10, &before);
+        FastVecSub(data + 0x70, object + 0x10, &before);
     }
 }

@@ -46,7 +46,7 @@ void func_L00_003B3AF8(char *object)
                 if (kind == 0xfd) return;
                 if (cursor && *(char **)(cursor + 0x24) &&
                     *(short *)(*(char **)(cursor + 0x24) + 0x46) == 0x13) {
-                    if (func_00282E48(cursor + 0x10, object + 0x10) < D_L00_001AF8C0)
+                    if (fast_vec_dist(cursor + 0x10, object + 0x10) < D_L00_001AF8C0)
                         ref_L00_003B3AF8_00(cursor, object);
                 }
                 cursor = *(char **)(cursor + 0x28);

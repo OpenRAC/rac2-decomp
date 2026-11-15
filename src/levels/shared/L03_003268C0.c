@@ -26,7 +26,7 @@ void func_L03_003268C0(unsigned char *object, int first, int count, int randomFi
         for (i = 0; i < count; i++) {
             func_002A7A00(&velocity, range.x, range.y);
             velocity.z = func_00282C48(velocity.z) * 1.5f;
-            func_00282CC0(&velocity, &velocity, offset);
+            FastVecAdd(&velocity, &velocity, offset);
             func_L02_0032B468(object, first + i, object + 0x10, object + 0xF0,
                             0, flags, &velocity, D_L03_001A8F20, D_L03_001A8F20, 0.0f);
         }
@@ -37,7 +37,7 @@ void func_L03_003268C0(unsigned char *object, int first, int count, int randomFi
             for (i = 0; i < limit && i < found; i++) {
                 func_002A7A00(&velocity, range.x, range.y);
                 velocity.z = func_00282C48(velocity.z) * 1.5f;
-                func_00282CC0(&velocity, &velocity, offset);
+                FastVecAdd(&velocity, &velocity, offset);
                 func_00282C88(&rotation);
                 rotation.x = func_002A7940();
                 rotation.y = func_002A7940();

@@ -156,14 +156,14 @@ void func_L11_002DE9E0(void) {
     if (func_L11_002CB130(1) != 0) {
         goto end;
     }
-    func_L00_002CB038();
+    UpdateHeroHeldTarget();
     if (FLD(D_00189E20, s32, 0x24CC) <= 0) {
         if ((FLD(D_00189E20, u32, 0x2294) == 0) || (FLD(D_00189E20, u32, 0x2294) == 2)) {
             func_L11_002D8EF8(0x39, 1);
             goto end;
         }
     }
-    if (func_L00_002C9448() != 0) {
+    if (ProcessHeroEquippedItemInput() != 0) {
         goto end;
     }
     if (func_L00_002C8C00() != 0) {
@@ -185,7 +185,7 @@ void func_L11_002DE9E0(void) {
                 func_L00_0030C710(0xB4);
                 break;
             case 1:
-                func_0028B3D0(0x23, 0, func_0028CC98, func_0028CCE0, func_0028D1E8, 0, 0);
+                func_0028B3D0(0x23, 0, func_0028CC98, UpdateRadialMenuSelection, DrawRadialSelectorPanel, 0, 0);
                 break;
             }
         }
@@ -247,7 +247,7 @@ void func_L11_002DE9E0(void) {
                 if (FLD(rec, s32, 0x44) != 0) {
                     func_L11_002D8EF8(0x3C, 1);
                 } else {
-                    func_L00_002D2168(FLD(rec, s32, 0x48), 0, 12.0f);
+                    set_hero_animation(FLD(rec, s32, 0x48), 0, 12.0f);
                 }
             }
         } else if (FLD(D_00189E20, s32, 0xC28) & 2) {
@@ -258,9 +258,9 @@ void func_L11_002DE9E0(void) {
             if (keep == 0) {
                 FLD(D_00189E20, s8, 0x22B8) = 0;
                 if (func_L03_002AB5C8(0) == 0x51) {
-                    func_L00_002D2168(func_L03_002AB5C8(0), 0, 18.0f);
+                    set_hero_animation(func_L03_002AB5C8(0), 0, 18.0f);
                 } else {
-                    func_L00_002D2168(func_L03_002AB5C8(0), 0, -2.0f);
+                    set_hero_animation(func_L03_002AB5C8(0), 0, -2.0f);
                 }
             }
         }
@@ -272,9 +272,9 @@ void func_L11_002DE9E0(void) {
             }
         }
         if ((FLD(D_00189E20, u8, 0x22B8) != 0) && (FLD(D_00189E20, s32, 0xC2C) == 0) && (FLD(D_00189E20, u8, 0x22BA) != 0) && (FLD(D_00189E20, s16, 0x24EC) == 0)) {
-            s32 slot = func_L00_002ADEA0(0);
+            s32 slot = hero_slot_item_id(0);
             if (slot != FLD(D_00189E20, s32, 0x24B4)) {
-                func_L00_002AF7D0();
+                cancel_hero_item_animation();
             } else {
                 s32 want = FLD(D_L11_00279BA0 + ((u8 *)D_00139568)[slot] * 0xE0, s32, 0x28);
                 if (FLD(FLD(D_00189E20, u8 *, 0x2290), u8, 0x43) != want) {
@@ -282,7 +282,7 @@ void func_L11_002DE9E0(void) {
                         FLD(D_00189E20, s32, 0xEA4) = 1;
                     }
                     FLD(D_00189E20, s32, 0x24B0) = want;
-                    func_L00_002D2168(want, 0, -4.0f);
+                    set_hero_animation(want, 0, -4.0f);
                 }
             }
         }
@@ -313,7 +313,7 @@ void func_L11_002DE9E0(void) {
                 }
             }
         }
-        if ((FLD(D_00189E20, s16, 0x348) == 1) && (D_L11_001A8FF4 == 0) && (func_L00_0032EF10(0x40, 7, NULL) != 0)) {
+        if ((FLD(D_00189E20, s16, 0x348) == 1) && (D_L11_001A8FF4 == 0) && (PadPressedWithin(0x40, 7, NULL) != 0)) {
             func_L11_002D8EF8(0x6E, 1);
             break;
         }
@@ -328,7 +328,7 @@ void func_L11_002DE9E0(void) {
             s32 turned;
             if (((FLD(D_00189E20, s32, 0x22A0) == 1) || (FLD(D_00189E20, s32, 0x22A0) == 0x1D)) && (FLD(D_00189E20, s32, 0x1B8) < 0x18) && (FLD(D_00189E20, s16, 0x348) != 1)) {
                 func_L00_002B39F0(0, 1.0f);
-                if ((func_00283C80(FLD(D_00189E20, f32, 0x1A0), FLD(D_L11_001BA780, f32, 0x158)) > 1.2217306f) && (func_00282E48(D_00189E20 + 0x80, D_L11_001BA780 + 0x140) < 2.5f)) {
+                if ((FastDiffRots(FLD(D_00189E20, f32, 0x1A0), FLD(D_L11_001BA780, f32, 0x158)) > 1.2217306f) && (fast_vec_dist(D_00189E20 + 0x80, D_L11_001BA780 + 0x140) < 2.5f)) {
                     go = 0;
                 }
             }
@@ -397,7 +397,7 @@ void func_L11_002DE9E0(void) {
             if (FLD(D_00189E20, s16, 0x21E) != 0) {
                 FLD(D_00189E20, u8, 0x22C0) = 1;
                 FLD(D_00189E20, s32, 0xC20) = 0;
-                func_00282978(D_00189E20 + 0x21E);
+                FastDecTimer(D_00189E20 + 0x21E);
                 return;
             }
             func_L00_002B30E8();
@@ -412,11 +412,11 @@ void func_L11_002DE9E0(void) {
         s32 anim;
         if ((FLD(D_00189E20, u8, 0x22B4) == 0) && ((FLD(D_00189E20, u8, 0x22BA) == 0) || (FLD(D_00189E20, u8, 0x22B5) != 0))) {
             if (FLD(D_00138180, s32, 0x1A0) & 8) {
-                func_L00_002D2168(0xD, 0, 8.0f);
+                set_hero_animation(0xD, 0, 8.0f);
             } else {
                 s32 a = func_L03_002AB5C8(1);
                 if (FLD(FLD(D_00189E20, u8 *, 0x2290), u8, 0x43) != a) {
-                    func_L00_002D2168(a, 0, 8.0f);
+                    set_hero_animation(a, 0, 8.0f);
                 }
             }
         }
@@ -440,7 +440,7 @@ void func_L11_002DE9E0(void) {
                 func_L11_002D8EF8(0, 0);
                 anim = func_L03_002AB5C8(1);
                 if (FLD(FLD(D_00189E20, u8 *, 0x2290), u8, 0x43) != anim) {
-                    func_L00_002D2168(anim, 0, 8.0f);
+                    set_hero_animation(anim, 0, 8.0f);
                 }
             }
         }
@@ -460,13 +460,13 @@ void func_L11_002DE9E0(void) {
         u8 *rec;
         s32 frames;
         if (FLD(D_00189E20, u32, 0x2294) == 0x14) {
-            s32 n = func_00283CF0(func_L01_002C81D0(60.0f, 0.036111113f, -1.0f));
+            s32 n = FloatToInt(func_L01_002C81D0(60.0f, 0.036111113f, -1.0f));
             f32 c00 = FLD(D_00189E20, f32, 0xC00);
             s32 top = 0x1A;
             if (c00 == 0.0f) {
                 FLD(D_00189E20, f32, 0xC20) = 0.33f;
             } else if ((c00 != 0.0f) && (FLD(D_00189E20, s16, 0x34E) != 0) && (n != 0) && (((f32)top - FLD(D_00189E20, f32, 0xC38)) > 1.0f)) {
-                func_L00_002A9E30((f32)top, (f32)n, 0.5f, -1.0f);
+                AdjustHeroAnimationSpeedForTargetFrame((f32)top, (f32)n, 0.5f, -1.0f);
                 if ((FLD(D_00189E20, f32, 0x31C) < 0.7f) && (FLD(D_00189E20, f32, 0xC20) < 0.75f)) {
                     FLD(D_00189E20, f32, 0xC20) = 0.75f;
                 }
@@ -477,12 +477,12 @@ void func_L11_002DE9E0(void) {
             }
         }
         rec = (u8 *)&D_L11_00275090[FLD(D_00189E20, s16, 0xBFC)];
-        frames = (func_00283CF0(FLD(D_00189E20, f32, 0xC38)) - FLD(rec, s32, 0xC)) * 2;
+        frames = (FloatToInt(FLD(D_00189E20, f32, 0xC38)) - FLD(rec, s32, 0xC)) * 2;
         if ((f32)FLD(rec, s32, 0x14) < FLD(D_00189E20, f32, 0xC38)) {
             if (FLD(D_00189E20, s32, 0xC2C) != 0) {
                 break;
             }
-            if (func_L00_0032EF10(0x40, frames, NULL) != 0) {
+            if (PadPressedWithin(0x40, frames, NULL) != 0) {
                 if (!(FLD(D_00138180, s32, 0x1A0) & 8)) {
                     func_L11_002D8EF8(7, 1);
                     break;
@@ -501,7 +501,7 @@ void func_L11_002DE9E0(void) {
     case 0x15:
     {
         u8 *rec = (u8 *)&D_L11_00275090[FLD(D_00189E20, s16, 0xBFC)];
-        s32 frames = (func_00283CF0(FLD(D_00189E20, f32, 0xC38)) - FLD(rec, s32, 0xC)) * 2;
+        s32 frames = (FloatToInt(FLD(D_00189E20, f32, 0xC38)) - FLD(rec, s32, 0xC)) * 2;
         u32 st = FLD(D_00189E20, u32, 0x2294);
         s32 lim;
         f32 h;
@@ -513,7 +513,7 @@ void func_L11_002DE9E0(void) {
                 goto tail13;
             }
             if ((st != 0x15) || (FLD(D_00189E20, s16, 0x348) != 1)) {
-                if (func_L00_0032EF10(0x40, frames, NULL) != 0) {
+                if (PadPressedWithin(0x40, frames, NULL) != 0) {
                     if (!(FLD(D_00138180, s32, 0x1A0) & 8)) {
                         func_L11_002D8EF8(7, 1);
                         break;
@@ -529,7 +529,7 @@ void func_L11_002DE9E0(void) {
         }
         if ((FLD(D_00189E20, f32, 0xC38) > 34.0f) && (FLD(D_00189E20, f32, 0x24B8) > 0.9f)) {
             func_L11_002D8EF8(2, 0);
-            func_L00_002D2168(3, D_L11_001A7DD8[FLD(D_00189E20, s32, 0x2298)], 13.0f);
+            set_hero_animation(3, D_L11_001A7DD8[FLD(D_00189E20, s32, 0x2298)], 13.0f);
             break;
         }
         if (FLD(D_00189E20, s32, 0xC2C) != 0) {
@@ -569,7 +569,7 @@ void func_L11_002DE9E0(void) {
             if (FLD(D_00189E20, s32, 0xC2C) != 0) {
                 goto tail83;
             }
-            if (func_L00_0032EF10(0x40, 7, NULL) != 0) {
+            if (PadPressedWithin(0x40, 7, NULL) != 0) {
                 if (!(FLD(D_00138180, s32, 0x1A0) & 8)) {
                     func_L11_002D8EF8(7, 1);
                     break;
@@ -581,7 +581,7 @@ void func_L11_002DE9E0(void) {
         }
         if ((FLD(D_00189E20, s32, 0xC2C) == 0) && (FLD(D_00189E20, f32, 0xC38) > 37.0f)) {
             func_L11_002D8EF8(0, 0);
-            func_L00_002D2168(func_L03_002AB5C8(0), 0, 15.0f);
+            set_hero_animation(func_L03_002AB5C8(0), 0, 15.0f);
             break;
         }
     tail83:
@@ -617,7 +617,7 @@ void func_L11_002DE9E0(void) {
         if (FLD(D_00189E20, s16, 0x1EE) != 0) {
             n = 1;
         }
-        if ((func_L00_0032EF10(0x40, n, NULL) != 0) && ((FLD(D_00189E20, s16, 0x34E) < 5) || (FLD(D_00189E20, s16, 0x202) != 0))) {
+        if ((PadPressedWithin(0x40, n, NULL) != 0) && ((FLD(D_00189E20, s16, 0x34E) < 5) || (FLD(D_00189E20, s16, 0x202) != 0))) {
             func_L00_002B39F0(0, 1.0f);
             if (func_L00_002C9FC8(n, 1) != 0) {
                 break;
@@ -661,9 +661,9 @@ void func_L11_002DE9E0(void) {
                 }
                 anim = func_L03_002AB5C8(1);
                 if (anim == 0x51) {
-                    func_L00_002D2168(0x51, 0, 15.0f);
+                    set_hero_animation(0x51, 0, 15.0f);
                 } else {
-                    func_L00_002D2168(anim, 0, -1.0f);
+                    set_hero_animation(anim, 0, -1.0f);
                 }
             } else {
                 func_L00_002CA0B0();
@@ -693,11 +693,11 @@ void func_L11_002DE9E0(void) {
             func_L00_002B9B88(9, 0);
             FLD(D_00189E20, s16, 0x1E0) = 0x1E;
             func_L11_002D8EF8(3, 0);
-            func_L00_002D2168(6, 4, 11.0f);
+            set_hero_animation(6, 4, 11.0f);
         } else {
             if (FLD(D_00189E20, u8, 0x287) != 0) {
-                f32 a = func_00282DF0(D_00189E20 + 0x110);
-                if (a < func_00282DF0(D_00189E20 + 0xF0) * 0.75f) {
+                f32 a = FastVecLength(D_00189E20 + 0x110);
+                if (a < FastVecLength(D_00189E20 + 0xF0) * 0.75f) {
                     func_L11_002D8EF8(0x77, 1);
                     break;
                 }
@@ -718,8 +718,8 @@ void func_L11_002DE9E0(void) {
         break;
     }
     case 0x62:
-        if (func_00282E80(D_00189E20 + 0x80, D_00189E20 + 0x18A0) < 0.2f) {
-            if ((FLD(D_00189E20, f32, 0x170) < 0.045f) && (func_00283C80(FLD(D_00189E20, f32, 0x98), FLD(D_00189E20, f32, 0x18AC)) < 0.03490659f)) {
+        if (vec_distance_xy(D_00189E20 + 0x80, D_00189E20 + 0x18A0) < 0.2f) {
+            if ((FLD(D_00189E20, f32, 0x170) < 0.045f) && (FastDiffRots(FLD(D_00189E20, f32, 0x98), FLD(D_00189E20, f32, 0x18AC)) < 0.03490659f)) {
                 func_L11_002D8EF8(0x64, 1);
                 break;
             }
@@ -739,13 +739,13 @@ void func_L11_002DE9E0(void) {
         if ((FLD(D_00189E20, s32, 0xC28) & 2) || (FLD(D_00189E20, s32, 0x18B0) != 0)) {
             func_L11_002D8EF8(0, 1);
         }
-        if (func_00282E80(D_00189E20 + 0x80, D_00189E20 + 0x18A0) > 0.2f) {
+        if (vec_distance_xy(D_00189E20 + 0x80, D_00189E20 + 0x18A0) > 0.2f) {
             func_L11_002D8EF8(0x62, 1);
         }
         break;
                 case 0x65:                          /* switch 2 */
                     temp_a0_11 = FLD(D_00189E20, s32, 0x18C0);
-                    if ((temp_a0_11 < 3) && (((temp_a0_11 * 7) + 0xA) < FLD(D_00189E20, s32, 0x1B8)) && (func_L00_0032EF10(0x40U, 7, &sp44) != 0)) {
+                    if ((temp_a0_11 < 3) && (((temp_a0_11 * 7) + 0xA) < FLD(D_00189E20, s32, 0x1B8)) && (PadPressedWithin(0x40U, 7, &sp44) != 0)) {
                         func_L11_002D8EF8(0x66, 1);
                     }
                     if (FLD(D_00189E20, f32, 0x88) < (FLD(D_00189E20, f32, 0x334) - 1.2f)) {
@@ -824,7 +824,7 @@ void func_L11_002DE9E0(void) {
                 break;
             }
         } else if ((FLD(D_00189E20, f32, 0xC38) > 10.0f) && (func_L11_002D8EF8(0, 0) != 0)) {
-            func_L00_002D2168(func_L03_002AB5C8(0), 0, 17.0f);
+            set_hero_animation(func_L03_002AB5C8(0), 0, 17.0f);
         }
         if (FLD(D_00189E20, f32, 0x24B8) > 0.5f) {
             func_L11_002D8EF8(2, 1);
@@ -837,7 +837,7 @@ void func_L11_002DE9E0(void) {
         }
         if ((FLD(D_00189E20, s32, 0x1B8) >= 0xC) && !(FLD(D_00138180, s32, 0x1A0) & 8)) {
             func_L11_002D8EF8(0, 0);
-            func_L00_002D2168(func_L03_002AB5C8(0), 0, -2.0f);
+            set_hero_animation(func_L03_002AB5C8(0), 0, -2.0f);
             break;
         }
         if ((FLD(D_00189E20, u8, 0x149A) != 0) && (FLD(D_00189E20, s16, 0x34C) == 0)) {
@@ -847,7 +847,7 @@ void func_L11_002DE9E0(void) {
         if (func_L00_002CAB08() != 0) {
             break;
         }
-        if ((func_L00_0032EF10(0x80, 0xF, NULL) != 0) && (FLD(D_00189E20, u8, 0x123A) == 0) && (FLD(D_00189E20, s32, 0x1248) == 0xA)) {
+        if ((PadPressedWithin(0x80, 0xF, NULL) != 0) && (FLD(D_00189E20, u8, 0x123A) == 0) && (FLD(D_00189E20, s32, 0x1248) == 0xA)) {
             func_L11_002D8EF8(0x15, 1);
         }
         if (FLD(D_00189E20, s16, 0x34E) >= 9) {
@@ -882,9 +882,9 @@ void func_L11_002DE9E0(void) {
     case 0x24:
     {
         s32 go;
-        func_L00_002A9E30(10.0f, FLD(D_00189E20, f32, 0xAAC), 0.5f, -1.0f);
+        AdjustHeroAnimationSpeedForTargetFrame(10.0f, FLD(D_00189E20, f32, 0xAAC), 0.5f, -1.0f);
         if ((FLD(D_00189E20, f32, 0xAAC) < 22.0f) && (FLD(D_00189E20, f32, 0xAAC) < 30.0f)) {
-            func_L00_002D2168(0xA, 0, 16.0f);
+            set_hero_animation(0xA, 0, 16.0f);
         }
         go = 0;
         if (!(FLD(D_00138180, s32, 0x1A0) & FLD(D_00189E20, s32, 0x1230))) {
@@ -903,14 +903,14 @@ void func_L11_002DE9E0(void) {
             }
             if (FLD(D_00189E20, f32, 0x31C) < 0.3f) {
                 func_L11_002D8EF8(0, 0);
-                func_L00_002D2168(func_L03_002AB5C8(0), 0, 30.0f);
+                set_hero_animation(func_L03_002AB5C8(0), 0, 30.0f);
                 break;
             }
             if (FLD(FLD(D_00189E20, u8 *, 0x2290), u8, 0x43) == 0xA) {
                 func_L11_002D8EF8(6, 0);
             } else {
                 func_L11_002D8EF8(6, 0);
-                func_L00_002D2168(0xA, 0, 17.0f);
+                set_hero_animation(0xA, 0, 17.0f);
             }
             FLD(D_00189E20, f32, 0xA84) = 0.011666667f;
             FLD(D_00189E20, f32, 0xA80) = 0.008055556f;
@@ -952,7 +952,7 @@ void func_L11_002DE9E0(void) {
                 func_L00_0038B888(D_00189E20 + 0x6D0, 4);
             }
             if (FLD(D_00189E20, s32, 0xC28) & 2) {
-                func_L00_002D2168(0x5F, 0, 30.0f);
+                set_hero_animation(0x5F, 0, 30.0f);
             }
         }
         if (FLD(D_00189E20, s32, 0x6F0) >= 6) {
@@ -967,7 +967,7 @@ void func_L11_002DE9E0(void) {
         break;
     case 0x18:
         if ((FLD(D_00189E20, s32, 0xC28) & 2) && (FLD(FLD(D_00189E20, u8 *, 0x2290), u8, 0x43) == 0x20)) {
-            func_L00_002D2168(0x21, 0, 6.0f);
+            set_hero_animation(0x21, 0, 6.0f);
         }
         func_L00_002B39F0(0, 1.0f);
         if (func_L00_002ACF88((s8 *)(D_00189E20 + 0x80), (s8 *)(D_00189E20 + 0x90), NULL) == 0) {
@@ -975,21 +975,21 @@ void func_L11_002DE9E0(void) {
             FLD(D_00189E20, s16, 0x1D0) = 0xA;
             break;
         }
-        if (((FLD(D_00189E20, f32, 0x24B8) > 0.5f) && (func_L00_0032EF10(0x40, 9, NULL) != 0) && (func_00283C80(FLD(D_00189E20, f32, 0x1A0), FLD(D_00189E20, f32, 0x98)) > 2.3561947f)) || (FLD(D_00138180, s32, 0x1A4) & 8)) {
+        if (((FLD(D_00189E20, f32, 0x24B8) > 0.5f) && (PadPressedWithin(0x40, 9, NULL) != 0) && (FastDiffRots(FLD(D_00189E20, f32, 0x1A0), FLD(D_00189E20, f32, 0x98)) > 2.3561947f)) || (FLD(D_00138180, s32, 0x1A4) & 8)) {
             func_L11_002D8EF8(6, 1);
             FLD(D_00189E20, s8, 0x22BF) = 1;
             FLD(D_00189E20, s16, 0x1D0) = 0xA;
             break;
         }
-        if (func_L00_0032EF10(0x40, 0x11, NULL) != 0) {
+        if (PadPressedWithin(0x40, 0x11, NULL) != 0) {
             func_L11_002D8EF8(0x1B, 1);
             break;
         }
         if (FLD(D_00189E20, f32, 0x24B8) > 0.5f) {
-            if (func_00283C80(FLD(D_00189E20, f32, 0x1A0), func_00283B98(FLD(D_00189E20, f32, 0x98), 1.5707965f)) < 0.78539824f) {
+            if (FastDiffRots(FLD(D_00189E20, f32, 0x1A0), FastAddRotations(FLD(D_00189E20, f32, 0x98), 1.5707965f)) < 0.78539824f) {
                 qcopy(v10, D_00189E20 + 0x80);
-                v10[0] += func_00283180(func_00283B98(FLD(D_00189E20, f32, 0x98), 1.5707965f)) * 0.3f;
-                v10[1] += func_00283198(func_00283B98(FLD(D_00189E20, f32, 0x98), 1.5707965f)) * 0.3f;
+                v10[0] += func_00283180(FastAddRotations(FLD(D_00189E20, f32, 0x98), 1.5707965f)) * 0.3f;
+                v10[1] += func_00283198(FastAddRotations(FLD(D_00189E20, f32, 0x98), 1.5707965f)) * 0.3f;
                 if (func_L00_002ACF88((s8 *)v10, (s8 *)(D_00189E20 + 0x90), NULL) != 0) {
                     func_L11_002D8EF8(0x19, 1);
                 }
@@ -997,10 +997,10 @@ void func_L11_002DE9E0(void) {
             }
         }
         if (FLD(D_00189E20, f32, 0x24B8) > 0.5f) {
-            if (func_00283C80(FLD(D_00189E20, f32, 0x1A0), func_00283B98(FLD(D_00189E20, f32, 0x98), -1.5707965f)) < 0.78539824f) {
+            if (FastDiffRots(FLD(D_00189E20, f32, 0x1A0), FastAddRotations(FLD(D_00189E20, f32, 0x98), -1.5707965f)) < 0.78539824f) {
                 qcopy(v10, D_00189E20 + 0x80);
-                v10[0] += func_00283180(func_00283B98(FLD(D_00189E20, f32, 0x98), -1.5707965f)) * 0.3f;
-                v10[1] += func_00283198(func_00283B98(FLD(D_00189E20, f32, 0x98), -1.5707965f)) * 0.3f;
+                v10[0] += func_00283180(FastAddRotations(FLD(D_00189E20, f32, 0x98), -1.5707965f)) * 0.3f;
+                v10[1] += func_00283198(FastAddRotations(FLD(D_00189E20, f32, 0x98), -1.5707965f)) * 0.3f;
                 if (func_L00_002ACF88((s8 *)v10, (s8 *)(D_00189E20 + 0x90), NULL) != 0) {
                     func_L11_002D8EF8(0x1A, 1);
                 }
@@ -1016,22 +1016,22 @@ void func_L11_002DE9E0(void) {
         if (FLD(D_00189E20, u32, 0x2294) == 0x1A) {
             side = -1.5707965f;
         }
-        v10[0] += func_00283180(func_00283B98(FLD(D_00189E20, f32, 0x98), side)) * 0.3f;
-        v10[1] += func_00283198(func_00283B98(FLD(D_00189E20, f32, 0x98), side)) * 0.3f;
+        v10[0] += func_00283180(FastAddRotations(FLD(D_00189E20, f32, 0x98), side)) * 0.3f;
+        v10[1] += func_00283198(FastAddRotations(FLD(D_00189E20, f32, 0x98), side)) * 0.3f;
         func_L00_002B39F0(0, 1.0f);
-        if ((FLD(D_00189E20, f32, 0x24B8) < 0.5f) || (func_00283C80(FLD(D_00189E20, f32, 0x1A0), func_00283B98(FLD(D_00189E20, f32, 0x98), side)) > 0.78539824f) || (func_L00_002ACF88((s8 *)v10, (s8 *)(D_00189E20 + 0x90), NULL) == 0)) {
+        if ((FLD(D_00189E20, f32, 0x24B8) < 0.5f) || (FastDiffRots(FLD(D_00189E20, f32, 0x1A0), FastAddRotations(FLD(D_00189E20, f32, 0x98), side)) > 0.78539824f) || (func_L00_002ACF88((s8 *)v10, (s8 *)(D_00189E20 + 0x90), NULL) == 0)) {
             if (FLD(D_00189E20, s32, 0xC28) & 2) {
                 func_L11_002D8EF8(0x18, 1);
                 break;
             }
         }
-        if ((FLD(D_00189E20, f32, 0x24B8) > 0.5f) && (func_L00_0032EF10(0x40, 9, NULL) != 0) && (func_00283C80(FLD(D_00189E20, f32, 0x1A0), FLD(D_00189E20, f32, 0x98)) > 2.3561947f)) {
+        if ((FLD(D_00189E20, f32, 0x24B8) > 0.5f) && (PadPressedWithin(0x40, 9, NULL) != 0) && (FastDiffRots(FLD(D_00189E20, f32, 0x1A0), FLD(D_00189E20, f32, 0x98)) > 2.3561947f)) {
             func_L11_002D8EF8(6, 1);
             FLD(D_00189E20, s8, 0x22BF) = 1;
             FLD(D_00189E20, s16, 0x1D0) = 0x28;
             break;
         }
-        if (func_L00_0032EF10(0x40, 9, NULL) != 0) {
+        if (PadPressedWithin(0x40, 9, NULL) != 0) {
             func_L11_002D8EF8(0x1B, 1);
         }
         break;
@@ -1051,7 +1051,7 @@ void func_L11_002DE9E0(void) {
     case 0x6:
     case 0x2C:
         if ((FLD(D_00189E20, s32, 0x2298) == 0) && ((FLD(D_00189E20, s32, 0x1B8) >= 0x12) || (FLD(D_00189E20, f32, 0x31C) > 1.75f))) {
-            func_L00_002D2168(0xB, 0, 16.0f);
+            set_hero_animation(0xB, 0, 16.0f);
             FLD(D_00189E20, s32, 0x2298) = 1;
             if (FLD(D_00189E20, u32, 0x2294) == 0x2C) {
                 FLD(D_00189E20, s32, 0x24A0) = 7;
@@ -1074,7 +1074,7 @@ void func_L11_002DE9E0(void) {
                 s32 low = FLD(D_00189E20, s32, 0x33C) == 0;
                 if (FLD(D_00189E20, s32, 0x1B8) >= 0x5A) {
                     if (func_L11_002D8EF8(0, 0) != 0) {
-                        func_L00_002D2168(0xC, 4, 6.0f);
+                        set_hero_animation(0xC, 4, 6.0f);
                     }
                     if (low != 0) {
                         FLD(D_00189E20, s16, 0x1E0) = 0x16;
@@ -1082,7 +1082,7 @@ void func_L11_002DE9E0(void) {
                     func_L00_002D3248(0xA, 4, 0, 1, 0.022f, 0.004f);
                 } else if (FLD(D_00189E20, s32, 0x2298) == one) {
                     if (func_L11_002D8EF8(0, 0) != 0) {
-                        func_L00_002D2168(0xC, 9, -1.0f);
+                        set_hero_animation(0xC, 9, -1.0f);
                     }
                     func_L00_002D3B58(D_00189E20 + 0x160, D_00189E20 + 0x160, 0.0f);
                     func_002AC9F8((f32 *)(D_00189E20 + 0x160), 0.116666675f);
@@ -1099,7 +1099,7 @@ void func_L11_002DE9E0(void) {
                     func_L00_002D3248(7, 2, 0, 1, 0.016f, 0.002f);
                 } else if (FLD(D_00189E20, f32, 0x174) > 0.050000004f) {
                     if (func_L11_002D8EF8(3, 0) != 0) {
-                        func_L00_002D2168(6, 0, 12.0f);
+                        set_hero_animation(6, 0, 12.0f);
                         func_002AC9F8((f32 *)(D_00189E20 + 0x160), 0.12833333f);
                     }
                 } else {
@@ -1108,7 +1108,7 @@ void func_L11_002DE9E0(void) {
                 }
             }
         } else if (FLD(D_00189E20, s32, 0x24CC) > 0) {
-            if ((FLD(D_00138180, s32, 0x1A0) & 0x40) && (D_001A7AF8[2] != 0) && (func_L00_002ADEA0(3) != 4) && (FLD(D_00189E20, s16, 0x24FC) == 0) && (FLD(D_00189E20, s16, 0x1E0) == 0) && (FLD(D_00189E20, f32, 0x31C) > 0.6f)) {
+            if ((FLD(D_00138180, s32, 0x1A0) & 0x40) && (D_001A7AF8[2] != 0) && (hero_slot_item_id(3) != 4) && (FLD(D_00189E20, s16, 0x24FC) == 0) && (FLD(D_00189E20, s16, 0x1E0) == 0) && (FLD(D_00189E20, f32, 0x31C) > 0.6f)) {
                 func_L11_002D8EF8(8, 1);
                 break;
             }
@@ -1153,7 +1153,7 @@ void func_L11_002DE9E0(void) {
                 if ((q == NULL) || (FLD(q, s16, 0xAA) == 0x8E2)) {
                     if (func_L11_002D8EF8(0, 0) != 0) {
                         FLD(p, s8, 0x24EF) = 0;
-                        func_L00_002D2168(7, 0x17, 9.0f);
+                        set_hero_animation(7, 0x17, 9.0f);
                         func_L00_002D3248(5, 2, 0, 1, 0.016f, 0.002f);
                     }
                 }
@@ -1197,7 +1197,7 @@ void func_L11_002DE9E0(void) {
         func_L00_002B39F0(0, 1.0f);
         if ((FLD(D_00189E20, s32, 0x22A0) == 0x10) && (FLD(D_00189E20, s32, 0x1B8) < 4)) {
             if (func_L11_002D8EF8(3, 0) != 0) {
-                func_L00_002D2168(5, 0, -1.0f);
+                set_hero_animation(5, 0, -1.0f);
                 FLD(D_00189E20, s16, 0x1E0) = 0x22;
             }
             break;
@@ -1207,7 +1207,7 @@ void func_L11_002DE9E0(void) {
             func_L00_002D3248(5, 2, 0, 1, 0.016f, 0.002f);
             break;
         }
-        if ((D_L11_001A7DAC[0][2] < FLD(D_00189E20, f32, 0x1B0)) && (func_00283C80(FLD(D_00189E20, f32, 0x1A0), FLD(D_00189E20, f32, 0x98)) < 1.5707964f)) {
+        if ((D_L11_001A7DAC[0][2] < FLD(D_00189E20, f32, 0x1B0)) && (FastDiffRots(FLD(D_00189E20, f32, 0x1A0), FLD(D_00189E20, f32, 0x98)) < 1.5707964f)) {
             if ((FLD(D_00189E20, u8, 0x1492) != 0) || (FLD(D_00189E20, u8, 0x22B9) != 0)) {
                 func_L11_002D8EF8(2, 1);
                 break;
@@ -1215,7 +1215,7 @@ void func_L11_002DE9E0(void) {
             func_L11_002D8EF8(2, 0);
             if (FLD(D_00189E20, u32, 0x2294) == 2) {
                 FLD(D_00189E20, s32, 0x2298) = 1;
-                func_L00_002D2168(4, 2, 8.0f);
+                set_hero_animation(4, 2, 8.0f);
                 FLD(D_00189E20, s8, 0x40E) = 1;
             }
             func_L00_002D3248(5, 2, 1, 0, 0.016f, 0.002f);
@@ -1227,16 +1227,16 @@ void func_L11_002DE9E0(void) {
             func_L11_002D8EF8(2, 0);
             if (FLD(D_00189E20, u32, 0x2294) == 2) {
                 FLD(D_00189E20, s32, 0x2298) = 1;
-                func_L00_002D2168(4, D_L11_001A7DDC, 12.0f);
+                set_hero_animation(4, D_L11_001A7DDC, 12.0f);
             }
             func_L00_002D3248(5, 2, 1, 0, 0.016f, 0.002f);
         } else if (FLD(D_00189E20, s16, 0x34E) == 0) {
             if (func_L11_002D8EF8(0, 0) != 0) {
-                func_L00_002D2168(func_L03_002AB5C8(0), 0, -2.0f);
+                set_hero_animation(func_L03_002AB5C8(0), 0, -2.0f);
                 func_L00_002D3248(5, 2, 0, 1, 0.016f, 0.002f);
             }
         } else if (func_L11_002D8EF8(0, 0) != 0) {
-            func_L00_002D2168(7, 0x17, 9.0f);
+            set_hero_animation(7, 0x17, 9.0f);
             func_L00_002D3248(5, 2, 0, 1, 0.016f, 0.002f);
         }
         break;
@@ -1270,10 +1270,10 @@ void func_L11_002DE9E0(void) {
         if (FLD(D_00189E20, u8, 0x52E) != 0) {
             s32 n = func_L00_002C3A40();
             if ((n > 0) && ((FLD(D_00189E20, s32, 0x1B8) < n) || (FLD(D_00189E20, u8, 0x49C) != 0)) && (FLD(D_00189E20, s32, 0x340) != 0)) {
-                if ((FLD(D_00189E20, u32, 0x2294) != 0xB) || (func_L00_0032EF10(0x40, 7, NULL) != 0)) {
+                if ((FLD(D_00189E20, u32, 0x2294) != 0xB) || (PadPressedWithin(0x40, 7, NULL) != 0)) {
                     s32 go = 1;
                     if ((FLD(D_00189E20, u32, 0x2294) == 0x1B) || (FLD(D_00189E20, u8, 0x49C) != 0)) {
-                        if (func_L00_0032EF10(0x40, 7, NULL) == 0) {
+                        if (PadPressedWithin(0x40, 7, NULL) == 0) {
                             go = 0;
                         }
                     }
@@ -1282,7 +1282,7 @@ void func_L11_002DE9E0(void) {
                             go = 0;
                         }
                     }
-                    if ((go != 0) && (func_L00_0032EF10(0x1F000, 5, NULL) != 0) && (FLD(D_00138180, s32, 0x1A0) & 8)) {
+                    if ((go != 0) && (PadPressedWithin(0x1F000, 5, NULL) != 0) && (FLD(D_00138180, s32, 0x1A0) & 8)) {
                         func_L11_002D8EF8(0xB, 1);
                         break;
                     }
@@ -1297,10 +1297,10 @@ void func_L11_002DE9E0(void) {
             FLD(D_00189E20, s8, 0x22BF) = 0;
             FLD(D_00189E20, s8, 0x22BC) = 0;
         }
-        if ((FLD(D_00189E20, s32, 0x1B8) < 7) && (func_L00_0032EF10(8, 2, NULL) != 0) && ((sa = FLD(D_00189E20, u32, 0x2294)) != 0x10) && (sa != 0xA) && (sa != 0x12) && (sa != 0x38) && (sa != 0x11) && (sa != 0xE) && (sa != 0x66)) {
-            if ((func_L00_002ADEA0(3) == 2) && (D_001A7AF8[2] != 0) && (FLD(D_00189E20, s16, 0x24FC) == 0) && (FLD(D_00189E20, f32, 0x178) > 0.015000001f)) {
+        if ((FLD(D_00189E20, s32, 0x1B8) < 7) && (PadPressedWithin(8, 2, NULL) != 0) && ((sa = FLD(D_00189E20, u32, 0x2294)) != 0x10) && (sa != 0xA) && (sa != 0x12) && (sa != 0x38) && (sa != 0x11) && (sa != 0xE) && (sa != 0x66)) {
+            if ((hero_slot_item_id(3) == 2) && (D_001A7AF8[2] != 0) && (FLD(D_00189E20, s16, 0x24FC) == 0) && (FLD(D_00189E20, f32, 0x178) > 0.015000001f)) {
                 func_L11_002D8EF8(0xA, 1);
-            } else if ((func_L00_002ADEA0(3) == 3) && (FLD(D_00189E20, s16, 0x24FC) == 0) && (FLD(D_00189E20, f32, 0x178) > 0.015000001f) && (FLD(D_00189E20, s16, 0x1E4) == 0)) {
+            } else if ((hero_slot_item_id(3) == 3) && (FLD(D_00189E20, s16, 0x24FC) == 0) && (FLD(D_00189E20, f32, 0x178) > 0.015000001f) && (FLD(D_00189E20, s16, 0x1E4) == 0)) {
                 func_L11_002D8EF8(0x10, 1);
             }
         }
@@ -1314,9 +1314,9 @@ void func_L11_002DE9E0(void) {
                     func_L11_002D8EF8(6, 1);
                     break;
                 }
-            } else if ((FLD(D_00189E20, u8, 0x49C) == 0) && ((FLD(D_00189E20, u32, 0x2294) == 0xA) || (FLD(D_00189E20, u32, 0x2294) == 0x10)) && (FLD(D_00189E20, f32, 0x278) < 0.9f) && (FLD(D_00189E20, u8, 0x287) != 0) && (func_00282DF0(D_00189E20 + 0xF0) > 0.116666675f)) {
-                f32 a = func_00282DF0(D_00189E20 + 0x110);
-                if ((a < func_00282DF0(D_00189E20 + 0xF0) * 0.5f) && (FLD(D_00189E20, s32, 0x578) == 0) && (FLD(D_00189E20, f32, 0x31C) < 2.0f)) {
+            } else if ((FLD(D_00189E20, u8, 0x49C) == 0) && ((FLD(D_00189E20, u32, 0x2294) == 0xA) || (FLD(D_00189E20, u32, 0x2294) == 0x10)) && (FLD(D_00189E20, f32, 0x278) < 0.9f) && (FLD(D_00189E20, u8, 0x287) != 0) && (FastVecLength(D_00189E20 + 0xF0) > 0.116666675f)) {
+                f32 a = FastVecLength(D_00189E20 + 0x110);
+                if ((a < FastVecLength(D_00189E20 + 0xF0) * 0.5f) && (FLD(D_00189E20, s32, 0x578) == 0) && (FLD(D_00189E20, f32, 0x31C) < 2.0f)) {
                     func_L11_002D8EF8(0x77, 1);
                     break;
                 }
@@ -1335,11 +1335,11 @@ void func_L11_002DE9E0(void) {
             if (FLD(D_00189E20, u8, 0x49D) != 0) {
                 f32 left = (f32)(FLD(D_00189E20, s32, 0x430) - now);
                 if (left > 0.0f) {
-                    func_L00_002A9E30(FLD(D_00189E20, f32, 0x438), left, FLD(D_00189E20, f32, 0x514), -1.0f);
+                    AdjustHeroAnimationSpeedForTargetFrame(FLD(D_00189E20, f32, 0x438), left, FLD(D_00189E20, f32, 0x514), -1.0f);
                 }
             } else if (FLD(D_00189E20, u32, 0x2294) != 0xE) {
-                func_L00_002D3D98((f32 *)(D_00189E20 + 0x80), (f32 *)(D_00189E20 + 0xF0), &sp68, FLD(D_00189E20, f32, 0x520));
-                func_L00_002A9E30(FLD(D_00189E20, f32, 0x4C8), (f32)sp68, FLD(D_00189E20, f32, 0x514), -1.0f);
+                EvaluateQuantizedHeight((f32 *)(D_00189E20 + 0x80), (f32 *)(D_00189E20 + 0xF0), &sp68, FLD(D_00189E20, f32, 0x520));
+                AdjustHeroAnimationSpeedForTargetFrame(FLD(D_00189E20, f32, 0x4C8), (f32)sp68, FLD(D_00189E20, f32, 0x514), -1.0f);
                 if (FLD(D_00189E20, f32, 0xC20) > 1.5f) {
                     FLD(D_00189E20, f32, 0xC20) = 1.5f;
                 }
@@ -1349,7 +1349,7 @@ void func_L11_002DE9E0(void) {
         if ((FLD(D_00189E20, u8, 0x49D) != 0) && (now >= FLD(D_00189E20, s32, 0x430)) && (now < FLD(D_00189E20, s32, 0x434))) {
             f32 left = (f32)(FLD(D_00189E20, s32, 0x440) - FLD(D_00189E20, s32, 0x430));
             if (left > 0.0f) {
-                func_L00_002A9E30(FLD(D_00189E20, f32, 0x4C8), left, FLD(D_00189E20, f32, 0x514), -1.0f);
+                AdjustHeroAnimationSpeedForTargetFrame(FLD(D_00189E20, f32, 0x4C8), left, FLD(D_00189E20, f32, 0x514), -1.0f);
             }
             break;
         }
@@ -1370,9 +1370,9 @@ void func_L11_002DE9E0(void) {
                 }
                 func_L00_002D3248(5, 2, 0, 1, 0.016f, 0.002f);
                 if (near == 0) {
-                    s32 k = func_00283CF0(FLD(D_00189E20, f32, 0x4D0)) + 2;
+                    s32 k = FloatToInt(FLD(D_00189E20, f32, 0x4D0)) + 2;
                     if (FLD(D_00189E20, f32, 0xC38) < FLD(D_00189E20, f32, 0x4CC) - 1.5f) {
-                        func_L00_002D2168(func_L00_002A4EF0(FLD(sp74, u8, 0x43)), k, 7.0f);
+                        set_hero_animation(func_L00_002A4EF0(FLD(sp74, u8, 0x43)), k, 7.0f);
                     }
                 }
             }
@@ -1381,17 +1381,17 @@ void func_L11_002DE9E0(void) {
             FLD(D_00189E20, f32, 0xC20) = 1.0f;
         } else if (FLD(D_00189E20, u8, 0x49E) != 0) {
             s32 cur;
-            if ((s32)FLD(sp74, u8, 0x41) < func_00283CF0(FLD(D_00189E20, f32, 0x4D0))) {
+            if ((s32)FLD(sp74, u8, 0x41) < FloatToInt(FLD(D_00189E20, f32, 0x4D0))) {
                 if ((FLD(D_00189E20, u32, 0x2294) == 0xE) && (FLD(D_00189E20, f32, 0xC38) < 37.0f)) {
-                    func_002AA2E8((f32 *)(D_00189E20 + 0xC20), 1.0f, 0.15f);
+                    ApproachValue((f32 *)(D_00189E20 + 0xC20), 1.0f, 0.15f);
                 } else {
-                    FLD(D_00189E20, s16, 0x4AE) = func_00283CF0(func_L01_002C81D0(60.0f, FLD(D_00189E20, f32, 0x520), -1.0f));
-                    func_L00_002A9E30(FLD(D_00189E20, f32, 0x4CC), (f32)FLD(D_00189E20, s16, 0x4AE), FLD(D_00189E20, f32, 0x514), 0.2f);
+                    FLD(D_00189E20, s16, 0x4AE) = FloatToInt(func_L01_002C81D0(60.0f, FLD(D_00189E20, f32, 0x520), -1.0f));
+                    AdjustHeroAnimationSpeedForTargetFrame(FLD(D_00189E20, f32, 0x4CC), (f32)FLD(D_00189E20, s16, 0x4AE), FLD(D_00189E20, f32, 0x514), 0.2f);
                 }
                 if (near == 0) {
-                    s32 k = func_00283CF0(FLD(D_00189E20, f32, 0x4D0)) + 2;
+                    s32 k = FloatToInt(FLD(D_00189E20, f32, 0x4D0)) + 2;
                     if (FLD(D_00189E20, f32, 0xC20) > 1.8f) {
-                        func_L00_002D2168(func_L00_002A4EF0(FLD(sp74, u8, 0x43)), k, (f32)(FLD(D_00189E20, s16, 0x4AE) + 3));
+                        set_hero_animation(func_L00_002A4EF0(FLD(sp74, u8, 0x43)), k, (f32)(FLD(D_00189E20, s16, 0x4AE) + 3));
                     }
                 }
                 if (FLD(D_00189E20, f32, 0xC20) < 0.2f) {
@@ -1408,13 +1408,13 @@ void func_L11_002DE9E0(void) {
                 if (rate > 10.0f) {
                     rate = 10.0f;
                 }
-                at = func_00283CF0(FLD(D_00189E20, f32, 0xC38)) + 4;
-                func_L00_002D2168(7, at / 2, rate);
+                at = FloatToInt(FLD(D_00189E20, f32, 0xC38)) + 4;
+                set_hero_animation(7, at / 2, rate);
                 FLD(D_00189E20, s32, 0x2294) = 7;
             }
             {
-                s32 a = func_00283CF0(FLD(D_00189E20, f32, 0xC38));
-                if (a == func_00283CF0(FLD(D_00189E20, f32, 0x4CC))) {
+                s32 a = FloatToInt(FLD(D_00189E20, f32, 0xC38));
+                if (a == FloatToInt(FLD(D_00189E20, f32, 0x4CC))) {
                     FLD(D_00189E20, s32, 0xC20) = 0;
                 }
             }
@@ -1422,15 +1422,15 @@ void func_L11_002DE9E0(void) {
         if (FLD(D_00189E20, u8, 0x49C) != 0) {
             if (FLD(D_00189E20, u32, 0x2294) == 0xA) {
                 if (func_L11_002D8EF8(3, 0) != 0) {
-                    func_L00_002D2168(5, 0, -2.0f);
-                    func_00282D30(D_00189E20 + 0x160, D_00189E20 + 0x160, 0.8f);
+                    set_hero_animation(5, 0, -2.0f);
+                    FastVecScale(D_00189E20 + 0x160, D_00189E20 + 0x160, 0.8f);
                 }
                 break;
             }
-            if ((FLD(D_00189E20, u8, 0x149A) == 0) && (FLD(D_00189E20, s16, 0x1E0) == 0) && (func_L00_0032EF10(0x40, 8, NULL) != 0) && (FLD(D_00189E20, s16, 0x34E) < 4)) {
+            if ((FLD(D_00189E20, u8, 0x149A) == 0) && (FLD(D_00189E20, s16, 0x1E0) == 0) && (PadPressedWithin(0x40, 8, NULL) != 0) && (FLD(D_00189E20, s16, 0x34E) < 4)) {
                 if (!(FLD(D_00189E20, f32, 0x1B0) > D_L11_001A7DAC[0][2])) {
                     func_L11_002D8EF8(7, 1);
-                } else if (!(func_00283C80(FLD(D_00189E20, f32, 0x1A0), FLD(D_00189E20, f32, 0x98)) < 1.0471976f)) {
+                } else if (!(FastDiffRots(FLD(D_00189E20, f32, 0x1A0), FLD(D_00189E20, f32, 0x98)) < 1.0471976f)) {
                     func_L11_002D8EF8(7, 1);
                 } else if (D_L11_001A7DAC[1][1] * 0.014166668f < FLD(D_00189E20, f32, 0x174)) {
                     func_L11_002D8EF8(9, 1);
@@ -1455,7 +1455,7 @@ void func_L11_002DE9E0(void) {
             if ((s == 7) || (s == 9) || (s == 0x11)) {
                 ok = 1;
             }
-            if ((FLD(D_00189E20, s32, 0x1D4) != 0) && (FLD(D_00189E20, u8, 0x49C) == 0) && (ok != 0) && ((FLD(D_00189E20, u32, 0x2294) != 0x11) || (FLD(D_00189E20, s32, 0x1B8) >= 0x1A)) && (func_L00_0032EF10(0x40, 7, &sp6C) != 0) && (sp6C < FLD(D_00189E20, s32, 0x1B8))) {
+            if ((FLD(D_00189E20, s32, 0x1D4) != 0) && (FLD(D_00189E20, u8, 0x49C) == 0) && (ok != 0) && ((FLD(D_00189E20, u32, 0x2294) != 0x11) || (FLD(D_00189E20, s32, 0x1B8) >= 0x1A)) && (PadPressedWithin(0x40, 7, &sp6C) != 0) && (sp6C < FLD(D_00189E20, s32, 0x1B8))) {
                 func_L11_002D8EF8(0x11, 1);
                 break;
             }
@@ -1470,7 +1470,7 @@ void func_L11_002DE9E0(void) {
         }
         if ((sc == 0xE) && (FLD(D_00189E20, f32, 0x31C) > 4.0f)) {
             if ((FLD(D_00189E20, u8, 0x49E) == 0) && (FLD(D_00189E20, f32, 0xC20) < 1.3f)) {
-                func_002AA2E8((f32 *)(D_00189E20 + 0xC20), 1.3f, 0.1f);
+                ApproachValue((f32 *)(D_00189E20 + 0xC20), 1.3f, 0.1f);
             }
             lim = 0x11;
             FLD(D_00189E20, s16, 0x526) = lim;
@@ -1483,10 +1483,10 @@ void func_L11_002DE9E0(void) {
             frames = 0x1E;
         }
         if (!(FLD(D_00189E20, s64, 0x498) & 0xFF0000FF00000000LL)) {
-            if ((func_L00_0032EF10(0x40, frames, NULL) != 0) || (FLD(D_00189E20, u32, 0x2294) == 0xE) || (FLD(D_00189E20, u32, 0x2294) == 0xF) || (FLD(D_00189E20, u32, 0x2294) == 0xD)) {
+            if ((PadPressedWithin(0x40, frames, NULL) != 0) || (FLD(D_00189E20, u32, 0x2294) == 0xE) || (FLD(D_00189E20, u32, 0x2294) == 0xF) || (FLD(D_00189E20, u32, 0x2294) == 0xD)) {
                 if ((FLD(D_00189E20, u32, 0x2294) != 0xE) && (FLD(D_00189E20, u8, 0x22B8) == 0) && ((FLD(D_00189E20, u8, 0x149A) == 0) || (FLD(D_00189E20, f32, 0x31C) >= 0.4f)) && (FLD(D_00189E20, u8, 0x52F) != 0) && (FLD(D_00189E20, s32, 0x1B8) >= 0xF) && ((FLD(D_00189E20, u8, 0x49E) == 0) || ((FLD(D_00189E20, f32, 0x31C) > 0.7f) && (func_00282C48(func_L00_002D3B00((s8 *)(D_00189E20 + 0xF0))) < 0.09666667f)))) {
                     func_L11_002D8EF8(0xE, 1);
-                } else if ((D_001A7AF8[2] != 0) && (func_L00_002ADEA0(3) != 4) && (FLD(D_00189E20, s16, 0x24FC) == 0) && (FLD(D_00138180, s32, 0x1A0) & 0x40) && (lim < FLD(D_00189E20, s32, 0x1B8)) && (FLD(D_00189E20, s16, 0x526) < FLD(D_00189E20, s32, 0x1B8))) {
+                } else if ((D_001A7AF8[2] != 0) && (hero_slot_item_id(3) != 4) && (FLD(D_00189E20, s16, 0x24FC) == 0) && (FLD(D_00138180, s32, 0x1A0) & 0x40) && (lim < FLD(D_00189E20, s32, 0x1B8)) && (FLD(D_00189E20, s16, 0x526) < FLD(D_00189E20, s32, 0x1B8))) {
                     f32 need = 0.6f;
                     if ((FLD(D_00189E20, u32, 0x2294) == 9) || (FLD(D_00189E20, u32, 0x2294) == 7)) {
                         need = 1.0f;
@@ -1526,13 +1526,13 @@ void func_L11_002DE9E0(void) {
         break;
     case 0x8C:
         if (FLD(D_00189E20, s32, 0xC28) & 2) {
-            func_L00_002D2168(0x97, 0, 2.0f);
+            set_hero_animation(0x97, 0, 2.0f);
         }
         if ((FLD(D_00189E20, s32, 0x1B8) >= 0x33) && (FLD(D_00189E20, s16, 0x1E0) == 0)) {
             if (FLD(D_00189E20, s32, 0x24CC) <= 0) {
                 func_L11_002D8EF8(0x39, 1);
             } else if (func_L11_002D8EF8(0, 0) != 0) {
-                func_L00_002D2168(func_L03_002AB5C8(0), 0, 13.0f);
+                set_hero_animation(func_L03_002AB5C8(0), 0, 13.0f);
             }
         }
         break;
@@ -1545,14 +1545,14 @@ void func_L11_002DE9E0(void) {
     {
         s16 t = FLD(D_00189E20, s16, 0x2520);
         if (t >= 0x2B) {
-            func_L00_002D2168(0x12, 0, 10.0f);
+            set_hero_animation(0x12, 0, 10.0f);
             break;
         }
         if ((t == 0) && (FLD(D_00189E20, s32, 0xC28) & 2)) {
             if (FLD(FLD(D_00189E20, u8 *, 0x2290), u8, 0x43) != 0) {
-                func_L00_002D2168(0, 0, 12.0f);
+                set_hero_animation(0, 0, 12.0f);
             } else if (func_002A7878(0.0f, 1.0f) < 0.5f) {
-                func_L00_002D2168(1, 0, 8.0f);
+                set_hero_animation(1, 0, 8.0f);
             }
         }
         if (FLD(D_00189E20, u8, 0x149A) != 0) {
@@ -1567,11 +1567,11 @@ void func_L11_002DE9E0(void) {
             func_L11_002D8EF8(0x41, 1);
             break;
         }
-        if (func_L00_0032EF10(0x40, 8, NULL) != 0) {
+        if (PadPressedWithin(0x40, 8, NULL) != 0) {
             func_L11_002D8EF8(0x45, 1);
             break;
         }
-        if (func_L00_0032EF10(0x80, 9, NULL) != 0) {
+        if (PadPressedWithin(0x80, 9, NULL) != 0) {
             func_L11_002D8EF8(0x4D, 1);
             break;
         }
@@ -1581,7 +1581,7 @@ void func_L11_002DE9E0(void) {
             break;
         }
         if ((FLD(D_00189E20, s16, 0x2520) == 0) && (FLD(FLD(D_00189E20, u8 *, 0x2290), u8, 0x43) == 0x12)) {
-            func_L00_002D2168(0, 0, 12.0f);
+            set_hero_animation(0, 0, 12.0f);
         }
         break;
     }
@@ -1601,17 +1601,17 @@ void func_L11_002DE9E0(void) {
             }
             busy = FLD(D_00189E20, s32, 0xC2C);
             if ((busy == 0) && ((f32)FLD(rec, s32, 0x10) <= FLD(D_00189E20, f32, 0xC38))) {
-                s32 n = func_00283CF0(FLD(D_00189E20, f32, 0xC38)) - FLD(rec, s32, 0xC);
+                s32 n = FloatToInt(FLD(D_00189E20, f32, 0xC38)) - FLD(rec, s32, 0xC);
                 if (n < 1) {
                     n = 1;
                 }
-                if (func_L00_0032EF10(0x80, (n < 0x10) ? n : 0xF, NULL) != 0) {
+                if (PadPressedWithin(0x80, (n < 0x10) ? n : 0xF, NULL) != 0) {
                     func_L11_002D8EF8(0x4D, 1);
                 }
             }
         }
-        frames = (func_00283CF0(FLD(D_00189E20, f32, 0xC38)) - FLD(rec, s32, 0xC)) * 2;
-        if (((f32)FLD(rec, s32, 0x14) < FLD(D_00189E20, f32, 0xC38)) && (FLD(D_00189E20, s32, 0xC2C) == 0) && (func_L00_0032EF10(0x40, frames, NULL) != 0)) {
+        frames = (FloatToInt(FLD(D_00189E20, f32, 0xC38)) - FLD(rec, s32, 0xC)) * 2;
+        if (((f32)FLD(rec, s32, 0x14) < FLD(D_00189E20, f32, 0xC38)) && (FLD(D_00189E20, s32, 0xC2C) == 0) && (PadPressedWithin(0x40, frames, NULL) != 0)) {
             func_L11_002D8EF8(0x45, 1);
         }
         break;
@@ -1625,14 +1625,14 @@ void func_L11_002DE9E0(void) {
             break;
         }
         if (now == lo + 1) {
-            func_L00_002D3D98((f32 *)(D_00189E20 + 0x80), (f32 *)(D_00189E20 + 0xF0), &sp70, FLD(D_00189E20, f32, 0x520));
-            func_L00_002A9E30(FLD(D_00189E20, f32, 0x4C8), (f32)sp70, FLD(D_00189E20, f32, 0x514), -1.0f);
+            EvaluateQuantizedHeight((f32 *)(D_00189E20 + 0x80), (f32 *)(D_00189E20 + 0xF0), &sp70, FLD(D_00189E20, f32, 0x520));
+            AdjustHeroAnimationSpeedForTargetFrame(FLD(D_00189E20, f32, 0x4C8), (f32)sp70, FLD(D_00189E20, f32, 0x514), -1.0f);
             break;
         }
         if ((FLD(D_00189E20, u8, 0x49D) != 0) && (now >= FLD(D_00189E20, s32, 0x430)) && (now < FLD(D_00189E20, s32, 0x434))) {
             f32 left = (f32)(FLD(D_00189E20, s32, 0x440) - FLD(D_00189E20, s32, 0x430));
             if (left > 0.0f) {
-                func_L00_002A9E30(FLD(D_00189E20, f32, 0x4C8), left, FLD(D_00189E20, f32, 0x514), -1.0f);
+                AdjustHeroAnimationSpeedForTargetFrame(FLD(D_00189E20, f32, 0x4C8), left, FLD(D_00189E20, f32, 0x514), -1.0f);
             }
             break;
         }
@@ -1643,9 +1643,9 @@ void func_L11_002DE9E0(void) {
             } else if ((FLD(D_00189E20, s16, 0x34E) == 0) && (FLD(D_00189E20, u8, 0x49E) != 0)) {
                 s32 k;
                 FLD(D_00189E20, u8, 0x49C) = 1;
-                k = func_00283CF0(FLD(D_00189E20, f32, 0x4D0)) + 3;
+                k = FloatToInt(FLD(D_00189E20, f32, 0x4D0)) + 3;
                 if (FLD(D_00189E20, f32, 0xC38) < FLD(D_00189E20, f32, 0x4CC)) {
-                    func_L00_002D2168(FLD(sp74, u8, 0x43), k, 6.0f);
+                    set_hero_animation(FLD(sp74, u8, 0x43), k, 6.0f);
                 }
             }
         }
@@ -1653,13 +1653,13 @@ void func_L11_002DE9E0(void) {
             FLD(D_00189E20, f32, 0xC20) = 1.0f;
         } else if (FLD(D_00189E20, u8, 0x49E) != 0) {
             s32 a;
-            if ((s32)FLD(sp74, u8, 0x41) < func_00283CF0(FLD(D_00189E20, f32, 0x4D0))) {
+            if ((s32)FLD(sp74, u8, 0x41) < FloatToInt(FLD(D_00189E20, f32, 0x4D0))) {
                 s32 k;
-                FLD(D_00189E20, s16, 0x4AE) = func_00283CF0(func_L01_002C81D0(60.0f, FLD(D_00189E20, f32, 0x520), -1.0f));
-                func_L00_002A9E30(FLD(D_00189E20, f32, 0x4CC), (f32)FLD(D_00189E20, s16, 0x4AE), FLD(D_00189E20, f32, 0x514), -1.0f);
-                k = func_00283CF0(FLD(D_00189E20, f32, 0x4D0)) + 1;
+                FLD(D_00189E20, s16, 0x4AE) = FloatToInt(func_L01_002C81D0(60.0f, FLD(D_00189E20, f32, 0x520), -1.0f));
+                AdjustHeroAnimationSpeedForTargetFrame(FLD(D_00189E20, f32, 0x4CC), (f32)FLD(D_00189E20, s16, 0x4AE), FLD(D_00189E20, f32, 0x514), -1.0f);
+                k = FloatToInt(FLD(D_00189E20, f32, 0x4D0)) + 1;
                 if (FLD(D_00189E20, f32, 0xC20) > 1.8f) {
-                    func_L00_002D2168(FLD(sp74, u8, 0x43), k, (f32)(FLD(D_00189E20, s16, 0x4AE) + 2));
+                    set_hero_animation(FLD(sp74, u8, 0x43), k, (f32)(FLD(D_00189E20, s16, 0x4AE) + 2));
                 }
                 if (FLD(D_00189E20, f32, 0xC20) < 0.2f) {
                     FLD(D_00189E20, f32, 0xC20) = 0.2f;
@@ -1668,12 +1668,12 @@ void func_L11_002DE9E0(void) {
                     FLD(D_00189E20, f32, 0xC20) = 2.7f;
                 }
             }
-            a = func_00283CF0(FLD(D_00189E20, f32, 0xC38));
-            if (a == func_00283CF0(FLD(D_00189E20, f32, 0x4CC))) {
+            a = FloatToInt(FLD(D_00189E20, f32, 0xC38));
+            if (a == FloatToInt(FLD(D_00189E20, f32, 0x4CC))) {
                 FLD(D_00189E20, s32, 0xC20) = 0;
             }
         }
-        if ((FLD(D_00189E20, u8, 0x49C) != 0) && (FLD(D_00189E20, s16, 0x1E0) == 0) && (FLD(D_00189E20, u8, 0x149A) == 0) && (func_L00_0032EF10(0x40, 4, NULL) != 0) && (FLD(D_00189E20, s16, 0x34E) < 4)) {
+        if ((FLD(D_00189E20, u8, 0x49C) != 0) && (FLD(D_00189E20, s16, 0x1E0) == 0) && (FLD(D_00189E20, u8, 0x149A) == 0) && (PadPressedWithin(0x40, 4, NULL) != 0) && (FLD(D_00189E20, s16, 0x34E) < 4)) {
             func_L00_002B39F0(0, 1.0f);
             func_L11_002D8EF8(0x45, 1);
             break;
@@ -1681,7 +1681,7 @@ void func_L11_002DE9E0(void) {
         if (FLD(D_00189E20, u8, 0x49C) >= 2) {
             FLD(D_00189E20, s32, 0x24A0) = 0;
             func_L00_002B39F0(0, 1.0f);
-            if ((FLD(D_00189E20, f32, 0x1B0) > D_L11_001A7DAC[0][2]) && (FLD(D_00189E20, f32, 0x24B8) > 0.5f) && (FLD(D_00189E20, u8, 0x149A) == 0) && (FLD(D_00189E20, s16, 0x1E0) == 0) && (func_00283C80(FLD(D_00189E20, f32, 0x1A0), FLD(D_00189E20, f32, 0x98)) < 1.5707964f)) {
+            if ((FLD(D_00189E20, f32, 0x1B0) > D_L11_001A7DAC[0][2]) && (FLD(D_00189E20, f32, 0x24B8) > 0.5f) && (FLD(D_00189E20, u8, 0x149A) == 0) && (FLD(D_00189E20, s16, 0x1E0) == 0) && (FastDiffRots(FLD(D_00189E20, f32, 0x1A0), FLD(D_00189E20, f32, 0x98)) < 1.5707964f)) {
                 func_L11_002D8EF8(0x40, 1);
             } else if (FLD(D_00189E20, u8, 0x49C) >= 0xD) {
                 func_L11_002D8EF8(0x3F, 1);
@@ -1691,7 +1691,7 @@ void func_L11_002DE9E0(void) {
             func_L11_002D8EF8(0x41, 1);
             break;
         }
-        if ((FLD(D_00189E20, u8, 0x49E) != 0) && (FLD(D_00189E20, f32, 0x31C) < 0.2f) && (func_L00_0032EF10(0x80, 5, NULL) != 0)) {
+        if ((FLD(D_00189E20, u8, 0x49E) != 0) && (FLD(D_00189E20, f32, 0x31C) < 0.2f) && (PadPressedWithin(0x80, 5, NULL) != 0)) {
             func_L11_002D8EF8(0x4D, 1);
             break;
         }
@@ -1699,7 +1699,7 @@ void func_L11_002DE9E0(void) {
             func_L11_002D8EF8(0x46, 1);
             break;
         }
-        if ((FLD(D_00189E20, u32, 0x2294) != 0x48) && (func_L00_0032EF10(0x40, 5, NULL) != 0) && (FLD(D_00189E20, f32, 0x31C) > 0.55f)) {
+        if ((FLD(D_00189E20, u32, 0x2294) != 0x48) && (PadPressedWithin(0x40, 5, NULL) != 0) && (FLD(D_00189E20, f32, 0x31C) > 0.55f)) {
             func_L11_002D8EF8(0x4B, 1);
         }
         break;
@@ -1751,7 +1751,7 @@ void func_L11_002DE9E0(void) {
                 func_L11_002D8EF8(0x46, 1);
                 break;
             }
-            if ((func_L00_0032EF10(0x40, 5, NULL) != 0) && (FLD(D_00189E20, f32, 0x31C) > 0.6f)) {
+            if ((PadPressedWithin(0x40, 5, NULL) != 0) && (FLD(D_00189E20, f32, 0x31C) > 0.6f)) {
                 func_L11_002D8EF8(0x4B, 1);
             }
         }
@@ -1785,11 +1785,11 @@ void func_L11_002DE9E0(void) {
         if ((FLD(D_00189E20, s32, 0xC2C) == 0) && (FLD(D_00189E20, f32, 0x170) < 0.025000002f) && (FLD(o = FLD(D_00189E20, u8 *, 0x2290), u8, 0x43) != 2)) {
             u8 *info = FLD(o, u8 *, 0x24);
             s32 n = FLD(FLD(info, u8 *, 0x50), u8, 0x10);
-            func_L00_002D2168(2, (FLD(o, u8, 0x41) * n / FLD(FLD(info, u8 *, 0x54), u8, 0x10) + 1) % n, 8.0f);
+            set_hero_animation(2, (FLD(o, u8, 0x41) * n / FLD(FLD(info, u8 *, 0x54), u8, 0x10) + 1) % n, 8.0f);
         } else if ((FLD(D_00189E20, s32, 0xC2C) == 0) && (FLD(D_00189E20, f32, 0x170) > 0.030000003f) && (FLD(o = FLD(D_00189E20, u8 *, 0x2290), u8, 0x43) != 3)) {
             u8 *info = FLD(o, u8 *, 0x24);
             s32 n = FLD(FLD(info, u8 *, 0x54), u8, 0x10);
-            func_L00_002D2168(3, (FLD(o, u8, 0x41) * n / FLD(FLD(info, u8 *, 0x50), u8, 0x10) + 7) % n, 8.0f);
+            set_hero_animation(3, (FLD(o, u8, 0x41) * n / FLD(FLD(info, u8 *, 0x50), u8, 0x10) + 7) % n, 8.0f);
         }
         speed = FLD(D_00189E20, f32, 0x170);
         if (FLD(D_00189E20, u8, 0x40F) != 0) {
@@ -1804,11 +1804,11 @@ void func_L11_002DE9E0(void) {
         if (FLD(D_00189E20, f32, 0xC20) < 0.57f) {
             FLD(D_00189E20, f32, 0xC20) = 0.57f;
         }
-        if (func_L00_0032EF10(0x40, 8, NULL) != 0) {
+        if (PadPressedWithin(0x40, 8, NULL) != 0) {
             func_L11_002D8EF8(0x45, 1);
             break;
         }
-        if (func_L00_0032EF10(0x80, 9, NULL) != 0) {
+        if (PadPressedWithin(0x80, 9, NULL) != 0) {
             func_L11_002D8EF8(0x4D, 1);
             break;
         }
@@ -1847,20 +1847,20 @@ void func_L11_002DE9E0(void) {
             FLD(D_00189E20, s16, 0x1D0) = 0xA;
             break;
         }
-        if (((FLD(D_00189E20, f32, 0x24B8) > 0.5f) && (func_L00_0032EF10(0x40, 9, NULL) != 0) && (func_00283C80(FLD(D_00189E20, f32, 0x1A0), FLD(D_00189E20, f32, 0x98)) > 2.3561947f)) || (FLD(D_00138180, s32, 0x1A0) & 8)) {
+        if (((FLD(D_00189E20, f32, 0x24B8) > 0.5f) && (PadPressedWithin(0x40, 9, NULL) != 0) && (FastDiffRots(FLD(D_00189E20, f32, 0x1A0), FLD(D_00189E20, f32, 0x98)) > 2.3561947f)) || (FLD(D_00138180, s32, 0x1A0) & 8)) {
             func_L11_002D8EF8(0x41, 1);
             FLD(D_00189E20, s16, 0x1D0) = 0xA;
             break;
         }
-        if (func_L00_0032EF10(0x40, 9, NULL) != 0) {
+        if (PadPressedWithin(0x40, 9, NULL) != 0) {
             func_L11_002D8EF8(0x48, 1);
             break;
         }
         if (FLD(D_00189E20, f32, 0x24B8) > 0.5f) {
-            if (func_00283C80(FLD(D_00189E20, f32, 0x1A0), func_00283B98(FLD(D_00189E20, f32, 0x98), 1.5707965f)) < 0.78539824f) {
+            if (FastDiffRots(FLD(D_00189E20, f32, 0x1A0), FastAddRotations(FLD(D_00189E20, f32, 0x98), 1.5707965f)) < 0.78539824f) {
                 qcopy(v20, D_00189E20 + 0x80);
-                v20[0] += func_00283180(func_00283B98(FLD(D_00189E20, f32, 0x98), 1.5707965f)) * 0.3f;
-                v20[1] += func_00283198(func_00283B98(FLD(D_00189E20, f32, 0x98), 1.5707965f)) * 0.3f;
+                v20[0] += func_00283180(FastAddRotations(FLD(D_00189E20, f32, 0x98), 1.5707965f)) * 0.3f;
+                v20[1] += func_00283198(FastAddRotations(FLD(D_00189E20, f32, 0x98), 1.5707965f)) * 0.3f;
                 if (func_L00_002ACF88((s8 *)v20, (s8 *)(D_00189E20 + 0x90), NULL) != 0) {
                     func_L11_002D8EF8(0x49, 1);
                 }
@@ -1868,10 +1868,10 @@ void func_L11_002DE9E0(void) {
             }
         }
         if (FLD(D_00189E20, f32, 0x24B8) > 0.5f) {
-            if (func_00283C80(FLD(D_00189E20, f32, 0x1A0), func_00283B98(FLD(D_00189E20, f32, 0x98), -1.5707965f)) < 0.78539824f) {
+            if (FastDiffRots(FLD(D_00189E20, f32, 0x1A0), FastAddRotations(FLD(D_00189E20, f32, 0x98), -1.5707965f)) < 0.78539824f) {
                 qcopy(v20, D_00189E20 + 0x80);
-                v20[0] += func_00283180(func_00283B98(FLD(D_00189E20, f32, 0x98), -1.5707965f)) * 0.3f;
-                v20[1] += func_00283198(func_00283B98(FLD(D_00189E20, f32, 0x98), -1.5707965f)) * 0.3f;
+                v20[0] += func_00283180(FastAddRotations(FLD(D_00189E20, f32, 0x98), -1.5707965f)) * 0.3f;
+                v20[1] += func_00283198(FastAddRotations(FLD(D_00189E20, f32, 0x98), -1.5707965f)) * 0.3f;
                 if (func_L00_002ACF88((s8 *)v20, (s8 *)(D_00189E20 + 0x90), NULL) != 0) {
                     func_L11_002D8EF8(0x4A, 1);
                 }
@@ -1887,21 +1887,21 @@ void func_L11_002DE9E0(void) {
         if (FLD(D_00189E20, u32, 0x2294) == 0x4A) {
             side = -1.5707965f;
         }
-        v10[0] += func_00283180(func_00283B98(FLD(D_00189E20, f32, 0x98), side)) * 0.3f;
-        v10[1] += func_00283198(func_00283B98(FLD(D_00189E20, f32, 0x98), side)) * 0.3f;
+        v10[0] += func_00283180(FastAddRotations(FLD(D_00189E20, f32, 0x98), side)) * 0.3f;
+        v10[1] += func_00283198(FastAddRotations(FLD(D_00189E20, f32, 0x98), side)) * 0.3f;
         func_L00_002B39F0(0, 1.0f);
-        if ((FLD(D_00189E20, f32, 0x24B8) < 0.5f) || (func_00283C80(FLD(D_00189E20, f32, 0x1A0), func_00283B98(FLD(D_00189E20, f32, 0x98), side)) > 0.78539824f) || (func_L00_002ACF88((s8 *)v10, (s8 *)(D_00189E20 + 0x90), NULL) == 0)) {
+        if ((FLD(D_00189E20, f32, 0x24B8) < 0.5f) || (FastDiffRots(FLD(D_00189E20, f32, 0x1A0), FastAddRotations(FLD(D_00189E20, f32, 0x98), side)) > 0.78539824f) || (func_L00_002ACF88((s8 *)v10, (s8 *)(D_00189E20 + 0x90), NULL) == 0)) {
             if (FLD(D_00189E20, s32, 0xC28) & 2) {
                 func_L11_002D8EF8(0x47, 1);
                 break;
             }
         }
-        if ((FLD(D_00189E20, f32, 0x24B8) > 0.5f) && (func_L00_0032EF10(0x40, 9, NULL) != 0) && (func_00283C80(FLD(D_00189E20, f32, 0x1A0), FLD(D_00189E20, f32, 0x98)) > 2.3561947f)) {
+        if ((FLD(D_00189E20, f32, 0x24B8) > 0.5f) && (PadPressedWithin(0x40, 9, NULL) != 0) && (FastDiffRots(FLD(D_00189E20, f32, 0x1A0), FLD(D_00189E20, f32, 0x98)) > 2.3561947f)) {
             func_L11_002D8EF8(0x41, 1);
             FLD(D_00189E20, s16, 0x1D0) = 0x28;
             break;
         }
-        if (func_L00_0032EF10(0x40, 9, NULL) != 0) {
+        if (PadPressedWithin(0x40, 9, NULL) != 0) {
             func_L11_002D8EF8(0x48, 1);
         }
         break;
@@ -1909,9 +1909,9 @@ void func_L11_002DE9E0(void) {
     case 0x1D:
         if ((FLD(D_00189E20, u8, 0x22B4) == 0) && ((FLD(D_00189E20, u8, 0x22BA) == 0) || (FLD(D_00189E20, u8, 0x22B5) != 0))) {
             if (FLD(D_00138180, s32, 0x1A0) & 8) {
-                func_L00_002D2168(0xD, 0, 8.0f);
+                set_hero_animation(0xD, 0, 8.0f);
             } else {
-                func_L00_002D2168(func_L03_002AB5C8(1), 0, 8.0f);
+                set_hero_animation(func_L03_002AB5C8(1), 0, 8.0f);
             }
         }
         if (!(FLD(D_00138180, s32, 0x1A0) & 4)) {
@@ -1920,7 +1920,7 @@ void func_L11_002DE9E0(void) {
                 func_L11_002D8EF8(0, 0);
                 anim = func_L03_002AB5C8(1);
                 if (FLD(FLD(D_00189E20, u8 *, 0x2290), u8, 0x43) != anim) {
-                    func_L00_002D2168(anim, 0, 8.0f);
+                    set_hero_animation(anim, 0, 8.0f);
                 }
             }
             D_L11_001A8A48 = 0;
@@ -1933,7 +1933,7 @@ void func_L11_002DE9E0(void) {
         break;
     case 0x22:
         if (FLD(D_00189E20, f32, 0xC38) > 19.0f) {
-            if (func_L00_0032EF10(0x40, 0xB, NULL) != 0) {
+            if (PadPressedWithin(0x40, 0xB, NULL) != 0) {
                 if (FLD(D_00138180, s32, 0x1A0) & 8) {
                     func_L00_002CAB08();
                     break;

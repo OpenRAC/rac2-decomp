@@ -18,8 +18,8 @@ void func_L08_00425AA8(char *a) {
     float v[4];
     char *p = *(char **)(a + 0x68);
     float f;
-    *(u8 *)(p + 0x48) = func_00283CF0(40.0f);
-    *(u8 *)(p + 0x4A) = func_00283CF0(64.0f);
+    *(u8 *)(p + 0x48) = FloatToInt(40.0f);
+    *(u8 *)(p + 0x4A) = FloatToInt(64.0f);
     *(u8 *)(p + 0x29) = 1;
     qcopy(p + 0x170, a + 0x10);
     *(float *)(p + 0x208) = *(float *)(a + 0xF8);
@@ -32,11 +32,11 @@ void func_L08_00425AA8(char *a) {
     *(u8 *)(p + 0x20E) = *(u8 *)(a + 0x30);
     *(Quad *)v = *(Quad *)(a + 0x10);
     f = func_L08_0032EF80(v, *(int *)(p + 0x1D0), -1, *(int *)(p + 0x1D4), -1);
-    if (f > 0.0f) *(u8 *)(a + 0x30) = func_00283CF0(f + 2.0f);
+    if (f > 0.0f) *(u8 *)(a + 0x30) = FloatToInt(f + 2.0f);
     *(u8 *)(p + 0x20E) = *(u8 *)(p + 0x20F) = *(u8 *)(a + 0x30);
     *(Quad *)v = *(Quad *)(a + 0x10);
     f = func_L08_0032EF80(v, *(int *)(p + 0x1D8), *(int *)(p + 0x1E0), *(int *)(p + 0x1DC), -1);
-    if (f > 0.0f) *(u8 *)(p + 0x20E) = func_00283CF0(f + 2.0f);
+    if (f > 0.0f) *(u8 *)(p + 0x20E) = FloatToInt(f + 2.0f);
     if (*(int *)(p + 0x1E4) != -1) func_L01_003377C8(D_L08_001FE7C0[*(int *)(p + 0x1E4)]);
     *(u8 *)(p + 0x60) = 5;
     *(int *)(p + 0x98) = -1;
@@ -79,7 +79,7 @@ void func_L08_00425AA8(char *a) {
     *(int *)(p + 0x22C) = func_L08_003D3D80(a);
     *(s16 *)(p + 0x1BE) = 0;
     if (*(u8 *)(p + 0x20C) == 1 || *(u8 *)(p + 0x20C) == 4) {
-        func_0026FEB8(D_L08_001B1BD0, *(s16 *)(a + 0xB2), *(u8 *)(p + 0x20C), *(u8 *)(p + 0x20C) + 1);
+        STUB_printf(D_L08_001B1BD0, *(s16 *)(a + 0xB2), *(u8 *)(p + 0x20C), *(u8 *)(p + 0x20C) + 1);
         *(u8 *)(p + 0x20C) += 1;
     }
     qcopy(p + 0x170, a + 0x10);

@@ -43,7 +43,7 @@ s32 func_002D2538(void) {
     s32 s1;
     f32 zf;
 
-    func_0027C540(0);
+    SetupGifPaging(0);
     zf = 0.0f;
     func_00300A00(func_00336D50(D_001A8CFC + 0x8710, 0xE5), 0x60442D00, (f32) (D_001A7340 / 2), (f32) D_001ABA6C, 1.0f, D_001B23A8, zf);
     func_00300A00(func_00336D50(D_001A8CFC + 0x8710, 0xE4), 0x55F0C070, (f32) (D_001A7340 / 2), (f32) D_001ABA6C, 1.0f, D_001B23A8, zf);
@@ -54,7 +54,7 @@ s32 func_002D2538(void) {
             s0 = s1;
         }
         func_00300A00(func_00336D50(D_001A8CFC + 0x8710, 0x4B), s0, 216.0f, 373.0f, 1.0f, D_001B23A8 * 0.8f, zf);
-        func_0027FAA8(0x53, 0x171, 0x80F0F0F0, func_00288FB8(0x2F40), -1);
+        func_0027FAA8(0x53, 0x171, 0x80F0F0F0, GetLocalizedString(0x2F40), -1);
     }
     if (D_001ABA68 < 6) {
         s0 = 0x80F0F0F0;
@@ -62,10 +62,10 @@ s32 func_002D2538(void) {
             s0 = s1;
         }
         func_00300A00(func_00336D50(D_001A8CFC + 0x8710, 0x4A), s0, 295.0f, 373.0f, 1.0f, D_001B23A8 * 0.8f, zf);
-        func_0027F980(0x1C1, 0x171, 0x80F0F0F0, func_00288FB8(0x2F41), -1);
+        func_0027F980(0x1C1, 0x171, 0x80F0F0F0, GetLocalizedString(0x2F41), -1);
     }
-    func_0027FAA8(D_001A7340 / 2, 0x1D, 0x80F0F0F0, func_00288FB8(0x3294), -1);
-    func_0027FAA8(D_001A7340 / 2, 0x173, 0x80F0F0F0, func_00288FB8(0x2D4F), -1);
-    func_0027C660();
+    func_0027FAA8(D_001A7340 / 2, 0x1D, 0x80F0F0F0, GetLocalizedString(0x3294), -1);
+    func_0027FAA8(D_001A7340 / 2, 0x173, 0x80F0F0F0, GetLocalizedString(0x2D4F), -1);
+    DoGifPaging();
     return 0;
 }

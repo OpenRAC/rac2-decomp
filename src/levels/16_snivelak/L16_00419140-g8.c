@@ -37,7 +37,7 @@ void func_L16_00419140(char *self) {
     func_00282C88(velocity);
     for (i = 0; i < D_L16_001B1C90; i++) {
         func_002A7A00(position, 0.0f, 0.25f);
-        func_00282CC0(position, position, self + 16);
+        FastVecAdd(position, position, self + 16);
         *(f32 *)(velocity + 8) = -(func_002A7878(D_L16_001B1C68, D_L16_001B1C6C) * 0.01666666753590107f);
         kind = func_002A7820(D_L16_001B1C88[0], D_L16_001B1C8C[0]) & 255;
         alpha = func_002A77E0(255);

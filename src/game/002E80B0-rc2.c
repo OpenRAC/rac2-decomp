@@ -46,13 +46,13 @@ void func_002E80B0(void) {
         temp_s0 = D_001A7BB4 - 1;
         temp_s0_2 = (temp_s0 > -1) ? temp_s0 : 0;
         func_0011AEA0(0);
-        func_0029D4D0(temp_s1 + *(s32 *)(temp_s1 + 0x50), D_001B22A8);
+        fast_decompress(temp_s1 + *(s32 *)(temp_s1 + 0x50), D_001B22A8);
         func_0011AEA0(0);
         temp_s1_2 = D_001B22A8;
         D_001A72D0 = D_001A72D4;
-        func_00291850(temp_s1_2 + *(s32 *)(temp_s1_2 + 4), sp);
+        UploadMipTexture(temp_s1_2 + *(s32 *)(temp_s1_2 + 4), sp);
         D_001B2160 = sp[0];
-        func_00291850(temp_s1_2 + *(s32 *)(temp_s1_2 + temp_s0_2 * 4 + 8), sp);
+        UploadMipTexture(temp_s1_2 + *(s32 *)(temp_s1_2 + temp_s0_2 * 4 + 8), sp);
         D_001B2168 = sp[0];
         D_001A72D4 = D_001A72D0 + 0x2000;
     }

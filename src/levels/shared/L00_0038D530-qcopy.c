@@ -32,7 +32,7 @@ Moby_38D530 *func_L00_0038D530(TI128 *a1, TI128 *a2)
     float lo;
     float hi;
 
-    p = func_0029EFD0(0x79);
+    p = CreateMoby(0x79);
     if (p != 0) {
         p->alpha = 0xFF;
         p->timer = 0x1FF;

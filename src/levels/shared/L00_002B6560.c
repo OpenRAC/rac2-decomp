@@ -70,11 +70,11 @@ void func_L00_002B6560(void)
             speed = 0.116666675f;
             near = 0;
             if (D_001A7AF8[2] && *(short *)(g + 0x24FC) == 0)
-                near = func_L00_002ADEA0(3) == 3;
+                near = hero_slot_item_id(3) == 3;
             {
                 char *position = D_00189EA0;
 
-                func_00282CF0(v, position, position + 0x3E0);
+                FastVecSub(v, position, position + 0x3E0);
                 distance = func_L00_002D3B00(v);
                 clear = 1;
                 if (near) {
@@ -101,7 +101,7 @@ void func_L00_002B6560(void)
                     }
                     func_L00_002D36E0(u, 0.0f, 0.0f, 1.0f, 1);
                     func_L00_002D36E0(w, 0.0f, 0.0f, 2.7f, 1);
-                    if (func_002761F8(u, w, 2, 0, 0))
+                    if (CollLine(u, w, 2, 0, 0))
                         clear = 0;
                 }
             }
@@ -116,7 +116,7 @@ void func_L00_002B6560(void)
                 else if (distance > 1.7f)
                     speed *= 0.7f;
             }
-            if (func_L00_002ADEA0(3) == 3) {
+            if (hero_slot_item_id(3) == 3) {
                 char *g = (char *)D_00189E20;
 
                 if (*(short *)(g + 0x24FC) == 0) {
@@ -130,7 +130,7 @@ void func_L00_002B6560(void)
                 if (*(int *)(g + 0x1B8) < 8) {
                     len = func_L00_002D3B00(g + 0xF0);
                     if (len < speed)
-                        func_002AA2E8(&len, speed, 0.041666668f);
+                        ApproachValue(&len, speed, 0.041666668f);
                     func_L00_002D3B58(g + 0xF0, g + 0xF0, len);
                 }
             }
@@ -152,7 +152,7 @@ void func_L00_002B6560(void)
                     if (*(float *)(g + 0x50C) < *(float *)(g + 0x4A8))
                         *(float *)(g + 0x4A8) = *(float *)(g + 0x50C);
                     *(float *)(g + 0x4B0) +=
-                        func_00282C10(*(float *)(g + 0x4A8) * 2.0f * *(float *)(g + 0x520)) -
+                        square_root(*(float *)(g + 0x4A8) * 2.0f * *(float *)(g + 0x520)) -
                         *(float *)(g + 0x4B4) - *(float *)(g + 0x4B0);
                 }
             }

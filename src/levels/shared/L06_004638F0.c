@@ -34,11 +34,11 @@ void func_L06_004638F0(unsigned char *m) {
         break;
     case 1:
         if(func_002B3868(m)) I38(v,0x30)=func_002A7820(20,40);
-        func_00282CD8(tmp,m+0x10,v+0x20);
-        func_00282D48(tmp,v+0x20,0.92f);
+        add_vectors(tmp,m+0x10,v+0x20);
+        scale_vector_xyz_in_place(tmp,v+0x20,0.92f);
         if(func_00282948((int *)(v+0x30))) {
-            func_00282D30(tmp,v+0x10,-F38(v,0x38));
-            func_00282CC0(v,tmp,m+0x10);
+            FastVecScale(tmp,v+0x10,-F38(v,0x38));
+            FastVecAdd(v,tmp,m+0x10);
             F38(v,8)-=F38(v,0x38)*0.5f;
             F38(v,0x3c)=3.1415927f/(F38(v,0x34)+F38(v,0x34));
             F38(v,0x40)=1.5707965f;
@@ -57,14 +57,14 @@ void func_L06_004638F0(unsigned char *m) {
         {
             float offset;
             bend=wave*3.0f;
-            bend=height*(wave>=0.0f ? func_00282C10(wave)+bend : bend-func_00282C10(-wave))*0.25f;
+            bend=height*(wave>=0.0f ? square_root(wave)+bend : bend-square_root(-wave))*0.25f;
             offset=F38(v,0x38)*wave*wave*0.6366197f*F38(v,0x40)*0.5f;
             F38(m,0xf4)=-(F38(v,0x40)*wave+1.5707965f);
-            func_00282D30(tmp,D_L06_001A8F50,offset);
+            FastVecScale(tmp,D_L06_001A8F50,offset);
         }
-        func_00282CC0(m+0x10,tmp,v);
-        func_00282D30(tmp,v+0x10,bend);
-        func_00282CC0(m+0x10,tmp,m+0x10);
+        FastVecAdd(m+0x10,tmp,v);
+        FastVecScale(tmp,v+0x10,bend);
+        FastVecAdd(m+0x10,tmp,m+0x10);
         if(func_00282C48(phase)<0.1f) F38(v,0x40)=func_002A7878(30.0f,60.0f)*0.017453294f;
         if(F38(m,0x18)<F38(v,0x48) || func_00282948((int *)(v+0x30))) func_002A7750(m,3,-1);
         break;

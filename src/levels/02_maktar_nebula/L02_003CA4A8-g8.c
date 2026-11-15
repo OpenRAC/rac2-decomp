@@ -34,13 +34,13 @@ void func_L02_003CA4A8(char *self) {
     Vector point;
     int step, pathCount;
     float slope, length;
-    if (((u8 *)self)[0x31] && func_00282E48(self + 0x10, &D_L02_001BA500) < 24.0f) {
+    if (((u8 *)self)[0x31] && fast_vec_dist(self + 0x10, &D_L02_001BA500) < 24.0f) {
         func_002A93B0(self); ((u8 *)self)[0x6F] = 22;
     }
     if (!((u8 *)self)[0x95]) {
         if (self == D_00189E20.pointer_5c0) {
             func_002A7750((u8 *)self, 5, 1); qcopy(state + 0x150,self + 0x10);
-        } else if (func_00282E80(self + 0x10, &D_00189E20.position_80) < *(float *)(state + 0x178)) *(u16 *)(self + 0x34) |= 0x1000;
+        } else if (vec_distance_xy(self + 0x10, &D_00189E20.position_80) < *(float *)(state + 0x178)) *(u16 *)(self + 0x34) |= 0x1000;
         else *(u16 *)(self + 0x34) &= 0xEFFF;
     }
     switch (((u8 *)self)[0x20]) {
@@ -90,7 +90,7 @@ void func_L02_003CA4A8(char *self) {
             if (((u8 *)self)[0x43] != 7) func_002A7470(self, 7, 0, 10);
             *(short *)(state + 0x3B4) = 0;
         }
-        slope = func_00282DB0(self + 0xC0, state + 0x140);
+        slope = FastVecDot(self + 0xC0, state + 0x140);
         if (slope < -0.033333335f) { if (((u8 *)self)[0x43] != 10) func_002A7470(self, 10, 0, 10); }
         else if (slope > 0.033333335f) { if (((u8 *)self)[0x43] != 9) func_002A7470(self, 9, 0, 10); }
         else if (((u8 *)self)[0x43] != 7) func_002A7470(self, 7, 0, 10);
@@ -109,20 +109,20 @@ void func_L02_003CA4A8(char *self) {
         func_L02_003CB090(self);
         break;
     case 7:
-        func_00282CC0(self + 0x10, self + 0x10, state + 0xF0);
+        FastVecAdd(self + 0x10, self + 0x10, state + 0xF0);
         *(float *)(state + 0xF8) -= D_L02_001B0084 * 0.00027777778f;
         func_L02_003CB090(self);
-        if (func_002ACBC8(self + 0x10, *(int *)(state + 0x398))) {
-            length = func_00282E20(state + 0xF0); if (length > 0.016666668f) length = 0.016666668f;
+        if (IsPointInCuboid(self + 0x10, *(int *)(state + 0x398))) {
+            length = vec_length_xy(state + 0xF0); if (length > 0.016666668f) length = 0.016666668f;
             func_00282F70(state + 0xF0, state + 0xF0, length);
         }
         qcopy(&point,self + 0x10); point.f[2] += 0.5f;
         if (func_00277258(&point, 0, 0.5f, self)) {
             qcopy(self + 0x10,&D_L02_001C0970.point); *(float *)(self + 0x18) -= 0.5f;
-            func_00282F20(&D_L02_001C0970.normal, &D_L02_001C0970.normal, 1);
-            if (func_00282DB0(&D_L02_001C0970.normal, state + 0xF0) < 0) {
+            vec_scale_to_length(&D_L02_001C0970.normal, &D_L02_001C0970.normal, 1);
+            if (FastVecDot(&D_L02_001C0970.normal, state + 0xF0) < 0) {
                 func_00283028(state + 0xF0, state + 0xF0, &D_L02_001C0970.normal);
-                func_00282D30(state + 0xF0, state + 0xF0, 0.5f);
+                FastVecScale(state + 0xF0, state + 0xF0, 0.5f);
             }
             if (D_L02_001C0970.normal.f[2] >= 0.95f) {
                 *(u16 *)(self + 0x34) |= 0x1000; func_002A7750((u8 *)self, 1, 0);
@@ -133,8 +133,8 @@ void func_L02_003CA4A8(char *self) {
         break;
     }
     if (((u8 *)self)[0x31]) {
-        *(float *)(state + 0x3B0) = func_00283B98(*(float *)(state + 0x3B0), D_L02_001B0090 * 0.0002908882452175021f);
-        *(int *)(self + 0x78) = func_L01_0031BC68(D_L02_001B0098[0], D_L02_001B0098[1], *(float *)(state + 0x3B0));
+        *(float *)(state + 0x3B0) = FastAddRotations(*(float *)(state + 0x3B0), D_L02_001B0090 * 0.0002908882452175021f);
+        *(int *)(self + 0x78) = PulseColor(D_L02_001B0098[0], D_L02_001B0098[1], *(float *)(state + 0x3B0));
     }
     if ((D_L02_001B30C8[0] & 31) == (((int)self >> 8) & 31)) {
         step = *(int *)(state + 0x3C4);
@@ -142,7 +142,7 @@ void func_L02_003CA4A8(char *self) {
         func_L02_0032EDD8(&D_00189E20.position_80, state + 0x290, pathCount, &step);
         if (*(int *)(state + 0x3C4) < step) {
             path = D_L02_001FF1C0[((L02_PathState *)state)->refs[step].id];
-            if (func_00282E48(path + 0x10, path + ((*(int *)path >> 1) * 16 + 0x10)) > 8) *(int *)(state + 0x3C4) = step;
+            if (fast_vec_dist(path + 0x10, path + ((*(int *)path >> 1) * 16 + 0x10)) > 8) *(int *)(state + 0x3C4) = step;
         }
     }
     ++*(u16 *)(self + 0x96);

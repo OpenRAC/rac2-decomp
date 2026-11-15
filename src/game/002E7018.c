@@ -40,7 +40,7 @@ void func_002E7018(void)
     if ((unsigned short)(v - 6) >= 2) {
         *(unsigned short *)(q + 114) = 5;
     }
-    func_002E4AC8();
+    UpdateSoundVoices();
     func_00288EA0();
     func_002E6D88(0);
     D_00152C2A = 0;
@@ -90,7 +90,7 @@ void func_002E7090(int level)
         func_00294070(D_001B8840.row);
         D_001B8840.page = D_001B8840.base % level;
     } else {
-        func_0029B3E0(0, level);
+        MemcardSave(0, level);
         D_001B1680 = level;
         menu->active = 1;
         menu->slot = none;
@@ -133,13 +133,13 @@ void func_002E82C8(int alpha)
     unsigned long long packet;
     char *dst;
 
-    func_002FC560(0x47, 0x31801ULL);
-    func_002FC560(0x42, 0x8000000044ULL);
+    VU1_addGSregister(0x47, 0x31801ULL);
+    VU1_addGSregister(0x42, 0x8000000044ULL);
     color = (alpha << 24) | 0x00808080;
     packet = D_001B2168;
     dst = D_001A7344;
-    func_0027E018(0x20, dst - 0x58, 0x100, 0x20, 0, 0, 0x100, 0x20, color, packet);
-    func_002FC560(0x47, 0x5360BULL);
+    DrawTexturedQuad(0x20, dst - 0x58, 0x100, 0x20, 0, 0, 0x100, 0x20, color, packet);
+    VU1_addGSregister(0x47, 0x5360BULL);
 }
 
 
@@ -166,7 +166,7 @@ void func_002EA8E8(void)
         break;
     case 1:
         D_001B1594 = 127;
-        func_0027BD70();
+        RenderFrame();
         break;
     case 2:
         func_002E8BA8();
@@ -189,7 +189,7 @@ void func_002EAAA8(void *arg, int *status) {
         do {
             func_0011AEA0(0);
             func_001261F0(0);
-            func_00132028();
+            snd_Pump();
         } while (*status == sentinel);
     }
 }

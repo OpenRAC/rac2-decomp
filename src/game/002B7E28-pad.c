@@ -65,7 +65,7 @@ void func_002B88F0(PadState *p, u8 *buf, s32 len) {
             if (d < 0)
                 d = -d;
             if (d >= 0x30) {
-                float f = func_00283CE0(d - 0x30) / func_00283CE0(0x4C);
+                float f = IntToFloat(d - 0x30) / IntToFloat(0x4C);
                 p->analog[i] = f;
                 if (f > 1.0f) {
                     p->analog[i] = 1.0f;
@@ -78,7 +78,7 @@ void func_002B88F0(PadState *p, u8 *buf, s32 len) {
     }
     if (len >= 0x12) {
         for (i = 4; i < 16; i++) {
-            p->analog[i] = func_00283CE0(buf[i + 2]) * 0.003921569f;
+            p->analog[i] = IntToFloat(buf[i + 2]) * 0.003921569f;
         }
     }
     if (D_001A7A40.mirror) {
@@ -157,7 +157,7 @@ void func_002B88F0(PadState *p, u8 *buf, s32 len) {
     }
     v[0] = p->analog[2];
     v[1] = p->analog[3];
-    mag = func_00282E20(v);
+    mag = vec_length_xy(v);
     ang = func_00283248(v[0], v[1]);
     p->hist_mag[p->hist_idx] = mag;
     p->hist_ang[p->hist_idx] = ang;
@@ -169,7 +169,7 @@ void func_002B88F0(PadState *p, u8 *buf, s32 len) {
         }
         if (!(p->pressed & 0x10000)) {
             for (k = 1; k < 5; k++) {
-                if (func_00283C80(p->hist_ang[(p->hist_idx - k + 30) % 30], ang) >
+                if (FastDiffRots(p->hist_ang[(p->hist_idx - k + 30) % 30], ang) >
                     0.959931194782257080078125f) {
                     p->pressed |= 0x10000;
                     break;

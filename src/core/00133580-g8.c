@@ -26,7 +26,7 @@ int func_00133580(int arg0) {
     if (arg0 == 1)
         return 1;
     while (D_001A7498 == 0) {
-        func_00132028();
+        snd_Pump();
         func_0011B500(&D_001A7100, end);
         busy = D_001A7100 < 1;
         D_001A7498 = busy;

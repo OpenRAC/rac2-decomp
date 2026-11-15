@@ -135,11 +135,11 @@ void func_L03_003CBE58(char *a0)
         if (*(s32 *)(s1 + 0x70) != -1) {
             func_002A7750(s2, 2, -1);
             s0 = s1 + 0x60;
-            func_00282CF0(s0, D_L03_001B2A1C + *(s32 *)(s1 + 0x70) * 0x100 + 0x10, s2 + 0x10);
+            FastVecSub(s0, D_L03_001B2A1C + *(s32 *)(s1 + 0x70) * 0x100 + 0x10, s2 + 0x10);
             *(s32 *)(s1 + 0x7C) = -1;
             *(s32 *)(s1 + 0x78) = 0;
-            func_00283698(buf, s2 + 0xC0);
-            func_00283098(s0, s0, buf);
+            matrix_from_basis_rows(buf, s2 + 0xC0);
+            matrix_mul_vec3(s0, s0, buf);
         } else {
             func_002A7750(s2, 1, -1);
         }
@@ -152,7 +152,7 @@ void func_L03_003CBE58(char *a0)
         }
         p = D_00188660 + *(s32 *)(s1 + 0x7C) * 0x70;
         if (*(char **)(p + 0x88) != s2 || *(u8 *)(p + 0x74) == 0) {
-            *(s32 *)(s1 + 0x7C) = func_002E5CF8(0, 4, s2);
+            *(s32 *)(s1 + 0x7C) = PlayMobySound(0, 4, s2);
         }
         func_L01_003115E8(*(u8 *)(s2 + 0x21), 4);
         func_002A7750(s2, 3, -1);
@@ -177,7 +177,7 @@ void func_L03_003CBE58(char *a0)
                     }
                 }
                 *(s32 *)(s1 + 0x7C) = -1;
-                func_002E5CF8(1, 0, s2);
+                PlayMobySound(1, 0, s2);
                 (*(s32 *)(s1 + 0x78))++;
             }
             *(f32 *)(s2 + 0xF4) = 1.69646013f;
@@ -190,8 +190,8 @@ void func_L03_003CBE58(char *a0)
             }
         }
         q = D_L03_001B2A1C + *(s32 *)(s1 + 0x70) * 0x100 + 0x10;
-        func_00283098(q, s1 + 0x60, s2 + 0xC0);
-        func_00282CC0(q, q, s2 + 0x10);
+        matrix_mul_vec3(q, s1 + 0x60, s2 + 0xC0);
+        FastVecAdd(q, q, s2 + 0x10);
         break;
     }
     case 4: {
@@ -312,8 +312,8 @@ void func_L03_003D22C8(char *a0)
         }
         break;
     case 1:
-        if (func_002A8AF0(D_00189EA0, ((u8 *)D_L03_001FE700[s2->index] + 0x10), D_L03_001FE700[s2->index]->field00) != 0) {
-            func_00335438(D_L03_001B9980, D_L03_001B9980 + 0x10, 1, 0, 0);
+        if (point_in_path_xy(D_00189EA0, ((u8 *)D_L03_001FE700[s2->index] + 0x10), D_L03_001FE700[s2->index]->field00) != 0) {
+            SetCamera5Pose(D_L03_001B9980, D_L03_001B9980 + 0x10, 1, 0, 0);
             func_002A7750(a0, 2, -1);
         }
         break;
@@ -321,17 +321,17 @@ void func_L03_003D22C8(char *a0)
         k = 0.0027777778450399637f;
         func_L03_003D2518(a0, v0, v1);
         one = 1.0f;
-        func_00282CF0(v2, v0, D_L03_001B9980);
+        FastVecSub(v2, v0, D_L03_001B9980);
         k2 = 0.0008726647356525064f;
-        len = func_00282DF0(v2);
+        len = FastVecLength(v2);
         func_002AAC80(&s2->f18, len, k, k, one);
-        func_00282F20(v2, v2, s2->f18);
-        func_00282CC0(D_L03_001B9980, v2, D_L03_001B9980);
+        vec_scale_to_length(v2, v2, s2->f18);
+        FastVecAdd(D_L03_001B9980, v2, D_L03_001B9980);
         func_00335370(D_L03_001B9980);
         func_002AAA00(D_L03_001B9980 + 0x14, &s2->f1C, v1[1], k2, k2, one, 0);
         func_002AAA00(D_L03_001B9980 + 0x18, &s2->f20, v1[2], k2, k2, one, 0);
         func_003353C8(D_L03_001B9980 + 0x10);
-        if (func_002A8AF0(D_00189EA0, ((u8 *)D_L03_001FE700[s2->index] + 0x10), D_L03_001FE700[s2->index]->field00) == 0) {
+        if (point_in_path_xy(D_00189EA0, ((u8 *)D_L03_001FE700[s2->index] + 0x10), D_L03_001FE700[s2->index]->field00) == 0) {
             func_003355A8(1);
             func_002A7750(a0, 1, -1);
         }

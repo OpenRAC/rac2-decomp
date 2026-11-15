@@ -146,33 +146,33 @@ int func_L04_00412308(RaceObject *object,RaceState *state)
         int lap=D_L04_001A8FE4, mode=D_L04_001B08F0;
         oldPath=state->x314; oldPoint=state->x318;
         state->x3B8=previous;
-        state->x310=func_L04_00410788(object,state,&state->x314,&state->x318,lap,mode);
+        state->x310=UpdateNearestRoutePoint(object,state,&state->x314,&state->x318,lap,mode);
     }
     if (state->x310<state->x3B8 || (state->x318>=451 && oldPoint<3))
         state->x3A4++;
     else state->x3A4=0;
     if (oldPath!=state->x314) state->x3A8=10;
     if (state->x3A8>0) func_00282948(&state->x3A8);
-    else func_L04_00412130(object,0);
+    else UpdateRacerRanks(object,0);
     {
     D_L04_001B0918++;
     D_L04_001A8FE8++;
-    if (func_002ACBC8(object->position,state->x194)) {
+    if (IsPointInCuboid(object->position,state->x194)) {
         if (state->x3A4>0) state->x31C=0;
         else state->x31C=1;
     }
     }
-    if (func_002ACBC8(object->position,state->x190) && state->x31C) {
+    if (IsPointInCuboid(object->position,state->x190) && state->x31C) {
         if (D_L04_001A8FE4<2) {
             D_L04_001A8FE4++;
             D_L04_001B091C=180;
-            func_002E5CF8(13,0,object);
+            PlayMobySound(13,0,object);
             D_L04_001B0920=D_L04_001B0918;
             D_L04_001B0918=0;
             state->x31C=0;
         } else {
             state->x6D0=D_L04_001FE340[state->x6E0];
-            length=func_00283CE0(func_L04_00400AB0(object,state->x6D0,0))*state->x6D0->length;
+            length=IntToFloat(FindNearestRoutePointIndex(object,state->x6D0,0))*state->x6D0->length;
             if (D_L04_001B08F0) start=length+20.0f;
             else start=length+5.0f;
             state->x6D8=start;
@@ -182,12 +182,12 @@ int func_L04_00412308(RaceObject *object,RaceState *state)
             object->state=3;
             state->x398=60;
             D_L04_001B08F8=0;
-            func_002E5CF8(23,17,object);
+            PlayMobySound(23,17,object);
             func_002E59F8(state->x330);
-            state->x330=func_002E5CF8(20,4,object);
+            state->x330=PlayMobySound(20,4,object);
             func_002E59F8(state->x334);
-            state->x334=func_002E5CF8(21,4,object);
-            func_L04_00412130(object,1);
+            state->x334=PlayMobySound(21,4,object);
+            UpdateRacerRanks(object,1);
             func_L04_00410F80(object);
             func_L04_0040E248(object,state);
             if (state->x320!=1) {
@@ -222,7 +222,7 @@ int func_L04_00412308(RaceObject *object,RaceState *state)
                 if (D_L04_001A8FE8<*bestTime || !*bestTime) *bestTime=D_L04_001A8FE8;
             }
                 D_L04_001A8ED0[5]=1;
-                func_00132AF8(93); func_00132028();
+                func_00132AF8(93); snd_Pump();
                 level=D_001A79F0;
                 limit=level==4?7800:8820;
                 ticks=D_L04_001A8FE8;
@@ -239,7 +239,7 @@ int func_L04_00412308(RaceObject *object,RaceState *state)
                 }
                 if (done || D_001A79F0==4 ||
                     (D_001A79F0==11 && (D_L04_001B090C!=0 || func_L04_0040A1D0(0)>=2)))
-                    func_0029B3E0(0,-1);
+                    MemcardSave(0,-1);
             return 1;
         }
     }
@@ -267,7 +267,7 @@ int func_L04_00412308(RaceObject *object,RaceState *state)
         state->x320++;
 skipRank:
         loopVars->nearestPlayer=0;
-        func_00282CF0(delta,object->position,other->position);
+        FastVecSub(delta,object->position,other->position);
         distance=func_L00_002EE290(delta);
         if (distance<nearest) {state->x3B0=other;nearest=distance;}
     }

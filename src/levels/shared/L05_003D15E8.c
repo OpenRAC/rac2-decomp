@@ -63,8 +63,8 @@ void func_L05_003D15E8(char *obj)
         func_00282C88(tmp);
         if (*(int *)(state + 0x264))
             func_L05_00379E60(obj, func_L00_003E7760, 0, 0);
-        func_0029F978(obj, 2, state + 0x270);
-        func_0029F978(obj, 3, state + 0x2b0);
+        AttachManipulator(obj, 2, state + 0x270);
+        AttachManipulator(obj, 3, state + 0x2b0);
         return;
     }
     sub = func_002ED688(obj);
@@ -79,7 +79,7 @@ void func_L05_003D15E8(char *obj)
         if (*(int *)(state + 0x260) != -1) {
             sub->targetMode = mode;
             sub->target = D_L05_001B251C + (*(int *)(state + 0x260) << 8);
-            if (func_00282E48(sub->target + 0x10, obj + 0x10) < 10.0f) {
+            if (fast_vec_dist(sub->target + 0x10, obj + 0x10) < 10.0f) {
                 char *sound1 = D_00188660 + *(int *)(state + 0x2f4) * 0x70;
 
                 if ((*(char **)(sound1 + 0x88) != obj || !*(unsigned char *)(sound1 + 0x74))

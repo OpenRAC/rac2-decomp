@@ -79,11 +79,11 @@ void func_L01_003CE228(u8 *a0)
         }
         {
             if (!*(int *)(state+0xBC)) qcopy(state+0x70,state+0x60);
-            func_00282CF0(v,state+0x70,a0+0x10);
+            FastVecSub(v,state+0x70,a0+0x10);
             func_00282FB8(v,v,0.050000004f);
-            func_00282CC0(a0+0x10,a0+0x10,v);
+            FastVecAdd(a0+0x10,a0+0x10,v);
             f=func_00283248(*(float *)(state+0x80)-*(float *)(a0+0x10),*(float *)(state+0x84)-*(float *)(a0+0x14));
-            func_002A7CA0(a0,state+0xB8,f,0.001163553f,0.1f,0.10471977f);
+            MobySpringTurn(a0,state+0xB8,f,0.001163553f,0.1f,0.10471977f);
             if (!*(int *)(state+0xBC)) {
                 func_L01_00323310(*(int *)(state+0xD4),*(int *)(state+0xDC));
                 *(u16 *)(a0+0x34) &= 0xEFFF;
@@ -93,18 +93,18 @@ void func_L01_003CE228(u8 *a0)
         }
         break;
     case 6:
-        func_00282CC0(v,a0+0x10,state+0x90);
-        if (func_002A8AF0(v,D_L01_001FE180[*(int *)(state+0xA8)]+0x10,*(int *)D_L01_001FE180[*(int *)(state+0xA8)]))
+        FastVecAdd(v,a0+0x10,state+0x90);
+        if (point_in_path_xy(v,D_L01_001FE180[*(int *)(state+0xA8)]+0x10,*(int *)D_L01_001FE180[*(int *)(state+0xA8)]))
             qcopy(a0+0x10,v);
         else {
             func_L01_00337A60(a0+0x10,v,D_L01_001FE180[*(int *)(state+0xA8)]+0x10,*(int *)D_L01_001FE180[*(int *)(state+0xA8)]);
-            func_00282CF0(w,state+0x60,a0+0x10);
-            func_00282F20(w,w,0.033333335f);
-            func_00282CC0(a0+0x10,a0+0x10,w);
+            FastVecSub(w,state+0x60,a0+0x10);
+            vec_scale_to_length(w,w,0.033333335f);
+            FastVecAdd(a0+0x10,a0+0x10,w);
         }
-        f=func_00282DF0(state+0x90)-0.0030555557f;
+        f=FastVecLength(state+0x90)-0.0030555557f;
         if (f<0.0f) f=0.0f;
-        func_00282F20(state+0x90,state+0x90,f);
+        vec_scale_to_length(state+0x90,state+0x90,f);
         if (*(float *)(state+0x20)<=0.0f && !func_002A77E0(4)) func_L01_003CBCD8(a0,3,10,1);
         if (a0[0x60]&2) {
             if (*(float *)(state+0x20)<=0.0f) {
@@ -120,7 +120,7 @@ void func_L01_003CE228(u8 *a0)
     case 7:
         func_L01_00323310(*(int *)(state+0xD4),*(int *)(state+0xDC));
         if (*(int *)(state+0xB0)!=-1) func_002A8598(*(int *)(state+0xB0),1);
-        func_002A6C58(a0,0x200,3);
+        SetDeathBits(a0,0x200,3);
         if (*(int *)(state+0xCC)!=-1) func_0029F338(D_L01_001B255C_base[0]+(*(int *)(state+0xCC)<<8));
         *(int *)(state+0xCC)=-1;
         func_0029F338(a0);

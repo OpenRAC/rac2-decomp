@@ -16,7 +16,7 @@ void func_002934F8(U8 *block, void *textures, U8 *map, int index)
     int count;
     if (compressed) {
         int size;
-        func_0026FEB8(ref_002934F8_00, index);
+        STUB_printf(ref_002934F8_00, index);
         size = *(int *)(block + 0x2C);
         if (size > 0x3FC00) size = 0x3FC00;
         block[0xB] = 0;

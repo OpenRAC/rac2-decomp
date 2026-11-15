@@ -62,7 +62,7 @@ int func_L09_003F9D08(ActivationObject *obj)
     }
     if (s->flags & 2) {
         if (func_L09_003F71C8(obj, s->threshold_arg) < s->threshold) { s->command = 0; return 1; }
-        if (func_00282978(&s->timer)) s->command = 1;
+        if (FastDecTimer(&s->timer)) s->command = 1;
         else s->command = 0;
     }
     if (s->command < 0) {
@@ -95,7 +95,7 @@ int func_L09_003F9D08(ActivationObject *obj)
             int i;
             s->disabled = 0;
             s->command = 0;
-            func_0026FEB8(D_L09_001B10E0, D_L09_001B2388[0], obj->id, 0);
+            STUB_printf(D_L09_001B10E0, D_L09_001B2388[0], obj->id, 0);
             obj->flags &= ~1;
             obj->enabled = 1;
             obj->update = obj->type->update;

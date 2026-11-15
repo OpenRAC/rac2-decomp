@@ -174,13 +174,13 @@ void func_L08_003CDF98(u8 *obj)
             qcopy(d + 0x10, table[id].bytes + 0xF0);
             func_L08_003CDB38(obj);
         } else {
-            func_0026FEB8(D_L08_001B0148, *(s16 *)(obj + 0xB2));
+            STUB_printf(D_L08_001B0148, *(s16 *)(obj + 0xB2));
         }
         DF(8) = DF(8) + D_L08_001AFFD0;
         func_0029FCC0(obj, 8, d + 0x30);
-        func_00282CF0(d + 0x30, obj + 0x10, d + 0x30);
-        func_00283698(scratch.inverse, obj + 0xC0);
-        func_002830C0(d + 0x30, d + 0x30, scratch.inverse);
+        FastVecSub(d + 0x30, obj + 0x10, d + 0x30);
+        matrix_from_basis_rows(scratch.inverse, obj + 0xC0);
+        transform_vector(d + 0x30, d + 0x30, scratch.inverse);
         DF(0x3C) = 1.0f;
         if (OB(0x43) != 0)
             func_002A7470(obj, 0, 0, 0xA);
@@ -197,7 +197,7 @@ void func_L08_003CDF98(u8 *obj)
             return;
         {
             if (DI(0x6C) < 0) {
-                if (func_00282E48(d, D_00189E20.pos) < D_L08_001AFFD4 && D_00189E20.unk2294 != 0x31) {
+                if (fast_vec_dist(d, D_00189E20.pos) < D_L08_001AFFD4 && D_00189E20.unk2294 != 0x31) {
                     if (OB(0x43) != 0)
                         func_002A7470(obj, 0, 0, 0xA);
                     func_002A7750(obj, 2, -1);
@@ -222,16 +222,16 @@ void func_L08_003CDF98(u8 *obj)
             DF(8) = DF(8) + D_L08_001AFFD0;
             func_002A7750(obj, 1, -1);
         }
-        ok = func_002B0C28(7, 0x279E, 1) != 0;
+        ok = TryClaimNotice(7, 0x279E, 1) != 0;
         if (OB(0x20) == 2 && (D_00138324[0] & 0x40)) {
             if (ok && D_00189E20.target == D_L08_001B29DC[DI(0x6C)].bytes && D_00189E20.unk340 != 0
                 && D_00189E20.unk34E == 0) {
                 u8 *q;
                 func_L08_002D2ED8(0x31, 0);
-                func_L00_002D2168(0x87, 0, 3.0f);
+                set_hero_animation(0x87, 0, 3.0f);
                 ((s32 *)D_00189E20.unk2290)[0x9C / 4] = -1;
                 q = D_L08_001B29DC[DI(0x6C)].bytes;
-                func_00282F20(d + 0x20, q + 0xC0, D_L08_001B00FC * 0.016666668f);
+                vec_scale_to_length(d + 0x20, q + 0xC0, D_L08_001B00FC * 0.016666668f);
                 DI(0x50) = D_L08_001B0108;
                 DF(0x28) = D_L08_001B0100 * 0.016666668f;
                 DF(0x18) = *(float *)(q + 0xF8);
@@ -245,7 +245,7 @@ void func_L08_003CDF98(u8 *obj)
     case 3: {
         if (func_002B3868(obj) != 0) {
             if (DI(0xBC) != -1) {
-                func_0026FEB8(D_L08_001B0168);
+                STUB_printf(D_L08_001B0168);
                 func_L01_00323310(DI(0xBC), DI(0xB8));
             }
             DI(0xB0) = 0x1E;
@@ -255,15 +255,15 @@ void func_L08_003CDF98(u8 *obj)
         }
         if (DI(0x9C) != 0 || D_00189E20.unkC38 > 10.0f) {
             DI(0x9C) = DI(0x9C) | 4;
-            func_002AA800(d + 0x14, 0, D_L08_001AFFE8 * 0.017453294f, D_L08_001B0134 * 0.00029088825f);
+            StepAngleTowardTarget(d + 0x14, 0, D_L08_001AFFE8 * 0.017453294f, D_L08_001B0134 * 0.00029088825f);
             if (D_L08_001B0140 != 0)
-                func_00282CC0(d, d, d + 0x20);
+                FastVecAdd(d, d, d + 0x20);
             DF(0x28) = DF(0x28) - D_L08_001B010C * 0.00027777778f;
             if (DF(0x28) < -(D_L08_001B0104 * 0.016666668f))
                 DI(0x9C) = DI(0x9C) | 1;
             if (D_00189E20.unkC28 & 2) {
                 DI(0x9C) = DI(0x9C) | 2;
-                func_L00_002D2168(0x81, 0, 15.0f);
+                set_hero_animation(0x81, 0, 15.0f);
             }
             if (func_00282948(d + 0x50) != 0) {
                 if (DI(0x9C) == 7) {
@@ -276,7 +276,7 @@ void func_L08_003CDF98(u8 *obj)
                     }
                     DI(0x50) = D_L08_001AFFDC;
                     func_L08_002D2ED8(0x31, 0);
-                    func_L00_002D2168(0x81, 0, 15.0f);
+                    set_hero_animation(0x81, 0, 15.0f);
                     ((s32 *)D_00189E20.unk2290)[0x9C / 4] = -1;
                     if (D_L08_001B0140 != 0)
                         DF(0x14) = D_L08_001AFFE8 * 0.017453294f;
@@ -302,7 +302,7 @@ void func_L08_003CDF98(u8 *obj)
         break;
     }
     case 4:
-        if (D_L08_001AFFD8 < func_00282E80(obj + 0x10, D_00189E20.pos)) {
+        if (D_L08_001AFFD8 < vec_distance_xy(obj + 0x10, D_00189E20.pos)) {
             if (OB(0x43) != 0)
                 func_002A7470(obj, 0, 0, 0xA);
             func_002A7750(obj, 1, -1);
@@ -329,7 +329,7 @@ void func_L08_003CDF98(u8 *obj)
                     func_002A7470(obj, 1, 0, 0xA);
             }
             {
-                float r = func_00283CE0(D_L08_001AFFE0 - DI(0x50)) / func_00283CE0(D_L08_001AFFE0);
+                float r = IntToFloat(D_L08_001AFFE0 - DI(0x50)) / IntToFloat(D_L08_001AFFE0);
                 DF(0x64) = r;
                 if (r > 1.0f)
                     DF(0x64) = 1.0f;
@@ -337,13 +337,13 @@ void func_L08_003CDF98(u8 *obj)
                     DF(0x64) = 0.0f;
             }
             func_L08_003CD708(obj, d, DF(0x64));
-            func_00282D30(d + 0x20, d + 0x20, 1.0f - DF(0x64));
+            FastVecScale(d + 0x20, d + 0x20, 1.0f - DF(0x64));
             func_002AF000(&scratch.v.velocity, DF(0x54), DF(0x18), -DF(0x14));
-            func_00282D30(&scratch.v.velocity, &scratch.v.velocity, DF(0x64));
-            func_00282CC0(d + 0x20, d + 0x20, &scratch.v.velocity);
+            FastVecScale(&scratch.v.velocity, &scratch.v.velocity, DF(0x64));
+            FastVecAdd(d + 0x20, d + 0x20, &scratch.v.velocity);
         }
         if (D_L08_001B0140 != 0)
-            func_00282CC0(d, d, d + 0x20);
+            FastVecAdd(d, d, d + 0x20);
         if (func_L08_003CDB78(obj, &saved) == 0) {
             float sp = DF(0x54) + D_L08_001AFFFC * 0.00027777778f;
             float top = D_L08_001AFFF8 * 0.016666668f;
@@ -353,13 +353,13 @@ void func_L08_003CDF98(u8 *obj)
                 DF(0x54) = top;
             rate = D_L08_001B0000 * 0.00029088825f;
             if (DI(0x50) < D_L08_001AFFDC - D_L08_001AFFE4 && D_L08_001B0140 != 0)
-                DF(0x14) = func_00283BE0(DF(0x14), rate);
+                DF(0x14) = fast_subtract_rotations(DF(0x14), rate);
             if (DF(0x14) < 0.0f)
                 DF(0x14) = 0.0f;
             if (func_00282948(d + 0x50) != 0) {
                 if (OB(0x43) != 2)
                     func_002A7470(obj, 2, 0, 0xA);
-                func_L00_002D2168(0x82, 0, 15.0f);
+                set_hero_animation(0x82, 0, 15.0f);
                 DF(0x40) = 0.0f;
                 DF(0x48) = 0.0f;
                 DF(0x44) = -(D_L08_001B0000 * 0.00029088825f);
@@ -383,28 +383,28 @@ void func_L08_003CDF98(u8 *obj)
         t = DF(0x5C);
         if (t < -0.4f) {
             if (*(u8 *)(D_00189E20.unk2290 + 0x42) != 0x85 && *(u8 *)(D_00189E20.unk2290 + 0x43) != 0x85) {
-                func_L00_002D2168(0x85, 0, 15.0f);
+                set_hero_animation(0x85, 0, 15.0f);
                 func_002E5DA0(2, 0, obj, 0x988);
             }
         } else if (t > 0.4f) {
             if (*(u8 *)(D_00189E20.unk2290 + 0x42) != 0x86 && *(u8 *)(D_00189E20.unk2290 + 0x43) != 0x86) {
-                func_L00_002D2168(0x86, 0, 15.0f);
+                set_hero_animation(0x86, 0, 15.0f);
                 func_002E5DA0(2, 0, obj, 0x988);
             }
         } else {
             if (D_L08_001B0070 * 0.000041555468f < DF(0x44)) {
                 if (*(u8 *)(D_00189E20.unk2290 + 0x42) != 0x83 && *(u8 *)(D_00189E20.unk2290 + 0x43) != 0x83)
-                    func_L00_002D2168(0x83, 0, 25.0f);
+                    set_hero_animation(0x83, 0, 25.0f);
             } else if (DF(0x44) < -D_L08_001B0070 * 0.000041555468f) {
                 if (*(u8 *)(D_00189E20.unk2290 + 0x42) != 0x81 && *(u8 *)(D_00189E20.unk2290 + 0x43) != 0x81) {
-                    func_L00_002D2168(0x81, 0, 25.0f);
+                    set_hero_animation(0x81, 0, 25.0f);
                     if (DI(0xB0) == 0) {
                         func_002E5DA0(3, 0, obj, 0x988);
                         DI(0xB0) = 0x2D;
                     }
                 }
             } else if (*(u8 *)(D_00189E20.unk2290 + 0x42) != 0x82 && *(u8 *)(D_00189E20.unk2290 + 0x43) != 0x82) {
-                func_L00_002D2168(0x82, 0, 20.0f);
+                set_hero_animation(0x82, 0, 20.0f);
             }
         }
         {
@@ -440,27 +440,27 @@ void func_L08_003CDF98(u8 *obj)
             if (w > 1.0f)
                 DF(0x64) = 1.0f;
             func_002AF000(&scratch.v.velocity, DF(0x54), DF(0x18), -DF(0x14));
-            func_00282D30(d + 0x20, d + 0x20, 1.0f - DF(0x64));
-            func_00282D30(&scratch.v.velocity, &scratch.v.velocity, DF(0x64));
-            func_00282CC0(d + 0x20, d + 0x20, &scratch.v.velocity);
+            FastVecScale(d + 0x20, d + 0x20, 1.0f - DF(0x64));
+            FastVecScale(&scratch.v.velocity, &scratch.v.velocity, DF(0x64));
+            FastVecAdd(d + 0x20, d + 0x20, &scratch.v.velocity);
         } else {
             func_002AF000(d + 0x20, DF(0x54), DF(0x18), -DF(0x14));
         }
         if (D_L08_001B0140 != 0)
-            func_00282CC0(d, d, d + 0x20);
+            FastVecAdd(d, d, d + 0x20);
         D_L08_001B99C0.f[0x3C8 / 4] = D_L08_001B99C0.f[0x3C8 / 4]
             + (((DF(0x28) * D_L08_001B007C) - D_L08_001B99C0.f[0x3C8 / 4]) * 0.5f);
         if (D_L08_001B000C < DF(8) - DF(0x58)) {
             float ang, lim;
             if (OB(0x43) != 2)
                 func_002A7470(obj, 2, 0, 3);
-            func_L00_002D2168(0x84, 0, 15.0f);
+            set_hero_animation(0x84, 0, 15.0f);
             ang = DF(0x14);
             lim = D_L08_001B008C * 0.017453294f;
             DI(0x60) = 0;
             DI(0x50) = D_L08_001B0084;
             if (lim < ang)
-                DF(0x68) = func_00283BE0(lim, ang) / func_00283CE0(D_L08_001B0084);
+                DF(0x68) = fast_subtract_rotations(lim, ang) / IntToFloat(D_L08_001B0084);
             else
                 DF(0x68) = 0.0f;
             func_002A7750(obj, 7, -1);
@@ -478,15 +478,15 @@ void func_L08_003CDF98(u8 *obj)
             func_002A7750(obj, 8, -1);
         }
         DF(0x28) = DF(0x28) + (-D_L08_001B0088 * 0.00027777778f);
-        func_00282CC0(d, d, d + 0x20);
-        DF(0x54) = func_00282DF0(d + 0x20);
-        t = func_00283CE0(DI(0x50)) / func_00283CE0(D_L08_001B0084);
+        FastVecAdd(d, d, d + 0x20);
+        DF(0x54) = FastVecLength(d + 0x20);
+        t = IntToFloat(DI(0x50)) / IntToFloat(D_L08_001B0084);
         if (t > 1.0f)
             t = 1.0f;
         else if (t < 0.0f)
             t = 0.0f;
         if (D_L08_001B0140 != 0)
-            DF(0x14) = func_00283B98(DF(0x14), DF(0x68));
+            DF(0x14) = FastAddRotations(DF(0x14), DF(0x68));
         func_L08_003CD708(obj, d, 1.0f);
         func_L08_003CDB78(obj, &saved);
         func_L08_003CD648(obj, d);
@@ -495,7 +495,7 @@ void func_L08_003CDF98(u8 *obj)
     case 8: {
         func_L08_003CD488(d + 0xA8, obj);
         if (D_L08_001B0094 * 0.017453294f < DF(0x14) && DF(8) - DF(0x58) < D_L08_001B000C) {
-            func_L00_002D2168(0x82, 0, 15.0f);
+            set_hero_animation(0x82, 0, 15.0f);
             if (OB(0x43) != 2)
                 func_002A7470(obj, 2, 0, 0xA);
             DF(0x64) = 0.0f;
@@ -505,8 +505,8 @@ void func_L08_003CDF98(u8 *obj)
         }
         DF(0x28) = DF(0x28) + (-D_L08_001B0088 * 0.00027777778f);
         if (D_L08_001B0140 != 0)
-            func_00282CC0(d, d, d + 0x20);
-        DF(0x54) = func_00282DF0(d + 0x20);
+            FastVecAdd(d, d, d + 0x20);
+        DF(0x54) = FastVecLength(d + 0x20);
         func_L08_003CD708(obj, d, 1.0f);
         func_L08_003CD648(obj, d);
         func_L08_003CDB78(obj, &saved);
@@ -525,15 +525,15 @@ void func_L08_003CDF98(u8 *obj)
             DI(0xB0) = 0xF;
         }
         if (D_L08_001B0140 != 0)
-            DF(0x18) = func_00283B98(DF(0x18), D_L08_001B0098 * 0.00029088825f);
+            DF(0x18) = FastAddRotations(DF(0x18), D_L08_001B0098 * 0.00029088825f);
         DF(0x28) = DF(0x28) + (-D_L08_001B009C * 0.00027777778f);
         if (D_L08_001B0140 != 0)
-            func_00282CC0(d, d, d + 0x20);
+            FastVecAdd(d, d, d + 0x20);
         func_L08_003CD648(obj, d);
         func_L08_003CDB78(obj, &saved);
-        if (DF(0x28) > 0.0f || DF(8) < 12.0f || func_00282DF0(d + 0x20) < 0.016666668f
+        if (DF(0x28) > 0.0f || DF(8) < 12.0f || FastVecLength(d + 0x20) < 0.016666668f
             || D_L08_001B0130 < (s32)OH(0x96)) {
-            func_002ABBB8(obj, D_L08_001A8F20, 0, 0.0f, 0.0f, 0xA, 3, 0x10, 4.0f, 2.0f, 9.0f, 1.0f,
+            SpawnExplosionEffects(obj, D_L08_001A8F20, 0, 0.0f, 0.0f, 0xA, 3, 0x10, 4.0f, 2.0f, 9.0f, 1.0f,
                           -1, 15.0f, 1, 1, -1, 0, 0x810001);
             D_0018B650[0] = 0;
             func_L00_002B30E8();
@@ -548,11 +548,11 @@ void func_L08_003CDF98(u8 *obj)
                 func_002E59F8(DI(0xAC));
         }
         DI(0xAC) = -1;
-        dist = func_00282E48(d, d + 0x80);
+        dist = fast_vec_dist(d, d + 0x80);
         lim = DF(0x94) < dist ? DF(0x94) : dist;
         if (D_L08_001B0140 != 0) {
-            func_002AA800(d + 0x14, 0, 0.0f, D_L08_001B0138 * 0.00029088825f);
-            func_002AA800(d + 0x10, 0, 0.0f, D_L08_001B0138 * 0.00029088825f);
+            StepAngleTowardTarget(d + 0x14, 0, 0.0f, D_L08_001B0138 * 0.00029088825f);
+            StepAngleTowardTarget(d + 0x10, 0, 0.0f, D_L08_001B0138 * 0.00029088825f);
         }
         if ((OB(0x60) & 2) && OB(0x42) == 3) {
             if (OB(0x43) != 0)
@@ -561,12 +561,12 @@ void func_L08_003CDF98(u8 *obj)
             OH(0x34) = OH(0x34) | 1;
         }
         if (lim < dist) {
-            func_00282CF0(&scratch.v.velocity, d + 0x80, d);
-            func_00282F20(&scratch.v.velocity, &scratch.v.velocity, lim * D_L08_001B0128);
-            func_00282D30(d + 0x20, d + 0x20, D_L08_001B0124);
-            func_00282CC0(d + 0x20, d + 0x20, &scratch.v.velocity);
+            FastVecSub(&scratch.v.velocity, d + 0x80, d);
+            vec_scale_to_length(&scratch.v.velocity, &scratch.v.velocity, lim * D_L08_001B0128);
+            FastVecScale(d + 0x20, d + 0x20, D_L08_001B0124);
+            FastVecAdd(d + 0x20, d + 0x20, &scratch.v.velocity);
             if (D_L08_001B0140 != 0)
-                func_00282CC0(d, d, d + 0x20);
+                FastVecAdd(d, d, d + 0x20);
             func_L08_003CD648(obj, d);
             break;
         }
@@ -586,7 +586,7 @@ void func_L08_003CDF98(u8 *obj)
                 func_L08_003CDB38(obj);
             }
             if (DI(0xC4) != -1) {
-                func_0026FEB8(D_L08_001B0180);
+                STUB_printf(D_L08_001B0180);
                 func_L01_00323310(DI(0xC4), DI(0xC0));
             }
             func_002A7750(obj, 1, -1);
@@ -605,21 +605,21 @@ void func_L08_003CDF98(u8 *obj)
         if (DF(8) > 1013.0f) DF(8) = 1013.0f;
         if ((u32)(OB(0x20) - 5) < 5) {
             if (OB(0x31) != 0) {
-                if (func_00282E48(obj + 0x10, D_L08_001B9B00) < 80.0f) {
+                if (fast_vec_dist(obj + 0x10, D_L08_001B9B00) < 80.0f) {
                     func_002A93B0(obj);
                     OB(0x6F) = 0x4B;
                 }
             }
-            func_00282D30(&scratch.v.velocity, d + 0x20, 0.25f);
+            FastVecScale(&scratch.v.velocity, d + 0x20, 0.25f);
             for (n = 0; n < 7; n++) {
                 func_0029FCC0(obj, n, &scratch.v.joint);
                 for (f = 0.0f; f < 1.0f; f += 0.2f) {
-                    func_00282D30(&scratch.v.point, d + 0x20, -f);
-                    func_00282CC0(&scratch.v.point, &scratch.v.point, &scratch.v.joint);
+                    FastVecScale(&scratch.v.point, d + 0x20, -f);
+                    FastVecAdd(&scratch.v.point, &scratch.v.point, &scratch.v.joint);
                     t = 0.0f;
                     if (OB(0x20) >= 7)
                         t = 0.07f;
-                    p = func_002BDCE8(&scratch.v.point, 2, &scratch.v.velocity, t, 0.5f, 0x0E7F7F7F, 0, 1.01f,
+                    p = SpawnSpinningSparkParticle(&scratch.v.point, 2, &scratch.v.velocity, t, 0.5f, 0x0E7F7F7F, 0, 1.01f,
                                       func_002A7878(24000.0f, 35000.0f));
                     if (p != 0)
                         p[8] = func_001163B0();
@@ -627,15 +627,15 @@ void func_L08_003CDF98(u8 *obj)
             }
             slot = (s32 *)(d + 0x70);
             for (i = 0; i < 4; i++) {
-                if (slot[i] != 0xFF && func_002ACBC8(d, slot[i]) != 0
+                if (slot[i] != 0xFF && IsPointInCuboid(d, slot[i]) != 0
                     && *(float *)(D_L08_001B2ACC[slot[i]].bytes + 0x38) < D_00189E20.pos[2]) {
                     if (OB(0x43) != 3)
                         func_002A7470(obj, 3, 0, 3);
-                    func_L00_002D2168(0x88, 0, 15.0f);
+                    set_hero_animation(0x88, 0, 15.0f);
                     qcopy(d + 0x80, D_L08_001B2ACC[slot[i]].bytes + 0x30);
-                    DF(0x90) = func_00282E48(D_00189E20.pos, d + 0x80);
+                    DF(0x90) = fast_vec_dist(D_00189E20.pos, d + 0x80);
                     {
-                        float m = func_00282DF0(d + 0x20) > 0.06666667f ? func_00282DF0(d + 0x20) : 0.06666667f;
+                        float m = FastVecLength(d + 0x20) > 0.06666667f ? FastVecLength(d + 0x20) : 0.06666667f;
                         DF(0x94) = m;
                     }
                     D_00189E20.unkC20 = D_L08_001B013C / (DF(0x90) / DF(0x94));
@@ -648,7 +648,7 @@ void func_L08_003CDF98(u8 *obj)
             slot = (s32 *)(d + 0xA0);
             for (j = 0; j < 2; j++) {
                 if (slot[j] != 0 && slot[j] != 0xFF && (((DI(0xB4) >> j) ^ 1) & 1)
-                    && func_002ACBC8(d, slot[j]) != 0 && OB(0x20) != 9) {
+                    && IsPointInCuboid(d, slot[j]) != 0 && OB(0x20) != 9) {
                     func_002E5DA0(5, 0, obj, 0x988);
                     DI(0xB4) = DI(0xB4) | (1 << j);
                 }

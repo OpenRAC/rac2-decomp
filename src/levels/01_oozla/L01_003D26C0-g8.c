@@ -23,23 +23,23 @@ void func_L01_003D26C0(u8 *self)
     qcopy(state + 0x60, self + 0x10);
     tbl = D_L01_001FE180[*(s32 *)(state + 0x74)];
     *(s32 *)(state + 0x78) =
-        func_L01_00337888(self, tbl, self + 0x10, *(s32 *)(state + 0x78), 1,
+        AdvancePointAlongPolyline(self, tbl, self + 0x10, *(s32 *)(state + 0x78), 1,
                           *(f32 *)(os + 0x20) * 0.016666668f);
     if (*(f32 *)(self + 0x18) < *(f32 *)(state + 0x68)) {
         if (!(*(u16 *)(state + 0x7C) & 0x80)) {
-            func_002E5CF8(1, 0, self);
+            PlayMobySound(1, 0, self);
             *(u16 *)(state + 0x7C) = *(u16 *)(state + 0x7C) | 0x80;
         }
         D_L01_001B255C[(*(s32 *)(*(u8 **)(*(u8 **)(state + 0x70) + 0x68) + 0xC) << 8) + 0xBC] = 1;
     }
     link = D_00188660 + *(s16 *)(state + 0x7E) * 0x70;
     if (*(u8 **)(link + 0x88) != self || link[0x74] == 0)
-        *(s16 *)(state + 0x7E) = func_002E5CF8(0, 4, self);
+        *(s16 *)(state + 0x7E) = PlayMobySound(0, 4, self);
     if (*(s32 *)(state + 0x78) == *(s32 *)tbl - 1) {
         D_L01_001B255C[(*(s32 *)(*(u8 **)(*(u8 **)(state + 0x70) + 0x68) + 0xC) << 8) + 0xBC] = 0;
         func_0029F338(self);
     } else {
-        func_00282CF0(tmp, self + 0x10, state + 0x60);
+        FastVecSub(tmp, self + 0x10, state + 0x60);
         func_002AD6F0(state + 0x20, tmp, self + 0xF0, self + 0xF0);
         qcopy(state + 0x60, self + 0x10);
     }

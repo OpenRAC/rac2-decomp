@@ -45,6 +45,6 @@ void func_L20_004395B0(char *arg0) {
                           D_L20_001B1E10, *(s32 *)(state + 0xE0));
         break;
     }
-    func_00282CF0(&out, arg0 + 0x10, &pos);
+    FastVecSub(&out, arg0 + 0x10, &pos);
     func_002AD6F0(state + 0xA0, (char *)&out, (char *)&rot, arg0 + 0xF0);
 }

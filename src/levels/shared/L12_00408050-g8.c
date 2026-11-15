@@ -19,7 +19,7 @@ u8 *func_L12_00408050(u8 *owner, TI128 *velocity, TI128 *position, float speed)
     u8 *state;
     u8 *pos;
     float scale;
-    obj = func_0029EFD0(0xEA5);
+    obj = CreateMoby(0xEA5);
     if (obj) {
         obj[0x30] = 255;
         *(u16 *)(obj + 0x32) = 255;
@@ -35,7 +35,7 @@ u8 *func_L12_00408050(u8 *owner, TI128 *velocity, TI128 *position, float speed)
         *(u8 **)(state + 0x10) = owner;
         *(u16 *)(obj + 0x34) |= 0x208;
         qcopy(obj + 0xF0, owner + 0xF0);
-        func_002833F0(obj + 0xC0, obj + 0xF0);
+        euler_rotation_basis(obj + 0xC0, obj + 0xF0);
         obj[0x23] = 128;
         *(float *)(obj + 0x2C) = D_L12_001B15B0;
         *(u16 *)(obj + 0x34) |= 0x100;

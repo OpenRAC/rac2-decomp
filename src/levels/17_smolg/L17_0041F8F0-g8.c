@@ -21,7 +21,7 @@ void func_L17_0041F8F0(u8 *self) {
     u8 mode;
 
     self[0x30] = 0xFF;
-    if (func_002ACBC8(D_00189EA0, state[0]) != 0) {
+    if (IsPointInCuboid(D_00189EA0, state[0]) != 0) {
         D_L17_001B27CC[0] = 2;
         D_L17_001B2868_gp = 55.0f;
     } else if (D_L17_001B27CC[0] == 2) {
@@ -31,7 +31,7 @@ void func_L17_0041F8F0(u8 *self) {
     mode = self[0x20];
     switch (mode) {
     case 0:
-        if (func_002ACBC8(D_00189EA0, state[1]) != 0) {
+        if (IsPointInCuboid(D_00189EA0, state[1]) != 0) {
             func_002A7750(self, 1, -1);
         } else {
             func_002A7750(self, 2, -1);
@@ -43,7 +43,7 @@ void func_L17_0041F8F0(u8 *self) {
             D_001395B8[0x85] = 1;
             D_L17_001B2868[0] = 75.0f;
         }
-        if (func_002ACBC8(D_00189EA0, state[1]) == 0) {
+        if (IsPointInCuboid(D_00189EA0, state[1]) == 0) {
             func_002A7750(self, 2, -1);
         }
         break;
@@ -51,7 +51,7 @@ void func_L17_0041F8F0(u8 *self) {
         if (func_002B3868(self) != 0) {
             func_L01_00323310(state[6], state[5]);
         }
-        if (func_002ACBC8(D_00189EA0, state[1]) != 0) {
+        if (IsPointInCuboid(D_00189EA0, state[1]) != 0) {
             func_002A7750(self, 1, -1);
         }
         break;

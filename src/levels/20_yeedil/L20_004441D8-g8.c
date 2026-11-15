@@ -81,7 +81,7 @@ void func_L20_004441D8(char *self) {
     int d;
     float sample;
 
-    func_002E5CF8(17, 0, self);
+    PlayMobySound(17, 0, self);
     {
         unsigned short *list = D_L20_001A9014[s->groups[s->groupIndex]];
 
@@ -203,12 +203,12 @@ objectsDone:
             func_00282C90(&pos);
             pos.f[0] = func_002A7878(-1.0f, 1.0f);
             pos.f[1] = func_002A7878(-1.0f, 1.0f);
-            func_002830C0(&pos, &pos, D_L20_001B308C + s->matrixIndex * 128);
+            transform_vector(&pos, &pos, D_L20_001B308C + s->matrixIndex * 128);
             pos.f[2] = height + func_002A7878(-0.5f, 0.5f);
             sample = func_002A7878(0.0f, 1.0f);
-            a = func_00283D38(D_L20_001B2210_gp, D_L20_001B2210[1], sample);
+            a = FastTweenColor(D_L20_001B2210_gp, D_L20_001B2210[1], sample);
             sample = func_002A7878(0.0f, 1.0f);
-            b = func_00283D38(D_L20_001B2210[2], D_L20_001B2210[3], sample);
+            b = FastTweenColor(D_L20_001B2210[2], D_L20_001B2210[3], sample);
             scale = D_L20_001B2220[func_002A77E0(2)];
             func_00282C88(&vel);
             vel.f[3] = scale;
@@ -227,7 +227,7 @@ objectsDone:
             func_00282C90(&pos);
             pos.f[0] = func_002A7878(-1.0f, 1.0f);
             pos.f[1] = func_002A7878(-1.0f, 1.0f);
-            func_002830C0(&pos, &pos, D_L20_001B308C + s->matrixIndex * 128);
+            transform_vector(&pos, &pos, D_L20_001B308C + s->matrixIndex * 128);
             pos.f[2] = height + func_002A7878(-0.5f, 0.5f);
             qzero_nc(&vel);
             vel.f[2] = func_002A7940();

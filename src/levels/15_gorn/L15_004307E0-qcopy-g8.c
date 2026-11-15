@@ -7,7 +7,7 @@
    absolutely (MACRO_ADDR), D_L15_00221E3C is NOT_SDA, and the basis w components are one
    chained `= 0.0f` in the order 0, 1, 2 (retail stores a float zero with swc1).
 
-   func_0029B3E0 returns int, as its definition in src/game/0029AE78-save-g8.c does and as
+   MemcardSave returns int, as its definition in src/game/0029AE78-save-g8.c does and as
    L00_002FC7A8-launch.c tests. With the value-returning call, local-alloc gives the counter
    decrement after it retail's registers (the table pointer in $v0, the counter in $v1); a
    void declaration swaps them. */
@@ -71,7 +71,7 @@ void func_L15_004307E0(u8 *self)
 
         D_L15_00221E3C = 0;
         D_L15_001B1534 = 1;
-        func_002B7320();
+        music_Unpause();
         func_L05_0037B210();
         func_L05_00379F18(0);
         *(int *)(vars + 0x6C) = 30;
@@ -98,27 +98,27 @@ void func_L15_004307E0(u8 *self)
         obj = D_L15_001B261C + (*(int *)(vars + 0x20) << 8);
         pos = obj + 0x10;
         qcopy(camera_pos, pos);
-        func_00282F20(step, obj + 0xC0, 196.0f);
+        vec_scale_to_length(step, obj + 0xC0, 196.0f);
         dist = 25.0f;
-        func_00282CC0(ahead, pos, step);
-        if (func_002761F8(pos, ahead, 0, obj, 0) != 0) {
+        FastVecAdd(ahead, pos, step);
+        if (CollLine(pos, ahead, 0, obj, 0) != 0) {
             Hit *hit = &D_L15_001BFC00;
 
             if (hit->target != 0 && *(short *)(hit->target + 0xAA) == 0x1211)
-                dist = func_00282E48(hit->pos, pos);
+                dist = fast_vec_dist(hit->pos, pos);
         }
         if (dist < 16.0f)
             dist = -32.0f;
         else
             dist = dist * 0.5f;
-        func_00282F20(step, obj + 0xC0, dist);
-        func_00282CC0(camera_pos, camera_pos, step);
+        vec_scale_to_length(step, obj + 0xC0, dist);
+        FastVecAdd(camera_pos, camera_pos, step);
         D_L15_001B1550[2] -= 16.0f;
         up.q = 0;
         up.f[2] = 1.0f;
         qcopy(basis[0], obj + 0xC0);
         qcopy(basis[2], up.f);
-        func_00282DD8(basis[1], basis[0], basis[2]);
+        FastVecCross(basis[1], basis[0], basis[2]);
         basis[0][3] = basis[1][3] = basis[2][3] = 0.0f;
         func_002AB6D8(basis, D_L15_001B1540);
         func_L05_00442828(camera_pos, D_L15_001B1540, 300);
@@ -130,7 +130,7 @@ void func_L15_004307E0(u8 *self)
         *(int *)(vars + 0x6C) = 10;
         D_L15_001B1520++;
         func_L15_00432008();
-        func_0029B3E0(0, -1);
+        MemcardSave(0, -1);
         D_L15_001B1520--;
         func_L00_003294F0(D_L15_001B261C + (*(int *)(vars + 0x28) << 8), 1);
         D_L15_001B15AC = 0;

@@ -38,9 +38,9 @@ void func_L05_00445D60(unsigned char *object)
     int i, j;
     u64 blend;
     if (D_001A79F0 == 20)
-        packet.texture = func_0027C878(65);
+        packet.texture = GetEffectTextureDescriptor(65);
     else
-        packet.texture = func_0027C878(63);
+        packet.texture = GetEffectTextureDescriptor(63);
     packet.tag = 0xFF9000000260ULL;
     blend = (u64)D_L05_001B1C80;
     blend |= (u64)D_L05_001B1C84 << 2;
@@ -51,19 +51,19 @@ void func_L05_00445D60(unsigned char *object)
     packet.colors[0] = packet.colors[1] = packet.colors[2] = packet.colors[3] = D_L05_001B1C94;
     packet.primitive = 0;
     qcopy(matrix[3], state + 0x20);
-    func_00282CF0(matrix[0], D_L05_001B96C0, matrix[3]);
-    func_00282F20(matrix[0], matrix[0], 1.0f);
-    func_00282DD8(matrix[1], matrix[0], D_L05_001B96C0 + 0x250);
-    func_00282F20(matrix[1], matrix[1], 1.0f);
-    func_00282DD8(matrix[2], matrix[1], matrix[0]);
+    FastVecSub(matrix[0], D_L05_001B96C0, matrix[3]);
+    vec_scale_to_length(matrix[0], matrix[0], 1.0f);
+    FastVecCross(matrix[1], matrix[0], D_L05_001B96C0 + 0x250);
+    vec_scale_to_length(matrix[1], matrix[1], 1.0f);
+    FastVecCross(matrix[2], matrix[1], matrix[0]);
     for (i = 0; i < 4; i++) {
         for (j = 0; j < 4; j++) {
             int vertex = indices_gp[i][j].vertex;
             int texture = D_L05_001B1C40[i][j].texture;
-            func_00282D30(packet.points[j], D_L05_002B8850[vertex], D_L05_001B1C98);
+            FastVecScale(packet.points[j], D_L05_002B8850[vertex], D_L05_001B1C98);
             packet.uv[j][0] = D_L05_002B88E0[texture][0];
             packet.uv[j][1] = D_L05_002B88E0[texture][1];
         }
-        func_00280B90(&packet, matrix, 0);
+        draw_world_quad(&packet, matrix, 0);
     }
 }

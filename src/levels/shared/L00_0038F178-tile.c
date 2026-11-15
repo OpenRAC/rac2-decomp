@@ -20,9 +20,9 @@ void func_L00_003A09F8(void *actor) {
     float scale[2];
     float pos[2];
 
-    scale[0] = func_00283CE0(D_001A7340[2]);
-    scale[1] = func_00283CE0(D_001A7340[3]);
-    texture = func_0027C878(30);
+    scale[0] = IntToFloat(D_001A7340[2]);
+    scale[1] = IntToFloat(D_001A7340[3]);
+    texture = GetEffectTextureDescriptor(30);
     rows = D_001A7340[0] / 32 + 1;
     columns = D_001A7340[1] / 32 + 1;
     for (row = 0; row < rows; row++) {
@@ -31,15 +31,15 @@ void func_L00_003A09F8(void *actor) {
             pos[0] = (float)(row << 5);
             pos[1] = (float)(column << 5);
             phase = (float)*p;
-            tick = func_00283CE0(*(int *)(state + 0x140));
-            limit = func_00283CE0(90);
+            tick = IntToFloat(*(int *)(state + 0x140));
+            limit = IntToFloat(90);
             opacity = (tick * 127.5f) / limit;
-            color = (func_00283CF0(opacity) << 24) + 0x00FF7F7F;
+            color = (FloatToInt(opacity) << 24) + 0x00FF7F7F;
             u = func_002A77E0(32);
             v = func_002A77E0(32);
-            x = func_00283CF0(pos[0] - phase);
-            y = func_00283CF0(pos[1] - phase);
-            func_0027E018(x, y, 32, 32, u, v, 32, 32, color, texture);
+            x = FloatToInt(pos[0] - phase);
+            y = FloatToInt(pos[1] - phase);
+            DrawTexturedQuad(x, y, 32, 32, u, v, 32, 32, color, texture);
         }
     }
 }

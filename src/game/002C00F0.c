@@ -20,18 +20,18 @@ void func_002C00F0(Particle *p)
 {
     float *pl = p->payload;
     float a;
-    if (func_00282978(&p->size) != 0) goto kill;
+    if (FastDecTimer(&p->size) != 0) goto kill;
     p->life += pl[4];
     p->seed++;
     a = pl[5] - 0.01f;
     pl[5] = a > 0.0f ? a : 0.0f;
     p->color &= 0xFFFFFF;
-    p->color |= func_00283CF0(pl[5] * 255.0f) << 24;
+    p->color |= FloatToInt(pl[5] * 255.0f) << 24;
     if (pl[5] <= 0.0f) {
 kill:
         func_002B9180(p);
     } else {
-        func_00282CC0(p->position, p->position, pl);
-        func_00282D30(pl, pl, 0.98f);
+        FastVecAdd(p->position, p->position, pl);
+        FastVecScale(pl, pl, 0.98f);
     }
 }

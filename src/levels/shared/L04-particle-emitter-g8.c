@@ -46,11 +46,11 @@ void func_L04_003C3BA0(char *self) {
     case 0:
         EB(self,0x20)=1; EB(self,0x30)=255;
         if (((EmitterView *)state)->matrix==-1) { func_0029F338(self); return; }
-        ((EmitterView *)state)->radius=func_00282DF0(D_L04_001B25CC+((EmitterView *)state)->matrix*128+0x10);
-        r=func_00282DF0(D_L04_001B25CC+((EmitterView *)state)->matrix*128);
+        ((EmitterView *)state)->radius=FastVecLength(D_L04_001B25CC+((EmitterView *)state)->matrix*128+0x10);
+        r=FastVecLength(D_L04_001B25CC+((EmitterView *)state)->matrix*128);
         if (((EmitterView *)state)->radius<r) ((EmitterView *)state)->radius=r;
         EF(state,0x44)=EH(state,0x40) ? ((EmitterView *)state)->radius : 3.0f;
-        EF(state,0x50)=func_00282DF0(D_L04_001B25CC+((EmitterView *)state)->matrix*128+0x20)*0.5f;
+        EF(state,0x50)=FastVecLength(D_L04_001B25CC+((EmitterView *)state)->matrix*128+0x20)*0.5f;
         EH(state,0)=func_L04_003C70C8(EH(state,2)+EH(state,0x40));
         end=EH(state,0)+EH(state,2);
         for(i=EH(state,0);i<end;i++) {
@@ -75,12 +75,12 @@ void func_L04_003C3BA0(char *self) {
         qcopy(&bound,matrix+0x30);
         bound.f[2]+=9.0f; bound.f[3]=10.0f;
         if (func_00283DB8(&bound,D_L04_001AF3E0)<0) return;
-        if (EH(state,0x42) && func_00282E80(D_L04_001B9680,self+0x10)<128.0f) {
+        if (EH(state,0x42) && vec_distance_xy(D_L04_001B9680,self+0x10)<128.0f) {
             for(j=0;j<D_L04_001AF3BC;j++) {
                 velocity.f[0]=func_002A78D8(0.0f,1.0f);
                 velocity.f[1]=func_002A78D8(0.0f,1.0f);
                 velocity.f[2]=1.0f; velocity.f[3]=1.0f;
-                func_002830C0(&position,&velocity,matrix);
+                transform_vector(&position,&velocity,matrix);
                 position.f[2]+=0.5f;
                 velocity.f[0]=func_002A78D8(0.0f,0.004166667f);
                 velocity.f[1]=func_002A78D8(0.0f,0.004166667f);
@@ -88,7 +88,7 @@ void func_L04_003C3BA0(char *self) {
                 size=func_002A7878(EF(state,0x24),EF(state,0x28));
                 color=(func_002A7820(EH(state,0x2C),EH(state,0x2E))<<24)|D_L04_001AF3C8;
                 kind=func_002A7820(D_L04_001AF3C0,D_L04_001AF3C4);
-                particle=func_002BDCE8(D_L04_001AF3B4,&position,kind,1.0f,&velocity,D_L04_001AF3B8,color,size,0);
+                particle=SpawnSpinningSparkParticle(D_L04_001AF3B4,&position,kind,1.0f,&velocity,D_L04_001AF3B8,color,size,0);
                 if (particle) {
                     data=particle+0x20;
                     EH(particle,0xA)=func_002A7820(EI(state,0x30),EI(state,0x34));
@@ -97,7 +97,7 @@ void func_L04_003C3BA0(char *self) {
                 }
             }
         }
-        ref_L04_003C3BA0_00(func_L04_003C4050,self);
+        ref_L04_003C3BA0_00(DrawEmitterParticles,self);
         break;
     }
     }

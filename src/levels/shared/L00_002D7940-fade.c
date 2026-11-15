@@ -29,7 +29,7 @@ void func_L00_002E2C30(float progress, int item)
     float ratio, offset;
     float fade;
     float alpha;
-    if (!func_002798A0(item, &bank, &index))
+    if (!AdvanceGroupedTableOffset(item, &bank, &index))
         return;
     text = func_L00_002E36F8(D_L00_001BC588[bank].textBase + index);
     if (!text)
@@ -39,7 +39,7 @@ void func_L00_002E2C30(float progress, int item)
         fade = (progress - 1.0f + D_L00_001BC200.fade) / D_L00_001BC200.fade;
         if (fade > 1.0f) fade = 1.0f;
         else if (fade < 0.0f) fade = 0.0f;
-        func_L00_002E30B8((char *)text, fade, 3, -1, position, 1);
+        DrawSlidingTextLine((char *)text, fade, 3, -1, position, 1);
         for (i = D_L00_001BC200.repeats; i >= 0; i--) {
             int grey, lo, hi;
             offset = i * D_L00_001BC200.spacing;
@@ -51,13 +51,13 @@ void func_L00_002E2C30(float progress, int item)
             colour = hi | grey;
             if (alpha > 1.0f) alpha = 1.0f;
             else if (alpha < 0.0f) alpha = 0.0f;
-            func_L00_002E30B8((char *)text, alpha, 3, colour, position, 0);
+            DrawSlidingTextLine((char *)text, alpha, 3, colour, position, 0);
         }
     } else if (progress < D_L00_001BC200.fade) {
         fade = progress / D_L00_001BC200.fade;
         if (fade > 1.0f) fade = 1.0f;
         else if (fade < 0.0f) fade = 0.0f;
-        func_L00_002E30B8((char *)text, fade, 2, -1, position, 1);
+        DrawSlidingTextLine((char *)text, fade, 2, -1, position, 1);
         for (i = D_L00_001BC200.repeats; i >= 0; i--) {
             int grey, lo, hi;
             alpha = progress / D_L00_001BC200.fade - i * D_L00_001BC200.spacing;
@@ -68,16 +68,16 @@ void func_L00_002E2C30(float progress, int item)
             colour = hi | grey;
             if (alpha > 1.0f) alpha = 1.0f;
             else if (alpha < 0.0f) alpha = 0.0f;
-            func_L00_002E30B8((char *)text, alpha, 2, colour, position, 0);
+            DrawSlidingTextLine((char *)text, alpha, 2, colour, position, 0);
         }
     } else {
-        func_L00_002E30B8((char *)text, 1.0f, 0, -1, position, 1);
-        func_L00_002E30B8((char *)text, -2.2f, 1, 0x80000000, position - 2, 0);
-        func_L00_002E30B8((char *)text, 0.0f, 1, 0x80000000, position - 2, 0);
-        func_L00_002E30B8((char *)text, 2.2f, 1, 0x80000000, position - 2, 0);
-        func_L00_002E30B8((char *)text, -2.2f, 1, 0x80000000, position + 2, 0);
-        func_L00_002E30B8((char *)text, 0.0f, 1, 0x80000000, position + 2, 0);
-        func_L00_002E30B8((char *)text, 2.2f, 1, 0x80000000, position + 2, 0);
-        func_L00_002E30B8((char *)text, 1.0f, 0, -1, position, 0);
+        DrawSlidingTextLine((char *)text, 1.0f, 0, -1, position, 1);
+        DrawSlidingTextLine((char *)text, -2.2f, 1, 0x80000000, position - 2, 0);
+        DrawSlidingTextLine((char *)text, 0.0f, 1, 0x80000000, position - 2, 0);
+        DrawSlidingTextLine((char *)text, 2.2f, 1, 0x80000000, position - 2, 0);
+        DrawSlidingTextLine((char *)text, -2.2f, 1, 0x80000000, position + 2, 0);
+        DrawSlidingTextLine((char *)text, 0.0f, 1, 0x80000000, position + 2, 0);
+        DrawSlidingTextLine((char *)text, 2.2f, 1, 0x80000000, position + 2, 0);
+        DrawSlidingTextLine((char *)text, 1.0f, 0, -1, position, 0);
     }
 }

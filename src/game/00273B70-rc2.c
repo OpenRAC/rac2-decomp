@@ -63,7 +63,7 @@ case02:
     (*(s8 **)((s8 *)(s0) + (0x30))) = loc;
     s2 = func_00273D10(arg0);
     if (!((*(u8 *)((s8 *)(s0) + (0x5C))) == 0 && (D_001B1688 & 3) != 0)) {
-        s2 = (func_00282978(s0 + 0x34) != 0) ? 1 : s2;
+        s2 = (FastDecTimer(s0 + 0x34) != 0) ? 1 : s2;
     }
     (*(s8 **)((s8 *)(s0) + (0x30))) = 0;
     goto done;
@@ -78,7 +78,7 @@ case5:
 
 case13:
     s2 = func_00273E98(arg0);
-    s2 = (func_00282978(s0 + 0x34) != 0) ? 1 : s2;
+    s2 = (FastDecTimer(s0 + 0x34) != 0) ? 1 : s2;
     goto done;
 
 done:

@@ -22,9 +22,9 @@ void func_L17_003A4740(char *self) {
     int color;
     int t0, t1;
 
-    fv[0] = func_00283CE0(D_001A7340[2]);
-    fv[1] = func_00283CE0(D_001A7340[3]);
-    packet = func_0027C878(0x1E);
+    fv[0] = IntToFloat(D_001A7340[2]);
+    fv[1] = IntToFloat(D_001A7340[3]);
+    packet = GetEffectTextureDescriptor(0x1E);
     nx = D_001A7340[0] / 32 + 1;
     ny = D_001A7340[1] / 32 + 1;
 
@@ -34,12 +34,12 @@ void func_L17_003A4740(char *self) {
             pv[0] = (float)(i * 32);
             pv[1] = (float)(j * 32);
             base = (float)*p;
-            a = func_00283CE0(*(int *)(data + 0x140));
-            b = func_00283CE0(0x5A);
-            color = (func_00283CF0(a * 127.5f / b) << 24) + 0xFF7F7F;
+            a = IntToFloat(*(int *)(data + 0x140));
+            b = IntToFloat(0x5A);
+            color = (FloatToInt(a * 127.5f / b) << 24) + 0xFF7F7F;
             t0 = func_002A77E0(0x20);
             t1 = func_002A77E0(0x20);
-            func_0027E018(func_00283CF0(pv[0] - base), func_00283CF0(pv[1] - base), 0x20, 0x20, t0, t1, 0x20, 0x20, color, packet);
+            DrawTexturedQuad(FloatToInt(pv[0] - base), FloatToInt(pv[1] - base), 0x20, 0x20, t0, t1, 0x20, 0x20, color, packet);
         }
     }
 }

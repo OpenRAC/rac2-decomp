@@ -34,7 +34,7 @@ void func_L18_003F53D8(u8 *object)
     }
     contact = *(u8 **)(state + 0x188);
     if (contact && *(s16 *)(contact + 0xAA) == 0xF59) {
-        func_002A6C58(object, 0, 1);
+        SetDeathBits(object, 0, 1);
         goto stop;
     }
     mode = object[0x20];

@@ -47,8 +47,8 @@ void func_L03_0041CA78(u8 *e) {
             *(short *)(s+0x24)=1;
         } else scale=D_L03_001B1BA0;
         *(float *)(e+0x2c)=*(float *)(*(u8 **)(e+0x24)+0x24)*scale;
-        s[0x48]=func_00283CF0(20);
-        s[0x4a]=func_00283CF0(6);
+        s[0x48]=FloatToInt(20);
+        s[0x4a]=FloatToInt(6);
         if(*(int *)(s+0x290)==-1) {
             func_0029F338(e);
             return;
@@ -91,13 +91,13 @@ void func_L03_0041CA78(u8 *e) {
         }
     }
     if(func_002B0ED8(e,s+0x140,0) && *(float *)(s+0x20)<=0) {
-        func_00283098(&a,D_L03_001B1BB0,e+0xc0);
-        func_00282CC0(&a,&a,e+0x10);
-        func_002E5CF8(2,0,e);
+        matrix_mul_vec3(&a,D_L03_001B1BB0,e+0xc0);
+        FastVecAdd(&a,&a,e+0x10);
+        PlayMobySound(2,0,e);
         func_002AC728(e,&a,-1,0.333f,0);
-        func_00282CF0(&b,e+0x10,D_00189EA0);
+        FastVecSub(&b,e+0x10,D_00189EA0);
         b.f[2]=0;
-        func_00282F20(&b,&b,0.10000001f);
+        vec_scale_to_length(&b,&b,0.10000001f);
         func_002B0A68(e,31,D_L03_001A8F20,3,6,3,6,255);
         if(*(int *)(D_00189EA0+0x2214)==49) {
             D_L03_001A9044++;
@@ -108,13 +108,13 @@ void func_L03_0041CA78(u8 *e) {
                 D_L03_001A903C=1;
             }
         }
-        func_002E5CF8(2,0,e);
+        PlayMobySound(2,0,e);
         func_L03_0041D0A8(e);
-        func_002A6C58(e,0,3);
+        SetDeathBits(e,0,3);
         func_0029F338(e);
         return;
     }
-    if(e[0x31] && func_00282E48(e+0x10,D_L03_001B9980)<24) {
+    if(e[0x31] && fast_vec_dist(e+0x10,D_L03_001B9980)<24) {
         func_002A93B0(e);
         e[0x6f]=22;
     }

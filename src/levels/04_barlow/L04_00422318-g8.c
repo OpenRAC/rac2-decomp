@@ -59,22 +59,22 @@ void func_L04_00422318(char *m)
         func_L00_00382CE8(m);
         break;
     case 1:
-        if (func_002ACBC8(D_00189EA0,I(p,0)) && !I(D_L04_00296748,0) && I(D_L04_00296748,0x24)==-1 && !D_0018C958[2519].count && !D_0018C360[115].count) {
+        if (IsPointInCuboid(D_00189EA0,I(p,0)) && !I(D_L04_00296748,0) && I(D_L04_00296748,0x24)==-1 && !D_0018C958[2519].count && !D_0018C360[115].count) {
             func_00288E18(0x9D7,0x2E); D_0018C958[46].count=65535;
         }
-        if (func_002ACBC8(D_00189EA0,I(p,0xC)) && !I(D_L04_00296748,0) && I(D_L04_00296748,0x24)==-1 && !D_001A7AFA) {
+        if (IsPointInCuboid(D_00189EA0,I(p,0xC)) && !I(D_L04_00296748,0) && I(D_L04_00296748,0x24)==-1 && !D_001A7AFA) {
             if (++I(p,0x10)>1200) { func_00288E18(0x9DE,0x35); I(p,0x10)=0; }
         }
-        if (func_002ACBC8(D_00189EA0,I(p,0x28)) && !I(D_L04_00296748,0) && I(D_L04_00296748,0x24)==-1 && D_001A7AFA && (I(D_00189EA0,0x2214)==0 || I(D_00189EA0,0x2214)==2) && (((D_001395B8.b[116]>>D_001A79F0)^1)&1)) {
+        if (IsPointInCuboid(D_00189EA0,I(p,0x28)) && !I(D_L04_00296748,0) && I(D_L04_00296748,0x24)==-1 && D_001A7AFA && (I(D_00189EA0,0x2214)==0 || I(D_00189EA0,0x2214)==2) && (((D_001395B8.b[116]>>D_001A79F0)^1)&1)) {
             now=D_001A7390; old=D_0018C958[35].maximum;
             if(now-old>300 || !old) func_00288E18(0x9CC,0x23);
             else if(old<now) D_0018C958[35].maximum=now;
         }
-        if(func_002ACBC8(D_00189EA0,I(p,0x40))) D_001395B8.b[116]|=BarlowLevelBit(D_001A79F0);
-        if(func_002ACBC8(D_00189EA0,I(p,8)) && !I(D_L04_00296748,0) && I(D_L04_00296748,0x24)==-1 && !D_001A7B05 && D_0018C958[49].levels>=0) func_00288E18(0x9DA,0x31);
-        if(D_00189E20.i[2215]==18 && !I(D_L04_00296748,0) && I(D_L04_00296748,0x24)==-1 && func_002ACBC8(D_00189E20.b+0x80,I(p,0x14))) {
+        if(IsPointInCuboid(D_00189EA0,I(p,0x40))) D_001395B8.b[116]|=BarlowLevelBit(D_001A79F0);
+        if(IsPointInCuboid(D_00189EA0,I(p,8)) && !I(D_L04_00296748,0) && I(D_L04_00296748,0x24)==-1 && !D_001A7B05 && D_0018C958[49].levels>=0) func_00288E18(0x9DA,0x31);
+        if(D_00189E20.i[2215]==18 && !I(D_L04_00296748,0) && I(D_L04_00296748,0x24)==-1 && IsPointInCuboid(D_00189E20.b+0x80,I(p,0x14))) {
                 ++I(p,0x18);
-                if(func_002ACBC8(D_00189E20.b+0x80,I(p,0x14)) && I(p,0x18)>240) {
+                if(IsPointInCuboid(D_00189E20.b+0x80,I(p,0x14)) && I(p,0x18)>240) {
                     now=D_001A7390; old=D_0018C958[50].maximum;
                     if(now-old>1080 || !old) func_00288E18(0x9DB,0x32);
                     else if(old<now) D_0018C958[50].maximum=now;
@@ -83,11 +83,11 @@ void func_L04_00422318(char *m)
             if(D_00189E20.i[2215]==17) D_0018C958[50].count=65535;
             else I(p,0x18)=0;
         }
-        if(!(D_001395B8.b[117]&16) && func_002ACBC8(D_00189EA0,I(p,0x44)) && *(short *)(D_00189EA0+0x247C) && (D_001A7390-D_0018C750[38].maximum>432000 || !D_0018C750[38].count)) {
+        if(!(D_001395B8.b[117]&16) && IsPointInCuboid(D_00189EA0,I(p,0x44)) && *(short *)(D_00189EA0+0x247C) && (D_001A7390-D_0018C750[38].maximum>432000 || !D_0018C750[38].count)) {
             D_001395B8.b[117]|=16; func_0028A180(0xA3C,0x93);
         }
-        if(func_002ACBC8(D_00189EA0,I(p,0x48)) && D_001A7390-D_0018C750[20].maximum>72000 && !(BarlowHintPlayed(&D_0018C958[32], D_001A79F0))) func_00288E18(0x9C9,0x20);
-        if(D_001A7AF8[0x27] && func_002ACBC8(D_00189EA0,I(p,0x2C))) {
+        if(IsPointInCuboid(D_00189EA0,I(p,0x48)) && D_001A7390-D_0018C750[20].maximum>72000 && !(BarlowHintPlayed(&D_0018C958[32], D_001A79F0))) func_00288E18(0x9C9,0x20);
+        if(D_001A7AF8[0x27] && IsPointInCuboid(D_00189EA0,I(p,0x2C))) {
             now=D_001A7390; old=D_0018C958[51].maximum;
             if(now-old>1080 || !old) func_00288E18(0x9DC,0x33);
             else if(old<now) D_0018C958[51].maximum=now;
@@ -98,7 +98,7 @@ void func_L04_00422318(char *m)
         }
         if(I(p,0x1C)!=-1 && D_001A7AF8[0x27]) {
             q=*(BarlowVendor **)(D_L04_001B24DC+(I(p,0x1C)<<8)+0x68);
-            if(func_002ACBC8(D_00189EA0,I(p,0x20))) {
+            if(IsPointInCuboid(D_00189EA0,I(p,0x20))) {
                 if(!q->active && !D_L04_001B0CFC) {
                     if(D_0018C958[52].count) {
                         old=D_0018C958[52].maximum;
@@ -115,7 +115,7 @@ void func_L04_00422318(char *m)
             if(q->active && D_L04_001B0D00) { D_L04_001B0CFC=1; D_0018C958[52].count=65535; }
             else if(!q->active) D_L04_001B0D00=1;
         }
-        if(func_002ACBC8(D_00189EA0,I(p,4)) && D_001A7390-D_0018C750[9].maximum>108000 && !(BarlowHintPlayed(&D_0018C958[12], D_001A79F0))) func_00288E18(0x9B5,12);
+        if(IsPointInCuboid(D_00189EA0,I(p,4)) && D_001A7390-D_0018C750[9].maximum>108000 && !(BarlowHintPlayed(&D_0018C958[12], D_001A79F0))) func_00288E18(0x9B5,12);
         break;
     }
     D_L04_001B9980.intensity=func_L04_00422A00(m);

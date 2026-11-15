@@ -41,7 +41,7 @@ void func_L02_00332EF0(Self_L02_00332EF0 *self, Ctl_L02_00332EF0 *ctl, void *tar
 
     changed = 0;
     func_L02_00333300(self, ctl);
-    dist = func_00282E48(self->pos, D_L02_001B3210);
+    dist = fast_vec_dist(self->pos, D_L02_001B3210);
     if (dist < ctl->f90 - ctl->f08) {
         changed = 1;
         ctl->flags94 |= 2;
@@ -62,7 +62,7 @@ void func_L02_00332EF0(Self_L02_00332EF0 *self, Ctl_L02_00332EF0 *ctl, void *tar
     if (changed) {
         *(Quad_L02_00332EF0 *)position = *(Quad_L02_00332EF0 *)newpos;
         func_L02_00333300(self, ctl);
-        dist = func_00282E48(position, D_L02_001B3210);
+        dist = fast_vec_dist(position, D_L02_001B3210);
     }
     if (dist <= ctl->f90 + 0.005f) {
         func_002AFF38(self, ctl->vA0, 0);
@@ -74,7 +74,7 @@ void func_L02_00332EF0(Self_L02_00332EF0 *self, Ctl_L02_00332EF0 *ctl, void *tar
         ctl->hC0 = 0;
         ctl->hC2++;
     }
-    near = func_00282E48(position, target);
+    near = fast_vec_dist(position, target);
     ctl->fCC = near;
     if (near <= ctl->f34)
         ctl->flags94 |= 0x80;

@@ -133,15 +133,15 @@ void func_L00_002D24E8(void)
         s32 event;
         s32 i;
         s32 *events;
-        upper = obj->frame * 16 + func_00283CF0(obj->time * 16.0f);
-        lower = oldFrame * 16 + func_00283CF0(oldTime * 16.0f);
+        upper = obj->frame * 16 + FloatToInt(obj->time * 16.0f);
+        lower = oldFrame * 16 + FloatToInt(oldTime * 16.0f);
         sequence = obj->model->seqs[obj->seq];
         events = &sequence->frames[sequence->count];
         for (i = 0; i < sequence->triggers; i++, events++) {
             event = *events;
             frame = event >> 16;
             if (lower < frame && upper >= frame) {
-                func_002E5CF8(event & 0xFFFF, 0, (char *)obj);
+                PlayMobySound(event & 0xFFFF, 0, (char *)obj);
                 break;
             }
         }
@@ -155,7 +155,7 @@ void func_L00_002D24E8(void)
             obj->voice = 255;
         }
     } else if (obj->sound != 255) {
-        obj->voice = func_002E5CF8(obj->sound, 4, (char *)obj);
+        obj->voice = PlayMobySound(obj->sound, 4, (char *)obj);
     }
     func_L00_002D1ED8();
     func_L00_002D2070();

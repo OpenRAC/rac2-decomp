@@ -44,7 +44,7 @@ extern unsigned int strlen(const char *) __asm__("func_001157AC");
         fp->cursor += (len); \
     } else { \
         if (fp->status.word == 0) fp->status.fields.file = 1; \
-        func_00118BC0(fp->status.fields.file, (ptr), (len), 0); \
+        BufferedWrite128(fp->status.fields.file, (ptr), (len), 0); \
     } \
 }
 #define PAD(howmany, with) { \
@@ -89,7 +89,7 @@ int func_00118D98(void *data, PrintFile *fp, const char *fmt0, char *ap)
     ret = 0;
     for (;;) {
         cp = fmt;
-        while ((n = func_00115FC0(D_00133E74, &wc, fmt, D_00133B80, &state)) > 0) {
+        while ((n = MultibyteToWideCharReentrant(D_00133E74, &wc, fmt, D_00133B80, &state)) > 0) {
             fmt += n;
             if (wc == '%') {
                 fmt--;
@@ -322,6 +322,6 @@ int func_00118D98(void *data, PrintFile *fp, const char *fmt0, char *ap)
     }
  done:
     if (!((unsigned short)fp->status.fields.flags & 0x200))
-        func_00118BC0(fp->status.fields.file, 0, 0, 1);
+        BufferedWrite128(fp->status.fields.file, 0, 0, 1);
     return ret;
 }

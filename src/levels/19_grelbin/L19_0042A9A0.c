@@ -91,8 +91,8 @@ void func_L19_0042A9A0(u8 *object)
         break;
     }
     if (object[0x20]) {
-        if (object[0x43] == 1 && func_00282978(state+0x11e)) {
-            *(short *)(state+0x11e) = func_00283CF0(func_002A7878(1200.0f,2400.0f));
+        if (object[0x43] == 1 && FastDecTimer(state+0x11e)) {
+            *(short *)(state+0x11e) = FloatToInt(func_002A7878(1200.0f,2400.0f));
             if (object[0x43] != 2) func_002A7470(object,2,0,10);
         } else if (object[0x60] & 2) {
             if (object[0x43] != 1) func_002A7470(object,1,0,10);
@@ -102,11 +102,11 @@ void func_L19_0042A9A0(u8 *object)
     rate = 0.02f;
     if (object[0x43] == 1) {
         aiming = 1;
-        if (func_00282E80(object+0x10,&((Hero *)D_00189E20)->q[8]) < 8.0f &&
-            func_00283C80(*(float *)(object+0xf8),
+        if (vec_distance_xy(object+0x10,&((Hero *)D_00189E20)->q[8]) < 8.0f &&
+            FastDiffRots(*(float *)(object+0xf8),
                 func_00283248(((Hero *)D_00189E20)->f[0xe0 / 4]-*(float *)(object+0x10),
                              ((Hero *)D_00189E20)->f[0xe4 / 4]-*(float *)(object+0x14))) < 1.5707965f) {
-            if (func_00282DF0(&((Hero *)D_00189E20)->q[0x110 / 16])>0.01f) *(int *)(state+0x114)=120;
+            if (FastVecLength(&((Hero *)D_00189E20)->q[0x110 / 16])>0.01f) *(int *)(state+0x114)=120;
             else func_00282948(state+0x114);
         } else if (*(int *)(state+0x114)) {
             *(int *)(state+0x114)=0;
@@ -114,10 +114,10 @@ void func_L19_0042A9A0(u8 *object)
         }
         if (func_00282948(state+0x118)) {
             radians=0.017453294f;
-            *(int *)(state+0x118)=func_00283CF0(func_002A7878(180.0f,300.0f));
-            rotation=func_00283B98(*(float *)(object+0xf8),func_002A7878(-90.0f,90.0f)*radians);
+            *(int *)(state+0x118)=FloatToInt(func_002A7878(180.0f,300.0f));
+            rotation=FastAddRotations(*(float *)(object+0xf8),func_002A7878(-90.0f,90.0f)*radians);
             func_002AF000((float *)(state+0x100),6.0f,rotation,func_002A7878(0.0f,30.0f)*radians);
-            func_00282CC0(state+0x100,state+0x100,object+0x10);
+            FastVecAdd(state+0x100,state+0x100,object+0x10);
         }
         if (*(int *)(state+0x114)) {
             qcopy(&target, &((Hero *)D_00189E20)->q[0xe0 / 16]);
@@ -127,9 +127,9 @@ void func_L19_0042A9A0(u8 *object)
     if (aiming) {
         qcopy(&origin, object+0x10);
         origin.f[2]+=2.0f;
-        func_00282CF0(&direction,&target,&origin);
-        yaw=func_00283BE0(func_00283248(direction.f[0],direction.f[1]),*(float *)(object+0xf8));
-        pitch=-func_00283248(func_00282E20(&direction),direction.f[2]);
+        FastVecSub(&direction,&target,&origin);
+        yaw=fast_subtract_rotations(func_00283248(direction.f[0],direction.f[1]),*(float *)(object+0xf8));
+        pitch=-func_00283248(vec_length_xy(&direction),direction.f[2]);
         if (yaw>1.5707965f) yaw=1.5707965f;
         else if (yaw< -1.5707965f) yaw= -1.5707965f;
         if (pitch>0.52359885f) pitch=0.52359885f;

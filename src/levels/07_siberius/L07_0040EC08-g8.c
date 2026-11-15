@@ -44,9 +44,9 @@ void func_L07_0040EC08(u8 *obj)
  path=D_L07_001FDEC0[pathid];
  target=ps->target;
  speed=ps->speed;
- func_002AA2E8(p+0x11c,target,speed);
+ ApproachValue(p+0x11c,target,speed);
  sound=D_00188660+*(s32 *)(p+0x1ac)*0x70;
- if(*(u8 **)(sound+0x88)!=obj || !sound[0x74]) *(s32 *)(p+0x1ac)=func_002E5CF8(2,12,obj);
+ if(*(u8 **)(sound+0x88)!=obj || !sound[0x74]) *(s32 *)(p+0x1ac)=PlayMobySound(2,12,obj);
  id=*(s32 *)(p+0x1ac);
  if(id!=-1) qcopy(D_001886F0+id*0x70,D_L07_001B9200);
  {
@@ -64,8 +64,8 @@ void func_L07_0040EC08(u8 *obj)
   ps->pathpos[i]+=*(f32 *)(p+0x11c);
   if(ps->pathpos[i]>=(f32)path[0]) ps->pathpos[i]-=(f32)path[0];
   step=D_L07_001B1788*0.000290888245f;
-  for(j=0;j<8;j++) *(f32 *)(state+0x15b4+j*0x20)=func_00283B98(*(f32 *)(state+0x15b4+j*0x20),step);
-  func_00282CF0(delta,child+0x10,oldpos);
+  for(j=0;j<8;j++) *(f32 *)(state+0x15b4+j*0x20)=FastAddRotations(*(f32 *)(state+0x15b4+j*0x20),step);
+  FastVecSub(delta,child+0x10,oldpos);
   func_002AD6F0(state+0x20,delta,oldrot,child+0xf0);
   if(D_00189E20.object==child || (*(u8 **)(state+0x108) && D_00189E20.object==*(u8 **)(state+0x108)) || (*(u8 **)(state+0x10c) && D_00189E20.object==*(u8 **)(state+0x10c))) {
    D_L07_001ADAAC=child;
@@ -77,7 +77,7 @@ void func_L07_0040EC08(u8 *obj)
   func_L07_004106B8(child);
   if(*(s16 *)(child+0xaa)==0x11d9 || *(s16 *)(child+0xaa)==0x11db) func_L07_0040F0D0(child);
   if(D_L07_001ADAAC) {
-   func_00282CF0(relative,D_00189E20.pos,D_L07_001ADAAC+0x10);
+   FastVecSub(relative,D_00189E20.pos,D_L07_001ADAAC+0x10);
    func_002AFDD8(D_L07_001ADAAC,relative,relative,0);
    if(relative[2]<-3.0f && D_00189E20.mode==0) func_L00_002B30E8();
   }

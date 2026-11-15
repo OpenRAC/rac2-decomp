@@ -20,7 +20,7 @@ extern void func_002A0F48(void *);
 /* Install the full position and owner identity before activating the new object. */
 CtorObject *func_L01_003BC490(CtorObject *owner, const CtorVector *position)
 {
-    CtorObject *object = func_0029EFD0(0xA26);
+    CtorObject *object = CreateMoby(0xA26);
     if (object != 0) {
         object->intensity = owner->intensity;
         object->colour = owner->colour;

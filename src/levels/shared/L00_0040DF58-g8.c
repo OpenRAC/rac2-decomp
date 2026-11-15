@@ -69,9 +69,9 @@ void func_L00_0040DF58(BurstObject *object, void *up)
         int i, j;
         u8 *effect;
         for (j = 0; j < 1; j++) {
-            func_00282D30(position, object->forward, 0.5f);
+            FastVecScale(position, object->forward, 0.5f);
             qcopy(velocity, object->position);
-            func_00282CC0(velocity, velocity, position);
+            FastVecAdd(velocity, velocity, position);
             inner = D_L00_001B1030 * state->scale * 210000.0f;
             outer = D_L00_001B1034 * state->scale * 210000.0f;
             effect = func_002C65A0(velocity, D_L00_001A8F20, D_L00_001B1038, 0x388EF7, 0, 100, 0, inner,
@@ -100,14 +100,14 @@ void func_L00_0040DF58(BurstObject *object, void *up)
             u8 *effect;
             heading = func_00283248(D_L00_001B8C80.target[0] - object->position[0],
                 D_L00_001B8C80.target[1] - object->position[1]);
-            phase = func_00283CF0(func_002A78D8(2.0f, 5.0f));
+            phase = FloatToInt(func_002A78D8(2.0f, 5.0f));
             lifetime = func_002A7820(30, 50);
             position[0] = object->position[0] + func_002A78D8(0.0f, 0.1f) * state->scale;
             position[1] = object->position[1] + func_002A78D8(0.0f, 0.1f) * state->scale;
             position[2] = object->position[2] + func_002A78D8(0.0f, 0.1f) * state->scale;
             size = func_002A7878(0.6f, 1.0f) * state->scale;
             speed = func_002A7878(9.0f, 12.0f) * state->scale * 2.0f;
-            angle = func_00283B98(heading, func_002A78D8(0.0f, 1.3962636f));
+            angle = FastAddRotations(heading, func_002A78D8(0.0f, 1.3962636f));
             velocity[0] = func_00283180(angle) * 0.016666668f * speed;
             velocity[1] = func_00283198(angle) * 0.016666668f * speed;
             velocity[2] = 0.0f;
@@ -128,14 +128,14 @@ void func_L00_0040DF58(BurstObject *object, void *up)
             int phase, lifetime;
             heading = func_00283248(D_L00_001B8C80.target[0] - object->position[0],
                 D_L00_001B8C80.target[1] - object->position[1]);
-            phase = func_00283CF0(func_002A78D8(2.0f, 5.0f));
+            phase = FloatToInt(func_002A78D8(2.0f, 5.0f));
             lifetime = func_002A7820(30, 50);
             position[0] = object->position[0] + func_002A78D8(0.0f, 0.1f) * state->scale;
             position[1] = object->position[1] + func_002A78D8(0.0f, 0.1f) * state->scale;
             position[2] = object->position[2] + func_002A78D8(0.0f, 0.1f) * state->scale;
             size = func_002A7878(0.75f, 1.5f) * state->scale;
             speed = func_002A7878(9.0f, 12.0f) * state->scale * 2.0f;
-            angle = func_00283B98(heading, func_002A78D8(0.0f, 1.3962636f));
+            angle = FastAddRotations(heading, func_002A78D8(0.0f, 1.3962636f));
             velocity[0] = func_00283180(angle) * 0.016666668f * speed;
             velocity[1] = func_00283198(angle) * 0.016666668f * speed;
             velocity[2] = 0.0f;
@@ -152,14 +152,14 @@ void func_L00_0040DF58(BurstObject *object, void *up)
             int phase, lifetime;
             heading = func_00283248(D_L00_001B8C80.target[0] - object->position[0],
                 D_L00_001B8C80.target[1] - object->position[1]);
-            phase = func_00283CF0(func_002A78D8(2.0f, 5.0f));
+            phase = FloatToInt(func_002A78D8(2.0f, 5.0f));
             lifetime = func_002A7820(30, 50);
             position[0] = object->position[0] + func_002A78D8(0.0f, 0.1f) * state->scale;
             position[1] = object->position[1] + func_002A78D8(0.0f, 0.1f) * state->scale;
             position[2] = object->position[2] + func_002A78D8(0.0f, 0.1f) * state->scale;
             size = func_002A7878(0.6f, 1.0f) * state->scale;
             speed = func_002A7878(9.0f, 12.0f) * state->scale;
-            angle = func_00283B98(heading, func_002A78D8(0.0f, 1.3962636f));
+            angle = FastAddRotations(heading, func_002A78D8(0.0f, 1.3962636f));
             velocity[0] = func_00283180(angle) * 0.016666668f * speed;
             velocity[1] = func_00283198(angle) * 0.016666668f * speed;
             velocity[2] = 0.0f;
@@ -189,17 +189,17 @@ void func_L00_0040DF58(BurstObject *object, void *up)
             position[2] = object->position[2] + func_002A78D8(0.0f, 1.0f) * state->scale;
             radius = func_002A7878(0.016666668f, 0.033333335f) * state->scale;
             roll = func_002A78D8(0.0f, 1.3962636f);
-            turn = func_00283B98(angle, func_002A78D8(0.0f, 1.5707965f));
+            turn = FastAddRotations(angle, func_002A78D8(0.0f, 1.5707965f));
             func_002AF000(velocity, radius, turn, roll);
-            effect = func_002BDCE8(position, 0.0f, 1.0f, sign, velocity, 0x323232, 0, 1.01f,
+            effect = SpawnSpinningSparkParticle(position, 0.0f, 1.0f, sign, velocity, 0x323232, 0, 1.01f,
                 state->scale * 315000.0f);
             if (effect) {
                 BurstParticle *particle = (BurstParticle *)effect;
                 BurstPayload *payload = &particle->payload;
                 effect[3] = 0x44;
                 particle->lifetime = func_002A7820(40, 70);
-                particle->rate = func_00283CF0(4.0f) + 64;
-                payload->size = func_00283CE0(func_002A7820(1, 10));
+                particle->rate = FloatToInt(4.0f) + 64;
+                payload->size = IntToFloat(func_002A7820(1, 10));
                 payload->kind = 3;
                 payload->alpha = 127;
                 payload->fade = particle->lifetime;

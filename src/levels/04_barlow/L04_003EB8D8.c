@@ -74,18 +74,18 @@ void func_L04_003EB8D8(char *obj)
   break;
  }
  case 2:
-  if (func_002B38B8(entry)) {func_002E5CF8(1, 0, obj); func_002A7750(obj, 6, -1);}
+  if (func_002B38B8(entry)) {PlayMobySound(1, 0, obj); func_002A7750(obj, 6, -1);}
   else {float heading = func_00283248(*(float *)(D_L04_001FE340[*(int *)(state + 0x184)] + 0x20) - *(float *)(obj + 0x10), *(float *)(D_L04_001FE340[*(int *)(state + 0x184)] + 0x24) - *(float *)(obj + 0x14)); func_002B50E0(obj, obj + 0x10, heading);}
   break;
  case 4:
-  if (func_002B38B8(entry)) {func_002E5CF8(1, 0, obj); func_002A7750(obj, 5, -1);}
+  if (func_002B38B8(entry)) {PlayMobySound(1, 0, obj); func_002A7750(obj, 5, -1);}
   else if (func_00342228(D_00189EA0, *(int *)(state + 0x194))) func_002A7750(obj, 5, -1);
-  else {float heading = func_00283248(*(float *)(D_L04_001FE340[*(int *)(state + 0x184)] + 0x10) - *(float *)(obj + 0x10), *(float *)(D_L04_001FE340[*(int *)(state + 0x184)] + 0x14) - *(float *)(obj + 0x14)); func_002A7CA0(obj, heading, 0.0011635529808700085f, 0.0011635529808700085f, 0.10471977293491364f, state + 0x18C);}
+  else {float heading = func_00283248(*(float *)(D_L04_001FE340[*(int *)(state + 0x184)] + 0x10) - *(float *)(obj + 0x10), *(float *)(D_L04_001FE340[*(int *)(state + 0x184)] + 0x14) - *(float *)(obj + 0x14)); MobySpringTurn(obj, heading, 0.0011635529808700085f, 0.0011635529808700085f, 0.10471977293491364f, state + 0x18C);}
   break;
  case 3:
-  if (func_002B38B8(entry)) {func_002E5CF8(1, 0, obj); func_002A7750(obj, 6, -1);}
+  if (func_002B38B8(entry)) {PlayMobySound(1, 0, obj); func_002A7750(obj, 6, -1);}
   else if (func_00342228(D_00189EA0, *(int *)(state + 0x190))) func_002A7750(obj, 6, -1);
-  else {float heading = func_00283248(*(float *)(D_L04_001FE340[*(int *)(state + 0x184)] + 0x20) - *(float *)(obj + 0x10), *(float *)(D_L04_001FE340[*(int *)(state + 0x184)] + 0x24) - *(float *)(obj + 0x14)); func_002A7CA0(obj, heading, 0.0011635529808700085f, 0.0011635529808700085f, 0.10471977293491364f, state + 0x18C);}
+  else {float heading = func_00283248(*(float *)(D_L04_001FE340[*(int *)(state + 0x184)] + 0x20) - *(float *)(obj + 0x10), *(float *)(D_L04_001FE340[*(int *)(state + 0x184)] + 0x24) - *(float *)(obj + 0x14)); MobySpringTurn(obj, heading, 0.0011635529808700085f, 0.0011635529808700085f, 0.10471977293491364f, state + 0x18C);}
   break;
  case 6:
   qcopy(temp, entry + 0x10);
@@ -106,7 +106,7 @@ void func_L04_003EB8D8(char *obj)
   qcopy(state + 0x1B0, obj + 0x10);
   if (func_0030EFA8(obj + 0x10, D_L04_001FE340[*(int *)(state + 0x184)] + 0x10) <= 0.5f) {
    func_002A7750(obj, 3, -1);
-   func_002E5CF8(1, 0, obj);
+   PlayMobySound(1, 0, obj);
    func_L00_003294F0(entry, 0);
    func_002B6228(obj, D_L04_001FE340[*(int *)(state + 0x184)], 1, 0);
   }
@@ -115,44 +115,44 @@ void func_L04_003EB8D8(char *obj)
  func_L04_003EC140(obj);
  {
   char *sound = (char *)D_00188660 + *(int *)(state + 0x1DC) * 112;
-  if (*(char **)(sound + 0x88) != obj || !*(unsigned char *)(sound + 0x74)) *(int *)(state + 0x1DC) = func_002E5CF8(0, 4, obj);
+  if (*(char **)(sound + 0x88) != obj || !*(unsigned char *)(sound + 0x74)) *(int *)(state + 0x1DC) = PlayMobySound(0, 4, obj);
  }
- func_00282CF0(delta, obj + 0x10, oldpos);
+ FastVecSub(delta, obj + 0x10, oldpos);
  func_002AD6F0(state + 0x140, delta, oldrot, obj + 0xF0);
  qcopy(entry + 0x10, obj + 0x10);
- func_00282F20(temp, obj + 0xC0, 2.2f);
- func_00282CC0(entry + 0x10, obj + 0x10, temp);
- func_00282F20(temp2, obj + 0xE0, 0.5f);
- func_00282CC0(entry + 0x10, entry + 0x10, temp2);
+ vec_scale_to_length(temp, obj + 0xC0, 2.2f);
+ FastVecAdd(entry + 0x10, obj + 0x10, temp);
+ vec_scale_to_length(temp2, obj + 0xE0, 0.5f);
+ FastVecAdd(entry + 0x10, entry + 0x10, temp2);
  velocity[0] = 0; velocity[3] = 1.0f; velocity[2] = -0.2f; velocity[1] = 0;
  angle = func_002A77E0(16);
  if (func_002A77E0(2)) angle = -angle;
  qcopy(pos, obj + 0x10);
  pos[2] -= 0.2f;
- particle = func_002BDCE8(pos, 0.1f, 1.0f, 0.9f, angle, velocity, 630000.0f, 0xDF204080, 0);
+ particle = SpawnSpinningSparkParticle(pos, 0.1f, 1.0f, 0.9f, angle, velocity, 630000.0f, 0xDF204080, 0);
  if (particle) {
   char *p = particle + 0x20;
   *(short *)(particle + 0xA) = 15;
-  *(unsigned char *)(particle + 9) = func_00283CF0(4.0f) + 112;
+  *(unsigned char *)(particle + 9) = FloatToInt(4.0f) + 112;
   *(int *)(p + 4) = 2;
   *(unsigned char *)(p + 0xA) = 0xDF;
   *(unsigned char *)(p + 0xB) = *(unsigned char *)(particle + 0xA);
  }
  /* Retail really does write the first particle's header here: only the
   * subrecord belongs to the new particle. */
- middle = func_002BDCE8(pos, 0.1f, 1.0f, 0.9f, angle, velocity, 630000.0f, 0xDF204080, 0);
+ middle = SpawnSpinningSparkParticle(pos, 0.1f, 1.0f, 0.9f, angle, velocity, 630000.0f, 0xDF204080, 0);
  if (middle) {
   char *p = middle + 0x20;
   *(short *)(particle + 0xA) = 15;
-  *(unsigned char *)(particle + 9) = func_00283CF0(4.0f) + 112;
+  *(unsigned char *)(particle + 9) = FloatToInt(4.0f) + 112;
   *(int *)(p + 4) = 2;
   *(unsigned char *)(p + 0xA) = 0xDF;
   *(unsigned char *)(p + 0xB) = *(unsigned char *)(particle + 0xA);
  }
- second = func_002BDCE8(pos, 0.05f, 1.0f, 0.97f, 16, velocity, 315000.0f, 0xDFFFFFFF, 0);
+ second = SpawnSpinningSparkParticle(pos, 0.05f, 1.0f, 0.97f, 16, velocity, 315000.0f, 0xDFFFFFFF, 0);
  if (second) {
   char *p = second + 0x20;
-  int size = func_00283CF0(4.0f) + 112;
+  int size = FloatToInt(4.0f) + 112;
   *(short *)(second + 0xA) = 25;
   *(unsigned char *)(second + 9) = size;
   *(unsigned char *)(second + 8) = func_002A77E0(255);

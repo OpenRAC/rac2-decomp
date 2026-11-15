@@ -106,8 +106,8 @@ void func_L00_003A6C30(char *moby)
     if (TYPE(moby) == 0x5D2)
         func_0029FCC0(moby, 0, muzzle);
     else {
-        func_00282D30(muzzle, moby + 0xD0, -1.3f);
-        func_00282CC0(muzzle, muzzle, moby + 0x10);
+        FastVecScale(muzzle, moby + 0xD0, -1.3f);
+        FastVecAdd(muzzle, muzzle, moby + 0x10);
     }
     {
         float *dst = (float *)(state + 0x14);
@@ -115,12 +115,12 @@ void func_L00_003A6C30(char *moby)
         dst[1] = muzzle[1];
         dst[2] = muzzle[2];
     }
-    func_00282D30(playerPoint, (char *)HERO->ptr[0x2290 / 4] + 0xE0, 0.75f);
-    func_00282CC0(playerPoint, &HERO->f[0x80 / 4], playerPoint);
+    FastVecScale(playerPoint, (char *)HERO->ptr[0x2290 / 4] + 0xE0, 0.75f);
+    FastVecAdd(playerPoint, &HERO->f[0x80 / 4], playerPoint);
     vertical = D_L00_001B2870;
     D_L00_001B2868 = D_L00_001B2870 = 0.1047197655f;
     *(int *)(state + 0x2C) = 0;
-    func_00282978(state + 6);
+    FastDecTimer(state + 6);
     {
         char *locked = *(char **)state;
         if (locked) {
@@ -128,8 +128,8 @@ void func_L00_003A6C30(char *moby)
             target = locked;
             component = func_002AB1F0(target);
             if (component) {
-                func_00282D30(offset, target + 0xE0, component[4]);
-                func_00282CC0(targetPosition, target + 0x10, offset);
+                FastVecScale(offset, target + 0xE0, component[4]);
+                FastVecAdd(targetPosition, target + 0x10, offset);
             } else {
                 qcopy(targetPosition, target + 0x10);
             }
@@ -161,8 +161,8 @@ void func_L00_003A6C30(char *moby)
                     component = func_002AB1F0(candidate);
                     if (component) {
                         *(float *)(state + 8) = component[4];
-                        func_00282D30(direction, *(char **)state + 0xE0, component[4]);
-                        func_00282CC0(targetPosition, *(char **)state + 0x10, direction);
+                        FastVecScale(direction, *(char **)state + 0xE0, component[4]);
+                        FastVecAdd(targetPosition, *(char **)state + 0x10, direction);
                     } else {
                         qcopy(targetPosition, *(char **)state + 0x10);
                     }
@@ -185,14 +185,14 @@ void func_L00_003A6C30(char *moby)
         *(int *)state = 0;
     }
     if (HERO->i[0x2294 / 4] == 29 || HERO->i[0x1500 / 4]) {
-        func_00273318(moby, 1.0f, *(float *)(state + 0xC) > 0.0f && func_L00_002D4040(-1) ? 0x600000FF : 0x600FFF0F, 0, 0x26, 0.0f, -1, 90.0f, 4);
+        func_00273318(moby, 1.0f, *(float *)(state + 0xC) > 0.0f && get_ammo(-1) ? 0x600000FF : 0x600FFF0F, 0, 0x26, 0.0f, -1, 90.0f, 4);
     }
     if (*(char **)state) {
-        float distance = func_00282E48(D_L00_001B8DC0, targetPosition);
+        float distance = fast_vec_dist(D_L00_001B8DC0, targetPosition);
         func_00273318(moby, func_00282C48(0.9f - distance * 0.006666667f * 0.65f), 0xFF0FFF0F, targetPosition, 0x26, 0.0f, -1, 90.0f, 4);
     }
     if (*(int *)(state + 0x28) > 0
-        && (*(int *)(state + 0x28) > 8 || !(D_00138180[0x1A0 / 4] & HERO->i[0x1230 / 4]) || !func_L00_002D4040(-1)))
+        && (*(int *)(state + 0x28) > 8 || !(D_00138180[0x1A0 / 4] & HERO->i[0x1230 / 4]) || !get_ammo(-1)))
         (*(int *)(state + 0x28))--;
     if (*(u8 *)(moby + 0x42) == *(u8 *)(moby + 0x43) && (*(u8 *)(moby + 0x60) & 2))
         func_002A75E0(moby, 1, 0, 2, 0);
@@ -220,11 +220,11 @@ void func_L00_003A6C30(char *moby)
                     D_0018C750[33].maximum = D_001A7390;
                 D_0018C750[33].levels = (D_0018C750[33].levels | (1u << D_001A79F0)) | 0x80000000u;
                 if (TYPE(moby) == 0x5D2)
-                    func_L00_003A78B0(moby);
+                    EmitParticleTrailLayers(moby);
                 else
                     func_L00_003E4968(moby);
                 if (*(short *)(state + 0x10) == 0) {
-                    func_L00_002AF568();
+                    start_equipped_item_animation();
                     *(short *)(state + 0x10) = 1;
                 }
                 if (*(u8 *)(moby + 0x43) != 2)
@@ -238,9 +238,9 @@ void func_L00_003A6C30(char *moby)
                 else if (*(int *)(state + 0x3C) < 0)
                     *(int *)(state + 0x3C) = func_L00_002D6998(D_L00_00294A00);
                 if (TYPE(moby) == 0x5D2)
-                    func_L00_003E2180(muzzle, moby, target, previousRange);
+                    CreateTargetedMovingEffect(muzzle, moby, target, previousRange);
                 else
-                    func_L00_0041EB38(muzzle, moby, target);
+                    SpawnAimedShot(muzzle, moby, target);
                 {
                     WeaponEntry *entry = D_00139568[0x1E] + D_L00_00262570;
                     *(float *)(state + 0xC) = 1.0f / entry->rate;
@@ -257,23 +257,23 @@ void func_L00_003A6C30(char *moby)
                     *(int *)(damage + 0x20) = 1;
                     *(char **)(damage + 0x10) = moby;
                     *(float *)(damage + 0x1C) = (D_00139568[0x1E] + D_L00_00262570)->damage;
-                    func_00282CF0(offset, D_L00_001C3280[i] + 0x10, muzzle);
-                    func_00282F20(offset, offset, (D_00139568[0x1E] + D_L00_00262570)->speed * 0.016666668f);
+                    FastVecSub(offset, D_L00_001C3280[i] + 0x10, muzzle);
+                    vec_scale_to_length(offset, offset, (D_00139568[0x1E] + D_L00_00262570)->speed * 0.016666668f);
                     qcopy(damage, offset);
-                    func_00282F20(damage, damage, 1.0f);
+                    vec_scale_to_length(damage, damage, 1.0f);
                     *(float *)(damage + 0xC) = 5627.9248046875f;
                     *(short *)(damage + 0x1A) = TYPE(moby);
                     *(u8 *)(damage + 0x18) = 1;
                     *(u8 *)(damage + 0x19) = 1;
-                    func_002A8E20(D_L00_001C3280[i], damage);
+                    QueueMobyImpact(D_L00_001C3280[i], damage);
                     func_002AFFD8(D_L00_001C3280[i] + 0x10, direction, 1);
-                    func_00282D30(direction, direction, component[4]);
-                    func_00282CC0(center, direction, D_L00_001C3280[i] + 0x10);
+                    FastVecScale(direction, direction, component[4]);
+                    FastVecAdd(center, direction, D_L00_001C3280[i] + 0x10);
                     func_L00_003E3258(center, 0x19, 1);
                 }
             } else {
                 if ((D_00138180[0x1A4 / 4] & HERO->i[0x1230 / 4]) || D_L00_001B2874 == 1) {
-                    func_002E5CF8(1, 0, moby);
+                    PlayMobySound(1, 0, moby);
                     D_L00_001B2874 = 0;
                 }
                 {
@@ -282,7 +282,7 @@ void func_L00_003A6C30(char *moby)
                 }
             }
         }
-        if (!((D_00138180[0x1A0 / 4] & HERO->i[0x1230 / 4]) && func_L00_002D4040(-1) && HERO->b[0x22B8])) {
+        if (!((D_00138180[0x1A0 / 4] & HERO->i[0x1230 / 4]) && get_ammo(-1) && HERO->b[0x22B8])) {
             if (*(int *)(state + 0x3C) >= 0) {
                 func_L00_002D6B70(*(int *)(state + 0x3C));
                 *(int *)(state + 0x3C) = -1;
@@ -290,15 +290,15 @@ void func_L00_003A6C30(char *moby)
         }
         if (*(int *)(state + 0x3C) > 0 && !func_L00_002D6978(*(int *)(state + 0x3C) - 1))
             *(int *)(state + 0x3C) = -1;
-        if (!((D_00138180[0x1A0 / 4] & HERO->i[0x1230 / 4]) && func_L00_002D4040(-1))
+        if (!((D_00138180[0x1A0 / 4] & HERO->i[0x1230 / 4]) && get_ammo(-1))
             && !(HERO->i[0x1D8 / 4] < 10 && HERO->b[0x22B8])) {
-            func_L00_002AF7D0();
+            cancel_hero_item_animation();
             *(short *)(state + 0x10) = 0;
         }
         break;
     }
     case 2:
-        func_L00_002AF7D0();
+        cancel_hero_item_animation();
         if (func_002829D8(state + 0xC))
             *(u8 *)(moby + 0x20) = 1;
         break;
@@ -312,15 +312,15 @@ void func_L00_003A6C30(char *moby)
             qzero_nc(offset);
             offset[0] = 2.0f;
             offset[2] = 2.0f;
-            func_00283098(offset, offset, &HERO->f[0x730 / 4]);
+            matrix_mul_vec3(offset, offset, &HERO->f[0x730 / 4]);
             (*(int *)(state + 0x24) + D_L00_001C6F40)->position[0] = HERO->f[0x80 / 4] + offset[0];
             (*(int *)(state + 0x24) + D_L00_001C6F40)->position[1] = HERO->f[0x84 / 4] + offset[1];
             (*(int *)(state + 0x24) + D_L00_001C6F40)->position[2] = HERO->f[0x88 / 4] + offset[2];
             (*(int *)(state + 0x24) + D_L00_001C6F40)->position[3] = 4.0f;
             {
                 float b;
-                ratio = func_00283CE0(*(int *)(state + 0x28));
-                b = func_00283CE0(10);
+                ratio = IntToFloat(*(int *)(state + 0x28));
+                b = IntToFloat(10);
                 ratio /= b;
                 /* Both weapons light the muzzle the same way. */
                 if (TYPE(moby) == 0x5D2) {

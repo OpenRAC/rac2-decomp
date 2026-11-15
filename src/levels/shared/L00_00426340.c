@@ -165,9 +165,9 @@ void func_L00_00426340(int object)
     func_L00_00425490_1(object);
     func_L00_00424F98(object, &x, &y);
     func_L00_00425118(object, x, y);
-    func_L00_004243C0(object);
+    FollowCameraHideObstructions(object);
     func_L00_00425CD0(object);
-    func_L00_00425560(object);
+    follow_camera_build_view(object);
 }
 void func_L00_00426478(void)
 {
@@ -295,21 +295,21 @@ void func_L00_004270C0(char *owner)
         *(float *)(base + 0x2A8) = 0.018f;
         return;
     }
-    f1 = func_00282DB0(base + 0x1D0, owner);
-    func_00282D30(tmp, base + 0x1D0, f1);
-    func_00282CF0(v1, owner, tmp);
-    f2 = func_00282DB0(base + 0x1D0, D_00189E20_20.ptr_2290 + 0xC0);
-    func_00282D30(tmp, base + 0x1D0, f2);
-    func_00282CF0(v2, D_00189E20_20.ptr_2290 + 0xC0, tmp);
-    f20 = func_00282DF0(v2);
+    f1 = FastVecDot(base + 0x1D0, owner);
+    FastVecScale(tmp, base + 0x1D0, f1);
+    FastVecSub(v1, owner, tmp);
+    f2 = FastVecDot(base + 0x1D0, D_00189E20_20.ptr_2290 + 0xC0);
+    FastVecScale(tmp, base + 0x1D0, f2);
+    FastVecSub(v2, D_00189E20_20.ptr_2290 + 0xC0, tmp);
+    f20 = FastVecLength(v2);
     if (f20 == 0.0f) {
         goto small;
     }
-    f20 = f20 * func_00282DF0(v1);
+    f20 = f20 * FastVecLength(v1);
     if (f20 == 0.0f) {
         goto small;
     }
-    r = func_00282DB0(v2, v1);
+    r = FastVecDot(v2, v1);
     s = func_002831B0(r / f20);
     if (1.3962636f <= 1.5707964f - s) {
         *(short *)(base + 0x290) = 0;
@@ -371,7 +371,7 @@ void func_L00_004276E8(char *object)
 
         func_00282948(transition);
         fraction = (float)(*(int *)(transition + 4) - *(int *)(saved + 0xE0)) /
-                   func_00283CE0(*(int *)(transition + 4));
+                   IntToFloat(*(int *)(transition + 4));
         func_L00_0031AC60(object + 0x30, object + 0x30, target, fraction);
         func_L00_0031AD40(object + 0x40, object + 0x40, saved + 0x90, fraction);
         goto finish;
@@ -385,10 +385,10 @@ void func_L00_004276E8(char *object)
             goto finish;
         }
         fraction = (float)(*(int *)(transition + 4) - *(int *)(saved + 0xE0)) /
-                   func_00283CE0(*(int *)(transition + 4));
+                   IntToFloat(*(int *)(transition + 4));
         func_00272550(saved + 0xE8, target, D_00189EA0);
-        x = func_00283BE0(*(float *)(transition + 8), *(float *)(transition + 0x1C));
-        y = func_00283BE0(*(float *)(target + 0x18), D_L00_001B8DD8);
+        x = fast_subtract_rotations(*(float *)(transition + 8), *(float *)(transition + 0x1C));
+        y = fast_subtract_rotations(*(float *)(target + 0x18), D_L00_001B8DD8);
         if ((x > 0.3490659f && y < -0.3490659f) ||
             (x < -0.3490659f && y > 0.3490659f)) {
             float zero = 0.0f;
@@ -403,7 +403,7 @@ void func_L00_004276E8(char *object)
             *(float *)(transition + 0x1C) = func_L00_0031ABE0(
                 *(float *)(transition + 0x1C), *(float *)(transition + 8), fraction);
         }
-        blend = func_002A7AA8(*(float *)(transition + 0x44), 0.0f, 1.0f,
+        blend = cubic_hermite_scalar(*(float *)(transition + 0x44), 0.0f, 1.0f,
                              *(float *)(transition + 0x48), fraction);
         *(float *)(transition + 0x24) +=
             (*(float *)(transition + 0x10) - *(float *)(transition + 0x24)) * blend;
@@ -437,8 +437,8 @@ void func_L00_004276E8(char *object)
             *(float *)(rotation + 0x20), *(float *)(rotation + 0x24), *(float *)(rotation + 0x28));
     }
 finish:
-    func_00283410(matrix, object + 0x40);
-    func_00283678(object, matrix);
+    euler_to_matrix(matrix, object + 0x40);
+    copy_matrix3x4(object, matrix);
 }
 
 unsigned int func_L00_00427AD8(void)
@@ -452,10 +452,10 @@ void func_L00_00427AE0(char *a0)
 {
     char *p = *(char **)(a0 + 0x70) + 0xE0;
 
-    func_L00_004276E8(a0);
+    UpdateCameraTransition(a0);
     if (*(int *)(p + 0x40)) {
         *(char *)(a0 + 0x89) = 0;
-        func_L00_002DA1E0(a0 + 0x30, 0.5f);
+        ResolveCameraMovementCollisions(a0 + 0x30, 0.5f);
     }
 }
 
@@ -478,7 +478,7 @@ void func_L00_00427B40(char *object)
     *(float *)(object + 72) = func_00283B98_6(*(float *)(object + 72), *(float *)(object + 96));
     *(int *)(object + 76) = 0;
     func_00283410_5((char *)local, object + 64);
-    func_00283678(object, (char *)local);
+    copy_matrix3x4(object, (char *)local);
 }
 
 extern void func_L00_002D7958_1(float *, void *, float);
@@ -532,12 +532,12 @@ void func_L00_004283C8(char *o)
     char *B = D_L00_001B8C80_1;
     char *D = D_00189E20_3;
     float *p = *(float **)(D + 8848);
-    float r = func_00283C80(*(float *)(B + 344),
+    float r = FastDiffRots(*(float *)(B + 344),
                       func_00283248_1(p[4] - *(float *)(B + 320),
                               p[5] - *(float *)(B + 324)));
 
     if (r < 0.5585054f) {
-        r = func_00282E48(D + 128, B + 320);
+        r = fast_vec_dist(D + 128, B + 320);
         if (r < 8.0f) {
             *(char *)(B + 659) = 0;
             *(short *)(o + 126) = 2;
@@ -675,20 +675,20 @@ void func_L00_004291A0(u8 *object)
                 data->indices[accepted] = i;
                 accepted++;
             }
-            distance = func_00282E48((char *)(path + (i * 16 + 0x10)), (char *)(path + 0x10 + ((i + 1) % *(int *)path) * 16));
+            distance = fast_vec_dist((char *)(path + (i * 16 + 0x10)), (char *)(path + 0x10 + ((i + 1) % *(int *)path) * 16));
             *(float *)(path + (i << 4) + 0x1C) = distance;
             if (i < *(int *)path - 1)
                 motion->distance += distance;
         }
     }
     if (data->duration > 0)
-        data->speed = (motion->distance / func_00283CE0(data->duration)) * 60.0f;
+        data->speed = (motion->distance / IntToFloat(data->duration)) * 60.0f;
     if (data->secondPathIndex >= 0) {
         int i;
         u8 *path = D_L00_001FDA80[data->secondPathIndex];
         for (i = 0; i < *(int *)path; i++) {
             int byteOffset = i * 16;
-            distance = func_00282E48((char *)(path + (byteOffset + 0x10)), (char *)(path + 0x10 + ((i + 1) % *(int *)path) * 16));
+            distance = fast_vec_dist((char *)(path + (byteOffset + 0x10)), (char *)(path + 0x10 + ((i + 1) % *(int *)path) * 16));
             *(float *)(path + byteOffset + 0x1C) = distance;
             if (i < *(int *)path - 1)
                 motion->secondDistance += distance;
@@ -776,7 +776,7 @@ int func_L00_0042A460(char *a0)
             return 0;
         }
     }
-    func_L00_00429F68(a0);
+    UpdateVolumeAimCamera(a0);
     return 0;
 }
 

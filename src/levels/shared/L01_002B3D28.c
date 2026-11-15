@@ -49,7 +49,7 @@ void func_L01_002B3D28(void) {
     if (D_00189E20[0x1494] != 0)
         goto slow;
 
-    r = func_00282E80(D_00189E20 + 0x240, D_00189E20 + 0x80);
+    r = vec_distance_xy(D_00189E20 + 0x240, D_00189E20 + 0x80);
     if (r > *(float *)(D_00189E20 + 0x264) * 0.5f)
         goto slow;
     return;
@@ -61,8 +61,8 @@ slow:
         u8 *p = D_00189E20 + 0x250;
         u8 *s = p - 0x250;
         float step = 0.02f;
-        func_002AA2E8((float *)p, *(float *)(s + 0x258), step);
-        func_002AA2E8((float *)(p + 4), *(float *)(s + 0x25C), step);
+        ApproachValue((float *)p, *(float *)(s + 0x258), step);
+        ApproachValue((float *)(p + 4), *(float *)(s + 0x25C), step);
         func_002AA3A8(
             (float *)(p + 0x14),
             (float *)(p + 0x18),

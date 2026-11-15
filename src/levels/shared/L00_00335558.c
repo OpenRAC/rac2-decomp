@@ -28,16 +28,16 @@ void func_L00_00335558(char *position, char *matrix, float speed)
         offset[1]=func_002A7878(-0.03f,0.03f);
         offset[2]=0;
         if (matrix) {
-            func_00283658(inverse,matrix);
-            func_002830C0(local,offset,inverse);
-            func_00282CC0(p+16,local,position);
-        } else func_00282CC0(p+16,offset,position);
+            copy_matrix_rotation(inverse,matrix);
+            transform_vector(local,offset,inverse);
+            FastVecAdd(p+16,local,position);
+        } else FastVecAdd(p+16,offset,position);
         FF(p,24)-=0.05f;
         r=func_001163B0()%96; if (!r) r=1;
         g=(func_001163B0()%r)%64; if (!g) g=1;
         b=(func_001163B0()%g)%48;
         FI(p,4)=(r+143)|((g+143)<<8)|((b+111)<<16);
-        FB(p,9)=func_00283CF0(4.0f)+64;
+        FB(p,9)=FloatToInt(4.0f)+64;
         FB(p,3)=72; FB(p,1)=0; FB(p,8)=0;
         FB(p,2)=FB(D_L00_001FE9B0,0);
         FF(q,4)=func_002A7878(0.0f,0.02234560064971447f)+0.00001f;
@@ -46,7 +46,7 @@ void func_L00_00335558(char *position, char *matrix, float speed)
         qzero_nc(velocity);
         if (matrix) {
             velocity[0]=speed; velocity[2]=-0.0025f;
-            func_00283098(q+16,velocity,matrix);
+            matrix_mul_vec3(q+16,velocity,matrix);
         } else {
             FF(q,16)=func_002A7878(-speed,speed);
             FF(q,20)=func_002A7878(-speed,speed);

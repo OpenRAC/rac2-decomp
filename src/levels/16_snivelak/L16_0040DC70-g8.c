@@ -38,18 +38,18 @@ void func_L16_0040DC70(u8 *arg) {
   random = func_002A77E0(255) & 255;
   particle = func_002C3150(origin, velocity, D_L16_001B1688, color, random, 0, D_L16_001B1680);
   if (particle)
-    particle[9] = func_00283CF0(4.0f) - 16;
+    particle[9] = FloatToInt(4.0f) - 16;
   func_00282C88(velocity);
   for (i = 0; i < D_L16_001B16A0; i++) {
     origin = pos;
     func_002A7A00(origin, 0.0f, 0.25f);
-    func_00282CC0(origin, origin, arg + 0x10);
+    FastVecAdd(origin, origin, arg + 0x10);
     velocity[2] = -(func_002A7878(D_L16_001B1678[0], D_L16_001B167C[0]) * tick);
     color = func_002A7820(D_L16_001B1698[0], D_L16_001B169C[0]) & 255;
     random = func_002A77E0(255) & 255;
     particle = func_002C3150(origin, velocity, D_L16_001B168C[0], color, random, 0, D_L16_001B1684[0]);
     if (particle)
-      particle[9] = func_00283CF0(4.0f) - 16;
+      particle[9] = FloatToInt(4.0f) - 16;
   }
 
 }

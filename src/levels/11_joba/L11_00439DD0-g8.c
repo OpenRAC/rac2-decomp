@@ -54,9 +54,9 @@ void func_L11_00439DD0(char *object)
     func_L11_0043A3F8(object);
     qcopy(target, state + 0x50);
     pos = object + 0x10;
-    distance = func_00282E80(pos, target);
+    distance = vec_distance_xy(pos, target);
     angle = func_00283248(target[0] - F(object, 0x10), target[1] - F(object, 0x14));
-    func_00283C80(F(object, 0xF8), angle);
+    FastDiffRots(F(object, 0xF8), angle);
     switch (B(object, 0x20)) {
     case 3:
         if (func_002B3868(object)) {
@@ -75,16 +75,16 @@ void func_L11_00439DD0(char *object)
         height = F(object, 0x18);
         height -= D_L11_001B1354;
         if (height >= F(func_L11_004417E8(*(void **)(object + 0xB8)), 8)) {
-            func_00282CC0(pos, pos, state + 0x2A0);
+            FastVecAdd(pos, pos, state + 0x2A0);
             F(state, 0x2A8) -= F(state, 0x2AC);
-            func_00283098(before, D_L11_001B1360, object + 0xC0);
-            F(object, 0xF0) = func_00283B98(F(state, 0x2B0), F(object, 0xF0));
-            F(object, 0xF4) = func_00283B98(F(state, 0x2B4), F(object, 0xF4));
-            F(object, 0xF8) = func_00283B98(F(state, 0x2B8), F(object, 0xF8));
-            func_002833F0(object + 0xC0, object + 0xF0);
-            func_00283098(after, D_L11_001B1360, object + 0xC0);
-            func_00282CF0(delta, before, after);
-            func_00282CC0(pos, pos, delta);
+            matrix_mul_vec3(before, D_L11_001B1360, object + 0xC0);
+            F(object, 0xF0) = FastAddRotations(F(state, 0x2B0), F(object, 0xF0));
+            F(object, 0xF4) = FastAddRotations(F(state, 0x2B4), F(object, 0xF4));
+            F(object, 0xF8) = FastAddRotations(F(state, 0x2B8), F(object, 0xF8));
+            euler_rotation_basis(object + 0xC0, object + 0xF0);
+            matrix_mul_vec3(after, D_L11_001B1360, object + 0xC0);
+            FastVecSub(delta, before, after);
+            FastVecAdd(pos, pos, delta);
         } else {
             I(object, 0xF0) = 0;
             I(object, 0xF4) = 0;
@@ -99,7 +99,7 @@ void func_L11_00439DD0(char *object)
                 func_002A7470(object, 7, 0, 3);
             F(object, 0x48) = D_L11_001B134C;
             qcopy(aim, pos);
-            func_L11_0043ACB0(D_L11_001B132C, aim, target, 45, 2);
+            PlacePointWithPolarJitterFlat(D_L11_001B132C, aim, target, 45, 2);
         }
         F(object, 0x18) -= D_L11_001B1354;
         func_002B4FF0(object, aim, F(state, 0x2D4));
@@ -137,7 +137,7 @@ attack:
         if (B(object, 0xBC) == 1) {
             anim = func_0029F530(object);
             func_L11_0043A810(object);
-            func_002E5CF8(2, 0, object);
+            PlayMobySound(2, 0, object);
             fireTimer = I(state, 0x2D0);
             if (!fireTimer && anim < (fireTimer = D_L11_001B1330) + 1) {
                 I(state, 0x2D0) = fireTimer;
@@ -166,7 +166,7 @@ attack:
         if (result & 2)
             func_002A7750(object, 4, 1);
         if (result & 1) {
-            func_002E5CF8(3, 0, object);
+            PlayMobySound(3, 0, object);
             func_L11_0043AB28(object);
         }
         break;

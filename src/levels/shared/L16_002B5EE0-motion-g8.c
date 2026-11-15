@@ -74,9 +74,9 @@ void func_L16_00395250(u8 *object)
         else { F(state,0x34)=0.0f; goto mode1; }
         return;
     case 1:
-        func_00282F20(position,object+0xE0,D_L16_001AF430);
-        func_00282CC0(object+0x10,position,state+0x10);
-        if (func_00282948((int *)(state+0x3C)) && func_00282E48(object+0x10,R+0x80)<1.75f) {
+        vec_scale_to_length(position,object+0xE0,D_L16_001AF430);
+        FastVecAdd(object+0x10,position,state+0x10);
+        if (func_00282948((int *)(state+0x3C)) && fast_vec_dist(object+0x10,R+0x80)<1.75f) {
             if (D_00189E20.field123a || D_00189E20.field22b4) goto decay;
             if (D_0018C958.sentinel<65535 && I(D_L16_0027F078,0)==0 && I(D_L16_0027F078,0x24)==-1) {
                 func_00288E18(0x9C7,30);
@@ -84,17 +84,17 @@ void func_L16_00395250(u8 *object)
             }
             if (D_00189E20.field1248!=10) goto decay;
             if (D_00189E20.field1220) {
-                if (!func_L00_0032EF10(0x80,7,0) || !(D_00189E20.field31c<0.2f) || !func_L16_003960F8((char *)object)) goto decay;
+                if (!PadPressedWithin(0x80,7,0) || !(D_00189E20.field31c<0.2f) || !func_L16_003960F8((char *)object)) goto decay;
                 if (F(state,0x34)<1.0f) {
                     func_002AFDD8((char *)object,(char *)forward,R,0);
-                    func_00282CF0(direction,R+0x80,object+0x10);
+                    FastVecSub(direction,R+0x80,object+0x10);
                     func_002AFDD8((char *)object,(char *)direction,(char *)direction,0);
                     zero=0.0f;
                     forward[2]=zero;
                     direction[2]=zero;
-                    func_00282F20(direction,direction,1.0f);
-                    func_00282F20(forward,forward,1.0f);
-                    if (func_00282DB0(direction,forward)<0.2f) { func_L16_002C0BC8(0x37,1); func_L16_00395D30((char *)object); }
+                    vec_scale_to_length(direction,direction,1.0f);
+                    vec_scale_to_length(forward,forward,1.0f);
+                    if (FastVecDot(direction,forward)<0.2f) { func_L16_002C0BC8(0x37,1); func_L16_00395D30((char *)object); }
                     func_002A7750(object,2,-1);
                 }
             }
@@ -110,7 +110,7 @@ decay:
     else F(state,0x40)=0.0f;
         return;
     case 2:
-        if (func_L00_0032EF10(0x80,7,0) && D_00189E20.field1b8>=21) goto leaveActive;
+        if (PadPressedWithin(0x80,7,0) && D_00189E20.field1b8>=21) goto leaveActive;
         if (F(state,0x34)>=1.0f) goto leaveActive;
         if (D_00189E20.field2294==0x37) goto active;
 leaveActive:
@@ -129,12 +129,12 @@ mode1:
         }
         return;
 active:
-            func_00282F20(position,object+0xE0,D_L16_001AF434);
-            func_00282CC0(object+0x10,position,state+0x10);
+            vec_scale_to_length(position,object+0xE0,D_L16_001AF434);
+            FastVecAdd(object+0x10,position,state+0x10);
             func_L16_00395858((char *)object);
             func_L16_003959B8((char *)object);
             func_L16_00395C00((char *)object);
-            func_L16_00395ED0((char *)object);
+            BlendCameraPose((char *)object);
         return;
     case 4:
         if (func_002B3868(object)) F(state,0x44)=D_L16_001AF430;
@@ -148,8 +148,8 @@ active:
             if (func_00282C48(F(state,0x48))>0.0016666668f) F(state,0x48)*=-0.333f;
             else *(u16 *)(object+0x34)|=2;
         }
-        func_00282F20(position,object+0xE0,F(state,0x44));
-        func_00282CC0(object+0x10,position,state+0x10);
+        vec_scale_to_length(position,object+0xE0,F(state,0x44));
+        FastVecAdd(object+0x10,position,state+0x10);
         return;
     default:
         return;

@@ -20,7 +20,7 @@ void func_L19_0041E5B0(u8 *obj)
         s->other = 0;
         s->angle = *(float *)(obj + 0xF8);
         s->height = *(float *)(obj + 0x18);
-        angle = func_00283B98(*(float *)(obj + 0xF8), 3.1415927f);
+        angle = FastAddRotations(*(float *)(obj + 0xF8), 3.1415927f);
         height = *(float *)(obj + 0x18) - D_L19_001B1D5C;
         *(float *)(obj + 0xF8) = angle;
         *(float *)(obj + 0x18) = height;
@@ -34,7 +34,7 @@ void func_L19_0041E5B0(u8 *obj)
         }
         break;
     case 2:
-        if (func_002B3868(obj)) func_002E5CF8(0, 0, obj);
+        if (func_002B3868(obj)) PlayMobySound(0, 0, obj);
         s->time += 1.0f / D_L19_001B1D60;
         if (s->time > 1.0f) {
             s->time = 0;
@@ -57,12 +57,12 @@ void func_L19_0041E5B0(u8 *obj)
             func_002A7750(obj, 4, -1);
         } else {
             float f = (func_00283180(s->time * 3.1415927f) + 1.0f) * 0.5f;
-            *(float *)(obj + 0xF8) = func_00283B98(s->angle, f * 3.1415927f);
+            *(float *)(obj + 0xF8) = FastAddRotations(s->angle, f * 3.1415927f);
         }
         break;
     case 4:
         if (!s->other || s->other[0x20] == 0xFE || s->other[0x20] == 0xFD ||
-            func_00282E80(obj + 0x10, s->other + 0x10) > D_L19_001B1D68) {
+            vec_distance_xy(obj + 0x10, s->other + 0x10) > D_L19_001B1D68) {
             obj[0xBC] = 3;
             s->other = 0;
             s->time = 1.0f;
@@ -70,15 +70,15 @@ void func_L19_0041E5B0(u8 *obj)
         }
         break;
     case 5:
-        if (func_002B3868(obj)) func_002E5CF8(1, 0, obj);
+        if (func_002B3868(obj)) PlayMobySound(1, 0, obj);
         s->time -= 1.0f / D_L19_001B1D64;
         if (s->time <= 0.0f) {
             s->time = 1.0f;
-            *(float *)(obj + 0xF8) = func_00283B98(s->angle, 3.1415927f);
+            *(float *)(obj + 0xF8) = FastAddRotations(s->angle, 3.1415927f);
             func_002A7750(obj, 6, -1);
         } else {
             float f = (func_00283180(s->time * 3.1415927f) + 1.0f) * 0.5f;
-            *(float *)(obj + 0xF8) = func_00283B98(s->angle, f * 3.1415927f);
+            *(float *)(obj + 0xF8) = FastAddRotations(s->angle, f * 3.1415927f);
         }
         break;
     case 6:

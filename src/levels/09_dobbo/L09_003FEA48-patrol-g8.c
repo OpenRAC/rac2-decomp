@@ -96,7 +96,7 @@ void func_L09_003FEF00(char *obj)
     if (B(obj, 0x20) == 0) func_L09_003FE670(obj);
     if (B(data, 0x2E) == 2) {
         I(data, 0x42C) = 0;
-        func_002A6C58(obj, 0, 3);
+        SetDeathBits(obj, 0, 3);
         func_0029F338(obj);
         return;
     }
@@ -117,7 +117,7 @@ void func_L09_003FEF00(char *obj)
             {
                 char *entry = (char *)((int)D_00188660 + I(data, 0x3F0) * 0x70);
                 if (P(entry, 0x88) != obj || !B(entry, 0x74))
-                    I(data, 0x3F0) = func_002E5CF8(D_L09_001B11B4, 4, obj);
+                    I(data, 0x3F0) = PlayMobySound(D_L09_001B11B4, 4, obj);
             }
             if (B(data, 0x440)) {
                 B(data, 0x440) = 0;
@@ -135,7 +135,7 @@ void func_L09_003FEF00(char *obj)
                 {
                     char *entry = (char *)((int)D_00188660 + I(data, 0x3F0) * 0x70);
                     if (P(entry, 0x88) != obj || !B(entry, 0x74))
-                        I(data, 0x3F0) = func_002E5CF8(D_L09_001B11BC, 4, obj);
+                        I(data, 0x3F0) = PlayMobySound(D_L09_001B11BC, 4, obj);
                 }
                 H(data, 0x412) = 600;
             }
@@ -146,7 +146,7 @@ void func_L09_003FEF00(char *obj)
             func_L09_003FDD80(obj);
             func_L09_003FDED8(obj);
             if (live) {
-                func_00282D08(a, data + 0x330, data + 0x370, 0.5f);
+                lerp_vector(a, data + 0x330, data + 0x370, 0.5f);
                 qcopy(b, data + 0x330);
                 count = func_00277F48(a, 0, 0, 0, F(data, 0x434) * 0.48f);
                 if (!count) count = func_00277F48(b, 0, 0, 0, F(data, 0x434) * 0.9f);
@@ -180,7 +180,7 @@ void func_L09_003FEF00(char *obj)
                             {
                                 char *entry = (char *)((int)D_00188660 + I(data, 0x3F0) * 0x70);
                                 if (P(entry, 0x88) != obj || !B(entry, 0x74))
-                                    I(data, 0x3F0) = func_002E5CF8(D_L09_001B11BC, 4, obj);
+                                    I(data, 0x3F0) = PlayMobySound(D_L09_001B11BC, 4, obj);
                             }
                             H(data, 0x412) = 600;
                             if (D_L09_001C3EC0[i] != P(hero, 0x2290)) break;
@@ -224,10 +224,10 @@ void func_L09_003FEF00(char *obj)
                 a[2] += 0.5f;
                 qcopy(b, a);
                 b[2] -= 4.0f;
-                if (func_002761F8(a, b, 0x12, 0, 0)) qcopy(a, D_L09_001BFE60);
+                if (CollLine(a, b, 0x12, 0, 0)) qcopy(a, D_L09_001BFE60);
                 else a[2] -= 0.5f;
                 qcopy(previous, data + 0x390);
-                phase = func_00283CE0(D_L09_001B2388[0]) + H(obj, 0xB2) * 36;
+                phase = IntToFloat(D_L09_001B2388[0]) + H(obj, 0xB2) * 36;
                 angle1 = func_002ABB18(phase * 0.025f);
                 angle2 = func_002ABB18(phase * 0.016666668f);
                 step1 = func_00283198(angle1) + 1.5f;
@@ -249,12 +249,12 @@ void func_L09_003FEF00(char *obj)
                 if (replacement && B(replacement, 0x20) != 0xFE && B(replacement, 0x20) != 0xFD)
                     I(data, 0x44C) = H(replacement, 0xAA);
             }
-            func_L00_00341FA8(D_L09_001FE6C0[I(data, 0x314)], data + 0x390, a,
+            find_nearest_path_point(D_L09_001FE6C0[I(data, 0x314)], data + 0x390, a,
                              data + 0x324, data + 0x3EC, 1, 20.0f, 5.0f, 0.0f);
             func_L09_003FDD80(obj);
             qcopy(a, obj + 0x10);
             a[3] = 4.0f;
-            if (func_00283DB8(a, func_00283CE0(H(obj, 0x32))) >= 0) {
+            if (func_00283DB8(a, IntToFloat(H(obj, 0x32))) >= 0) {
                 float *dst;
                 func_0029FCC0(obj, 8, b);
                 dst = (float *)(data + 0x3F4);
@@ -280,7 +280,7 @@ void func_L09_003FEF00(char *obj)
                     {
                         char *entry = (char *)((int)D_00188660 + I(data, 0x3F0) * 0x70);
                         if (P(entry, 0x88) != obj || !B(entry, 0x74))
-                            I(data, 0x3F0) = func_002E5CF8(D_L09_001B11B4, 4, obj);
+                            I(data, 0x3F0) = PlayMobySound(D_L09_001B11B4, 4, obj);
                     }
                 }
             }
@@ -303,12 +303,12 @@ void func_L09_003FEF00(char *obj)
                 }
             }
             I(data, 0x3F0) = -1;
-            func_002ABBB8(obj, data + 0x400, obj + 0x10, 0.0f, 0.0f, 5, 2, 4,
+            SpawnExplosionEffects(obj, data + 0x400, obj + 0x10, 0.0f, 0.0f, 5, 2, 4,
                          4.0f, 2.0f, 9.0f, 1.0f, 1, 15.0f, 1, 5, -1, 0, 0x810001);
-            func_00282CF0(a, obj + 0x10, (D_00189E20 + 0x80));
+            FastVecSub(a, obj + 0x10, (D_00189E20 + 0x80));
             a[2] = 0.0f;
-            func_00282F20(a, a, func_002A7878(0.075f, 0.2f));
-            func_00282DD8(b, D_00189E20 + 0x2C0, a);
+            vec_scale_to_length(a, a, func_002A7878(0.075f, 0.2f));
+            FastVecCross(b, D_00189E20 + 0x2C0, a);
             func_002ACEC0(data + 0x400, a, D_00189E20 + 0x2C0, func_002A78D8(0.698131799697876f, 1.2217305898666382f));
             F(data, 0x408) = func_002A7878(0.1f, 0.2f);
             func_002B0A68(obj, 3.0f, 0x7F, 6.0f, 3.0f, D_L09_001A8F20, 6.0f, 0xFF);
@@ -317,8 +317,8 @@ void func_L09_003FEF00(char *obj)
             F(data, 0x414) = func_002A78D8(0.0f, 0.0872664749622345f);
             F(data, 0x418) = func_002A78D8(0.0f, 0.0872664749622345f);
             F(data, 0x41C) = func_002A78D8(0.0f, 0.0872664749622345f);
-            F(obj, 0xF0) = func_00283B98(F(obj, 0xF0), func_002A78D8(0.0f, 0.78539824f));
-            F(obj, 0xF4) = func_00283B98(F(obj, 0xF4), func_002A78D8(0.0f, 0.78539824f));
+            F(obj, 0xF0) = FastAddRotations(F(obj, 0xF0), func_002A78D8(0.0f, 0.78539824f));
+            F(obj, 0xF4) = FastAddRotations(F(obj, 0xF4), func_002A78D8(0.0f, 0.78539824f));
             func_002A7750(obj, 6, -1);
             func_L09_003FDFF0(obj);
             return;
@@ -327,12 +327,12 @@ void func_L09_003FEF00(char *obj)
         case 6: {
             int i;
             char *vel = data + 0x400;
-            func_00282CC0(obj + 0x10, obj + 0x10, vel);
+            FastVecAdd(obj + 0x10, obj + 0x10, vel);
             if (func_00282C48(F(data, 0x400)) > 0.05f) F(data, 0x400) *= 0.97f;
             if (func_00282C48(F(data, 0x404)) > 0.05f) F(data, 0x404) *= 0.97f;
             if (F(data, 0x408) > 0.0f) F(data, 0x408) *= 0.97f;
             F(data, 0x408) -= 0.003f;
-            F(obj, 0xF8) = func_00283B98(F(obj, 0xF8), F(data, 0x41C));
+            F(obj, 0xF8) = FastAddRotations(F(obj, 0xF8), F(data, 0x41C));
             F(data, 0x280) = 10.0f;
             if (F(obj, 0x10) < 2.0f || F(obj, 0x10) > 1021.0f ||
                 F(obj, 0x14) < 2.0f || F(obj, 0x14) > 1021.0f ||
@@ -340,10 +340,10 @@ void func_L09_003FEF00(char *obj)
                 func_0029F338(obj);
                 return;
             }
-            if (func_00282978(data + 0x410) || func_00277258(obj + 0x10, 0, obj, 0.5f)) {
-                func_002ABBB8(obj, data + 0x400, obj + 0x10, 2.0f, 1.0f, 5, 2, 4,
+            if (FastDecTimer(data + 0x410) || func_00277258(obj + 0x10, 0, obj, 0.5f)) {
+                SpawnExplosionEffects(obj, data + 0x400, obj + 0x10, 2.0f, 1.0f, 5, 2, 4,
                              2.0f, 1.0f, 9.0f, 1.0f, 1, 15.0f, 1, 5, -1, 0, 0x810001);
-                func_002A6C58(obj, 0, 3);
+                SetDeathBits(obj, 0, 3);
                 func_0029F338(obj);
                 return;
             }
@@ -359,7 +359,7 @@ void func_L09_003FEF00(char *obj)
                 colour = func_002A7820(0x30, 0xFF);
                 tint = (colour << 8) | 0x60000000;
                 colour = colour | ((colour << 16) | tint);
-                particle = func_002BDCE8(obj + 0x10, 0.025f, 1.0f, 1.0f, spin, D_L09_001A8F20,
+                particle = SpawnSpinningSparkParticle(obj + 0x10, 0.025f, 1.0f, 1.0f, spin, D_L09_001A8F20,
                                        energy, colour, 0);
                 if (particle) {
                     char *extra = particle + 0x20;
@@ -379,7 +379,7 @@ tail:
     func_L09_003FE918(obj);
     func_002AEC48(obj, data + 0x210, 0, 0.15f, 0.3f);
     func_L09_003FEAE8(obj);
-    F(data, 0x2F8) = func_00283B98(F(data, 0x2D8), 0.05235988646745682f);
+    F(data, 0x2F8) = FastAddRotations(F(data, 0x2D8), 0.05235988646745682f);
     func_002AEC48(obj, data + 0x290, 11, 0.15f, 0.3f);
     func_L09_003FECF0(obj);
 }

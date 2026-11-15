@@ -69,8 +69,8 @@ void func_L06_003E5428(char *obj) {
         float f[4];
     } buffer;
     if (data->valid == -1) {
-        func_0026FEB8(D_L06_001AF6A0);
-        func_0026FEB8(D_L06_001AF6E0, *(short *)(obj + 0xB2));
+        STUB_printf(D_L06_001AF6A0);
+        STUB_printf(D_L06_001AF6E0, *(short *)(obj + 0xB2));
         func_0029F338(obj);
     }
     switch (m->state) {
@@ -91,12 +91,12 @@ void func_L06_003E5428(char *obj) {
         }
         for (k = 0; k < data->count; k++)
             data->order[k] = buffer.seq.x[k];
-        r = func_00283B98(m->angle, 1.5707964897155762f);
+        r = FastAddRotations(m->angle, 1.5707964897155762f);
         m->mode = 0x60;
         m->state = 1;
         m->angle = r;
         data->effect = -1;
-        data->timer = func_00283CF0(D_L06_001AF620 * 60.0f);
+        data->timer = FloatToInt(D_L06_001AF620 * 60.0f);
         m->flags |= 0x41;
         break;
     }
@@ -107,13 +107,13 @@ void func_L06_003E5428(char *obj) {
         h = (float)data->count * data->step * 0.5f;
         *(Quad *)sphere = *(Quad *)(obj + 0x10);
         sphere[2] += h;
-        sphere[3] = func_00282C10(h * h + r * r);
-        if (func_00282E48(obj + 0x10, D_L06_001B9840) < 80.0f) {
+        sphere[3] = square_root(h * h + r * r);
+        if (fast_vec_dist(obj + 0x10, D_L06_001B9840) < 80.0f) {
             if ((float)func_00283DB8(sphere, 80.0f) >= 0.0f)
                 func_L00_002E6EF8(func_L06_003E57E8, obj);
         }
         if (!func_002E59B0(obj, data->effect))
-            data->effect = func_002E5CF8(0, 4, obj);
+            data->effect = PlayMobySound(0, 4, obj);
         break;
     }
     case 2: {
@@ -131,8 +131,8 @@ void func_L06_003E5428(char *obj) {
         h = (float)data->count * data->step * 0.5f;
         buffer.q = *(Quad *)(obj + 0x10);
         buffer.f[2] += h;
-        buffer.f[3] = func_00282C10(h * h + r * r);
-        if (func_00282E48(obj + 0x10, D_L06_001B9840) < 80.0f &&
+        buffer.f[3] = square_root(h * h + r * r);
+        if (fast_vec_dist(obj + 0x10, D_L06_001B9840) < 80.0f &&
             (float)func_00283DB8(&buffer, 80.0f) >= 0.0f)
             func_L00_002E6EF8(func_L06_003E57E8, obj);
         break;
@@ -150,8 +150,8 @@ void func_L06_004005F8(char *obj) {
         float f[4];
     } buffer;
     if (data->valid == -1) {
-        func_0026FEB8(D_L06_001AFFA0);
-        func_0026FEB8(D_L06_001AFFE0, *(short *)(obj + 0xB2));
+        STUB_printf(D_L06_001AFFA0);
+        STUB_printf(D_L06_001AFFE0, *(short *)(obj + 0xB2));
         func_0029F338(obj);
     }
     switch (m->state) {
@@ -172,12 +172,12 @@ void func_L06_004005F8(char *obj) {
         }
         for (k = 0; k < data->count; k++)
             data->order[k] = buffer.seq.x[k];
-        r = func_00283B98(m->angle, 1.5707964897155762f);
+        r = FastAddRotations(m->angle, 1.5707964897155762f);
         m->mode = 0xFF;
         m->state = 1;
         m->angle = r;
         data->effect = -1;
-        data->timer = func_00283CF0(D_L06_001AFF20 * 60.0f);
+        data->timer = FloatToInt(D_L06_001AFF20 * 60.0f);
         m->flags |= 0x41;
         break;
     }
@@ -188,13 +188,13 @@ void func_L06_004005F8(char *obj) {
         h = (float)data->count * data->step * 0.5f;
         *(Quad *)sphere = *(Quad *)(obj + 0x10);
         sphere[2] += h;
-        sphere[3] = func_00282C10(h * h + r * r);
-        if (func_00282E48(obj + 0x10, D_L06_001B9840) < 80.0f) {
+        sphere[3] = square_root(h * h + r * r);
+        if (fast_vec_dist(obj + 0x10, D_L06_001B9840) < 80.0f) {
             if ((float)func_00283DB8(sphere, 80.0f) >= 0.0f)
                 func_L00_002E6EF8(func_L06_004009B8, obj);
         }
         if (!func_002E59B0(obj, data->effect))
-            data->effect = func_002E5CF8(0, 4, obj);
+            data->effect = PlayMobySound(0, 4, obj);
         break;
     }
     case 2: {
@@ -212,8 +212,8 @@ void func_L06_004005F8(char *obj) {
         h = (float)data->count * data->step * 0.5f;
         buffer.q = *(Quad *)(obj + 0x10);
         buffer.f[2] += h;
-        buffer.f[3] = func_00282C10(h * h + r * r);
-        if (func_00282E48(obj + 0x10, D_L06_001B9840) < 80.0f &&
+        buffer.f[3] = square_root(h * h + r * r);
+        if (fast_vec_dist(obj + 0x10, D_L06_001B9840) < 80.0f &&
             (float)func_00283DB8(&buffer, 80.0f) >= 0.0f)
             func_L00_002E6EF8(func_L06_004009B8, obj);
         break;

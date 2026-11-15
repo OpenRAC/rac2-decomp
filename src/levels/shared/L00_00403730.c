@@ -83,7 +83,7 @@ Moby403730 *func_L00_00403730(Moby403730 *self) {
     Weapon403730 *w;
     f32 rate;
 
-    m = func_0029EFD0(0xE7D);
+    m = CreateMoby(0xE7D);
     if (m != 0) {
         m->alpha = 0x7F;
         m->f32 = 0x7F;
@@ -92,7 +92,7 @@ Moby403730 *func_L00_00403730(Moby403730 *self) {
         m->scale = func_002A7878(0.85f, 1.15f);
         qcopy(m->pos, self->pos);
         if (D_001A8FF4[0] != 0 || D_001A8FF0[0] != 0) {
-            func_00283658(mtx, self->mtx);
+            copy_matrix_rotation(mtx, self->mtx);
             func_002AB6D8(mtx, m->rot);
         } else {
             func_00282C88(m->rot);
@@ -118,7 +118,7 @@ Moby403730 *func_L00_00403730(Moby403730 *self) {
         link = func_002AB1F0(self);
         link->f17 = 0x10;
         if (m->flags & 0x1000) {
-            func_002A6C58(self, 0, 3);
+            SetDeathBits(self, 0, 3);
         }
         if (link != 0 && link->mode == 1) {
             link->mode = 2;

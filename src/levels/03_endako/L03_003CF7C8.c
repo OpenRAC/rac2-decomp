@@ -44,7 +44,7 @@ void func_L03_003CF7C8(char *obj)
     case 1: {
         int yes = 0;
         if (state->source != -1 && func_L03_003CF7B8(D_L03_001B2A1C[0]+state->source*256)) yes = 1;
-        else if (state->handle != -1 && func_002ACBC8(D_00189EA0, state->handle)) yes = 1;
+        else if (state->handle != -1 && IsPointInCuboid(D_00189EA0, state->handle)) yes = 1;
         else if (state->active != -1) yes = func_002A8508(state->active, -1) == 0;
         if (yes) func_002A7750(obj, 2, -1);
         break;

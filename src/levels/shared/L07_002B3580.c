@@ -110,7 +110,7 @@ extern void func_00282CC0(void *, void *, void *);
 
 
 /* Update directional movement, including the state-44 yaw spring.
- * Shares the resident views and locomotion arms with func_L01_002B7360. */
+ * Shares the resident views and locomotion arms with UpdateHeroVelocityForState. */
 void func_L07_002B5738(void)
 {
     union { DriveVector q; float f[4]; } local;
@@ -126,7 +126,7 @@ void func_L07_002B5738(void)
         float speed;
         PlayerDriveView *hero = &D_00189E20;
         if (D_00189E20.frame > 54) {
-            func_002AA2E8((float *)(&D_00189E20.recoveryRate), 0.0069444445f, 0.0019444445f);
+            ApproachValue((float *)(&D_00189E20.recoveryRate), 0.0069444445f, 0.0019444445f);
         }
         if (D_00189E20.frame <= 54) speed = D_00189E20.recoverySpeed;
         else speed = 0.058333337f;
@@ -141,13 +141,13 @@ void func_L07_002B5738(void)
         }
         if (13.0f <= D_00189E20.plane && D_00189E20.plane <= 30.0f) {
             if (27.0f < D_00189E20.plane)
-                func_002AA2E8((float *)(&D_00189E20.lateralSpeed), 0.0f, 0.0022222223f);
-            else func_002AA2E8((float *)(&D_00189E20.lateralSpeed), 0.033333335f, 0.0022222223f);
+                ApproachValue((float *)(&D_00189E20.lateralSpeed), 0.0f, 0.0022222223f);
+            else ApproachValue((float *)(&D_00189E20.lateralSpeed), 0.033333335f, 0.0022222223f);
         }
         local.f[0] = D_00189E20.lateralSpeed;
         local.f[1] = 0.0f;
-        local.f[2] = func_00282DB0(&D_00189E20.velocity, &D_00189E20.basis);
-        func_00283098(&D_00189E20.velocity, &local, &D_00189E20);
+        local.f[2] = FastVecDot(&D_00189E20.velocity, &D_00189E20.basis);
+        matrix_mul_vec3(&D_00189E20.velocity, &local, &D_00189E20);
     } else if (state == 11) {
         D_00189E20.heading = D_00189E20.targetHeading;
         qcopy(&D_00189E20.direction, &D_00189E20.targetDirection);
@@ -157,12 +157,12 @@ void func_L07_002B5738(void)
         if (D_00189E20.useCurrentSpeed != 0) {
             float rate = D_00189E20.animationSpeed * 0.083333336f;
             if (rate < 0.033333335f) rate = 0.033333335f;
-            func_002AA2E8((float *)(&D_00189E20.strafeSpeed), rate, 0.010277778f);
+            ApproachValue((float *)(&D_00189E20.strafeSpeed), rate, 0.010277778f);
             D_00189E20.targetSpeed = D_00189E20.planarDistance;
         } else {
             if (D_00189E20.allowAction != 0 && D_00189E20.actionFrame <= 11)
-                func_002AA2E8((float *)(&D_00189E20.strafeSpeed), 0.0f, 0.0022222223f);
-            else func_002AA2E8((float *)(&D_00189E20.strafeSpeed), 0.07f, 0.0022222223f);
+                ApproachValue((float *)(&D_00189E20.strafeSpeed), 0.0f, 0.0022222223f);
+            else ApproachValue((float *)(&D_00189E20.strafeSpeed), 0.07f, 0.0022222223f);
         }
         if (D_00189E20.axisMode == 0) {
             ((float *)&D_00189E20.velocity)[0] = func_00283180(D_00189E20.inputHeading);
@@ -173,10 +173,10 @@ void func_L07_002B5738(void)
             func_L00_002D3BD8(&local, &D_00189E20.localDirection, D_00189E20.strafeSpeed);
             func_L00_002D3B58(&local.q, &local.q, 0.0f);
             func_L00_002D3BD8(&D_00189E20.velocity, &D_00189E20.velocity, 0.0f);
-            func_00282CC0(&D_00189E20.velocity, &D_00189E20.velocity, &local);
+            FastVecAdd(&D_00189E20.velocity, &D_00189E20.velocity, &local);
         }
         if (D_00189E20.axisMode == 0 && D_00189E20.useCurrentSpeed == 0) {
-            float angle = func_00283C80(D_00189E20.targetHeading, D_00189E20.inputHeading);
+            float angle = FastDiffRots(D_00189E20.targetHeading, D_00189E20.inputHeading);
             float cosine = func_00283198(angle);
             float amount = D_00189E20.inputSpeed * cosine;
             float component = func_00283180(D_00189E20.targetHeading);
@@ -198,8 +198,8 @@ void func_L07_002B5738(void)
                 ((float *)&D_00189E20.velocity)[1] *= 0.08166667f;
             } else {
                 func_L00_002D3BD8(&D_00189E20.velocity, &D_00189E20.velocity, 0.0f);
-                func_00282F20(&local, &D_00189E20.direction, 0.08166667f);
-                func_00282CC0(&D_00189E20.velocity, &D_00189E20.velocity, &local);
+                vec_scale_to_length(&local, &D_00189E20.direction, 0.08166667f);
+                FastVecAdd(&D_00189E20.velocity, &D_00189E20.velocity, &local);
             }
         }
         D_00189E20.targetSpeed = D_00189E20.planarDistance;
@@ -212,7 +212,7 @@ void func_L07_002B5738(void)
             float delta;
             D_00189E20.yawError = func_002AA898(&angle, &D_00189E20.yawRate, 0,
                 D_00189E20.heading, 0.017999999225139618f, 0.2f, 0.12217307090759277f);
-            delta = func_00283BE0(angle, D_00189E20.rotation);
+            delta = fast_subtract_rotations(angle, D_00189E20.rotation);
             func_L00_002AA0F0(0.0f, 0.0f, delta);
         } else {
             oldHeading = D_00189E20.heading;
@@ -237,7 +237,7 @@ void func_L07_002B5738(void)
                 if (D_00189E20.mode == 2) {
                     float rate = D_00189E20.pendingDamping;
                     smoothed = func_L00_002D3A58((char *)&D_00189E20.velocity);
-                    func_002AA2E8(&smoothed, 0.0f, rate);
+                    ApproachValue(&smoothed, 0.0f, rate);
                     func_L00_002D3BD8(&D_00189E20.velocity, &D_00189E20.velocity, smoothed);
                     return;
                 }
@@ -291,7 +291,7 @@ void func_L07_003844C0(unsigned char *obj) {
     frame.normal.q = 0;
     frame.normal.f[2] = 1.0f;
     qcopy(&frame.old, position);
-    func_00282CC0(position, ctx, position);
+    FastVecAdd(position, ctx, position);
     func_002FEE70(*(int *)(ctx + 0x1C), ctx, 0);
     func_00300190(position, position);
     func_00300248(ctx, ctx);
@@ -311,11 +311,11 @@ void func_L07_003844C0(unsigned char *obj) {
     frame.packet.kind = 2;
     frame.packet.class_id = *(unsigned short *)(obj + 0xAA);
     frame.packet.active = 1;
-    if (func_002761F8(&frame.old, position, 0x10, obj, &frame.packet)) {
-        if (!func_00278E78() && *(float *)(ctx + 8) < 0.0f) {
+    if (CollLine(&frame.old, position, 0x10, obj, &frame.packet)) {
+        if (!GetCollHitMaterial() && *(float *)(ctx + 8) < 0.0f) {
             char *effect;
             Vec *spread;
-            func_002FD1B8(D_L00_001B2630, D_L00_001B2638, 1,
+            RippleDisturb(D_L00_001B2630, D_L00_001B2638, 1,
                 *(float *)(obj + 0x10), *(float *)(obj + 0x14), 0.5f, -0.35f);
             *(int *)(ctx + 0x14) = 1;
             func_00282C88(ctx);
@@ -356,21 +356,21 @@ void func_L07_003844C0(unsigned char *obj) {
                 obj[0xBC] = 1;
                 qcopy(obj + 0x10, &reread->point);
                 func_00283028(&frame.velocity, ctx, &reread->normal);
-                func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-                func_00282F20(&frame.normal, &reread->normal, 1.0f);
+                vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+                vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
             } else {
                 if (collision->count < 1)
                     goto finish;
                 obj[0xBC] = 1;
                 qcopy(obj + 0x10, &collision->point);
                 func_00283028(&frame.velocity, ctx, &collision->normal);
-                func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-                func_00282F20(&frame.normal, &collision->normal, 1.0f);
+                vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+                vec_scale_to_length(&frame.normal, &collision->normal, 1.0f);
             }
         }
     } else if (func_00282948(ctx + 0x18)) {
         obj[0xBC] = 1;
-        func_00282CC0((char *)&frame.velocity, (char *)&frame.velocity, ctx);
+        FastVecAdd((char *)&frame.velocity, (char *)&frame.velocity, ctx);
     }
 finish:
     if (obj[0xBC]) {
@@ -403,9 +403,9 @@ void func_L07_003848D8(char *obj) {
     frame.normal.q = 0;
     frame.normal.f[2] = 1.0f;
     qcopy(&frame.old, position);
-    func_00282CC0(position, position, ctx);
+    FastVecAdd(position, position, ctx);
     func_002AFFD8(position, &frame.surface, 0);
-    func_00282D30(&frame.surface, &frame.surface, 0.0003055556f);
+    FastVecScale(&frame.surface, &frame.surface, 0.0003055556f);
     func_L00_0038F3D8(obj);
     frame.packet.moby = obj;
     frame.packet.flags = 0x830000;
@@ -421,7 +421,7 @@ void func_L07_003848D8(char *obj) {
     frame.packet.vector.f[2] = 1.0f;
     frame.packet.active = 1;
     (*(int *)(ctx + 0x14))++;
-    if (func_002761F8(&frame.old, position, 0x10, obj, &frame.packet)) {
+    if (CollLine(&frame.old, position, 0x10, obj, &frame.packet)) {
         collision = &D_L00_001BF200;
         hit = collision->hit;
         if (hit) {
@@ -440,8 +440,8 @@ void func_L07_003848D8(char *obj) {
                 qcopy(dest, source);
             }
             func_00283028(&frame.velocity, ctx, &reread->normal);
-            func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-            func_00282F20(&frame.normal, &reread->normal, 1.0f);
+            vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+            vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
         } else {
             collision = &D_L00_001BF200;
             if (collision->count <= 0)
@@ -449,12 +449,12 @@ void func_L07_003848D8(char *obj) {
             obj[0xBC] = 1;
             qcopy(position, &collision->point);
             func_00283028(&frame.velocity, ctx, &collision->normal);
-            func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-            func_00282F20(&frame.normal, &collision->normal, 1.0f);
+            vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+            vec_scale_to_length(&frame.normal, &collision->normal, 1.0f);
         }
     } else if (func_00282948(ctx + 0x18)) {
         obj[0xBC] = 1;
-        func_00282CC0((char *)&frame.velocity, (char *)&frame.velocity, ctx);
+        FastVecAdd((char *)&frame.velocity, (char *)&frame.velocity, ctx);
     }
 finish:
     if (*(unsigned char *)(obj + 0xBC)) {

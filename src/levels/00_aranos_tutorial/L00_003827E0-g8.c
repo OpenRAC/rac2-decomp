@@ -34,7 +34,7 @@ void func_L00_003827E0(char *obj) {
         words.q = 0;
         words.f[1] = 0.10000001f;
         func_002B0A68(obj, 1, &words, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
-        func_002E5CF8(0, 0, obj);
+        PlayMobySound(0, 0, obj);
         func_0029F338(obj);
         return;
     default:

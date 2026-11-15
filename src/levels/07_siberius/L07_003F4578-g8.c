@@ -75,22 +75,22 @@ void func_L07_003F4970(u8 *a0)
             if ((u16)n == 1) {
                 break;
             }
-            func_002AA2E8((f32 *)(s2 + 0x24), 1.0f, D_L07_001B0E98 * (1.0f / 60.0f));
+            ApproachValue((f32 *)(s2 + 0x24), 1.0f, D_L07_001B0E98 * (1.0f / 60.0f));
             if (1.0f <= *(f32 *)(s2 + 0x24)) {
                 func_002A7750(s1, 1, -1);
             }
         }
         break;
     case 1:
-        func_002AA2E8((f32 *)(s2 + 0x24), 0.0f, D_L07_001B0E9C * (1.0f / 60.0f));
+        ApproachValue((f32 *)(s2 + 0x24), 0.0f, D_L07_001B0E9C * (1.0f / 60.0f));
         if (*(f32 *)(s2 + 0x24) <= 0.0f) {
             func_0029F338(s1);
             return;
         }
         break;
     }
-    *(f32 *)(s2 + 0x28) = func_00283B98(*(f32 *)(s2 + 0x28), D_L07_001B0EA0 * 0.00029088825f);
-    func_L00_002E6CF0(func_L07_003F4CC0, s1);
+    *(f32 *)(s2 + 0x28) = FastAddRotations(*(f32 *)(s2 + 0x28), D_L07_001B0EA0 * 0.00029088825f);
+    func_L00_002E6CF0(DrawSegmentedBeam, s1);
     if (0.333f < *(f32 *)(s2 + 0x24)) {
         func_L07_003F4C18(s1, v, w);
         func_L01_003120A8(*(u32 *)(s1 + 0xB8), v, w, 1, *(f32 *)(s2 + 0x2C), 1.0f, 0, 1, 0);
@@ -184,8 +184,8 @@ void func_L07_003F8780(u8 *a0)
 {
     EffectState *s1 = *(EffectState **)(a0 + 0x68);
 
-    func_L00_00424A08(0, D_L07_001B10B8, 0.003f);
-    func_L00_00424A50(D_L07_001B10BC, 0.003f);
+    follow_camera_set_distance(0, D_L07_001B10B8, 0.003f);
+    follow_camera_set_height(D_L07_001B10BC, 0.003f);
     if (*(u8 *)(a0 + 0x95) != 0) {
         if (s1->effect == 0)
             s1->effect = (Effect *)func_L00_002D70A0(5);
@@ -294,7 +294,7 @@ void func_L07_0040F760(u8 *a0)
         if (*(s16 *)(o + 0xAA) == 0x2F6) {
             u8 *p = D_00189E20;
             if (*(s32 *)(p + 0x229C) == 13 && *(u8 **)(p + 0xAA4) == o && *(u8 **)(p + 0x3A0) != a0) {
-                if (func_00282E48(p + 0x80, o + 0x10) < 8.0f)
+                if (fast_vec_dist(p + 0x80, o + 0x10) < 8.0f)
                     *(u8 **)(p + 0x3A0) = a0;
                 continue;
             }
@@ -359,8 +359,8 @@ void func_L07_003F6960(u8 *a0)
         pos = (char *)a0 + 0x10;
         func_002A8C28((char *)a0, pos, 0x10000, 6.0f, 5.0f, 1.0f, 0, 1, 0);
         func_002A8C28((char *)a0, pos, 1, 4.0f, (f32)state[0x34], 1.0f, 0, 1, 0);
-        func_00282CF0(dir, D_L07_001B9200, pos);
-        func_00282F20(dir, dir, 1.0f);
+        FastVecSub(dir, D_L07_001B9200, pos);
+        vec_scale_to_length(dir, dir, 1.0f);
         func_0032DA58((char *)a0, pos, (char *)dir, 0.0f);
         tune = D_L07_001B9200 - 0x140;
         *(f32 *)(tune + 0x180) = 0.1f;

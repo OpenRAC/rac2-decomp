@@ -34,7 +34,7 @@ void func_L14_00304190(void) {
     axis.q = 0;
     axis.f[0] = 1.0f;
     D_L14_001B23D0 = dst;
-    scale = func_00282DB0(D_L14_001B9730, &axis);
+    scale = FastVecDot(D_L14_001B9730, &axis);
     {
         Record *src = D_L14_00284690;
         int copyIndex;
@@ -43,7 +43,7 @@ void func_L14_00304190(void) {
     }
     for (i = 0; i < *(short *)(D_L14_001B2B20 + 6); i++) {
         if (i >= 10)
-            func_00283388(D_L14_001B2B50);
+            set_identity_matrix(D_L14_001B2B50);
         else
             func_002E3478(i);
         func_002E3940(i);
@@ -69,6 +69,6 @@ void func_L14_00390EC0(Vector *output, char *transform, float yScale, float zSca
             func_002ACEC0(&output[i], &output[i], &axis, angle);
             output[i].f[3] = 1.0f;
         }
-        func_002830C0(&output[i], &output[i], transform);
+        transform_vector(&output[i], &output[i], transform);
     }
 }

@@ -92,7 +92,7 @@ void func_L00_002D2168(s32 seq, s32 frame, float speed)
     }
     obj->nextFrame = frame;
     obj->nextSeq = seq;
-    func_0029F390(obj);
+    update_moby_animation_state(obj);
 
     if (obj->seq != 0xFF)
         obj->current = func_L00_002A4DB0((char *)obj, obj->seq, obj->frame, (s32)D_L00_001B4400);
@@ -105,7 +105,7 @@ void func_L00_002D2168(s32 seq, s32 frame, float speed)
         HA->curve = -1;
     } else {
         HA->rate = 1.0f;
-        HA->curve = func_00283CF0(-speed) - 1;
+        HA->curve = FloatToInt(-speed) - 1;
         HA->step = 0;
         obj->time = 0.0f;
     }

@@ -99,7 +99,7 @@ extern DobboLimits D_L09_001C9F80;
 
 /* Steps a beam link (class 0xD09) once per frame: spins it, runs its state (ramp up, hold, fade
    out and destroy once its owner is gone, too far or past the level limits), damages what the
-   beam touches near the player and passes the link's basis to func_L09_003FB908. */
+   beam touches near the player and passes the link's basis to UpdateBeamLinkRecord. */
 void func_L09_003F6B28(DobboMoby *moby)
 {
     DobboLinkState *state;
@@ -122,11 +122,11 @@ void func_L09_003F6B28(DobboMoby *moby)
     }
     state = moby->data;
     /* each axis draws its own random turn */
-    moby->rotation[0] = func_00283B98(moby->rotation[0],
+    moby->rotation[0] = FastAddRotations(moby->rotation[0],
         func_002A7878(D_L09_001B0EF8 * 0.017453294f, D_L09_001B0EFC * 0.017453294f));
-    moby->rotation[1] = func_00283B98(moby->rotation[1],
+    moby->rotation[1] = FastAddRotations(moby->rotation[1],
         func_002A7878(D_L09_001B0EF8 * 0.017453294f, D_L09_001B0EFC * 0.017453294f));
-    moby->rotation[2] = func_00283B98(moby->rotation[2],
+    moby->rotation[2] = FastAddRotations(moby->rotation[2],
         func_002A7878(D_L09_001B0EF8 * 0.017453294f, D_L09_001B0EFC * 0.017453294f));
     switch (moby->state) {
     case 0:
@@ -139,7 +139,7 @@ void func_L09_003F6B28(DobboMoby *moby)
             moby->f48 = 2;
         }
         func_L09_003F69A0((unsigned char *)moby,
-            D_L09_001B0EE4 * func_002A7790(1.0f - func_00283CE0(state->timer) / state->duration_f));
+            D_L09_001B0EE4 * func_002A7790(1.0f - IntToFloat(state->timer) / state->duration_f));
         if (func_00282948((char *)&state->timer))
             func_002A7750_3((unsigned char *)moby, 2, -1);
         if (!state->owner || state->owner->state == 254 || state->owner->state == 253)
@@ -155,13 +155,13 @@ void func_L09_003F6B28(DobboMoby *moby)
         func_L09_003F69A0((unsigned char *)moby, D_L09_001B0EE0);
         func_L09_003F6AB8((unsigned char *)moby);
         owner = state->owner;
-        if (state->max_distance < func_00282E80(moby->position, owner->position) || !state->owner ||
+        if (state->max_distance < vec_distance_xy(moby->position, owner->position) || !state->owner ||
             state->owner->state == 254 || state->owner->state == 253)
             func_002A7750_3((unsigned char *)moby, 3, -1);
         if (moby->state == 3) {
             if (moby->alpha < D_L09_001B0EF0) {
             destroy:
-                func_L09_003FB788(moby);
+                ReleaseRecordSlot(moby);
                 func_0029F338(moby);
                 return;
             }
@@ -170,7 +170,7 @@ void func_L09_003F6B28(DobboMoby *moby)
         }
         break;
     }
-    distance = func_00282E80(moby->position, D_00189EA0);
+    distance = vec_distance_xy(moby->position, D_00189EA0);
     if (distance < state->radius * 2 + 1) {
         owner = state->owner;
         if (owner && owner->type == 0xCEA && owner->state != 254 && owner->state != 253) {
@@ -207,12 +207,12 @@ void func_L09_003F6B28(DobboMoby *moby)
     if (moby->f_bc == 1) {
         DobboMoby *partner = state->partner;
         if (partner && partner->state != 254 && partner->state != 253) {
-            func_00282CF0(basis[0].f, partner->position, moby->position);
-            func_00282F20(basis, basis, 1);
+            FastVecSub(basis[0].f, partner->position, moby->position);
+            vec_scale_to_length(basis, basis, 1);
             qcopy(&basis[2], D_L09_001AC5A0);
-            func_00282DD8(&basis[2], basis, &basis[1]);
+            FastVecCross(&basis[2], basis, &basis[1]);
             qcopy(&basis[3], moby->position);
-            func_L09_003FB908(moby, basis);
+            UpdateBeamLinkRecord(moby, basis);
         }
     }
 }

@@ -38,7 +38,7 @@ void func_L18_0043C778(u8 *obj) {
         x = 4;
         q = D_L18_001B1B40;
         for (; i < 4; i++, y -= 8, x -= 8, q += 4) {
-            func_00282D30(v, q, *(float *)(obj + 0x2C));
+            FastVecScale(v, q, *(float *)(obj + 0x2C));
             func_L00_0033E220(v, obj, 0x28808080, -1, 0, -1, 0, 0x60,
                              *(float *)(obj + 0x2C) * 1050000.f, .15f);
             func_L00_00324F18(obj, ap, q[0], q[1], q[2]);
@@ -60,10 +60,10 @@ void func_L18_0043C778(u8 *obj) {
             b[0] = 3.f;
             b[1] = 3.f;
             *(float *)(p + 0x18) = .75f;
-            func_00282D30(v, p + 0x10, func_002A7878(6.f, 8.f));
+            FastVecScale(v, p + 0x10, func_002A7878(6.f, 8.f));
             qcopy(a, v);
-            func_00282CF0(v, v, b);
-            func_00282CC0(a, a, b);
+            FastVecSub(v, v, b);
+            FastVecAdd(a, a, b);
             func_L00_0032A258(obj, v, D_L18_001B1B08, D_L18_001B1B00,
                              0xFFFF, -1, D_L18_001B1B30, 9, -128, 255, 0);
             func_002A7750(obj, 2, -1);
@@ -74,7 +74,7 @@ void func_L18_0043C778(u8 *obj) {
         func_L00_0032A258(obj, D_L18_001B1B10, D_L18_001B1B08, D_L18_001B1B00,
                          0xFFFF, 0, D_L18_001B1B30, 6, 0xFA7F, 255, 0);
         func_L00_00324F18(obj, v, 0, 0, 20.f);
-        func_0032C700(v, 0, 5, 5, 5, 5, 5, 0, 1, 0, 1, 0,
+        SpawnExplosion(v, 0, 5, 5, 5, 5, 5, 0, 1, 0, 1, 0,
                       *(float *)(obj + 0x2C) * 2.f, 20.f);
         func_0029F338(obj);
         break;

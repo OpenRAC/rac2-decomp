@@ -25,8 +25,8 @@ int func_L05_0037B538(u8 *object, void *context, int keepPosition, int skipColli
         if (D_L05_001BFB00.count > 0) {
             char *normal = owner + 0xD0;
             ++*(int *)(owner + 0x15C);
-            func_00282D30(normal, D_L05_001BFB00.normal, 0.0009765599970705807f);
-            func_00282F20(normal, normal, 1.0f);
+            FastVecScale(normal, D_L05_001BFB00.normal, 0.0009765599970705807f);
+            vec_scale_to_length(normal, normal, 1.0f);
         }
     } else {
         *(int *)(owner + 0x15C) = 0;

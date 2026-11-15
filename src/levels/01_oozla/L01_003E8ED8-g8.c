@@ -211,18 +211,18 @@ void func_L01_003E8ED8(HintMoby *obj) {
     if ((!D_0018C750.f6c || (u32)(D_001A7390 - D_0018C750.f70) > 108000U) &&
         ((D_0018C958.f98 & (1U << D_001A79F0)) < 1U))
         func_00288E18(0x9b5, 12);
-    if (!D_0018C958.f9c && func_002ACBC8(D_00189E20.position, s->area[0]) && !D_0018C750.fc)
+    if (!D_0018C958.f9c && IsPointInCuboid(D_00189E20.position, s->area[0]) && !D_0018C750.fc)
         func_00288E18(0x9b6, 13);
-    if (func_002ACBC8(D_00189E20.position, s->area[1]) && !D_0018C958.fa8)
+    if (IsPointInCuboid(D_00189E20.position, s->area[1]) && !D_0018C958.fa8)
         func_00288E18(0x9b7, 14);
-    if (func_002ACBC8(D_00189E20.position, s->area[2])) {
+    if (IsPointInCuboid(D_00189E20.position, s->area[2])) {
         if (s->messageActive)
             func_00288D90();
         s->messageActive = 0;
     }
-    if (func_002ACBC8(D_00189E20.position, s->area[4]))
+    if (IsPointInCuboid(D_00189E20.position, s->area[4]))
         D_0018C958.fc0 = 0xffff;
-    if (D_001A7AF8[0x24] && func_002ACBC8(D_00189E20.position, s->repeatArea) && !D_0018C958.fc0) {
+    if (D_001A7AF8[0x24] && IsPointInCuboid(D_00189E20.position, s->repeatArea) && !D_0018C958.fc0) {
         if (D_0018C958.fc4 + D_0018C958.fc2 >= D_001A7390 - 2U) {
             D_0018C958.fc2++;
             if (D_0018C958.fc2 >= 180) {
@@ -235,60 +235,60 @@ void func_L01_003E8ED8(HintMoby *obj) {
             D_0018C958.fc2 = 0;
         }
     }
-    if (D_001A7AF8[0x2e] && func_002ACBC8(D_00189E20.position, s->lateArea) &&
+    if (D_001A7AF8[0x2e] && IsPointInCuboid(D_00189E20.position, s->lateArea) &&
         (u32)(D_001A7390 - D_0018C958.fe8) > 3600U)
         func_00288E18(0x9bc, 19);
-    if (func_002ACBC8(D_00189E20.position, s->completeArea0) ||
-        func_002ACBC8(D_00189E20.position, s->completeArea1)) {
+    if (IsPointInCuboid(D_00189E20.position, s->completeArea0) ||
+        IsPointInCuboid(D_00189E20.position, s->completeArea1)) {
         D_001395B8.flag9b = 1;
         D_0018C958.fe4 = 0xffff;
     }
-    if (!D_0018C958.fb4 && func_002ACBC8(D_00189E20.position, s->area[3]) && D_0018C750.f18c < 100)
+    if (!D_0018C958.fb4 && IsPointInCuboid(D_00189E20.position, s->area[3]) && D_0018C750.f18c < 100)
         func_00288E18(0x9b8, 15);
-    if (!D_0018C958.fcc && func_002ACBC8(D_00189E20.position, s->area[5]) && D_0018C750.f198 < 3)
+    if (!D_0018C958.fcc && IsPointInCuboid(D_00189E20.position, s->area[5]) && D_0018C750.f198 < 3)
         func_00288E18(0x9ba, 17);
-    if (!D_0018C958.fd8 && func_002ACBC8(D_00189E20.position, s->area[6]) && !D_0018C750.f0)
+    if (!D_0018C958.fd8 && IsPointInCuboid(D_00189E20.position, s->area[6]) && !D_0018C750.f0)
         func_00288E18(0x9bb, 18);
-    if (D_00189E20.weapon == 0x39 && func_002ACBC8(D_00189E20.position, s->weaponArea) &&
+    if (D_00189E20.weapon == 0x39 && IsPointInCuboid(D_00189E20.position, s->weaponArea) &&
         !D_0018C958.f2b8 && !D_001395B8.flags7b.bits.bit1)
         D_0018C750.f1bc = 0;
-    if (func_002ACBC8(D_00189E20.position, s->weaponArea) &&
+    if (IsPointInCuboid(D_00189E20.position, s->weaponArea) &&
         (!D_0018C750.f1bc || (u32)(D_001A7390 - D_0018C750.f1c0) > 72000U) &&
         D_00189E20.weapon != 0x6f && D_00189E20.weapon != 0x39 &&
         ((D_001395B8.flags7b.value ^ 1) & 1) && func_00282948(&s->messageTimer) &&
         D_0018C958.f2c0 >= 0)
         func_00288E18(0x9e3, 0x3a);
-    if (func_002ACBC8(D_00189E20.position, s->weaponArea) && D_00189E20.field220)
+    if (IsPointInCuboid(D_00189E20.position, s->weaponArea) && D_00189E20.field220)
         D_001395B8.flags7b.bits.bit1 = 1;
-    if (func_002ACBC8(D_00189E20.position, s->exitArea))
+    if (IsPointInCuboid(D_00189E20.position, s->exitArea))
         D_001395B8.flags7b.bits.bit0 = 1;
-    if (!func_002ACBC8(D_00189E20.position, s->departureArea))
+    if (!IsPointInCuboid(D_00189E20.position, s->departureArea))
         s->departed = 1;
     if (!D_001A7BC8[2] && s->departed)
-        func_L01_002EABA8(0x9e4, 0x3b, 1, s->messageArg, -1);
+        TriggerSubtitleInCuboid(0x9e4, 0x3b, 1, s->messageArg, -1);
     if (!D_0018C958.f48) {
         for (p = D_L01_001B2568; p; p = p->next) {
-            if (p->oClass == 0x326 && func_00282E48(p->position, D_00189E20.position) < 10.0f &&
+            if (p->oClass == 0x326 && fast_vec_dist(p->position, D_00189E20.position) < 10.0f &&
                 !D_L01_0027EAC8.key0 && D_L01_0027EAC8.key == -1 && !D_0018C958.f48 &&
                 !func_00312E10(p)) {
                 if (D_00189E20.field24cc < D_001A7A00)
                     func_00288E18(0x9af, 6);
-                else if (func_00282E48(p->position, D_00189E20.position) < 1.0f && !D_0018C958.f2e8)
+                else if (fast_vec_dist(p->position, D_00189E20.position) < 1.0f && !D_0018C958.f2e8)
                     func_00288E18(0x9e7, 0x3e);
             }
         }
     }
     if (func_L01_00305E18(3) == 2 && func_L01_00305E18(1) != 2 && !(D_001395B8.flags75 & 2) &&
-        func_002ACBC8(D_00189E20.position, s->missionArea)) {
+        IsPointInCuboid(D_00189E20.position, s->missionArea)) {
         D_001395B8.flags75 |= 2;
         func_0028A180(0xa3c, 0x93);
     }
     for (i = 0; i < 11; i++) {
-        if (func_002ACBC8(D_00189E20.position, s->dialogueAreas[i]))
+        if (IsPointInCuboid(D_00189E20.position, s->dialogueAreas[i]))
             break;
     }
     found = i < 11;
-    if (func_002ACBC8(D_00189E20.position, s->specialArea)) {
+    if (IsPointInCuboid(D_00189E20.position, s->specialArea)) {
         if (s->lastDialogue != 4 && !D_001A63A8.busy && D_001A63A8.key == -1) {
             s32 key = s->specialDialogue;
             D_001A63A8.selection = 0;

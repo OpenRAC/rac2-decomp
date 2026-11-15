@@ -48,11 +48,11 @@ void func_L08_0041EA88(u8 *a0)
     *(u8 *)(s0 + 0x8A) = 0;
     qcopy(&sc, D_L08_001B9D30);
     sc.s.scale = 0.0f;
-    func_00282F20((char *)&sc, (char *)&sc, 2.5f);
+    vec_scale_to_length((char *)&sc, (char *)&sc, 2.5f);
     sc.s.scale = 0.7f;
-    func_00282CC0((char *)&sc, (char *)(a0 + 0x10), (char *)&sc);
+    FastVecAdd((char *)&sc, (char *)(a0 + 0x10), (char *)&sc);
     *(u32 *)(a0 + 0x98) = 0;
-    if (func_002761F8(r + 0x80, (char *)&sc, 2, (void *)*(u32 *)(r + 0x2290), 0) != 0) {
+    if (CollLine(r + 0x80, (char *)&sc, 2, (void *)*(u32 *)(r + 0x2290), 0) != 0) {
         qcopy(&sc, &D_L08_001BFF60);
         if (func_00277258((char *)&sc, 2, (void *)*(u32 *)(r + 0x2290), 0.4f) != 0) {
             qcopy(&sc, &D_L08_001BFF60);

@@ -46,13 +46,13 @@ void func_0028E2A8(void)
     state = D_00189E20;
     if (state[0x22B4] == 2) {
         if (D_001A8FB0.handle != -1) {
-            func_0028B6C8(D_001A8FB0.handle, 0);
+            set_animation_parameter(D_001A8FB0.handle, 0);
             D_001A8FB0.handle = -1;
         }
         *(unsigned short *)(state + 0x1878) = func_0028B3D0(0x10, 0xFFFF,
             func_0028BA50, func_0028BA88, func_0028DDD8, (int)(state + 0x1874), 0xC8);
     } else if (D_001A8FB0.handle != -1) {
-        func_0028B6C8(D_001A8FB0.handle, 0);
+        set_animation_parameter(D_001A8FB0.handle, 0);
         D_001A8FB0.handle = -1;
     }
 }

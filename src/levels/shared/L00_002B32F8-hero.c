@@ -75,10 +75,10 @@ void func_L00_002B32F8(void)
         D_00189E20.field22b0 == 18 ||
         (D_00189E20.vehicle_mode == 0 && D_00189E20.capsule_bottom < 0.53f) ||
         D_00189E20.control_mode == 17 || D_00189E20.base_condition ||
-        func_00282E80((char *)&D_00189E20 + 0x240, (char *)&D_00189E20 + 0x80) >
+        vec_distance_xy((char *)&D_00189E20 + 0x240, (char *)&D_00189E20 + 0x80) >
             D_00189E20.radius * 0.5f) {
-        func_002AA2E8(&D_00189E20.capsule_top, D_00189E20.top_target, 0.02f);
-        func_002AA2E8(&D_00189E20.capsule_bottom, D_00189E20.bottom_target, 0.02f);
+        ApproachValue(&D_00189E20.capsule_top, D_00189E20.top_target, 0.02f);
+        ApproachValue(&D_00189E20.capsule_bottom, D_00189E20.bottom_target, 0.02f);
         func_002AA3A8(&D_00189E20.radius, &D_00189E20.radius_velocity,
                      D_00189E20.radius_target, 0.02f, 0.3f, 0.0666666701f);
     }

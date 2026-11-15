@@ -101,16 +101,16 @@ void func_L14_003E2328(char *self) {
     int i, j, k;
 
     qcopy(pos, self + 0x10);
-    func_00282CF0(a, D_L14_001B9500, pos);
-    func_00282F20(a, a, 1.0f);
-    func_00282DD8(b, a, D_0018A0E0);
-    func_00282F20(b, b, 1.0f);
-    func_00282DD8(c, b, a);
-    func_00282D30(off, a, D_L14_001B04C0);
-    func_00282CC0(pos, pos, off);
+    FastVecSub(a, D_L14_001B9500, pos);
+    vec_scale_to_length(a, a, 1.0f);
+    FastVecCross(b, a, D_0018A0E0);
+    vec_scale_to_length(b, b, 1.0f);
+    FastVecCross(c, b, a);
+    FastVecScale(off, a, D_L14_001B04C0);
+    FastVecAdd(pos, pos, off);
     for (i = 0; i < 4; i++) {
-        func_00282D30(p.pos[i], D_L14_001AA250[i], D_L14_001B04BC * func_L14_003E22A8(self));
-        func_002830C0(p.pos[i], p.pos[i], a);
+        FastVecScale(p.pos[i], D_L14_001AA250[i], D_L14_001B04BC * func_L14_003E22A8(self));
+        transform_vector(p.pos[i], p.pos[i], a);
         qcopy(corners[i], p.pos[i]);
     }
     func_00281DE8(&p, 0x3C, 1, 0x80);
@@ -124,21 +124,21 @@ void func_L14_003E2328(char *self) {
     p.uv[2][1] = 0;
     p.uv[3][0] = 1;
     p.uv[3][1] = 1;
-    func_002FC560(0x47, 0x31001);
-    func_00280B90(&p, 0, 0);
+    VU1_addGSregister(0x47, 0x31001);
+    draw_world_quad(&p, 0, 0);
     func_00281DE8(&p, -1, 2, 0x80);
     p.regs = 0x8000000054ULL;
-    func_002FC560(0x47, 0x53001);
-    func_00282CF0(x, corners[2], corners[0]);
-    func_00282CF0(y, corners[1], corners[0]);
+    VU1_addGSregister(0x47, 0x53001);
+    FastVecSub(x, corners[2], corners[0]);
+    FastVecSub(y, corners[1], corners[0]);
     for (j = 0; j < 8; j++) {
         for (k = 0; k < 8; k++) {
             func_L14_003E2688(self, &p, 0, corners, x, y, j, k);
             func_L14_003E2688(self, &p, 1, corners, x, y, j, k + 1);
             func_L14_003E2688(self, &p, 2, corners, x, y, j + 1, k);
             func_L14_003E2688(self, &p, 3, corners, x, y, j + 1, k + 1);
-            func_00280B90(&p, 0, 0);
+            draw_world_quad(&p, 0, 0);
         }
     }
-    func_002FC560(0x47, 0x5360B);
+    VU1_addGSregister(0x47, 0x5360B);
 }

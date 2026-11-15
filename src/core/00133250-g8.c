@@ -14,13 +14,13 @@ int func_00133250(int arg0, int arg1, int arg2, int arg3) {
         return 0;
     }
     if (D_001A74C8 != 0) {
-        while (func_00132028() != 0) {
+        while (snd_Pump() != 0) {
         }
     }
-    func_00133580(0);
+    snd_CheckLoadInProgress(0);
     args[0] = arg0;
     args[1] = arg1;
     args[2] = arg2;
     args[3] = arg3;
-    D_001A748C = func_00132C48(0x2A, 0x10, args);
+    D_001A748C = snd_SendCommandSync(0x2A, 0x10, args);
 }

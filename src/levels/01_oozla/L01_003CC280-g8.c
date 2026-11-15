@@ -77,7 +77,7 @@ void func_L01_003CC280(u8 *a0)
         a0[0xA8] = 0xFF;
 
         if (0.0f < damage) {
-            state[0x57] = func_00283CF0(damage * 20.0f) + 100;
+            state[0x57] = FloatToInt(damage * 20.0f) + 100;
             func_002AB800(a0, state + 0x50);
         }
         if (a0[0x95] == 1 && ent) {
@@ -113,11 +113,11 @@ void func_L01_003CC280(u8 *a0)
                         func_002A7750(a0, 0, 7);
                     }
                     if (0.1f < damage) {
-                        func_00282CF0(state + 0xA0, a0 + 0x10, D_00189EA0);
+                        FastVecSub(state + 0xA0, a0 + 0x10, D_00189EA0);
                         w = (damage + damage + 3.0f) * 0.016666668f;
                         if (0.20000002f < w)
                             w = 0.20000002f;
-                        func_00282F20(state + 0xA0, state + 0xA0, w);
+                        vec_scale_to_length(state + 0xA0, state + 0xA0, w);
                         *(s32 *)(state + 0xA8) = 0;
                     }
                 }
@@ -137,7 +137,7 @@ void func_L01_003CC280(u8 *a0)
     }
     func_002B3BA8(a0, *(s32 *)(state + 0xF0), 0, a0[0x95] < 5, 0.0f, 0.0f);
     kind = a0[0x31];
-    if (kind && func_00282E48(a0 + 0x10, D_L01_001B94C0) < 48.0f) {
+    if (kind && fast_vec_dist(a0 + 0x10, D_L01_001B94C0) < 48.0f) {
         func_002A93B0(a0);
         a0[0x6F] = 45;
     }

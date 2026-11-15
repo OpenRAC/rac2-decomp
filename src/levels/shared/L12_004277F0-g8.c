@@ -93,7 +93,7 @@ void func_L12_004277F0(char *obj) {
             s->f358=1;
             W(obj,0x9C)=3;
             U(obj,0x34)|=0x100;
-            s->f90=func_00282E48(obj+0x10,D_L12_001B2B10)-1.5f;
+            s->f90=fast_vec_dist(obj+0x10,D_L12_001B2B10)-1.5f;
         } else {
             W(obj,0x9C)=12;
             s->f90=F(obj,0x18)-1.0f;
@@ -106,8 +106,8 @@ void func_L12_004277F0(char *obj) {
         } else s->f238=-1; }
         s->f344=func_002A7878(1.0f,1.3329999446868896f);
         F(obj,0x2C)=F(P(obj,0x24),0x24)*s->f344;
-        s->f48=func_00283CF0(15.0f);
-        s->f4A=func_00283CF0(6.4f);
+        s->f48=FloatToInt(15.0f);
+        s->f4A=FloatToInt(6.4f);
         s->f60=11; s->f98=3;
         s->f80=0.2f; s->f84=0.2f; s->f8C=0.4f;
         if(s->f230!=-1) {
@@ -138,7 +138,7 @@ void func_L12_004277F0(char *obj) {
         }
         qcopy((char *)s+0x300,obj+0x10);
     }
-    if(B(obj,0x31) && func_00282E48(obj+0x10,D_L12_001B9E00)<24.0f) {
+    if(B(obj,0x31) && fast_vec_dist(obj+0x10,D_L12_001B9E00)<24.0f) {
         func_002A93B0(obj); B(obj,0x6F)=22;
     }
     result=func_002B0ED8(obj,(char *)s+0x50,0);

@@ -117,7 +117,7 @@ void func_00289178(void)
     case 0:
         if (D_00254E78.pending < 0)
             return;
-        D_00254E78.entry = func_00288F48(D_00254E78.pending);
+        D_00254E78.entry = Help_FindIndex(D_00254E78.pending);
         func_0028A030(D_00254E78.pending);
         D_00254E78.pending = -1;
         if (D_00254E78.entry >= 0)
@@ -149,7 +149,7 @@ void func_00289178(void)
         }
         break;
     case 3:
-        func_002B0CE0(5, 0, 1);
+        ForceClaimNotice(5, 0, 1);
         if (D_00138324 & 16) {
             RECORD_SUBTITLE_TIME();
             D_00254E78.state = 7;
@@ -164,7 +164,7 @@ void func_00289178(void)
         break;
     case 4: {
         int subtitles;
-        func_002B0CE0(5, 0, 1);
+        ForceClaimNotice(5, 0, 1);
         if (D_00138324 & 16) {
             RECORD_SUBTITLE_TIME();
             RECORD_SUBTITLE_LEVEL();
@@ -192,7 +192,7 @@ void func_00289178(void)
         break;
     }
     case 5:
-        func_002B0CE0(5, 0, 1);
+        ForceClaimNotice(5, 0, 1);
         if (D_00254E78.timer >= D_00254E78.duration) {
             /* Retail reloads this option again below, without an intervening store. */
             if (SUBTITLE_VOICE_ID == -1 || !HAS_AUDIO(SUBTITLE_VOICE_ID) ||
@@ -219,7 +219,7 @@ void func_00289178(void)
         D_00254E78.timer = 0;
         break;
     case 7:
-        func_002B0CE0(5, 0, 1);
+        ForceClaimNotice(5, 0, 1);
         if (SUBTITLE_VOICE_ID == D_001A63A8.id - 6000 &&
             (unsigned short)(D_001A63A8.state - 6) > 1)
             D_001A63A8.state = 5;

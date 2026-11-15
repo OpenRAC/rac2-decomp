@@ -22,12 +22,12 @@ void func_00280328(void) {
     char *base;
     int *p;
 
-    func_002833B8(m, 1024.0f);
+    set_scale_matrix(m, 1024.0f);
     cam = D_001B5340;
-    func_00282D30(&m[12], cam, -1024.0f);
+    FastVecScale(&m[12], cam, -1024.0f);
     m[15] = 1.0f;
     if (D_001B169C != 8) {
-        func_002FC410(D_0010ED30, D_0010ED20);
+        VU1_addDataRef(D_0010ED30, D_0010ED20);
         D_001B169C = 8;
     }
     *(int *)((char *)D_001B22A8 + 0) = 0x10000000;
@@ -40,10 +40,10 @@ void func_00280328(void) {
     *(int *)(base + 0x18) = 0;
     *(int *)(base + 0x1C) = 0x6C0C43A4;
     p = (int *)(base + 0x20);
-    func_00283788(p, cam - 0x100, m);
+    multiply_matrix(p, cam - 0x100, m);
     *(float *)(p + 14) += D_001A86F0;
     p = (int *)(base + 0x60);
-    func_00283788(p, cam - 0x80, m);
+    multiply_matrix(p, cam - 0x80, m);
     *(float *)(p + 14) += D_001A86F0;
     g = D_001B9040;
     *(int *)(base + 0xA0) = 0x8000;

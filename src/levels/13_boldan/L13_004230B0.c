@@ -88,7 +88,7 @@ void func_L13_004230B0(u8 *m) {
             if(!func_L00_00324120(m)) m[0x20]=1;
         } else if(!func_00277258(m+0x10,1,m,2.8f) ||
             (F(m,0x18)<=D_00189E20.height || (D_00189E20.platform!=0 && D_00189E20.platform==m) || (D_L13_001BFD18 && *(short *)(D_L13_001BFD18+0xAA)==0xEA3))) {
-            { u8 *sound=D_00188660+I(d,0xB0)*0x70; if(P(sound,0x88)!=m || !sound[0x74]) I(d,0xB0)=func_002E5CF8(0,4,m); }
+            { u8 *sound=D_00188660+I(d,0xB0)*0x70; if(P(sound,0x88)!=m || !sound[0x74]) I(d,0xB0)=PlayMobySound(0,4,m); }
             func_002AA548((float *)(m+0x18),(float *)(d+0x64),F(d,0x88),0.00194444449f,0.00166666671f,0.100000009f);
         } else {
             n=I(d,0xB0);
@@ -105,7 +105,7 @@ void func_L13_004230B0(u8 *m) {
             I(d,0xB0)=-1;
             if(!func_L00_00324120(m)) { I(d,0x60)=I(d,0x74); --I(d,0x78); m[0x20]=1; }
         } else {
-            { u8 *sound=D_00188660+I(d,0xB0)*0x70; if(P(sound,0x88)!=m || !sound[0x74]) I(d,0xB0)=func_002E5CF8(0,4,m); }
+            { u8 *sound=D_00188660+I(d,0xB0)*0x70; if(P(sound,0x88)!=m || !sound[0x74]) I(d,0xB0)=PlayMobySound(0,4,m); }
         }
         break;
     case 4:
@@ -120,6 +120,6 @@ void func_L13_004230B0(u8 *m) {
     c=(int)(f*255.0f);
     color=(c<<8)|0x7F000000;
     I(m,0x78)=(c<<16)|color|c;
-    func_00282CF0(delta,m+0x10,oldpos);
+    FastVecSub(delta,m+0x10,oldpos);
     func_002AD6F0(d+0x20,delta,oldrot,m+0xF0);
 }

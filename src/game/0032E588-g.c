@@ -38,7 +38,7 @@ extern void func_0032E708(Moby_32E588 *);
 /* Spawn class 0xDC1 at a position with its timed parameters and start its update. */
 Moby_32E588 *func_0032E588(f32 *pos, f32 *vec, s32 frames, f32 x, f32 y, f32 z, f32 w, s32 a, s32 b, s32 c, s32 d, s32 e)
 {
-    Moby_32E588 *m = func_0029EFD0(0xDC1);
+    Moby_32E588 *m = CreateMoby(0xDC1);
     if (m != 0) {
         Pvar_32E588 *pv;
         m->f30 = 0xFF;
@@ -55,7 +55,7 @@ Moby_32E588 *func_0032E588(f32 *pos, f32 *vec, s32 frames, f32 x, f32 y, f32 z, 
             dst[2] = vec[2];
         }
         pv->frames = frames;
-        pv->step = 1.0f / func_00283CE0(frames);
+        pv->step = 1.0f / IntToFloat(frames);
         pv->f1C = w;
         pv->f20 = a;
         pv->f24 = b;

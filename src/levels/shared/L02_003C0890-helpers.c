@@ -27,7 +27,7 @@ void func_L02_003C0890(u8 *object) {
             *(f32 *)(data + 0x10) = heading;
             *(int *)(data + 0x18) = value;
         }
-        child = func_0029EFD0(0xAFC);
+        child = CreateMoby(0xAFC);
         *(u8 **)(data + 0x1C) = child;
         if (child) {
             child[0x30] = object[0x30];
@@ -44,7 +44,7 @@ void func_L02_003C0890(u8 *object) {
                 flags->flags |= 0x41;
             }
         } else {
-            func_0026FEB8(ref_L02_003C0890_00, *(short *)(object + 0xB2));
+            STUB_printf(ref_L02_003C0890_00, *(short *)(object + 0xB2));
         }
     }
 }

@@ -35,12 +35,12 @@ void func_L00_0041E958(float range, float angle, float elevation)
     }
     candidate = HERO->ptr[0x1450 / 4];
     if (candidate == 0 || (u8)candidate[0x20] == 254 || (u8)candidate[0x20] == 253)
-        target = func_002AF580(D_00189E20 + 0x80, &position, &count, 0, 0, 0, angle, elevation, range, 0.0f, 0.0f, 1, 0);
+        target = SelectBestTargetInCone(D_00189E20 + 0x80, &position, &count, 0, 0, 0, angle, elevation, range, 0.0f, 0.0f, 1, 0);
     else
         target = candidate;
     if (target && (HERO->i[0xBE4 / 4] == 0 || HERO->i[0xBE8 / 4] != 0)) {
         HERO->f[0xBEC / 4] = func_00283248(*(float *)(target + 0x10) - HERO->f[0x80 / 4], *(float *)(target + 0x14) - HERO->f[0x84 / 4]);
-        func_00282CF0(&HERO->q[0xBC0 / 16], target + 0x10, &HERO->f[0x80 / 4]);
+        FastVecSub(&HERO->q[0xBC0 / 16], target + 0x10, &HERO->f[0x80 / 4]);
         HERO->ptr[0xBE4 / 4] = target;
     } else {
         HERO->f[0xBEC / 4] = heading;

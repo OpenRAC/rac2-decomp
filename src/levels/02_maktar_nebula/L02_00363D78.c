@@ -71,7 +71,7 @@ void func_L02_00363D78(void)
     short *angles;
 
     D_L02_001B3B20[0]->relocation_state = 0;
-    func_00283388(D_L02_001B3B50);
+    set_identity_matrix(D_L02_001B3B50);
     func_002E3478(0);
     func_002E3940(0);
     func_002E3478(1);
@@ -98,7 +98,7 @@ void func_L02_00363D78(void)
                 effect->texture_index = (func_001163B0() >> 16) & 1;
                 effect->flags = effect_flags;
                 effect->angle = func_002A7940();
-                effect->size = func_00283CE0(func_002A77E0(0x30) + 0x20) * 0.00390625f;
+                effect->size = IntToFloat(func_002A77E0(0x30) + 0x20) * 0.00390625f;
                 azimuth = func_002A7940();
                 elevation = func_002A7940();
                 trig_product = func_00283180(azimuth);
@@ -130,8 +130,8 @@ void func_L02_00363D78(void)
             angles = &effect->state.angles.azimuth;
             effect->state.angles.azimuth = (short)(effect->state.angles.azimuth + 1);
             angles[1] = (u16)(angles[1] + 1);
-            azimuth = func_00283CE0((orbit->azimuth & 0xFFF) - 0x800) * 0.0015339808f;
-            elevation = func_00283CE0((angles[1] & 0xFFF) - 0x800) * 0.0015339808f;
+            azimuth = IntToFloat((orbit->azimuth & 0xFFF) - 0x800) * 0.0015339808f;
+            elevation = IntToFloat((angles[1] & 0xFFF) - 0x800) * 0.0015339808f;
             trig_product = func_00283180(azimuth);
             trig_product = trig_product * func_00283198(elevation);
             trig_product = trig_product * 50.0f;
@@ -158,7 +158,7 @@ void func_L02_00363D78(void)
         }
     }
     func_L02_00364A18();
-    func_002FC560(0x42, (0x8000ULL << 24) | 0x44);
+    VU1_addGSregister(0x42, (0x8000ULL << 24) | 0x44);
     func_002E3478(2);
     func_002E3940(2);
     func_002E3478(3);

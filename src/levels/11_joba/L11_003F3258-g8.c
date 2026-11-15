@@ -22,22 +22,22 @@ int func_L11_003F3258(char *object, float *from, float *to)
     else qcopy(to, D_00189EA0);
     factor = 0.2f;
     /* The subtraction writes all 16 bytes, preserving the initialized input W. */
-    func_00282CF0(delta, to, from);
+    FastVecSub(delta, to, from);
     result = 0;
     radius = D_L11_001B0590[0] + func_002A7878(-D_L11_001B0590[1], D_L11_001B0590[1]);
     if (radius * radius < func_00282EB0(from, to)) {
         func_002ACB48(delta, D_L11_001B0590[2]);
-        func_00282F20(delta, delta, radius);
-        func_00282CC0(to, from, delta);
+        vec_scale_to_length(delta, delta, radius);
+        FastVecAdd(to, from, delta);
     } else {
         result = 1;
         factor = 0.5f;
     }
     height = to[2];
-    func_00282CF0(radial, to, func_L11_004417E8(*(void **)(object + 0xb8)));
+    FastVecSub(radial, to, func_L11_004417E8(*(void **)(object + 0xb8)));
     radial[2] = 0.0f;
-    func_00282F20(radial, radial, D_L11_001B0558[0] - factor);
-    func_00282CC0(to, func_L11_004417E8(*(void **)(object + 0xb8)), radial);
+    vec_scale_to_length(radial, radial, D_L11_001B0558[0] - factor);
+    FastVecAdd(to, func_L11_004417E8(*(void **)(object + 0xb8)), radial);
     to[2] = height;
     return result;
 }

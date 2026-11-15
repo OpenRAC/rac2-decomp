@@ -26,7 +26,7 @@ Particle *func_L00_0033C0D0(char *object,Quad *position,float *velocity,int *con
     Particle *p=func_002B9030(0x4a);
     if(p) {
         float *out;
-        p->alpha=func_00283CF0(0.04f)-96;
+        p->alpha=FloatToInt(0.04f)-96;
         p->b3=flag?0x48:0x44;
         p->b1=0;
         out=p->payload;
@@ -35,10 +35,10 @@ Particle *func_L00_0033C0D0(char *object,Quad *position,float *velocity,int *con
         p->life=0;
         qcopy(&p->position, position);
         out[0]=velocity[0];out[1]=velocity[1];out[2]=velocity[2];
-        func_00282CF0(relative,position,object+0x10);
+        FastVecSub(relative,position,object+0x10);
         qzero_nc(&matrix[0]);qzero_nc(&matrix[1]);qzero_nc(&matrix[2]);qzero_nc(&matrix[3]);
-        func_00283698(matrix,object+0xc0);
-        func_002830C0(relative,relative,matrix);
+        matrix_from_basis_rows(matrix,object+0xc0);
+        transform_vector(relative,relative,matrix);
         out[4]=relative[0];out[5]=relative[1];out[6]=relative[2];
         *(char **)(out+3)=object;
         *(int **)(out+7)=config;

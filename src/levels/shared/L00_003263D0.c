@@ -26,9 +26,9 @@ void func_L00_003263D0(char *owner, void *origin, int count, int mode,
     float life;
     for (i = 0; i < count; i++) {
         func_002A7A00(&velocity, 0.0f, speed * 0.016666668f);
-        func_00282CC0(&velocity, &velocity, velocity_origin);
+        FastVecAdd(&velocity, &velocity, velocity_origin);
         func_002A7A00(&position, 0.0f, radius);
-        func_00282CC0(&position, &position, origin);
+        FastVecAdd(&position, &position, origin);
         random_rotation.q = 0;
         random_rotation.f[0] = func_002A7940();
         random_rotation.f[2] = func_002A7940();
@@ -49,7 +49,7 @@ void func_L00_003263D0(char *owner, void *origin, int count, int mode,
             b = (color >> 16) & 0xff;
             g = (color >> 8) & 0xff;
             payload = *(char **)(effect + 0x68);
-            func_002A0488(effect, r, g, b);
+            set_moby_color(effect, r, g, b);
             ((unsigned char *)effect)[0x23] = t;
             if (r != g || r != b)
                 t = 1;

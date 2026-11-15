@@ -125,7 +125,7 @@ void func_00116460(void *reent_ptr, INTERNAL_SIZE_T nb) {
             chunk_at_offset(old_top, old_top_size)->size = SIZE_SZ | PREV_INUSE;
             chunk_at_offset(old_top, old_top_size + SIZE_SZ)->size = SIZE_SZ | PREV_INUSE;
             if (old_top_size >= MINSIZE)
-                func_00116E10(reent_ptr, chunk2mem(old_top));
+                FreeReentrant(reent_ptr, chunk2mem(old_top));
         }
     }
 

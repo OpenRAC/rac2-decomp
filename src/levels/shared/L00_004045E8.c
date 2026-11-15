@@ -37,7 +37,7 @@ void func_L00_004045E8(char *arg)
         break;
     case 1:
         qcopy(old,arg+16);
-        func_00282CC0(arg+16,(int *)ctx,arg+16);
+        FastVecAdd(arg+16,(int *)ctx,arg+16);
         func_00300190(arg+16,arg+16);
         func_00300248(ctx,ctx);
         func_002FEE70(*(int *)(ctx+48),(int *)ctx,0);
@@ -60,20 +60,20 @@ void func_L00_004045E8(char *arg)
             do {
                 obj=*objects;
                 if (*(short *)(*(char **)(obj+36)+70)==5 || (*(unsigned short *)(obj+52)&0x4000)) {
-                    func_00282CF0(delta,obj+16,arg+16);
-                    func_00282F20(delta,delta,1.0f);
-                    func_00282F20(hit,hit,1.0f);
+                    FastVecSub(delta,obj+16,arg+16);
+                    vec_scale_to_length(delta,delta,1.0f);
+                    vec_scale_to_length(hit,hit,1.0f);
                     force=10.0f;
                     power=D_L00_00262570+224*(unsigned char)D_00139568[32];
                     boosted=*(int *)power && (unsigned char)power[4]==3;
                     if(boosted) force=20.0f;
-                    func_002A8C00(hit,arg,force,0x810000,delta);
+                    make_hit_descriptor(hit,arg,force,0x810000,delta);
                     *(TI128 *)(hit)=*(TI128 *)(delta);
                     *(float *)(hit+12)=5627.9248046875f;
                     hit[25]=3; *(int *)(hit+32)=1; hit[24]=5;
                     *(unsigned short *)(hit+26)=*(unsigned short *)(obj+170);
-                    func_002A8E20(obj,hit);
-                    func_0032D758(obj,78,*(int *)(*(char **)(ctx+52)+184));
+                    QueueMobyImpact(obj,hit);
+                    StartAttachedEffect(obj,78,*(int *)(*(char **)(ctx+52)+184));
                 }
                 objects++;
             } while(--count);
@@ -89,8 +89,8 @@ void func_L00_004045E8(char *arg)
     ref_L00_004045E8_00(func_L00_00404B48,arg);
     *(TI128 *)(delta)=*(TI128 *)(arg+16);
     func_L00_00404ED8(arg,delta,old);
-    func_00282CC0((char *)delta,arg+16,ctx+32);
-    func_00282CC0(hit,(char *)old,ctx+32);
+    FastVecAdd((char *)delta,arg+16,ctx+32);
+    FastVecAdd(hit,(char *)old,ctx+32);
     func_L00_00404ED8(arg,delta,hit);
     if (*(int *)(ctx+24)==-1)
         *(int *)(ctx+24)=func_L00_002FCF18(arg+16,5.0f,0.0f,1.0f,0.8f,0.25f);

@@ -33,10 +33,10 @@ extern s8 D_001B5340[];
 s32 func_002E4528(s32 arg0, s32 arg1) {
     s32 temp_ret;
     s32 sp[1];
-    func_00282CF0(sp, arg0 + 0x20, ((s32)D_001B5340));
-    func_00282D30(sp, sp, 0.75f);
+    FastVecSub(sp, arg0 + 0x20, ((s32)D_001B5340));
+    FastVecScale(sp, sp, 0.75f);
     func_00282FB8(sp, sp, 64.0f);
-    func_00282CC0(sp, sp, ((s32)D_001B5340));
-    temp_ret = func_002761F8(arg1, sp, 0x82, (*(s32 *)((s8 *)(arg0) + (0x18))), 0);
+    FastVecAdd(sp, sp, ((s32)D_001B5340));
+    temp_ret = CollLine(arg1, sp, 0x82, (*(s32 *)((s8 *)(arg0) + (0x18))), 0);
     return temp_ret;
 }

@@ -29,7 +29,7 @@ void func_L03_00409AB0(u8 *object)
         }
         break;
     case 3:
-        func_002AA2E8((f32 *)(vars + 0x10),
+        ApproachValue((f32 *)(vars + 0x10),
                      D_L03_001B1658 * 0.01666666753590107f,
                      D_L03_001B1650 * 0.00027777778450399637f);
         *(f32 *)(object + 0x18) += *(f32 *)(vars + 0x10);

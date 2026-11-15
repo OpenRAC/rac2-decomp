@@ -68,7 +68,7 @@ void func_L12_0041D808(u8 *self)
     qcopy(oldrot, self + 0xF0);
     switch (self[0x20]) {
     case 0:
-        F(self, 0xF8) = func_00283B98(F(self, 0xF8), 1.5707964897155762f);
+        F(self, 0xF8) = FastAddRotations(F(self, 0xF8), 1.5707964897155762f);
         qcopy_nc(p->origin, self + 0x10);
         p->origin[3] = F(self, 0xF8);
         func_002A7750(self, 2, -1);
@@ -77,23 +77,23 @@ void func_L12_0041D808(u8 *self)
         p->targetHeight = p->destination ?
             F((u8 *)(p->node * 128 + (u32)D_L12_001B2F8C), 0x38) : p->origin[2];
         p->targetAngle = p->destination ?
-            func_00283B98(F((u8 *)(p->node * 128 + (u32)D_L12_001B2F8C), 0x78),
+            FastAddRotations(F((u8 *)(p->node * 128 + (u32)D_L12_001B2F8C), 0x78),
                           4.7123894691467285f) : p->origin[3];
         y = F((u8 *)(p->node * 128 + (u32)D_L12_001B2F8C), 0x38);
         if (D_00189E20.lift == self && D_00189E20.active) {
-            func_002B0C28(8, 0x279A, 1);
+            TryClaimNotice(8, 0x279A, 1);
             if (D_00138324 & 16) {
                 p->destination = (p->destination + 1) & 1;
                 func_002A7750(self, 3, -1);
             }
         } else if (p->destination) {
             if (func_00282C48(D_00189E20.position[2] - p->origin[2]) < 4.0f &&
-                func_00282E80(D_00189E20.position, self + 0x10) < 32.0f) {
+                vec_distance_xy(D_00189E20.position, self + 0x10) < 32.0f) {
                 p->destination = 0;
                 func_002A7750(self, 1, -1);
             }
         } else if (func_00282C48(D_00189E20.position[2] - y) < 4.0f &&
-                   func_00282E80(D_00189E20.position, self + 0x10) < 32.0f) {
+                   vec_distance_xy(D_00189E20.position, self + 0x10) < 32.0f) {
             p->destination = 1;
             func_002A7750(self, 1, -1);
         }
@@ -118,13 +118,13 @@ void func_L12_0041D808(u8 *self)
         p->targetHeight = p->destination ?
             F((u8 *)(p->node * 128 + (u32)D_L12_001B2F8C), 0x38) : p->origin[2];
         p->targetAngle = p->destination ?
-            func_00283B98(F((u8 *)(p->node * 128 + (u32)D_L12_001B2F8C), 0x78),
+            FastAddRotations(F((u8 *)(p->node * 128 + (u32)D_L12_001B2F8C), 0x78),
                           4.7123894691467285f) : p->origin[3];
         target = p->targetHeight;
         speed = 0.003888889f;
         if (p->destination) {
             if (D_00189E20.position[2] < F(self, 0x18) - 1.0f &&
-                func_002ACBC8(D_00189E20.position, p->node)) {
+                IsPointInCuboid(D_00189E20.position, p->node)) {
                 target += 3.0f;
                 speed = 0.007777778f;
             } else {
@@ -150,12 +150,12 @@ void func_L12_0041D808(u8 *self)
             LiftSound *entry = (LiftSound *)(p->sound * 0x70 + (s32)D_00188660);
 
             if (entry->owner != self || !entry->active)
-                p->sound = func_002E5CF8(0, 4, self);
+                p->sound = PlayMobySound(0, 4, self);
         }
         func_002AAA00(self + 0xF8, &p->angularSpeed, p->targetAngle,
                       0.00014544412260875106f, 0.00014544412260875106f, 0.10471977f, 0);
         break;
     }
-    func_00282CF0(delta, self + 0x10, oldpos);
+    FastVecSub(delta, self + 0x10, oldpos);
     func_002AD6F0((u8 *)p + 0x20, delta, oldrot, self + 0xF0);
 }

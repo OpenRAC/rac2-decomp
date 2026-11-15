@@ -35,7 +35,7 @@ extern char D_L00_001B1428 __attribute__((sda));
 
 char *func_L00_00412FF8(char *owner)
 {
-    char *object = func_0029EFD0(0x1195);
+    char *object = CreateMoby(0x1195);
     char *state;
     int counter;
     float local[4];
@@ -46,7 +46,7 @@ char *func_L00_00412FF8(char *owner)
         state = *(char **)(object + 0x68);
         *(unsigned short *)(state + 0x1E) = D_L00_001B13DC;
         *(int *)(state + 0x18) = -1;
-        func_002833F0(object + 0xC0, D_00189EB0);
+        euler_rotation_basis(object + 0xC0, D_00189EB0);
         counter = D_L00_001B1378;
         *(char **)(state + 0) = D_L00_0025A1A0 + counter * 0xA0;
         *(char **)(state + 4) = D_L00_0025A420 + counter * 0x140;
@@ -55,8 +55,8 @@ char *func_L00_00412FF8(char *owner)
         D_L00_001B1378 = (D_L00_001B1378 + 1) % 4;
         *(int *)(state + 0x24) = D_L00_001B137C;
         *(char **)(state + 0x20) = owner;
-        func_00282D30(local, *(char **)(D_00189EB0 + 0x2200) + 0xE0, 0.75f);
-        func_00282CC0(object + 0x10, D_00189EB0 - 0x10, local);
+        FastVecScale(local, *(char **)(D_00189EB0 + 0x2200) + 0xE0, 0.75f);
+        FastVecAdd(object + 0x10, D_00189EB0 - 0x10, local);
         func_L00_00413298(object);
     }
     return object;
@@ -89,7 +89,7 @@ void func_L00_004173B0(char *object)
         func_L00_0033E888(life, &pos, &velocity, 0x4F808080, 0x08101010, func_002A7820(35, 50), 1, 0.5f, 1, -1, 1);
     }
     func_002AFFD8(object + 0x10, &velocity, 1);
-    func_00282F20(&velocity, &velocity, 0.2f);
+    vec_scale_to_length(&velocity, &velocity, 0.2f);
     qcopy_nc(&pos, object + 0x10);
     pos.f[2] += func_002A7878(0.1f, 0.4f);
     func_L00_0033C0D0(object, &pos, &velocity, &D_L00_001B1418, func_002A77E0(2));

@@ -15,7 +15,7 @@ extern int D_L16_001B0410 __attribute__((sda));
 extern int D_L16_001B0414 __attribute__((nosda));
 char *func_L16_003C3A10(char *parent,char *position,char *rotation)
 {
-    char *object=func_0029EFD0(0xa80);
+    char *object=CreateMoby(0xa80);
     char *state;
     float factor;
     if (object != 0) {

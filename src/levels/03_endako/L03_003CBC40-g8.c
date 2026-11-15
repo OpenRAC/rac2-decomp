@@ -22,17 +22,17 @@ void func_L03_003CBC40(char *a0)
     f32 f;
 
     moby = *(s32 *)(a0 + 0x68);
-    func_00283658(work + 0x150, a0 + 0xC0);
+    copy_matrix_rotation(work + 0x150, a0 + 0xC0);
     qcopy(work + 0x180, a0 + 0x10);
     *(TI128 *)(work + 0x190) = 0;
     *(f32 *)(work + 0x18C) = 1.0f;
     *(f32 *)(work + 0x198) = 0.19634954f;
-    func_002833F0(work + 0x120, work + 0x190);
-    res = func_L01_0031BC68(D_L03_001B0430[0], D_L03_001B0430[1], *(f32 *)(moby + 0x30));
+    euler_rotation_basis(work + 0x120, work + 0x190);
+    res = PulseColor(D_L03_001B0430[0], D_L03_001B0430[1], *(f32 *)(moby + 0x30));
     f = *(f32 *)(moby + 0x18);
     if (f < 1.0f)
-        res = func_00283D38(res & 0xFFFFFF, res, f);
-    func_L02_002EF968(work, 5, res, &D_L03_001B0410, D_L03_0029B9F0, 1);
-    func_L02_002EF968(work + 0x90, 5, res, &D_L03_001B0410, D_L03_0029B9F0 + 0x10, 1);
+        res = FastTweenColor(res & 0xFFFFFF, res, f);
+    FillQuadPacket(work, 5, res, &D_L03_001B0410, D_L03_0029B9F0, 1);
+    FillQuadPacket(work + 0x90, 5, res, &D_L03_001B0410, D_L03_0029B9F0 + 0x10, 1);
     func_L01_002E1510(work, 2, work + 0x120, 0x20, work + 0x150);
 }

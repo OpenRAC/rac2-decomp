@@ -19,21 +19,21 @@ void func_002C7620(char *self) {
     float t;
     int color;
 
-    if (func_00282978(self + 0xA) != 0) {
+    if (FastDecTimer(self + 0xA) != 0) {
         func_002B9180(self);
         return;
     }
     s0 = self + 0x10;
     buf.word = *(TI128 *)s0;
-    func_00282CC0(s0, s0, s2);
+    FastVecAdd(s0, s0, s2);
     *(float *)(s2 + 8) = *(float *)(s2 + 8) - *(float *)(s2 + 0xC);
-    t = func_00282DF0(s2);
-    func_00282F20(&offset, s2, t * 0.4f);
-    func_00282CF0(self + 0x20, s0, &offset);
+    t = FastVecLength(s2);
+    vec_scale_to_length(&offset, s2, t * 0.4f);
+    FastVecSub(self + 0x20, s0, &offset);
     *(float *)(self + 0x2C) = 1.0f;
     if (*(short *)(self + 0xA) < *(unsigned char *)(self + 8)) {
-        t = func_00283CE0(*(short *)(self + 0xA)) / func_00283CE0(*(unsigned char *)(self + 8));
-        color = (func_00283CF0(t * 127.0f) << 24) | 0x00FFFFFF;
+        t = IntToFloat(*(short *)(self + 0xA)) / IntToFloat(*(unsigned char *)(self + 8));
+        color = (FloatToInt(t * 127.0f) << 24) | 0x00FFFFFF;
         *(int *)(self + 0xC) = color;
         *(int *)(self + 4) = color;
     }

@@ -42,8 +42,8 @@ int func_00317D78(char *self)
         *(float *)(data + 0x28C) = *(float *)(self + 0x18);
         *(float *)(self + 0x2C) *= 0.75f;
         *(int *)(data + 0x2A8) = -1;
-        data[0x48] = func_00283CF0(10.0f);
-        data[0x4A] = func_00283CF0(8.0f);
+        data[0x48] = FloatToInt(10.0f);
+        data[0x4A] = FloatToInt(8.0f);
         if (*(float *)(data + 0x290) == -1.0f)
             *(float *)(data + 0x290) = 0.01745329424738884f * func_002A78D8(25.0f, 100.0f);
         else
@@ -85,7 +85,7 @@ int func_00317D78(char *self)
         func_002A7750(self, 2, 0);
         if (*(u8 *)(self + 0x43)) func_002A7470(self, 0, 0, 0);
     }
-    if (*(u8 *)(self + 0x31) && func_00282E48(self + 0x10, D_001B5200.pos) < 48.0f) {
+    if (*(u8 *)(self + 0x31) && fast_vec_dist(self + 0x10, D_001B5200.pos) < 48.0f) {
         func_002A93B0(self); self[0x6F] = 45;
     }
     dead = (unsigned char)data[0x2E] == 2;

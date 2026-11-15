@@ -34,7 +34,7 @@ void func_00312EB0(unsigned char *object)
     func_002B00D8(object + 0x10, start, start, -0.5f);
     qcopy(end, start);
     func_002B00D8(object + 0x10, end, end, 1.5f);
-    if (func_002761F8(start, end, 2, object, 0)) {
+    if (CollLine(start, end, 2, object, 0)) {
         hit = 1;
         height = *(float *)(ref_L00_00312EB0_00 + 0x28);
     } else {

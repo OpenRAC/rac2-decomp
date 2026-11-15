@@ -25,7 +25,7 @@ void func_L02_003C9D78(char *obj)
     case 1:
         one = 1.0f;
         if (*(float *)(sub + 8) < one) {
-            func_002AA2E8((float *)(sub + 8), one, D_L02_001AFFB8 * (1.0f / 60.0f));
+            ApproachValue((float *)(sub + 8), one, D_L02_001AFFB8 * (1.0f / 60.0f));
             goto update;
         }
         list = (char **)(sub + 0x10);
@@ -33,10 +33,10 @@ void func_L02_003C9D78(char *obj)
             goto cleanup;
         if (*(int *)(sub + 4) == 0) {
             *(int *)(sub + 4) = 1;
-            func_L02_003CA0A8(obj);
+            SpawnEffectParticleRing(obj);
         }
         func_L02_003C9ED0(obj);
-        func_002AA2E8((float *)(sub + 12), one, D_L02_001AFFBC[0] * (1.0f / 60.0f));
+        ApproachValue((float *)(sub + 12), one, D_L02_001AFFBC[0] * (1.0f / 60.0f));
         goto update;
     cleanup:
         count = 3;
@@ -53,7 +53,7 @@ void func_L02_003C9D78(char *obj)
         func_0029F338(obj);
         break;
     update:
-        func_L00_002E6CF0((void *)func_L02_003CA280, obj);
+        func_L00_002E6CF0((void *)DrawEffectQuad, obj);
         break;
     }
 }

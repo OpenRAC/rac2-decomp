@@ -38,16 +38,16 @@ void func_00305058(char *obj)
                 tgt = *(char **)(rec + 0x68);
                 qcopy(b, tgt + 0x10);
                 if (link != 0) {
-                    func_00282D30(e, tgt + 0xE0, *(float *)(link + 0x10));
-                    func_00282CC0(b, b, e);
+                    FastVecScale(e, tgt + 0xE0, *(float *)(link + 0x10));
+                    FastVecAdd(b, b, e);
                 }
                 ent = ENTRY();
                 scale = *(float *)(ent + 0x50) * 0.016666668f;
-                func_00282CF0(c, b, d);
-                func_00282F20(c, c, scale);
+                FastVecSub(c, b, d);
+                vec_scale_to_length(c, c, scale);
                 func_003001E0(c, c, d);
                 func_00305438(obj, c);
-                func_002E5CF8(0, 0, obj);
+                PlayMobySound(0, 0, obj);
                 *(s32 *)(rec + 0x40) = D_001AEC08;
                 *(s32 *)(rec + 0x44) = 6;
                 if (--*(s32 *)(rec + 0x60) <= 0)

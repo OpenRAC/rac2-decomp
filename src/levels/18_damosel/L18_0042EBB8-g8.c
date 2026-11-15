@@ -66,7 +66,7 @@ void func_L18_0042EBB8(u8 *a) {
 
     if (a[0x20] >= 2) {
         if (!func_002E59B0(a, s->voice))
-            s->voice = func_002E5CF8(0, 4, a);
+            s->voice = PlayMobySound(0, 4, a);
     } else if (func_002E59B0(a, s->voice)) {
         ReleaseVoice(a, s);
     }
@@ -76,7 +76,7 @@ void func_L18_0042EBB8(u8 *a) {
         func_002B3380(a, s->hit, &s->health);
         if (s->health <= 0.0f || s->state == 2) {
             int i;
-            func_0032C700(a + 0x10, 1, 0x19, 20, 1.0f, 20.0f, 20, 20, 45, 1, 1, 1, 0, 0);
+            SpawnExplosion(a + 0x10, 1, 0x19, 20, 1.0f, 20.0f, 20, 20, 45, 1, 1, 1, 0, 0);
             for (i = 0; i < 6; i++) {
                 if (s->ids[i] != -1)
                     func_L18_004329B0(D_L18_001B281C + (s->ids[i] << 8));
@@ -84,7 +84,7 @@ void func_L18_0042EBB8(u8 *a) {
             if (func_002E59B0(a, s->voice))
                 ReleaseVoice(a, s);
             func_002A7A00(vec, 0.10000000894069672f, 0.25f);
-            func_00282CC0(vec, vec, s->velocity);
+            FastVecAdd(vec, vec, s->velocity);
             func_002B0A68(a, 63, vec, 255, 3.0f, 6.0f, 3.0f, 6.0f);
             func_0029F338(a);
             return;
@@ -126,7 +126,7 @@ void func_L18_0042EBB8(u8 *a) {
         break;
     }
     case 1:
-        if (s->trigger != -1 && func_002ACBC8(D_00189EA0, s->trigger))
+        if (s->trigger != -1 && IsPointInCuboid(D_00189EA0, s->trigger))
             func_L18_0042F768(a);
         break;
     case 2: {

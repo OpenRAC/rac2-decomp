@@ -53,7 +53,7 @@ void func_L30_0040B6B0(char *m, void *position, int count,
         start = D_L30_001B1820[0];
         end = D_L30_001B1824[0];
     }
-    if (!func_00278E78()) {
+    if (!GetCollHitMaterial()) {
         start = D_L30_001B18B8[0];
         end = D_L30_001B18BC[0];
     }
@@ -67,23 +67,23 @@ void func_L30_0040B6B0(char *m, void *position, int count,
             y *= func_002A7878(minRadius, maxRadius);
             offset[1] = y;
             offset[2] = 0;
-            func_00283098(offset, offset, m + 0xC0);
+            matrix_mul_vec3(offset, offset, m + 0xC0);
             {
-                float range = speed * ((maxRadius - func_00282DF0(offset)) * 0.01666666753590107f) / maxRadius;
-                func_00282F20(velocity, offset, func_002A7878(range / D_L30_001B1858[0], range));
+                float range = speed * ((maxRadius - FastVecLength(offset)) * 0.01666666753590107f) / maxRadius;
+                vec_scale_to_length(velocity, offset, func_002A7878(range / D_L30_001B1858[0], range));
             }
             qcopy(motion, vars);
             motion[2] *= D_L30_001B18AC[0];
-            func_00282CC0(velocity, velocity, motion);
+            FastVecAdd(velocity, velocity, motion);
             velocity[2] += func_002A7878(rise / D_L30_001B185C[0], rise) * 0.01666666753590107f;
             vzero(accel);
-            func_00282CC0(offset, offset, position);
+            FastVecAdd(offset, offset, position);
             offset[2] += D_L30_001B18B0[0];
             velocity[3] = size;
             accel[3] = endSize;
-            a = func_00283CF0(func_002A7878(D_L30_001B1828[0], D_L30_001B182C[0]));
-            b = func_00283CF0(func_002A7878(D_L30_001B1830[0], D_L30_001B1834[0]));
-            c = func_00283CF0(func_002A7878(D_L30_001B1838[0], D_L30_001B183C[0]));
+            a = FloatToInt(func_002A7878(D_L30_001B1828[0], D_L30_001B182C[0]));
+            b = FloatToInt(func_002A7878(D_L30_001B1830[0], D_L30_001B1834[0]));
+            c = FloatToInt(func_002A7878(D_L30_001B1838[0], D_L30_001B183C[0]));
             particle = func_002BAA28(offset, velocity, accel, start, end, a, b, c, -1);
             if (particle && (func_001163B0() & 1))
                 particle[3] = 0x48;

@@ -43,12 +43,12 @@ void func_L00_0038F8B8(char *actor) {
     pitch = 0.0f;
     heading = D_00189E20.heading;
     if (D_00189E20.platform == 1 || D_00189E20.special) {
-        pitch = func_00283248(func_00282E20(actor + 0xD0), *(float *)(actor + 0xD8));
+        pitch = func_00283248(vec_length_xy(actor + 0xD0), *(float *)(actor + 0xD8));
         func_002AF000(point, 0.6f, heading, -pitch);
-        func_00282CC0(point, point, actor + 0x10);
+        FastVecAdd(point, point, actor + 0x10);
     } else {
         func_002AF000(point, 0.6f, heading, -pitch);
-        func_00282CC0(point, point, actor + 0x10);
+        FastVecAdd(point, point, actor + 0x10);
     }
     if (*(u8 *)(actor + 0x43) != 3) func_002A7470(actor, 3, 0, 0);
     func_L00_002F46C8();
@@ -61,7 +61,7 @@ void func_L00_0038F8B8(char *actor) {
     state[0] = 60;
     goto finish;
 denied:
-    if (D_00138180.buttons & D_00189E20.buttons) func_002E5CF8(0, 0, actor);
+    if (D_00138180.buttons & D_00189E20.buttons) PlayMobySound(0, 0, actor);
 finish:
     if ((*(u8 *)(actor + 0x60) & 2) && *(u8 *)(actor + 0x43) != 1) func_002A7470(actor, 1, 0, 0);
     *(u16 *)(actor + 0x34) |= 4;

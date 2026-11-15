@@ -15,8 +15,8 @@ void func_002E9110(char *object)
     f32 to[4] __attribute__((aligned(16)));
     int i;
 
-    func_00283098(position, D_001AC1A0, object + 0xC0);
-    func_00282CC0(position, position, object + 0x10);
+    matrix_mul_vec3(position, D_001AC1A0, object + 0xC0);
+    FastVecAdd(position, position, object + 0x10);
     for (i = 0; i < 2; i++) {
         from[0] = func_002A7878(-0.008333334f, 0.008333334f);
         from[1] = func_002A7878(-0.008333334f, 0.008333334f);

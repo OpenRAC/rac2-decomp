@@ -41,9 +41,9 @@ void func_L15_003AA298(unsigned char *object)
     delta[2] = 0.03333333507180214f;
     normal[2] = 1.0f;
     qcopy(previous, position);
-    func_00282CC0(position, position, state);
+    FastVecAdd(position, position, state);
     func_002AFFD8(position, temporary, 0);
-    func_00282D30(temporary, temporary, 0.0003055555862374604f);
+    FastVecScale(temporary, temporary, 0.0003055555862374604f);
     func_L00_0038F3D8((char *)object);
     *(void **)(collision + 0x10) = object;
     *(int *)(collision + 0x14) = 0x830000;
@@ -59,7 +59,7 @@ void func_L15_003AA298(unsigned char *object)
     *(float *)(collision + 8) = 1.0f;
     collision[0x19] = 1;
     ++*(int *)(state + 0x14);
-    if (func_002761F8(previous, position, 0x10, object, collision)) {
+    if (CollLine(previous, position, 0x10, object, collision)) {
         if (D_L15_001BFC00.object) {
             if ((D_L15_001BFC00.object == D_0018C0B0 || *(short *)(D_L15_001BFC00.object + 0xaa) == 0xc0) &&
                 *(int *)(state + 0x18) >= 0x122)
@@ -69,18 +69,18 @@ void func_L15_003AA298(unsigned char *object)
             *(unsigned char *)(object + 0xbc) = 1;
             qcopy(object + 0x10, &D_L15_001BFC00.position);
             func_00283028(delta, state, D_L15_001BFC00.normal);
-            func_00282F20(delta, delta, 0.03333333507180214f);
-            func_00282F20(normal, D_L15_001BFC00.normal, 1.0f);
+            vec_scale_to_length(delta, delta, 0.03333333507180214f);
+            vec_scale_to_length(normal, D_L15_001BFC00.normal, 1.0f);
         } else if (D_L15_001BFC00.count > 0) {
             *(unsigned char *)(object + 0xbc) = 1;
             qcopy(position, &D_L15_001BFC00.position);
             func_00283028(delta, state, D_L15_001BFC00.normal);
-            func_00282F20(delta, delta, 0.03333333507180214f);
-            func_00282F20(normal, D_L15_001BFC00.normal, 1.0f);
+            vec_scale_to_length(delta, delta, 0.03333333507180214f);
+            vec_scale_to_length(normal, D_L15_001BFC00.normal, 1.0f);
         }
     } else if (func_00282948((s32 *)(state + 0x18))) {
         *(unsigned char *)(object + 0xbc) = 1;
-        func_00282CC0(delta, delta, state);
+        FastVecAdd(delta, delta, state);
     }
 finished:
     if ((unsigned char)object[0xbc]) {

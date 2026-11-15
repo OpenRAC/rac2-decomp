@@ -16,7 +16,7 @@ void func_L08_003D0508(u8 *object)
         object[0x20] = 1;
         *(u16 *)(object + 0x34) |= 0x20;
     }
-    func_00282CF0(displacement, object + 0x10, state + 0x90);
+    FastVecSub(displacement, object + 0x10, state + 0x90);
     func_002AD6F0(state + 0x50, displacement, object + 0xF0, object + 0xF0);
     qcopy(state + 0x90, object + 0x10);
 }

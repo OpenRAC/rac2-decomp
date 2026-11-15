@@ -130,7 +130,7 @@ void func_L23_004190C8(PickMoby *arg0, u64 mask, int mode, int check) {
 
             if (check != 0)
                 ok = func_L23_00419CE0(*keys[j]);
-            d = func_00282E48(pts[j], state->ref);
+            d = fast_vec_dist(pts[j], state->ref);
             if ((d < f && ok == 0) || n == 1) {
                 best = j;
                 f = d;
@@ -148,9 +148,9 @@ void func_L23_004190C8(PickMoby *arg0, u64 mask, int mode, int check) {
 
             if (check != 0)
                 ok = func_L23_00419CE0(*keys[j]);
-            func_00282CF0(d1, (float *)D_00189EA0, arg0->pos);
-            func_00282CF0(d2, pts[j], arg0->pos);
-            d = func_00282DB0(d1, d2);
+            FastVecSub(d1, (float *)D_00189EA0, arg0->pos);
+            FastVecSub(d2, pts[j], arg0->pos);
+            d = FastVecDot(d1, d2);
             if ((f < d && ok == 0) || n == 1) {
                 best = j;
                 f = d;
@@ -170,9 +170,9 @@ void func_L23_004190C8(PickMoby *arg0, u64 mask, int mode, int check) {
 
                 if (check != 0)
                     ok = func_L23_00419CE0(*keys[j]);
-                func_00282CF0(d1, (float *)D_00189EA0, arg0->pos);
-                func_00282CF0(d2, pts[j], arg0->pos);
-                d = func_00282DB0(d1, d2);
+                FastVecSub(d1, (float *)D_00189EA0, arg0->pos);
+                FastVecSub(d2, pts[j], arg0->pos);
+                d = FastVecDot(d1, d2);
                 if ((d < f && ok == 0) || n == 1) {
                     best = j;
                     f = d;
@@ -189,19 +189,19 @@ void func_L23_004190C8(PickMoby *arg0, u64 mask, int mode, int check) {
 
                 if (check != 0)
                     ok = func_L23_00419CE0(*keys[j]);
-                func_00282CF0(d1, state->target, state->origin);
-                func_00282CF0(d2, pts[j], state->origin);
-                func_00282F20(n1, d1, 1.0f);
-                func_00282F20(n2, d2, 1.0f);
+                FastVecSub(d1, state->target, state->origin);
+                FastVecSub(d2, pts[j], state->origin);
+                vec_scale_to_length(n1, d1, 1.0f);
+                vec_scale_to_length(n2, d2, 1.0f);
                 qcopy(a ,n1);
                 qcopy(b ,n2);
                 qcopy(up1,&arg0->up);
                 qcopy(up2,&arg0->up);
-                func_00282DD8(c1, up1, a);
-                func_00282DD8(c2, up2, b);
+                FastVecCross(c1, up1, a);
+                FastVecCross(c2, up2, b);
                 func_L00_00325600(a, state->frame, 0);
                 func_L00_00325600(b, state->frame, 0);
-                d = func_00282C48(func_00282DB0(a, b) - lim);
+                d = func_00282C48(FastVecDot(a, b) - lim);
                 if ((d < f && ok == 0) || n == 1) {
                     best = j;
                     f = d;

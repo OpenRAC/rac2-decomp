@@ -33,10 +33,10 @@ void func_L06_00403DA8(void *unused, void *position)
     }
     for (i = 0; i < 16; ++i) {
         func_002A7A00(vector, 1.0f, 1.0f);
-        func_00282CC0(vector, vector, position);
+        FastVecAdd(vector, vector, position);
         vector[2] = D_L06_001B2FC8 + 0.05f;
         effect = func_L00_00338AE0((char *)vector, D_L06_001A8F20, (int)data, func_002A7878(0.7f, 1.0f), i == 0 ? 2.0f : -2.0f);
         if (effect != 0)
-            *(short *)(effect + 10) = func_00283CF0(func_002A7878(30.0f, 60.0f));
+            *(short *)(effect + 10) = FloatToInt(func_002A7878(30.0f, 60.0f));
     }
 }

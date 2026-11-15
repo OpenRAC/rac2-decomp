@@ -37,10 +37,10 @@ void func_L14_003DE9B0(char *self) {
         c = *(int *)(s + 0x18);
         *(int *)(self + 0x78) = (long long)(int)(0x80000000 | (c << 16) | (c << 8)) | c;
         if (*(int *)(s + 0xC) == -1) {
-            if (func_00282E48(D_00189EA0, self + 0x10) < 10.0f) {
+            if (fast_vec_dist(D_00189EA0, self + 0x10) < 10.0f) {
                 func_002A7750(self, 2, -1);
             }
-        } else if (func_002ACBC8(D_00189EA0, *(int *)(s + 0xC))) {
+        } else if (IsPointInCuboid(D_00189EA0, *(int *)(s + 0xC))) {
             func_002A7750(self, 2, -1);
         }
         break;
@@ -68,7 +68,7 @@ void func_L14_003DE9B0(char *self) {
             qcopy(v, D_L14_001A8F20);
             v[2] -= 0.5f;
             func_002B4090(*(char **)(s + 0x10), v, *(float *)(s + 4), 0.0f, 0.0f);
-            func_002833F0(*(char **)(s + 0x10) + 0xC0, *(char **)(s + 0x10) + 0xF0);
+            euler_rotation_basis(*(char **)(s + 0x10) + 0xC0, *(char **)(s + 0x10) + 0xF0);
         }
         break;
     case 3:

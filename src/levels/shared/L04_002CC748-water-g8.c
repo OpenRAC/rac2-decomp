@@ -65,9 +65,9 @@ void func_L04_003A21F8(WaterGrid *pos, s32 count) {
     f32 *height;
     u64 *data;
 
-    func_L04_003A0FC8();
-    func_002FC560(0x47,0x53001);
-    func_002FC560(0x48,0x53001);
+    BuildWaterRenderSetupPacket();
+    VU1_addGSregister(0x47,0x53001);
+    VU1_addGSregister(0x48,0x53001);
     i = 0;
     if (count > 0) do {
         u16 active = pos->active;
@@ -88,7 +88,7 @@ void func_L04_003A21F8(WaterGrid *pos, s32 count) {
         pos->scroll1 = scroll1;
         pos->uv2 = uv2;
         pos->uv3 = uv3;
-        D_L04_001AD820=func_00283D38(D_L04_001ADA30,D_L04_001ADA34,blend);
+        D_L04_001AD820=FastTweenColor(D_L04_001ADA30,D_L04_001ADA34,blend);
         x_offset = pos->position[0] + D_L04_001AD848;
         x_end = pos->position[0] - D_L04_001AD848;
         corners[0][0] = x_offset;
@@ -113,13 +113,13 @@ void func_L04_003A21F8(WaterGrid *pos, s32 count) {
         near_bits = 0;
         far_bits = 0;
         for (j = 0; j < 4; j++) {
-            func_00282CF0(near_clip, corners[j], D_L04_001B9680);
-            func_00282D30(far_clip, near_clip, 1024.0f);
-            func_00282D30(near_clip, near_clip, 1024.0f);
-            func_002830C0(far_clip, far_clip, D_L04_001B9680 - 0x80);
-            func_002830C0(near_clip, near_clip, D_L04_001B9680 - 0x40);
-            far_bits = (far_bits << 8) | func_00282BE0(far_clip);
-            near_bits = (near_bits << 8) | func_00282BE0(near_clip);
+            FastVecSub(near_clip, corners[j], D_L04_001B9680);
+            FastVecScale(far_clip, near_clip, 1024.0f);
+            FastVecScale(near_clip, near_clip, 1024.0f);
+            transform_vector(far_clip, far_clip, D_L04_001B9680 - 0x80);
+            transform_vector(near_clip, near_clip, D_L04_001B9680 - 0x40);
+            far_bits = (far_bits << 8) | is_vector_outside_clip(far_clip);
+            near_bits = (near_bits << 8) | is_vector_outside_clip(near_clip);
         }
         if ((near_bits & 0x01010101) == 0x01010101) goto next_entity;
         if ((near_bits & 0x02020202) == 0x02020202) goto next_entity;
@@ -128,7 +128,7 @@ void func_L04_003A21F8(WaterGrid *pos, s32 count) {
         if ((near_bits & 0x20202020) == 0x20202020) goto next_entity;
 
         twice=blend+blend;
-        func_L04_0032F1D8((void *)0x70000000, (u8 *)pos + ((*(s32 *)&D_L04_001AD82C) * 0x5c0 + 0x50));
+        ripple_heights_to_scratchpad((void *)0x70000000, (u8 *)pos + ((*(s32 *)&D_L04_001AD82C) * 0x5c0 + 0x50));
         func_L04_0032F3C0(pos);
         func_L04_003A0C40(pos);
         func_L04_003A00E8(pos);
@@ -154,8 +154,8 @@ void func_L04_003A21F8(WaterGrid *pos, s32 count) {
             if (!(near_bits & 0x2f2f2f2f)) mode = 0;
         }
         mask = pos->active;
-        alpha=func_00283CE0(pos->alpha1);
-        v=func_00283CE0(ref_L04_003A21F8_00.alpha);
+        alpha=IntToFloat(pos->alpha1);
+        v=IntToFloat(ref_L04_003A21F8_00.alpha);
         interpolated_alpha = alpha + (v-alpha)*blend;
         lower = 1.0f-twice;
         upper = twice-1.0f;
@@ -166,11 +166,11 @@ void func_L04_003A21F8(WaterGrid *pos, s32 count) {
         reverse = pos->reverse;
         D_L04_001B2C48.bytes += 16;
         if (reverse) {
-            if (twice<=1.0f) { ref_L04_003A21F8_01.b=1; ref_L04_003A21F8_01.alpha=func_00283CF0(lower*70.0f); }
-            else { ref_L04_003A21F8_01.b=2; ref_L04_003A21F8_01.alpha=func_00283CF0(upper*170.5f); }
-        } else if (twice>=1.0f) { n=2; ref_L04_003A21F8_01.b=n; ref_L04_003A21F8_01.alpha=func_00283CF0(upper*170.0f); }
-        else { ref_L04_003A21F8_01.b=1; ref_L04_003A21F8_01.alpha=func_00283CF0(lower*70.0f); }
-        alpha_index=func_00283CF0(interpolated_alpha);
+            if (twice<=1.0f) { ref_L04_003A21F8_01.b=1; ref_L04_003A21F8_01.alpha=FloatToInt(lower*70.0f); }
+            else { ref_L04_003A21F8_01.b=2; ref_L04_003A21F8_01.alpha=FloatToInt(upper*170.5f); }
+        } else if (twice>=1.0f) { n=2; ref_L04_003A21F8_01.b=n; ref_L04_003A21F8_01.alpha=FloatToInt(upper*170.0f); }
+        else { ref_L04_003A21F8_01.b=1; ref_L04_003A21F8_01.alpha=FloatToInt(lower*70.0f); }
+        alpha_index=FloatToInt(interpolated_alpha);
         data = (u64 *)D_L04_001B2C48.words;
         data[0] = 0x4000000000008001ULL;
         data[1] = 0xeeee;
@@ -188,9 +188,9 @@ void func_L04_003A21F8(WaterGrid *pos, s32 count) {
         state1 |= (u64)ref_L04_003A21F8_01.alpha<<32;
         data[4] = state1;
         data[5] = 0x43;
-        data[6] = func_0027C878(pos->texture1);
+        data[6] = GetEffectTextureDescriptor(pos->texture1);
         data[7] = 6;
-        data[8] = func_0027C878(pos->texture0);
+        data[8] = GetEffectTextureDescriptor(pos->texture0);
         data[9] = 7;
         {
             u32 texture_id = pos->texture0;
@@ -213,6 +213,6 @@ next_entity:
     D_L04_001B2C48.words[2] = 0x13000000;
     D_L04_001B2C48.words[3] = 0;
     D_L04_001B2C48.bytes += 16;
-    func_002FC560(0x47,0x5360B);
-    func_002FC560(0x48,0x5360B);
+    VU1_addGSregister(0x47,0x5360B);
+    VU1_addGSregister(0x48,0x5360B);
 }

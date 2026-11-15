@@ -21,14 +21,14 @@ void func_L18_002C4000(void)
             H->b[0x22B8] = 1;
             H->b[0x22BA] = 1;
             if (object[0x43] != 11) {
-                func_L00_002D2168(11, 1, 5.0f);
+                set_hero_animation(11, 1, 5.0f);
                 H->f[0xC20 / 4] = 3.0f;
             }
         } else if (H->i[0xC28 / 4] & 2) {
             H->b[0x22B8] = 0;
             H->b[0x22BA] = 0;
-            if (H->i[0x2294 / 4] == 0x8E) func_L00_002D2168(14, 0, 8.0f);
-            else func_L00_002D2168(13, 0, 9.0f);
+            if (H->i[0x2294 / 4] == 0x8E) set_hero_animation(14, 0, 8.0f);
+            else set_hero_animation(13, 0, 9.0f);
         }
     }
     object = H->ptr[0x2290 / 4];

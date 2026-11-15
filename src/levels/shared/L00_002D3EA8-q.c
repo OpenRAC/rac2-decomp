@@ -13,12 +13,12 @@ float func_L00_002D3EA8(char *in)
     float local[4] __attribute__((aligned(16)));
 
     if (mode == 0)
-        return func_00283248(*(float *)(in + 8), func_00282E20(in));
+        return func_00283248(*(float *)(in + 8), vec_length_xy(in));
     if (mode < 0)
         return 0.0f;
     if (mode >= 3)
         return 0.0f;
     qcopy(local, in);
-    func_002830C0(local, local, p + 64);
-    return func_00283248(local[2], func_00282E20((char *)local));
+    transform_vector(local, local, p + 64);
+    return func_00283248(local[2], vec_length_xy((char *)local));
 }

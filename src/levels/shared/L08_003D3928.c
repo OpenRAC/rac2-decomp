@@ -132,7 +132,7 @@ extern char D_L08_001B1FB0[];
    The records are reached as `sda` offsets, so every access is one assembler macro. */
 void func_L08_003D3928(void *owner, void *pos)
 {
-    float d = func_00282E80(D_00189EA0, pos);
+    float d = vec_distance_xy(D_00189EA0, pos);
 
     if (d < D_L08_001B3490[1].dist) {
         D_L08_001B3490[1].unk1C = 0;
@@ -182,7 +182,7 @@ void func_L08_003D4690(u8 *self)
         if (self[0x43] != 1) func_002A7470(self, 1, 0, 0);
         func_002AF000(direction, 1.0f, *(float *)(self+0xF8), -*(float *)(self+0xF4));
         func_0029FCC0(self, 0, position);
-        func_L08_003B2DB0(self, position, direction, 0x5A);
+        SpawnDirectedEffectObject(self, position, direction, 0x5A);
         i = 4;
         do {
             *(TI128 *)random = 0;
@@ -190,12 +190,12 @@ void func_L08_003D4690(u8 *self)
             random[1] = func_002A7878(-1.0f, 1.0f);
             random[2] = func_002A7878(-1.0f, 1.0f);
             *(TI128 *)velocity = *(TI128 *)random;
-            func_00282F20(velocity, velocity, func_00282DF0(direction)*0.65f);
-            func_00282CC0(velocity, direction, velocity);
-            func_00282F20(velocity, velocity, func_002A7878(0.050000004f, 0.10000001f));
+            vec_scale_to_length(velocity, velocity, FastVecLength(direction)*0.65f);
+            FastVecAdd(velocity, direction, velocity);
+            vec_scale_to_length(velocity, velocity, func_002A7878(0.050000004f, 0.10000001f));
             func_L04_00358AE8(position, velocity, 0x5F2F4F6F, func_002A7820(5,10), 50000.0f);
         } while (--i >= 0);
-        func_00282F20(direction, direction, 0.008333334f);
+        vec_scale_to_length(direction, direction, 0.008333334f);
         func_L04_00358AE8(position, direction, 0x2F4F7F7F, func_002A7820(4,7), 500000.0f);
     }
 }
@@ -284,7 +284,7 @@ void func_L08_004356A0(u8 *a0, void *a1)
 
 
 /* For every listed entity of A0's kind, while the mode word is 2 and the resident
-   flag is set, hands it to func_0029F978 with the level block at 0x001B22E0 unless its
+   flag is set, hands it to AttachManipulator with the level block at 0x001B22E0 unless its
    byte 1 is set, and sets the vector at 0x001B2300 to 2.3. */
 void func_L08_00435990(L08Thing *a0)
 {
@@ -301,7 +301,7 @@ void func_L08_00435990(L08Thing *a0)
             continue;
         if (D_L08_001B22E0[1] != 0)
             continue;
-        func_0029F978((u8 *)e, 0, D_L08_001B22E0);
+        AttachManipulator((u8 *)e, 0, D_L08_001B22E0);
         D_L08_001B2300[0] = 2.3f;
         D_L08_001B2300[1] = 2.3f;
         D_L08_001B2300[2] = 2.3f;
@@ -436,14 +436,14 @@ void func_L08_00435A78(u8 *self)
                 func_002A8598(self[0x21], 1);
             D_001395B8[0x1C] = 1;
             func_L08_0036F030();
-            func_0026FEB8(D_L08_001B1FB0);
+            STUB_printf(D_L08_001B1FB0);
             if (I(data, 0x124) != -1) {
                 func_0029F338(&D_L08_001B29DC[I(data, 0x124)]);
                 I(data, 0x124) = -1;
             }
             if (I(data, 0x120) != -1)
                 D_L08_001B29DC[I(data, 0x120)].xBC = 1;
-            func_0029B3E0(0, -1);
+            MemcardSave(0, -1);
             if (QUANTITY <= 0)
                 func_002A7750(self, 6, -1);
             else
@@ -494,8 +494,8 @@ void func_L08_00435A78(u8 *self)
         break;
     }
     if (self[0x20]) {
-        if (self[0x43] == 1 && func_00282978(data + 0x11E)) {
-            H(data, 0x11E) = func_00283CF0(func_002A7878(1200, 2400));
+        if (self[0x43] == 1 && FastDecTimer(data + 0x11E)) {
+            H(data, 0x11E) = FloatToInt(func_002A7878(1200, 2400));
             if (self[0x43] != 2)
                 func_002A7470(self, 2, 0, 10);
         } else if ((self[0x60] & 2) && self[0x43] != 1)
@@ -505,10 +505,10 @@ void func_L08_00435A78(u8 *self)
     active = 0;
     if (self[0x43] == 1) {
         active = 1;
-        if (func_00282E80((char *)self + 0x10, D_00189E20.x80) < 8 &&
-            func_00283C80(F(self, 0xF8), func_00283248(D_00189E20.pos[0] - F(self, 0x10),
+        if (vec_distance_xy((char *)self + 0x10, D_00189E20.x80) < 8 &&
+            FastDiffRots(F(self, 0xF8), func_00283248(D_00189E20.pos[0] - F(self, 0x10),
                                                        D_00189E20.pos[1] - F(self, 0x14))) < 1.57079649f) {
-            if (func_00282DF0(D_00189E20.x110) > 0.01f)
+            if (FastVecLength(D_00189E20.x110) > 0.01f)
                 I(data, 0x114) = 120;
             else
                 func_00282948(data + 0x114);
@@ -517,11 +517,11 @@ void func_L08_00435A78(u8 *self)
             qcopy(data + 0x100, D_00189E20.pos);
         }
         if (func_00282948(data + 0x118)) {
-            I(data, 0x118) = func_00283CF0(func_002A7878(180, 300));
-            angle = func_00283B98(F(self, 0xF8), func_002A7878(-90, 90) * 0.0174532942f);
+            I(data, 0x118) = FloatToInt(func_002A7878(180, 300));
+            angle = FastAddRotations(F(self, 0xF8), func_002A7878(-90, 90) * 0.0174532942f);
             pitch = func_002A7878(0, 30) * 0.0174532942f;
             func_002AF000(data + 0x100, 6, angle, pitch);
-            func_00282CC0(data + 0x100, data + 0x100, self + 0x10);
+            FastVecAdd(data + 0x100, data + 0x100, self + 0x10);
         }
         if (I(data, 0x114)) {
             qcopy(dest, D_00189E20.pos);
@@ -532,9 +532,9 @@ void func_L08_00435A78(u8 *self)
     if (active) {
         qcopy(pos, self + 0x10);
         pos[2] += 2;
-        func_00282CF0(delta, dest, pos);
-        yaw = func_00283BE0(func_00283248(delta[0], delta[1]), F(self, 0xF8));
-        pitch = -func_00283248(func_00282E20(delta), delta[2]);
+        FastVecSub(delta, dest, pos);
+        yaw = fast_subtract_rotations(func_00283248(delta[0], delta[1]), F(self, 0xF8));
+        pitch = -func_00283248(vec_length_xy(delta), delta[2]);
         if (yaw > 1.57079649f)
             yaw = 1.57079649f;
         else if (yaw < -1.57079649f)

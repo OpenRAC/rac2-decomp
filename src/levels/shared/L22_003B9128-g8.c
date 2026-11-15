@@ -98,19 +98,19 @@ void func_L22_003B9128(u8 *arg0, TI128 *arg1, s32 arg2) {
                     *(u8 **)(payload + 0x44) = hero;
                 }
                 if (arg2 != 0) {
-                    func_00282D30(&dir, *(u8 **)(payload + 0x44) + 0xE0, 4.0f);
-                    func_00282CC0(&dir, &dir, *(u8 **)(payload + 0x44) + 0x10);
+                    FastVecScale(&dir, *(u8 **)(payload + 0x44) + 0xE0, 4.0f);
+                    FastVecAdd(&dir, &dir, *(u8 **)(payload + 0x44) + 0x10);
                 } else {
                     qcopy(&dir, *(u8 **)(payload + 0x44) + 0x10);
                     func_L22_003A2988(&dir, 2.2f);
                 }
-                func_00282CF0(payload + 0x50, &dir, arg0 + 0x10);
-                func_00282F20(payload + 0x50, payload + 0x50, 1.0f);
+                FastVecSub(payload + 0x50, &dir, arg0 + 0x10);
+                vec_scale_to_length(payload + 0x50, payload + 0x50, 1.0f);
                 qcopy(&facing, arg0 + 0xC0);
-                func_00282F20(&facing, &facing, 1.0f);
-                dot = func_00282DB0(payload + 0x50, &facing);
+                vec_scale_to_length(&facing, &facing, 1.0f);
+                dot = FastVecDot(payload + 0x50, &facing);
                 if (arg2 != 0) {
-                    dist = func_00282E48(target + 0x10, &((Hero *)D_00189E20)->q[8]);
+                    dist = fast_vec_dist(target + 0x10, &((Hero *)D_00189E20)->q[8]);
                     if (dot < D_L22_001AF9E4) {
                         *(s32 *)(payload + 0x44) = 0;
                     } else if (D_L22_001AF9E8 < dist) {

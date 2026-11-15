@@ -64,7 +64,7 @@ void func_L11_002CDE10(void)
     int state;
 
     qcopy(initial.f, (char *)&D_00189E20.position);
-    func_L00_002D4140(D_00189E20.attachment, (char *)&D_00189E20.impulse, (u8 *)&D_00189E20 + 0x90);
+    UpdateHeroAttachment(D_00189E20.attachment, (char *)&D_00189E20.impulse, (u8 *)&D_00189E20 + 0x90);
     state = D_00189E20.state;
     if (state == 0x14 || state == 0x5B || state == 0x58 || state == 0x81) {
         if (D_00189E20.collisionOffFrames == 0) {
@@ -83,53 +83,53 @@ void func_L11_002CDE10(void)
     } else if (D_00189E20.controlMode != 13) {
         if (D_00189E20.controlMode != 14) {
             if (state != 0x44 && D_00189E20.collisionOffFrames == 0) {
-                magnitude = func_00282DF0((char *)&D_00189E20.velocity);
+                magnitude = FastVecLength((char *)&D_00189E20.velocity);
                 limit = D_00189E20.radius - 0.02f;
                 if (limit < magnitude)
-                    func_00282F20((char *)&D_00189E20.velocity, (char *)&D_00189E20.velocity, limit);
+                    vec_scale_to_length((char *)&D_00189E20.velocity, (char *)&D_00189E20.velocity, limit);
             }
         }
     }
-    func_00282CC0((char *)&D_00189E20.position, (char *)&D_00189E20.position, (char *)&D_00189E20.velocity);
-    func_00282CC0((char *)&D_00189E20.position, (char *)&D_00189E20.position, &D_00189E20.extraStep);
+    FastVecAdd((char *)&D_00189E20.position, (char *)&D_00189E20.position, (char *)&D_00189E20.velocity);
+    FastVecAdd((char *)&D_00189E20.position, (char *)&D_00189E20.position, &D_00189E20.extraStep);
     func_00282C88((TI128 *)&D_00189E20.extraStep);
     D_00189E20.collHit = 0;
     D_00189E20.wallHit = 0;
-    if (func_00282DF0((char *)&D_00189E20.impulse) <= 0.0001f) {
+    if (FastVecLength((char *)&D_00189E20.impulse) <= 0.0001f) {
         func_L00_002B5A88();
         func_L09_002B7238();
-        func_00282CF0((char *)&D_00189E20.displacement, (char *)&D_00189E20.position, initial.f);
-        func_L00_002B5250();
+        FastVecSub((char *)&D_00189E20.displacement, (char *)&D_00189E20.position, initial.f);
+        EaseHeroPositionToGoal();
     } else {
         func_L09_002B7238();
     }
 
     resolved = &D_00189E20.projected;
-    func_00282CF0((char *)resolved, (char *)&D_00189E20.position, initial.f);
+    FastVecSub((char *)resolved, (char *)&D_00189E20.position, initial.f);
     qcopy((char *)&D_00189E20.flat, (char *)resolved);
     qcopy((char *)&D_00189E20.up, (char *)resolved);
-    func_00282F20((char *)resolved, (char *)resolved, 1.0f);
-    magnitude = func_00282DB0((char *)resolved, (char *)&D_00189E20.velocity);
+    vec_scale_to_length((char *)resolved, (char *)resolved, 1.0f);
+    magnitude = FastVecDot((char *)resolved, (char *)&D_00189E20.velocity);
     if (magnitude < 0.0f)
         magnitude = 0.0f;
-    func_00282F20((char *)resolved, (char *)&D_00189E20.velocity, magnitude);
+    vec_scale_to_length((char *)resolved, (char *)&D_00189E20.velocity, magnitude);
     qcopy(planar.f, (char *)&D_00189E20.velocity);
     func_L00_002D3960((char *)planar.f, (char *)planar.f);
     func_L00_002D3960((char *)&D_00189E20.flat, (char *)&D_00189E20.flat);
-    func_00282F20((char *)&D_00189E20.flat, (char *)&D_00189E20.flat, 1.0f);
-    magnitude = func_00282DB0((char *)&D_00189E20.flat, planar.f);
+    vec_scale_to_length((char *)&D_00189E20.flat, (char *)&D_00189E20.flat, 1.0f);
+    magnitude = FastVecDot((char *)&D_00189E20.flat, planar.f);
     if (magnitude < 0.0f)
         magnitude = 0.0f;
-    func_00282F20((char *)&D_00189E20.flat, planar.f, magnitude);
+    vec_scale_to_length((char *)&D_00189E20.flat, planar.f, magnitude);
     qcopy(vertical.f, (char *)&D_00189E20.velocity);
     func_L00_002D3BD8((char *)vertical.f, (int)vertical.f, 0.0f);
     func_L00_002D3BD8((char *)&D_00189E20.up, (int)(char *)&D_00189E20.up, 0.0f);
-    func_00282F20((char *)&D_00189E20.up, (char *)&D_00189E20.up, 1.0f);
-    magnitude = func_00282DB0((char *)&D_00189E20.up, vertical.f);
+    vec_scale_to_length((char *)&D_00189E20.up, (char *)&D_00189E20.up, 1.0f);
+    magnitude = FastVecDot((char *)&D_00189E20.up, vertical.f);
     if (magnitude < 0.0f)
         magnitude = 0.0f;
-    func_00282F20((char *)&D_00189E20.up, vertical.f, magnitude);
-    D_00189E20.speed = func_00282DF0((char *)resolved);
+    vec_scale_to_length((char *)&D_00189E20.up, vertical.f, magnitude);
+    D_00189E20.speed = FastVecLength((char *)resolved);
     magnitude = func_L00_002D3A58((char *)resolved);
     planar.q = resolved->q;
     D_00189E20.flatSpeed = magnitude;
@@ -138,21 +138,21 @@ void func_L11_002CDE10(void)
     if (D_00189E20.forwardSpeed < 0.0f)
         D_00189E20.forwardSpeed = 0.0f;
     qcopy(planar.f, (char *)&D_00189E20.position);
-    if (func_00282DF0((char *)&D_00189E20.impulse) > 0.0001f) {
-        func_00282CC0((char *)&D_00189E20.position, (char *)&D_00189E20.position, (char *)&D_00189E20.impulse);
+    if (FastVecLength((char *)&D_00189E20.impulse) > 0.0001f) {
+        FastVecAdd((char *)&D_00189E20.position, (char *)&D_00189E20.position, (char *)&D_00189E20.impulse);
         savedW = D_00189E20.impulse.f[3];
         func_00282C88((TI128 *)(char *)&D_00189E20.impulse);
         D_00189E20.impulse.f[3] = savedW;
         func_L00_002B5A88();
         func_L09_002B7238();
-        func_00282CF0((char *)&D_00189E20.displacement, (char *)&D_00189E20.position, initial.f);
-        func_L00_002B5250();
+        FastVecSub((char *)&D_00189E20.displacement, (char *)&D_00189E20.position, initial.f);
+        EaseHeroPositionToGoal();
     }
-    func_00282CF0((char *)&D_00189E20.impulseMove, (char *)&D_00189E20.position, planar.f);
-    D_00189E20.impulseSpeed = func_00282DF0((char *)&D_00189E20.impulseMove);
+    FastVecSub((char *)&D_00189E20.impulseMove, (char *)&D_00189E20.position, planar.f);
+    D_00189E20.impulseSpeed = FastVecLength((char *)&D_00189E20.impulseMove);
     D_00189E20.impulseMove.f[3] = D_00189E20.impulse.f[3];
     D_00189E20.impulse.f[3] = 0.0f;
-    func_00282CF0((char *)&D_00189E20.displacement, (char *)&D_00189E20.position, initial.f);
+    FastVecSub((char *)&D_00189E20.displacement, (char *)&D_00189E20.position, initial.f);
     D_00189E20.slope = 0.0f;
     if (D_00189E20.flatSpeed > 0.004f) {
         D_00189E20.slope = D_00189E20.displacement.f[2] / D_00189E20.flatSpeed;
@@ -162,7 +162,7 @@ void func_L11_002CDE10(void)
             D_00189E20.slope = -0.5f;
     }
     if (D_00189E20.speed > 0.86666673f) {
-        func_00282D30((char *)&D_00189E20.displacement, (char *)&D_00189E20.displacement, 0.86666673f / D_00189E20.speed);
+        FastVecScale((char *)&D_00189E20.displacement, (char *)&D_00189E20.displacement, 0.86666673f / D_00189E20.speed);
         D_00189E20.speed = 0.86666673f;
     }
 }

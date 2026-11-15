@@ -87,7 +87,7 @@ SpawnObject *func_L00_003AB9C0(SpawnObject *owner, char *pos, SpawnObject *targe
     float v[4] __attribute__((aligned(16)));
     float w[4] __attribute__((aligned(16)));
     float tmp[4] __attribute__((aligned(16)));
-    SpawnObject *obj = func_0029EFD0(0x5da);
+    SpawnObject *obj = CreateMoby(0x5da);
     SpawnData *data;
     float *basis;
     float speed;
@@ -113,8 +113,8 @@ SpawnObject *func_L00_003AB9C0(SpawnObject *owner, char *pos, SpawnObject *targe
         qcopy(obj->position, pos);
 
         if (target) {
-            func_00282D30(w, target->up, scale);
-            func_00282CC0(v, target->position, w);
+            FastVecScale(w, target->up, scale);
+            FastVecAdd(v, target->position, w);
         } else {
             /* A plain quadword store, not qzero: reload loads its zero into a register,
              * which moves on the reload registers below, and $zero replaces it after reload. */
@@ -122,26 +122,26 @@ SpawnObject *func_L00_003AB9C0(SpawnObject *owner, char *pos, SpawnObject *targe
         }
 
         if (D_00189E20.mode == 1) {
-            func_00282F20(obj->forward, owner->right, -1.0f);
-            func_00282D30(obj->right, owner->forward, -1.0f);
+            vec_scale_to_length(obj->forward, owner->right, -1.0f);
+            FastVecScale(obj->right, owner->forward, -1.0f);
             qcopy(obj->up, owner->up);
             basis = obj->forward;
         } else if (target) {
             float *direction = obj->forward;
-            func_00282CF0(direction, v, obj->position);
-            func_00282F20(direction, direction, 1.0f);
-            func_00282DD8(obj->right, direction, D_00189E20.target->up);
-            func_00282F20(obj->right, obj->right, 1.0f);
-            func_00282DD8(obj->up, obj->right, direction);
+            FastVecSub(direction, v, obj->position);
+            vec_scale_to_length(direction, direction, 1.0f);
+            FastVecCross(obj->right, direction, D_00189E20.target->up);
+            vec_scale_to_length(obj->right, obj->right, 1.0f);
+            FastVecCross(obj->up, obj->right, direction);
             basis = direction;
         } else {
             qcopy(obj->forward, D_00189E20.forward);
             basis = obj->forward;
             if (D_00189E20.aiming)
                 func_L00_0037FA90(basis, pos, 1.0f, 75.0f, 0.52359885f);
-            func_00282DD8(obj->right, basis, D_00189E20.up);
-            func_00282F20(obj->right, obj->right, 1.0f);
-            func_00282DD8(obj->up, obj->right, basis);
+            FastVecCross(obj->right, basis, D_00189E20.up);
+            vec_scale_to_length(obj->right, obj->right, 1.0f);
+            FastVecCross(obj->up, obj->right, basis);
         }
 
         obj->forward[3] = obj->right[3] = obj->up[3] = 0.0f;
@@ -161,9 +161,9 @@ SpawnObject *func_L00_003AB9C0(SpawnObject *owner, char *pos, SpawnObject *targe
         if (D_L00_001A8FF0[0]) {
             float projection;
             func_002AFFD8(obj->position, w, 1);
-            projection = func_00282DB0(w, data->basis);
-            func_00282D30(tmp, w, projection);
-            func_00282CF0(data->basis, data->basis, tmp);
+            projection = FastVecDot(w, data->basis);
+            FastVecScale(tmp, w, projection);
+            FastVecSub(data->basis, data->basis, tmp);
         }
 
         if (target) {
@@ -175,11 +175,11 @@ SpawnObject *func_L00_003AB9C0(SpawnObject *owner, char *pos, SpawnObject *targe
             }
         }
 
-        data->life = func_00283CF0(75.0f / speed);
+        data->life = FloatToInt(75.0f / speed);
 
         if (target) {
-            func_00282D30(w, target->up, scale);
-            func_00282CC0(w, target->position, w);
+            FastVecScale(w, target->up, scale);
+            FastVecAdd(w, target->position, w);
             data->position[0] = w[0];
             data->position[1] = w[1];
             data->position[2] = w[2];
@@ -189,14 +189,14 @@ SpawnObject *func_L00_003AB9C0(SpawnObject *owner, char *pos, SpawnObject *targe
         *(Quad *)w = *(Quad *)(owner->position);
         w[2] = ((float *)pos)[2];
 
-        if (func_002761F8(w, pos, 0, D_00189E20.target, 0)) {
+        if (CollLine(w, pos, 0, D_00189E20.target, 0)) {
             obj->blocked = on;
             qcopy(obj->position, D_L00_001BF220);
         }
 
         func_L00_003ACC88(obj, D_L00_0023B710 + (data->material << 6));
         func_002A0F48(obj);
-        func_002ACA50(obj, D_L00_001B1FB0, 31);
+        AddMobyToIndexList(obj, D_L00_001B1FB0, 31);
         obj->radius *= 2.5f;
         data->sound = func_002FED90(obj, 0, 1.0f, 1.0f, 1.0f);
     }

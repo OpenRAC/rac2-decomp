@@ -155,20 +155,20 @@ int func_002EB1E0(void)
             key = D_001B8840.tick >> 1;
             actor->next_key = key + 1;
             actor->key = key;
-            func_0029F390(actor);
-            actor->blend = func_00283CE0(D_001B8840.tick & 1) * 0.5f;
+            update_moby_animation_state(actor);
+            actor->blend = IntToFloat(D_001B8840.tick & 1) * 0.5f;
             if (camera && (D_001B8840.tick & 1))
                 actor->blend = 1.0f;
             keys = actor->keys;
-            func_00282D30(first, keys + actor->key * 16, 1.0f - actor->blend);
-            func_00282D30(last, keys + actor->next_key * 16, actor->blend);
-            func_00282CC0(actor->pos, first, last);
+            FastVecScale(first, keys + actor->key * 16, 1.0f - actor->blend);
+            FastVecScale(last, keys + actor->next_key * 16, actor->blend);
+            FastVecAdd(actor->pos, first, last);
             type = actor->type;
             if (type == 0xD54) {
                 actor->flags = 8;
-                func_002E64A0(actor);
+                UpdateEquipmentPieces(actor);
                 if (!D_001B2148 || D_001B2148->type == type)
-                    func_0027CFD0(func_002ECB70, actor);
+                    func_0027CFD0(render_environment_mapped_object, actor);
             }
             actor->alpha = 255;
             func_002A0F48(actor);
@@ -178,8 +178,8 @@ int func_002EB1E0(void)
             }
         }
     }
-    func_002E4AC8();
-    func_002914B8();
+    UpdateSoundVoices();
+    UpdateLightingEnvironment();
     func_002F52B8();
     return skip;
 }

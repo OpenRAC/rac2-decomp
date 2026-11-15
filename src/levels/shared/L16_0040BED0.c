@@ -75,12 +75,12 @@ void func_L16_0040BED0(u8 *object)
         if (D_00189E20.mode==0x81) {
             if (D_00189E20.owner==object && D_00189E20.upward>0.0f) {
                 multiplier=0.5f;
-                func_002E5CF8(1,0,(char *)object);
+                PlayMobySound(1,0,(char *)object);
                 if (D_001A79F0[0]==16) multiplier=0.3f;
-                distance=func_00282E80((u8 *)&D_00189E20+0x80,state->position);
+                distance=vec_distance_xy((u8 *)&D_00189E20+0x80,state->position);
                 rate=D_L16_001A7CDC[0]*(distance*0.00027777778f)*multiplier/D_L16_001A7CD8[0];
-                value=func_00282C10((rate+rate)*distance);
-                func_00282CF0(difference,state->position,(u8 *)&D_00189E20+0x80);
+                value=square_root((rate+rate)*distance);
+                FastVecSub(difference,state->position,(u8 *)&D_00189E20+0x80);
                 difference[2]=0.0f;
                 func_00282F70(state->velocity,difference,value);
                 func_00282F70((u8 *)&D_00189E20+0xF0,(u8 *)&D_00189E20+0xF0,0.0f);
@@ -93,13 +93,13 @@ void func_L16_0040BED0(u8 *object)
         break;
     case 2:
         if (D_00189E20.mode==0x81) {
-            value=func_00282E20(state->velocity);
-            distance=func_00282E80((u8 *)&D_00189E20+0x80,state->position);
+            value=vec_length_xy(state->velocity);
+            distance=vec_distance_xy((u8 *)&D_00189E20+0x80,state->position);
             if (distance<0.5f) value=0.0f;
             else if (value!=0.0f) {
-                func_00282CF0(difference,state->position,(u8 *)&D_00189E20+0x80);
+                FastVecSub(difference,state->position,(u8 *)&D_00189E20+0x80);
                 difference[2]=0.0f;
-                if (func_00282DB0(difference,state->velocity)<0.0f) value=0.0f;
+                if (FastVecDot(difference,state->velocity)<0.0f) value=0.0f;
             }
             value-=state->rate;
             func_00282F70(state->velocity,state->velocity,value);
@@ -166,7 +166,7 @@ void func_L16_0040BED0(u8 *object)
     if (((*(u16 *)(object+0x34)^1)&1) && I(object,0x98)!=0) {
         u8 *sound=state->sound*0x70+D_00188660;
         if (*(u8 **)(sound+0x88)==object && sound[0x74]) return;
-        state->sound=func_002E5CF8(0,4,(char *)object);
+        state->sound=PlayMobySound(0,4,(char *)object);
         return;
     }
     handle=state->sound;

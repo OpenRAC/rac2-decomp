@@ -97,8 +97,8 @@ void func_00341220(s8 *arg0, s8 *arg1) {
     func_00336390(s3, D_001A8CFC + 0x8710, 0x93);
     func_00336390(s4, D_001A8CFC + 0x8710, 0x95);
     func_00335F88(s4, 1.0f, 1.05f, 0.0f, 0.0f);
-    func_00336A38(l0, func_00288FB8(0x2D55));
+    func_00336A38(l0, GetLocalizedString(0x2D55));
     func_00336920(s6, 0xEA9D, 0);
-    func_00115484(arg0 + 0x1B8, 0, 12);
+    memset(arg0 + 0x1B8, 0, 12);
     func_00335F88(s6, 32.0f, 32.0f, 0.0f, 0.0f);
 }

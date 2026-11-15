@@ -35,7 +35,7 @@ void func_L12_003BE7D0(u8 *o) {
         break;
     case 1:
         yaw = 0;
-        if (func_00282E80(o + 0x10, D_00189EA0) < 16.0f) {
+        if (vec_distance_xy(o + 0x10, D_00189EA0) < 16.0f) {
             o[0x20] = 2;
             if (o[0x43] != 1)
                 func_002A7470(o, 1, 0, 30);
@@ -47,10 +47,10 @@ void func_L12_003BE7D0(u8 *o) {
     case 2: {
         float *target;
 
-        yaw = func_00283B98(func_00283BE0(func_00283248(D_00189E20.x - *(float *)(o + 0x10), D_00189E20.y - *(float *)(o + 0x14)), *(float *)(o + 0xF8)), 1.5707964897155762f);
+        yaw = FastAddRotations(fast_subtract_rotations(func_00283248(D_00189E20.x - *(float *)(o + 0x10), D_00189E20.y - *(float *)(o + 0x14)), *(float *)(o + 0xF8)), 1.5707964897155762f);
         target = &D_00189E20.x;
-        pitch = func_00283248(func_00282E80(target, o + 0x10), *(float *)(o + 0x18) - D_00189E20.z);
-        if (func_00282E80(o + 0x10, target) > 20.0f) {
+        pitch = func_00283248(vec_distance_xy(target, o + 0x10), *(float *)(o + 0x18) - D_00189E20.z);
+        if (vec_distance_xy(o + 0x10, target) > 20.0f) {
             o[0x20] = 1;
             if (o[0x43] != 0)
                 func_002A7470(o, 0, 0, 30);
@@ -62,7 +62,7 @@ void func_L12_003BE7D0(u8 *o) {
     }
     case 3:
         func_L00_00326620(o, 0x1132, o[0x30]);
-        func_002E5CF8(0, 0, o);
+        PlayMobySound(0, 0, o);
         {
             int id = *(int *)(d + 0x114);
             u8 *effect;
@@ -77,11 +77,11 @@ void func_L12_003BE7D0(u8 *o) {
         func_0029F338(o);
         return;
     }
-    if (func_00282C48(func_00283BE0(yaw, *(float *)(d + 0x100))) > D_L12_001AFC74 * 0.017453294f) {
+    if (func_00282C48(fast_subtract_rotations(yaw, *(float *)(d + 0x100))) > D_L12_001AFC74 * 0.017453294f) {
         u8 *effect = D_00188660 + *(int *)(d + 0x114) * 0x70;
 
         if (*(u8 **)(effect + 0x88) != o || !effect[0x74])
-            *(int *)(d + 0x114) = func_002E5CF8(1, 4, o);
+            *(int *)(d + 0x114) = PlayMobySound(1, 4, o);
     } else {
         int id = *(int *)(d + 0x114);
         u8 *effect;

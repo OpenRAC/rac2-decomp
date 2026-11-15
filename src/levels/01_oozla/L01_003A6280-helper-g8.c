@@ -5,7 +5,7 @@ extern void *func_0029EFD0(int);
 extern void func_002A0F48(void *);
 
 void *func_L01_003A6280(u8 *arg0, void *arg1, u32 arg2, f32 f12, f32 f13) {
-    u8 *s0 = (u8 *)func_0029EFD0(0x660);
+    u8 *s0 = (u8 *)CreateMoby(0x660);
     u8 *a2;
 
     if (s0 != 0) {

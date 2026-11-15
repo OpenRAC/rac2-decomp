@@ -28,7 +28,7 @@ void func_L12_003E20F0(char *object)
         char *target = *(char **)(state + 0x270);
         float angle = func_00283248(*(float *)(target + 0x10) - *(float *)(object + 0x10),
                                    *(float *)(target + 0x14) - *(float *)(object + 0x14));
-        func_002AA800(object + 0xF8, angle, 6.0000005f, 0);
+        StepAngleTowardTarget(object + 0xF8, angle, 6.0000005f, 0);
     }
     probeRadius = 0.5f;
     position = object + 0x10;
@@ -42,7 +42,7 @@ void func_L12_003E20F0(char *object)
             char *sink = D_L12_001B0B18;
             float floor = func_002A89A8(probeRadius, position, 0);
             double heightDifference = func_001234F0(*(float *)(object + 0x18) - floor);
-            func_0026FEB8(sink, heightDifference, *(short *)(object + 0xB2));
+            STUB_printf(sink, heightDifference, *(short *)(object + 0xB2));
         }
     }
     targetHeight = *(float *)(path + (*(int *)(state + 0x264) << 4) + 0x18);

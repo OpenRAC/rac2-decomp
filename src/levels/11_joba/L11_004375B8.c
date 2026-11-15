@@ -34,8 +34,8 @@ void func_L11_004375B8(char *obj)
     char *hit;
     float damage, scale;
     if (*(unsigned char *)(obj+0x20)==0) {
-        *(unsigned char *)(s+0x48)=func_00283CF0(15.0f);
-        *(unsigned char *)(s+0x4A)=func_00283CF0(4.0f);
+        *(unsigned char *)(s+0x48)=FloatToInt(15.0f);
+        *(unsigned char *)(s+0x4A)=FloatToInt(4.0f);
         *(int *)(s+0x38C)=-1;
         if (*(short *)(s+0x24)==0) {
             *(short *)(s+0x24)=30;
@@ -56,8 +56,8 @@ void func_L11_004375B8(char *obj)
                         scale=damage*0.125f;
                         if (scale>1.0f) scale=1.0f;
                         else if (scale<0.0f) scale=0.0f;
-                        func_00282F20((char *)v,hit+0x10,scale*0.2777777910232544f);
-                        func_00282CC0(s+0x110+i*16,s+0x110+i*16,(char *)v);
+                        vec_scale_to_length((char *)v,hit+0x10,scale*0.2777777910232544f);
+                        FastVecAdd(s+0x110+i*16,s+0x110+i*16,(char *)v);
                         func_002A7750(obj,5,-1);
                     }
                 }
@@ -86,8 +86,8 @@ void func_L11_004375B8(char *obj)
                 scale=damage*0.125f;
                 if (scale>1.0f) scale=1.0f;
                 else if (scale<0.0f) scale=0.0f;
-                func_00282F20((char *)direction,hit+0x10,scale*0.5555555820465088f);
-                func_00282CC0(obj+0x10,obj+0x10,(char *)direction);
+                vec_scale_to_length((char *)direction,hit+0x10,scale*0.5555555820465088f);
+                FastVecAdd(obj+0x10,obj+0x10,(char *)direction);
             }
             if (*(short *)(s+0x378)>=4) *(float *)(s+0x360)+=damage;
             else *(float *)(s+0x20)-=damage;
@@ -108,17 +108,17 @@ void func_L11_004375B8(char *obj)
     if (*(unsigned char *)(obj+0x20)>=2 && *(unsigned char *)(s+0x2E)==2) {
         *(float *)(s+0x20)=0;
         func_L11_00439BF0(obj);
-        func_00282CF0(direction,(float *)D_L11_001BA8C0,(float *)(obj+0x10));
-        func_00282F20((char *)direction,(char *)direction,0.5f);
+        FastVecSub(direction,(float *)D_L11_001BA8C0,(float *)(obj+0x10));
+        vec_scale_to_length((char *)direction,(char *)direction,0.5f);
         qcopy(v,s+0x100);
         func_L11_00439640(obj,(char *)v);
         func_002A7A00(random,0.03333333507180214f,0.06666667014360428f);
-        func_00282CC0((char *)velocity,(char *)direction,(char *)random);
+        FastVecAdd((char *)velocity,(char *)direction,(char *)random);
         for (k=0;k<10;k++) {
             if (!((ChildSlots *)s)->flags[k]) {
                 qcopy(pos,s+0x100+k*16);
                 func_002A7A00(random,0.1666666716337204f,0.3333333432674408f);
-                func_00282CC0((char *)velocity,(char *)direction,(char *)random);
+                FastVecAdd((char *)velocity,(char *)direction,(char *)random);
                 func_002B0A68(CHILD(obj,k),3,velocity,3,6,3,6,255);
                 func_L11_00439640(obj,(char *)pos);
                 func_L11_0043AB28(CHILD(obj,k));
@@ -126,7 +126,7 @@ void func_L11_004375B8(char *obj)
         }
     }
     *(int *)(s+0x328)=func_002B3BA8(obj,*(int *)(s+0x36C),0,0,255,255);
-    if (*(unsigned char *)(obj+0x31) && func_00282E48(obj+0x10,D_L11_001BA8C0)<48.0f) {
+    if (*(unsigned char *)(obj+0x31) && fast_vec_dist(obj+0x10,D_L11_001BA8C0)<48.0f) {
         func_002A93B0(obj);
         *(unsigned char *)(obj+0x6F)=45;
     }

@@ -40,15 +40,15 @@ void func_002F9C80(void)
     if (D_0021F240.scroll < 0) D_0021F240.scroll += 4;
     else if (D_0021F240.scroll > 0) D_0021F240.scroll -= 4;
     i = -5;
-    pulse = ((func_00282C30(((D_0021F240.tick*4)&63)-32)+64)*0x10202)|0x80000000;
-    func_00285548(229,screen_y(325),285,screen_y(381),D_001A7340,D_001A7344,
+    pulse = ((subtract_integer_with_clamp(((D_0021F240.tick*4)&63)-32)+64)*0x10202)|0x80000000;
+    DrawFramebufferRect(229,screen_y(325),285,screen_y(381),D_001A7340,D_001A7344,
         pulse);
-    func_00285548(231,screen_y(327),283,screen_y(379),D_001A7340,D_001A7344,0x80442d00);
+    DrawFramebufferRect(231,screen_y(327),283,screen_y(379),D_001A7340,D_001A7344,0x80442d00);
     y = D_0021F240.scroll - 47;
     do {
         index = i + D_0021F240.selected;
         if (index >= 0 && index < D_0021F240.count) {
-            icon = func_0028E588((D_00239BA0 + D_00139568[D_0021F240.rows[index].id])->icon,0);
+            icon = GetIconFrame((D_00239BA0 + D_00139568[D_0021F240.rows[index].id])->icon,0);
             if (D_0021F240.rows[index].owned) kind = 2;
             else {
                 special = 0;
@@ -73,13 +73,13 @@ void func_002F9C80(void)
             colors[3] = colors[1] = alpha1 | color;
             func_0028EA58(icon,y+4,screen_y(329),40,(int)(D_001B2280[0]*40.0f+0.5f),colors);
             if (D_0021F240.rows[index].owned) {
-                char *text = func_00288FB8(0x325f);
+                char *text = GetLocalizedString(0x325f);
                 int tx = (func_0027F288(text,-1,0.75f) >> 1) - 25;
-                func_002F97A0((float)(y - tx),(float)screen_y(366),0x80f0f0f0UL,0.75f,text,-1);
+                draw_large_text_edge_faded((float)(y - tx),(float)screen_y(366),0x80f0f0f0UL,0.75f,text,-1);
             } else if (D_0021F240.rows[index].kind == 1) {
-                char *text = func_00288FB8(0x2dc9);
+                char *text = GetLocalizedString(0x2dc9);
                 int tx = (func_0027F288(text,-1,0.75f) >> 1) - 25;
-                func_002F97A0((float)(y - tx),(float)screen_y(366),0x80f0f0f0UL,0.75f,text,-1);
+                draw_large_text_edge_faded((float)(y - tx),(float)screen_y(366),0x80f0f0f0UL,0.75f,text,-1);
             }
         }
         i++;

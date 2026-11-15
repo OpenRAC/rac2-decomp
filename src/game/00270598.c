@@ -85,7 +85,7 @@ void func_00270598(char *camera)
             float duration = next->duration;
             D_001B5200.nextkind = 2;
             if (duration > 0.0f)
-                D_001B5200.frames = func_00283CF0(duration);
+                D_001B5200.frames = FloatToInt(duration);
             else
                 D_001B5200.frames = 40;
         }

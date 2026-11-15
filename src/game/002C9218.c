@@ -27,29 +27,29 @@ int func_002C9218(int index, float *point, float *out, float radius)
         offset = i * 16 + 16;
         next = i * 16 + 32;
         if (((Path_2C9218 *)D_001F1700[index])->points[i].active == 0) continue;
-        func_00282CF0(delta, position, (float *)(D_001F1700[index] + offset));
+        FastVecSub(delta, position, (float *)(D_001F1700[index] + offset));
         delta[2] = 0;
-        func_00282CF0(edge, (float *)(D_001F1700[index] + next), (float *)(D_001F1700[index] + offset));
+        FastVecSub(edge, (float *)(D_001F1700[index] + next), (float *)(D_001F1700[index] + offset));
         edge[2] = 0;
-        func_00282F20(unit, edge, 1.0f);
-        func_00282DD8(cross, delta, unit);
+        vec_scale_to_length(unit, edge, 1.0f);
+        FastVecCross(cross, delta, unit);
         if (radius < func_00282C48(cross[2])) continue;
-        length = func_00282DF0(edge);
-        dot = func_00282DB0(delta, unit);
+        length = FastVecLength(edge);
+        dot = FastVecDot(delta, unit);
         if (length < dot || dot < 0) {
-            if (func_00282DF0(delta) < radius) {
-                func_00282F20(adjustment, delta, radius);
+            if (FastVecLength(delta) < radius) {
+                vec_scale_to_length(adjustment, delta, radius);
                 found = 1;
-                func_00282CC0(position, adjustment, (float *)(D_001F1700[index] + offset));
+                FastVecAdd(position, adjustment, (float *)(D_001F1700[index] + offset));
                 position[2] = point[2];
             }
         } else {
-            func_00282F20(projection, unit, dot);
+            vec_scale_to_length(projection, unit, dot);
             found = 1;
-            func_00282CF0(adjustment, delta, projection);
-            func_00282F20(adjustment, adjustment, radius);
-            func_00282CC0(adjustment, adjustment, projection);
-            func_00282CC0(position, adjustment, (float *)(D_001F1700[index] + offset));
+            FastVecSub(adjustment, delta, projection);
+            vec_scale_to_length(adjustment, adjustment, radius);
+            FastVecAdd(adjustment, adjustment, projection);
+            FastVecAdd(position, adjustment, (float *)(D_001F1700[index] + offset));
             position[2] = point[2];
         }
     }

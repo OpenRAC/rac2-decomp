@@ -130,12 +130,12 @@ default_rotation:
         obj = D_001F2840.entries + i * 0x100;
         *(PreviewQuad *)(obj + 0x10) = pos.q;
         if (D_001F2840.timer <= 0) {
-            F(obj, 0xf0) = func_00283B98(F(obj, 0xf0), (D_001F2840.x - F(obj, 0xf0)) * step);
-            F(obj, 0xf4) = func_00283B98(F(obj, 0xf4), (D_001F2840.y - F(obj, 0xf4)) * step);
-            F(obj, 0xf8) = func_00283B98(F(obj, 0xf8), (D_001F2840.z - F(obj, 0xf8)) * step);
+            F(obj, 0xf0) = FastAddRotations(F(obj, 0xf0), (D_001F2840.x - F(obj, 0xf0)) * step);
+            F(obj, 0xf4) = FastAddRotations(F(obj, 0xf4), (D_001F2840.y - F(obj, 0xf4)) * step);
+            F(obj, 0xf8) = FastAddRotations(F(obj, 0xf8), (D_001F2840.z - F(obj, 0xf8)) * step);
         } else {
-            F(obj, 0xf8) = func_00283B98(F(obj, 0xf8), dx);
-            F(obj, 0xf4) = func_00283B98(F(obj, 0xf4), dy);
+            F(obj, 0xf8) = FastAddRotations(F(obj, 0xf8), dx);
+            F(obj, 0xf4) = FastAddRotations(F(obj, 0xf4), dy);
         }
         type = ((unsigned char *)obj)[0xbc];
         F(obj, 0x2c) = F(*(char **)(obj + 0x24), 0x24);

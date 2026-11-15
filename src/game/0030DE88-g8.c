@@ -26,8 +26,8 @@ void func_0030DE88(u8 *obj, int count)
 
     v.bits = 0;
     v.f[1] = -0.9f;
-    func_00283098(&v, &v, obj + 0xC0);
-    func_00282CC0(&v, &v, obj + 0x10);
+    matrix_mul_vec3(&v, &v, obj + 0xC0);
+    FastVecAdd(&v, &v, obj + 0x10);
     for (i = 0; i < count; i++) {
         int spin;
         int colour;
@@ -36,7 +36,7 @@ void func_0030DE88(u8 *obj, int count)
         float life;
         func_002A7A00(&w, 0.0f, D_001AF044);
         w.f[0] = func_00282C48(w.f[0]);
-        func_00283098(&w, &w, D_0018A550);
+        matrix_mul_vec3(&w, &w, D_0018A550);
         spin = func_002A7820(-8, 8);
         inner = 0.3f;
         size = func_002A7878(0.2f, 0.6f);

@@ -118,21 +118,21 @@ void func_L17_003C3330(Moby *moby)
         if (D_00189E20.groundMoby == moby && D_00189E20.groundedFrames) {
             if (vars->needsTrigger && !func_002B38B8(moby))
                 goto finish;
-            func_002B0C28(8, 0x279A, 1);
+            TryClaimNotice(8, 0x279A, 1);
             if (D_00138324[0] & 0x10) {
                 if (!vars->atLast) {
                     func_002A7750(moby, 4, -1);
                     velocity = &vars->velocity;
                     vars->point = 1;
-                    func_00282CF0(velocity, &path->points[1], &path->points[0]);
-                    func_00282F20(velocity, velocity, D_L17_001B0220 * 0.016666668f);
+                    FastVecSub(velocity, &path->points[1], &path->points[0]);
+                    vec_scale_to_length(velocity, velocity, D_L17_001B0220 * 0.016666668f);
                 } else {
                     func_002A7750(moby, 5, -1);
                     velocity = &vars->velocity;
                     point = path->count - 2;
                     vars->point = point;
-                    func_00282CF0(velocity, &path->points[point], &path->points[point + 1]);
-                    func_00282F20(velocity, velocity, D_L17_001B0220 * 0.016666668f);
+                    FastVecSub(velocity, &path->points[point], &path->points[point + 1]);
+                    vec_scale_to_length(velocity, velocity, D_L17_001B0220 * 0.016666668f);
                 }
                 break;
             }
@@ -173,7 +173,7 @@ void func_L17_003C3330(Moby *moby)
             SoundVoice *voice = (SoundVoice *)&D_00188660[vars->sound];
 
             if (voice->owner != moby || !voice->active)
-                vars->sound = func_002E5CF8(0, 4, moby);
+                vars->sound = PlayMobySound(0, 4, moby);
         }
         if (func_L06_003E3ED0(moby)) {
             D_00189E20.f212 = 4;
@@ -223,13 +223,13 @@ void func_L17_003C3330(Moby *moby)
                 func_002E59F8(sound);
         }
         vars->sound = -1;
-        if (func_00282978(&vars->atLast)) {
+        if (FastDecTimer(&vars->atLast)) {
             func_002A7750(moby, 5, -1);
             velocity = &vars->velocity;
             point = vars->point - 1;
             vars->point = point;
-            func_00282CF0(velocity, &path->points[point], &path->points[point + 1]);
-            func_00282F20(velocity, velocity, D_L17_001B0220 * 0.016666668f);
+            FastVecSub(velocity, &path->points[point], &path->points[point + 1]);
+            vec_scale_to_length(velocity, velocity, D_L17_001B0220 * 0.016666668f);
         }
         break;
 
@@ -241,7 +241,7 @@ void func_L17_003C3330(Moby *moby)
             SoundVoice *voice = (SoundVoice *)&D_00188660[vars->sound];
 
             if (voice->owner != moby || !voice->active)
-                vars->sound = func_002E5CF8(0, 4, moby);
+                vars->sound = PlayMobySound(0, 4, moby);
         }
         if (func_L06_003E3ED0(moby)) {
             D_00189E20.f212 = 4;
@@ -287,6 +287,6 @@ finish:
         func_L00_002D7140(vars->record);
         vars->hasRecord = 0;
     }
-    func_00282CF0(&delta, &moby->position, &old);
+    FastVecSub(&delta, &moby->position, &old);
     func_002AD6F0(vars->motion, &delta, &moby->rotation, &moby->rotation);
 }

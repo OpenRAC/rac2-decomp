@@ -125,7 +125,7 @@ void func_L16_004165B0(char *self) {
             func_00313DD0(self, 3, -1);
         D_0018CDF0 = 0xffff;
         func_L16_00416E30(self);
-        func_L16_00416FB0(self);
+        FireAlternatingMuzzleShot(self);
         func_L16_00416EC8(self);
         break;
     case 5:
@@ -145,8 +145,8 @@ void func_L16_004165B0(char *self) {
             D_L16_001A8FB4 = 2;
             D_L16_001A8FB0 = 30;
         } else {
-            func_L16_00417210(self);
-            func_L16_00416FB0(self);
+            UpdateSnivelakSteering(self);
+            FireAlternatingMuzzleShot(self);
             func_L16_00416EC8(self);
             func_L16_00416E30(self);
         }

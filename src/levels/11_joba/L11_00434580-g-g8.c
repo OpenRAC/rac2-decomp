@@ -61,12 +61,12 @@ void func_L11_00434580(char *obj) {
     if (*(float *)(st+0x38)<25) {
         float size; int sign;
         *(float *)(st+0x34)+=1;
-        func_00282F20(st+0x10,st+0x20,*(float *)(st+0x34));
-        func_00282F20(vel,st+0x20,0.06666667f);
-        func_002A8C00(collision,obj,0x10001,vel,scale);
+        vec_scale_to_length(st+0x10,st+0x20,*(float *)(st+0x34));
+        vec_scale_to_length(vel,st+0x20,0.06666667f);
+        make_hit_descriptor(collision,obj,0x10001,vel,scale);
         *(unsigned short *)(collision+0x1A)=*(unsigned short *)(obj+0xAA);
-        func_00282CC0(st+0x10,st,st+0x10);
-        if(func_002761F8(st,st+0x10,0,obj,collision)) {
+        FastVecAdd(st+0x10,st,st+0x10);
+        if(CollLine(st,st+0x10,0,obj,collision)) {
             impact=(float *)D_L11_001C0D20;
             *(Quad34580 *)(st+0x10)=*(Quad34580 *)impact;
             if(!func_002B38B8(obj)) {
@@ -85,15 +85,15 @@ void func_L11_00434580(char *obj) {
         func_L00_002E6EF8(func_L11_00434AA8,obj);
         return;
     } else if (*(float *)(st+0x38)>=25 && *(float *)(st+0x38)<34) {
-        if(func_00282E80(st,st+0x10)>1) {
+        if(vec_distance_xy(st,st+0x10)>1) {
             float size; int sign;
             *(float *)(st+0x34)+=1;
-            func_00282F20(st+0x10,st+0x20,*(float *)(st+0x34));
-            func_00282F20(vel,st+0x20,0.06666667f);
-            func_002A8C00(collision,obj,0x10001,vel,scale);
+            vec_scale_to_length(st+0x10,st+0x20,*(float *)(st+0x34));
+            vec_scale_to_length(vel,st+0x20,0.06666667f);
+            make_hit_descriptor(collision,obj,0x10001,vel,scale);
             *(unsigned short *)(collision+0x1A)=*(unsigned short *)(obj+0xAA);
-            func_00282CC0(st+0x10,st,st+0x10);
-            if(func_002761F8(st,st+0x10,0,obj,collision)) {
+            FastVecAdd(st+0x10,st,st+0x10);
+            if(CollLine(st,st+0x10,0,obj,collision)) {
                 impact=(float *)D_L11_001C0D20;
             *(Quad34580 *)(st+0x10)=*(Quad34580 *)impact;
                 if(!func_002B38B8(obj)) {
@@ -102,8 +102,8 @@ void func_L11_00434580(char *obj) {
                 }
                 func_0029F338(obj); return;
             }
-            func_00282F20(pos,st+0x20,1.66666675f);
-            func_00282CC0(st,st,pos);
+            vec_scale_to_length(pos,st+0x20,1.66666675f);
+            FastVecAdd(st,st,pos);
             size=func_002A7878(1,4);
             sign=func_002A7820(25,35); if(!sign) sign--;
             qcopy(pos2,st+0x10); pos2[2]-=0.1f;

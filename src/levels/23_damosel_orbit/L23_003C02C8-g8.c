@@ -52,7 +52,7 @@ void func_L23_003C02C8(u8 *object)
     }
     func_L23_00418650((char *)reference,0.0f);
     target=*(float **)(state+0x320);
-    arrived=target==D_00189EA0 ? S(state,0x324) : func_L23_003C0A60(object,object+0x10,target);
+    arrived=target==D_00189EA0 ? S(state,0x324) : IsPathClear(object,object+0x10,target);
     if (arrived==0 && S(state,0x2B0)==0 && S(state,0x26C)==0) S(state,0x2B0)=1;
     if (S(state,0x26C)!=0) goto timer;
     allow=1;
@@ -75,9 +75,9 @@ void func_L23_003C02C8(u8 *object)
     }
     {
         ((L23PathState *)state)->probeHit=0;
-        func_00282D30(node,object+0xC0,D_L23_001AFA50);
-        func_00282CC0(node,node,object+0x10);
-    if (func_002761F8(object+0x10,node,17,object,0) && D_L23_001C0A98 && *(s16 *)(D_L23_001C0A98+0xAA)==0x7E5) {
+        FastVecScale(node,object+0xC0,D_L23_001AFA50);
+        FastVecAdd(node,node,object+0x10);
+    if (CollLine(object+0x10,node,17,object,0) && D_L23_001C0A98 && *(s16 *)(D_L23_001C0A98+0xAA)==0x7E5) {
         choice=func_002A77E0(3);
         switch (choice) {
         case 0: side=1.0f; S(state,0x26C)=1; break;
@@ -90,10 +90,10 @@ void func_L23_003C02C8(u8 *object)
         }
         }
         if (side!=0.0f) {
-            func_00282D30(direction,object+0xD0,side);
-            func_00282CC0(direction,direction,object+0xC0);
-            func_00282D30(direction,direction,12.0f);
-            func_00282CC0(state+0x2D0,object+0x10,direction);
+            FastVecScale(direction,object+0xD0,side);
+            FastVecAdd(direction,direction,object+0xC0);
+            FastVecScale(direction,direction,12.0f);
+            FastVecAdd(state+0x2D0,object+0x10,direction);
             func_L23_00418650((char *)state+0x2D0,0.0f);
         }
         base=D_L23_001AFA54;
@@ -105,7 +105,7 @@ void func_L23_003C02C8(u8 *object)
     }
     goto follow;
 timer:
-    if (S(state,0x26E)) func_00282978((s16 *)(state+0x26E));
+    if (S(state,0x26E)) FastDecTimer((s16 *)(state+0x26E));
     if (!S(state,0x26E)) S(state,0x26C)=0;
     if (S(state,0x26C)==-1) return;
     qcopy(destination, (state+0x2D0));
@@ -115,30 +115,30 @@ follow:
     switch (mode) {
     case 1: {
         u8 *path;
-        func_L23_003C0C78(object,1);
+        SelectNearestPathNode(object,1);
         path=D_L23_001FF300[D_L23_001B36A8[S(state,0x2B4)]];
         {
             int initialIndex=S(state,0x2B6);
             qcopy(node, (path+0x10+initialIndex*16));
             S(state,0x2B0)=2;
-            first=func_00282E48(path+0x10+initialIndex*16,reference);
+            first=fast_vec_dist(path+0x10+initialIndex*16,reference);
         }
         index=S(state,0x2B6);
         if (index==0) {
-            second=func_00282E48(path+0x20,reference);
+            second=fast_vec_dist(path+0x20,reference);
             if (second<first) {
                 ((L23PathState *)state)->direction=1;
                 func_L00_0031BDC0((float *)(state+0x2C0),node,(float *)(path+0x20+S(state,0x2B6)*16),(float *)(object+0x10));
             } else { Quad savedNode=*(Quad *)node; ((L23PathState *)state)->direction=-1; *(Quad *)(state+0x2C0)=savedNode; }
         } else if (index==I(path,0)-1) {
-            second=func_00282E48(path+(I(path,0)*16-4*4),reference);
+            second=fast_vec_dist(path+(I(path,0)*16-4*4),reference);
             if (second<first) {
                 ((L23PathState *)state)->direction=-1;
                 func_L00_0031BDC0((float *)(state+0x2C0),node,(float *)(path+S(state,0x2B6)*16),(float *)(object+0x10));
             } else { Quad savedNode=*(Quad *)node; ((L23PathState *)state)->direction=1; *(Quad *)(state+0x2C0)=savedNode; }
         } else {
-            direction[0]=func_00282E48(path+index*16,reference);
-            direction[1]=func_00282E48(path+0x20+S(state,0x2B6)*16,reference);
+            direction[0]=fast_vec_dist(path+index*16,reference);
+            direction[1]=fast_vec_dist(path+0x20+S(state,0x2B6)*16,reference);
             if (direction[0]<direction[1]) ((L23PathState *)state)->direction=-1; else ((L23PathState *)state)->direction=1;
             func_L00_0031BDC0((float *)(state+0x2C0),node,(float *)(path+0x10+((L23PathState *)state)->direction*16),(float *)(object+0x10));
         }
@@ -147,13 +147,13 @@ follow:
     }
     case 2: {
         float *pathTarget=(float *)(state+0x2C0);
-        if (func_00282E48(object+0x10,pathTarget)<2.0f) { S(state,0x2B0)=3; goto update; }
+        if (fast_vec_dist(object+0x10,pathTarget)<2.0f) { S(state,0x2B0)=3; goto update; }
         qcopy(destination,pathTarget);
         goto update;
     }
     case 3: {
-        if (func_00282E48(state+0x300,reference)<20.0f && arrived) { S(state,0x2B0)=4; goto update; }
-        if (func_00282E48(object+0x10,state+0x2C0)<2.0f) {
+        if (fast_vec_dist(state+0x300,reference)<20.0f && arrived) { S(state,0x2B0)=4; goto update; }
+        if (fast_vec_dist(object+0x10,state+0x2C0)<2.0f) {
             next=S(state,0x2B6)+((L23PathState *)state)->direction;
             if (next<0) func_L23_003C0F88((char *)object,D_L23_002595C8[D_L23_001B36A8[S(state,0x2B4)]].first,1,1);
             else {
@@ -176,8 +176,8 @@ loadPath:
     default: goto update;
     }
 update:
-    func_00282CF0(node,destination,object+0x10);
-    func_00282F20(node,node,F(state,0x2A8)*0.016666668f);
+    FastVecSub(node,destination,object+0x10);
+    vec_scale_to_length(node,node,F(state,0x2A8)*0.016666668f);
     func_L02_00332630((char *)object,destination);
     func_L22_003300E8((char *)object,(Quad *)node);
     func_L23_003C01F8((char *)object,1);

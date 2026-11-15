@@ -61,7 +61,7 @@ void func_L22_003A3D50(char *obj) {
                 } else {
                     if (!(*(float *)(st + 0x20) > 0.0f) || (unsigned char)obj[0x43] == 4 || (unsigned char)obj[0x43] == 8)
                         continue;
-                    if (!(func_00282E48(*slot + 0x10, obj + 0x10) < D_L22_001AF380) || !func_L22_003A42E8(obj, *slot, i, 0))
+                    if (!(fast_vec_dist(*slot + 0x10, obj + 0x10) < D_L22_001AF380) || !func_L22_003A42E8(obj, *slot, i, 0))
                         continue;
                     if (!*(unsigned char *)(*slot + 0x20)) func_002A7750(*slot, 17, 0);
                     (*count)--;
@@ -89,13 +89,13 @@ void func_L22_003A3D50(char *obj) {
             char **slot = D_L22_0023B530[group];
             int remaining;
             for (remaining = 49; remaining >= 0; remaining--, slot++) {
-                if (*slot && func_00282E48(*slot + 0x10, &v.point) < 4.0f) {
+                if (*slot && fast_vec_dist(*slot + 0x10, &v.point) < 4.0f) {
                     char *axis = *slot + 0xC0 + func_002A77E0(2) * 16;
                     float scale;
                     if (func_002A77E0(2)) scale = D_L22_001AF308;
                     else scale = -D_L22_001AF308;
-                    func_00282D30(high, axis, scale);
-                    func_00282CC0(&v.point, &v.point, high);
+                    FastVecScale(high, axis, scale);
+                    FastVecAdd(&v.point, &v.point, high);
                     func_L22_003A2988(&v.point, 0.0f);
                 }
             }
@@ -103,7 +103,7 @@ void func_L22_003A3D50(char *obj) {
         }
         qcopy(high, &v.point);
         func_L22_003A2988(high, 3.0f);
-        if (func_002761F8(high, &v.point, 0x12, 0, 0)) qcopy(&v.point, &D_L22_001C00E0);
-        func_L22_003A3B50(&v.point, 0);
+        if (CollLine(high, &v.point, 0x12, 0, 0)) qcopy(&v.point, &D_L22_001C00E0);
+        SpawnRandomKindAt(&v.point, 0);
     }
 }

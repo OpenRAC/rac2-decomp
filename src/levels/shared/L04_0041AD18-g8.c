@@ -53,12 +53,12 @@ void func_L04_0041AD18(char *self)
     /* Fall through to move the object on its first update. */
     case 1:
         *(Quad *)previous = *(Quad *)(self + 0x10);
-        func_00282CC0(self + 0x10, self + 0x10, state);
+        FastVecAdd(self + 0x10, self + 0x10, state);
         *(float *)(state + 8) -= 0.00305555575f;
-        *(float *)(self + 0xF4) = func_00283B98(*(float *)(self + 0xF4), *(float *)(state + 0x14));
-        *(float *)(self + 0xF8) = func_00283B98(*(float *)(self + 0xF8), *(float *)(state + 0x18));
+        *(float *)(self + 0xF4) = FastAddRotations(*(float *)(self + 0xF4), *(float *)(state + 0x14));
+        *(float *)(self + 0xF8) = FastAddRotations(*(float *)(self + 0xF8), *(float *)(state + 0x18));
         func_00328848(self);
-        func_003290D0(self, self + 0x10, func_00282E48(previous, self + 0x10) * 0.5f);
+        SpawnObjectParticle(self, self + 0x10, fast_vec_dist(previous, self + 0x10) * 0.5f);
         if (func_003286D0(self, previous)) {
             *(unsigned char *)(self + 0x20) = 2;
             *(int *)(state + 0x44) = 20;
@@ -66,9 +66,9 @@ void func_L04_0041AD18(char *self)
             *(unsigned short *)(self + 0x34) |= 8;
             func_00282C88(state);
             func_00328758(self);
-            func_002E5CF8(0, 0, self);
-            func_00282D30(state + 0x20, D_L04_001BFAE0 + 0x20, 0.0009765625f);
-            func_00282F20(state + 0x20, state + 0x20, 1.0f);
+            PlayMobySound(0, 0, self);
+            FastVecScale(state + 0x20, D_L04_001BFAE0 + 0x20, 0.0009765625f);
+            vec_scale_to_length(state + 0x20, state + 0x20, 1.0f);
             *(Quad *)(state + 0x30) = *(Quad *)D_L04_001BFAE0;
             if (!*(int *)(state + 0x54)) {
                 float *v = velocity;
@@ -83,8 +83,8 @@ void func_L04_0041AD18(char *self)
         }
         break;
     case 2:
-        func_003290D0(self, self + 0x10, 0.1f);
-        func_00282CC0(self + 0x10, self + 0x10, state);
+        SpawnObjectParticle(self, self + 0x10, 0.1f);
+        FastVecAdd(self + 0x10, self + 0x10, state);
         *(float *)(state + 8) -= 0.00152777787f;
         *(unsigned char *)(self + 0x23) -= 4;
         func_00282948((int *)(state + 0x44));

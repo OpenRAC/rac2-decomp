@@ -17,7 +17,7 @@ char *func_00308408(char *parent, char *pos, char *childpos, s32 index, u8 r, u8
     char tmp[16];
     float dir[4];
 
-    moby = func_0029EFD0(0x70);
+    moby = CreateMoby(0x70);
     if (moby != 0) {
         child = *(char **)(moby + 0x68);
         *(TI *)dir = 0;
@@ -30,7 +30,7 @@ char *func_00308408(char *parent, char *pos, char *childpos, s32 index, u8 r, u8
         *(u8 *)(moby + 0x30) = 0xFF;
         *(u16 *)(moby + 0x32) = 0xFF;
         *(u8 *)(moby + 0x31) = 1;
-        func_002A0488(moby, r, g, b);
+        set_moby_color(moby, r, g, b);
         *(f32 *)(child + 0x18) = *(f32 *)(moby + 0x2C) * scale;
         *(s32 *)(moby + 0x2C) = 0;
         *(char **)(child + 0x10) = parent;
@@ -39,8 +39,8 @@ char *func_00308408(char *parent, char *pos, char *childpos, s32 index, u8 r, u8
         qcopy(moby + 0xF0, tmp);
         *(s32 *)(child + 0x14) = index;
         *(u16 *)(child + 0x1C) = *(u16 *)(child + 0x14) - 4;
-        *(f32 *)(moby + 0x2C) = func_00283CE0(index - (short)(*(u16 *)(child + 0x14) - 4))
-                * *(f32 *)(child + 0x18) / func_00283CE0(*(s32 *)(child + 0x14));
+        *(f32 *)(moby + 0x2C) = IntToFloat(index - (short)(*(u16 *)(child + 0x14) - 4))
+                * *(f32 *)(child + 0x18) / IntToFloat(*(s32 *)(child + 0x14));
         *(u16 *)(child + 0x1E) = a;
         func_002A0F48(moby);
     }

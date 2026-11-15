@@ -45,26 +45,26 @@ void func_L09_003AEA88(char *object)
     func_002AFFD8(object + 0x10, scratch, 1);
     qcopy(start, object + 0x10);
     if (B(object, 0x20) == 0) {
-        func_00282CC0(object + 0x10, object + 0x10, data + 0x30);
+        FastVecAdd(object + 0x10, object + 0x10, data + 0x30);
         hit.object = object;
         hit.flags = 0x10001;
         hit.radius = F(data, 0x54);
         hit.mode = 1;
         qcopy(hit.v, data + 0x30);
-        func_00282F20(hit.v, hit.v, F(data, 0x60));
+        vec_scale_to_length(hit.v, hit.v, F(data, 0x60));
         hit.v[3] = 5627.925f;
         hit.a = B(data, 0x64);
         hit.b = B(data, 0x68);
         hit.id = *(u16 *)(object + 0xAA);
-        if (func_002761F8(start, object + 0x10, 0, I(data, 0x40), &hit)
+        if (CollLine(start, object + 0x10, 0, I(data, 0x40), &hit)
             || func_00277258(0.2f, object + 0x10, 0, I(data, 0x40))) {
             int r, g, b;
 
-            func_002E5CF8(0, 0, object);
-            r = func_00283CF0(F(data, 0x50) * 5.0f);
-            g = func_00283CF0(F(data, 0x50) * 4.0f);
-            b = func_00283CF0(F(data, 0x50) * 10.0f);
-            func_002ABBB8(object, data + 0x30, 0, 0.0f, 0.0f, r, g, b, 0.0f, 0.0f, 9.0f, F(data, 0x50),
+            PlayMobySound(0, 0, object);
+            r = FloatToInt(F(data, 0x50) * 5.0f);
+            g = FloatToInt(F(data, 0x50) * 4.0f);
+            b = FloatToInt(F(data, 0x50) * 10.0f);
+            SpawnExplosionEffects(object, data + 0x30, 0, 0.0f, 0.0f, r, g, b, 0.0f, 0.0f, 9.0f, F(data, 0x50),
                           -1, 0.0f, 0, 1, -1, 0, 0x810001);
             func_00277F48(object + 0x10, 16, I(data, 0x40), &hit, 1.0f);
             func_0029F338(object);
@@ -74,10 +74,10 @@ void func_L09_003AEA88(char *object)
     if (func_00282948(data + 0x48)) {
         int r, g, b;
 
-        r = func_00283CF0(F(data, 0x50) * 5.0f);
-        g = func_00283CF0(F(data, 0x50) * 4.0f);
-        b = func_00283CF0(F(data, 0x50) * 10.0f);
-        func_002ABBB8(object, data + 0x30, 0, 2.0f, F(data, 0x54), r, g, b, 0.0f, 0.0f, 9.0f, F(data, 0x50),
+        r = FloatToInt(F(data, 0x50) * 5.0f);
+        g = FloatToInt(F(data, 0x50) * 4.0f);
+        b = FloatToInt(F(data, 0x50) * 10.0f);
+        SpawnExplosionEffects(object, data + 0x30, 0, 2.0f, F(data, 0x54), r, g, b, 0.0f, 0.0f, 9.0f, F(data, 0x50),
                       -1, 0.0f, 0, 1, -1, 0, 0x810001);
         func_0029F338(object);
         return;

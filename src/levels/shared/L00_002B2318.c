@@ -84,19 +84,19 @@ void func_L00_002B2318(void) {
     Record2318 *record;
 
     if (D_00189E20.active && !D_00189E20.mode && (D_001A7B00[1] || D_001A7B00[0x41])) {
-        if ((func_L00_002ADEA0(3) == 3 || func_L00_002ADEA0(3) == 2) && !D_00189E20.blocked) {
+        if ((hero_slot_item_id(3) == 3 || hero_slot_item_id(3) == 2) && !D_00189E20.blocked) {
             if (func_00282948(&D_00189E20.timer)) {
                 Obj2318 *object;
                 for (k = 0; (object = D_L00_001FACE0[k]) != 0; k++) {
                     if (object->type && object->type->kind == 5 && object && object->state != 254 && object->state != 253 && func_002AB1F0(object)) {
-                        func_00282CF0(v, object->pos, D_00189E20.position);
-                        if (!(16.0f < func_00282E20(v))) D_00189E20.target = object;
+                        FastVecSub(v, object->pos, D_00189E20.position);
+                        if (!(16.0f < vec_length_xy(v))) D_00189E20.target = object;
                     }
                 }
                 if (D_00189E20.target && D_00189E20.target->type->kind == 5 && D_00189E20.target->state != 254 && D_00189E20.target->state != 253
-                    && func_002761F8(D_00189E20.point, D_00189E20.target->pos, 0, D_00189E20.owner, 0)) {
-                    func_00282CF0(v, D_00189E20.target->pos, D_00189E20.position);
-                    if (func_00282E20(v) < 16.0f) {
+                    && CollLine(D_00189E20.point, D_00189E20.target->pos, 0, D_00189E20.owner, 0)) {
+                    FastVecSub(v, D_00189E20.target->pos, D_00189E20.position);
+                    if (vec_length_xy(v) < 16.0f) {
                         record = &D_L00_00262570[D_00139568.index];
                         if (record->count > 0) {
                             if (record->flag) func_L00_0040B838(D_00189E20.point, D_00189E20.owner, D_00189E20.target, 1);
@@ -111,7 +111,7 @@ void func_L00_002B2318(void) {
                     }
                 }
             } else {
-                angle = func_00283C80(func_00283248(D_00189E20.target->pos[0] - D_00189E20.position[0], D_00189E20.target->pos[1] - D_00189E20.position[1]), D_00189E20.heading);
+                angle = FastDiffRots(func_00283248(D_00189E20.target->pos[0] - D_00189E20.position[0], D_00189E20.target->pos[1] - D_00189E20.position[1]), D_00189E20.heading);
                 if (angle > 1.3962636f && D_L00_00262570[D_00139568.index].flag) {
                     Obj2318 *weapon = D_00189E20.weapon;
                     weapon->colour = 0x800000ff;
@@ -123,10 +123,10 @@ void func_L00_002B2318(void) {
                     *(Vec128 *)d = 0;
                     c[0] = -0.025f; c[1] = 0.01f; c[2] = 0.04f;
                     d[0] = -0.025f; d[1] = -0.01f; d[2] = 0.04f;
-                    func_00283098(c, c, weapon->mat);
-                    func_00282CC0(a, a, c);
-                    func_00283098(d, d, weapon->mat);
-                    func_00282CC0(b, b, d);
+                    matrix_mul_vec3(c, c, weapon->mat);
+                    FastVecAdd(a, a, c);
+                    matrix_mul_vec3(d, d, weapon->mat);
+                    FastVecAdd(b, b, d);
                     for (i = 0; i < 30; i++) {
                         a[0] += func_002A78D8(0.0f, 0.004f);
                         a[1] += func_002A78D8(0.0f, 0.004f);
@@ -134,9 +134,9 @@ void func_L00_002B2318(void) {
                         b[0] += func_002A78D8(0.0f, 0.004f);
                         b[1] += func_002A78D8(0.0f, 0.004f);
                         b[2] += func_002A78D8(0.0f, 0.004f);
-                        effect = func_002C16C0(a, D_L00_001A8F20, 2, 127, 0x2020ff, func_00283CF0(func_002A78D8(1.0f, -1.0f)), 25200.0f, 500.0f, 1.0f, 0.0f, 0.0f);
+                        effect = func_002C16C0(a, D_L00_001A8F20, 2, 127, 0x2020ff, FloatToInt(func_002A78D8(1.0f, -1.0f)), 25200.0f, 500.0f, 1.0f, 0.0f, 0.0f);
                         if (effect) effect[2] = *D_L00_001FE940.owner;
-                        effect = func_002C16C0(b, D_L00_001A8F20, 2, 127, 0x2020ff, func_00283CF0(func_002A78D8(1.0f, -1.0f)), 25200.0f, 500.0f, 1.0f, 0.0f, 0.0f);
+                        effect = func_002C16C0(b, D_L00_001A8F20, 2, 127, 0x2020ff, FloatToInt(func_002A78D8(1.0f, -1.0f)), 25200.0f, 500.0f, 1.0f, 0.0f, 0.0f);
                         if (effect) effect[2] = *D_L00_001FE940.owner;
                     }
                 }
@@ -150,10 +150,10 @@ void func_L00_002B2318(void) {
                         /* Identical arms: retail still reads this flag into $v0 and the next call clobbers it, the
                            dead load jump2's cross-jump leaves. One arm is 36 bytes short of retail. */
                         if (record->flag) {
-                            effect = func_002C16C0(a, D_L00_001A8F20, 2, 127, 0x20ff20, func_00283CF0(func_002A78D8(1.0f, -1.0f)), 31500.002f, 500.0f, 1.0f, 0.0f, 0.0f);
+                            effect = func_002C16C0(a, D_L00_001A8F20, 2, 127, 0x20ff20, FloatToInt(func_002A78D8(1.0f, -1.0f)), 31500.002f, 500.0f, 1.0f, 0.0f, 0.0f);
                             if (effect) effect[2] = *D_L00_001FE940.owner;
                         } else {
-                            effect = func_002C16C0(a, D_L00_001A8F20, 2, 127, 0x20ff20, func_00283CF0(func_002A78D8(1.0f, -1.0f)), 31500.002f, 500.0f, 1.0f, 0.0f, 0.0f);
+                            effect = func_002C16C0(a, D_L00_001A8F20, 2, 127, 0x20ff20, FloatToInt(func_002A78D8(1.0f, -1.0f)), 31500.002f, 500.0f, 1.0f, 0.0f, 0.0f);
                             if (effect) effect[2] = *D_L00_001FE940.owner;
                         }
                     }

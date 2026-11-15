@@ -75,16 +75,16 @@ void func_L06_003E5D30(u8 *moby)
                         int first = (int)temporary - mirror;
                         int before = offset + (int)temporary;
                         for (k = 1; k < 19; k++) {
-                            func_00282CC0(&velocities[k][col], (L06GridVector *)(before + k * 160), (L06GridVector *)(first + k * 160));
-                            func_00282CC0(&velocities[k][col], &velocities[k][col], column[k + 1]);
-                            func_00282D30(&velocities[k][col], &velocities[k][col], 0.333f);
+                            FastVecAdd(&velocities[k][col], (L06GridVector *)(before + k * 160), (L06GridVector *)(first + k * 160));
+                            FastVecAdd(&velocities[k][col], &velocities[k][col], column[k + 1]);
+                            FastVecScale(&velocities[k][col], &velocities[k][col], 0.333f);
                         }
                     }
                     st->timer[group][col] = D_L06_001B31B0;
                 } else {
                     int k;
                     for (k = 1; k < 19; k++) {
-                        func_00282CC0(&points[k][col], &points[k][col], &velocities[k][col]);
+                        FastVecAdd(&points[k][col], &points[k][col], &velocities[k][col]);
                     }
                 }
             }

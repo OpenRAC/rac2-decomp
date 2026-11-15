@@ -58,22 +58,22 @@ void func_L06_004009B8(char *obj)
     u32 color;
     s32 opacity;
 
-    distance = func_00282E48(obj+0x10,D_L06_001B9840);
+    distance = fast_vec_dist(obj+0x10,D_L06_001B9840);
     if (distance>48.0f) fade=(80.0f-distance)*0.03125f;
     else fade=1.0f;
-    func_002833B8(rotation,RF(data,0)*0.5f);
+    set_scale_matrix(rotation,RF(data,0)*0.5f);
     uv0=&quad[0].uv[0][0];
     uv1=&quad[1].uv[0][0];
     v0=uv0+1;
     v1=uv1+1;
     for (matrixIndex=0;matrixIndex<RI(data,4);matrixIndex++) {
         char *matrix=matrices+matrixIndex*64;
-        func_00283410(matrix,obj+0xF0);
-        func_00283788(matrix,matrix,rotation);
+        euler_to_matrix(matrix,obj+0xF0);
+        multiply_matrix(matrix,matrix,rotation);
         *(QuadWord *)(matrix+0x30) = *(QuadWord *)(obj+0x10);
-        RF(matrix,0x38)+=func_00283CE0(matrixIndex+1)*RF(data,8);
+        RF(matrix,0x38)+=IntToFloat(matrixIndex+1)*RF(data,8);
     }
-    texture=func_0027C878(14);
+    texture=GetEffectTextureDescriptor(14);
     blend=(u64)D_L06_001AFE50 | ((u64)D_L06_001AFE54<<2);
     blend |= ((u64)D_L06_001AFE58<<4);
     blend |= ((u64)D_L06_001AFE5C<<6);
@@ -115,15 +115,15 @@ void func_L06_004009B8(char *obj)
                 ages=ageBase+0x2C00;
                 time=RI(ages,order[n]*4+groupAge);
                 groupVertices=i*0x2580;
-                if(time>D_L06_001B31B4) progress=func_00283CE0(time-D_L06_001B31B4)/func_00283CE0(D_L06_001B31B0-D_L06_001B31B4);
-                else progress=1.0f-func_00283CE0(time)/func_00283CE0(D_L06_001B31B4);
-                color=func_00283D38(D_L06_001AFE70,D_L06_001AFE74,progress);
-                alpha=func_00283CE0((s32)color>>24);
-                opacity=func_00283CF0(fade*fade*alpha);
+                if(time>D_L06_001B31B4) progress=IntToFloat(time-D_L06_001B31B4)/IntToFloat(D_L06_001B31B0-D_L06_001B31B4);
+                else progress=1.0f-IntToFloat(time)/IntToFloat(D_L06_001B31B4);
+                color=FastTweenColor(D_L06_001AFE70,D_L06_001AFE74,progress);
+                alpha=IntToFloat((s32)color>>24);
+                opacity=FloatToInt(fade*fade*alpha);
                 color=(color&0xFFFFFF)+(opacity<<24);
                 if((u8)obj[0x20]==2) {
-                    alpha=func_00283CE0(opacity)*func_00283CE0(RI(data,0x34));
-                    color=(color&0xFFFFFF)+(func_00283CF0(alpha/(D_L06_001AFF20*60.0f))<<24);
+                    alpha=IntToFloat(opacity)*IntToFloat(RI(data,0x34));
+                    color=(color&0xFFFFFF)+(FloatToInt(alpha/(D_L06_001AFF20*60.0f))<<24);
                 }
                 k=0;
                 offset=n*64;
@@ -133,9 +133,9 @@ void func_L06_004009B8(char *obj)
                 quad[1].colors[1]=color;
                 quad[1].colors[0]=color;
                 for(;k<4;k++) {
-                    func_00282CC0(&quad[1].points[k],&D_L06_001AFEA0[k],&((RenderVec (*)[20])(mesh+groupVertices))[j+(k>>1)][order[n]]);
+                    FastVecAdd(&quad[1].points[k],&D_L06_001AFEA0[k],&((RenderVec (*)[20])(mesh+groupVertices))[j+(k>>1)][order[n]]);
                 }
-                func_00280B90(&quad[1],matrices+offset,0);
+                draw_world_quad(&quad[1],matrices+offset,0);
             }
             j=nextRow;
         } while(j<19);

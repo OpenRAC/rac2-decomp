@@ -29,7 +29,7 @@ void func_L11_00456438(char *arg0, int arg1) {
     func_002B3380(arg0, state + 0x1F0, state + 0x20);
     if (*(short *)(state + 0x50) != 0) {
         *(short *)(state + 0x50) = 0;
-        func_002A0488(arg0, *(u8 *)(state + 0x54), *(u8 *)(state + 0x55),
+        set_moby_color(arg0, *(u8 *)(state + 0x54), *(u8 *)(state + 0x55),
                       *(u8 *)(state + 0x56));
         *(short *)(state + 0x52) = 1;
     }

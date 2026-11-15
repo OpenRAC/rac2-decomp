@@ -41,23 +41,23 @@ void func_002E7BC8(void *object)
  next = *(unsigned long long *)(*(char **)(o + 0x5c) + 0x10);
  func_00283130(first, *(unsigned long long *)(*(char **)(o + 0x58) + 0x10));
  func_00283130(second, next);
- func_00282D60(first, first, (1.0f - *(float *)(o + 0x44)) * (1.0f / 32768.0f));
- func_00282D60(second, second, *(float *)(o + 0x44) * (1.0f / 32768.0f));
+ scale_vector(first, first, (1.0f - *(float *)(o + 0x44)) * (1.0f / 32768.0f));
+ scale_vector(second, second, *(float *)(o + 0x44) * (1.0f / 32768.0f));
  func_00282CA8(combined, first, second);
- func_00283958(combined, matrix);
- func_00283738(matrix, o + 0xc0, matrix);
- func_00283098(pos, &D_001AC130, matrix);
- func_00283098(other, &D_001AC140, matrix);
- func_00282CC0(pos, pos, o + 0x10);
- func_00282CC0(other, other, o + 0x10);
+ quaternion_to_rotation_basis(combined, matrix);
+ multiply_matrix3x3(matrix, o + 0xc0, matrix);
+ matrix_mul_vec3(pos, &D_001AC130, matrix);
+ matrix_mul_vec3(other, &D_001AC140, matrix);
+ FastVecAdd(pos, pos, o + 0x10);
+ FastVecAdd(other, other, o + 0x10);
  func_002ED368(object);
  effect.life = func_002A7820(95, 127);
  if (*(short *)(o + 0xaa) == 0x128c)
-  effect.color = func_00283D38(0xff0f0f, 0xff3f3f, func_002A7878(0.0f, 1.0f));
+  effect.color = FastTweenColor(0xff0f0f, 0xff3f3f, func_002A7878(0.0f, 1.0f));
  else if (*(short *)(o + 0xaa) == 0x128d)
-  effect.color = func_00283D38(0xf6fcf, 0x3fcfef, func_002A7878(0.0f, 1.0f));
+  effect.color = FastTweenColor(0xf6fcf, 0x3fcfef, func_002A7878(0.0f, 1.0f));
  else
-  effect.color = func_00283D38(0xf4fdf, 0x1f8fff, func_002A7878(0.0f, 1.0f));
+  effect.color = FastTweenColor(0xf4fdf, 0x1f8fff, func_002A7878(0.0f, 1.0f));
  effect.size = func_002A7878(1.0f, 2.0f);
  if (*(short *)(o + 0xaa) == 0x128c) qcopy(effect.pos, pos);
  else qcopy(effect.pos, o + 0x10);

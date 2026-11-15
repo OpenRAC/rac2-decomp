@@ -10,7 +10,7 @@ void func_L02_003CD668(char *self, void *position) {
     func_002A7750((u8 *)self, 0x16, 4);
     func_002A7398((s8 *)self, 0, 0);
     func_0029FC20(self, 0, (char *)transform);
-    func_00283678(*(char **)(state + 0x370) + 0xC0, transform);
+    copy_matrix3x4(*(char **)(state + 0x370) + 0xC0, transform);
     *(Quad *)(*(char **)(state + 0x370) + 0x10) = transform[3];
     *(u16 *)(self + 0x34) = (*(u16 *)(self + 0x34) & 0xFFBE) | 0x1000;
     *(int *)(self + 0x98) = *(int *)(*(char **)(self + 0x24) + 0x10);

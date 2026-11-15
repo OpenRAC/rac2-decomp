@@ -127,8 +127,8 @@ void func_L03_0041EAE0(u8 *entity) {
                 st->f33C=6;
             }
         }
-        st->f48=func_00283CF0(20);
-        st->f4A=func_00283CF0(17.6f);
+        st->f48=FloatToInt(20);
+        st->f4A=FloatToInt(17.6f);
         st->f70=8;
         st->fA8=3;
         st->f90=0.5f;
@@ -158,10 +158,10 @@ void func_L03_0041EAE0(u8 *entity) {
         if(*(s16 *)(other+0xAA)==0xFFD && *(float *)(other+0x18)<*(float *)(entity+0x18)+2) entity[0xA8]=0xFF;
     }
     if(func_002B0ED8(entity,st->f60,0) && st->f20<=0) {
-        func_00283098(point,D_L03_001B1C30,entity+0xC0);
-        func_00282CC0(point,point,entity+0x10);
-        func_0032C700(point,0,25,20,20,20,45,0,0.5f,20.0f,1,0,0,0);
-        func_00282F20(velocity,st->fE0,0.06666667f);
+        matrix_mul_vec3(point,D_L03_001B1C30,entity+0xC0);
+        FastVecAdd(point,point,entity+0x10);
+        SpawnExplosion(point,0,25,20,20,20,45,0,0.5f,20.0f,1,0,0,0);
+        vec_scale_to_length(velocity,st->fE0,0.06666667f);
         func_002B0A68(entity,31,velocity,3,6,3,6,255);
         if(D_0018C0B4==49) {
             D_L03_001A9044_gp=D_L03_001A9044[0]+1;
@@ -172,8 +172,8 @@ void func_L03_0041EAE0(u8 *entity) {
                 D_L03_001A903C[0]=1;
             }
         }
-        func_002E5CF8(3,0,entity);
-        func_002A6C58(entity,0,3);
+        PlayMobySound(3,0,entity);
+        SetDeathBits(entity,0,3);
         if(st->f340!=-1) {
             func_002E59F8(st->f340);
             st->f340=-1;
@@ -181,7 +181,7 @@ void func_L03_0041EAE0(u8 *entity) {
         func_0029F338(entity);
         return;
     }
-    if(entity[0x31] && func_00282E48(entity+0x10,D_L03_001B9980)<24) {
+    if(entity[0x31] && fast_vec_dist(entity+0x10,D_L03_001B9980)<24) {
         func_002A93B0(entity);
         entity[0x6F]=22;
     }

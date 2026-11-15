@@ -41,20 +41,20 @@ void func_L06_003E1498(unsigned char *m) {
     case 0:
         if(target) {
             *(unsigned short *)(v+0x14)=*(unsigned short *)(target+0xaa);
-            F14(v,0x44)=func_00283CE0((unsigned char)target[0x23]);
+            F14(v,0x44)=IntToFloat((unsigned char)target[0x23]);
             if(I14(v,8)&0x10) qcopy(m+0x10,target+0x10);
             else if(I14(v,8)&0x40) qcopy(target+0x10,m+0x10);
             if(I14(v,8)&0x20) qcopy(m+0xf0,target+0xf0);
             else if(I14(v,8)&0x80) qcopy(target+0xf0,m+0xf0);
-        } else func_0026FEB8(D_L06_001AF320);
+        } else STUB_printf(D_L06_001AF320);
         for(i=0,link=links;i<5;i++,link+=8) {
             if(I14(link,0)!=-1){
                 char *base = D_L06_001B281C[0];
                 char *other=(char *)(I14(link,0)*256+(s32)base);
                 unsigned short uid=*(unsigned short *)(other+0xaa);
                 *(unsigned short *)(link+4)=uid;
-                func_0026FEB8(D_L06_001AF350,((char *)m-base)>>8,i,I14(link,0),(short)uid);
-            } else func_0026FEB8(D_L06_001AF380,((char *)m-D_L06_001B281C[0])>>8,i);
+                STUB_printf(D_L06_001AF350,((char *)m-base)>>8,i,I14(link,0),(short)uid);
+            } else STUB_printf(D_L06_001AF380,((char *)m-D_L06_001B281C[0])>>8,i);
         }
         {
             float a=F14(v,0),b=F14(v,4);
@@ -73,9 +73,9 @@ void func_L06_003E1498(unsigned char *m) {
         break;
     case 2:
         if(target && !(I14(v,8)&2)) {
-            float remaining=func_00283CE0(I14(v,0x40));
-            float total=func_00283CE0(I14(v,0xc));
-            target[0x23]=func_00283CF0(F14(v,0x44)*remaining/total);
+            float remaining=IntToFloat(I14(v,0x40));
+            float total=IntToFloat(I14(v,0xc));
+            target[0x23]=FloatToInt(F14(v,0x44)*remaining/total);
         }
         if(!(I14(v,8)&4) && target && (signed char)v[0x17]!=-1 && (unsigned char)target[0x20]==(signed char)v[0x17]) m[0x20]=3;
         if(!(I14(v,8)&8) && func_00282948((int *)(v+0x40))) m[0x20]=3;
@@ -88,5 +88,5 @@ void func_L06_003E1498(unsigned char *m) {
     case 4:
         break;
     }
-    if(D_001A79F0[0]==13) func_00282F20(m+0xc0,m+0xc0,0.5f);
+    if(D_001A79F0[0]==13) vec_scale_to_length(m+0xc0,m+0xc0,0.5f);
 }

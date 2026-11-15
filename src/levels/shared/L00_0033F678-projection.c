@@ -24,26 +24,26 @@ float func_L00_00341D08(Vector *out, const Vector *point, const Vector *start, c
     if (0.0f < height && func_00282C48(point->f[2] - start->f[2]) < height &&
         func_00282C48(point->f[2] - end->f[2]) < height) {
         distance = func_L00_00341B18(out->f, point->f, start->f, end->f);
-        height = func_00282E80(start, out);
-        height /= func_00282E80(start, end);
+        height = vec_distance_xy(start, out);
+        height /= vec_distance_xy(start, end);
         direction.q = start->q;
         base.q = end->q;
-        func_L00_0031D670(out, &direction, &base, height);
+        LerpVector4(out, &direction, &base, height);
         return distance;
     }
-    func_00282CF0(&direction, end, start);
+    FastVecSub(&direction, end, start);
     base.q = start->q;
-    func_00282F20(&direction, &direction, 1.0f);
+    vec_scale_to_length(&direction, &direction, 1.0f);
     qcopy(&normal, &direction);
-    negativeDot = -func_00282DB0(point, &direction);
-    baseDot = func_00282DB0(&base, &normal);
-    denominator = func_00282DB0(&direction, &normal);
+    negativeDot = -FastVecDot(point, &direction);
+    baseDot = FastVecDot(&base, &normal);
+    denominator = FastVecDot(&direction, &normal);
     {
         float numerator = -(negativeDot + baseDot);
         float scale = numerator / denominator;
-        func_00282D30(out, &direction, scale);
+        FastVecScale(out, &direction, scale);
     }
-    func_00282CC0(out, out, &base);
+    FastVecAdd(out, out, &base);
     axis = 0;
     b = end->f;
     a = start->f;
@@ -58,8 +58,8 @@ float func_L00_00341D08(Vector *out, const Vector *point, const Vector *start, c
         ++projection;
     } while (axis < 3);
     if (axis < 3) {
-        endpointDistance = func_00282E48(out, start);
-        if (endpointDistance < func_00282E48(out, end)) qcopy(out, start);
+        endpointDistance = fast_vec_dist(out, start);
+        if (endpointDistance < fast_vec_dist(out, end)) qcopy(out, start);
         else qcopy(out, end);
     }
     pointCopy.q = point->q;

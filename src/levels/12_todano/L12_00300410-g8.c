@@ -90,7 +90,7 @@ void func_L12_00300410(void)
             *(unsigned short *)(obj + 0x34) |= 0x800;
         }
         if (*(short *)(obj + 0xAA) == 0xD54) {
-            func_002E64A0(obj);
+            UpdateEquipmentPieces(obj);
         }
         if (obj && *(short *)(obj + 0xAA) == 0xFA0) {
             char *p = *(char **)(obj + 0x68);
@@ -112,7 +112,7 @@ void func_L12_00300410(void)
 
         func_0029FCC0(emitter, 3, &a);
         func_0029FCC0(emitter, 5, &b);
-        func_00282D08(&a, &a, &b, 0.5f);
+        lerp_vector(&a, &a, &b, 0.5f);
         d.q = 0;
         d.f[2] = -(func_002A7878(D_L12_001A93E0, D_L12_001A93E4[0]) * 0.016666668f);
         c.q = d.q;
@@ -142,15 +142,15 @@ void func_L12_00300410(void)
         D_L12_001B9CC0.time = 45;
         D_L12_001B9CC0.flag = 0;
         func_0029FCC0(D_L12_001BDB00.objects[4], 0, &a);
-        func_0032C700(&a, 1, 25, 20, 20, 20, 45, 1, 0.666f, 20.0f, 1, 1, 0, 0);
+        SpawnExplosion(&a, 1, 25, 20, 20, 20, 45, 1, 0.666f, 20.0f, 1, 1, 0, 0);
         break;
     case 0x6F5:
         D_L12_001B9CC0.fade = 0.5f;
         D_L12_001B9CC0.time = 60;
         D_L12_001B9CC0.flag = 0;
-        func_00282F20(&a, &D_L12_001B9CC0.rot, 4.0f);
-        func_00282CC0(&a, &a, &D_L12_001B9CC0.pos);
-        func_00282F20(&b, &D_L12_001B9CC0.rot, -1.0f);
+        vec_scale_to_length(&a, &D_L12_001B9CC0.rot, 4.0f);
+        FastVecAdd(&a, &a, &D_L12_001B9CC0.pos);
+        vec_scale_to_length(&b, &D_L12_001B9CC0.rot, -1.0f);
         func_0032DA58(D_L12_001BDB00.objects[2], &a, &b, 0.0f);
         break;
     case 0x8D2:
@@ -161,14 +161,14 @@ void func_L12_00300410(void)
         a.f[2] = 1.0f;
         D_L12_001B9CC0.time = 45;
         D_L12_001B9CC0.flag = 0;
-        func_00283098(&a, &a, &D_L12_001B9CC0.rot);
-        func_00282CC0(&a, &a, &D_L12_001B9CC0.pos);
-        func_0032C700(&a, 1, 25, 20, 20, 20, 45, 1, 0.666f, 20.0f, 1, 1, 0, 0);
+        matrix_mul_vec3(&a, &a, &D_L12_001B9CC0.rot);
+        FastVecAdd(&a, &a, &D_L12_001B9CC0.pos);
+        SpawnExplosion(&a, 1, 25, 20, 20, 20, 45, 1, 0.666f, 20.0f, 1, 1, 0, 0);
         for (k = 24; k >= 0; k--) {
             qcopy(&b, &a);
             func_002ACB48(&b, 0.3f);
-            func_00282CF0(velocity, &b, &a);
-            func_00282F20(velocity, velocity, func_002A7878(0.0f, 1.0f) * 0.016666668f);
+            FastVecSub(velocity, &b, &a);
+            vec_scale_to_length(velocity, velocity, func_002A7878(0.0f, 1.0f) * 0.016666668f);
             func_L00_0033FFB8(&b, velocity, 300);
         }
         break;

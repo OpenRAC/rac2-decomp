@@ -57,7 +57,7 @@ void func_L00_002B5250(void)
             d = func_00282C48(D_00189E20.x31C);
             if (d < func_00282C48(func_L00_002D3B00(&hero->vF0)) + 0.01f) {
                 if (D_00189E20.easing == 0
-                    || func_00282E80(&hero->anchor, &hero->position) > D_00189E20.reach * 0.5f) {
+                    || vec_distance_xy(&hero->anchor, &hero->position) > D_00189E20.reach * 0.5f) {
                     qcopy(&hero->position, &hero->goal);
                     return;
                 }
@@ -75,7 +75,7 @@ void func_L00_002B5250(void)
             d = func_00282C48(D_00189E20.position.z - D_00189E20.goalZ);
             if (d < func_00282C48(D_00189E20.vF0.z) + 0.01f) {
                 if (D_00189E20.easing == 0
-                    || func_00282E80(&hero->anchor, &hero->position) > D_00189E20.reach * 0.5f) {
+                    || vec_distance_xy(&hero->anchor, &hero->position) > D_00189E20.reach * 0.5f) {
                     D_00189E20.position.z = D_00189E20.goalZ;
                     return;
                 }

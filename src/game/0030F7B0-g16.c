@@ -81,14 +81,14 @@ int func_00313210(Moby *self)
     int alpha;
     unsigned char *particle;
 
-    func_00282CF0(position, D_001B5340, self->position);
-    func_00282F20(position, position, -0.3f);
-    func_00282F20(step, position, 0.1f);
+    FastVecSub(position, D_001B5340, self->position);
+    vec_scale_to_length(position, position, -0.3f);
+    vec_scale_to_length(step, position, 0.1f);
     count = 3;
-    func_00282CC0(position, position, self->position);
+    FastVecAdd(position, position, self->position);
     baseZ = position[2];
     do {
-        if (func_00282978(timer) == 0) {
+        if (FastDecTimer(timer) == 0) {
             if (TIMER(timerOffset) >= 49)
                 active = 1;
             ANGLE(floatOffset) += ENTRY(D_001AF1E0, floatOffset);
@@ -97,30 +97,30 @@ int func_00313210(Moby *self)
             else if (ANGLE(floatOffset) <= 0.0f)
                 ANGLE(floatOffset) += 255.0f;
 
-            mix = func_00282C48(0.5f - func_00283CE0(255 - TIMER(timerOffset)) * 0.003921569f);
+            mix = func_00282C48(0.5f - IntToFloat(255 - TIMER(timerOffset)) * 0.003921569f);
             if (vars->altColors)
-                color = func_00283D38(D_001AF1CC, D_001AF1D0, mix);
+                color = FastTweenColor(D_001AF1CC, D_001AF1D0, mix);
             else
-                color = func_00283D38(D_001AF1C4, D_001AF1C8, mix);
+                color = FastTweenColor(D_001AF1C4, D_001AF1C8, mix);
             oldAlpha = color >> 24;
-            duration = func_00283CE0(D_001AF174);
+            duration = IntToFloat(D_001AF174);
             remaining = 1.0f - (float)TIMER(timerOffset) / duration;
-            alpha = func_00283CF0(func_00283CE0(oldAlpha) * (1.0f - remaining)) << 24;
+            alpha = FloatToInt(IntToFloat(oldAlpha) * (1.0f - remaining)) << 24;
             color = alpha | (color & 0xFFFFFF);
 
             position[2] = baseZ + ENTRY(D_001AF200, floatOffset);
-            particle = func_002C2FD8(position, color, func_00283CF0(ANGLE(floatOffset)) & 255,
+            particle = func_002C2FD8(position, color, FloatToInt(ANGLE(floatOffset)) & 255,
                                      D_001AF1D8, 0, 2, 1,
                                      ENTRY(D_001AF1F0, floatOffset) * remaining);
             if (particle != 0)
                 particle[2] = D_001F2540[62][0];
             particle = func_002C2FD8(position, alpha | 0xFFFFFF,
-                                     func_00283CF0(ANGLE(floatOffset)) & 255, D_001AF1D8,
+                                     FloatToInt(ANGLE(floatOffset)) & 255, D_001AF1D8,
                                      D_001AF1D4, 2, 1,
                                      ENTRY(D_001AF1F0, floatOffset) * 0.7f * remaining);
             if (particle != 0)
                 particle[2] = D_001F2540[62][0];
-            func_00282CC0(position, position, step);
+            FastVecAdd(position, position, step);
         }
         floatOffset += 4;
         timerOffset += 2;

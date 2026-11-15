@@ -44,7 +44,7 @@ void func_L03_003E4588(u8 *a0) {
         c[1] = D_L03_001B0C5C;
         f13 = D_L03_001B0C64 * 0.00029088825f;
     }
-    r = func_00283B98(*(f32 *)(rec + 0x78), f13);
+    r = FastAddRotations(*(f32 *)(rec + 0x78), f13);
     *(f32 *)(rec + 0x78) = r;
     *(u32 *)(a0 + 0x78) = ref_L01_0031BC68_00(c[0], c[1], r);
 }

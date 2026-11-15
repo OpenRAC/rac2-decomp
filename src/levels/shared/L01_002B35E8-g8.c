@@ -69,5 +69,5 @@ void func_L01_002B35E8(void) {
     *(int *)(*(char **)(p + 0x2290) + 0x5C) = r;
     if (*(int *)(p + 0x2294) != 0x61 ||
         (D_001A8F40 != 2 && D_001A8F40 != 6))
-        func_L01_002BEB90(0, 1);
+        SetHeroMoveState(0, 1);
 }

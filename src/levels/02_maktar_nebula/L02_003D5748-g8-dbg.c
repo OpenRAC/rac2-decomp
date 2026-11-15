@@ -49,12 +49,12 @@ int func_L02_003D5748(char *self, int joint) {
     int elapsed;
     func_0029FCC0(self, joint, (char *)origin);
     func_0029FC20(self, joint, (char *)matrix);
-    func_00283678(rotation, matrix);
+    copy_matrix3x4(rotation, matrix);
     func_002AB028(rotation);
     qcopy(direction, rotation);
     travel = (origin[2] - D_L02_001B01B8) / func_00283180(1.15f);
-    func_00282D30(impact, direction, travel);
-    func_00282CC0(impact, impact, origin);
+    FastVecScale(impact, direction, travel);
+    FastVecAdd(impact, impact, origin);
     travel -= 5.3f;
     outbound = travel * 0.8571428f;
     inbound = travel * 0.6666666f;
@@ -72,26 +72,26 @@ int func_L02_003D5748(char *self, int joint) {
                 phase = outbound * ((float)i * 0.2916667f) - (time - (outbound + 5.0f)) * 1.5000001f;
                 if (phase < 0.0f) phase = 0.0f;
             }
-            func_00282F20(delta, direction, phase + *(float *)((char *)D_L02_001B0190 + trajectoryOffset));
-            func_00282CC0(*slots + 0x10, origin, delta);
+            vec_scale_to_length(delta, direction, phase + *(float *)((char *)D_L02_001B0190 + trajectoryOffset));
+            FastVecAdd(*slots + 0x10, origin, delta);
             func_002A10E8(*slots);
             if (*(char **)(state + 0x300)) func_L02_003D5DF8(*(char **)(state + 0x300));
-            func_00282F20(offset, rotation + 8, D_L02_001B01E8);
-            func_00282CC0(origin, *(char **)(state + 0x2A0) + 0x10, offset);
+            vec_scale_to_length(offset, rotation + 8, D_L02_001B01E8);
+            FastVecAdd(origin, *(char **)(state + 0x2A0) + 0x10, offset);
             qcopy(end, *(char **)(state + 0x2B0) + 0x10);
-            func_00282F20(offset, rotation + 4, D_L02_001B01E4);
-            func_00282CC0(origin, origin, offset);
+            vec_scale_to_length(offset, rotation + 4, D_L02_001B01E4);
+            FastVecAdd(origin, origin, offset);
             *(char **)(state + 0x300) = func_L02_003D5CF0(origin, end, 0.2f);
         }
     }
     timer = ++*(short *)(state + 0x31E);
-    rounded = func_00283CF0(outbound);
-    if (timer > func_00283CF0(inbound) + rounded + 7) return 2;
+    rounded = FloatToInt(outbound);
+    if (timer > FloatToInt(inbound) + rounded + 7) return 2;
     elapsed = *(short *)(state + 0x31E);
-    if (elapsed > func_00283CF0(outbound) + 6) return 1;
+    if (elapsed > FloatToInt(outbound) + 6) return 1;
     elapsed = *(short *)(state + 0x31E);
-    if (elapsed > func_00283CF0(outbound) + 1 && *(short *)(state + 0x320) == 0) {
-        func_0032C700(impact, 0.5f, 20.0f, 0, 25, 20, 20, 20, 45, 0, 1, 0, 0, 0);
+    if (elapsed > FloatToInt(outbound) + 1 && *(short *)(state + 0x320) == 0) {
+        SpawnExplosion(impact, 0.5f, 20.0f, 0, 25, 20, 20, 20, 45, 0, 1, 0, 0, 0);
         func_002A8C28(self, impact, 0x10001, 0, 1, 0, 0.5f, (float)*(unsigned char *)(state + 0x35), 1.0f);
         *(short *)(state + 0x320) = 1;
     }

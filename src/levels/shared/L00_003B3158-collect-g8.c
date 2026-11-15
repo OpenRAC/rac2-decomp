@@ -126,8 +126,8 @@ waiting:
 
     case 1:
         /* Pulse the glow between 32 and 128. */
-        vars->phase = func_00283B98(vars->phase, 0.10471977f);    /* 6 degrees a frame */
-        intensity = func_00283CF0((func_00283198(vars->phase) * 4.0f - 3.0f) * 128.0f);
+        vars->phase = FastAddRotations(vars->phase, 0.10471977f);    /* 6 degrees a frame */
+        intensity = FloatToInt((func_00283198(vars->phase) * 4.0f - 3.0f) * 128.0f);
         if (intensity > 128)
             intensity = 128;
         else if (intensity < 32)
@@ -161,7 +161,7 @@ waiting:
         moby->state = 2;
         moby->fBC = 1;
         moby->color = 0x80208020;
-        func_002E5CF8(0, 0, moby);
+        PlayMobySound(0, 0, moby);
         ClearPathTags(vars);
     }
 }

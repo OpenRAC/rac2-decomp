@@ -35,10 +35,10 @@ void func_L16_003E6E08(char *object)
     }
     switch (*(unsigned char *)(object + 32)) {
     case 0:
-        func_00282CC0(position, object + 16, state);
-        func_002A8C00(collision, object, 1, state, *(float *)(state + 20));
+        FastVecAdd(position, object + 16, state);
+        make_hit_descriptor(collision, object, 1, state, *(float *)(state + 20));
         *(unsigned short *)(collision + 26) = *(unsigned short *)(object + 170);
-        if ((func_002761F8(object + 16, position, 0, object, collision) ||
+        if ((CollLine(object + 16, position, 0, object, collision) ||
              func_00277258(object + 16, 0, object, 0.3f)) &&
              (D_L16_001BFF58[0] == 0 || D_L16_001BFF58[0] != *(char **)(state + 16))) {
             func_002A8C28(0.6f, *(float *)(state + 20), 0.0f, object, object + 16, 0x10001, 0, 1, 0);
@@ -46,7 +46,7 @@ void func_L16_003E6E08(char *object)
             return;
         }
         *(Quadword *)(object + 16) = *(Quadword *)position;
-        func_00282D30(velocity, state, -0.5f);
+        FastVecScale(velocity, state, -0.5f);
         func_00282C88(direction);
         break;
     case 1:

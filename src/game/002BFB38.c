@@ -38,7 +38,7 @@ Effect2BFB38 *func_002BFB38(void *pos, void *dir, s32 kind, s32 life) {
         qcopy(e->pos, pos);
         s = &e->s;
         e->color = 0x80808080;
-        e->f9 = func_00283CF0(2.0f) + 0x10;
+        e->f9 = FloatToInt(2.0f) + 0x10;
         e->f1 = 0;
         e->f3 = 0x44;
         e->fC = func_002A7878(10500.0f, 16800.0f);

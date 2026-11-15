@@ -61,7 +61,7 @@ void func_L09_003E9AA0(char *object) {
 
     for (i = 5; i < 8; i++) {
         func_0029FCC0(object, i, &pos);
-        if (func_00282E80(&pos, D_00189EA0) < D_L09_001B0C40) {
+        if (vec_distance_xy(&pos, D_00189EA0) < D_L09_001B0C40) {
             qcopy(&vel, &pos);
             vel.f[2] -= D_L09_001B0C44;
             func_002A8C28(object, &vel, 0x10001, 0, 1, 0, D_L09_001B0C48,
@@ -83,7 +83,7 @@ void func_L09_003E9AA0(char *object) {
     }
     if (!(D_L09_001B2390 > 0.95f) && !(D_L09_001B238C > 0.95f) && *(unsigned char *)(object + 0x31)) {
         for (j = 3; j < 5; j++) {
-            func_00282F20(&vel, object + 0xC0, -(func_002A7878(4.5f, 5.5f) * (1.0f / 60.0f)));
+            vec_scale_to_length(&vel, object + 0xC0, -(func_002A7878(4.5f, 5.5f) * (1.0f / 60.0f)));
             func_0029FCC0(object, j, &pos);
             if (D_L09_001B2388 & 1)
                 func_002BAE50(&pos, &vel, 0xCF0000FF, 207, func_002A7820(18, 22), 50, -10, 1);
@@ -107,7 +107,7 @@ void func_L09_003EAA18(char *object) {
         func_L09_003EA798(object);
 
     if (*(unsigned char *)(object + 0x31) != 0) {
-        if (func_00282E48(object + 0x10, D_L09_001B9A00) < 32.0f) {
+        if (fast_vec_dist(object + 0x10, D_L09_001B9A00) < 32.0f) {
             func_002A93B0(object);
             *(unsigned char *)(object + 0x6F) = 0x1E;
         }
@@ -202,18 +202,18 @@ void func_L09_003F8898(char *object) {
         if (*(short *)(frame + 0x2E0) < D_L09_001B0F50)
             *(short *)(frame + 0x2E0) = func_002A7820(D_L09_001B0F54, D_L09_001B0F58);
     }
-    if (func_00282978(frame + 0x2E0) == 0)
+    if (FastDecTimer(frame + 0x2E0) == 0)
         *(unsigned short *)(frame + 0x2E8) = D_L09_001B0F4C;
-    func_00282978(frame + 0x2E2);
-    func_00282978(frame + 0x2E6);
-    func_00282978(frame + 0x2E8);
+    FastDecTimer(frame + 0x2E2);
+    FastDecTimer(frame + 0x2E6);
+    FastDecTimer(frame + 0x2E8);
     if (*(unsigned short *)(object + 0x96) <= 0xFFFE)
         *(unsigned short *)(object + 0x96) = *(unsigned short *)(object + 0x96) + 1;
     func_002B0990(*(int *)(frame + 0x2F8), frame + 0x430, 4, 1, 1.9f);
 }
 
 /* func_L09_003A01D8: a 16-byte vector with a whole-quadword view, and the 0x28-byte impact
-   request func_002A8C00 fills (attacker 0x10, flags 0x14, damage 0x1C, enabled 0x20 and the
+   request make_hit_descriptor fills (attacker 0x10, flags 0x14, damage 0x1C, enabled 0x20 and the
    direction copied from its last argument). */
 typedef int Quad_L09_003A01D8 __attribute__((mode(TI)));
 typedef union {
@@ -290,43 +290,43 @@ void func_L09_003A01D8(u8 *object)
 
     if (object[0x20])
         return;
-    F(object, 0xF0) = func_00283B98(F(object, 0xF0), 0.10471977293491364f);
-    func_00282CC0(f.predicted, object + 0x10, state);
+    F(object, 0xF0) = FastAddRotations(F(object, 0xF0), 0.10471977293491364f);
+    FastVecAdd(f.predicted, object + 0x10, state);
     busy = D_L09_001B238C > 0.9f || D_L09_001B2390 > 0.9f;
     if (!busy || !(D_L09_001B2388 & 1)) {
-        length = func_00282DF0(state);
+        length = FastVecLength(state);
         f.payload.effects.axis.q = 0;
         f.payload.effects.axis.f[0] = func_002A7878(-1.0f, 1.0f);
         f.payload.effects.axis.f[1] = func_002A7878(-1.0f, 1.0f);
         f.payload.effects.axis.f[2] = func_002A7878(-1.0f, 1.0f);
         f.payload.effects.velocity.q = f.payload.effects.axis.q;
-        func_00282F20(f.payload.effects.velocity.f, f.payload.effects.velocity.f,
+        vec_scale_to_length(f.payload.effects.velocity.f, f.payload.effects.velocity.f,
                       func_002A7878(0.04f, 0.08f) * 0.016666668f);
-        func_00282D30(f.payload.effects.point.f, state, func_002A7878(0.2f, 0.99f));
-        func_00282CC0(f.payload.effects.velocity.f, f.payload.effects.velocity.f,
+        FastVecScale(f.payload.effects.point.f, state, func_002A7878(0.2f, 0.99f));
+        FastVecAdd(f.payload.effects.velocity.f, f.payload.effects.velocity.f,
                       f.payload.effects.point.f);
-        func_00282F20(f.payload.effects.point.f, state, func_002A7878(0.0f, 1.0f) * length);
-        func_00282CC0(f.payload.effects.point.f, f.payload.effects.point.f, object + 0x10);
+        vec_scale_to_length(f.payload.effects.point.f, state, func_002A7878(0.0f, 1.0f) * length);
+        FastVecAdd(f.payload.effects.point.f, f.payload.effects.point.f, object + 0x10);
         func_002C16C0(object + 0x10, f.payload.effects.velocity.f, 7, 127, 0xB0B0B0, 3,
                       40000.0f, 1000.0f, 1.0f, -0.00039999998989515007f, 0.0f);
         f.payload.effects.axis.q = 0;
         f.payload.effects.axis.f[2] = 0.01f;
-        func_00283098(f.payload.effects.axis.f, f.payload.effects.axis.f, object + 0xC0);
+        matrix_mul_vec3(f.payload.effects.axis.f, f.payload.effects.axis.f, object + 0xC0);
         func_002ACEC0(f.payload.effects.axis.f, f.payload.effects.axis.f, object + 0xC0,
                       func_002A7940());
         if (func_001163B0() & 1)
             func_002BD8B0(f.payload.effects.point.f, f.payload.effects.axis.f, 0x4F007FFF,
                           0x1FFFFFFF, 13, 1, 25000.0f);
     }
-    func_002A8C00(&f.payload.impact, I(state, 0x3C), 0x10001, F(state, 0x40), state);
+    make_hit_descriptor(&f.payload.impact, I(state, 0x3C), 0x10001, F(state, 0x40), state);
     f.payload.impact.object_class = *(u16 *)(object + 0xAA);
-    func_00282CF0(f.payload.impact.direction, object + 0x10, P(state, 0x3C) + 0x10);
+    FastVecSub(f.payload.impact.direction, object + 0x10, P(state, 0x3C) + 0x10);
     f.payload.impact.direction[2] = 0.0f;
-    func_00282F20(f.payload.impact.direction, f.payload.impact.direction, 1.6666667461395264f);
+    vec_scale_to_length(f.payload.impact.direction, f.payload.impact.direction, 1.6666667461395264f);
     f.payload.impact.direction[3] = 5627.9248046875f;
     f.payload.impact.enabled |= 1;
     f.payload.impact.kind = 4;
-    collision = func_002761F8(object + 0x10, f.predicted, 0, object, &f.payload.impact);
+    collision = CollLine(object + 0x10, f.predicted, 0, object, &f.payload.impact);
     if (collision || func_00277258(object + 0x10, 1, object, 0.3f)
         || func_00282948(state + 0x38)) {
         hit = D_L09_001BFE58;
@@ -339,14 +339,14 @@ void func_L09_003A01D8(u8 *object)
                 func_00277F48(object + 0x10, 0, P(state, 0x3C), &f.payload.impact, 0.5f);
             /* The calls are written out per arm: a call ending a block that falls into a label
                gets a (use 0) from flow, which stops jump2 from cross-jumping the tails. */
-            func_002ABBB8(object, D_L09_001A8F20, 0, 0.0f, 0.0f, 0, 2, 10, 0.0f, 0.0f, 9.0f,
+            SpawnExplosionEffects(object, D_L09_001A8F20, 0, 0.0f, 0.0f, 0, 2, 10, 0.0f, 0.0f, 9.0f,
                           0.666f, -1, 0.0f, 0, 1, -1, 0, 0x810001);
-            func_002E5CF8(0, 0, object);
+            PlayMobySound(0, 0, object);
             func_0029F338(object);
         } else {
-            func_002ABBB8(object, D_L09_001A8F20, 0, 0.0f, 0.0f, 0, 2, 8, 0.0f, 0.0f, 9.0f,
+            SpawnExplosionEffects(object, D_L09_001A8F20, 0, 0.0f, 0.0f, 0, 2, 8, 0.0f, 0.0f, 9.0f,
                           0.5f, -1, 0.0f, 0, 1, -1, 0, 0x810001);
-            func_002E5CF8(0, 0, object);
+            PlayMobySound(0, 0, object);
             func_0029F338(object);
         }
     } else

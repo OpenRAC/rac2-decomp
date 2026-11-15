@@ -52,7 +52,7 @@ void func_L07_003F5B50(u8 *obj)
     }
     if (*(f32 *)(other + 0x18) > 202.0f && *(f32 *)(other + 0x18) < 204.0f && D_L07_00189E20.platform == other) {
         p = func_002AD0B0(other);
-        if (p != 0 && *(f32 *)(p + 0x18) > 0.0f && !func_002ACBC8(D_L07_001B9200, *(s32 *)(state + 0xEC))) {
+        if (p != 0 && *(f32 *)(p + 0x18) > 0.0f && !IsPointInCuboid(D_L07_001B9200, *(s32 *)(state + 0xEC))) {
             saved = D_L07_00189E20.rotation[2];
             D_L07_00189E20.rotation[2] = func_00283248(D_L07_00189E20.position[0] - *(f32 *)(other + 0x10), D_L07_00189E20.position[1] - *(f32 *)(other + 0x14));
             func_L00_002B9D60(D_L07_00189E20.position, D_L07_00189E20.rotation, 0x6F, 1);
@@ -60,7 +60,7 @@ void func_L07_003F5B50(u8 *obj)
             func_L00_002B9D60(D_L07_00189E20.position, D_L07_00189E20.rotation, 0, 0);
         }
     }
-    if (func_002ACBC8(obj + 0x10, *(s32 *)(state + 0xEC))) {
+    if (IsPointInCuboid(obj + 0x10, *(s32 *)(state + 0xEC))) {
         *(f32 *)(obj + 0x18) = *(f32 *)(other + 0x18) + D_L07_001B0F48;
         *(f32 *)(state + 0x68) = *(f32 *)(obj + 0x18);
         *(f32 *)(state + 0x58) = 0.0f;

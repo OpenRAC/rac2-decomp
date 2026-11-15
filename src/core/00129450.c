@@ -118,7 +118,7 @@ int func_00129450(void *arg0, int mbAddr, int arg2, int mbType, int motionType,
 }
 
 /* libmpeg. func_001296A0 is rac1-decomp src/core/00125630.c func_00125880
-   (_getAllRefs) and func_00129DA8 is Lombyte (GPL-3.0) src/assembly/sdk/library/
+   (_getAllRefs) and _getRef0 is Lombyte (GPL-3.0) src/assembly/sdk/library/
    _getRef0.c; both keep RAC2's position relative to RAC1 (RAC2 = RAC1 + 0x3E20)
    at the same sizes. Every field offset below was re-measured against RAC2's
    own accesses, not inherited:
@@ -129,7 +129,7 @@ int func_00129450(void *arg0, int mbAddr, int arg2, int mbType, int motionType,
      frame base 0 (`lw $t1,0x0($fp)`) and width 0x10 (`lw $a1,0x10($fp)`).
    Fifth to eighth integer arguments arrive in $t0-$t3 (the SDK compiler's EE
    convention): motion_type, pmv, mvfs, dmvector here; dx, dy, fieldpred, avg
-   read from 0xB0/0xB8/0xC0/0xC8($sp) in func_00129DA8.
+   read from 0xB0/0xB8/0xC0/0xC8($sp) in _getRef0.
    The error strings are at 0x13BA20/0x13BA40/0x13BA60 and the two MC routine
    tables at 0x137ED0/0x137EF0. */
 
@@ -218,22 +218,22 @@ void func_001296A0(MpegDecoderC *d, int bx, int by, int mb_type, int motion_type
     if ((mb_type & 8) || d->picture_coding_type == 2) {
         if (d->picture_structure == 3) {
             if (motion_type == 2 || !(mb_type & 8)) {
-                func_00129DA8(d, d->ref_images[0], 0, 0, 0, 16, bx, by, pmv[0][0][0],
+                _getRef0(d, d->ref_images[0], 0, 0, 0, 16, bx, by, pmv[0][0][0],
                               pmv[0][0][1], 0, 0);
             } else if (motion_type == same) {
-                func_00129DA8(d, d->ref_images[0], mvfs[0][0], 0, 0, 8, bx, by,
+                _getRef0(d, d->ref_images[0], mvfs[0][0], 0, 0, 8, bx, by,
                               pmv[0][0][0], pmv[0][0][1] >> 1, same, 0);
-                func_00129DA8(d, d->ref_images[0], mvfs[1][0], 1, 0, 8, bx, by,
+                _getRef0(d, d->ref_images[0], mvfs[1][0], 1, 0, 8, bx, by,
                               pmv[1][0][0], pmv[1][0][1] >> 1, same, 0);
             } else if (motion_type == 3) {
                 func_0012B3E0(d, dmv, dmvector, pmv[0][0][0], pmv[0][0][1] >> 1);
-                func_00129DA8(d, d->ref_images[0], 0, 0, 0, 8, bx, by, pmv[0][0][0],
+                _getRef0(d, d->ref_images[0], 0, 0, 0, 8, bx, by, pmv[0][0][0],
                               pmv[0][0][1] >> 1, same, 0);
-                func_00129DA8(d, d->ref_images[0], 1, 0, 0, 8, bx, by, dmv[0][0],
+                _getRef0(d, d->ref_images[0], 1, 0, 0, 8, bx, by, dmv[0][0],
                               dmv[0][1], same, one);
-                func_00129DA8(d, d->ref_images[0], 1, 1, 0, 8, bx, by, pmv[0][0][0],
+                _getRef0(d, d->ref_images[0], 1, 1, 0, 8, bx, by, pmv[0][0][0],
                               pmv[0][0][1] >> 1, same, 0);
-                func_00129DA8(d, d->ref_images[0], 0, 1, 0, 8, bx, by, dmv[1][0],
+                _getRef0(d, d->ref_images[0], 0, 1, 0, 8, bx, by, dmv[1][0],
                               dmv[1][1], same, one);
             } else {
                 func_00130250_msg(d, D_0013BA20, motion_type);
@@ -251,21 +251,21 @@ void func_001296A0(MpegDecoderC *d, int bx, int by, int mb_type, int motion_type
                 same = currentfield != mvfs[0][0];
             }
             if (motion_type == 1 || !(mb_type & 8)) {
-                func_00129DA8(d, refs[same][mvfs[0][0]], 0, 0, 0, 16, bx, by,
+                _getRef0(d, refs[same][mvfs[0][0]], 0, 0, 0, 16, bx, by,
                               pmv[0][0][0], pmv[0][0][1], 0, 0);
             } else if (motion_type == 2) {
-                func_00129DA8(d, refs[same][mvfs[0][0]], 0, 0, 0, 8, bx, by,
+                _getRef0(d, refs[same][mvfs[0][0]], 0, 0, 0, 8, bx, by,
                               pmv[0][0][0], pmv[0][0][1], 0, 0);
                 same = d->picture_coding_type == motion_type && d->second_field &&
                        currentfield != mvfs[1][0];
-                func_00129DA8(d, refs[same][mvfs[1][0]], 0, 0, 8, 8, bx, by,
+                _getRef0(d, refs[same][mvfs[1][0]], 0, 0, 8, 8, bx, by,
                               pmv[1][0][0], pmv[1][0][1], 0, 0);
             } else if (motion_type == 3) {
                 same = d->second_field ? motion_type - 2 : 0;
                 func_0012B3E0(d, dmv, dmvector, pmv[0][0][0], pmv[0][0][1]);
-                func_00129DA8(d, refs[0][currentfield], 0, 0, 0, 16, bx, by,
+                _getRef0(d, refs[0][currentfield], 0, 0, 0, 16, bx, by,
                               pmv[0][0][0], pmv[0][0][1], 0, 0);
-                func_00129DA8(d, refs[same][!currentfield], 0, 0, 0, 16, bx, by,
+                _getRef0(d, refs[same][!currentfield], 0, 0, 0, 16, bx, by,
                               dmv[0][0], dmv[0][1], 0, 1);
             } else {
                 func_00130250_msg(d, D_0013BA40, motion_type);
@@ -278,21 +278,21 @@ void func_001296A0(MpegDecoderC *d, int bx, int by, int mb_type, int motion_type
         if (d->picture_structure == 3) {
             same = 1;
             if (motion_type == 2) {
-                func_00129DA8(d, d->ref_images[1], 0, 0, 0, 16, bx, by, pmv[0][1][0],
+                _getRef0(d, d->ref_images[1], 0, 0, 0, 16, bx, by, pmv[0][1][0],
                               pmv[0][1][1], 0, avg);
             } else {
-                func_00129DA8(d, d->ref_images[1], mvfs[0][1], 0, 0, 8, bx, by,
+                _getRef0(d, d->ref_images[1], mvfs[0][1], 0, 0, 8, bx, by,
                               pmv[0][1][0], pmv[0][1][1] >> 1, same, avg);
-                func_00129DA8(d, d->ref_images[1], mvfs[1][1], 1, 0, 8, bx, by,
+                _getRef0(d, d->ref_images[1], mvfs[1][1], 1, 0, 8, bx, by,
                               pmv[1][1][0], pmv[1][1][1] >> 1, same, avg);
             }
         } else if (motion_type == 1) {
-            func_00129DA8(d, mvfs[0][1] ? d->ref_images[9] : d->ref_images[5], 0, 0, 0,
+            _getRef0(d, mvfs[0][1] ? d->ref_images[9] : d->ref_images[5], 0, 0, 0,
                           16, bx, by, pmv[0][1][0], pmv[0][1][1], 0, avg);
         } else if (motion_type == 2) {
-            func_00129DA8(d, mvfs[0][1] ? d->ref_images[9] : d->ref_images[5], 0, 0, 0,
+            _getRef0(d, mvfs[0][1] ? d->ref_images[9] : d->ref_images[5], 0, 0, 0,
                           8, bx, by, pmv[0][1][0], pmv[0][1][1], 0, avg);
-            func_00129DA8(d, mvfs[1][1] ? d->ref_images[9] : d->ref_images[5], 0, 0, 8,
+            _getRef0(d, mvfs[1][1] ? d->ref_images[9] : d->ref_images[5], 0, 0, 8,
                           8, bx, by, pmv[1][1][0], pmv[1][1][1], 0, avg);
         } else {
             func_00130250_msg(d, D_0013BA60, motion_type);

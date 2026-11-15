@@ -109,13 +109,13 @@ void func_L14_00304588(void) {
         if (mob != 0 && mob->type == 0xE29)
             mob->flags |= 0x800;
         if (mob->type == 0xD54)
-            func_002E64A0(mob);
+            UpdateEquipmentPieces(mob);
         if (mob != 0 && mob->type == 0xFA0 && mob->p68 != 0)
             func_L00_00326048(mob, (unsigned char *)mob->p68 + 0xC, 0x80AAAAD2, 0x80396464, 0.0610865355f);
     }
     if (D_001A79F0 == 0xE && ref_L14_00304588_00.mode == 0) {
         func_L08_0037E6D8();
-        func_L03_00326458(*(int *)((char *)&ref_L14_00304588_00 + 0x194));
+        EmitScaledObjectParticles(*(int *)((char *)&ref_L14_00304588_00 + 0x194));
     }
 }
 
@@ -160,8 +160,8 @@ void func_L14_00390FE8(char *arg0) {
 void func_L14_00391B58(char *arg0, float scale) {
     char buf[16];
 
-    func_00282D30(buf, arg0, scale);
-    func_00282CC0(arg0 + 0x30, arg0 + 0x30, buf);
+    FastVecScale(buf, arg0, scale);
+    FastVecAdd(arg0 + 0x30, arg0 + 0x30, buf);
 }
 
 void func_L14_00399E28(unsigned char *obj) {
@@ -187,7 +187,7 @@ void func_L14_00399E28(unsigned char *obj) {
     frame.normal.q = 0;
     frame.normal.f[2] = 1.0f;
     qcopy(&frame.old, position);
-    func_00282CC0(position, ctx, position);
+    FastVecAdd(position, ctx, position);
     func_002FEE70(*(int *)(ctx + 0x1C), ctx, 0);
     func_00300190(position, position);
     func_00300248(ctx, ctx);
@@ -207,11 +207,11 @@ void func_L14_00399E28(unsigned char *obj) {
     frame.packet.kind = 2;
     frame.packet.class_id = *(unsigned short *)(obj + 0xAA);
     frame.packet.active = 1;
-    if (func_002761F8(&frame.old, position, 0x10, obj, &frame.packet)) {
-        if (!func_00278E78() && *(float *)(ctx + 8) < 0.0f) {
+    if (CollLine(&frame.old, position, 0x10, obj, &frame.packet)) {
+        if (!GetCollHitMaterial() && *(float *)(ctx + 8) < 0.0f) {
             char *effect;
             Vec *spread;
-            func_002FD1B8(D_L14_001B2D30, D_L14_001B2D38, 1,
+            RippleDisturb(D_L14_001B2D30, D_L14_001B2D38, 1,
                 *(float *)(obj + 0x10), *(float *)(obj + 0x14), 0.5f, -0.35f);
             *(int *)(ctx + 0x14) = 1;
             func_00282C88(ctx);
@@ -252,21 +252,21 @@ void func_L14_00399E28(unsigned char *obj) {
                 obj[0xBC] = 1;
                 qcopy(obj + 0x10, &reread->point);
                 func_00283028(&frame.velocity, ctx, &reread->normal);
-                func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-                func_00282F20(&frame.normal, &reread->normal, 1.0f);
+                vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+                vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
             } else {
                 if (collision->count < 1)
                     goto finish;
                 obj[0xBC] = 1;
                 qcopy(obj + 0x10, &collision->point);
                 func_00283028(&frame.velocity, ctx, &collision->normal);
-                func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-                func_00282F20(&frame.normal, &collision->normal, 1.0f);
+                vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+                vec_scale_to_length(&frame.normal, &collision->normal, 1.0f);
             }
         }
     } else if (func_00282948(ctx + 0x18)) {
         obj[0xBC] = 1;
-        func_00282CC0((char *)&frame.velocity, (char *)&frame.velocity, ctx);
+        FastVecAdd((char *)&frame.velocity, (char *)&frame.velocity, ctx);
     }
 finish:
     if (obj[0xBC]) {
@@ -299,9 +299,9 @@ void func_L14_0039A240(char *obj) {
     frame.normal.q = 0;
     frame.normal.f[2] = 1.0f;
     qcopy(&frame.old, position);
-    func_00282CC0(position, position, ctx);
+    FastVecAdd(position, position, ctx);
     func_002AFFD8(position, &frame.surface, 0);
-    func_00282D30(&frame.surface, &frame.surface, 0.0003055556f);
+    FastVecScale(&frame.surface, &frame.surface, 0.0003055556f);
     func_L00_0038F3D8(obj);
     frame.packet.moby = obj;
     frame.packet.flags = 0x830000;
@@ -317,7 +317,7 @@ void func_L14_0039A240(char *obj) {
     frame.packet.vector.f[2] = 1.0f;
     frame.packet.active = 1;
     (*(int *)(ctx + 0x14))++;
-    if (func_002761F8(&frame.old, position, 0x10, obj, &frame.packet)) {
+    if (CollLine(&frame.old, position, 0x10, obj, &frame.packet)) {
         collision = &D_L14_001BF940;
         hit = collision->hit;
         if (hit) {
@@ -336,8 +336,8 @@ void func_L14_0039A240(char *obj) {
                 qcopy(dest, source);
             }
             func_00283028(&frame.velocity, ctx, &reread->normal);
-            func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-            func_00282F20(&frame.normal, &reread->normal, 1.0f);
+            vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+            vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
         } else {
             collision = &D_L14_001BF940;
             if (collision->count <= 0)
@@ -345,12 +345,12 @@ void func_L14_0039A240(char *obj) {
             obj[0xBC] = 1;
             qcopy(position, &collision->point);
             func_00283028(&frame.velocity, ctx, &collision->normal);
-            func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-            func_00282F20(&frame.normal, &collision->normal, 1.0f);
+            vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+            vec_scale_to_length(&frame.normal, &collision->normal, 1.0f);
         }
     } else if (func_00282948(ctx + 0x18)) {
         obj[0xBC] = 1;
-        func_00282CC0((char *)&frame.velocity, (char *)&frame.velocity, ctx);
+        FastVecAdd((char *)&frame.velocity, (char *)&frame.velocity, ctx);
     }
 finish:
     if (*(unsigned char *)(obj + 0xBC)) {
@@ -405,7 +405,7 @@ void func_L14_003CB608(char *self) {
     unsigned char *e;
     int clamped;
 
-    func_00283698(mtx, self + 0xC0);
+    matrix_from_basis_rows(mtx, self + 0xC0);
     for (p = D_L14_001FB060[*(int *)(state + 0x64)];
          (*(int *)(state + 0x64) & 0xFF) != 0xFF && *(int *)(state + 0x64) <= D_L14_001B25B8 &&
          p != 0 && ((p != 0 && (short)p[-1] >= 0) || p == D_L14_001FB060[*(int *)(state + 0x64)]);
@@ -417,7 +417,7 @@ void func_L14_003CB608(char *self) {
             if (e[0x20] != 0xFD) {
                 if (*(short *)(e + 0xAA) != 0xA59) {
                     if (func_L14_003C9548((char *)e) != 0) {
-                        func_00282CF0(off, e + 0x10, self + 0x10);
+                        FastVecSub(off, e + 0x10, self + 0x10);
                         clamped = 0;
                         func_002AFDD8(self, off, off, mtx);
                         if (func_00282C48(off[0] + 2.0f) > 0.8f) {
@@ -435,8 +435,8 @@ void func_L14_003CB608(char *self) {
                                 off[1] = -0.5f;
                         }
                         if (clamped) {
-                            func_00283098(off, off, self + 0xC0);
-                            func_00282CC0(off, off, self + 0x10);
+                            matrix_mul_vec3(off, off, self + 0xC0);
+                            FastVecAdd(off, off, self + 0x10);
                             func_L14_003C9658((char *)e, off);
                         }
                     }
@@ -567,7 +567,7 @@ void func_L14_003DE4E8(char *arg0)
         if (D_00189E20.mode == 1 && *(int *)(state + 0x84)) {
             if (*(int *)(state + 0x6C) == 1) {
                 func_002A7750(arg0, 2, -1);
-                *(int *)(state + 0x74) = func_002E5CF8(0, 4, arg0);
+                *(int *)(state + 0x74) = PlayMobySound(0, 4, arg0);
             }
         } else if (func_L00_00324120(arg0)
                    || ((*(float *)(arg0 + 0x18) - *(float *)(state + 0x80)) * (D_00189E20.position.f[2] - *(float *)(state + 0x80)) < 0.0f
@@ -575,11 +575,11 @@ void func_L14_003DE4E8(char *arg0)
             if (*(int *)(state + 0x6C) == 0) {
                 func_002A7750(arg0, 3, -1);
                 if (!func_002E59B0(arg0, *(int *)(state + 0x74)))
-                    *(int *)(state + 0x74) = func_002E5CF8(0, 4, arg0);
+                    *(int *)(state + 0x74) = PlayMobySound(0, 4, arg0);
             } else {
                 func_002A7750(arg0, 2, -1);
                 if (!func_002E59B0(arg0, *(int *)(state + 0x74)))
-                    *(int *)(state + 0x74) = func_002E5CF8(0, 4, arg0);
+                    *(int *)(state + 0x74) = PlayMobySound(0, 4, arg0);
             }
         }
         break;
@@ -621,13 +621,13 @@ void func_L14_003DE4E8(char *arg0)
             }
         } else {
             int ridden = func_L00_00324120(arg0) != 0;
-            int away = func_002ACBC8(&D_00189E20.position, *(int *)(state + 0x88)) == 0;
+            int away = IsPointInCuboid(&D_00189E20.position, *(int *)(state + 0x88)) == 0;
             if (ridden || away)
                 func_002AA548(arg0 + 0x18, state + 0x78, *(float *)(state + 0x68), *(float *)(state + 0x7C), *(float *)(state + 0x7C), 0.10000001f);
         }
         break;
     }
-    func_00282CF0(&delta, arg0 + 0x10, &pos);
+    FastVecSub(&delta, arg0 + 0x10, &pos);
     func_002AD6F0(state + 0x20, &delta, &rot, arg0 + 0xF0);
 }
 
@@ -681,7 +681,7 @@ void func_L14_003DF200(char *self) {
     unsigned char *e;
     int clamped;
 
-    func_00283698(mtx, self + 0xC0);
+    matrix_from_basis_rows(mtx, self + 0xC0);
     for (p = D_L14_001FB060[*(int *)(state + 0x68)];
          (*(int *)(state + 0x68) & 0xFF) != 0xFF && *(int *)(state + 0x68) <= D_L14_001B25B8 &&
          p != 0 && ((p != 0 && (short)p[-1] >= 0) || p == D_L14_001FB060[*(int *)(state + 0x68)]);
@@ -692,7 +692,7 @@ void func_L14_003DF200(char *self) {
         if (e[0x20] != 0xFE) {
             if (e[0x20] != 0xFD) {
                 if (func_L14_003C9548((char *)e) != 0) {
-                    func_00282CF0(off, e + 0x10, self + 0x10);
+                    FastVecSub(off, e + 0x10, self + 0x10);
                     clamped = 0;
                     func_002AFDD8(self, off, off, mtx);
                     if (func_00282C48(off[0]) > 1.0f) {
@@ -710,8 +710,8 @@ void func_L14_003DF200(char *self) {
                             off[1] = -1.25f;
                     }
                     if (clamped) {
-                        func_00283098(off, off, self + 0xC0);
-                        func_00282CC0(off, off, self + 0x10);
+                        matrix_mul_vec3(off, off, self + 0xC0);
+                        FastVecAdd(off, off, self + 0x10);
                         func_L14_003C9658((char *)e, off);
                     }
                 }
@@ -774,8 +774,8 @@ void func_L14_003E2238(char *arg0) {
     float f = func_3E22A8(arg0);
 
     func_2F6498(arg0 + 0xC0, arg0 + 0xF0);
-    func_00282D30(arg0 + 0xC0, arg0 + 0xC0, f);
-    func_00282D30(arg0 + 0xD0, arg0 + 0xD0, f);
+    FastVecScale(arg0 + 0xC0, arg0 + 0xC0, f);
+    FastVecScale(arg0 + 0xD0, arg0 + 0xD0, f);
     func_31A618(arg0);
 }
 
@@ -889,7 +889,7 @@ typedef struct {
 /* Steps the object by its state byte: 0 copies the six halfwords at +0x40 of its state into the
    state of every class-0xB19 entity of its group and calls func_L14_003E5030; 1 and 2 test
    func_002B3868 and call their handlers (the cases are in retail's block order, 0, 2, 1). Then,
-   while the key word (+0x34) is set: when func_00282978 has run down the key counter (+0x14)
+   while the key word (+0x34) is set: when FastDecTimer has run down the key counter (+0x14)
    the current key is reloaded from the key word and the key index of every class-0xB19 entity
    of the group is cleared; finally the current key is copied into each of them. Two pointers:
    the third walk has its own (one shared variable gives the other loops different registers). */
@@ -935,7 +935,7 @@ void func_L14_003E4BA0(unsigned char *self)
         break;
     }
     if (*(int *)(state + 0x34) != 0) {
-        if (func_00282978((char *)(state + 0x14)) != 0) {
+        if (FastDecTimer((char *)(state + 0x14)) != 0) {
             *(unsigned short *)(state + 0x14) = *(unsigned short *)(state + 0x34);
             for (p = D_L14_001FB060[self[0x21]];
                  self[0x21] != 0xFF && self[0x21] <= D_L14_001B25B8 && p != 0 &&
@@ -959,7 +959,7 @@ void func_L14_003E4BA0(unsigned char *self)
                 ((L14Key *)*(unsigned char **)(e + 0x68))->cur = ((L14Key *)state)->cur;
         }
     }
-    func_L14_003E50B8((char *)self);
+    AdvanceRingState((char *)self);
 }
 
 /* func_L14_003E4EA0 is matched in L14_003E4EA0-g8.c (built with -g). */

@@ -41,11 +41,11 @@ Particle *func_002BAA28(void *position, float *from, float *to, int startColor, 
     if (p != 0) {
         qcopy(&p->position, position);
         p->color = startColor;
-        p->fade = func_00283CF0(4.0f) + 0x40;
+        p->fade = FloatToInt(4.0f) + 0x40;
         p->phase = 0.0f;
         p->flag1 = 0;
         p->mode = 0x44;
-        p->alpha = func_00283CF0(func_002A7878(p->phase, 255.0f));
+        p->alpha = FloatToInt(func_002A7878(p->phase, 255.0f));
         if (flags == -1) {
             p->texture = *D_001F259C;
         } else {
@@ -55,8 +55,8 @@ Particle *func_002BAA28(void *position, float *from, float *to, int startColor, 
         }
         p->kind = kind;
         t = &p->trail;
-        t->scaleA = func_00283CF0(from[3] * 210.00002f);
-        t->scaleB = func_00283CF0(to[3] * 210.00002f);
+        t->scaleA = FloatToInt(from[3] * 210.00002f);
+        t->scaleB = FloatToInt(to[3] * 210.00002f);
         func_002AE730(from, &t->packedA);
         func_002AE730(to, &t->packedB);
         func_002AE838(a, &t->packedA);

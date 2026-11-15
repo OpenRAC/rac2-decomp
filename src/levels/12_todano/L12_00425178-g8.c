@@ -38,15 +38,15 @@ s32 func_L12_00425178(u8 *object, s32 limit)
         qcopy(to, (L12_25178Quad *)list + pick + 1);
         to[2] += 0.5f;
         if (limit != 0) {
-            dist = func_00282E80(to, target);
-            steps = func_00282C30(pick - *(s32 *)(state + 0x2B4));
-            current = func_00282C30(*(s32 *)(state + 0x2B0) - *(s32 *)(state + 0x2B4));
+            dist = vec_distance_xy(to, target);
+            steps = subtract_integer_with_clamp(pick - *(s32 *)(state + 0x2B4));
+            current = subtract_integer_with_clamp(*(s32 *)(state + 0x2B0) - *(s32 *)(state + 0x2B4));
             if (D_L12_001B20CC < dist && current < steps)
                 continue;
         }
         if (from[2] + 2.0f < to[2])
             continue;
-        if (func_002761F8(from, to, 2, object, 0) == 0)
+        if (CollLine(from, to, 2, object, 0) == 0)
             return pick;
     }
     return *(s32 *)(state + 0x2B0);

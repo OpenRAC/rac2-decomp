@@ -106,7 +106,7 @@ void func_L02_0040A4A8(u8 *object)
         target.quad = *(TI128 *)(D_00189E20 + 0x80);
         heading = func_00283248(((Hero *)D_00189E20)->f[0x20] - *(float *)(object + 0x10), ((Hero *)D_00189E20)->f[0x21] - *(float *)(object + 0x14));
     }
-    range = func_00282E80(object + 0x10, &target);
+    range = vec_distance_xy(object + 0x10, &target);
     switch (object[0x95]) {
     case 2: {
         if (func_002B3890(object)) {
@@ -134,10 +134,10 @@ void func_L02_0040A4A8(u8 *object)
             } else if (object[0x43] != 4) func_002A7470(object, 4, 0, 10);
         }
         angle = func_00283248(target.f[0] - *(float *)(object + 0x10), target.f[1] - *(float *)(object + 0x14));
-        if (func_00283C80(*(float *)(object + 0xF8), angle) > 2.7925272f)
+        if (FastDiffRots(*(float *)(object + 0xF8), angle) > 2.7925272f)
             func_L02_0040BBA0(object);
         goal = state + 0x2C0;
-        if (!object[0xBC] && func_00282E80(object + 0x10, goal) < 0.5f)
+        if (!object[0xBC] && vec_distance_xy(object + 0x10, goal) < 0.5f)
             object[0xBC] = 1;
         else
             func_L01_00321178((char *)object, (char *)goal);
@@ -187,11 +187,11 @@ void func_L02_0040A4A8(u8 *object)
             func_002B60B0(object, 0.0044444446f, 0.13333334f, 0.0005817765f, 0.052359886f);
             if (object[0x43] != 10) func_002A7470(object, 10, 0, 15);
         }
-        if (object[0x42] != 13 && func_00282E80(object + 0x10, &((Hero *)D_00189E20)->q[8]) < 15.0f &&
-            func_00283C80(*(float *)(object + 0xF8), func_00283248(((Hero *)D_00189E20)->f[0x20] - *(float *)(object + 0x10), ((Hero *)D_00189E20)->f[0x21] - *(float *)(object + 0x14))) < 1.5707965f) {
+        if (object[0x42] != 13 && vec_distance_xy(object + 0x10, &((Hero *)D_00189E20)->q[8]) < 15.0f &&
+            FastDiffRots(*(float *)(object + 0xF8), func_00283248(((Hero *)D_00189E20)->f[0x20] - *(float *)(object + 0x10), ((Hero *)D_00189E20)->f[0x21] - *(float *)(object + 0x14))) < 1.5707965f) {
             if (object[0x43] != 13) func_002A7470(object, 13, 0, 10);
             func_002B60B0(object, 0.0011111111f, 0.033333335f, 0.0005817765f, 0.052359886f);
-        } else if (func_00282E80(object + 0x10, &((Hero *)D_00189E20)->q[8]) > 2.8f) {
+        } else if (vec_distance_xy(object + 0x10, &((Hero *)D_00189E20)->q[8]) > 2.8f) {
             if (!func_L02_0040BBD8(object))
                 func_002B4FF0((char *)object, target.f, *(float *)(state + 0x2D8));
         } else {
@@ -199,7 +199,7 @@ void func_L02_0040A4A8(u8 *object)
             func_002B50E0(object, object + 0x10, angle);
         }
         angle = func_00283248(target.f[0] - *(float *)(object + 0x10), target.f[1] - *(float *)(object + 0x14));
-        if (func_00283C80(*(float *)(object + 0xF8), angle) > 2.7925272f)
+        if (FastDiffRots(*(float *)(object + 0xF8), angle) > 2.7925272f)
             func_L02_0040BBA0(object);
         if (object[0x42] == 13) {
             bounds[1].quad = 0;
@@ -215,12 +215,12 @@ void func_L02_0040A4A8(u8 *object)
                 func_0029FC20((char *)object, 4, (char *)matrix);
                 qcopy(&bounds[1], &matrix[1]);
                 func_0029FCC0((char *)object, 4, (char *)&effect);
-                func_00282F20(&near_point, bounds + 1, 0.85f);
-                func_00282F20(&far_point, bounds + 1, 1.6f);
-                func_00282F20(&velocity, matrix + 1, 0.25f);
-                func_00282F20(bounds + 1, bounds + 1, 3.0f);
-                func_00282CC0(&near_point, &near_point, &effect);
-                func_00282CC0(&far_point, &far_point, &effect);
+                vec_scale_to_length(&near_point, bounds + 1, 0.85f);
+                vec_scale_to_length(&far_point, bounds + 1, 1.6f);
+                vec_scale_to_length(&velocity, matrix + 1, 0.25f);
+                vec_scale_to_length(bounds + 1, bounds + 1, 3.0f);
+                FastVecAdd(&near_point, &near_point, &effect);
+                FastVecAdd(&far_point, &far_point, &effect);
                 near_point.f[2] -= 0.1f;
                 tmpl = &particle;
                 far_point.f[2] -= 0.1f;

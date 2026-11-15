@@ -24,7 +24,7 @@ void func_L01_003DAB98(u8 *obj) {
     f32 height;
     *(f32 *)(obj + 0x2C) += (*(f32 *)(*(u8 **)(obj + 0x24) + 0x24) * D_L01_001B082C - *(f32 *)(obj + 0x2C)) * D_L01_001B0830;
     qcopy(pos, obj + 0x10);
-    func_00282CC0(obj + 0x10, obj + 0x10, state);
+    FastVecAdd(obj + 0x10, obj + 0x10, state);
     func_L01_003DA740(obj);
     if ((obj[0x60] & 2) && obj[0x43] != 1) func_002A7470(obj, 1, 0, 10);
     height = func_L01_003BAFB0();
@@ -34,10 +34,10 @@ void func_L01_003DAB98(u8 *obj) {
         qcopy(bottom, obj + 0x10);
         bottom[2] -= 6.0f;
         func_L01_003120A8(D_00189E20.collision, obj + 0x10, bottom, 0.0001f, 1.0f, 1, 0, 1, 0);
-        func_00282F20(state, state, D_L01_001B0838);
+        vec_scale_to_length(state, state, D_L01_001B0838);
         *(s32 *)(state + 8) = 0;
-        func_00282CC0(obj + 0x10, obj + 0x10, state);
-        func_00282CC0(bottom, bottom, state);
+        FastVecAdd(obj + 0x10, obj + 0x10, state);
+        FastVecAdd(bottom, bottom, state);
         func_L01_003120A8(D_00189E20.collision, obj + 0x10, bottom, 0.0001f, 1.0f, 1, 0, 1, 0);
         func_0029F338(obj);
     } else {

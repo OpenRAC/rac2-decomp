@@ -31,14 +31,14 @@ void func_L09_003FD7D0(unsigned char *object)
     qcopy(position, state + 0x330);
     position[2] += 0.01f;
     position[3] = 1.0f;
-    packet.texture = func_0027C878(11);
+    packet.texture = GetEffectTextureDescriptor(11);
     packet.tag = 0xFF9000000260ULL;
     packet.blend = 0x8000000048ULL;
     packet.primitive = 0;
-    func_002FC560(0x4A, 0);
-    func_002FC560(0x47, 0x51001);
-    func_00282CF0(direction, D_L09_001B9A00, position);
-    distance = func_00282DF0(direction);
+    VU1_addGSregister(0x4A, 0);
+    VU1_addGSregister(0x47, 0x51001);
+    FastVecSub(direction, D_L09_001B9A00, position);
+    distance = FastVecLength(direction);
     if (distance > 0.0f) {
         radius = *(float *)(state + 0x438);
         remaining = distance - 2.0f;
@@ -47,8 +47,8 @@ void func_L09_003FD7D0(unsigned char *object)
             if (radius < 0.0f)
                 radius = 0.0f;
         }
-        func_00282F20(adjusted, direction, radius);
-        func_00282CC0(position, position, adjusted);
+        vec_scale_to_length(adjusted, direction, radius);
+        FastVecAdd(position, position, adjusted);
     }
     packet.uv[0].u = 1.0f;
     packet.uv[0].v = 1.0f;
@@ -64,17 +64,17 @@ void func_L09_003FD7D0(unsigned char *object)
         packet.colors[0] = packet.colors[1] = packet.colors[2] = packet.colors[3] = 0x40507F7F;
     }
     for (i = 0; i < 4; i++) {
-        func_00282D30(packet.vertices[i], D_L09_001B1240_gp[i], *(float *)(state + 0x434));
-        func_00282CC0(packet.vertices[i], packet.vertices[i], position);
+        FastVecScale(packet.vertices[i], D_L09_001B1240_gp[i], *(float *)(state + 0x434));
+        FastVecAdd(packet.vertices[i], packet.vertices[i], position);
     }
-    func_00280B90(&packet, 0, 0);
+    draw_world_quad(&packet, 0, 0);
     if (state[0x42B] != 0) {
-        packet.texture = func_0027C878(32);
+        packet.texture = GetEffectTextureDescriptor(32);
         for (i = 0; i < 4; i++) {
-            func_00282D30(packet.vertices[i], D_L09_001B1240_gp[i], 1.0f);
-            func_00282CC0(packet.vertices[i], packet.vertices[i], position);
+            FastVecScale(packet.vertices[i], D_L09_001B1240_gp[i], 1.0f);
+            FastVecAdd(packet.vertices[i], packet.vertices[i], position);
         }
-        func_00280B90(&packet, 0, 0);
+        draw_world_quad(&packet, 0, 0);
         state[0x42B] = 0;
     }
 }

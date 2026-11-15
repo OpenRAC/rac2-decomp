@@ -133,7 +133,7 @@ void func_L05_00417D48(Obj_L05_00417D48 *o)
         flags = (D_001A7AF0 >> 4) & 3;
         st->f4C = func_L05_0041C708(o, 0.05f, 0, D_L05_001A8F80[flags]);
         if (st->f4C) *(int *)(st->f4C + 0x98) = 0;
-        st->f50 = func_L05_00432080(o, 0.05f);
+        st->f50 = CreateTransformClone(o, 0.05f);
         flags = (D_001A7AF0 >> 6) & 1;
         id = D_L05_001A8F88[flags];
         st->fAC = func_L05_0041C708(o, 0.05f, 0, id);
@@ -180,7 +180,7 @@ void func_L05_00417D48(Obj_L05_00417D48 *o)
         if (st->f260) {
             if (func_00282948((char *)&st->f264)) st->f268 = mode;
         }
-        if (!func_002E59B0(o, st->f30)) st->f30 = func_002E5CF8(0, 4, o);
+        if (!func_002E59B0(o, st->f30)) st->f30 = PlayMobySound(0, 4, o);
         func_L05_00418288(o);
         qcopy(D_L05_001B3510, o->pos);
         func_L00_004450C0(o);

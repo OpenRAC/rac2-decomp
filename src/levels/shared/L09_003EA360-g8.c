@@ -37,19 +37,19 @@ void func_L09_003EA360(u8 *object)
     float blend = 1.0f, distance, angle;
     if ((unsigned)(object[0x20] - 3) < 3) {
         func_0029FCC0(object, 0, frame.point);
-        distance = func_00282E48(frame.point, state + 0x140) - 1.0f;
+        distance = fast_vec_dist(frame.point, state + 0x140) - 1.0f;
         distance /= D_L09_001B0BD4 * 0.016666668f;
         distance *= func_002A7878(D_L09_001B0C2C, D_L09_001B0C30);
-        func_00282D30(frame.direction, D_00189F30, distance);
+        FastVecScale(frame.direction, D_00189F30, distance);
         func_002ACB48(frame.direction, D_L09_001B0C34);
         frame.direction[2] = 0.0f;
-        func_00282CC0(frame.direction, frame.direction, state + 0x140);
-        func_00282CF0(frame.point, frame.direction, frame.point);
-        *(float *)(state + 0x298) = func_00283BE0(
+        FastVecAdd(frame.direction, frame.direction, state + 0x140);
+        FastVecSub(frame.point, frame.direction, frame.point);
+        *(float *)(state + 0x298) = fast_subtract_rotations(
             func_00283248(frame.point[0], frame.point[1]), *(float *)(object + 0xF8));
         func_0029FCC0(object, 1, frame.point);
-        func_00282CF0(frame.point, frame.direction, frame.point);
-        angle = func_00283BE0(-func_00283248(func_00282E20(frame.point), frame.point[2]),
+        FastVecSub(frame.point, frame.direction, frame.point);
+        angle = fast_subtract_rotations(-func_00283248(vec_length_xy(frame.point), frame.point[2]),
                               *(float *)(object + 0xF4));
         if (angle > 0.349065899848938f) angle = 0.349065899848938f;
         else if (angle < -0.349065899848938f) angle = -0.349065899848938f;
@@ -63,7 +63,7 @@ void func_L09_003EA360(u8 *object)
             if (distance < 1.0f) distance = D_L09_001B0C24;
             func_0029FCC0(object, 2, frame.point);
             func_0029FC20(object, 2, frame.joint);
-            func_00282F20(frame.direction, frame.joint, D_L09_001B0BD4 * 0.016666668f);
+            vec_scale_to_length(frame.direction, frame.joint, D_L09_001B0BD4 * 0.016666668f);
             func_L09_003AE8C8(frame.point, object, frame.direction, 1, 1,
                               (float)state[0x34], distance, 1.0f, 1.0f);
             state[0x369]++;
@@ -71,21 +71,21 @@ void func_L09_003EA360(u8 *object)
             if (D_L09_001B0BD8 < state[0x369]) {
                 state[0x369] = 0;
                 *(u16 *)(state + 0x36A) = D_L09_001B0BE0;
-                if (func_00282E80(object + 0x10, state + 0x140) < D_L09_001B0BE8)
+                if (vec_distance_xy(object + 0x10, state + 0x140) < D_L09_001B0BE8)
                     *(u16 *)(state + 0x36A) = D_L09_001B0BE4;
                 if (object[0x43] != 0) func_002A7470(object, 0, 0, 0);
             }
         }
-        blend = func_00283CE0(*(u16 *)(object + 0x96)) / D_L09_001B0BEC;
+        blend = IntToFloat(*(u16 *)(object + 0x96)) / D_L09_001B0BEC;
         if (blend > 1.0f) blend = 1.0f;
         else if (blend < 0.0f) blend = 0.0f;
     } else if (object[0x20] < 3) {
         if (object[0x43] != 0) func_002A7470(object, 0, 0, 0);
         blend = 0.1f;
         ((AimState *)state)->aim.pitch = func_00283198(func_002ABB18(
-            func_00283CE0(D_L09_001B2388_gp) * 0.016666668f)) * 0.2617994248867035f;
+            IntToFloat(D_L09_001B2388_gp) * 0.016666668f)) * 0.2617994248867035f;
         ((AimState *)state)->aim.yaw = func_00283198(func_002ABB18(
-            func_00283CE0(D_L09_001B2388) * 0.014285714365541935f)) * 0.349065899848938f;
+            IntToFloat(D_L09_001B2388) * 0.014285714365541935f)) * 0.349065899848938f;
     }
     func_002AEC48(object, state + 0x230, 0, D_L09_001B0C38 * blend, D_L09_001B0C3C);
     func_002AEC48(object, state + 0x2B0, 1, D_L09_001B0C38 * blend, D_L09_001B0C3C);

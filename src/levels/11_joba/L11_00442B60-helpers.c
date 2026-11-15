@@ -24,16 +24,16 @@ s32 func_L11_00442B60(u8 *arg) {
 
     qcopy(&a,&D_L11_001BAAF0);
     a.f[2] = 0;
-    func_00282F20(&a, &a, 1.0f);
+    vec_scale_to_length(&a, &a, 1.0f);
     result = 0;
-    func_00282CF0(&b, arg + 0x10, D_00189EA0);
+    FastVecSub(&b, arg + 0x10, D_00189EA0);
     b.f[2] = 0;
-    func_00282F20(&b, &b, 1.0f);
-    func_00282CF0(&c, arg + 0x10, D_00189EA0);
+    vec_scale_to_length(&b, &b, 1.0f);
+    FastVecSub(&c, arg + 0x10, D_00189EA0);
     c.f[2] = 0;
-    func_00282F20(&c, &c, 1.0f);
-    if (func_00282DB0(&a,&c) > 0.81915f) {
-        if (func_00282E80(arg + 0x10, D_00189EA0) > 30.0f) {
+    vec_scale_to_length(&c, &c, 1.0f);
+    if (FastVecDot(&a,&c) > 0.81915f) {
+        if (vec_distance_xy(arg + 0x10, D_00189EA0) > 30.0f) {
             result = 1;
         }
     }

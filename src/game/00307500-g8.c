@@ -27,7 +27,7 @@ void func_00307500(char *obj)
     func_0029FCC0(obj, 0, &pos);
     if (rec->target == 0) {
         params = D_001AEC70;
-        rec->target = func_002AF580(&pos, obj + 0xC0, 6.2831855f, 6.2831855f, &output, 0, 0, 0, D_001AEC64, 0.0f, 0.0f, 0, &params);
+        rec->target = SelectBestTargetInCone(&pos, obj + 0xC0, 6.2831855f, 6.2831855f, &output, 0, 0, 0, D_001AEC64, 0.0f, 0.0f, 0, &params);
         if (rec->target) {
             obj[0x20] = 4;
             rec->timer = 0.0f;
@@ -41,16 +41,16 @@ void func_00307500(char *obj)
             up.q = 0;
             up.f[2] = 1.0f;
             qcopy(&matrix[0], direction);
-            func_00282DD8(&matrix[1], &matrix[0], &up);
-            func_00282F20(&matrix[1], &matrix[1], 1.0f);
-            func_00282DD8(&matrix[2], &matrix[1], &matrix[0]);
+            FastVecCross(&matrix[1], &matrix[0], &up);
+            vec_scale_to_length(&matrix[1], &matrix[1], 1.0f);
+            FastVecCross(&matrix[2], &matrix[1], &matrix[0]);
             matrix[3].f[0] = 0;
             matrix[3].f[1] = 0;
             matrix[3].f[2] = 0;
             matrix[3].f[3] = 1;
             func_002AB6D8(&matrix, &angles);
             {
-                float angle = func_00283B98(angles.f[2], func_002A78D8(0.78539824f, 1.5707965f));
+                float angle = FastAddRotations(angles.f[2], func_002A78D8(0.78539824f, 1.5707965f));
                 float elevation = func_002A7878(-0.1f, 0.45f);
                 func_002AF000(&rec->velocity, 1.0f, angle, elevation);
             }

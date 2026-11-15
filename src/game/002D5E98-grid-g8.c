@@ -33,9 +33,9 @@ int func_002D9008(char *object)
     int texture;
     unsigned long colour, pulse;
     GridItem *entry;
-    func_002FC560(66, 0x8000000044ULL);
-    func_002FC560(71, 11);
-    func_0027C540(0);
+    VU1_addGSregister(66, 0x8000000044ULL);
+    VU1_addGSregister(71, 11);
+    SetupGifPaging(0);
     width = D_001ABAD8;
     height = D_001ABADC;
     areaWidth = *(int *)(object + 0x20) << 4;
@@ -89,22 +89,22 @@ int func_002D9008(char *object)
                         func_002D8EC0(object, record, column, row, x >> 4, (y >> 4) + 36);
                 }
                 if (active && *(int *)(object + 0x3C) == index) {
-                    pulse = (unsigned int)(((func_00282C30((D_001B1598 & 63) - 32) + 64) * 0x10202) | 0x80000000u);
+                    pulse = (unsigned int)(((subtract_integer_with_clamp((D_001B1598 & 63) - 32) + 64) * 0x10202) | 0x80000000u);
                     colour = state == 4 ? (unsigned long)(int)0x80101010u : (unsigned long)D_001AA43C;
-                    func_0028FC48(x - 48, y - 48, right + 48, bottom + 48, pulse, 1);
-                    func_0028FC48(x - 16, y - 16, right + 16, bottom + 16, colour, 1);
+                    AppendScreenRectPacket(x - 48, y - 48, right + 48, bottom + 48, pulse, 1);
+                    AppendScreenRectPacket(x - 16, y - 16, right + 16, bottom + 16, colour, 1);
                 }
                 if (state == 4)
-                    func_0028FC48(x - 64, y - 64, right + 64, bottom + 64, 0x80FFFFFFUL, 1);
-                texture = func_0028E588(D_00239BA0[D_00139568[record[3]]].icon, record[1]);
+                    AppendScreenRectPacket(x - 64, y - 64, right + 64, bottom + 64, 0x80FFFFFFUL, 1);
+                texture = GetIconFrame(D_00239BA0[D_00139568[record[3]]].icon, record[1]);
                 func_0028EE98(texture, x, y, width, height, 128);
                 if (state == 2)
-                    func_0028FC48(x - 64, y - 64, right + 64, bottom + 64, 0x60202020UL, 1);
+                    AppendScreenRectPacket(x - 64, y - 64, right + 64, bottom + 64, 0x60202020UL, 1);
             } else if (active && *(int *)(object + 0x3C) == index) {
-                pulse = (unsigned int)(((func_00282C30((D_001B1598 & 63) - 32) + 64) * 0x10202) | 0x80000000u);
+                pulse = (unsigned int)(((subtract_integer_with_clamp((D_001B1598 & 63) - 32) + 64) * 0x10202) | 0x80000000u);
                 colour = (unsigned long)D_001AA43C;
-                func_0028FC48(x - 48, y - 48, right + 48, bottom + 48, pulse, 1);
-                func_0028FC48(x - 16, y - 16, right + 16, bottom + 16, colour, 1);
+                AppendScreenRectPacket(x - 48, y - 48, right + 48, bottom + 48, pulse, 1);
+                AppendScreenRectPacket(x - 16, y - 16, right + 16, bottom + 16, colour, 1);
             }
             index++;
             record += 5;
@@ -113,6 +113,6 @@ int func_002D9008(char *object)
         y += yStep;
     }
     }
-    func_0027C660();
+    DoGifPaging();
     return 2;
 }

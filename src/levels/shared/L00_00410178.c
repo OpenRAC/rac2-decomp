@@ -45,18 +45,18 @@ void func_L00_00410178(char *object, void *origin)
     state = *(FlashState **)(object + 0x68);
     if (!disabled && state->timer > 0) {
         if (state->timer >= 13) {
-            float inverse = 1.0f / func_00283CE0(3);
-            a = func_00283CE0(15 - state->timer) * inverse;
-            b = func_00283CE0(15 - state->timer) * (inverse * 0.8f);
-            c = func_00283CE0(15 - state->timer) * (inverse * 0.5f);
+            float inverse = 1.0f / IntToFloat(3);
+            a = IntToFloat(15 - state->timer) * inverse;
+            b = IntToFloat(15 - state->timer) * (inverse * 0.8f);
+            c = IntToFloat(15 - state->timer) * (inverse * 0.5f);
         } else {
-            float inverse = 1.0f / func_00283CE0(12);
-            a = func_00283CE0(state->timer) * inverse;
-            b = func_00283CE0(state->timer) * (inverse * 0.8f);
-            c = func_00283CE0(state->timer) * (inverse * 0.5f);
+            float inverse = 1.0f / IntToFloat(12);
+            a = IntToFloat(state->timer) * inverse;
+            b = IntToFloat(state->timer) * (inverse * 0.8f);
+            c = IntToFloat(state->timer) * (inverse * 0.5f);
         }
         if (D_00189E20.alternate) {
-            func_00282D30(direction, object + 0xd0, -1.0f);
+            FastVecScale(direction, object + 0xd0, -1.0f);
             qcopy(position, origin);
             axis = direction;
         } else {
@@ -64,10 +64,10 @@ void func_L00_00410178(char *object, void *origin)
             qcopy(position, origin);
             axis = direction;
         }
-        func_00282D30(offset, D_00189E20.object + 0xe0, 0.3f);
-        func_00282CC0(position, position, offset);
-        func_00282D30(scale, axis, 1.75f);
-        func_00282CC0(position, position, scale);
+        FastVecScale(offset, D_00189E20.object + 0xe0, 0.3f);
+        FastVecAdd(position, position, offset);
+        FastVecScale(scale, axis, 1.75f);
+        FastVecAdd(position, position, scale);
         if (state->light == -1) {
             state->light = func_L00_002FCF18(position, 14.0f, 0.0f, a, b, c);
         } else {
@@ -78,7 +78,7 @@ void func_L00_00410178(char *object, void *origin)
             light->color[1] = b;
             light->color[2] = c;
         }
-        func_00282978(&state->timer);
+        FastDecTimer(&state->timer);
     } else if (state->light != -1) {
         func_00291450(state->light);
         state->light = -1;

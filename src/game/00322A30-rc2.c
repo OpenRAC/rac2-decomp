@@ -49,7 +49,7 @@ void func_00322A30(void *arg0) {
     s32 i;
 
     obj = (*(void **)((s8 *)(arg0) + (0x68)));
-    func_00282F20(&loc0, (s8 *)obj + 0xE0, 0.05000000447034836f);
+    vec_scale_to_length(&loc0, (s8 *)obj + 0xE0, 0.05000000447034836f);
     for (i = 0; i < 0xF; i++) {
         if (!(((0x7F8 >> i) ^ 1) & 1)) {
             t20 = func_002A7940();
@@ -60,9 +60,9 @@ void func_00322A30(void *arg0) {
             sp10.y = t;
             sp10.z = func_002A7878(3.0f, 5.0f) * 0.016666668f;
             if (D_001A8CA0 != 0) {
-                func_00283098(&sp10, &sp10, (s8 *)arg0 + 0xC0);
+                matrix_mul_vec3(&sp10, &sp10, (s8 *)arg0 + 0xC0);
             }
-            func_00282CC0(&sp10, &sp10, &loc0);
+            FastVecAdd(&sp10, &sp10, &loc0);
             t22 = func_002A7878(90.0f, 270.0f);
             t = func_002A7878(10.0f, 20.0f);
             v1 = func_00273730(arg0, 2, (*(s16 *)((s8 *)(arg0) + (0xAA))), i, (s8 *)arg0 + 0x10, (s8 *)arg0 + 0xF0, &sp10, 0xFF, t22, t);

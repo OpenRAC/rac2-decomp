@@ -36,8 +36,8 @@ void func_L20_0039F968(unsigned char *object) {
     unsigned char *particle;
     int j, last;
     float length, limit;
-    func_00282D30(&offset, object + 0xE0, D_L20_001AED3C);
-    func_00282CC0(&origin, object + 0x10, &offset);
+    FastVecScale(&offset, object + 0xE0, D_L20_001AED3C);
+    FastVecAdd(&origin, object + 0x10, &offset);
     for (; i < 8; ++i) {
         if (func_L02_002F1658()) {
             Vector *head;
@@ -51,12 +51,12 @@ void func_L20_0039F968(unsigned char *object) {
             func_002AB668(&rotation, (int)&D_L20_00235500[i], D_L20_001AED58 * 0.017453294f);
             func_002ACDE8(head, head, &rotation);
             func_002ACB48(head->f, 0.125f);
-            length = func_00282DF0(head);
+            length = FastVecLength(head);
             limit = D_L20_001AED40 * 1.1f;
-            if (limit < length) func_00282D30(head, head, limit / length);
+            if (limit < length) FastVecScale(head, head, limit / length);
             else {
                 limit = D_L20_001AED40 * 0.9f;
-                if (length < limit) func_00282D30(head, head, limit / length);
+                if (length < limit) FastVecScale(head, head, limit / length);
             }
         }
         last = counts[i] - 1;
@@ -64,12 +64,12 @@ void func_L20_0039F968(unsigned char *object) {
         {
             int n = 0;
             for (j = last; j > 0; --j) {
-                func_00282CC0(&points[n], &origin, &D_L20_00234880[i][j]);
+                FastVecAdd(&points[n], &origin, &D_L20_00234880[i][j]);
                 points[n].f[3] = 0.5f;
                 ++n;
             }
         }
-        func_00282CC0(&points[last], &origin, D_L20_00234880[i]);
+        FastVecAdd(&points[last], &origin, D_L20_00234880[i]);
         points[last].f[3] = 0.05f;
         if (func_L02_002F1658()) {
             int top = counts[i] - 1;

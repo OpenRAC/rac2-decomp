@@ -32,14 +32,14 @@ void func_L07_003F8AB0(u8 *a0)
     f32 len;
 
     s3 = *(u8 **)(a0 + 0x68);
-    func_002E5CF8(1, 0, a0);
+    PlayMobySound(1, 0, a0);
     func_0029FCC0(a0, 0, &v[0]);
     func_L07_003F8898(a0, &v[2]);
-    func_00282CF0(&v[1], &v[2], &v[0]);
-    len = func_00282DF0(&v[1]);
-    func_00282F20(&v[1], &v[1], len + 2.0f);
-    func_00282CC0(&v[1], &v[1], &v[0]);
-    if (func_002761F8(&v[0], &v[1], 2, a0, 0) != 0) {
+    FastVecSub(&v[1], &v[2], &v[0]);
+    len = FastVecLength(&v[1]);
+    vec_scale_to_length(&v[1], &v[1], len + 2.0f);
+    FastVecAdd(&v[1], &v[1], &v[0]);
+    if (CollLine(&v[0], &v[1], 2, a0, 0) != 0) {
         v[1] = D_L07_001BF660;
     }
     func_L07_003F4B08(a0, *(s32 *)(s3 + 0x418), &v[0], &v[1], (f32)*(u8 *)(s3 + 0x34));

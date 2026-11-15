@@ -25,14 +25,14 @@ void func_002BD9B0(char *p)
     float v[4] __attribute__((aligned(16)));
     float w[4] __attribute__((aligned(16)));
 
-    if (func_00282978((short *)(p + 0xA))) {
+    if (FastDecTimer((short *)(p + 0xA))) {
         func_002B9180(p);
         return;
     }
-    inv = 1.0f / func_00283CE0(*(short *)(s + 0x18));
-    *(float *)(p + 0xC) = func_00283CE0(*(short *)(p + 0xA)) * *(float *)(s + 0x1C) * inv;
-    *(int *)(p + 4) = func_002A9568(*(int *)(s + 0x14), *(int *)(s + 0x10), func_00283CE0(*(short *)(p + 0xA)) * inv);
-    func_00282CC0((p + 0x10), (p + 0x10), s);
+    inv = 1.0f / IntToFloat(*(short *)(s + 0x18));
+    *(float *)(p + 0xC) = IntToFloat(*(short *)(p + 0xA)) * *(float *)(s + 0x1C) * inv;
+    *(int *)(p + 4) = func_002A9568(*(int *)(s + 0x14), *(int *)(s + 0x10), IntToFloat(*(short *)(p + 0xA)) * inv);
+    FastVecAdd((p + 0x10), (p + 0x10), s);
     *(float *)(s + 8) -= 0.001f;
     qcopy(keep, p + 0x10);
     if (*(short *)(s + 0x1A) != 0 && (D_001B1688 & 1)) {
@@ -41,12 +41,12 @@ void func_002BD9B0(char *p)
         w[1] = func_002A7878(-1.0f, 1.0f);
         w[2] = func_002A7878(-1.0f, 1.0f);
         *(TI *)v = *(TI *)w;
-        len = func_00282DF0(s);
-        func_00282F20(v, v, len * func_002A7878(0.21f, 0.25f));
-        func_00282CC0(v, v, s);
-        func_00282D30(v, v, func_002A7878(0.75f, 0.95f));
+        len = FastVecLength(s);
+        vec_scale_to_length(v, v, len * func_002A7878(0.21f, 0.25f));
+        FastVecAdd(v, v, s);
+        FastVecScale(v, v, func_002A7878(0.75f, 0.95f));
         func_002BD8B0((p + 0x10), v, *(int *)(p + 4), *(int *)(s + 0x14), func_002A7820(15, 20), 0, *(float *)(p + 0xC));
     } else {
-        func_00282D30(s, s, 0.96f);
+        FastVecScale(s, s, 0.96f);
     }
 }

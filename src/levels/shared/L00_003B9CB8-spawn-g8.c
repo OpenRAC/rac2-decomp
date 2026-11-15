@@ -68,24 +68,24 @@ unsigned char *func_L00_003C3A70(int mode)
     int *words;
 
     if (D_L00_001AFF98 != 0) {
-        func_002E5AD0(*(char **)(D_L00_001D9F00[D_L00_001DB2BC[0]] + 0x28) + 0x80,
+        AllocateSoundVoice(*(char **)(D_L00_001D9F00[D_L00_001DB2BC[0]] + 0x28) + 0x80,
                       0, 0, D_00189EA0, 0x400);
         return 0;
     }
     if (func_L00_002D3F30(45, 1) == 0) {
-        func_002E5AD0(*(char **)(D_L00_001D9F00[D_L00_001DB2BC[0]] + 0x28),
+        AllocateSoundVoice(*(char **)(D_L00_001D9F00[D_L00_001DB2BC[0]] + 0x28),
                       0, 0, D_00189EA0, 0x400);
         return 0;
     }
 
-    owner = (Owner3A *)func_0029EFD0(mode ? 0x1192 : 0xA5C);
+    owner = (Owner3A *)CreateMoby(mode ? 0x1192 : 0xA5C);
     if (owner != 0) {
         state = owner->state;
         D_L00_001AFF98 = (char *)owner;
         owner->flags |= 0x41;
         owner->group = 0xFF;
         owner->status = 1;
-        func_002833F0(owner->forward, owner->angles);
+        euler_rotation_basis(owner->forward, owner->angles);
         up = owner->up;
         position = &owner->position;
         side = owner->side;
@@ -96,17 +96,17 @@ unsigned char *func_L00_003C3A70(int mode)
             for (n = 3; n >= 0; n--)
                 D_L00_001B2940[n] = 0;
         }
-        func_00282F20(D_L00_0023FB80, owner->forward, D_L00_001AFF4C);
+        vec_scale_to_length(D_L00_0023FB80, owner->forward, D_L00_001AFF4C);
         qcopy(&D_L00_001B2900, up);
-        func_00282F20(D_L00_0023FB80 + 0x140, side, D_L00_001AFF4C);
+        vec_scale_to_length(D_L00_0023FB80 + 0x140, side, D_L00_001AFF4C);
         qcopy(&D_L00_001B2910, owner->forward);
-        func_00282F20(D_L00_0023FB80 + 0x280, up, D_L00_001AFF4C);
+        vec_scale_to_length(D_L00_0023FB80 + 0x280, up, D_L00_001AFF4C);
         qcopy(&D_L00_001B2920, side);
-        func_00282CC0(D_L00_0023FB80 + 0x3C0, owner->forward, up);
+        FastVecAdd(D_L00_0023FB80 + 0x3C0, owner->forward, up);
         entries = state->entries;
-        func_00282F20(D_L00_0023FB80 + 0x3C0, D_L00_0023FB80 + 0x3C0, D_L00_001AFF4C);
+        vec_scale_to_length(D_L00_0023FB80 + 0x3C0, D_L00_0023FB80 + 0x3C0, D_L00_001AFF4C);
         words = state->words;
-        func_00282DD8(&D_L00_001B2930, D_L00_0023FB80 + 0x3C0, side);
+        FastVecCross(&D_L00_001B2930, D_L00_0023FB80 + 0x3C0, side);
 
         {
             int n;
@@ -140,7 +140,7 @@ unsigned char *func_L00_003C3A70(int mode)
             for (n = 3; n >= 0; n--)
                 words[n] = 0;
         }
-        func_002E5CF8(1, 0, owner);
+        PlayMobySound(1, 0, owner);
     }
     return (unsigned char *)owner;
 }

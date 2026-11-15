@@ -83,7 +83,7 @@ void func_L01_003CC210(u8 *a0)
         *(u16 *)(p + 0x96) = *(u16 *)(p + 0x96) + 1;
     func_00282948(q + 0xBC);
     func_00282948(q + 0xC4);
-    func_00282978(q + 0x26);
+    FastDecTimer(q + 0x26);
 }
 
 /* func_L01_003CC280 is defined in L01_003CC280-g8.c. */
@@ -167,8 +167,8 @@ void func_L01_003CDD00(u8 *a0)
 {
     u8 *s0 = *(u8 **)(a0 + 0x68);
 
-    *(u8 *)(s0 + 0x48) = func_00283CF0(30.0f);
-    *(u8 *)(s0 + 0x4A) = func_00283CF0(24.0f);
+    *(u8 *)(s0 + 0x48) = FloatToInt(30.0f);
+    *(u8 *)(s0 + 0x4A) = FloatToInt(24.0f);
     *(f32 *)(a0 + 0x2C) = *(f32 *)(*(u8 **)(a0 + 0x24) + 0x24);
     qcopy(s0 + 0x60, a0 + 0x10);
     *(u8 *)(s0 + 0x28) = 3;
@@ -208,7 +208,7 @@ void func_L01_003CDE58(u8 *a0)
         *(u16 *)(a0 + 0x96) = *(u16 *)(a0 + 0x96) + 1;
     func_00282948(p + 0xBC);
     func_00282948(p + 0xB4);
-    func_00282978(p + 0x26);
+    FastDecTimer(p + 0x26);
 }
 
 /* The group count and the entity base, read as bare symbols (`sda` arrays of unknown size: the
@@ -299,11 +299,11 @@ void func_L01_003CDEA8(u8 *a0)
                 func_002A7750(a0, 0, 6);
             }
             if (0.1f < f20) {
-                func_00282CF0(state + 0x90, a0 + 0x10, D_00189EA0);
+                FastVecSub(state + 0x90, a0 + 0x10, D_00189EA0);
                 w = (f20 + f20 + 3.0f) * 0.016666668f;
                 if (0.20000002f < w)
                     w = 0.20000002f;
-                func_00282F20(state + 0x90, state + 0x90, w);
+                vec_scale_to_length(state + 0x90, state + 0x90, w);
                 *(s32 *)(state + 0x98) = 0;
             }
         }
@@ -312,7 +312,7 @@ void func_L01_003CDEA8(u8 *a0)
     }
     func_L01_003CDB40(a0);
     if (a0[0x95] >= 5 && a0[0x95] <= 6)
-        func_L01_002F14E8(1, 0, *(f32 *)(state + 0x20) / func_00283CE0(*(short *)(state + 0x24)));
+        func_L01_002F14E8(1, 0, *(f32 *)(state + 0x20) / IntToFloat(*(short *)(state + 0x24)));
 }
 
 
@@ -341,8 +341,8 @@ void func_L01_003CEDA0(u8 *a0)
         func_002A7750(a0, 1, -1);
         break;
     case 1:
-        *(float *)(a0 + 0xF8) = func_00283B98(*(float *)(a0 + 0xF8), 0.078539826f);
-        if (func_002ACBC8(D_00189EA0, *(int *)(p + 4))) {
+        *(float *)(a0 + 0xF8) = FastAddRotations(*(float *)(a0 + 0xF8), 0.078539826f);
+        if (IsPointInCuboid(D_00189EA0, *(int *)(p + 4))) {
             p = D_L01_001BF6C0;
             if (func_00288AA0(p, 0x26)) {
                 func_00288BE8(p);
@@ -368,7 +368,7 @@ void func_L01_003CEDA0(u8 *a0)
         func_00288308(0x24);
         func_002AD860(0x24);
         func_002B0A18(0x1225, -1);
-        func_0029B3E0(0, -1);
+        MemcardSave(0, -1);
         if (*(int *)(p + 12) != -1) {
             p = *(u8 **)(D_L01_001B255C + (*(int *)(p + 12) << 8) + 0x68);
             if (!*(int *)(p + 0x3C)) {

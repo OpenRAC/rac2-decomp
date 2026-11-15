@@ -18,7 +18,7 @@ typedef struct {
     float f28;                          /* 0x28 */
     char pad1[0x60 - 0x2C];
     Quad_002B5678 q60;                  /* 0x60: cleared */
-    char out70[0x10];                   /* 0x70: movement of this step (func_00282CF0 output) */
+    char out70[0x10];                   /* 0x70: movement of this step (FastVecSub output) */
     int w80;                            /* 0x80 */
     int w84;                            /* 0x84: cleared */
     char pad2[0x90 - 0x88];
@@ -47,7 +47,7 @@ void func_002B5678(Self_002B5678 *self, Ctl_002B5678 *ctl, float *target, void *
     int changed, i, r;
     float len;
 
-    func_00282CC0(position, position, ctl->vel);
+    FastVecAdd(position, position, ctl->vel);
     qcopy(&saved, position);
     ctl->w84 = 0;
     qzero(&ctl->q60);
@@ -60,8 +60,8 @@ void func_002B5678(Self_002B5678 *self, Ctl_002B5678 *ctl, float *target, void *
             break;
     }
     if (changed) {
-        func_00282CF0(ctl->vel, self->pos, target);
-        len = func_00282E20(ctl->vel);
+        FastVecSub(ctl->vel, self->pos, target);
+        len = vec_length_xy(ctl->vel);
         if (ctl->speed < len)
             func_00282F70(ctl->vel, ctl->vel, ctl->speed);
         else
@@ -79,5 +79,5 @@ void func_002B5678(Self_002B5678 *self, Ctl_002B5678 *ctl, float *target, void *
     } else {
         func_00282948(&ctl->w80);
     }
-    func_00282CF0(ctl->out70, self->pos, &saved);
+    FastVecSub(ctl->out70, self->pos, &saved);
 }

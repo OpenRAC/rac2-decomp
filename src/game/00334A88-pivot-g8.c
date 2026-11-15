@@ -30,7 +30,7 @@ void func_00334A88(char *obj, void *out)
         H651(state,0xEC)=15;
         B651(state,0xD6)=1;
         H651(state,0xEE)=1;
-        func_00282D30(state+0x10,cam+0x30,func_00282DB0(state,cam+0x30));
+        FastVecScale(state+0x10,cam+0x30,FastVecDot(state,cam+0x30));
         qcopy(state+0x20,state+0x10);
         mode=B651(state,0xC4);
         axis=cam+0x30;
@@ -38,20 +38,20 @@ void func_00334A88(char *obj, void *out)
             func_003349E8(state+0x30,1,D_001B120C*0.5f);
     } else {
         if (H651(state,0xEE)==1) {
-            func_00282D30(state+0x10,cam+0x30,func_00282DB0(state,cam+0x30));
+            FastVecScale(state+0x10,cam+0x30,FastVecDot(state,cam+0x30));
             qcopy(state+0x20,state+0x10);
             mode=B651(state,0xC4);
             axis=cam+0x30;
             if ((unsigned)(mode-5)<3 || mode==3)
                 func_003349E8(state+0x30,1,D_001B120C*0.5f);
-            f=func_00283CE0(H651(state,0xD8))/func_00283CE0(15);
-            H651(state,0xD8)=func_00283CF0(func_00283CE0(H651(state,0xEC))*f);
+            f=IntToFloat(H651(state,0xD8))/IntToFloat(15);
+            H651(state,0xD8)=FloatToInt(IntToFloat(H651(state,0xEC))*f);
             H651(state,0xEE)=2;
         } else {
             axis=cam+0x30;
             if (H651(state,0xEE)>=2) {
-            f=func_00282DB0(state,axis);
-            func_00282D30(state+0x10,axis,f);
+            f=FastVecDot(state,axis);
+            FastVecScale(state+0x10,axis,f);
             qcopy(state+0x20,state+0x10);
             mode=B651(state,0xC4);
             axis=cam+0x30;
@@ -63,9 +63,9 @@ void func_00334A88(char *obj, void *out)
     }
     func_00334710((int)obj,&base.q);
     if (D_00189E20.i2294==0x74) {
-        func_00282D30(out,axis,func_00282DB0(state,axis));
-        func_00282CF0(state,state,out);
-        func_00282D30(out,axis,func_00282DB0(axis,state+0x60));
+        FastVecScale(out,axis,FastVecDot(state,axis));
+        FastVecSub(state,state,out);
+        FastVecScale(out,axis,FastVecDot(axis,state+0x60));
         qcopy(state+0x10,out);
         if (B651(state,0xC4)!=11) {
             char *p;
@@ -73,7 +73,7 @@ void func_00334A88(char *obj, void *out)
             qcopy(obj+0x40,obj);
             p=*(char **)(obj+0x70)+0x20;
             H651(p,0)=D_001B11D8;
-            F651(p,0x24)=1.0f/func_00283CE0(H651(p,0));
+            F651(p,0x24)=1.0f/IntToFloat(H651(p,0));
         }
         return;
     }
@@ -83,65 +83,65 @@ void func_00334A88(char *obj, void *out)
         if (D_00189E20.i2294==17 || (D_00189E20.b49E && D_00189E20.distance>0.2f && ((angle=func_003348A8(obj,F651(state,0xB0)))<D_001B11C4 || angle>D_001B11C0))) {
             B651(state,0xC4)=1;
             H651(state,0xC6)=D_001B11F0;
-            F651(state,0xC8)=1.0f/func_00283CE0(H651(state,0xC6));
+            F651(state,0xC8)=1.0f/IntToFloat(H651(state,0xC6));
         }
         blocked=0;
         if (D_00189E20.h34C && (!D_00189E20.b49E || D_00189E20.h4AE>=16)) blocked=1;
         else if (func_00334730(&temp,1)!=1) blocked=1;
         else {
-            f=func_00282DB0(&temp,axis);
-            if (f<func_00282DF0(state+0x10)) blocked=1;
+            f=FastVecDot(&temp,axis);
+            if (f<FastVecLength(state+0x10)) blocked=1;
         }
         if (blocked) {
             qcopy(out,state+0x10);
-            f=func_00282DB0(&base,axis);
-            func_00282D30(&temp,axis,f);
-            func_00282CF0(state,&base,&temp);
+            f=FastVecDot(&base,axis);
+            FastVecScale(&temp,axis,f);
+            FastVecSub(state,&base,&temp);
         } else {
             func_00334730(&temp,1);
-            func_00282D30(out,axis,func_00282DB0(&temp,axis));
-            func_00282CF0(state,&temp,out);
+            FastVecScale(out,axis,FastVecDot(&temp,axis));
+            FastVecSub(state,&temp,out);
         }
         break;
     }
     case 3: case 5: case 6: case 7:
-        func_00282D08(state+0x10,state+0x30,state+0x20,(float)H651(state,0xD4)*F651(state,0xCC));
+        lerp_vector(state+0x10,state+0x30,state+0x20,(float)H651(state,0xD4)*F651(state,0xCC));
         if (!B651(state,0xD7) && func_00277258(obj+0x30,18,0,0.2f)) {
             qcopy(state+0x30,state+0x10); B651(state,0xD7)=1;
         }
         qcopy(out,state+0x10);
-        f=func_00282DB0(&base,axis);
-        func_00282D30(&temp,axis,f);
-        func_00282CF0(state,&base,&temp);
-        if (func_00282978(state+0xD4)) {
+        f=FastVecDot(&base,axis);
+        FastVecScale(&temp,axis,f);
+        FastVecSub(state,&base,&temp);
+        if (FastDecTimer(state+0xD4)) {
             if (B651(state,0xC4)==9) {
                 B651(state,0xC4)=10; H651(state,0xD4)=D_001B1220;
                 qcopy(state+0x20,state+0x10);
-                func_00282D30(&temp,axis,F651(state,0xD0));
-                func_00282CF0(state+0x30,state+0x20,&temp);
+                FastVecScale(&temp,axis,F651(state,0xD0));
+                FastVecSub(state+0x30,state+0x20,&temp);
             } else if (B651(state,0xC4)==6) {
                 B651(state,0xC4)=7; H651(state,0xD4)=D_001B11F4;
                 qcopy(state+0x30,state+0x20); qcopy(state+0x20,state+0x10);
             } else {
                 B651(state,0xC4)=4; H651(state,0xC6)=D_001B1208;
-                F651(state,0xC8)=1.0f/func_00283CE0(H651(state,0xC6));
+                F651(state,0xC8)=1.0f/IntToFloat(H651(state,0xC6));
             }
         }
         break;
     case 8:
         qcopy(out,state+0x10);
-        f=func_00282DB0(&base,axis);
-        func_00282D30(&temp,axis,f);
-        func_00282CF0(state,&base,&temp);
+        f=FastVecDot(&base,axis);
+        FastVecScale(&temp,axis,f);
+        FastVecSub(state,&base,&temp);
         break;
     case 9: case 10:
-        func_00282D30(out,axis,func_00282DB0(&base,axis));
-        func_00282CF0(state,&base,out);
-        func_00282D08(out,out,state+0x20,D_001B1234);
+        FastVecScale(out,axis,FastVecDot(&base,axis));
+        FastVecSub(state,&base,out);
+        lerp_vector(out,out,state+0x20,D_001B1234);
         break;
     default:
-        func_00282D30(out,axis,func_00282DB0(&base,axis));
-        func_00282CF0(state,&base,out);
+        FastVecScale(out,axis,FastVecDot(&base,axis));
+        FastVecSub(state,&base,out);
         break;
     }
 }

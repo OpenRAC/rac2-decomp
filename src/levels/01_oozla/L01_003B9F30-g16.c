@@ -111,8 +111,8 @@ void func_L01_003B9F30(unsigned char *object)
     switch (object[0x20]) {
     case 0:
         if (surface > 0.0f) {
-            F(context, 0x2B4) = 1.0f / func_00282E48(outbound + 0x10, outbound + 0x20);
-            F(context, 0x2B8) = 1.0f / func_00282E48(inbound + 0x10, inbound + 0x20);
+            F(context, 0x2B4) = 1.0f / fast_vec_dist(outbound + 0x10, outbound + 0x20);
+            F(context, 0x2B8) = 1.0f / fast_vec_dist(inbound + 0x10, inbound + 0x20);
             I(context, 0x2F0) = -1;
             qcopy(object+0x10, outbound+0x10);
             F(object, 0xF8) = func_00283248(F(outbound, 0x20) - F(object, 0x10), F(outbound, 0x24) - F(object, 0x14));
@@ -162,14 +162,14 @@ void func_L01_003B9F30(unsigned char *object)
             if (object[0x43] != 2) func_002A7470(object, 2, 5, 3);
             func_002A7750(object, 3, -1);
         } else {
-            rate = func_00282E80(object + 0x10, &D_00189E20.position);
+            rate = vec_distance_xy(object + 0x10, &D_00189E20.position);
             if (rate < 10.0f) {
                 if (object[0x43]) func_002A7470(object, 0, 0, func_002A7820(10, 20));
                 func_0029FCC0(object, 0, (char *)&direction);
-                func_00282CF0(&direction, &D_00189E20.eye, &direction);
+                FastVecSub(&direction, &D_00189E20.eye, &direction);
                 yaw = func_00283248(direction.v[0], direction.v[1]);
-                yaw = func_00283BE0(yaw, F(object, 0xF8));
-                rate = -func_00283248(func_00282E20(&direction), direction.v[2]);
+                yaw = fast_subtract_rotations(yaw, F(object, 0xF8));
+                rate = -func_00283248(vec_length_xy(&direction), direction.v[2]);
                 if (yaw > 2.2689283f) yaw = 2.2689283f;
                 else if (yaw < -2.2689283f) yaw = -2.2689283f;
                 if (rate > 0.52359885f) rate = 0.52359885f;
@@ -206,16 +206,16 @@ void func_L01_003B9F30(unsigned char *object)
         float rate, lookahead;
         float *point;
         int i, index;
-        i = func_00283CF0(F(context, 0x2B0));
+        i = FloatToInt(F(context, 0x2B0));
         point = (float *)outbound;
         point += i*4;
         if (point[7] > 0.0f) {
-            i = func_00283CF0(F(context, 0x2B0));
+            i = FloatToInt(F(context, 0x2B0));
             point = (float *)outbound;
             point += i*4;
             F(context, 0x2CC) = point[7];
         }
-        func_002AA2E8((float *)(context + 0x2D0), F(context, 0x2CC), 0.33333334f);
+        ApproachValue((float *)(context + 0x2D0), F(context, 0x2CC), 0.33333334f);
         {
             float rate = F(context, 0x2B4);
             func_002AA548((float *)(context+0x2B0), (float *)(context+0x2BC), (float)(I(outbound, 0)-1), rate*0.005f, rate*0.0016666667f, F(context, 0x2D0)*(rate*0.016666668f));
@@ -229,16 +229,16 @@ void func_L01_003B9F30(unsigned char *object)
             qcopy(&target, object+0x10);
             qcopy(&velocity, object+0xF0);
             func_002C9828(outbound, 0, &target, &velocity, 0, lookahead);
-            func_00282CF0(&target, &target, object+0x10);
+            FastVecSub(&target, &target, object+0x10);
             yaw = func_00283248(target.v[0], target.v[1]);
-            yaw = func_00283BE0(yaw, F(object, 0xF8));
+            yaw = fast_subtract_rotations(yaw, F(object, 0xF8));
             F(context, 0xF0) = yaw; F(context, 0xF8) = yaw*0.5f;
             F(context, 0x174) = yaw*0.33333334f; F(context, 0x1F4) = -yaw*0.5f;
         }
         target.v[0] = func_00283180(F(object, 0xF8))*10.0f;
         target.v[1] = func_00283198(F(object, 0xF8))*10.0f;
         target.v[2] = 0.0f;
-        func_00282CC0(&target, &target, object+0x10);
+        FastVecAdd(&target, &target, object+0x10);
         target.v[3] = 12345.0f;
         if (!func_002A77E0(4)) {
             qcopy(&velocity, object+0x10);
@@ -247,7 +247,7 @@ void func_L01_003B9F30(unsigned char *object)
             rate = func_002A7878(2.0f, 3.0f);
             i = func_002A77E0(6);
             child = func_002C19D8(&velocity, rate, 13000.0f, D_L01_001AFE18, ((u32)(i+20)<<24)|0x5060U);
-            if (child) child[9] = func_00283CF0(16.0f)+32;
+            if (child) child[9] = FloatToInt(16.0f)+32;
         }
         if ((float)(I(outbound, 0)-1) <= F(context, 0x2B0)) {
             func_L00_002D6B70(I(context, 0x2F0));
@@ -267,7 +267,7 @@ void func_L01_003B9F30(unsigned char *object)
         index = I(context, 0x298);
         if (index != -1) {
             other = D_L01_001B255C + index*0x100;
-            if (func_00282E80(object+0x10, other+0x10) < F(context, 0x29C)) {
+            if (vec_distance_xy(object+0x10, other+0x10) < F(context, 0x29C)) {
                 qcopy(&target, other+0x10);
                 target.v[3] = 12345.0f;
             }
@@ -278,7 +278,7 @@ void func_L01_003B9F30(unsigned char *object)
                 if (!P(context, 0x2AC)) break;
             }
             child = P(context, 0x2AC);
-            func_00282CF0(child+0x20, &target, &D_00189E20.position);
+            FastVecSub(child+0x20, &target, &D_00189E20.position);
             ((PoolRecord64 *)child)->f31 = 1;
             ((PoolRecord64 *)child)->f52 = 3;
         }
@@ -298,11 +298,11 @@ void func_L01_003B9F30(unsigned char *object)
             yaw = func_00283248(F(inbound, 0x20)-direction.v[0], F(inbound, 0x24)-direction.v[1]);
         else
             yaw = func_00283248(F(outbound, 0x20)-direction.v[0], F(outbound, 0x24)-direction.v[1]);
-        func_00282CF0(&velocity, &direction, object+0x10);
-        rate = func_00282DF0(&velocity);
+        FastVecSub(&velocity, &direction, object+0x10);
+        rate = FastVecLength(&velocity);
         func_002AAC80(context+0x2C4, rate, 0.0016666667f, 0.0016666667f, 0.10000001f);
         func_002AC9F8(velocity.v, F(context, 0x2C4));
-        func_00282CC0(object+0x10, object+0x10, &velocity);
+        FastVecAdd(object+0x10, object+0x10, &velocity);
         if (object[0x20] == 5) F(object, 0x18) = F(outbound, 0x18) + D_L01_002A48B0[U(object, 0x96)];
         else F(object, 0x18) = F(outbound, 0x18) + D_L01_002A45D0[U(object, 0x96)];
         if (U(object, 0x96) < 180) {
@@ -316,7 +316,7 @@ void func_L01_003B9F30(unsigned char *object)
         } else {
             if (object[0x43]) func_002A7470(object, 0, 0, 10);
             func_002AAA00((float *)(object+0xF8), yaw, (float *)(context+0x2C8), 0, 0.000387851f, 0.0003393696097191423f, 0.02617994323372841f);
-            if (func_00283C80(F(object, 0xF8), yaw) < 0.001f) {
+            if (FastDiffRots(F(object, 0xF8), yaw) < 0.001f) {
                 object[0xA8] = 0xFF; object[0x20] = object[0x20] == 5 ? 6 : 2;
                 F(context, 0x2B0) = 0.0f;
             }
@@ -326,7 +326,7 @@ void func_L01_003B9F30(unsigned char *object)
             func_002ACB48(target.v, 0.5f); target.v[2] = surface;
             rate = func_002A7878(2.0f, 3.0f); i = func_002A77E0(6);
             child = func_002C19D8(&target, rate, 13000.0f, D_L01_001AFE18, ((u32)(i+20)<<24)|0x5060U);
-            if (child) child[9] = func_00283CF0(16.0f)+32;
+            if (child) child[9] = FloatToInt(16.0f)+32;
         }
         if (P(context, 0x2AC)) { func_L00_002D7140(P(context, 0x2AC)); P(context, 0x2AC) = 0; }
         break;
@@ -354,9 +354,9 @@ void func_L01_003B9F30(unsigned char *object)
         if (object[0x20] != 6 && object[0x20] != 0 && !func_002A77E0(49)) {
             rate = func_002A7878(3.0f, 5.0f); i = func_002A77E0(6);
             child = func_002C19D8(object+0x10, rate, 13000.0f, D_L01_001AFE18, ((u32)(i+20)<<24)|0x5060U);
-            if (child) child[9] = func_00283CF0(16.0f)+32;
+            if (child) child[9] = FloatToInt(16.0f)+32;
         }
-        func_00282CF0(&direction, object+0x10, &old_position);
+        FastVecSub(&direction, object+0x10, &old_position);
         if (surface-0.2f < F(object, 0x18)) func_002AD6F0(context+0x50, &direction, object+0xF0, object+0xF0);
     }
     func_002B0990(object, (float *)(context+0x300), 2.5f, 4, 1);

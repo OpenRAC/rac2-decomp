@@ -11,8 +11,8 @@ void func_L00_002B35A0(void)
     float f;
     *(float *)(p+0x1458)=*(float *)(p+0x1a0);
     qcopy_nc(p+0x1440,p+0x190);
-    func_00282978(p+0x146c);
-    func_00282978(p+0x146e);
+    FastDecTimer(p+0x146c);
+    FastDecTimer(p+0x146e);
     f=1.0f;
     if(p[0x22b4]==0) {
         if(p[0x1457]==0) {

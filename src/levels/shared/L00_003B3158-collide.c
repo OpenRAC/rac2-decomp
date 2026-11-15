@@ -27,13 +27,13 @@ void func_L00_003B39D0(CollisionObject *object)
         if(D_L00_001A8FF0[0]) {
             float dot;
             char *vector=data+0x30;
-            func_00282CF0(normal,D_00189E20.origin,position);
-            func_00282F20(normal,normal,1.0f);
-            dot=func_00282DB0(normal,(float *)vector);
-            func_00282D30(projection,normal,dot);
-            func_00282CF0(remaining,vector,projection);
+            FastVecSub(normal,D_00189E20.origin,position);
+            vec_scale_to_length(normal,normal,1.0f);
+            dot=FastVecDot(normal,(float *)vector);
+            FastVecScale(projection,normal,dot);
+            FastVecSub(remaining,vector,projection);
             func_00283028(vector,remaining,&D_L00_001BF230[1]);
-            func_00282CC0(vector,vector,projection);
+            FastVecAdd(vector,vector,projection);
         } else {
             float vertical=*(float *)(data+0x38);
             *(float *)(data+0x38)=0;

@@ -44,7 +44,7 @@ typedef struct SpawnObject {
 char *func_L16_00406080(float size, char *position, int trigger, int kind, int red, int green, int blue, int enabled, int flags, int extra, int control)
 {
     Vector128 direction[1], up[1], sphere[1], difference[1];
-    char *object = func_0029EFD0(0xec1);
+    char *object = CreateMoby(0xec1);
     SpawnState *state;
     SpawnObject *m;
     char *camera;
@@ -58,13 +58,13 @@ char *func_L16_00406080(float size, char *position, int trigger, int kind, int r
         qcopy(object + 0x10, position);
         *(float *)(object + 0x1c) = 1.0f;
         camera = (char *)D_L16_001B99C0.f140;
-        func_00282CF0(direction, camera, object + 0x10);
-        func_00282F20(direction, direction, 1.0f);
+        FastVecSub(direction, camera, object + 0x10);
+        vec_scale_to_length(direction, direction, 1.0f);
         func_002AFFD8(object + 0x10, (char *)up, 1);
         qcopy(object + 0xc0, direction);
-        func_00282DD8(object + 0xd0, object + 0xc0, up);
-        func_00282F20(object + 0xd0, object + 0xd0, 1.0f);
-        func_00282DD8(object + 0xe0, object + 0xd0, object + 0xc0);
+        FastVecCross(object + 0xd0, object + 0xc0, up);
+        vec_scale_to_length(object + 0xd0, object + 0xd0, 1.0f);
+        FastVecCross(object + 0xe0, object + 0xd0, object + 0xc0);
         m->forward[3] = m->right[3] = m->up[3] = 0.0f;
         /* Both countdowns start together. */
         state->timer = state->life = 60;
@@ -84,16 +84,16 @@ char *func_L16_00406080(float size, char *position, int trigger, int kind, int r
         if (func_00283DB8(sphere, 128.0f) == 1) {
             state->delay = 10;
             state->fade = 0.1f;
-            if (func_00282E48(position, camera) < 48.0f && trigger != 0) {
+            if (fast_vec_dist(position, camera) < 48.0f && trigger != 0) {
                 char *manager = camera - 0x140;
                 *(int *)(manager + 0x16c) = 0;
                 *(volatile float *)(manager + 0x160) = 0.075f;
                 *(volatile int *)(manager + 0x168) = 40;
             }
             if (state->flags != 0) {
-                func_00282CF0(difference, object + 0x10, D_L16_001B99C0.f140);
-                func_00282F20(difference, difference, 1.0f);
-                angle = func_002831B0(func_00282DB0(difference, (char *)&D_L16_001B99C0 + 0x370));
+                FastVecSub(difference, object + 0x10, D_L16_001B99C0.f140);
+                vec_scale_to_length(difference, difference, 1.0f);
+                angle = func_002831B0(FastVecDot(difference, (char *)&D_L16_001B99C0 + 0x370));
                 if (1.5707963705f - angle < 0.4537856579f)
                     state->flags = 1;
                 else

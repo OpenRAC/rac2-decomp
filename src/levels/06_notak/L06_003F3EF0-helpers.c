@@ -15,7 +15,7 @@ char *func_L06_003F3EF0(char *owner, TI128 *position, TI128 *motion, int field1a
     u8 byte1c = (u8)field1c;
     u8 byte1a = (u8)field1a;
 
-    created = (char *)func_0029EFD0(0x75E);
+    created = (char *)CreateMoby(0x75E);
     if (created != 0) {
         record = *(char **)(created + 0x68);
         *(char **)(record + 0x10) = owner;

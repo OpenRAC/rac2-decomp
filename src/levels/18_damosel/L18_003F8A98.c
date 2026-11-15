@@ -21,7 +21,7 @@ low:
 high:
         if (*(int *)(state+0x71C)!=-1 && *(s16 *)(state+0x76A)) {
             u8 *p=state+0x700;
-            func_L02_0032E998(obj+0x10,p,state+0x748,state+0x200,*(int *)(state+0x730),state+0x73C,state+0x740,0.0f,0.4f);
+            ComputeRegionRouteHeading(obj+0x10,p,state+0x748,state+0x200,*(int *)(state+0x730),state+0x73C,state+0x740,0.0f,0.4f);
             func_002B50E0(obj,p,*(float *)(state+0x748));
         } else func_002B4FF0(obj,state+0x700,*(float *)(state+0x720));
         if (obj[0x20]!=9 && obj[0x20]!=4 && obj[0x20]!=3) {

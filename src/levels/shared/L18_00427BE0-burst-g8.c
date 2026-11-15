@@ -24,15 +24,15 @@ int func_L18_00428738(u8 *object)
     switch (*(short *)(object + 0xAA)) {
     case 0xEC0:
         if (object[0xBC] != 1) {
-            if (func_00282E80(object + 0x10, state + 0x220) < D_L18_001B1270)
+            if (vec_distance_xy(object + 0x10, state + 0x220) < D_L18_001B1270)
                 func_002B5258(object);
             else func_L01_00321178(object, state + 0x220);
         } else {
             if (D_00138320[1] & 0x80) *(u16 *)(state + 0x392) = D_L18_001B1240;
-            func_00282978((short *)(state + 0x392));
+            FastDecTimer((short *)(state + 0x392));
         }
         if (*(float *)(object + 0x18) < *(float *)(state + 0x90)) {
-            func_002A6C58(object, 0, 3);
+            SetDeathBits(object, 0, 3);
             changed = 1;
             func_002A7750(object, 12, -1);
         }
@@ -100,7 +100,7 @@ int func_L18_00428738(u8 *object)
         }
         break;
     default:
-        func_0026FEB8(D_L18_001B1360);
+        STUB_printf(D_L18_001B1360);
         break;
     }
     return changed;

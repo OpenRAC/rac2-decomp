@@ -57,7 +57,7 @@ void func_L00_003E7E40(unsigned char *object, const unsigned char *info, float o
         from[2] = 0.0f;
         from[2] = func_002A7878(D_L00_001B0680_gp, D_L00_001B0684) * 0.01666666753590107f;
         from[3] = func_002A7878(0.1f, 0.2f);
-        angle = func_00283B98(angle, func_002A7878(120.0f, 240.0f) * 0.01745329424738884f);
+        angle = FastAddRotations(angle, func_002A7878(120.0f, 240.0f) * 0.01745329424738884f);
         speed = func_002A7878(D_L00_001B0678, D_L00_001B067C) * 0.01666666753590107f;
         to[0] = func_00283180(angle) * speed;
         to[1] = func_00283198(angle) * speed;
@@ -67,7 +67,7 @@ void func_L00_003E7E40(unsigned char *object, const unsigned char *info, float o
         size = func_002A7878(D_L00_001B0668_gp, D_L00_001B066C);
         to[3] = from[3] = size;
         original = *(const u32 *)info;
-        color = (int)func_00283D38((original & 0xFFFFFF) | 0x10000000, original, opacity);
+        color = (int)FastTweenColor((original & 0xFFFFFF) | 0x10000000, original, opacity);
         end_color = *(const int *)(info + 8);
         duration = func_002A7820(D_L00_001B0690_gp, D_L00_001B0694);
         func_002BAA28(&points[i], from, to, color, end_color, 5, duration, 10, D_L00_001B0664_gp);

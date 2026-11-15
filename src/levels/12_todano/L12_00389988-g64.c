@@ -35,7 +35,7 @@ void func_L12_00389988(char *obj) {
             frame.uv[j].x = texX[uv].x + *(float *)(ctx + 0x10);
             frame.uv[j].y = texY[uv].x;
         }
-        func_00280B90(&frame, 0, 0);
+        draw_world_quad(&frame, 0, 0);
     }
     func_00281DE8(&frame, D_L12_001AEF48 + 1, 0, 128);
     frame.colors[0] = frame.colors[1] = frame.colors[2] = frame.colors[3] = D_L12_001AEE38;
@@ -47,6 +47,6 @@ void func_L12_00389988(char *obj) {
             frame.uv[j].x = D_L12_001AEE98[uv].x + *(float *)(ctx + 0x10);
             frame.uv[j].y = D_L12_001AEE9C[uv].x;
         }
-        func_00280B90(&frame, 0, 0);
+        draw_world_quad(&frame, 0, 0);
     }
 }

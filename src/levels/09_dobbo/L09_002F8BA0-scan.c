@@ -81,7 +81,7 @@ void *func_L09_003FE3B0(int index, int *table)
             }
         }
         if (found == 0) {
-            float f = func_00282E80(D_L09_001B9A00, r + 0x10);
+            float f = vec_distance_xy(D_L09_001B9A00, r + 0x10);
             if (bestf < f) {
                 bestf = f;
                 best = r;
@@ -151,14 +151,14 @@ void func_L09_003E3288(unsigned char *object)
     }
 
     if (!D_0018C958.flag && D_001397C4 < 0 && !D_001A7B08[5]) {
-        if (func_002ACBC8(D_00189E20.position, s->region[0]))
+        if (IsPointInCuboid(D_00189E20.position, s->region[0]))
             func_00288E18(0xa02, 0x59);
     }
-    if (func_002ACBC8(D_00189E20.position, s->region[1]))
+    if (IsPointInCuboid(D_00189E20.position, s->region[1]))
         s->entered = 1;
     if (D_00189E20.field2294 == 0x39 && !D_00189E20.field1b8 && s->entered)
         D_001395B8[0x7a]++;
-    if (D_001A7A10[4] <= 0 && func_002ACBC8(D_00189E20.position, s->region[1])) {
+    if (D_001A7A10[4] <= 0 && IsPointInCuboid(D_00189E20.position, s->region[1])) {
         if (D_001395B8[0x7a] % 5 == 4 && !s->hint1c && D_00189E20.field2294 != 0x39) {
             if (D_0018C958.second >= 0)
                 func_00288E18(0x9fb, 0x52);
@@ -166,11 +166,11 @@ void func_L09_003E3288(unsigned char *object)
             D_001395B8[0x7a]++;
         }
     }
-    if (func_002ACBC8(D_00189E20.position, s->region[2])) {
+    if (IsPointInCuboid(D_00189E20.position, s->region[2])) {
         if (D_00189E20.field2294 == 0x39 && !D_00189E20.field1b8)
             D_001395B8[0x79]++;
     }
-    if (!D_001A7B08[7] && func_002ACBC8(D_00189E20.position, s->region[2])) {
+    if (!D_001A7B08[7] && IsPointInCuboid(D_00189E20.position, s->region[2])) {
         if (D_001395B8[0x79] % 5 == 4 && !s->hint18 && D_00189E20.field2294 != 0x39) {
             if (D_0018C958.third >= 0)
                 func_00288E18(0x9fe, 0x55);
@@ -178,7 +178,7 @@ void func_L09_003E3288(unsigned char *object)
             D_001395B8[0x79]++;
         }
     }
-    if (func_002ACBC8(D_00189E20.position, s->region[3])) {
+    if (IsPointInCuboid(D_00189E20.position, s->region[3])) {
         if ((!D_0018C750.flag || D_001A7390 - D_0018C750.time > 432000) &&
             D_001395B8[0x7d] < 3 && !s->hint14) {
             if (D_0018C958.first >= 0)

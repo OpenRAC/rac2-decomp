@@ -77,7 +77,7 @@ void func_L00_00370408(void) {
     func_L00_002A6DD0();
     func_002B9390();
     { int t; ++((SequenceState *)D_L00_001BCAC0)->frame; t = ++((SequenceState *)D_L00_001BCAC0)->time; if (t < 18) {
-        func_002AA2E8(&D_L00_001B18E0, 0.0f, 0.16666667f);
+        ApproachValue(&D_L00_001B18E0, 0.0f, 0.16666667f);
         if (D_L00_001B18E0 > 1.0f) D_L00_001B18E0 = 1.0f;
     }
     }
@@ -111,27 +111,27 @@ void func_L00_00370408(void) {
                 { int frame = ((SequenceState *)D_L00_001BCAC0)->frame >> 1;
                 object[0x41] = frame + 1;
                 object[0x40] = frame; }
-                func_0029F390(object);
-                *(float *)(object + 0x44) = func_00283CE0(((SequenceState *)D_L00_001BCAC0)->frame & 1) * 0.5f;
+                update_moby_animation_state(object);
+                *(float *)(object + 0x44) = IntToFloat(((SequenceState *)D_L00_001BCAC0)->frame & 1) * 0.5f;
                 if (complete && (((SequenceState *)D_L00_001BCAC0)->frame & 1)) *(float *)(object + 0x44) = 1.0f;
                 path = *(char **)(object + 0x68);
-                func_00282D30(first, path + object[0x40] * 16, 1.0f - *(float *)(object + 0x44));
-                func_00282D30(second, path + object[0x41] * 16, *(float *)(object + 0x44));
-                func_00282CC0(object + 0x10, first, second);
+                FastVecScale(first, path + object[0x40] * 16, 1.0f - *(float *)(object + 0x44));
+                FastVecScale(second, path + object[0x41] * 16, *(float *)(object + 0x44));
+                FastVecAdd(object + 0x10, first, second);
                 object[0x61] = 0xFF;
                 func_002A0F48(object);
-                if (*(short *)(object + 0xAA) == 0xD54) func_0027CFD0(func_002ECB70, object);
+                if (*(short *)(object + 0xAA) == 0xD54) func_0027CFD0(render_environment_mapped_object, object);
                 if (object[0x6F]) func_002A93B0(object);
                 id = *(short *)(object + 0xAA);
                 if (id == 0 || id == 0xF6B) func_L00_002D4E58(object, 0);
                 id = *(short *)(object + 0xAA);
-                if (id == 10 || id == 0x1159 || id == 0x57 || id == 0xD6B) func_L00_002A70F8(object);
+                if (id == 10 || id == 0x1159 || id == 0x57 || id == 0xD6B) update_moby_pulsing_glow_effects(object);
             }
         }
     }
     func_L00_002FCBE8();
-    func_002E4AC8();
-    func_002914B8();
+    UpdateSoundVoices();
+    UpdateLightingEnvironment();
     func_0029FFB8();
     func_002F52B8();
 }

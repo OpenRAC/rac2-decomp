@@ -42,7 +42,7 @@ void func_L03_003F11A0(u8 *entity) {
     s32 i, j;
     s32 *cbase;
     u64 mode;
-    packet.texture = func_0027C878(D_L03_001B0F38);
+    packet.texture = GetEffectTextureDescriptor(D_L03_001B0F38);
     packet.tag = 0xFF9000000260ULL;
     mode = (u64)D_L03_001B0F24 | ((u64)D_L03_001B0F28 << 2);
     mode |= (u64)D_L03_001B0F2C << 4;
@@ -76,7 +76,7 @@ void func_L03_003F11A0(u8 *entity) {
         for (j = 3; j >= 0; j--) {
             s32 uv = *uvindices;
             s32 color = indices[2];
-            func_00282D30(out, D_L03_002A0A30[*indices], D_L03_001B0F40);
+            FastVecScale(out, D_L03_002A0A30[*indices], D_L03_001B0F40);
             *u = D_L03_002A0EC8[uv][0] + *(f32 *)(state + 0x74);
             *v = D_L03_002A0EC8[uv][1];
             *c = D_L03_002A11E8[color];
@@ -87,6 +87,6 @@ void func_L03_003F11A0(u8 *entity) {
             v += 2;
             c++;
         }
-        func_00280B90(&packet, 0, 0);
+        draw_world_quad(&packet, 0, 0);
     }
 }

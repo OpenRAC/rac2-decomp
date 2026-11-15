@@ -103,13 +103,13 @@ void func_002FB1A0(void)
         D_0021F240.objectCount = 0;
         classes = D_001AD500;
         if (D_0021F240.rows.armor[D_0021F240.selected].value == 0) {
-            func_002F88D8(((char *)func_00288FB8(0x3188)));
+            func_002F88D8(((char *)GetLocalizedString(0x3188)));
         } else {
             if (D_001A7290[0] != D_0021F240.rows.armor[D_0021F240.selected].value)
                 func_002923C0((void *)D_0021F240.rows.armor[D_0021F240.selected].value);
-            func_002F88D8(((char *)func_00288FB8(D_001AD250[D_0021F240.rows.armor[D_0021F240.selected].value])));
+            func_002F88D8(((char *)GetLocalizedString(D_001AD250[D_0021F240.rows.armor[D_0021F240.selected].value])));
         }
-        facing = func_00283B98(func_00283248(D_001B5200.x, D_001B5200.y), 1.7453294f);
+        facing = FastAddRotations(func_00283248(D_001B5200.x, D_001B5200.y), 1.7453294f);
         while (classes.ids[D_0021F240.objectCount] >= 0) {
             moby = &D_0021F240.objects[D_0021F240.objectCount];
             func_0029F0C8(moby, classes.ids[D_0021F240.objectCount]);
@@ -126,14 +126,14 @@ void func_002FB1A0(void)
             moby->unk62 = 255;
             func_002A0F48(moby);
             moby->anim = 0; moby->anim2 = 0;
-            func_0029F390(moby);
+            update_moby_animation_state(moby);
             if (D_001A7290[0]) moby->rotZ = facing;
             if (D_001A7290[0] == 4 && moby->classId == 0x50A) moby->flags |= 1;
             if (D_001A7290[0] >= 3 && moby->classId == 0xA73) moby->flags |= 1;
             D_0021F240.objectCount++;
         }
         func_00282A60(D_001B1390, 0, 0x40);
-        func_0029F978(D_0021F240.objects, 24, D_001B1390);
+        AttachManipulator(D_0021F240.objects, 24, D_001B1390);
         D_001B1390[10] = D_001A7C94[0];
         D_001B1390[9] = D_001B1390[8] = D_001A7C94[0] * 0.97f;
         if (D_001A7290[0] < 3) {
@@ -142,7 +142,7 @@ void func_002FB1A0(void)
             func_00282A60(&D_001B2980[1], 0, 0x40);
             for (i = 0; i < 2; i++) {
                 PreviewTransform *transform = &D_001B2980[i];
-                func_0029F978(D_0021F240.objects, i + 22, transform);
+                AttachManipulator(D_0021F240.objects, i + 22, transform);
                 transform->m[8] = 0.01f;
                 transform->m[9] = 0.01f;
                 transform->m[10] = 0.01f;
@@ -225,7 +225,7 @@ void func_002FB1A0(void)
         if (value == 0xC00 || value == 0x200 || value == 12 || value == 3 || value == 0x40) {
             D_0021F240.x = 0.346f; D_0021F240.y = 0.3227f; D_0021F240.z = -0.7141964f;
         } else if (value == 0x30 || value == 0x2000) {
-            D_0021F240.x = 0.0225f; D_0021F240.y = 0.0239f; D_0021F240.z = func_00283BE0(-3.0301f, 1.5707964f);
+            D_0021F240.x = 0.0225f; D_0021F240.y = 0.0239f; D_0021F240.z = fast_subtract_rotations(-3.0301f, 1.5707964f);
         } else if (value == 0x1000 || value == 0x180) {
             D_0021F240.x = -0.587f; D_0021F240.y = 0.165f; D_0021F240.z = 0.4842037f;
         } else if (value == 0x1F0000) {
@@ -233,7 +233,7 @@ void func_002FB1A0(void)
             D_0021F240.y = (index & 1) ? 0.3203f : 0.165f;
             D_0021F240.z = (index & 1) ? -0.90089637f : -0.13629639f;
         } else if (value == 0xC000) {
-            D_0021F240.x = -0.5f; D_0021F240.y = -0.4f; D_0021F240.z = func_00283BE0(-2.1f, 1.5707964f);
+            D_0021F240.x = -0.5f; D_0021F240.y = -0.4f; D_0021F240.z = fast_subtract_rotations(-2.1f, 1.5707964f);
         } else {
             D_0021F240.x = 0; D_0021F240.y = 0; D_0021F240.z = -1.5707964f;
         }
@@ -266,9 +266,9 @@ void func_002FB1A0(void)
         }
         state = &D_0021F240;
         state->modelActive = 1; state->field9c = 0; state->resourceActive = 0; state->field90 = 0;
-        func_002F88D8(((char *)func_00288FB8(state->rows.equipment[state->selected].extra)));
+        func_002F88D8(((char *)GetLocalizedString(state->rows.equipment[state->selected].extra)));
         armor = ((unsigned)state->equipment >> 16) & 0x1F;
-        if (D_00152C00[12] != armor) func_002926B8(armor);
+        if (D_00152C00[12] != armor) LoadDiscTableTexture(armor);
     } else if (mode == 0) {
         D_0021F240.field750 = 0;
         if (D_0021F240.rows.item[D_0021F240.selected].kind == 1) {
@@ -291,9 +291,9 @@ void func_002FB1A0(void)
                 case 12: case 14: case 17: case 18: case 53: special = 1;
                 }
                 func_00288870(&info, D_0021F240.rows.item[D_0021F240.selected].id, special ? 1 : 2);
-                func_002F88D8(((char *)func_00288FB8(info.text)));
+                func_002F88D8(((char *)GetLocalizedString(info.text)));
             } else {
-                func_002F88D8(((char *)func_00288FB8((D_00139568[D_0021F240.rows.item[D_0021F240.selected].id] + D_00239BA0)->text)));
+                func_002F88D8(((char *)GetLocalizedString((D_00139568[D_0021F240.rows.item[D_0021F240.selected].id] + D_00239BA0)->text)));
             }
             func_002B7CE0(1);
             state = &D_0021F240;
@@ -302,7 +302,7 @@ void func_002FB1A0(void)
         }
     } else if (mode == 1) {
         if (D_0021F240.count) {
-            func_002F88D8(((char *)func_00288FB8(D_001A8B00[D_0021F240.rows.ammo[D_0021F240.selected][0]])));
+            func_002F88D8(((char *)GetLocalizedString(D_001A8B00[D_0021F240.rows.ammo[D_0021F240.selected][0]])));
             func_002B7CE0(1);
             func_00294BC8(D_0021F240.rows.ammo[D_0021F240.selected][3], D_0021F240.buffer);
             D_0021F240.resourceActive = 1; D_0021F240.previous = D_0021F240.selected; D_0021F240.modelActive = 0;

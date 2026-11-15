@@ -57,9 +57,9 @@ void func_L07_00410700(u8 *a0, s32 group)
     qzero_nc(w);
     origin = &D_L07_001B1810;
     w[2] = func_00283248(D_00189E20[0x20] - D_L07_001B1810, D_00189E20[0x21] - D_L07_001B1814);
-    r = func_00282E80(t, origin);
+    r = vec_distance_xy(t, origin);
     w[1] = func_00283248(r, D_L07_001B1818 - t[2]);
-    func_00335438(origin, w, 1, 0, 0);
+    SetCamera5Pose(origin, w, 1, 0, 0);
     func_L07_004106B8(a0);
     for (p = D_L07_001A9014[group];
          p != 0 && ((s16)p[-1] >= 0 || p == D_L07_001A9014[group]) &&

@@ -162,7 +162,7 @@ void func_L12_003E1638(u8 *o) {
     if(!o[0x20]) {
         *(short *)(*(u8 **)(o+0x24)+0x46)=5;
         *(u16 *)(o+0x34)|=0x1000;
-        d[0x48]=func_00283CF0(15.0f);d[0x4A]=func_00283CF0(6.0f);
+        d[0x48]=FloatToInt(15.0f);d[0x4A]=FloatToInt(6.0f);
         d[0x29]=1;
         d[0x70]=8; *(int *)(d+0xA8)=3; d[0x71]=11; d[0x72]=11;
         d[0x76]=13; d[0x77]=14;
@@ -192,7 +192,7 @@ void func_L12_003E1638(u8 *o) {
             *(u16 *)(o+0x34)=(*(u16 *)(o+0x34)|0x41)&0xEFFF;
         }
     }
-    if(o[0x31] && func_00282E48(o+0x10,D_L12_001B9E00)<24) {func_002A93B0(o);o[0x6F]=22;}
+    if(o[0x31] && fast_vec_dist(o+0x10,D_L12_001B9E00)<24) {func_002A93B0(o);o[0x6F]=22;}
     if(func_002B0ED8(o,d+0x60,0)) func_L12_003E1AA8(o);
     *(short *)(d+0x364)=func_002B3BA8(o,-1,0,0,*(float *)(d+0x36C),3);
     if(*(u8 **)(d+0x120)) *(u8 **)(d+0x368)=*(u8 **)(d+0x120); else *(u8 **)(d+0x368)=D_0018C0B0;
@@ -200,7 +200,7 @@ void func_L12_003E1638(u8 *o) {
         float range=D_L12_001B0A40;
         if(*(int *)(d+0x130)!=-1) {
             u8 *zone=D_L12_001FEAC0[*(int *)(d+0x130)];
-            if(!func_002A8AF0(*(u8 **)(d+0x120)+0x10,zone+0x10,*(int *)zone,range)) *(short *)(d+0x364)=0;
+            if(!point_in_path_xy(*(u8 **)(d+0x120)+0x10,zone+0x10,*(int *)zone,range)) *(short *)(d+0x364)=0;
         }
     }
     func_002B0990(o,d+0x3C0,1,1,D_L12_001B0A40);
@@ -238,10 +238,10 @@ void func_L12_003EB470(u8 *o) {
         func_002A7750(o, 1, -1);
         break;
     case 1:
-        if (func_002ACBC8(D_00189EA0, *(int *)d) && *(int *)(D_00189EA0 + 0x540)
+        if (IsPointInCuboid(D_00189EA0, *(int *)d) && *(int *)(D_00189EA0 + 0x540)
             && !D_0018C958[121].count)
             func_00288E18(0xA22, 121);
-        if (func_002ACBC8(D_00189EA0, *(int *)(d + 4)) && !D_001A7AF8[0x33]) {
+        if (IsPointInCuboid(D_00189EA0, *(int *)(d + 4)) && !D_001A7AF8[0x33]) {
             if (D_0018C958[92].count) {
                 u32 now = D_001A7390;
                 u32 old = D_0018C958[92].time;
@@ -258,7 +258,7 @@ void func_L12_003EB470(u8 *o) {
                 D_0018C958[92].levels = (D_0018C958[92].levels | (1u << D_001A79F0[0])) | 0x80000000u;
             }
         }
-        if (func_002ACBC8(D_00189EA0, *(int *)(d + 8))) {
+        if (IsPointInCuboid(D_00189EA0, *(int *)(d + 8))) {
             u8 *p = D_L12_001B2E9C + (*(int *)(d + 0xC) << 8);
 
             if (p && *(s16 *)(p + 0xAA) == 0xFB8 && p[0x20] != 254 && p[0x20] != 253) {

@@ -118,8 +118,8 @@ void func_L00_0040BA30(BeamMoby *self)
     func_0029FCC0(heroNode, 6, vars->left);
     func_0029FCC0(heroNode, 7, vars->right);
     qcopy(old20, self->pos);
-    func_00282CF0(dir, vars->end, &D_00189E20.b[0x2010]);
-    func_00282F20(dir, dir, 1.0f);
+    FastVecSub(dir, vars->end, &D_00189E20.b[0x2010]);
+    vec_scale_to_length(dir, dir, 1.0f);
     ang = func_00283248(*(float *)(D_00189E20.ptr[0x18D0 / 4] + 0x10) - D_00189E20.f[0x80 / 4],
                         *(float *)(D_00189E20.ptr[0x18D0 / 4] + 0x14) - D_00189E20.f[0x84 / 4]);
     if (ang < 1.5707964897155762f)
@@ -128,9 +128,9 @@ void func_L00_0040BA30(BeamMoby *self)
         r = func_002A7878(0.0f, 0.7853982448577881f);
     qcopy(vars->aim, &D_0018BE30);
     vars->aim[2] -= D_L00_001B1008;
-    func_00282CF0(vars->aim, vars->aim, &D_0018BE30);
+    FastVecSub(vars->aim, vars->aim, &D_0018BE30);
     func_002ACEC0(vars->aim, vars->aim, dir, r);
-    func_00282CC0(vars->aim, &D_0018BE30, vars->aim);
+    FastVecAdd(vars->aim, &D_0018BE30, vars->aim);
     t = vars->target;
     if (t != 0) {
         if (t->state == 0xFE) {
@@ -138,20 +138,20 @@ void func_L00_0040BA30(BeamMoby *self)
         } else if (t->state == 0xFD) {
             vars->target = 0;
         } else {
-            func_00282CF0(v40, t->pos, self->pos);
-            if (func_00282DF0(v40) != 0.0f) {
+            FastVecSub(v40, t->pos, self->pos);
+            if (FastVecLength(v40) != 0.0f) {
                 char *target = func_002AB1F0(vars->target);
                 if (target != 0) {
-                    func_00282D30(v50, mtx, *(float *)(target + 0x10));
-                    func_00282CC0(v40, v40, v50);
-                    func_00282DF0(v40);
+                    FastVecScale(v50, mtx, *(float *)(target + 0x10));
+                    FastVecAdd(v40, v40, v50);
+                    FastVecLength(v40);
                 }
             } else {
                 vars->target = 0;
             }
         }
     }
-    ang = func_00283C80(func_00283248(*(float *)(D_00189E20.ptr[0x18D0 / 4] + 0x10) - D_00189E20.f[0x80 / 4],
+    ang = FastDiffRots(func_00283248(*(float *)(D_00189E20.ptr[0x18D0 / 4] + 0x10) - D_00189E20.f[0x80 / 4],
                                       *(float *)(D_00189E20.ptr[0x18D0 / 4] + 0x14) - D_00189E20.f[0x84 / 4]),
                         D_00189E20.f[0x98 / 4]);
     switch (self->state) {
@@ -164,7 +164,7 @@ void func_L00_0040BA30(BeamMoby *self)
             hit.f20 = 1;
             hit.f1C = tbl[D_00139568.b[0x49]].f70;
             qcopy(hit.v, vars->dir);
-            func_00282F20(&hit, &hit, 0.2f);
+            vec_scale_to_length(&hit, &hit, 0.2f);
             hit.b18 = 1;
             hit.b19 = 1;
             hit.v[3] = 5627.9248046875f;
@@ -175,7 +175,7 @@ void func_L00_0040BA30(BeamMoby *self)
             hit.f20 = 1;
             hit.f1C = tbl[D_00139568.b[9]].f70;
             qcopy(hit.v, vars->dir);
-            func_00282F20(&hit, &hit, 0.2f);
+            vec_scale_to_length(&hit, &hit, 0.2f);
             hit.b18 = 1;
             hit.b19 = 1;
             hit.v[3] = 5627.9248046875f;
@@ -184,7 +184,7 @@ void func_L00_0040BA30(BeamMoby *self)
         if (D_L00_001B1000 * 0.01745329424738884f < ang) {
             if (vars->enabled == 0)
                 { func_0029F338(self); return; }
-            if (func_002761F8(&D_0018BE30, vars->end, 0, D_0018BE30.i[0x280 / 4], &hit) == 0)
+            if (CollLine(&D_0018BE30, vars->end, 0, D_0018BE30.i[0x280 / 4], &hit) == 0)
                 { func_0029F338(self); return; }
             if (D_L00_001BF200.i[0x1C / 4] > 0)
                 { func_0029F338(self); return; }
@@ -197,7 +197,7 @@ void func_L00_0040BA30(BeamMoby *self)
             self->flags |= 0x41;
             vars->timer = D_L00_001B0FE4;
         } else {
-            if (func_002761F8(&D_0018BE30, vars->end, 0, D_0018BE30.i[0x280 / 4], &hit) == 0)
+            if (CollLine(&D_0018BE30, vars->end, 0, D_0018BE30.i[0x280 / 4], &hit) == 0)
                 { func_0029F338(self); return; }
             if (D_L00_001BF200.i[0x1C / 4] > 0)
                 { func_0029F338(self); return; }
@@ -210,9 +210,9 @@ void func_L00_0040BA30(BeamMoby *self)
             self->flags |= 0x41;
             vars->timer = D_L00_001B0FE4;
         }
-        func_00282CF0(v40, vars->end, &D_0018BE30);
-        func_00282F20(v40, v40, func_00282DF0(v40) * 0.5f);
-        func_00282CC0(v40, &D_0018BE30, v40);
+        FastVecSub(v40, vars->end, &D_0018BE30);
+        vec_scale_to_length(v40, v40, FastVecLength(v40) * 0.5f);
+        FastVecAdd(v40, &D_0018BE30, v40);
         if (D_L00_001B1000 * 0.01745329424738884f < ang) {
             if (vars->enabled == 0)
                 goto bounds;
@@ -234,13 +234,13 @@ void func_L00_0040BA30(BeamMoby *self)
                 for (i = 0; i < 10; i++) {
                     char *p;
                     s1 = func_002A7878(0.0f, 1.0f);
-                    func_00282CF0(v40, vars->end, vars->left);
-                    func_00282F20(v40, v40, s1 * func_00282DF0(v40));
-                    func_00282CC0(v40, vars->left, v40);
+                    FastVecSub(v40, vars->end, vars->left);
+                    vec_scale_to_length(v40, v40, s1 * FastVecLength(v40));
+                    FastVecAdd(v40, vars->left, v40);
                     s2 = func_002A7878(0.0f, 1.0f);
-                    func_00282CF0(v50, vars->end, vars->right);
-                    func_00282F20(v50, v50, s2 * func_00282DF0(v50));
-                    func_00282CC0(v50, vars->right, v50);
+                    FastVecSub(v50, vars->end, vars->right);
+                    vec_scale_to_length(v50, v50, s2 * FastVecLength(v50));
+                    FastVecAdd(v50, vars->right, v50);
                     n = func_002A77E0(0xFF);
                     s3 = func_002A7878(0.35f, 0.5f);
                     p = func_002C65A0(v40, D_L00_001A8F20, D_L00_001B0FEC, D_L00_001B0FF0, n, 0x30, 0,
@@ -255,13 +255,13 @@ void func_L00_0040BA30(BeamMoby *self)
                 for (j = 0; j < 20; j++) {
                     char *p;
                     s4 = func_002A7878(0.0f, 1.0f);
-                    func_00282CF0(v40, vars->end, vars->left);
-                    func_00282F20(v40, v40, s4 * func_00282DF0(v40));
-                    func_00282CC0(v40, vars->left, v40);
+                    FastVecSub(v40, vars->end, vars->left);
+                    vec_scale_to_length(v40, v40, s4 * FastVecLength(v40));
+                    FastVecAdd(v40, vars->left, v40);
                     s5 = func_002A7878(0.0f, 1.0f);
-                    func_00282CF0(v50, vars->end, vars->right);
-                    func_00282F20(v50, v50, s5 * func_00282DF0(v50));
-                    func_00282CC0(v50, vars->right, v50);
+                    FastVecSub(v50, vars->end, vars->right);
+                    vec_scale_to_length(v50, v50, s5 * FastVecLength(v50));
+                    FastVecAdd(v50, vars->right, v50);
                     n = func_002A77E0(0xFF);
                     s6 = func_002A7878(0.2f, 0.35f);
                     v40[0] += func_002A78D8(0.0f, 0.02f);
@@ -292,13 +292,13 @@ void func_L00_0040BA30(BeamMoby *self)
                 if (vars->target != 0 && D_L00_001B19C8 % 5 == 0) {
                     char *p;
                     s7 = func_002A7878(0.0f, 1.0f);
-                    func_00282CF0(v40, vars->end, vars->left);
-                    func_00282F20(v40, v40, s7 * func_00282DF0(v40));
-                    func_00282CC0(v40, vars->left, v40);
+                    FastVecSub(v40, vars->end, vars->left);
+                    vec_scale_to_length(v40, v40, s7 * FastVecLength(v40));
+                    FastVecAdd(v40, vars->left, v40);
                     s8 = func_002A7878(0.0f, 1.0f);
-                    func_00282CF0(v50, vars->end, vars->right);
-                    func_00282F20(v50, v50, s8 * func_00282DF0(v50));
-                    func_00282CC0(v50, vars->right, v50);
+                    FastVecSub(v50, vars->end, vars->right);
+                    vec_scale_to_length(v50, v50, s8 * FastVecLength(v50));
+                    FastVecAdd(v50, vars->right, v50);
                     p = func_002C65A0(v40, D_L00_001A8F20, 0x1E, 0x202080, 0, 0x40, 0,
                                       2100.0f, 126000.0078125f, 0.0f, 0);
                     if (p != 0)
@@ -324,7 +324,7 @@ void func_L00_0040BA30(BeamMoby *self)
             }
         }
         func_L00_0040B398(self);
-        ref_L00_0040BA30_00(func_L00_0040C7D8, self);
+        ref_L00_0040BA30_00(DrawBeamSegmentsOrRibbons, self);
         break;
     }
 bounds:

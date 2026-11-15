@@ -80,7 +80,7 @@ int func_L01_002F1588(void)
     oldProjection = *(float *)(hud_camera() + 0xB0);
     *(float *)(hud_camera() + 0xB0) = 0.6200000047683716f;
     span = 375.0f;
-    func_0027AB40();
+    UpdateViewContext();
     rounding = 0.5f;
     one = 1;
     entry = 0x8710;
@@ -101,15 +101,15 @@ int func_L01_002F1588(void)
     height = (float)y;
     func_00300A00(node, 0x55F0C070, 250.0f, height, unit, unit, zero);
     source.first = (int)0x800050C0;
-    source.second = func_00283D38(0x800050C0, 0x80C04000, D_L01_001A90C4[0]);
+    source.second = FastTweenColor(0x800050C0, 0x80C04000, D_L01_001A90C4[0]);
     colors = source;
-    x2 = func_00283CF0(190.0f + func_00283CE0(198) * D_L01_001A90C4[0]);
+    x2 = FloatToInt(190.0f + IntToFloat(198) * D_L01_001A90C4[0]);
     height = D_L01_001B2DC4[0];
     top = hud_round(374.0f, height, rounding, one);
     bottom = hud_round(388.0f, height, rounding, one);
     func_0027EAE8(190, top, x2, bottom, 0, &colors);
     if (D_L01_001A90CC[0]) {
-        int icon = func_0028E588(0xEAA7, D_L01_001A90CC[0] - 1);
+        int icon = GetIconFrame(0xEAA7, D_L01_001A90CC[0] - 1);
         height = D_L01_001B2DC4[0];
         /* This caller passes `one`, a local holding 1, as `active` (allowed by owner ruling). */
         top = label_y((void *)icon, 352.0f, height, rounding, one);
@@ -117,6 +117,6 @@ int func_L01_002F1588(void)
         func_0028E868(icon, 139, top, 43, bottom, 128);
     }
     *(float *)(hud_camera() + 0xB0) = oldProjection;
-    func_0027AB40();
+    UpdateViewContext();
     return D_L01_001A90D0[0];
 }

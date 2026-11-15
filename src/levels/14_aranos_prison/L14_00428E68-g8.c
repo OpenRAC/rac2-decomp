@@ -113,17 +113,17 @@ void func_L14_00428E68(char *self)
             if (W(s, 0x2B8) == -1)
                 break;
             if (W(s, 0x31C) && HERO->position[2] + 2.0f < F(self, 0x18) &&
-                func_00282E80(self + 0x10, D_00189EA0) < 16.0f) {
+                vec_distance_xy(self + 0x10, D_00189EA0) < 16.0f) {
                 func_002A7750(self, 2, -1);
                 break;
             }
             if (!W(s, 0x31C) && F(self, 0x18) < HERO->position[2] - 2.0f &&
-                func_00282E80(self + 0x10, D_00189EA0) < 8.0f)
+                vec_distance_xy(self + 0x10, D_00189EA0) < 8.0f)
                 func_002A7750(self, 3, -1);
         } else {
             angle = func_00283248(HERO->position[0] - F(self, 0x10),
                                  HERO->position[1] - F(self, 0x14));
-            if (func_00283C80(F(self, 0xF8), angle) > 0.7853982449f)
+            if (FastDiffRots(F(self, 0xF8), angle) > 0.7853982449f)
                 func_002A7750(self, 4, -1);
         }
         break;
@@ -133,7 +133,7 @@ void func_L14_00428E68(char *self)
         angle = func_00283248(HERO->position[0] - F(self, 0x10),
                              HERO->position[1] - F(self, 0x14));
         func_L01_00322288(self, angle);
-        if (func_00283C80(F(self, 0xF8), angle) < 0.05235988274f)
+        if (FastDiffRots(F(self, 0xF8), angle) < 0.05235988274f)
             func_002A7750(self, 1, -1);
         break;
     case 2:

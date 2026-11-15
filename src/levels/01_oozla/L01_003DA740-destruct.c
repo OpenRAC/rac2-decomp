@@ -76,19 +76,19 @@ void func_L01_0040F958(DestructionMoby *object)
         object->hit_slot = 255;
         break;
     case 2:
-        func_00282D30(velocity, object->rot_row1, -0.06666667014360428f);
+        FastVecScale(velocity, object->rot_row1, -0.06666667014360428f);
         if (object->visible && D_L01_001B2090_gp[0] < 0.9f && D_L01_001B208C_gp[0] < 0.9f &&
             D_L01_001B3468 < D_L01_001B15E0[0]) {
             func_002B0A68(object, 0x3F, velocity, 255, 1.0f, 3.0f, 2.0f, 5.0f);
             tilt.q = 0;
             tilt.f[1] = -0.015000000596046448f;
             func_L00_00324F18(object, position, D_L01_001B1640_gp[0], D_L01_001B1644[0], D_L01_001B1648[0]);
-            func_00283098(tilt.f, tilt.f, object->rot_row0);
+            matrix_mul_vec3(tilt.f, tilt.f, object->rot_row0);
             func_L01_002E1680(position, tilt.f, 10, 0x3F7FFF3F, 0, 0.0066666672937572f, 1.0f, 1.0299999713897705f);
         } else
             func_002B0A68(object, 2, velocity, 255, 1.0f, 3.0f, 2.0f, 5.0f);
         func_L00_00326110(object, 1, 0.0f);
-        func_002E5CF8(0, 0, object);
+        PlayMobySound(0, 0, object);
         func_002A7750(object, 3, -1);
         break;
     case 3:

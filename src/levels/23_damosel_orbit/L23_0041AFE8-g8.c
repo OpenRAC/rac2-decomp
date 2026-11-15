@@ -36,13 +36,13 @@ void func_L23_0041AFE8(char *obj, TI128 *p1, TI128 *p2, TI128 *out, int *handles
 
     qcopy(&loc[0], p2);
     func_L23_00418650((char *)&loc[0], D_L23_001B157C);
-    func_00282CF0((float *)&loc[1], (float *)&loc[0], (float *)p1);
-    func_00282F20((float *)&loc[1], (float *)&loc[1], D_L23_001B378C);
+    FastVecSub((float *)&loc[1], (float *)&loc[0], (float *)p1);
+    vec_scale_to_length((float *)&loc[1], (float *)&loc[1], D_L23_001B378C);
     qcopy(&loc[4], p1);
     qcopy(&loc[2], p1);
     func_L23_00418650((char *)&loc[2], D_L23_001B157C);
     for (k = 0; k < 3; k++) {
-        func_00282CC0((float *)&loc[3], (float *)&loc[4], (float *)&loc[1]);
+        FastVecAdd((float *)&loc[3], (float *)&loc[4], (float *)&loc[1]);
         func_L23_00418650((char *)&loc[3], D_L23_001B157C);
         qcopy(out, &loc[3]);
         if (*handles == 0) {
@@ -51,7 +51,7 @@ void func_L23_0041AFE8(char *obj, TI128 *p1, TI128 *p2, TI128 *out, int *handles
         handles++;
         qcopy(&loc[2], &loc[3]);
         prev = (char *)out;
-        func_00282CC0((float *)&loc[4], (float *)&loc[4], (float *)&loc[1]);
+        FastVecAdd((float *)&loc[4], (float *)&loc[4], (float *)&loc[1]);
         out++;
     }
 }

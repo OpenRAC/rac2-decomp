@@ -18,7 +18,7 @@ extern float D_L20_001B1F98 __attribute__((sda));
 
 
 char *func_L20_0043F318(char *arg0, char *arg1, int arg2, int arg3, int arg4, float f) {
-    char *obj = (char *)func_0029EFD0(0x119D);
+    char *obj = (char *)CreateMoby(0x119D);
     char *state;
     float v[4] __attribute__((aligned(16)));
     float r;
@@ -30,9 +30,9 @@ char *func_L20_0043F318(char *arg0, char *arg1, int arg2, int arg3, int arg4, fl
     }
     func_002B37E8(obj, arg0);
     qcopy(obj + 0x10, arg1);
-    func_00282CF0(v, (void *)(obj + 0x10), arg0 + 0x10);
+    FastVecSub(v, (void *)(obj + 0x10), arg0 + 0x10);
     state = *(char **)(obj + 0x68);
-    *(float *)(state + 0x40) = func_00282E20(v);
+    *(float *)(state + 0x40) = vec_length_xy(v);
     *(float *)(state + 0x44) = func_00283248(v[0], v[1]);
     *(float *)(state + 0x5C) = *(float *)(arg0 + 0x18);
     r = func_002A7878(1.0f, 4.0f);

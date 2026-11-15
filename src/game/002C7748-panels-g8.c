@@ -86,29 +86,29 @@ void func_002CBC58(int mode)
     if (D_001AB91C) {
         void *page = state->page;
         if (page == D_00259018) {
-            func_0027C540(0); D_00210AD0(); func_0027C660(); return;
+            SetupGifPaging(0); D_00210AD0(); DoGifPaging(); return;
         }
         if (page == D_0025A738) {
-            func_0027C540(0); func_0028E458(); func_0029BF08(); func_0027C660(); return;
+            SetupGifPaging(0); func_0028E458(); func_0029BF08(); DoGifPaging(); return;
         }
         if (page == D_0025A498 && !D_001AB910) {
-            func_0027C540(0); func_0029C2D0(); func_0027C660();
+            SetupGifPaging(0); func_0029C2D0(); DoGifPaging();
         } else if (D_001F2840.page == (void *)D_0025A190 && !D_001AB910) {
-            func_0027C540(0); func_0029C340(); func_0027C660(); return;
+            SetupGifPaging(0); func_0029C340(); DoGifPaging(); return;
         } else if (D_001F2840.page == (void *)D_0025A058 && !D_001AB910) {
             ;
         }
     }
-    func_002FC560(0x47,0x5360B);
+    VU1_addGSregister(0x47,0x5360B);
     if (D_001F2840.field168) {
-        func_002A0250(); func_002A01C8(); func_002A01F0();
+        DrawMobysSetup(); func_002A01C8(); func_002A01F0();
     }
     if (D_001F2840.page) {
         panels = D_001F2840.page->panels;
         panels = (PanelCBC58 **)((char *)panels + none);
     }
     if ((D_00138180.flags&15)==15 && (D_00138180.pressed&15))
-        func_0026FEB8(D_001AB920);
+        STUB_printf(D_001AB920);
     for (j=0;j<14;j++) {
         StateCBC58 *st = &D_001F2840;
         if (D_001AA450[j]) {
@@ -123,7 +123,7 @@ void func_002CBC58(int mode)
         }
     }
     if ((D_00138180.flags&15)==15 && (D_00138180.pressed&15))
-        func_0026FEB8(D_001AB928);
+        STUB_printf(D_001AB928);
     for (pass=0;pass<2;pass++) {
         for (i=0;i<14;i++) {
             PanelCBC58 *p;
@@ -142,8 +142,8 @@ void func_002CBC58(int mode)
                 result=panels[i]->draw(panels[i]);
                 func_00280600();
             } else result=panels[i]->draw(panels[i]);
-            func_002FC560(0x42,0x8000000064L);
-            func_002FC560(0x47,0x43);
+            VU1_addGSregister(0x42,0x8000000064L);
+            VU1_addGSregister(0x47,0x43);
             if (result&1) continue;
             tw=1<<lw; th=1<<lh; left=0; right=tw; top=0; bottom=th;
             if (result&2) { right=w; bottom=h; }
@@ -161,10 +161,10 @@ void func_002CBC58(int mode)
                 else { top=bottom/2-h*bottom/(w*2); bottom-=top; }
             } else if (!(result&16)) continue;
             if (D_001AB92C)
-                func_0027E018(x,y,w,h,left,top,right-left,bottom-top,0x80808080L,D_001A7470);
+                DrawTexturedQuad(x,y,w,h,left,top,right-left,bottom-top,0x80808080L,D_001A7470);
         }
         if (D_001AB930 && !pass && D_001F2840.field168) {
-            func_002A0220(); func_002A0380(); func_002FC3C0(16); func_0029FEE0();
+            func_002A0220(); func_002A0380(); func_002FC3C0(16); PatchMobyGifs();
             D_001F2840.field168=0; D_001F2840.field16C=0;
         }
     }
@@ -176,9 +176,9 @@ void func_002CBC58(int mode)
         D_001F2840.fade+=delta;
     }
     if (D_001F2840.fade != 0.0f)
-        func_0027DDC0(0,0,0,func_00283CF0(D_001F2840.fade*128.0f));
-    func_002FC560(0x42,0x8000000044L);
-    func_002FC560(0x47,0x5360B);
+        func_0027DDC0(0,0,0,FloatToInt(D_001F2840.fade*128.0f));
+    VU1_addGSregister(0x42,0x8000000044L);
+    VU1_addGSregister(0x47,0x5360B);
     }
     }
 }

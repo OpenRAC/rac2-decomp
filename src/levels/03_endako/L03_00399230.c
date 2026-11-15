@@ -289,7 +289,7 @@ u8 *func_L03_003E18D8(char *owner, void *position, void *first, void *second,
     u8 *object;
     u8 *state;
 
-    object = func_0029EFD0(0xB1B);
+    object = CreateMoby(0xB1B);
     if (object != 0) {
         qcopy(object + 0x10, position);
         object[0x30] = *(u16 *)(object + 0x32) = 0xFF;

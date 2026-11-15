@@ -57,13 +57,13 @@ int func_L23_0041A038(char *object, char *target) {
     local.axis = 0;
     ((float *)&local.axis)[2] = 1.0f;
     ((float *)&local.axis)[3] = 1.0f;
-    func_00282D30(state + 0x4A0, (char *)&local.axis,
+    FastVecScale(state + 0x4A0, (char *)&local.axis,
         (float)D_L23_001B1440 * D_L23_001B1448 * D_L23_001B144C);
     func_0029FCC0(object, 42, (char *)&local.axis);
-    func_00282CF0((char *)&local.direction, target, (char *)&local.axis);
-    func_00282F20((char *)&local.direction, (char *)&local.direction, 1.0f);
-    D_L23_001B3728 = func_00282DB0((char *)&local.direction, (char *)&D_L23_001B3870);
-    D_L23_001B3784 = func_002761F8(D_L23_001B3860, D_L23_001B36C0, 16, D_0018C0B0, 0) == 0;
+    FastVecSub((char *)&local.direction, target, (char *)&local.axis);
+    vec_scale_to_length((char *)&local.direction, (char *)&local.direction, 1.0f);
+    D_L23_001B3728 = FastVecDot((char *)&local.direction, (char *)&D_L23_001B3870);
+    D_L23_001B3784 = CollLine(D_L23_001B3860, D_L23_001B36C0, 16, D_0018C0B0, 0) == 0;
     direction = (char *)&local.direction;
     speed = D_L23_001B1580 * 0.00029088825f;
     if (((unsigned char *)state)[0x404] && ((unsigned char *)state)[0x405]) {
@@ -72,16 +72,16 @@ int func_L23_0041A038(char *object, char *target) {
             if ((unsigned char)mode == 16) speed = D_L23_001B1584 * 0.00029088825f;
             else if ((unsigned)(mode - 13) < 3) speed = D_L23_001B1588 * 0.00029088825f;
         }
-        func_00282DD8((char *)&local.cross, direction, (char *)&D_L23_001B3870);
-        dot = func_00282DB0((char *)&local.cross, object + 0xD0);
+        FastVecCross((char *)&local.cross, direction, (char *)&D_L23_001B3870);
+        dot = FastVecDot((char *)&local.cross, object + 0xD0);
         angle = func_002831B0(dot);
         func_00283C28(angle + 1.5707964f);
         if (dot < 0.0f) *(float *)(state + 0x57C) = -speed;
         else *(float *)(state + 0x57C) = speed;
-        *(float *)(state + 0x578) = func_00283B98(*(float *)(state + 0x578), *(float *)(state + 0x57C));
-        if (((unsigned char *)state)[0x4B1] == 0) func_0029F978((unsigned char *)object, 39, (unsigned char *)state + 0x4B0);
-        func_00283898(state + 0x4C0, 1, *(float *)(state + 0x578));
-        *(float *)(state + 0x578) = func_00283BE0(*(float *)(state + 0x578), *(float *)(state + 0x57C) * 0.00029088825f);
+        *(float *)(state + 0x578) = FastAddRotations(*(float *)(state + 0x578), *(float *)(state + 0x57C));
+        if (((unsigned char *)state)[0x4B1] == 0) AttachManipulator((unsigned char *)object, 39, (unsigned char *)state + 0x4B0);
+        build_axis_rotation_quaternion(state + 0x4C0, 1, *(float *)(state + 0x578));
+        *(float *)(state + 0x578) = fast_subtract_rotations(*(float *)(state + 0x578), *(float *)(state + 0x57C) * 0.00029088825f);
         func_L23_0041BF18(object, 1.0f, 1.0f);
         return 1;
     }
@@ -90,9 +90,9 @@ int func_L23_0041A038(char *object, char *target) {
         *(float *)(state + 0x57C) = -(D_L23_001B158C * 0.00029088825f);
         if (*(float *)(state + 0x578) > 0.0f) {
             *(float *)(state + 0x578) += *(float *)(state + 0x57C);
-            if (((unsigned char *)state)[0x4B1] == 0) func_0029F978((unsigned char *)object, 39, (unsigned char *)state + 0x4B0);
-            func_00283898(state + 0x4C0, 1, *(float *)(state + 0x578));
-            *(float *)(state + 0x578) = func_00283BE0(*(float *)(state + 0x578), *(float *)(state + 0x57C) * 0.00029088825f);
+            if (((unsigned char *)state)[0x4B1] == 0) AttachManipulator((unsigned char *)object, 39, (unsigned char *)state + 0x4B0);
+            build_axis_rotation_quaternion(state + 0x4C0, 1, *(float *)(state + 0x578));
+            *(float *)(state + 0x578) = fast_subtract_rotations(*(float *)(state + 0x578), *(float *)(state + 0x57C) * 0.00029088825f);
             func_L23_0041BF18(object, -1.0f, -1.0f);
         }
     }

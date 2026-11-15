@@ -104,12 +104,12 @@ void func_L23_0041B9F0(unsigned char *moby) {
     func_L23_0041B968();
     func_00282948(&D_L23_001B3714);
     if (*(int *)(st + 0x60C) == -1 && *(char **)(st + 0x610) == 0) {
-        func_00282D30(tmp, moby + 0xE0, D_L23_001B16BC);
-        func_00282CC0(tmp, tmp, moby + 0x10);
+        FastVecScale(tmp, moby + 0xE0, D_L23_001B16BC);
+        FastVecAdd(tmp, tmp, moby + 0x10);
         qcopy(&D_L23_001B36E0, tmp);
         hit = func_002A9640(moby, 0x30000, 0);
         moby[0xA8] = 0xFF;
-        func_00282978(st + 0x26);
+        FastDecTimer(st + 0x26);
         if (hit != 0) {
             if (*(short *)(st + 0x26) != 0 || *(int *)(st + 0x604) != 0
                 || (*(int *)(hit + 0x20) == D_0018C0B0 && D_L23_001B1694 < 0)) {
@@ -126,7 +126,7 @@ void func_L23_0041B9F0(unsigned char *moby) {
                         float speed;
                         char *child;
 
-                        angle = func_00283B98(func_002A78D8(90.0f, 120.0f) * 0.017453294f,
+                        angle = FastAddRotations(func_002A78D8(90.0f, 120.0f) * 0.017453294f,
                                               D_L23_001BA500.f158);
                         speed = func_002A7878(2.0f, 4.0f) * 0.016666668f;
                         vec[0] = func_00283180(angle) * speed;
@@ -146,8 +146,8 @@ void func_L23_0041B9F0(unsigned char *moby) {
                 if (*(float *)(st + 0x20) <= 0.0f) {
                     func_002A7750(moby, 4, 0);
                     D_00189E20.f2294 = 0;
-                    func_L00_002AF7D0();
-                    func_L00_00310C88(D_00189E20.f2290, D_00189E20.f1870);
+                    cancel_hero_item_animation();
+                    release_moby_animation_slot(D_00189E20.f2290, D_00189E20.f1870);
                     D_00189E20.f187C = 0;
                     func_L22_002C9898(0, 1);
                     return;
@@ -164,8 +164,8 @@ void func_L23_0041B9F0(unsigned char *moby) {
             int k;
 
             func_0029FC20(moby, *(int *)(st + 0x60C) + 1, mtx);
-            func_00282D30(tmp, (char *)(mtx + 4), D_L23_001B16C0);
-            func_00282CC0(tmp, tmp, moby + 0x10);
+            FastVecScale(tmp, (char *)(mtx + 4), D_L23_001B16C0);
+            FastVecAdd(tmp, tmp, moby + 0x10);
             qcopy(&D_L23_001B36E0, tmp);
             for (k = 0; k < 5; k++) {
                 char *gen = ((char **)(st + 0x358))[k];
@@ -178,8 +178,8 @@ void func_L23_0041B9F0(unsigned char *moby) {
                 }
             }
         } else {
-            func_00282D30(tmp, moby + 0xE0, D_L23_001B16BC);
-            func_00282CC0(tmp, tmp, moby + 0x10);
+            FastVecScale(tmp, moby + 0xE0, D_L23_001B16BC);
+            FastVecAdd(tmp, tmp, moby + 0x10);
             qcopy(&D_L23_001B36E0, tmp);
         }
         held = *(char **)(st + 0x610);

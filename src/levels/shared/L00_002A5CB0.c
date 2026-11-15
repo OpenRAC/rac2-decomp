@@ -43,7 +43,7 @@ void func_L00_002A5CB0(void)
     unsigned int color;
     if (D_00189E20.object == 0) {
         char *created;
-        created = func_0029EFD0(0x4B4);
+        created = CreateMoby(0x4B4);
         D_00189E20.object = created;
         if (created) {
             *(unsigned int *)(created + 0x78) = 0x801432D7;
@@ -69,21 +69,21 @@ void func_L00_002A5CB0(void)
         if (D_00189E20.object) {
             func_0029FC20(D_00189E20.moby, 7, (char *)matrix);
             qcopy_nc(D_00189E20.object + 0x10, matrix + 12);
-            func_00283678(D_00189E20.object + 0xC0, matrix);
+            copy_matrix3x4(D_00189E20.object + 0xC0, matrix);
             func_002A0F48(D_00189E20.object);
             scale = 1.7f;
             if (D_001A7A40[3])
                 scale = 3.1f;
             if (D_00189E20.timer)
                 scale *= 1.4f;
-            func_002AA2E8((float *)(D_00189E20.object + 0x2C), *(float *)(*(char **)(D_00189E20.object + 0x24) + 0x24) * scale, 0.02f);
+            ApproachValue((float *)(D_00189E20.object + 0x2C), *(float *)(*(char **)(D_00189E20.object + 0x24) + 0x24) * scale, 0.02f);
         }
     }
-    D_00189E20.phase = func_00283B98(D_00189E20.phase, 0.049451005f);
+    D_00189E20.phase = FastAddRotations(D_00189E20.phase, 0.049451005f);
     first = 0x281414C8;
     second = 0x1E00004B;
-    if (!func_00282978(&D_00189E20.timer)) {
-        D_00189E20.phase = func_00283B98(D_00189E20.phase, 0.20362177f);
+    if (!FastDecTimer(&D_00189E20.timer)) {
+        D_00189E20.phase = FastAddRotations(D_00189E20.phase, 0.20362177f);
         switch (D_00189E20.variant) {
         case 1: first = 0x2814C814; second = 0x1E004B00; break;
         case 2: first = 0x2814C8C8; second = 0x1E004B4B; break;
@@ -91,10 +91,10 @@ void func_L00_002A5CB0(void)
         case 4: first = 0x28F01414; second = 0x1E4B0000; break;
         }
         if (D_00189E20.timer >= 50 && (D_00189E20.timer & 1))
-            func_002E5CF8(D_00189E20.variant + 16, 0, D_00189E20.moby);
+            PlayMobySound(D_00189E20.variant + 16, 0, D_00189E20.moby);
     }
-    color = func_00283D38(first, second, func_00283198(D_00189E20.phase) * 0.5f + 0.5f);
+    color = FastTweenColor(first, second, func_00283198(D_00189E20.phase) * 0.5f + 0.5f);
     if (D_00189E20.object)
-        *(unsigned int *)(D_00189E20.object + 0x78) = func_00283D38(*(unsigned int *)(D_00189E20.object + 0x78), color, 0.1f);
-    D_00189E20.color = func_00283D38(D_00189E20.color, color, 0.1f);
+        *(unsigned int *)(D_00189E20.object + 0x78) = FastTweenColor(*(unsigned int *)(D_00189E20.object + 0x78), color, 0.1f);
+    D_00189E20.color = FastTweenColor(D_00189E20.color, color, 0.1f);
 }

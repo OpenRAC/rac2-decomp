@@ -17,18 +17,18 @@ void func_L16_003C3870(char *object)
     char *state=*(char **)(object+0x68);
     float speed;
     func_L00_003253A0(object,state,state,*(float *)(state+0x20));
-    func_00282CC0(object+0x10,object+0x10,state);
-    *(float *)(object+0xf0)=func_00283B98(*(float *)(object+0xf0),*(float *)(state+0x10));
-    *(float *)(object+0xf4)=func_00283B98(*(float *)(object+0xf4),*(float *)(state+0x14));
-    *(float *)(object+0xf8)=func_00283B98(*(float *)(object+0xf8),*(float *)(state+0x18));
+    FastVecAdd(object+0x10,object+0x10,state);
+    *(float *)(object+0xf0)=FastAddRotations(*(float *)(object+0xf0),*(float *)(state+0x10));
+    *(float *)(object+0xf4)=FastAddRotations(*(float *)(object+0xf4),*(float *)(state+0x14));
+    *(float *)(object+0xf8)=FastAddRotations(*(float *)(object+0xf8),*(float *)(state+0x18));
     if (func_00277258(object+0x10,0,object,1.5f)!=0) {
         *(Vector128 *)(object+0x10)=D_L16_001BFF70[0];
-        if (func_00282DB0(state,&D_L16_001BFF70[1])<0.0f) {
-            func_00282F20(&D_L16_001BFF70[1],&D_L16_001BFF70[1],1.0f);
-            speed=func_00282DF0(state);
-            func_00282D30(correction,&D_L16_001BFF70[1],-func_00282DB0(state,&D_L16_001BFF70[1])*1.25f);
-            func_00282CC0(state,state,correction);
-            func_00282F20(state,state,speed*0.5f);
+        if (FastVecDot(state,&D_L16_001BFF70[1])<0.0f) {
+            vec_scale_to_length(&D_L16_001BFF70[1],&D_L16_001BFF70[1],1.0f);
+            speed=FastVecLength(state);
+            FastVecScale(correction,&D_L16_001BFF70[1],-FastVecDot(state,&D_L16_001BFF70[1])*1.25f);
+            FastVecAdd(state,state,correction);
+            vec_scale_to_length(state,state,speed*0.5f);
         }
         *(int *)(state+0x24)=0;
         if (*(unsigned char *)(object+0x23)>0x60) object[0x23]=0x60;

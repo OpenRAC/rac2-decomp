@@ -52,11 +52,11 @@ void func_L04_00344568(f32 angle, void *axis, void *rotation) {
     skew[11] = 0;
     skew[15] = 0;
 
-    func_00283788(square, skew, skew);
+    multiply_matrix(square, skew, skew);
     func_L03_002EFB60(cosine, square, 1.0f - func_00283180(angle));
     func_L03_002EFB60(sine, skew, func_00283198(angle));
     func_L04_0030FA30(sine, sine, cosine);
-    func_00283388(cosine);
+    set_identity_matrix(cosine);
     func_L04_0030FA30(result, sine, cosine);
     func_002AB6D8(result, out);
 }

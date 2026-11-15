@@ -13,7 +13,7 @@ void func_002DF640(f32 *dir, f32 scale) {
 
     qcopy(D_001B2050, dir);
     func_00282C78(v, dir);
-    func_00282D30(D_001B2070, D_001B2050, scale);
+    FastVecScale(D_001B2070, D_001B2050, scale);
     if (v[0] < v[1]) {
         if (v[0] < v[2]) {
             D_001B2060[0] = v[0];
@@ -33,6 +33,6 @@ void func_002DF640(f32 *dir, f32 scale) {
         D_001B2060[1] = v[0];
         D_001B2060[2] = v[2];
     }
-    func_00282DD8(D_001B2060, D_001B2060, D_001B2050);
-    func_00282F20(D_001B2060, D_001B2060, 1.0f);
+    FastVecCross(D_001B2060, D_001B2060, D_001B2050);
+    vec_scale_to_length(D_001B2060, D_001B2060, 1.0f);
 }

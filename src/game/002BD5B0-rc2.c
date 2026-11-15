@@ -85,21 +85,21 @@ void func_002BD5B0(Obj *o)
         fr.a[2] = func_00283180(s->f14) * s->f10;
         fr.a[0] = 0.0f;
         fr.a[3] = 0.0f;
-        func_002830C0(fr.b, fr.a, (s8 *)&fr.m0);
-        func_00282CF0(vec, vec, fr.b);
+        transform_vector(fr.b, fr.a, (s8 *)&fr.m0);
+        FastVecSub(vec, vec, fr.b);
         s->f1C = s->f1C + 0.0600100006f;
         func_0029FCC0(s->p18, 0, fr.c);
-        func_00282CF0(fr.a, fr.c, vec);
-        func_00282F20(fr.a, fr.a, s->f1C);
-        func_00282CC0(vec, vec, fr.a);
-        s->f14 = func_00283B98(s->f14, 0.5235988f);
+        FastVecSub(fr.a, fr.c, vec);
+        vec_scale_to_length(fr.a, fr.a, s->f1C);
+        FastVecAdd(vec, vec, fr.a);
+        s->f14 = FastAddRotations(s->f14, 0.5235988f);
         s->f10 = s->f10 * 0.9f;
         fr.a[1] = func_00283198(s->f14) * s->f10;
         fr.a[2] = func_00283180(s->f14) * s->f10;
         fr.a[0] = 0.0f;
         fr.a[3] = 0.0f;
-        func_002830C0(fr.b, fr.a, (s8 *)&fr.m0);
-        func_00282CC0(vec, vec, fr.b);
+        transform_vector(fr.b, fr.a, (s8 *)&fr.m0);
+        FastVecAdd(vec, vec, fr.b);
         if (func_002AB0E8(fr.c, s->p18 + 0xC0, vec, 1) > 0.0f) {
             func_002B9180(o);
             return;
@@ -111,7 +111,7 @@ void func_002BD5B0(Obj *o)
         func_002B9180(o);
         return;
     }
-    if (func_00282978((s8 *)o + 0xA) != 0) {
+    if (FastDecTimer((s8 *)o + 0xA) != 0) {
         func_002B9180(o);
         return;
     }
@@ -120,7 +120,7 @@ void func_002BD5B0(Obj *o)
         s->f04 = s->f04 + s->f0C * 0.011f;
     }
     o->f0C = o->f0C + (-2940.0f);
-    o->w04 = (o->w04 & 0x00FFFFFF) | (func_00283CF0(s->f04 * 255.0f) << 24);
+    o->w04 = (o->w04 & 0x00FFFFFF) | (FloatToInt(s->f04 * 255.0f) << 24);
     s->f08 = s->f08 + 0.006f;
     if (1.0f < s->f08) s->f08 = s->f08 - 1.0f;
     o->b08 = (s32)(s->f08 * 255.0f);

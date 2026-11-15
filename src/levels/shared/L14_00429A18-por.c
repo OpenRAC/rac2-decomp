@@ -1,5 +1,5 @@
 /* func_L14_00429A18: the func_L07_003E7240 launch burst without the flag and timer reset
- * (state block at +0x300). func_0032C700 returns a pointer: with a void prototype the
+ * (state block at +0x300). SpawnExplosion returns a pointer: with a void prototype the
  * constant 1 for the stack argument is scheduled ahead of the 20.0f. */
 #include "include_asm.h"
 #include "common.h"
@@ -32,13 +32,13 @@ void func_L14_00429A18(char *arg)
 
     o = *(char **)(arg + 0x68);
     func_00325D30(arg, o + 0x300);
-    func_002A6C58(arg, 0, 3);
+    SetDeathBits(arg, 0, 3);
     v[0] = 0;
     ((float *)v)[2] = 0.75f;
-    func_00283098(v, v, arg + 0xC0);
-    func_00282CC0(v, v, arg + 0x10);
-    func_0032C700(v, 0, 25, 20, 20, 20, 45, 1, 0.6f, 20.0f, 1, 0, 0, 0);
-    func_002E5CF8(6, 0, arg);
-    func_00282F20(&w, o + 0x1C0, 0.05000000447034836f);
+    matrix_mul_vec3(v, v, arg + 0xC0);
+    FastVecAdd(v, v, arg + 0x10);
+    SpawnExplosion(v, 0, 25, 20, 20, 20, 45, 1, 0.6f, 20.0f, 1, 0, 0, 0);
+    PlayMobySound(6, 0, arg);
+    vec_scale_to_length(&w, o + 0x1C0, 0.05000000447034836f);
     func_002B0A68(arg, 1016, &w, 3.0f, 6.0f, 3.0f, 6.0f, 255);
 }

@@ -18,15 +18,15 @@ void func_L19_00420B48(char *object)
 {
     BeamWorkspace local;
     int i, j;
-    func_00282F20(&local.direction,object+0xe0,*(float *)(*(char **)(object+0x68)+0xc));
-    func_00282CC0(&local.end,object+0x10,&local.direction);
-    func_00282CF0(&local.firstSide,object+0x10,D_L19_001B9A40);
-    func_00282CF0(&local.secondSide,&local.end,D_L19_001B9A40);
-    func_00282DD8(&local.firstSide,&local.firstSide,&local.direction);
-    func_00282F20(&local.firstSide,&local.firstSide,0.15f);
-    func_00282DD8(&local.secondSide,&local.secondSide,&local.direction);
-    func_00282F20(&local.secondSide,&local.secondSide,0.15f);
-    local.packet.header[1]=func_0027C878(14);
+    vec_scale_to_length(&local.direction,object+0xe0,*(float *)(*(char **)(object+0x68)+0xc));
+    FastVecAdd(&local.end,object+0x10,&local.direction);
+    FastVecSub(&local.firstSide,object+0x10,D_L19_001B9A40);
+    FastVecSub(&local.secondSide,&local.end,D_L19_001B9A40);
+    FastVecCross(&local.firstSide,&local.firstSide,&local.direction);
+    vec_scale_to_length(&local.firstSide,&local.firstSide,0.15f);
+    FastVecCross(&local.secondSide,&local.secondSide,&local.direction);
+    vec_scale_to_length(&local.secondSide,&local.secondSide,0.15f);
+    local.packet.header[1]=GetEffectTextureDescriptor(14);
     local.packet.header[2]=0xff9000000260ULL;
     local.packet.header[3]=0x8000000048ULL;
     local.packet.header[0]=0;
@@ -35,22 +35,22 @@ void func_L19_00420B48(char *object)
         local.packet.uv[i][0] = D_L19_001B1DE8[i * 2];
         local.packet.uv[i][1] = D_L19_001B1DEC[i * 2];
     }
-    func_00282CF0(&local.scratch,object+0x10,&local.firstSide);
+    FastVecSub(&local.scratch,object+0x10,&local.firstSide);
     local.packet.vertices[0]=local.scratch;
-    func_00282CC0(&local.scratch,object+0x10,&local.firstSide);
+    FastVecAdd(&local.scratch,object+0x10,&local.firstSide);
     local.packet.vertices[1]=local.scratch;
-    func_00282CF0(&local.scratch,&local.end,&local.secondSide);
+    FastVecSub(&local.scratch,&local.end,&local.secondSide);
     local.packet.vertices[2]=local.scratch;
-    func_00282CC0(&local.scratch,&local.end,&local.secondSide);
+    FastVecAdd(&local.scratch,&local.end,&local.secondSide);
     local.packet.vertices[3]=local.scratch;
-    func_00280B90(&local.packet,0,0);
-    func_00282CF0(&local.firstSide,object+0x10,D_L19_001B9A40);
-    func_00282CF0(&local.secondSide,&local.end,D_L19_001B9A40);
-    func_00282DD8(&local.firstSide,&local.firstSide,&local.direction);
-    func_00282F20(&local.firstSide,&local.firstSide,0.05f);
-    func_00282DD8(&local.secondSide,&local.secondSide,&local.direction);
-    func_00282F20(&local.secondSide,&local.secondSide,0.05f);
-    local.packet.header[1]=func_0027C878(14);
+    draw_world_quad(&local.packet,0,0);
+    FastVecSub(&local.firstSide,object+0x10,D_L19_001B9A40);
+    FastVecSub(&local.secondSide,&local.end,D_L19_001B9A40);
+    FastVecCross(&local.firstSide,&local.firstSide,&local.direction);
+    vec_scale_to_length(&local.firstSide,&local.firstSide,0.05f);
+    FastVecCross(&local.secondSide,&local.secondSide,&local.direction);
+    vec_scale_to_length(&local.secondSide,&local.secondSide,0.05f);
+    local.packet.header[1]=GetEffectTextureDescriptor(14);
     local.packet.header[2]=0xff9000000260ULL;
     local.packet.header[3]=0x8000000048ULL;
     local.packet.header[0]=0;
@@ -59,13 +59,13 @@ void func_L19_00420B48(char *object)
         local.packet.uv[j][0] = D_L19_001B1DE8[j * 2];
         local.packet.uv[j][1] = D_L19_001B1DEC[j * 2];
     }
-    func_00282CF0(&local.scratch,object+0x10,&local.firstSide);
+    FastVecSub(&local.scratch,object+0x10,&local.firstSide);
     local.packet.vertices[0]=local.scratch;
-    func_00282CC0(&local.scratch,object+0x10,&local.firstSide);
+    FastVecAdd(&local.scratch,object+0x10,&local.firstSide);
     local.packet.vertices[1]=local.scratch;
-    func_00282CF0(&local.scratch,&local.end,&local.secondSide);
+    FastVecSub(&local.scratch,&local.end,&local.secondSide);
     local.packet.vertices[2]=local.scratch;
-    func_00282CC0(&local.scratch,&local.end,&local.secondSide);
+    FastVecAdd(&local.scratch,&local.end,&local.secondSide);
     local.packet.vertices[3]=local.scratch;
-    func_00280B90(&local.packet,0,0);
+    draw_world_quad(&local.packet,0,0);
 }

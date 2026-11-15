@@ -179,9 +179,9 @@ void func_L00_00404368(float *pos, int unused, int mode)
         heading = func_002A7940();
         speed = func_002A7878(0.0f, 0.5f);
         func_002AF000(velocity, speed * 0.016666668f, heading, pitch);
-        func_00282CF0(offset, D_L00_001B8DC0, pos);
-        func_00282F20(offset, offset, 0.3f);
-        func_00282CC0(pos, pos, offset);
+        FastVecSub(offset, D_L00_001B8DC0, pos);
+        vec_scale_to_length(offset, offset, 0.3f);
+        FastVecAdd(pos, pos, offset);
         speed = func_002A7878(25000.0f, 50000.0f);
         point[0] = pos[0] + func_002A78D8(0.0f, 0.02f);
         point[1] = pos[1] + func_002A78D8(0.0f, 0.02f);

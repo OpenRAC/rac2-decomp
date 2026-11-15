@@ -39,7 +39,7 @@ void func_L01_0042DE20(char *m)
     axis[2] = 1;
     do {
         func_002ACEC0(sample, radius, axis, angle);
-        func_00282CC0(sample, D_L01_001B9380.pos, sample);
+        FastVecAdd(sample, D_L01_001B9380.pos, sample);
         if (func_002B0520(sample) < D_L01_001B9380.pos[2])
             exposedFraction += 0.05f;
         angle += 0.3141592741012573f;

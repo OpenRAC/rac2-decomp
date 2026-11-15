@@ -167,29 +167,29 @@ void func_L08_003D3EF8(char *obj)
         func_002C3150(&joint, &velocity, D_L08_001B034C, b, func_002A77E0(255), 0, D_L08_001B0354);
         for (count = 2; count >= 0; count--) {
             func_002A7A00(&step, D_L08_001B0340 * 0.016666668f, D_L08_001B0344 * 0.016666668f);
-            func_00282CC0(&velocity, &velocity, &step);
+            FastVecAdd(&velocity, &velocity, &step);
             b = D_L08_001B0348;
             func_002C3150(&joint, &velocity, D_L08_001B0350, b, func_002A77E0(255), 0, D_L08_001B0358);
         }
     }
-    func_00282CF0(&ring, D_L08_001B9B00, &joint);
-    func_00282F20(&ring, &ring, -0.3f);
-    func_00282F20(&ring_step, &ring, 0.1f);
-    func_00282CC0(&ring, &ring, &joint);
+    FastVecSub(&ring, D_L08_001B9B00, &joint);
+    vec_scale_to_length(&ring, &ring, -0.3f);
+    vec_scale_to_length(&ring_step, &ring, 0.1f);
+    FastVecAdd(&ring, &ring, &joint);
     reciprocal = 0.003921569f;
     half = 0.5f;
     size = 3.0f;
     for (k = 0; k < 4; k++) {
-        t = func_00283CE0(0xFF - ((D_L08_001B2508 + k * 20) & 0xFF));
-        color = func_00283D38(D_L08_001B035C, D_L08_001B0360, func_00282C48(half - t * reciprocal));
+        t = IntToFloat(0xFF - ((D_L08_001B2508 + k * 20) & 0xFF));
+        color = FastTweenColor(D_L08_001B035C, D_L08_001B0360, func_00282C48(half - t * reciprocal));
         b = D_L08_001B2508 & 0xFF;
         if (k & 2)
             b = b * 2;
         if (k & 1)
             b = 0xFF - b;
         func_002C2FD8(&ring, color, b, D_L08_001B036C, D_L08_001B0368, 2, 0,
-                      (func_00283CE0(k) + size)
+                      (IntToFloat(k) + size)
                           * (*(float *)(obj + 0x2C) / *(float *)(*(char **)(obj + 0x24) + 0x24)));
-        func_00282CC0(&ring, &ring, &ring_step);
+        FastVecAdd(&ring, &ring, &ring_step);
     }
 }

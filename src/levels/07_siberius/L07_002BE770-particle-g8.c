@@ -84,23 +84,23 @@ void func_L07_00378AE0(Object *obj) {
         for (i = 0; i < func_002A77E0(2); i++) {
             func_L02_0031E9E8(&pos, 15.0f);
             pos.z += 7.0f;
-            func_00282CC0(&pos, &pos, &D_L07_001B9200);
-            func_00282D30(&tmp, &D_L07_001B9200[35], 4.0f);
-            func_00282CC0(&pos, &tmp, &pos);
+            FastVecAdd(&pos, &pos, &D_L07_001B9200);
+            FastVecScale(&tmp, &D_L07_001B9200[35], 4.0f);
+            FastVecAdd(&pos, &tmp, &pos);
             func_L02_0031E9E8(&vel, data->speed * (1.0f / 60.0f));
             vel.z = -(data->fall * (1.0f / 60.0f)) * func_002A7878(0.8f, 1.2f);
             if (!func_L00_00329520(&pos, data->group))
                 func_L07_00336860(&pos, &vel, 0, 0);
         }
-        func_00282D30(&point, &D_L07_001B9200[35], 4.0f);
-        func_00282CC0(&tmp, &point, &D_L07_001B9200);
-        func_00282CF0(&D_L07_001B2550, &tmp, &data->previous);
-        data->scale = func_00282DF0(&D_L07_001B2550) * 4.0f;
+        FastVecScale(&point, &D_L07_001B9200[35], 4.0f);
+        FastVecAdd(&tmp, &point, &D_L07_001B9200);
+        FastVecSub(&D_L07_001B2550, &tmp, &data->previous);
+        data->scale = FastVecLength(&D_L07_001B2550) * 4.0f;
         if (data->scale > 1.0f)
             data->scale = 1.0f;
         else if (data->scale < 0.0f)
             data->scale = 0.0f;
-        func_00282D30(&D_L07_001B2550, &D_L07_001B2550, data->scale);
+        FastVecScale(&D_L07_001B2550, &D_L07_001B2550, data->scale);
         qcopy_nc(&data->previous, &tmp);
         break;
     case 2:
@@ -117,20 +117,20 @@ void func_L07_00378AE0(Object *obj) {
         lo = D_L07_001AEC10[j * 2];
         hi = D_L07_001AEC14[j * 2];
         for (k = 0; k < 6; k++) {
-            func_00282D30(&tmp, &data->axisA, func_002A7878(-25.0f, 25.0f));
-            func_00282CC0(&pos, &tmp, &data->origin);
-            func_00282D30(&tmp, &data->axisB, func_002A7878(lo, hi));
-            func_00282CC0(&pos, &tmp, &pos);
-            func_00282CC0(&pos, &pos, hero_pos);
-            func_00282CF0(&pos, &pos, D_L07_001ADAAC + 0x10);
+            FastVecScale(&tmp, &data->axisA, func_002A7878(-25.0f, 25.0f));
+            FastVecAdd(&pos, &tmp, &data->origin);
+            FastVecScale(&tmp, &data->axisB, func_002A7878(lo, hi));
+            FastVecAdd(&pos, &tmp, &pos);
+            FastVecAdd(&pos, &pos, hero_pos);
+            FastVecSub(&pos, &pos, D_L07_001ADAAC + 0x10);
             pos.z -= D_L07_001B90C0[0x148 / 4] - *(float *)(D_L07_001ADAAC + 0x18);
             func_L02_0031E9E8(&vel, 1.0f / 24.0f);
             vel.z = data->fall * (func_002A7878(0.8f, 1.2f) * (-1.0f / 120.0f));
             func_L07_00336860(&pos, &vel, 1, 0);
         }
-        func_00282CF0(&D_L07_001B2550, hero_pos, &data->previous);
-        func_00282D30(&tmp, D_L07_001ADAAC + 0xC0, 1.0f);
-        func_00282CC0(&D_L07_001B2550, &tmp, &D_L07_001B2550);
+        FastVecSub(&D_L07_001B2550, hero_pos, &data->previous);
+        FastVecScale(&tmp, D_L07_001ADAAC + 0xC0, 1.0f);
+        FastVecAdd(&D_L07_001B2550, &tmp, &D_L07_001B2550);
         qcopy_nc(&data->previous, hero_pos);
         break;
     }

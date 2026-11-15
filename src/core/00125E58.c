@@ -55,7 +55,7 @@ typedef struct {
 /* rac1-decomp src/core/00122200.c: func_001222C8 */
 /* sceGsSetDefDrawEnv (libgraph.h), graph006.o: fills in a default drawing
  * environment for a psm/w/h framebuffer. zbuf1's page count reuses
- * func_00125E58 (the same page-count helper FRAME's own fbw comes from) on
+ * sceGszbufaddr (the same page-count helper FRAME's own fbw comes from) on
  * the color psm/w/h, since the Z buffer is laid out right after the color
  * buffer; ztest==0 disables Z (mask writes, ZTE/ZTST forced on).
  * prmodecont/colclamp are read-modify-write: only their AC/CLAMP bit is
@@ -69,10 +69,10 @@ int func_00125F20(DrawEnv1_125F20 *draw, short psm, short w, short h,
     draw->frame1 = ((unsigned long)fbw << 16) | ((unsigned long)(psm & 0xF) << 24);
     draw->zbuf1addr = 0x4E;
     if (ztest == 0) {
-        zbp = func_00125E58(psm, w, h);
+        zbp = sceGszbufaddr(psm, w, h);
         draw->zbuf1 = (unsigned long)zbp | ((unsigned long)(zpsm & 0xF) << 24) | (1UL << 32);
     } else {
-        zbp = func_00125E58(psm, w, h);
+        zbp = sceGszbufaddr(psm, w, h);
         draw->zbuf1 = (unsigned long)zbp | ((unsigned long)(zpsm & 0xF) << 24);
     }
     draw->xyoffset1addr = 0x18;

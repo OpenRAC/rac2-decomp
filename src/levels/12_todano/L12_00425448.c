@@ -18,6 +18,6 @@ void func_L12_00425448(u8 *a0) {
 
     if (func_00282948(s0 + 0x2C0) != 0) {
         *(s32 *)(s0 + 0x2C0) = func_002A7820(D_L12_001B20C0, (s32)D_L12_001B20C4);
-        func_002E5CF8(1, 0, a0);
+        PlayMobySound(1, 0, a0);
     }
 }

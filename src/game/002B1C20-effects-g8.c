@@ -23,7 +23,7 @@ int func_002B3380(char *obj,DamageThresholds *thresholds,DamageHealth *health)
         func_0029F648(obj,&flags,&unused);
         value=health->current;
         if(value<0.0f)value=0.0f;
-        fraction=func_00283CF0(value/health->maximum*255.0f);
+        fraction=FloatToInt(value/health->maximum*255.0f);
         for(i=0;i<15;i++) {
             int bit=1<<i;
             if((bit&flags) && thresholds->threshold[i] && thresholds->threshold[i]<fraction)
@@ -36,11 +36,11 @@ int func_002B3380(char *obj,DamageThresholds *thresholds,DamageHealth *health)
         value=health->current;
         if(value<0.0f)value=0.0f;
         bit=1;
-        fraction=func_00283CF0(
+        fraction=FloatToInt(
             value/health->maximum*255.0f);
         for(i=0;i<15;i++,bit<<=1) {
             if((*(unsigned short *)(obj+0x7c)&bit) && fraction<thresholds->threshold[i]) {
-                angle=func_00283B98(func_002A78D8(90.0f,120.0f)*0.01745329424738884f,D_001B5200.angle);
+                angle=FastAddRotations(func_002A78D8(90.0f,120.0f)*0.01745329424738884f,D_001B5200.angle);
                 speed=func_002A7878(2.0f,4.0f)*0.01666666753590107f;
                 v[0]=func_00283180(angle)*speed;
                 v[1]=func_00283198(angle)*speed;

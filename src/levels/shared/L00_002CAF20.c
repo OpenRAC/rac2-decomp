@@ -43,9 +43,9 @@ int func_L00_002CAF20(void)
     void *moby;
 
     if (h->b22B8 != 0 && h->b22BA != 0 && h->h24EC == 0) {
-    idx = func_L00_002ADEA0(0);
+    idx = hero_slot_item_id(0);
     if (idx != h->f24B4) {
-        func_L00_002AF7D0();
+        cancel_hero_item_animation();
         return 0;
     }
     moby = (D_L00_00262570 + D_00139568[idx])->moby;
@@ -54,7 +54,7 @@ int func_L00_002CAF20(void)
     func_002AC9F8(h->v160, 0.0250000015f);
     if (0.0250000015f < h->f1B4)
         h->f1B4 = 0.0250000015f;
-    func_L00_002D2168(moby, 0, 11.0f);
+    set_hero_animation(moby, 0, 11.0f);
     if (h->fE98 != 0)
         h->fEA4 = 1;
     h->f24B0 = moby;

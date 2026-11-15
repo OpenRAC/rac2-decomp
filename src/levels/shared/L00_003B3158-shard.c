@@ -39,14 +39,14 @@ void func_L00_003B3158(char *obj)
     dir.f[2] = 0.13333334f;
     qcopy(&from, obj + 0x10);
     func_002AF000(st, st->fade, *(float *)(obj + 0xF8), -*(float *)(obj + 0xF4));
-    func_00282CC0(obj + 0x10, obj + 0x10, st);
+    FastVecAdd(obj + 0x10, obj + 0x10, st);
     game = D_00189E20;
-    if (func_002761F8(&from, obj + 0x10, 0, *(void **)(game + 0x2290), 0)
+    if (CollLine(&from, obj + 0x10, 0, *(void **)(game + 0x2290), 0)
         || func_00277258(obj + 0x10, 1, *(void **)(game + 0x2290), 0.3f)) {
         qcopy(&at, D_L00_001BF220);
         func_00283028(&dir, st, D_L00_001BF220 + 0x20);
-        func_00282F20(&dir, &dir, 0.033333335f);
-        func_002ABBB8(obj, &dir, &at, 0.0f, 0.0f, 0, 0, 4, 0.0f, 0.0f, 9.0f, 0.4f, -1, 0.0f, 0, 0, -1, 0, 0x810001);
+        vec_scale_to_length(&dir, &dir, 0.033333335f);
+        SpawnExplosionEffects(obj, &dir, &at, 0.0f, 0.0f, 0, 0, 4, 0.0f, 0.0f, 9.0f, 0.4f, -1, 0.0f, 0, 0, -1, 0, 0x810001);
         func_L00_003B3090(obj, st, &at);
         func_0029F338(obj);
         return;
@@ -57,8 +57,8 @@ void func_L00_003B3158(char *obj)
         func_0029F338(obj);
         return;
     }
-    if (st->stuck == 0 && (func_00282978(&st->timer) || st->life < 0.0f)) {
-        func_002ABBB8(obj, &dir, 0, 0.0f, 0.0f, 0, 0, 4, 0.0f, 0.0f, 9.0f, 0.4f, -1, 0.0f, 0, 0, -1, 0, 0x810001);
+    if (st->stuck == 0 && (FastDecTimer(&st->timer) || st->life < 0.0f)) {
+        SpawnExplosionEffects(obj, &dir, 0, 0.0f, 0.0f, 0, 0, 4, 0.0f, 0.0f, 9.0f, 0.4f, -1, 0.0f, 0, 0, -1, 0, 0x810001);
         func_0029F338(obj);
         return;
     }

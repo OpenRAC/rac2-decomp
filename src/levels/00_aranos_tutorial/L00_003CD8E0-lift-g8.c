@@ -1,7 +1,7 @@
 #include "common.h"
 
 /* A lift that eases its height between a home height and an endpoint. Its child moby (0xC16)
- * pulses until the hero triggers it; func_L00_003CD8E0 is alone in this -G8 unit. */
+ * pulses until the hero triggers it; UpdateAranosVerticalLift is alone in this -G8 unit. */
 
 typedef unsigned int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
@@ -60,7 +60,7 @@ typedef struct {
     }
 #define START_SOUND(s)                                                                  \
     if (!func_002E59B0(obj, ctx->sound))                                                \
-        ctx->sound = func_002E5CF8(s, 4, obj)
+        ctx->sound = PlayMobySound(s, 4, obj)
 #define RESET_CHILD()                                                                   \
     func_002A7750(obj, 1, -1);                                                          \
     I(ctx->child, 0x78) = 0x808C8C8C;                                                   \
@@ -94,7 +94,7 @@ void func_L00_003CD8E0(LiftMoby *moby) {
         }
         ctx->counter = 0;
         ctx->sound = -1;
-        created = func_0029EFD0(0xC16);
+        created = CreateMoby(0xC16);
         ctx->child = created;
         if (!created) {
             func_0029F338(obj);
@@ -113,8 +113,8 @@ void func_L00_003CD8E0(LiftMoby *moby) {
         break;
     }
     case 1:
-        ctx->phase = func_00283B98(ctx->phase, 0.10471977f);
-        value = func_00283CF0((func_00283198(ctx->phase) * 4.0f - 3.0f) * 208.0f);
+        ctx->phase = FastAddRotations(ctx->phase, 0.10471977f);
+        value = FloatToInt((func_00283198(ctx->phase) * 4.0f - 3.0f) * 208.0f);
         if (value > 208)
             value = 208;
         else if (value < 80)
@@ -130,7 +130,7 @@ void func_L00_003CD8E0(LiftMoby *moby) {
             ctx->velocity = 0.0f;
             I(ctx->child, 0x78) = 0x8000DF2A;
             if (!D_001A7908) {
-                func_00335438(&D_L00_001B8C80.from, &D_L00_001B8C80.to, 2, 120, 0);
+                SetCamera5Pose(&D_L00_001B8C80.from, &D_L00_001B8C80.to, 2, 120, 0);
                 frame.camera.f[0] = 246.85f;
                 frame.camera.f[1] = 198.19f;
                 frame.camera.f[2] = D_00189E20.position.f[2] + 1.5f;
@@ -164,18 +164,18 @@ void func_L00_003CD8E0(LiftMoby *moby) {
     case 2:
         qcopy(&frame.delta, &moby->position);
         frame.delta.f[2] = ctx->target;
-        if (func_00282E48(&moby->position, &frame.delta) > 0.14f) {
+        if (fast_vec_dist(&moby->position, &frame.delta) > 0.14f) {
             func_002AA548(obj + 0x18, &ctx->velocity, frame.delta.f[2], 0.0019444445f, 0.0016666667f,
                           0.10000001f);
             ++ctx->counter;
-        } else if (func_00282E80(&moby->position, &D_00189E20.position) > 1.2f) {
+        } else if (vec_distance_xy(&moby->position, &D_00189E20.position) > 1.2f) {
             RELEASE();
             ctx->direction = 0;
             STOP_SOUND();
             RESET_CHILD();
         } else {
             if (ctx->counter > 0) {
-                func_002E5CF8(1, 0, obj);
+                PlayMobySound(1, 0, obj);
                 ctx->counter = 0;
             }
             RELEASE();
@@ -187,7 +187,7 @@ void func_L00_003CD8E0(LiftMoby *moby) {
         break;
     case 3:
         if (F(obj, 0x18) > ctx->otherTarget) {
-            if (func_002ACBC8(&D_00189E20.position, ctx->trigger)) {
+            if (IsPointInCuboid(&D_00189E20.position, ctx->trigger)) {
                 if (F(obj, 0x18) - D_00189E20.position.f[2] < 1.8f && D_00189E20.position.f[2] < F(obj, 0x18))
                     break;
                 func_002AA3A8(obj + 0x18, &ctx->velocity, ctx->otherTarget, 0.02f, 0.3f, 0.10000001f);
@@ -196,8 +196,8 @@ void func_L00_003CD8E0(LiftMoby *moby) {
                 F(obj, 0x18) -= 0.08f;
                 ++ctx->counter;
             }
-        } else if (func_00282E80(&moby->position, &D_00189E20.position) > 1.0f) {
-            func_002E5CF8(1, 0, obj);
+        } else if (vec_distance_xy(&moby->position, &D_00189E20.position) > 1.0f) {
+            PlayMobySound(1, 0, obj);
             RELEASE();
             ctx->direction = 1;
             STOP_SOUND();
@@ -209,7 +209,7 @@ void func_L00_003CD8E0(LiftMoby *moby) {
         }
         break;
     }
-    func_00282CF0(&frame.delta, &moby->position, &frame.old);
+    FastVecSub(&frame.delta, &moby->position, &frame.old);
     func_002AD6F0(ctx->transform, &frame.delta, &frame.rotation, obj + 0xF0);
     {
         char *child = ctx->child;
@@ -221,7 +221,7 @@ void func_L00_003CD8E0(LiftMoby *moby) {
         frame.camera.f[1] = 198.19f;
         frame.camera.f[2] = D_00189E20.position.f[2] + 1.5f;
         func_00335370(&frame.camera);
-        if (func_00282E80(D_L00_001B8C80.camera + 0x30, &frame.camera) < 0.5f)
+        if (vec_distance_xy(D_L00_001B8C80.camera + 0x30, &frame.camera) < 0.5f)
             func_003355A8(1);
     }
 }

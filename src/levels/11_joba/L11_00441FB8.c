@@ -29,7 +29,7 @@ s32 func_L11_00441FB8(u8 *a, u8 *b, s32 c) {
     if (*(s16 *)(state + 0x1FA) == 2 || *(s16 *)(state + 0x1FA) == 4) {
         u8 *poly = (u8 *)D_L11_001FF580[*(s32 *)(state + 0x1C8)];
         if (*(float *)(b + 0x18) < ((float *)func_L11_004417E8(a))[2] + 0.5f)
-            result = !func_002A8AF0((float *)(b + 0x10), (float *)(poly + 0x10), *(s32 *)poly);
+            result = !point_in_path_xy((float *)(b + 0x10), (float *)(poly + 0x10), *(s32 *)poly);
     }
     return result;
 }

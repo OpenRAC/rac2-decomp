@@ -106,7 +106,7 @@ void func_L09_00403798(char *obj)
                 func_002A7470(obj, 0, 0, 20);
         }
         path = D_L09_001FE6C0[*(int *)(p + 0x250)];
-        length = func_00283CE0(*path);
+        length = IntToFloat(*path);
         *(float *)(p + 0x290) += length / (*(float *)(p + 0x25C) * 60.0f);
         if (length <= *(float *)(p + 0x290)) {
             *(float *)(p + 0x290) = length;
@@ -141,10 +141,10 @@ void func_L09_00403798(char *obj)
         if (func_002B3868(obj)) {
             DobboSoundAnchor *entry = (DobboSoundAnchor *)(D_00188660 + *(s16 *)(p + 0x274) * 0x70);
             if (entry->owner != obj || !entry->active)
-                *(s16 *)(p + 0x274) = func_002E5CF8(D_L09_001B13D4, 4, obj);
+                *(s16 *)(p + 0x274) = PlayMobySound(D_L09_001B13D4, 4, obj);
         }
         func_002B4FF0(obj, p + 0x220, 0.0f);
-        if (D_00189E20.target == obj || func_00282E80(obj + 0x10, D_00189E20.position) < 1.2f) {
+        if (D_00189E20.target == obj || vec_distance_xy(obj + 0x10, D_00189E20.position) < 1.2f) {
             if ((u8)obj[0x43] != 4)
                 func_002A7470(obj, 4, 0, 5);
             func_002A7750(obj, 8, -1);
@@ -160,7 +160,7 @@ void func_L09_00403798(char *obj)
     case 9:
         flags = func_002B1C20(obj, p + 0x50);
         if (flags & 1) {
-            func_0026FEB8(D_L09_001B13D8, *(s16 *)(p + 0x274), *(s16 *)(obj + 0xB2));
+            STUB_printf(D_L09_001B13D8, *(s16 *)(p + 0x274), *(s16 *)(obj + 0xB2));
             index = *(s16 *)(p + 0x274);
             if (index != -1) {
                 DobboSoundAnchor *entry = (DobboSoundAnchor *)(D_00188660 + index * 0x70);
@@ -168,18 +168,18 @@ void func_L09_00403798(char *obj)
                     func_002E59F8(index);
             }
             *(s16 *)(p + 0x274) = -1;
-            func_00282CF0(v, obj + 0x10, D_00189EA0);
+            FastVecSub(v, obj + 0x10, D_00189EA0);
             func_002AFEB8(obj, v, v, 0, 0.0f);
-            func_00282F20(v, v, 0.10000001f);
+            vec_scale_to_length(v, v, 0.10000001f);
             func_002B0A68(obj, 0x3F, v, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
-            func_002E5CF8(0, 0, obj);
-            func_002A6C58(obj, 0, 3);
+            PlayMobySound(0, 0, obj);
+            SetDeathBits(obj, 0, 3);
             func_0029F338(obj);
             return;
         } else if (flags & 2) {
             *(u16 *)(p + 0x26C) = D_L09_001B13C0;
             func_002A7750(obj, 5, 3);
-            func_002E5CF8(3, 0, obj);
+            PlayMobySound(3, 0, obj);
         }
         break;
     }

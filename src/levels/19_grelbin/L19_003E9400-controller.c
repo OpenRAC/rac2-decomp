@@ -28,7 +28,7 @@ void func_L19_003E9400(u8 *obj)
     float end[4] __attribute__((aligned(16)));
     u8 *s = *(u8 **)(obj + 0x68);
     u8 *other, *os;
-    if (I(s,0x38) > 0 && func_002ACBC8(D_00189EA0,I(s,0x38))) {
+    if (I(s,0x38) > 0 && IsPointInCuboid(D_00189EA0,I(s,0x38))) {
         D_L19_001B2628 = F((u8 *)((I(s,0x38) << 7) + (int)D_L19_001B2B0C),0x38);
     } else {
         if (*(float *)((int)s + (D_L19_001C9FC0 << 2)) > 0.0f)
@@ -41,7 +41,7 @@ void func_L19_003E9400(u8 *obj)
         func_002A7750(obj,1,-1);
         break;
     case 1:
-        if (!D_001A7B2F[0] && func_002ACBC8(D_00189EA0,I(s,0x10)) &&
+        if (!D_001A7B2F[0] && IsPointInCuboid(D_00189EA0,I(s,0x10)) &&
             D_001A7390[0] - D_0018CE48[0] > 3600U)
             func_00288E18(0xA12,0x69);
         if (D_0019B2E8[I(s,0x20) + D_001A79F0 * 16] & 0x80) {
@@ -66,15 +66,15 @@ void func_L19_003E9400(u8 *obj)
         qcopy_nc(end,(u8 *)((I(s,0x1C) << 8) + (int)D_L19_001B2A1C) + 0x10);
         end[2] += F(s,0x34);
         F(os,0x18) = func_00283248(end[0]-start[0],end[1]-start[1]);
-        func_00282CF0(end,end,start);
+        FastVecSub(end,end,start);
         {
             float ratio = (float)I(s,0x2C) / (float)I(s,0x28);
             float t = func_00283198((1.0f - ratio) * 3.1415927f + -1.5707964f);
-            func_00282D30(end,end,t * 0.45f + 0.45f);
+            FastVecScale(end,end,t * 0.45f + 0.45f);
         }
-        func_00282CC0(os,start,end);
+        FastVecAdd(os,start,end);
         if (func_00282948(s + 0x2C)) {
-            func_0029B3E0(0,-1);
+            MemcardSave(0,-1);
             func_002A7750(obj,1,-1);
         }
         break;

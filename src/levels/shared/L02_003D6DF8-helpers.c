@@ -32,7 +32,7 @@ void func_L02_003D6DF8(char *a0) {
     v[1] = 0;
     *(float *)&v[1] = D_L02_001B0380 * 0.0002908882452175021f;
     v[0] = v[1];
-    func_002833F0((char *)(s1 + 0x80), (char *)&v[0]);
+    euler_rotation_basis((char *)(s1 + 0x80), (char *)&v[0]);
     f = 180.0f / D_L02_001B0380;
     *(unsigned short *)(s0 + 0x34) |= 0x100;
     D_L02_001B3FD8 = (int)(f * 60.0f);

@@ -19,7 +19,7 @@ void func_L03_003E3678(u8 *object)
                  D_L03_001B0B80 * 0.01666666753590107f);
     func_00283810(quaternion, D_L03_001B36B0, D_L03_001B36C0,
                  *(f32 *)(vars + 0x4C));
-    func_00283958(quaternion, object + 0xC0);
+    quaternion_to_rotation_basis(quaternion, object + 0xC0);
     if (1.0f <= *(f32 *)(vars + 0x4C)) {
         *(short *)(vars + 0x56) = 1;
         qcopy(D_L03_001B36B0, D_L03_001B36C0);

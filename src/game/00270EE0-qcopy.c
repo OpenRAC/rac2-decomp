@@ -27,9 +27,9 @@ void func_00270EE0(char *from)
         } else {
             char *g = D_00189E20;
 
-            func_00282F20(a, (float *)(*(char **)(g + 0x2290) + 0xC0), 1.0f);
-            func_00282F20(b, (float *)(*(char **)(g + 0x2290) + 0xD0), 1.0f);
-            func_00282F20(c, (float *)(*(char **)(g + 0x2290) + 0xE0), 1.0f);
+            vec_scale_to_length(a, (float *)(*(char **)(g + 0x2290) + 0xC0), 1.0f);
+            vec_scale_to_length(b, (float *)(*(char **)(g + 0x2290) + 0xD0), 1.0f);
+            vec_scale_to_length(c, (float *)(*(char **)(g + 0x2290) + 0xE0), 1.0f);
             func_00270B58((float *)(r + 0x70), (float *)(from + 0x30),
                           (float *)(*(char **)(r - 0x100) + 0x30), a, b, c);
             func_002AB600(r + 0xB0, from);
@@ -63,6 +63,6 @@ void func_00270EE0(char *from)
         int n = ++*(int *)(o + 0x14);
 
         *(int *)(o + 0xC) = n;
-        *(float *)(o + 0x10) = 1.0f / func_00283CE0(n);
+        *(float *)(o + 0x10) = 1.0f / IntToFloat(n);
     }
 }

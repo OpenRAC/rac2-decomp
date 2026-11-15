@@ -28,7 +28,7 @@ extern s32 func_00282978();
 extern s32 func_002B9180();
 
 void func_002C0C70(s32 arg0) {
-    if (((*(s16 *)((char *)(arg0) + (0xA))) != -1) && (func_00282978(arg0 + 0xA) != 0)) {
+    if (((*(s16 *)((char *)(arg0) + (0xA))) != -1) && (FastDecTimer(arg0 + 0xA) != 0)) {
         func_002B9180(arg0);
     }
 }

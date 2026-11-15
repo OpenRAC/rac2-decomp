@@ -47,7 +47,7 @@ void func_L03_003C72A8(char *a0)
     if (*(char **)(vars + 0xF0)) {
         *(s32 *)(*(char **)(vars + 0xF0) + 0x98) = 0;
     }
-    func_00282978(vars + 0x104);
+    FastDecTimer(vars + 0x104);
     switch (*(u8 *)(a0 + 0x20)) {
     case 0:
         D_L03_001B2A78[0] = -1.0f;
@@ -61,13 +61,13 @@ void func_L03_003C72A8(char *a0)
         *(f32 *)(buf + 8) += 20.0f;
         qcopy(buf + 0x10, a0 + 0x10);
         *(f32 *)(buf + 0x18) += 1.0f;
-        if (!func_002761F8(buf + 0x10, buf, 0, a0, 0)) {
+        if (!CollLine(buf + 0x10, buf, 0, a0, 0)) {
             func_0029F338(a0);
             return;
         }
         *(f32 *)(vars + 0xF4) = D_L03_001BFDE8[0];
         for (i = 0; i < 3; i++) {
-            func_0029F978(a0, i, vars + 0x20 + i * 0x40);
+            AttachManipulator(a0, i, vars + 0x20 + i * 0x40);
         }
         func_002A7750(a0, 1, -1);
         break;
@@ -114,7 +114,7 @@ void func_L03_003C72A8(char *a0)
         *(f32 *)(vars + 0x100) -= D_L03_001B01C0 * 0.00027777778f;
         *(f32 *)(vars + 0xFC) += *(f32 *)(vars + 0x100);
         if (!*(s32 *)(vars + 0x10C)) {
-            func_002E5CF8(1, 0, a0);
+            PlayMobySound(1, 0, a0);
             *(s32 *)(vars + 0x10C) = 1;
         }
         func_L03_003C7AC0(a0);
@@ -192,29 +192,29 @@ void func_L03_003C72A8(char *a0)
             break;
         }
         func_0029FCC0(a0, 2, buf + 0x10);
-        *(f32 *)(buf + 0x20) = func_00282DF0(vars + 0xE0);
-        distance = func_00282E80(buf + 0x10, buf);
+        *(f32 *)(buf + 0x20) = FastVecLength(vars + 0xE0);
+        distance = vec_distance_xy(buf + 0x10, buf);
         func_002AAC80((f32 *)(vars + 0x100), *(f32 *)(buf + 8) - *(f32 *)(buf + 0x18),
             0.0055555557f, 0.0055555557f, 0.16666667f);
         *(f32 *)(vars + 0xFC) += *(f32 *)(vars + 0x100);
         func_002AAC80((f32 *)(buf + 0x20), distance, 0.0055555557f, 0.0055555557f, 0.16666667f);
-        func_00282CF0(vars + 0xE0, buf, buf + 0x10);
+        FastVecSub(vars + 0xE0, buf, buf + 0x10);
         *(s32 *)(vars + 0xE8) = 0;
         func_002AC9F8(vars + 0xE0, *(f32 *)(buf + 0x20));
-        func_00282CC0(a0 + 0x10, a0 + 0x10, vars + 0xE0);
+        FastVecAdd(a0 + 0x10, a0 + 0x10, vars + 0xE0);
         func_002C9218(*(s32 *)vars, a0 + 0x10, a0 + 0x10, 1.25f);
-        if (func_00282E48(buf + 0x10, buf) < 0.01f) {
+        if (fast_vec_dist(buf + 0x10, buf) < 0.01f) {
             func_002A7750(a0, 2, -1);
             *(s32 *)(vars + 0xE8) = 0;
             *(s32 *)(vars + 0x100) = 0;
             switch (*(s16 *)(*(char **)(vars + 0xF0) + 0xAA)) {
             case 0xB85:
             case 0xCFC:
-                func_002E5CF8(2, 0, a0);
+                PlayMobySound(2, 0, a0);
                 func_L03_003C85F8(*(char **)(vars + 0xF0), (s32)a0);
                 break;
             case 0xFFD:
-                func_002E5CF8(2, 0, a0);
+                PlayMobySound(2, 0, a0);
                 func_L03_0041F008(*(char **)(vars + 0xF0), a0);
                 break;
             }

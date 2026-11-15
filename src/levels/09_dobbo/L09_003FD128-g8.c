@@ -32,19 +32,19 @@ void func_L09_003FD128(char *moby) {
 
     func_L09_003FCF68(moby);
     qcopy(f.mat[0], d + 0x340);
-    func_00282CF0(f.mat[2], d + 0x370, D_L09_001B9A00);
-    func_00282DD8(f.mat[1], f.mat[0], f.mat[2]);
-    func_00282F20(f.mat[1], f.mat[1], 1.0f);
-    func_00282DD8(f.mat[2], f.mat[1], f.mat[0]);
+    FastVecSub(f.mat[2], d + 0x370, D_L09_001B9A00);
+    FastVecCross(f.mat[1], f.mat[0], f.mat[2]);
+    vec_scale_to_length(f.mat[1], f.mat[1], 1.0f);
+    FastVecCross(f.mat[2], f.mat[1], f.mat[0]);
     qcopy(f.mat[3], d + 0x370);
     f.mat[3][3] = 1.0f;
-    func_002FC560(6, func_0027C878(0x16));
-    func_002FC560(0x42, 0x8000000048);
-    func_002FC560(8, 5);
-    func_002FC560(0x14, 0xFF9000000260);
-    func_002FC560(0x47, 0x51001);
-    func_002FC560(0x4A, 0);
-    func_00280328();
+    VU1_addGSregister(6, GetEffectTextureDescriptor(0x16));
+    VU1_addGSregister(0x42, 0x8000000048);
+    VU1_addGSregister(8, 5);
+    VU1_addGSregister(0x14, 0xFF9000000260);
+    VU1_addGSregister(0x47, 0x51001);
+    VU1_addGSregister(0x4A, 0);
+    font_queue_vu_state();
     for (i = 0; i < D_L09_001B11D8; i++) {
         float *s = D_L09_002A1FF0[i];
         float *o = f.verts[i];
@@ -52,7 +52,7 @@ void func_L09_003FD128(char *moby) {
         v[1] = s[1];
         v[2] = s[2];
         v[3] = 1.0f;
-        func_002830C0(v, v, f.mat);
+        transform_vector(v, v, f.mat);
         o[0] = v[0];
         o[1] = v[1];
         o[2] = v[2];
@@ -65,8 +65,8 @@ void func_L09_003FD128(char *moby) {
     } else {
         func_00281810(D_L09_001B11D8, f.verts, D_L09_002A2658, D_L09_002A23C8, 1);
     }
-    func_00282D30(f.mat[1], f.mat[1], -1.0f);
-    func_00282D30(f.mat[2], f.mat[2], -1.0f);
+    FastVecScale(f.mat[1], f.mat[1], -1.0f);
+    FastVecScale(f.mat[2], f.mat[2], -1.0f);
     for (j = 0; j < D_L09_001B11D8; j++) {
         float *o = f.verts[j];
         float *s = D_L09_002A1FF0[j];
@@ -74,7 +74,7 @@ void func_L09_003FD128(char *moby) {
         v[1] = s[1];
         v[2] = s[2];
         v[3] = 1.0f;
-        func_002830C0(v, v, f.mat);
+        transform_vector(v, v, f.mat);
         o[0] = v[0];
         o[1] = v[1];
         o[2] = v[2];

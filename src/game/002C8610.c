@@ -22,7 +22,7 @@ void func_002C8610(char *obj)
     int top;
 
     if (*(float *)(obj + 0x18) - D_001B5348 < -7.0f ||
-        (*(int *)(p + 0x14) != 0 && func_00282978(obj + 0xA) != 0)) {
+        (*(int *)(p + 0x14) != 0 && FastDecTimer(obj + 0xA) != 0)) {
         n = *(int *)(p + 0x10) - 1;
         *(int *)(p + 0x10) = n;
         if (n <= 0) {
@@ -41,12 +41,12 @@ void func_002C8610(char *obj)
     else
         *(unsigned char *)(obj + 8) -= 2;
     q = obj + 0x10;
-    func_00282CC0(q, q, p);
-    func_00282CC0(q, q, D_001B1DF0);
+    FastVecAdd(q, q, p);
+    FastVecAdd(q, q, D_001B1DF0);
     if (*(int *)(p + 0x14) == 0) {
         short h = *(short *)(obj + 0xA);
         float f = func_00283198((float)(D_001B1688[0] & (h - 1)) / (float)h * 6.2831855f);
-        func_00282D30(v, D_001B5580, f * 0.016666668f);
-        func_00282CC0(q, v, q);
+        FastVecScale(v, D_001B5580, f * 0.016666668f);
+        FastVecAdd(q, v, q);
     }
 }

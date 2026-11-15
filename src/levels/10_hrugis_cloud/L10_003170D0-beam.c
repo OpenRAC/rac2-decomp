@@ -95,15 +95,15 @@ void func_L10_003F61C8(Moby *moby)
     vars->scroll[0] += func_002A7878(0.1f, 0.25f);
     if (vars->scroll[0] >= 8.0f)
         vars->scroll[0] -= 8.0f;
-    func_00282CF0(view, position, D_L10_001B9680);
-    func_00282CF0(direction, end, position);
-    func_00282DD8(side, view, direction);
-    func_00282F20(side, side, 2.0f);
-    func_00282CC0(q.corners[0], position, side);
-    func_00282CF0(q.corners[1], position, side);
-    func_00282CC0(q.corners[2], end, side);
-    func_00282CF0(q.corners[3], end, side);
-    func_00280B90(&q, 0, 0);
+    FastVecSub(view, position, D_L10_001B9680);
+    FastVecSub(direction, end, position);
+    FastVecCross(side, view, direction);
+    vec_scale_to_length(side, side, 2.0f);
+    FastVecAdd(q.corners[0], position, side);
+    FastVecSub(q.corners[1], position, side);
+    FastVecAdd(q.corners[2], end, side);
+    FastVecSub(q.corners[3], end, side);
+    draw_world_quad(&q, 0, 0);
 
     /* Second layer. */
     if (func_001163B0() & 1)
@@ -128,15 +128,15 @@ void func_L10_003F61C8(Moby *moby)
     vars->scroll[1] += func_002A7878(0.08f, 0.1f);
     if (vars->scroll[1] >= 8.0f)
         vars->scroll[1] -= 8.0f;
-    func_00282CF0(view, position, D_L10_001B9680);
-    func_00282CF0(direction, end, position);
-    func_00282DD8(side, view, direction);
-    func_00282F20(side, side, 2.0f);
-    func_00282CC0(q.corners[0], position, side);
-    func_00282CF0(q.corners[1], position, side);
-    func_00282CC0(q.corners[2], end, side);
-    func_00282CF0(q.corners[3], end, side);
-    func_00280B90(&q, 0, 0);
+    FastVecSub(view, position, D_L10_001B9680);
+    FastVecSub(direction, end, position);
+    FastVecCross(side, view, direction);
+    vec_scale_to_length(side, side, 2.0f);
+    FastVecAdd(q.corners[0], position, side);
+    FastVecSub(q.corners[1], position, side);
+    FastVecAdd(q.corners[2], end, side);
+    FastVecSub(q.corners[3], end, side);
+    draw_world_quad(&q, 0, 0);
 
     /* The glow: four units either side at the moby, three at the far end. */
     func_00281DE8(&q, 0xE, 1, 0x80);
@@ -149,13 +149,13 @@ void func_L10_003F61C8(Moby *moby)
     q.uv[5] = 0;
     q.uv[6] = 1;
     q.uv[7] = 1;
-    func_00282F20(side, side, 4.0f);
-    func_00282CC0(q.corners[0], position, side);
-    func_00282CF0(q.corners[1], position, side);
-    func_00282F20(side, side, 3.0f);
-    func_00282CC0(q.corners[2], end, side);
-    func_00282CF0(q.corners[3], end, side);
-    func_00280B90(&q, 0, 0);
+    vec_scale_to_length(side, side, 4.0f);
+    FastVecAdd(q.corners[0], position, side);
+    FastVecSub(q.corners[1], position, side);
+    vec_scale_to_length(side, side, 3.0f);
+    FastVecAdd(q.corners[2], end, side);
+    FastVecSub(q.corners[3], end, side);
+    draw_world_quad(&q, 0, 0);
 
     /* Two sprites of random size and angle at the far end. */
     size1 = func_002A7878(3.5f, 4.5f);

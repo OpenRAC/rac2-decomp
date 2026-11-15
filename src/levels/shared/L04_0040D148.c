@@ -45,34 +45,34 @@ void func_L04_0040D148(unsigned char *m, int alpha)
     int i, j;
     int rows = 10, cols = 10;
 
-    t = func_00283198(func_00283D00(func_00283CE0(D_L04_001B2008[0]), 180.0f) * 0.0055555557f * 6.283186f);
+    t = func_00283198(fast_fmod(IntToFloat(D_L04_001B2008[0]), 180.0f) * 0.0055555557f * 6.283186f);
     t = (t + 1.0f) * 0.5f;
     if (alpha == -1) {
-        color = func_00283D38(0x1fb43264, 0x1f502800, t);
+        color = FastTweenColor(0x1fb43264, 0x1f502800, t);
     } else {
         if (alpha < 0) {
             alpha = 0;
         }
-        color = func_00283D38(0x1fb43264, ((unsigned int)alpha << 24) | 0x502800, t);
+        color = FastTweenColor(0x1fb43264, ((unsigned int)alpha << 24) | 0x502800, t);
     }
-    offset = func_00283D00(func_00283CE0(D_L04_001B2008[0]), 30.0f) * 0.033333335f;
-    func_00283410(matrix, m + 0xf0);
+    offset = fast_fmod(IntToFloat(D_L04_001B2008[0]), 30.0f) * 0.033333335f;
+    euler_to_matrix(matrix, m + 0xf0);
     *(B1202Quad *)(matrix[3]) = *(B1202Quad *)(m + 0x10);
-    func_00282F20(matrix[0], matrix[0], 0.4f);
-    func_00282F20(matrix[1], matrix[1], 0.35f);
-    func_00282F20(matrix[2], matrix[2], 0.35f);
-    packet.texture = func_0027C878(21);
+    vec_scale_to_length(matrix[0], matrix[0], 0.4f);
+    vec_scale_to_length(matrix[1], matrix[1], 0.35f);
+    vec_scale_to_length(matrix[2], matrix[2], 0.35f);
+    packet.texture = GetEffectTextureDescriptor(21);
     packet.mode = 0xff9000000260ULL;
     packet.flags = 0x8000000048ULL;
     packet.primitive = 0;
     for (i = 0; i < rows; i++) {
-        lat0 = func_00283CE0(i) * 3.141593f / func_00283CE0(rows) - 1.5707965f;
-        lat1 = func_00283CE0(i + 1) * 3.141593f / func_00283CE0(rows) - 1.5707965f;
+        lat0 = IntToFloat(i) * 3.141593f / IntToFloat(rows) - 1.5707965f;
+        lat1 = IntToFloat(i + 1) * 3.141593f / IntToFloat(rows) - 1.5707965f;
         v0 = (func_00283198(lat0) + 1.0f) * 0.5f;
         v1 = (func_00283198(lat1) + 1.0f) * 0.5f;
         for (j = 0; j < cols; j++) {
-            lon0 = func_00283C28(func_00283CE0(j) * 6.283186f / func_00283CE0(cols));
-            lon1 = func_00283C28(func_00283CE0(j + 1) * 6.283186f / func_00283CE0(cols));
+            lon0 = func_00283C28(IntToFloat(j) * 6.283186f / IntToFloat(cols));
+            lon1 = func_00283C28(IntToFloat(j + 1) * 6.283186f / IntToFloat(cols));
             cos0 = func_00283180(lon0);
             cos1 = func_00283180(lon1);
             u0 = offset + (cos0 + 1.0f) * 0.5f;
@@ -97,13 +97,13 @@ void func_L04_0040D148(unsigned char *m, int alpha)
             packet.vertex[1].f[3] = 1.0f;
             packet.vertex[2].f[3] = 1.0f;
             packet.vertex[3].f[3] = 1.0f;
-            func_00280B90(&packet, matrix, 0);
+            draw_world_quad(&packet, matrix, 0);
         }
     }
-    *(float *)(p + 0x4b4) = func_00283B98(*(float *)(p + 0x4b4), 0.01f);
-    *(float *)(p + 0x4b8) = func_00283B98(*(float *)(p + 0x4b8), -0.007f);
-    *(float *)(p + 0x4bc) = func_00283B98(*(float *)(p + 0x4bc), 0.007f);
-    *(float *)(p + 0x4c0) = func_00283B98(*(float *)(p + 0x4c0), *(float *)(p + 0x30c) * 0.1f);
+    *(float *)(p + 0x4b4) = FastAddRotations(*(float *)(p + 0x4b4), 0.01f);
+    *(float *)(p + 0x4b8) = FastAddRotations(*(float *)(p + 0x4b8), -0.007f);
+    *(float *)(p + 0x4bc) = FastAddRotations(*(float *)(p + 0x4bc), 0.007f);
+    *(float *)(p + 0x4c0) = FastAddRotations(*(float *)(p + 0x4c0), *(float *)(p + 0x30c) * 0.1f);
     if (alpha == -1) {
         func_L04_0040DCA8(m + 0x10, *(int *)(p + 0x648), 0x0fc8c8c8, 1, 0.495f, 0.35f, *(float *)(p + 0x4b4), *(float *)(m + 0xf4));
         func_L04_0040DCA8(m + 0x10, *(int *)(p + 0x648), 0x0fc8c8c8, 1, 0.495f, 0.35f, *(float *)(p + 0x4b8), *(float *)(m + 0xf4));

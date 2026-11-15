@@ -69,7 +69,7 @@ char *func_L00_00387CA8(Vector4 *position, Vector4 *velocity)
 {
     Vector4 direction, forward, quaternion, axis;
     Vector4 rotation[3];
-    char *object = func_0029EFD0(0x1366);
+    char *object = CreateMoby(0x1366);
     TrailWork *work;
     float angle;
     if (object) {
@@ -82,15 +82,15 @@ char *func_L00_00387CA8(Vector4 *position, Vector4 *velocity)
         ((TrailMoby *)object)->alpha = initialState;
         qcopy(&((TrailMoby *)object)->position, position);
         qcopy(&work->velocity, velocity);
-        func_002833F0(object + 0xC0, D_0018C0B0[0] + 0xF0);
+        euler_rotation_basis(object + 0xC0, D_0018C0B0[0] + 0xF0);
         func_002FE8D8(object + 0x10, &direction);
-        func_00282F20(&forward, object + 0xE0, 1);
-        func_00282DD8(&axis, &forward, &direction);
-        angle = func_00282DB0(&forward, &direction) * 0.5f;
-        func_00282D30(&quaternion, &axis, func_00283198(angle));
+        vec_scale_to_length(&forward, object + 0xE0, 1);
+        FastVecCross(&axis, &forward, &direction);
+        angle = FastVecDot(&forward, &direction) * 0.5f;
+        FastVecScale(&quaternion, &axis, func_00283198(angle));
         quaternion.f[3] = func_00283180(angle);
-        func_00283958(&quaternion, rotation);
-        func_00283738(object + 0xC0, rotation, object + 0xC0);
+        quaternion_to_rotation_basis(&quaternion, rotation);
+        multiply_matrix3x3(object + 0xC0, rotation, object + 0xC0);
         work->owner = 0;
         work->f60 = (D_L00_00262570 + D_00139591[0])->f58;
         work->f64 = 0;
@@ -120,7 +120,7 @@ char *func_L00_0038A748(void *owner, Vector4 *position, Vector4 *velocity)
 {
     Vector4 direction, forward, quaternion, axis;
     Vector4 rotation[3];
-    char *object = func_0029EFD0(0x1367);
+    char *object = CreateMoby(0x1367);
     TrailWork *work;
     float angle;
     if (object) {
@@ -132,15 +132,15 @@ char *func_L00_0038A748(void *owner, Vector4 *position, Vector4 *velocity)
         ((TrailMoby *)object)->alpha = initialState;
         qcopy(&((TrailMoby *)object)->position, position);
         qcopy(&work->velocity, velocity);
-        func_002833F0(object + 0xC0, D_0018C0B0[0] + 0xF0);
+        euler_rotation_basis(object + 0xC0, D_0018C0B0[0] + 0xF0);
         func_002FE8D8(object + 0x10, &direction);
-        func_00282F20(&forward, object + 0xE0, 1);
-        func_00282DD8(&axis, &forward, &direction);
-        angle = func_00282DB0(&forward, &direction) * 0.5f;
-        func_00282D30(&quaternion, &axis, func_00283198(angle));
+        vec_scale_to_length(&forward, object + 0xE0, 1);
+        FastVecCross(&axis, &forward, &direction);
+        angle = FastVecDot(&forward, &direction) * 0.5f;
+        FastVecScale(&quaternion, &axis, func_00283198(angle));
         quaternion.f[3] = func_00283180(angle);
-        func_00283958(&quaternion, rotation);
-        func_00283738(object + 0xC0, rotation, object + 0xC0);
+        quaternion_to_rotation_basis(&quaternion, rotation);
+        multiply_matrix3x3(object + 0xC0, rotation, object + 0xC0);
         work->f64 = 0;
         work->f50 = 0;
         work->f44 = 0;
@@ -232,8 +232,8 @@ void func_L00_00384248(char *owner)
     Vector4 *source;
 
     for (i = 0; i < 2; ++i) {
-        func_00283098(work->objects[i] + 0x10, &work->basis[i], D_L00_001B8DC0 + 0x230);
-        func_00282CC0(work->objects[i] + 0x10, work->objects[i] + 0x10, D_L00_001B8DC0);
+        matrix_mul_vec3(work->objects[i] + 0x10, &work->basis[i], D_L00_001B8DC0 + 0x230);
+        FastVecAdd(work->objects[i] + 0x10, work->objects[i] + 0x10, D_L00_001B8DC0);
         FIELD(float, work->objects[i], 0x2C) =
             FIELD(float, FIELD(char *, work->objects[i], 0x24), 0x24) * D_L00_001AEDA0[i];
         func_002AEC18(work->objects[i], D_L00_001AEDA8[i]);
@@ -256,9 +256,9 @@ void func_L00_00384248(char *owner)
         }
         target = -input * scale;
         if (target != 0.0f)
-            func_002AA2E8(&work->motion[i].f[2], target, step);
+            ApproachValue(&work->motion[i].f[2], target, step);
         else
-            func_002AA2E8(&work->motion[i].f[2], 0.0f, step + step);
+            ApproachValue(&work->motion[i].f[2], 0.0f, step + step);
         work->basis[i].f[2] += work->motion[i].f[2];
         if (work->basis[i].f[2] > 0.35f) {
             work->basis[i].f[2] = 0.35f;
@@ -272,11 +272,11 @@ void func_L00_00384248(char *owner)
         if (func_00282948(&D_L00_001AEDD0[i])) {
             FIELD(unsigned char, work->objects[i], 0x23) = 128;
         } else {
-            phase = func_00283CE0(D_L00_001B19C8 % 60);
-            period = func_00283CE0(60);
+            phase = IntToFloat(D_L00_001B19C8 % 60);
+            period = IntToFloat(60);
             phase *= 6.2831855f;
             phase /= period;
-            alpha = func_00283CF0(func_00283198(phase - 3.1415927f) * 10.0f) + 20;
+            alpha = FloatToInt(func_00283198(phase - 3.1415927f) * 10.0f) + 20;
             FIELD(unsigned char, work->objects[i], 0x23) = alpha;
         }
         if (func_00282948(&work->timers[i])
@@ -286,11 +286,11 @@ void func_L00_00384248(char *owner)
             position.bits = source->bits;
             if (!i)
                 position.f[1] -= 0.05f;
-            func_00283098(&position, &position, work->objects[i] + 0xC0);
-            func_00282CC0(&position, &position, work->objects[i] + 0x10);
-            func_00282F20(&velocity, work->objects[i] + 0xC0, D_L00_001AEDB4 * 0.016666668f);
+            matrix_mul_vec3(&position, &position, work->objects[i] + 0xC0);
+            FastVecAdd(&position, &position, work->objects[i] + 0x10);
+            vec_scale_to_length(&velocity, work->objects[i] + 0xC0, D_L00_001AEDB4 * 0.016666668f);
             func_L00_00384CA8(work->objects[i], &position, &velocity, i);
-            func_002E5CF8(0, 0, work->objects[i]);
+            PlayMobySound(0, 0, work->objects[i]);
         }
     }
 }

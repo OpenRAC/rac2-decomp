@@ -158,9 +158,9 @@ int func_L22_003A5018(void) {
         func_00300A00(sprite, 0x55F0C070, ref_L22_003A5018_01, sy, -1.0f, 1.0f, 0.0f);
     }
     one = 1;
-    { void *sprite = (void *)(u32)func_0028E588(0xEAA4, one);
+    { void *sprite = (void *)(u32)GetIconFrame(0xEAA4, one);
     func_0028EA58(sprite, ref_L22_003A5018_14, label_y(sprite, (float)ref_L22_003A5018_15, D_L22_001B2984, 0.5f, 1), ref_L22_003A5018_16, ref_L22_003A5018_17, ref_L22_003A5018_42); }
-    { void *sprite = (void *)(u32)func_0028E588(0xEAA4, 0);
+    { void *sprite = (void *)(u32)GetIconFrame(0xEAA4, 0);
     func_0028EA58(sprite, ref_L22_003A5018_18, label_y(sprite, (float)ref_L22_003A5018_19, D_L22_001B2984, 0.5f, 1), ref_L22_003A5018_20, ref_L22_003A5018_21, ref_L22_003A5018_42); }
 
     {
@@ -188,11 +188,11 @@ int func_L22_003A5018(void) {
     }
 
     {
-        void *sprite = (void *)(u32)func_0028E588(0xEAA5, 0);
+        void *sprite = (void *)(u32)GetIconFrame(0xEAA5, 0);
         func_0028EA58(sprite, ref_L22_003A5018_22, screen_coord(D_L22_001B2980, (float)ref_L22_003A5018_23, 1.0f), ref_L22_003A5018_24, ref_L22_003A5018_25, ref_L22_003A5018_42);
     }
     {
-        void *sprite = (void *)(u32)func_0028E588(0xEAA5, 0);
+        void *sprite = (void *)(u32)GetIconFrame(0xEAA5, 0);
         func_0028EA58(sprite, ref_L22_003A5018_26, screen_coord(D_L22_001B2980, (float)ref_L22_003A5018_27, 1.0f), ref_L22_003A5018_28, ref_L22_003A5018_29, ref_L22_003A5018_42);
     }
     one2 = 1;
@@ -210,37 +210,37 @@ int func_L22_003A5018(void) {
     func_0027FB40(ref_L22_003A5018_34, value, colour, text, func_001157AC(text));
     }
     if (D_L22_001B1910.leftIcons) {
-        void *sprite = (void *)(u32)func_0028E588(0xEAA5, one2);
+        void *sprite = (void *)(u32)GetIconFrame(0xEAA5, one2);
         func_0028EA58(sprite, ref_L22_003A5018_36, screen_coord(D_L22_001B2980, (float)ref_L22_003A5018_37, 1.0f), ref_L22_003A5018_40, ref_L22_003A5018_41, ref_L22_003A5018_42);
     }
     if (D_L22_001B1910.leftIcons >= 2) {
-        void *sprite = (void *)(u32)func_0028E588(0xEAA5, 1);
+        void *sprite = (void *)(u32)GetIconFrame(0xEAA5, 1);
         int x = ref_L22_003A5018_36 + ref_L22_003A5018_44;
         func_0028EA58(sprite, x, screen_coord(D_L22_001B2980, (float)ref_L22_003A5018_37, 1.0f), ref_L22_003A5018_40, ref_L22_003A5018_41, ref_L22_003A5018_42);
     }
     if (D_L22_001B1910.rightIcons) {
-        void *sprite = (void *)(u32)func_0028E588(0xEAA5, 1);
+        void *sprite = (void *)(u32)GetIconFrame(0xEAA5, 1);
         func_0028EA58(sprite, ref_L22_003A5018_38, screen_coord(D_L22_001B2980, (float)ref_L22_003A5018_39, 1.0f), ref_L22_003A5018_40, ref_L22_003A5018_41, ref_L22_003A5018_42);
     }
     if (D_L22_001B1910.rightIcons >= 2) {
-        void *sprite = (void *)(u32)func_0028E588(0xEAA5, 1);
+        void *sprite = (void *)(u32)GetIconFrame(0xEAA5, 1);
         int x = ref_L22_003A5018_38 - ref_L22_003A5018_44;
         func_0028EA58(sprite, x, screen_coord(D_L22_001B2980, (float)ref_L22_003A5018_39, 1.0f), ref_L22_003A5018_40, ref_L22_003A5018_41, ref_L22_003A5018_42);
     }
     if (D_L22_001B2AC8 != -1 && obj[0x95] != 10) {
         switch (D_L22_001B2AC8) {
-        case 0: func_L00_0030DD70((int)func_00288FB8(0x2FA3), -1); break;
-        case 2: func_00288FB8(0x1241); func_0029CC50(0x1241, *(short *)(ctl + 0x32C), -1); break;
-        case 1: func_00288FB8(0x1240); func_0029CC50(0x1240, D_L22_001B2ACC, -1); break;
+        case 0: func_L00_0030DD70((int)GetLocalizedString(0x2FA3), -1); break;
+        case 2: GetLocalizedString(0x1241); func_0029CC50(0x1241, *(short *)(ctl + 0x32C), -1); break;
+        case 1: GetLocalizedString(0x1240); func_0029CC50(0x1240, D_L22_001B2ACC, -1); break;
         }
         ref_L22_003A5018_05 = 0;
         func_00282948(&D_L22_001B2AD0);
         if (D_L22_001B2AD0 <= 0) D_L22_001B2AC8 = -1;
     }
     if (ref_L22_003A5018_31) {
-        func_002802E0(box, 240, 480, 44, 468, 256, label_y(ctl, 320.0f, ref_L22_003A5018_06, 0.5f, 1), 16, 3);
-        label = func_00288FB8(0x9FC);
-        hint = func_00288FB8(0x2F2C);
+        FontSetWindow(box, 240, 480, 44, 468, 256, label_y(ctl, 320.0f, ref_L22_003A5018_06, 0.5f, 1), 16, 3);
+        label = GetLocalizedString(0x9FC);
+        hint = GetLocalizedString(0x2F2C);
         func_0029B888(box, 0x80F0F0F0, label, 0, 0, -1, 0, hint, 0, 0);
     }
     func_L00_0030CF60();

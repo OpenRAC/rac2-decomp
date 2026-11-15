@@ -99,11 +99,11 @@ void func_L11_0047A310(JobaGroupMoby *self) {
             (D_0019B2E8[self->index + (D_001A79F0 << 4)] & 0x80)) {
             self->timer = 0;
             self->state = 2;
-            func_002E5CF8(1, 0, self);
+            PlayMobySound(1, 0, self);
             {
                 unsigned char *record = D_00188660 + data[5] * 0x70;
                 if (*(JobaGroupMoby **)(record + 0x88) != self || record[0x74] == 0) {
-                    data[5] = func_002E5CF8(2, 4, self);
+                    data[5] = PlayMobySound(2, 4, self);
                 }
             }
             {
@@ -134,10 +134,10 @@ void func_L11_0047A310(JobaGroupMoby *self) {
         }
         event = func_002A9640(self, 0x10000, 0);
         if (event) {
-            func_00282F20(vec, self->target, 0.4166666865f);
+            vec_scale_to_length(vec, self->target, 0.4166666865f);
             if ((*(JobaGroupMoby **)(event + 0x20))->type == 0xDD9) {
                 short *entries, *list;
-                func_002E5CF8(0, 0, self);
+                PlayMobySound(0, 0, self);
                 self->timer = 0;
                 self->slot = 255;
                 /* Each exit writes its calls out: jump2 shares only the last call between them. */

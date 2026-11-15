@@ -47,14 +47,14 @@ void func_L13_0041A398(u8 *self)
         }
         break;
     case 2:
-        if (func_00282978(state + 0x10) != 0) {
+        if (FastDecTimer(state + 0x10) != 0) {
             self[0x20] = 3;
             *(u16 *)(state + 0x10) = *(u16 *)(state + 4);
             func_L13_0041A550(self);
         }
         break;
     case 3:
-        if (func_00282978(state + 0x10) != 0) {
+        if (FastDecTimer(state + 0x10) != 0) {
             if (*(s16 *)(state + 6) != 0)
                 self[0x20] = 2;
             *(s16 *)(state + 0x10) = 5;

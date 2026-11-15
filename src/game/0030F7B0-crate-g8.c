@@ -124,12 +124,12 @@ void func_00312600(Moby *moby)
         vars->frame = D_001B1688;
         if (moby->state != 0) {
             /* A crate the hero touches from below breaks and drops its loot. */
-            func_00282CF0(delta, D_00189E20.position, moby->position);
-            func_00283098(delta, delta, moby->matrix);
+            FastVecSub(delta, D_00189E20.position, moby->position);
+            matrix_mul_vec3(delta, delta, moby->matrix);
             if (func_00282C48(delta[0]) < 0.55f && func_00282C48(delta[1]) < 0.55f &&
                 delta[2] < 0.0f && delta[2] > -(D_00189E20.f250 + D_00189E20.f264) &&
                 (moby->state == 1 || moby->state == 5)) {
-                func_003120C8(moby, moby->oClass == 0x1F9, 0);
+                DestroyCrate(moby, moby->oClass == 0x1F9, 0);
                 func_00311F70(moby);
             }
 
@@ -145,14 +145,14 @@ void func_00312600(Moby *moby)
                 /* Ride the attachment, the lift easing towards its target. */
                 if (vars->below == 0) {
                     vars->velocity[3] -= 0.0027777778f;
-                    if (func_002AA2E8(&vars->lift, 0.0f, func_00282C48(vars->velocity[3])) == 0.0f)
+                    if (ApproachValue(&vars->lift, 0.0f, func_00282C48(vars->velocity[3])) == 0.0f)
                         vars->velocity[3] = 0.0f;
                 } else {
                     float target;
 
                     vars->velocity[3] -= 0.0027777778f;
                     target = vars->below->vars->lift + 1.0f;
-                    if (func_002AA2E8(&vars->lift, target,
+                    if (ApproachValue(&vars->lift, target,
                                       func_00282C48(vars->velocity[3])) == 0.0f)
                         vars->velocity[3] = 0.0f;
                 }
@@ -168,7 +168,7 @@ void func_00312600(Moby *moby)
                     qcopy(vars->attachOffset, attachPosition);
                     vars->attachOffset[2] -= vars->lift;
                 }
-                func_00282CF0(movement, moby->position, previousPosition);
+                FastVecSub(movement, moby->position, previousPosition);
                 movement[3] = vars->velocity[3];
                 qcopy(vars->velocity, movement);
                 func_002AD6F0(vars->f50, vars->velocity, previousRotation, moby->rotation);
@@ -180,7 +180,7 @@ void func_00312600(Moby *moby)
                     qcopy(end, moby->position);
                     start[2] += vars->height * 0.75f;
                     end[2] += vars->velocity[2];
-                    landed = func_002761F8(start, end, 2, 0, 0);
+                    landed = CollLine(start, end, 2, 0, 0);
                     qcopy(hit, D_001BAF80.point);
                 } else {
                     qcopy(hit, vars->below->position);
@@ -192,7 +192,7 @@ void func_00312600(Moby *moby)
                 if (landed) {
                     /* A fast landing sets off a class 0x1F9 crate in state 1: this one, or the
                      * one below. */
-                    if ((vars->flags & 0x20) && func_00282DF0(vars->velocity) > 0.008333334f) {
+                    if ((vars->flags & 0x20) && FastVecLength(vars->velocity) > 0.008333334f) {
                         if (moby->oClass == 0x1F9 && moby->state == 1) {
                             moby->fBC = 0;
                             moby->state = 5;
@@ -208,7 +208,7 @@ void func_00312600(Moby *moby)
                     vars->velocity[2] = 0.0f;
                 } else {
                     vars->flags |= 4;
-                    func_00282CC0(moby->position, moby->position, vars->velocity);
+                    FastVecAdd(moby->position, moby->position, vars->velocity);
                 }
             }
         }

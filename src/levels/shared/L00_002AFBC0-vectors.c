@@ -19,16 +19,16 @@ void func_L00_002B47A8(char *first, char *second, float x, float y, int mode)
 
     if (mode) {
         if (D_L00_001A8FF0)
-            func_00282F20(buffer, D_0018A0E0, -y);
+            vec_scale_to_length(buffer, D_0018A0E0, -y);
         else
-            func_00282F20(buffer, D_0018C0B0 + 0xe0, y);
+            vec_scale_to_length(buffer, D_0018C0B0 + 0xe0, y);
         p = (char *)&D_00189EA0;
-        func_00282CC0(second, p, buffer);
+        FastVecAdd(second, p, buffer);
         if (D_L00_001A8FF0)
-            func_00282F20(buffer, p + 0x240, -x);
+            vec_scale_to_length(buffer, p + 0x240, -x);
         else
-            func_00282F20(buffer, *(char **)(p + 0x2210) + 0xe0, x);
-        func_00282CC0(first, (char *)&D_00189EA0, buffer);
+            vec_scale_to_length(buffer, *(char **)(p + 0x2210) + 0xe0, x);
+        FastVecAdd(first, (char *)&D_00189EA0, buffer);
         work = *(Quad *)first;
         func_L00_0031EC88((char *)&work, second);
     } else {

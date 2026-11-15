@@ -76,7 +76,7 @@ void func_L20_003A0320(char *arg0) {
         f21 = 3.0f;
         func_L00_00324F18(s0, (char *)buf, f20, f20, f21);
         if (*(u8 *)(s0 + 0x31) != 0 && D_L20_001B2ACC < 0.9f) {
-            func_002ABBB8(s0, D_L20_001A8F20, buf, f20, f20, 10, 3, 16,
+            SpawnExplosionEffects(s0, D_L20_001A8F20, buf, f20, f20, 10, 3, 16,
                           1.0f, 0.5f, 9.0f, *(f32 *)(s0 + 0x2C) * 1.3f, -1, 15.0f,
                           0, 1, -1, 0, 0);
             func_002B0A68(s0, 1, (float *)D_L20_001A8F20_1, f21, 6.0f, f21, 6.0f, 0xFF);
@@ -84,7 +84,7 @@ void func_L20_003A0320(char *arg0) {
             func_002B0A68(s0, 1, (float *)D_L20_001A8F20_1, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
         }
         func_L00_00326110(s0, 1, 0.0f);
-        func_002E5CF8(0, 0, s0);
+        PlayMobySound(0, 0, s0);
         func_0032F5B0(s0, 3, -1);
         break;
     case 3:

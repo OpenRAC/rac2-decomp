@@ -74,30 +74,30 @@ void func_L00_002B4458(int force)
     }
     func_L00_002D36E0(&upper, 0.0f, 0.0f, height, 1);
     func_L00_002D36E0(&lower, 0.0f, 0.0f, height * 0.3f, 1);
-    if (force || func_00282E20(&D_00189E20.velocity) < 0.01f) {
-        func_00282F20(&upperEnd, &D_00189E20.dir0, reach);
-        func_00282F20(&lowerEnd, &D_00189E20.dir0, reach * 1.4f);
+    if (force || vec_length_xy(&D_00189E20.velocity) < 0.01f) {
+        vec_scale_to_length(&upperEnd, &D_00189E20.dir0, reach);
+        vec_scale_to_length(&lowerEnd, &D_00189E20.dir0, reach * 1.4f);
     } else {
         func_L00_002D3B58(&upperEnd, &D_00189E20.velocity, 0.0f);
-        func_00282F20(&upperEnd, &upperEnd, reach);
-        func_00282D30(&lowerEnd, &upperEnd, 1.4f);
+        vec_scale_to_length(&upperEnd, &upperEnd, reach);
+        FastVecScale(&lowerEnd, &upperEnd, 1.4f);
     }
     type = -1;
-    func_00282CC0(&upperEnd, &upperEnd, &upper);
-    func_00282CC0(&lowerEnd, &lowerEnd, &lower);
-    if (func_002761F8(&lower, &lowerEnd, 2, D_00189E20.moby, 0) && D_L00_001BF200.hits > 0)
-        type = func_00278E78();
+    FastVecAdd(&upperEnd, &upperEnd, &upper);
+    FastVecAdd(&lowerEnd, &lowerEnd, &lower);
+    if (CollLine(&lower, &lowerEnd, 2, D_00189E20.moby, 0) && D_L00_001BF200.hits > 0)
+        type = GetCollHitMaterial();
     slope = 0.0f;
-    if (func_002761F8(&upper, &upperEnd, 2, D_00189E20.moby, 0) && D_L00_001BF200.hits > 0)
+    if (CollLine(&upper, &upperEnd, 2, D_00189E20.moby, 0) && D_L00_001BF200.hits > 0)
         slope = func_L00_002D3EA8(&D_L00_001BF200.normal);
     if (slope >= 0.87266469f || type == 8 || type == 12) {
         D_00189E20.x270 = D_L00_001BF200.x18;
         func_L00_002D3B58(&D_L00_001BF200.normal, &D_L00_001BF200.normal, 0.0f);
-        func_00282F20(&D_L00_001BF200.normal, &D_L00_001BF200.normal, 1.0f);
-        dot = func_00282DB0(&D_L00_001BF200.normal, &D_00189E20.velocity);
+        vec_scale_to_length(&D_L00_001BF200.normal, &D_L00_001BF200.normal, 1.0f);
+        dot = FastVecDot(&D_L00_001BF200.normal, &D_00189E20.velocity);
         if (dot < 0.0f) {
-            func_00282D30(&D_L00_001BF200.normal, &D_L00_001BF200.normal, -dot);
-            func_00282CC0(&D_00189E20.velocity, &D_00189E20.velocity, &D_L00_001BF200.normal);
+            FastVecScale(&D_L00_001BF200.normal, &D_L00_001BF200.normal, -dot);
+            FastVecAdd(&D_00189E20.velocity, &D_00189E20.velocity, &D_L00_001BF200.normal);
         }
     }
 }

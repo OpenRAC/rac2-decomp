@@ -77,14 +77,14 @@ void func_L02_0040BE08(u8 *object)
         target.quad = *(TI128 *)&D_00189E20.pos;
         func_00283248(D_00189E20.pos.f[0] - *(float *)(object + 0x10), D_00189E20.pos.f[1] - *(float *)(object + 0x14));
     }
-    range = func_00282E80(object + 0x10, &target);
+    range = vec_distance_xy(object + 0x10, &target);
     if (object[0x20] == 1 || object == 0 || object[0x20] == 0xFE || object[0x20] == 0xFD)
         return;
     if (object[0x95] == 4) {
         qcopy(&point, object + 0x10);
         *(float *)(state + 0x108) -= *(float *)(state + 0x8C);
-        func_00282CC0(object + 0x10, object + 0x10, state + 0x100);
-        if (func_002761F8(&point, object + 0x10, 0, object, 0) ||
+        FastVecAdd(object + 0x10, object + 0x10, state + 0x100);
+        if (CollLine(&point, object + 0x10, 0, object, 0) ||
             func_00277258(object + 0x10, 4, object, 0.3f) || func_002A77E0(30) == 0) {
             func_002A8C28(object, object + 0x10, 0x10000, 0.5f, (float)(state[0x34] * 3), 1.0f, 0, 1, 0);
             if (*(float *)(state + 0x20) > 0.0f) {
@@ -129,9 +129,9 @@ void func_L02_0040BE08(u8 *object)
                 float best;
                 func_002B60B0(object, 0.027777778f, 3.3333335f, 0.001163553f, 0.10471977f);
                 *(float *)(state + 0x188) = *(float *)(ground + 8) + func_002A7878(1.0f, 3.0f);
-                best = func_00282E80(object + 0x10, cursor);
+                best = vec_distance_xy(object + 0x10, cursor);
                 for (index = 0; index < *(s32 *)path - 1; index++) {
-                    float next = func_00282E80(object + 0x10, cursor);
+                    float next = vec_distance_xy(object + 0x10, cursor);
                     if (next < best) { best = next; closest = index; }
                     cursor += 0x10;
                 }
@@ -140,16 +140,16 @@ void func_L02_0040BE08(u8 *object)
             } else {
                 qcopy(&point, &((PatrolVector *)(path + 0x10))[*(s32 *)(state + 0x194)]);
                 point.f[2] = *(float *)(state + 0x188);
-                func_00282CF0(&velocity, &point, object + 0x10);
-                func_00282F20(&velocity, &velocity, *(float *)(state + 0x198));
-                func_00282CC0(object + 0x10, object + 0x10, &velocity);
+                FastVecSub(&velocity, &point, object + 0x10);
+                vec_scale_to_length(&velocity, &velocity, *(float *)(state + 0x198));
+                FastVecAdd(object + 0x10, object + 0x10, &velocity);
                 if (*(s16 *)(state + 0x1B4)) {
-                    if (func_00282E80(object + 0x10, &point) < 2.0f)
+                    if (vec_distance_xy(object + 0x10, &point) < 2.0f)
                         --*(s32 *)(state + 0x194);
                     if (*(s32 *)(state + 0x194) < 0)
                         *(s32 *)(state + 0x194) = *(s32 *)path - 1;
                 } else {
-                    if (func_00282E80(object + 0x10, &point) < 2.0f)
+                    if (vec_distance_xy(object + 0x10, &point) < 2.0f)
                         ++*(s32 *)(state + 0x194);
                     if (*(s32 *)(state + 0x194) >= *(s32 *)path)
                         *(s32 *)(state + 0x194) = 0;
@@ -194,9 +194,9 @@ void func_L02_0040BE08(u8 *object)
         if (range >= 1.7f)
             func_L01_00321178((char *)object, (char *)&target);
         else if (range < 1.7f) {
-            func_00282CF0(&point, object + 0x10, &target);
-            func_00282F20(&point, &point, 2.0f);
-            func_00282CC0(&point, &point, object + 0x10);
+            FastVecSub(&point, object + 0x10, &target);
+            vec_scale_to_length(&point, &point, 2.0f);
+            FastVecAdd(&point, &point, object + 0x10);
             func_L01_00321178((char *)object, (char *)&point);
         }
         i = 0;
@@ -231,9 +231,9 @@ void func_L02_0040BE08(u8 *object)
     *(float *)(state + 0x170) = func_002AA150(*(float *)(state + 0x170), D_L02_001B1970 * 0.00029088825f, 0.0625f);
     *(float *)(state + 0x174) = func_002AA150(*(float *)(state + 0x174), D_L02_001B1974[0] * 0.00029088825f, 0.0625f);
     *(float *)(state + 0x178) = func_002AA150(*(float *)(state + 0x178), D_L02_001B1978[0] * 0.00029088825f, 0.0625f);
-    *(float *)(object + 0xF0) = func_00283B98(*(float *)(object + 0xF0), *(float *)(state + 0x170));
-    *(float *)(object + 0xF4) = func_00283B98(*(float *)(object + 0xF4), *(float *)(state + 0x174));
-    *(float *)(object + 0xF8) = func_00283B98(*(float *)(object + 0xF8), *(float *)(state + 0x178));
+    *(float *)(object + 0xF0) = FastAddRotations(*(float *)(object + 0xF0), *(float *)(state + 0x170));
+    *(float *)(object + 0xF4) = FastAddRotations(*(float *)(object + 0xF4), *(float *)(state + 0x174));
+    *(float *)(object + 0xF8) = FastAddRotations(*(float *)(object + 0xF8), *(float *)(state + 0x178));
     if (ground && *(float *)(object + 0x18) <= *(float *)(ground + 8) + 0.4f) {
         if (!object[0x31]) {
             *(float *)(state + 0x108) = 0.016666668f;

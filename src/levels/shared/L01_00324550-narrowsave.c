@@ -10,10 +10,10 @@ void func_L01_00324550(int id, ...) __attribute__((register_precision(ra, 64)));
 void func_L01_00324550(int id, ...)
 {
     char text[0x200];
-    char *format = (char *)func_00288FB8(id);
+    char *format = (char *)GetLocalizedString(id);
     if (format) {
         /* The seven saved integer argument slots are forwarded. */
         func_L01_00324410(text, format, (int *)((char *)__builtin_next_arg(id) - 0x38));
         func_0028BCA0((int)text);
-    } else func_0026FEB8(D_001AA590, id);
+    } else STUB_printf(D_001AA590, id);
 }

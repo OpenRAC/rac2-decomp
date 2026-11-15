@@ -17,7 +17,7 @@ extern float D_L05_001B1528 __attribute__((sda));
 
 char *func_L05_00427090(char *pos, char *vec, int a2, char *a3, int flag, int a5)
 {
-    char *obj = func_0029EFD0(0x1182);
+    char *obj = CreateMoby(0x1182);
 
     if (obj != 0) {
         char *st = *(char **)(obj + 0x68);
@@ -34,7 +34,7 @@ char *func_L05_00427090(char *pos, char *vec, int a2, char *a3, int flag, int a5
         f22 = (flag ? D_L05_001B1518 : D_L05_001B1514) * (1.0f / 60.0f);
         f21 = (flag ? D_L05_001B1528 : D_L05_001B1524) / f22;
         f20 = 1.0f;
-        count = func_00283CF0(f21);
+        count = FloatToInt(f21);
         *(int *)(st + 0x28) = D_L05_001B151C;
         *(int *)(st + 0x18) = count;
         *(int *)(st + 0x10) = a2;
@@ -44,18 +44,18 @@ char *func_L05_00427090(char *pos, char *vec, int a2, char *a3, int flag, int a5
         *(float *)(st + 0x1C) = f20 / f21;
         *(unsigned short *)(obj + 0x34) = *(unsigned short *)(obj + 0x34) | 0x100;
         qcopy(obj + 0x10, pos);
-        func_00282F20(st, vec, f22);
-        func_00282F20(obj + 0xC0, st, f20);
-        func_00282DD8(obj + 0xD0, obj + 0xC0, a3 + 0xE0);
-        func_00282F20(obj + 0xD0, obj + 0xD0, f20);
-        func_00282DD8(obj + 0xE0, obj + 0xD0, obj + 0xC0);
+        vec_scale_to_length(st, vec, f22);
+        vec_scale_to_length(obj + 0xC0, st, f20);
+        FastVecCross(obj + 0xD0, obj + 0xC0, a3 + 0xE0);
+        vec_scale_to_length(obj + 0xD0, obj + 0xD0, f20);
+        FastVecCross(obj + 0xE0, obj + 0xD0, obj + 0xC0);
     }
     return obj;
 }
 
 char *func_L05_00427988(char *pos, char *vec, int a2, char *a3, int flag)
 {
-    char *obj = func_0029EFD0(0x1191);
+    char *obj = CreateMoby(0x1191);
 
     if (obj != 0) {
         char *st = *(char **)(obj + 0x68);
@@ -72,7 +72,7 @@ char *func_L05_00427988(char *pos, char *vec, int a2, char *a3, int flag)
         f22 = (flag ? D_L05_001B1550 : D_L05_001B154C) * (1.0f / 60.0f);
         f21 = (flag ? D_L05_001B1560 : D_L05_001B155C) / f22;
         f20 = 1.0f;
-        count = func_00283CF0(f21);
+        count = FloatToInt(f21);
         *(int *)(st + 0x28) = D_L05_001B1554;
         *(int *)(st + 0x18) = count;
         *(int *)(st + 0x10) = a2;
@@ -81,11 +81,11 @@ char *func_L05_00427988(char *pos, char *vec, int a2, char *a3, int flag)
         *(float *)(st + 0x1C) = f20 / f21;
         *(unsigned short *)(obj + 0x34) = *(unsigned short *)(obj + 0x34) | 0x100;
         qcopy(obj + 0x10, pos);
-        func_00282F20(st, vec, f22);
-        func_00282F20(obj + 0xC0, st, f20);
-        func_00282DD8(obj + 0xD0, obj + 0xC0, a3 + 0xE0);
-        func_00282F20(obj + 0xD0, obj + 0xD0, f20);
-        func_00282DD8(obj + 0xE0, obj + 0xD0, obj + 0xC0);
+        vec_scale_to_length(st, vec, f22);
+        vec_scale_to_length(obj + 0xC0, st, f20);
+        FastVecCross(obj + 0xD0, obj + 0xC0, a3 + 0xE0);
+        vec_scale_to_length(obj + 0xD0, obj + 0xD0, f20);
+        FastVecCross(obj + 0xE0, obj + 0xD0, obj + 0xC0);
     }
     return obj;
 }

@@ -165,7 +165,7 @@ int func_L11_00440B28(u8 *object, float *target)
             member->fF4 = -1.5707965f;
             dx = target[0] - ((float *)func_L11_004417E8(object))[0];
             member->fF8 = func_00283248(dx, target[1] - ((float *)func_L11_004417E8(object))[1]);
-            func_002833F0(member->rot, &member->fF0);
+            euler_rotation_basis(member->rot, &member->fF0);
             func_L11_00436910(member, 0, 1);
             return 1;
         }
@@ -394,7 +394,7 @@ s32 func_L11_00441808(u8 *object, f32 *point) {
         result = 0;
     } else {
         header = D_L11_001FF580[index];
-        result = func_002A8AF0(point, (f32 *)(header + 1), header->field00);
+        result = point_in_path_xy(point, (f32 *)(header + 1), header->field00);
     }
     return result;
 }

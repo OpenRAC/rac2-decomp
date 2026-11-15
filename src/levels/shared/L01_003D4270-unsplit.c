@@ -61,7 +61,7 @@ void func_L01_003D4270(char *m)
     float rot[4];
     int clear = 1;
     TriggerData *d = *(TriggerData **)(m + 0x68);
-    int active = func_002ACBC8(D_00189EA0, d->volume);
+    int active = IsPointInCuboid(D_00189EA0, d->volume);
     Pool *p;
 
     if (d->conditions[0] == -1 && d->conditions[1] == -1 &&
@@ -106,7 +106,7 @@ void func_L01_003D4270(char *m)
                 if (d->b49)
                     created->pos = ref_L01_003D4270_00[d->anchor].q0;
                 else {
-                    func_00282CF0(pos, &D_L01_001B264C[0][d->anchor].centre, D_00189EA0);
+                    FastVecSub(pos, &D_L01_001B264C[0][d->anchor].centre, D_00189EA0);
                     created->pos = *(Quad *)(pos);
                 }
             }
@@ -116,9 +116,9 @@ void func_L01_003D4270(char *m)
             *(Quad *)(pos) = *(Quad *)(D_00189EA0);
             pos[2] += 1.25f;
             rot[2] = func_00283248(pos[0] - F(camera, 0x10), pos[1] - F(camera, 0x14));
-            rot[1] = -func_00283248(func_00282E80(camera + 0x10, pos), pos[2] - F(camera, 0x18));
+            rot[1] = -func_00283248(vec_distance_xy(camera + 0x10, pos), pos[2] - F(camera, 0x18));
             rot[0] = 0;
-            func_00335438(D_L01_001B94C0, D_L01_001B94C0 + 0x10, 3, 120, 0);
+            SetCamera5Pose(D_L01_001B94C0, D_L01_001B94C0 + 0x10, 3, 120, 0);
             func_00335370(camera + 0x10);
             func_003353C8(rot);
             d->state = 1;
@@ -127,13 +127,13 @@ void func_L01_003D4270(char *m)
 
             if (d->state == 1 && (func_L01_0042A568() & 1)) {
                 d->state = 2;
-                func_L01_0042A6F0(1, 0);
+                SetCamera5Mode(1, 0);
             }
             camera = D_L01_001FE180[d->target];
             *(Quad *)(pos) = *(Quad *)(D_00189EA0);
             pos[2] += 1.25f;
             rot[2] = func_00283248(pos[0] - F(camera, 0x10), pos[1] - F(camera, 0x14));
-            rot[1] = -func_00283248(func_00282E80(camera + 0x10, pos), pos[2] - F(camera, 0x18));
+            rot[1] = -func_00283248(vec_distance_xy(camera + 0x10, pos), pos[2] - F(camera, 0x18));
             rot[0] = 0;
             func_00335370(camera + 0x10);
             func_003353C8(rot);
@@ -145,7 +145,7 @@ void func_L01_003D4270(char *m)
             if (d->b49)
                 p->pos = ref_L01_003D4270_00[d->anchor].q0;
             else {
-                func_00282CF0(pos, &D_L01_001B264C[0][d->anchor].centre, D_00189EA0);
+                FastVecSub(pos, &D_L01_001B264C[0][d->anchor].centre, D_00189EA0);
                 p->pos = *(Quad *)(pos);
             }
         }

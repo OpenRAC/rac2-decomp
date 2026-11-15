@@ -40,22 +40,22 @@ extern void func_00282CD8(void *,void *,void *);
 /* Advance the sampled route and update its bounded lateral offset. */
 void func_L04_004135B8(char *m,RouteState1006 *s) {
  int old,i; float d,t; float v[4] __attribute__((aligned(16))); float out[4] __attribute__((aligned(16)));
- func_L04_00412EC0(m);
- s->progress=func_L04_00410788(m,s,&s->pathIndex,&s->pointIndex,D_L04_001A8FE4,D_L04_001B08F0);
+ UpdateLinkedRouteSelection(m);
+ s->progress=UpdateNearestRoutePoint(m,s,&s->pathIndex,&s->pointIndex,D_L04_001A8FE4,D_L04_001B08F0);
  old=s->routeIndex;
- d=func_00282E80(&s->routePos[0],m+0x10);
+ d=vec_distance_xy(&s->routePos[0],m+0x10);
  if (D_L04_001B08F0 ? d<20.0f : d<5.0f) {
   s->distance+=(D_L04_001B08F0 ? 20.0f:5.0f)-d;
-  if (s->distance>s->route->points[0][3]*func_00283CE0(s->route->count))
-   s->distance-=s->route->points[0][3]*func_00283CE0(s->route->count);
+  if (s->distance>s->route->points[0][3]*IntToFloat(s->route->count))
+   s->distance-=s->route->points[0][3]*IntToFloat(s->route->count);
   func_002C96F8(s->distance,s->route->points[0][3],s->route,&s->routeIndex,&s->fraction,s->routePos);
  } else {
   func_002C96F8(s->distance,s->route->points[0][3],s->route,&s->routeIndex,&s->fraction,s->routePos);
  }
  {
   t=func_00283248(s->routePos[0]-F(m,0x10),s->routePos[1]-F(m,0x14));
-  if(func_00283C80(F(m,0xf8),t)>1.0471977f) {
-   t=func_00283CE0(func_L04_00400AB0(m,s->route,0))*s->route->points[0][3];
+  if(FastDiffRots(F(m,0xf8),t)>1.0471977f) {
+   t=IntToFloat(FindNearestRoutePointIndex(m,s->route,0))*s->route->points[0][3];
    s->distance=t+(D_L04_001B08F0?20.0f:5.0f);
    func_002C96F8(s->distance,s->route->points[0][3],s->route,&s->routeIndex,&s->fraction,s->routePos);
   }
@@ -66,18 +66,18 @@ void func_L04_004135B8(char *m,RouteState1006 *s) {
    s->lateral+=func_002A7878(-0.25f,0.25f);
    if(s->lateral>1.5f) s->lateral=1.5f;
    if(s->lateral<-1.5f) s->lateral=-1.5f;
-   s->lateralTimer=func_00283CF0(func_002A7878(3.0f,6.0f)*60.0f);
+   s->lateralTimer=FloatToInt(func_002A7878(3.0f,6.0f)*60.0f);
   } else if(knot<=-1000.0f) { s->lateral=0; s->lateralTimer=-1000; }
  }
  if(s->lateralTimer>0 && --s->lateralTimer==-1) {
   s->lateral+=func_002A7878(-0.25f,0.25f);
   if(s->lateral>1.5f) s->lateral=1.5f;
   if(s->lateral<-1.5f) s->lateral=-1.5f;
-  s->lateralTimer=func_00283CF0(func_002A7878(3.0f,6.0f)*60.0f);
+  s->lateralTimer=FloatToInt(func_002A7878(3.0f,6.0f)*60.0f);
  }
- v[0]=func_00283180(func_00283B98(F(m,0xf8),1.5707965f))*s->lateral*0.15f;
- v[1]=func_00283198(func_00283B98(F(m,0xf8),1.5707965f))*s->lateral*0.15f;
+ v[0]=func_00283180(FastAddRotations(F(m,0xf8),1.5707965f))*s->lateral*0.15f;
+ v[1]=func_00283198(FastAddRotations(F(m,0xf8),1.5707965f))*s->lateral*0.15f;
  v[2]=0;
- func_00282CD8(out,s->routePos,v);
+ add_vectors(out,s->routePos,v);
 }
 

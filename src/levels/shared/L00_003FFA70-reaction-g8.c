@@ -87,19 +87,19 @@ void func_L00_00408E58(char *o)
     if (B(o, 0x42) == B(o, 0x43) && (B(o, 0x60) & 2)) {
         func_002A75E0(o, 1, 0, 2, 0);
     }
-    func_00282CC0(base, base, o + 16);
+    FastVecAdd(base, base, o + 16);
     func_002829D8(q);
     if (B(o, 32) == 1) {
         if (D_L00_001A8F00 || D_00189E20.disabled || !(D_00138324 & D_00189E20.mask) || D_00189E20.level < 23) {
             return;
         }
-        if (func_L00_002D4040(-1)) {
-            func_L00_002AF568();
+        if (get_ammo(-1)) {
+            start_equipped_item_animation();
             I(q, 24) = func_L00_002D6998(D_L00_0029FBE0);
             B(o, 32) = 2;
             I(q, 4) = D_L00_001B0F90;
         } else {
-            func_002E5CF8(4, 0, o);
+            PlayMobySound(4, 0, o);
         }
         {
             RateEntry *entry = &D_L00_00262570[D_00139593];
@@ -113,7 +113,7 @@ void func_L00_00408E58(char *o)
         }
         if (I(q, 16) == 10) {
             func_002A75E0(o, 2, 0, 3, 0);
-            func_002E5CF8(1, 0, o);
+            PlayMobySound(1, 0, o);
         }
     } else if (B(o, 32) == 4) {
         if (func_00282948(q + 16)) {
@@ -123,8 +123,8 @@ void func_L00_00408E58(char *o)
             func_002A75E0(o, 3, 0, 3, 0);
         } else if (!I(q, 20)) {
             qcopy(v, D_00189E20.object + 0xc0);
-            func_00282F20(v, v, 1.0f);
-            func_00282CC0(out, base, v);
+            vec_scale_to_length(v, v, 1.0f);
+            FastVecAdd(out, base, v);
             func_L00_00416F68(out, 1, o);
             I(q, 20) = 1;
         }
@@ -142,8 +142,8 @@ void func_L00_00408E58(char *o)
         qcopy(v, D_L00_001B8FF0);
         hits.timer = (int *)(q + 4);
         func_00282A88(list, 128);
-        func_L00_0037E000(o);
-        func_002AF580(o + 16, v, &hits.count, list, 32, 0, 3.1415929794311523f, 1.047197699546814f, 40.0f, 0.0f,
+        ReleaseDeadOrExpiredSlots(o);
+        SelectBestTargetInCone(o + 16, v, &hits.count, list, 32, 0, 3.1415929794311523f, 1.047197699546814f, 40.0f, 0.0f,
                       0.0f, 0, 0);
         for (i = 0; i < hits.count; i++) {
             char *p;
@@ -173,12 +173,12 @@ void func_L00_00408E58(char *o)
                 if ((p && B(p, 14) == 1) || B(p, 14) == 2) {
                     func_L00_00416F68(out, 0, 0);
                     I(q, 28)++;
-                    func_002A6C58(list[i], 0, 3);
+                    SetDeathBits(list[i], 0, 3);
                     B(p, 14) = 2;
                 } else if (p && B(p, 14) != 3) {
                     func_L00_00416F68(out, 0, 0);
                     I(q, 28)++;
-                    func_002A6C58(list[i], 0, 3);
+                    SetDeathBits(list[i], 0, 3);
                     func_00310440(list[i]);
                 }
             } else {
@@ -191,9 +191,9 @@ void func_L00_00408E58(char *o)
         done = func_00282948(hits.timer);
         if (done) {
             if (I(q, 28)) {
-                func_002E5CF8(2, 0, o);
+                PlayMobySound(2, 0, o);
             } else {
-                func_002E5CF8(3, 0, o);
+                PlayMobySound(3, 0, o);
             }
             I(q, 28) = 0;
             B(o, 32) = 0;

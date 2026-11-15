@@ -104,7 +104,7 @@ void func_L14_00430410(char *self)
         if (((PrisonSoundAnchor *)(D_00188660+s->sound*112))->owner!=self ||
             !((PrisonSoundAnchor *)(D_00188660+s->sound*112))->active)
             s->sound=prisonStartSound(0,4,self);
-        func_L00_002E6EF8(func_L14_00430B70,self);
+        func_L00_002E6EF8(DrawAnimatedPrisonQuads,self);
         if(func_002B38B8(self)) {
             if(D_L14_001B20C8_1<50) s->baseScale=0;
             func_002A7750(self,2,-1);
@@ -117,7 +117,7 @@ void func_L14_00430410(char *self)
         s->sound=-1;
         if(func_002B3868(self)) *(int *)(self+0x98)=0;
         if(s->baseScale>0.5f) {
-            func_L00_002E6EF8(func_L14_00430B70,self);
+            func_L00_002E6EF8(DrawAnimatedPrisonQuads,self);
             s->baseScale-=0.05f;
         }
         break;

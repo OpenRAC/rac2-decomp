@@ -61,14 +61,14 @@ void func_L11_00435600(char *p)
     if (P(p,0xB8)) node=func_L11_004417E8(P(p,0xB8));
     if (I(s,0x270)) COPY(target,P(s,0x270)+0x10); else COPY(target,D_00189EA0);
     if (H(s,0x286)) {
-        func_00282CF0(delta,target,p+0x10);
+        FastVecSub(delta,target,p+0x10);
         angle=0;
         turn=func_002B04E0(p,delta,s+0x210);
     } else {
         angle=func_00283248(target[0]-F(p,0x10),target[1]-F(p,0x14));
-        turn=func_00283C80(angle,F(p,0xF8));
+        turn=FastDiffRots(angle,F(p,0xF8));
     }
-    distance=func_00282E48(p+0x10,target);
+    distance=fast_vec_dist(p+0x10,target);
     if (B(p,0x95)==2) {
         if (func_002B3890(p)) {
             SetAnimation(p,6,0,10);
@@ -94,7 +94,7 @@ void func_L11_00435600(char *p)
         }
         {
             char *home=s+0x250;
-            if (!B(p,0xBC) && func_00282E80(p+0x10,home)<0.5f) B(p,0xBC)=1;
+            if (!B(p,0xBC) && vec_distance_xy(p+0x10,home)<0.5f) B(p,0xBC)=1;
             else if (H(s,0x286)) func_L02_00333438(p,home);
             else func_L01_00321178(p,home);
         }
@@ -119,8 +119,8 @@ void func_L11_00435600(char *p)
             SetAnimation(p,6,0,10);
             U(p,0x96)=0;
         }
-        func_00282F20(zero,p+0xE0,F(s,0x104)+F(s,0x100));
-        func_00282CC0(delta,p+0x10,zero);
+        vec_scale_to_length(zero,p+0xE0,F(s,0x104)+F(s,0x100));
+        FastVecAdd(delta,p+0x10,zero);
         clear=1;
         if (func_00277258(delta,5,p,F(s,0x100)) && D_L11_001C0D18 && H(D_L11_001C0D18,0xAA)==0xB3A) clear=0;
         if (clear) {
@@ -165,8 +165,8 @@ void func_L11_00435600(char *p)
                 func_002A8D70(p,0,1,0,1,0,0.4f,B(s,0x34),1.0f);
             } else {
                 func_002B60B0(p,0.05555555597f,0.03333333507f,0.00349065894f,0.1047197729f);
-                func_00282F20(delta,p+0xC0,-4.0f);
-                func_00282CC0(delta,p+0x10,delta);
+                vec_scale_to_length(delta,p+0xC0,-4.0f);
+                FastVecAdd(delta,p+0x10,delta);
                 I(s,0x138)|=0x10;
                 if (H(s,0x286)) func_L02_00333438(p,delta); else func_L01_00321178(p,delta);
                 I(s,0x138)&=~0x10;
@@ -201,9 +201,9 @@ void func_L11_00435600(char *p)
         break;
     case 11:
         if (func_002B3868(p)) {
-            func_00282CF0(s+0x1A0,func_L11_004417E8(P(p,0xB8)),p+0x10);
+            FastVecSub(s+0x1A0,func_L11_004417E8(P(p,0xB8)),p+0x10);
             F(s,0x1A8)=0;
-            func_00282F20(s+0x1A0,s+0x1A0,func_002A7878(3.0f,5.0f)*0.0166666675f);
+            vec_scale_to_length(s+0x1A0,s+0x1A0,func_002A7878(3.0f,5.0f)*0.0166666675f);
             H(s,0x286)=0;
             spin=(float *)(s+0x260);
             for (i=0;i<3;i++) {
@@ -216,12 +216,12 @@ void func_L11_00435600(char *p)
         }
         F(s,0x1A8)-=F(s,0x12C);
         func_L07_00321D68(p,s+0x1A0);
-        func_00282D30(s+0x260,s+0x260,0.98f);
+        FastVecScale(s+0x260,s+0x260,0.98f);
         *(Quad *)zero=0;
         zero[2]=F(s,0x30);
         COPY(delta,zero);
         func_002B4090(p,delta,F(s,0x260),F(s,0x264),F(s,0x268));
-        func_002833F0(p+0xC0,p+0xF0);
+        euler_rotation_basis(p+0xC0,p+0xF0);
         if (F(p,0x18)<F(func_L11_004417E8(P(p,0xB8)),8)+5.0f || !func_002A77E0(450) || U(p,0x96)>=301) {
             func_L02_003FC248(p,0,-1);
             func_L11_00436A78(p);

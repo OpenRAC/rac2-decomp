@@ -43,18 +43,18 @@ void func_L00_003B3E78(u8 *obj)
 
     axis.bits = 0;
     axis.f[2] = D_001AF908;
-    func_00282CF0(&w, D_L00_001B8DC0, obj + 0x10);
-    step = 6.2831855f / func_00283CE0(D_001AF918);
+    FastVecSub(&w, D_L00_001B8DC0, obj + 0x10);
+    step = 6.2831855f / IntToFloat(D_001AF918);
     for (i = 0; i < D_001AF918; i++) {
         u8 *e;
         int r;
         func_002ACEC0(&a, &axis, &w, (float)i * step);
-        func_00282F20(&b, &a, D_001AF920 * 0.016666668f);
+        vec_scale_to_length(&b, &a, D_001AF920 * 0.016666668f);
         r = func_002A77E0(16);
         if (func_002A77E0(2) != 0) {
             r = -r;
         }
-        e = func_002BDCE8(obj + 0x10, 0.5f, 1.0f, D_001AF930, D_001AF924 * 210000.0f, r, &b, D_001AF928, 0);
+        e = SpawnSpinningSparkParticle(obj + 0x10, 0.5f, 1.0f, D_001AF930, D_001AF924 * 210000.0f, r, &b, D_001AF928, 0);
         if (e != 0) {
             Sub_L00_003B3E78 *q = (Sub_L00_003B3E78 *)(e + 0x20);
             *(unsigned short *)(e + 0xA) = D_001AF91C;

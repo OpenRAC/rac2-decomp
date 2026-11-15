@@ -109,7 +109,7 @@ void func_L00_003A48D0(Moby *moby)
         vars->candidate = 0;
         vars->aiming = 0;
     }
-    func_L00_003A41F0(moby);
+    EmitLayeredSparks(moby);
     func_002829D8(vars);
     if (((Hero *)D_00189E20)->i[0x2294 / 4] == 1)
         func_L00_002C42E0(0x1D, 1);
@@ -126,24 +126,24 @@ void func_L00_003A48D0(Moby *moby)
         }
         vars->aiming = 1;
         horizontal = vertical = 0.06981317699f;
-        if (vars->cooldown > 0.0f && func_L00_002D4040(-1))
+        if (vars->cooldown > 0.0f && get_ammo(-1))
             color = 0x600000FF;
         else
             color = 0x600FFF0F;
         func_00273318(moby, 1.25f, color, 0, 0x27, 0.0f, -1, 90.0f, 4);
         qcopy(&direction, &((Hero *)D_00189E20)->q[0x760 / 16]);
-        func_00282D30(&origin, ((Hero *)D_00189E20)->ptr[0x2290 / 4] + 0xE0, 0.75f);
-        func_00282CC0(&origin, &((Hero *)D_00189E20)->q[0x80 / 16], &origin);
+        FastVecScale(&origin, ((Hero *)D_00189E20)->ptr[0x2290 / 4] + 0xE0, 0.75f);
+        FastVecAdd(&origin, &((Hero *)D_00189E20)->q[0x80 / 16], &origin);
     } else {
         vars->aiming = 0;
         horizontal = 0.3141593039f;
         vertical = 0.2967059910f;
         if (((Hero *)D_00189E20)->h[0x24EC / 2] != 0)
-            func_00282D30(&direction, &moby->forward, -1.0f);
+            FastVecScale(&direction, &moby->forward, -1.0f);
         else
             qcopy(&direction, &((Hero *)D_00189E20)->q[0x760 / 16]);
-        func_00282D30(&origin, ((Hero *)D_00189E20)->ptr[0x2290 / 4] + 0xE0, 0.75f);
-        func_00282CC0(&origin, &((Hero *)D_00189E20)->q[0x80 / 16], &origin);
+        FastVecScale(&origin, ((Hero *)D_00189E20)->ptr[0x2290 / 4] + 0xE0, 0.75f);
+        FastVecAdd(&origin, &((Hero *)D_00189E20)->q[0x80 / 16], &origin);
     }
     candidate = func_L00_00324D18(&origin, &direction, horizontal, vertical, 75.0f, horizontal, horizontal, 1);
 
@@ -162,11 +162,11 @@ void func_L00_003A48D0(Moby *moby)
             float distance;
             float *health;
             vars->lockTimer = 5;
-            distance = func_00282E48(D_L00_001B8DC0, &candidate->position) * 0.006666667f;
+            distance = fast_vec_dist(D_L00_001B8DC0, &candidate->position) * 0.006666667f;
             health = ((float *)func_002AB1F0(candidate));
             vars->lockHeight = health ? health[4] : 0.1f;
-            func_00282D30(&aim, &candidate->up, vars->lockHeight);
-            func_00282CC0(&aim, &candidate->position, &aim);
+            FastVecScale(&aim, &candidate->up, vars->lockHeight);
+            FastVecAdd(&aim, &candidate->position, &aim);
             func_00273318(moby, func_00282C48(0.9f - distance * 0.65f), 0xFF0FFF0F, &aim, 0x26, 0.0f, -1, 90.0f, 4);
             ((Hero *)D_00189E20)->ptr[0xBF8 / 4] = (char *)candidate;
         }
@@ -203,10 +203,10 @@ void func_L00_003A48D0(Moby *moby)
             D_L00_001B2864 = 1;
             if (candidate == 0) {
                 int count, i;
-                func_00282D30(&muzzle, &moby->forward, -1.0f);
-                func_00282CC0(&muzzle, &muzzle, &moby->position);
-                func_00282D30(&offset, &moby->right, 0.275f);
-                func_00282CC0(&muzzle, &muzzle, &offset);
+                FastVecScale(&muzzle, &moby->forward, -1.0f);
+                FastVecAdd(&muzzle, &muzzle, &moby->position);
+                FastVecScale(&offset, &moby->right, 0.275f);
+                FastVecAdd(&muzzle, &muzzle, &offset);
                 count = func_00277F48(1.0f, &muzzle, 1, ((Hero *)D_00189E20)->ptr[0x2290 / 4], 0);
                 if (count != 0) {
                     for (i = 0; i < count; i++) {
@@ -238,14 +238,14 @@ void func_L00_003A48D0(Moby *moby)
                     }
                 }
             }
-            func_002E5CF8(0, 0, moby);
+            PlayMobySound(0, 0, moby);
             vars->flash = 15;
             func_L00_003A4480(moby);
             func_L00_003A5370(moby);
             if (((Hero *)D_00189E20)->i[0x229C / 4] == 0 || (((Hero *)D_00189E20)->i[0x2294 / 4] == 2 && ((Hero *)D_00189E20)->f[0x24B8 / 4] < 0.7f))
-                func_L00_002D2168(0x36, 1, 10.0f);
+                set_hero_animation(0x36, 1, 10.0f);
             else
-                func_L00_002AF568();
+                start_equipped_item_animation();
             func_002A7470(moby, 2, 0, 0);
             vars->sound = func_L00_002D6998(D_00294880);
             {
@@ -253,10 +253,10 @@ void func_L00_003A48D0(Moby *moby)
                 vars->cooldown = 1.0f / weapon->rate;
             }
         } else if ((D_00138180[0x1A4 / 4] & ((Hero *)D_00189E20)->u[0x1230 / 4]) || D_L00_001B2864 == 1) {
-            func_002E5CF8(1, 0, moby);
+            PlayMobySound(1, 0, moby);
             D_L00_001B2864 = 0;
         }
-        if (!((D_00138180[0x1A0 / 4] & ((Hero *)D_00189E20)->u[0x1230 / 4]) && func_L00_002D4040(-1) && ((Hero *)D_00189E20)->b[0x22B8]) &&
+        if (!((D_00138180[0x1A0 / 4] & ((Hero *)D_00189E20)->u[0x1230 / 4]) && get_ammo(-1) && ((Hero *)D_00189E20)->b[0x22B8]) &&
             vars->sound >= 0) {
             func_L00_002D6B70(vars->sound);
             vars->sound = -1;
@@ -268,18 +268,18 @@ void func_L00_003A48D0(Moby *moby)
         Vector *off;
         Vector *pos;
         if (vars->flash >= 13) {
-            float scale = 1.0f / func_00283CE0(3);
-            alpha = func_00283CE0(15 - vars->flash) * scale;
-            width = func_00283CE0(15 - vars->flash) * (scale * 0.8f);
-            power = func_00283CE0(15 - vars->flash) * (scale * 0.5f);
+            float scale = 1.0f / IntToFloat(3);
+            alpha = IntToFloat(15 - vars->flash) * scale;
+            width = IntToFloat(15 - vars->flash) * (scale * 0.8f);
+            power = IntToFloat(15 - vars->flash) * (scale * 0.5f);
         } else {
-            float scale = 1.0f / func_00283CE0(12);
-            alpha = func_00283CE0(vars->flash) * scale;
-            width = func_00283CE0(vars->flash) * (scale * 0.8f);
-            power = func_00283CE0(vars->flash) * (scale * 0.5f);
+            float scale = 1.0f / IntToFloat(12);
+            alpha = IntToFloat(vars->flash) * scale;
+            width = IntToFloat(vars->flash) * (scale * 0.8f);
+            power = IntToFloat(vars->flash) * (scale * 0.5f);
         }
         if (((Hero *)D_00189E20)->h[0x24EC / 2] != 0) {
-            func_00282D30(&offset, &moby->forward, -1.0f);
+            FastVecScale(&offset, &moby->forward, -1.0f);
             func_0029FCC0(moby, 0, &muzzle);
             pos = &muzzle;
             off = &offset;
@@ -289,9 +289,9 @@ void func_L00_003A48D0(Moby *moby)
             pos = &muzzle;
             off = &offset;
         }
-        func_00282CC0(pos, pos, off);
-        func_00282D30(&lift, ((Hero *)D_00189E20)->ptr[0x2290 / 4] + 0xE0, 0.3f);
-        func_00282CC0(pos, pos, &lift);
+        FastVecAdd(pos, pos, off);
+        FastVecScale(&lift, ((Hero *)D_00189E20)->ptr[0x2290 / 4] + 0xE0, 0.3f);
+        FastVecAdd(pos, pos, &lift);
         if (vars->light == -1) {
             vars->light = func_L00_002FCF18(pos, 8.0f, 0.0f, alpha, width, power);
         } else {
@@ -302,7 +302,7 @@ void func_L00_003A48D0(Moby *moby)
             light->spread = width;
             light->power = power;
         }
-        func_00282978(&vars->flash);
+        FastDecTimer(&vars->flash);
     } else if (vars->light != -1) {
         func_00291450(vars->light);
         vars->light = -1;

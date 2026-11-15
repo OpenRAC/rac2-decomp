@@ -77,23 +77,23 @@ void func_00330150(char *object)
         hits = 0;
         lift = D_001B096C;
         drop = -lift;
-        func_00282F20(base, D_001B2830, drop);
-        func_00282CC0(base, base, self + 0x10);
+        vec_scale_to_length(base, D_001B2830, drop);
+        FastVecAdd(base, base, self + 0x10);
         if (!D_001B2848 && func_00278870(base, D_001B0970)) {
-            func_00282CF0(axis, D_001BAFB0, base);
-            func_00282CC0(self + 0x10, axis, self + 0x10);
+            FastVecSub(axis, D_001BAFB0, base);
+            FastVecAdd(self + 0x10, axis, self + 0x10);
         }
         for (i = 0; i < 32; i++) {
-            step = func_00283CE0(i);
+            step = IntToFloat(i);
             last = 31;
-            span = func_00283CE0(last);
+            span = IntToFloat(last);
             angle = step / span;
-            func_00282F20(axis, self + 0xD0, D_001B0970);
+            vec_scale_to_length(axis, self + 0xD0, D_001B0970);
             quarter = 1.57079637f;
             angle *= quarter;
             sine = func_00283198(angle);
             if (!negative) sine = -sine;
-            func_00282D30(rotated, self + 0xE0, sine);
+            FastVecScale(rotated, self + 0xE0, sine);
             cosine = func_00283180(angle);
             rotated[3] = cosine;
             x = rotated[0];
@@ -106,20 +106,20 @@ void func_00330150(char *object)
             nz = -z;
             inverse[2] = nz;
             inverse[3] = cosine;
-            func_002837D0(temporary, rotated, axis);
-            func_002837D0(first, temporary, inverse);
-            func_00282CC0(endpoint, first, base);
-            hit = func_002761F8(base, endpoint, 0, moby, 0);
+            multiply_quaternions(temporary, rotated, axis);
+            multiply_quaternions(first, temporary, inverse);
+            FastVecAdd(endpoint, first, base);
+            hit = CollLine(base, endpoint, 0, moby, 0);
             if (hit) {
                 hits++;
                 down = -1.0f;
-                func_00282D30(opposite, D_001B2830, down);
+                FastVecScale(opposite, D_001B2830, down);
                 unit = 0.0009765625f;
-                func_00282D30(normal, D_001BAF80.normal, unit);
+                FastVecScale(normal, D_001BAF80.normal, unit);
                 one = 1.0f;
-                func_00282F20(normal, normal, one);
-                func_00282CF0(correction, D_001BAF80.position, endpoint);
-                func_00282CC0(sum, sum, correction);
+                vec_scale_to_length(normal, normal, one);
+                FastVecSub(correction, D_001BAF80.position, endpoint);
+                FastVecAdd(sum, sum, correction);
                 other = D_001BAF80.object;
                 if (other) {
                     info = *(char **)(other + 0x24);
@@ -132,8 +132,8 @@ void func_00330150(char *object)
         }
         if (hits) {
             total = (float)hits;
-            func_00282D90(sum, sum, total);
-            func_00282CC0(self + 0x10, self + 0x10, sum);
+            divide_vector_xyz(sum, sum, total);
+            FastVecAdd(self + 0x10, self + 0x10, sum);
         }
     }
 }

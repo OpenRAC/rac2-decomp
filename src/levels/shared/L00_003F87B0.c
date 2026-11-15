@@ -29,7 +29,7 @@ extern void func_L00_003F9040(char *);
    and, when it runs out, sends a kill impact pointing back along the moby's facing. A slot whose
    moby is dead, gone or finished is released; otherwise the moby is tinted with the colour
    between the slot's two colours at the current pulse, unless the slot is on hold. Then it
-   schedules func_L00_003F9040 for the object. */
+   schedules SpawnHealthDrainSparks for the object. */
 void func_L00_003F87B0(char *object)
 {
     Vec direction;
@@ -43,7 +43,7 @@ void func_L00_003F87B0(char *object)
             int remove;
             float *health;
 
-            record->phase = func_00283B98(record->phase, 0.20943955f);
+            record->phase = FastAddRotations(record->phase, 0.20943955f);
             remove = 0;
             if (*(signed char *)(record->object + 0x20) < 0)
                 remove = 1;
@@ -53,17 +53,17 @@ void func_L00_003F87B0(char *object)
             if (health != 0) {
                 *health -= record->damage;
                 if (*health <= 0.0f) {
-                    func_00282D30(&direction, record->object + 0xC0, -1.0f);
-                    func_00282F20(&impact, &impact, 0.0016666668f);
+                    FastVecScale(&direction, record->object + 0xC0, -1.0f);
+                    vec_scale_to_length(&impact, &impact, 0.0016666668f);
                     *(int *)(object + 0xB8) = record->owner;
-                    func_002A8C00(&impact, object, 0x810000, 0.001f, &direction);
+                    make_hit_descriptor(&impact, object, 0x810000, 0.001f, &direction);
                     impact.vector.q = direction.q;
                     impact.vector.f[3] = 5627.925f;
                     impact.enabled = 1;
                     impact.kind = 5;
                     impact.active = 1;
                     impact.id = *(unsigned short *)(record->object + 0xAA);
-                    func_002A8E20(record->object, &impact);
+                    QueueMobyImpact(record->object, &impact);
                     remove = 1;
                 }
             } else {
@@ -75,14 +75,14 @@ void func_L00_003F87B0(char *object)
                 func_L00_003F89F8(record);
                 record->object = 0;
             } else if (record->hold == 0) {
-                int color = func_00283D38(record->first, record->second,
+                int color = FastTweenColor(record->first, record->second,
                                           (func_00283180(record->phase) + 1.0f) * 0.5f);
 
-                func_002A0488(record->object, color & 255, (color >> 8) & 255, (color >> 16) & 255);
+                set_moby_color(record->object, color & 255, (color >> 8) & 255, (color >> 16) & 255);
             } else {
                 record->hold--;
             }
         }
     }
-    ref_L00_003F87B0_00(func_L00_003F9040, object);
+    ref_L00_003F87B0_00(SpawnHealthDrainSparks, object);
 }

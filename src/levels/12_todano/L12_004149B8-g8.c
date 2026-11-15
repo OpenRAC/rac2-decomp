@@ -208,7 +208,7 @@ void func_L12_00415128(GuardMoby *moby)
         func_002B3380(moby, (char *)vars + 0x290, (char *)vars + 0x20);
         func_L09_003F73E8(moby);
         func_L09_003F77D0(moby);
-        func_002ABBB8(moby, (char *)vars + 0xD0, 0, 0.0f, 0.0f, 4, 0, 0,
+        SpawnExplosionEffects(moby, (char *)vars + 0xD0, 0, 0.0f, 0.0f, 4, 0, 0,
                       2.0f, 1.0f, 9.0f, 1.0f, -1, 0.0f, 0, 0, -1, 0, 0x810001);
         func_0029F338(moby);
         return;
@@ -263,10 +263,10 @@ void func_L12_00415128(GuardMoby *moby)
             goto release;
         if (vars->f4A0->state == 0xFD) {
         release:
-            func_002A04B8(moby, &sx, &sy, &sz);
+            get_moby_color(moby, &sx, &sy, &sz);
         if (sx != D_L12_001B3D98 || sy != D_L12_001B3D9C || sz != D_L12_001B3DA0)
-            func_0026FEB8(D_L12_001B1880);
-        func_002A0488(moby, D_L12_001B3D98, D_L12_001B3D9C, D_L12_001B3DA0);
+            STUB_printf(D_L12_001B1880);
+        set_moby_color(moby, D_L12_001B3D98, D_L12_001B3D9C, D_L12_001B3DA0);
         vars->f4A0 = 0;
         }
     }
@@ -303,11 +303,11 @@ void func_L12_00415128(GuardMoby *moby)
             GuardMoby *head;
             int i;
 
-            func_0026FEB8(D_L12_001B1890, D_L12_001B29C8, moby->fB2, alarm);
+            STUB_printf(D_L12_001B1890, D_L12_001B29C8, moby->fB2, alarm);
             moby->f31 = 1;
             moby->f34 = moby->f34 & 0xFFFE;
             moby->f98 = moby->f24->f10;
-            func_002A0488(moby, D_L12_001B3D98, D_L12_001B3D9C, D_L12_001B3DA0);
+            set_moby_color(moby, D_L12_001B3D98, D_L12_001B3D9C, D_L12_001B3DA0);
             head = vars->f2F8;
             if (head != 0 && head->fAA == 0x114B && head->state != 0xFE && head->state != 0xFD) {
                 head->f34 = head->f34 & 0xFFFE;
@@ -336,7 +336,7 @@ void func_L12_00415128(GuardMoby *moby)
 
     switch (moby->f95) {
     case 0:
-        func_0026FEB8(D_L12_001B18A8, moby->fB2, moby->fAA);
+        STUB_printf(D_L12_001B18A8, moby->fB2, moby->fAA);
         break;
     case 1:
         vars->f2EC = moby->fF8;
@@ -354,7 +354,7 @@ void func_L12_00415128(GuardMoby *moby)
     case 2:
         if (func_002B3890(moby) != 0 && vars->f300 < 5 && !(vars->f302 & 2))
             vars->f300 = func_002A7820(0, 0x78);
-        if (func_00282978(&vars->f300) != 0) {
+        if (FastDecTimer(&vars->f300) != 0) {
             vars->f2D8 = vars->f2D4;
             if (vars->f2B0 != -1) {
                 func_L09_003F7C50(moby, vars->f2B0, -1);
@@ -420,8 +420,8 @@ void func_L12_00415128(GuardMoby *moby)
         vars->f2EC = func_00283248(vars->f200->x - moby->x, vars->f200->y - moby->y);
         break;
     case 8:
-        vars->f2EC = func_00283B98(vars->f2EC,
-            (func_00283198(func_002ABB18(func_00283CE0(D_L12_001B29C8) * 0.02f)) + 2.0f) * 0.023271061f);
+        vars->f2EC = FastAddRotations(vars->f2EC,
+            (func_00283198(func_002ABB18(IntToFloat(D_L12_001B29C8) * 0.02f)) + 2.0f) * 0.023271061f);
         break;
     case 9: {
         s32 hit;
@@ -512,7 +512,7 @@ void func_L12_00415128(GuardMoby *moby)
         f32 yaw = func_00283248(vars->f1F0 - moby->x, vars->f1F4 - moby->y);
 
         func_002B5278(moby, yaw);
-        if (func_00283C80(yaw, moby->fF8) < 0.17453295f) {
+        if (FastDiffRots(yaw, moby->fF8) < 0.17453295f) {
             func_L12_00412E50(moby, 5, 0, func_002A7820(7, 0xC));
             vars->f30C = 0;
             vars->f30D = 0;
@@ -525,7 +525,7 @@ void func_L12_00415128(GuardMoby *moby)
         s32 near, close, ahead, picked, tried;
 
         near = 1;
-        d = func_00282E80(&moby->x, &vars->f200->x);
+        d = vec_distance_xy(&moby->x, &vars->f200->x);
         if (!(d <= D_L12_001B1818))
             near = 0;
         close = 1;
@@ -577,7 +577,7 @@ void func_L12_00415128(GuardMoby *moby)
     case 11:
         if (D_L12_001B1824 < moby->f96)
             func_L12_00414C60(moby);
-        if ((D_L12_001B1820 < moby->f96 && D_L12_001B1814 < func_00282E80(&moby->x, &vars->f200->x))
+        if ((D_L12_001B1820 < moby->f96 && D_L12_001B1814 < vec_distance_xy(&moby->x, &vars->f200->x))
             || vars->f2F8 == 0) {
             vars->f2E6 = func_002A7820(D_L12_001B182C, D_L12_001B1830);
             func_L09_003F73E8(moby);
@@ -607,8 +607,8 @@ void func_L12_00415128(GuardMoby *moby)
         func_002B3380(moby, (char *)vars + 0x290, (char *)vars + 0x20);
         func_L09_003F73E8(moby);
         func_L09_003F77D0(moby);
-        func_002A6C58(moby, 0, 3);
-        func_002ABBB8(moby, (char *)vars + 0xD0, 0, 0.0f, 0.0f, 4, 0, 0,
+        SetDeathBits(moby, 0, 3);
+        SpawnExplosionEffects(moby, (char *)vars + 0xD0, 0, 0.0f, 0.0f, 4, 0, 0,
                       2.0f, 1.0f, 9.0f, 1.0f, -1, 0.0f, 0, 0, -1, 0, 0x810001);
         func_0029F338(moby);
         return;

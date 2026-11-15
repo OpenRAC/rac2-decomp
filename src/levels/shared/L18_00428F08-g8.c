@@ -178,7 +178,7 @@ void func_L18_00428F08(u8 *a0) {
         s32 r = func_002B1C20(a0, v + 0x50);
 
         if (r & 1) {
-            func_002A6C58(a0, 0, 3);
+            SetDeathBits(a0, 0, 3);
             func_002A7750(a0, 12, -1);
         } else if (r & 2) {
             ((View *)v)->h[0x390 / 2] = func_002A7820(D_L18_001B1258, D_L18_001B125C);
@@ -273,7 +273,7 @@ void func_L18_00428F08(u8 *a0) {
         float f;
         float t;
 
-        func_002B0C28(6, 0, 20);
+        TryClaimNotice(6, 0, 20);
         if (func_002B3890(a0) != 0)
             func_002E5DA0(6, 0, a0, 0xEE1);
         if (((View *)v)->i[0x3F0 / 4] != -1) {
@@ -292,7 +292,7 @@ void func_L18_00428F08(u8 *a0) {
         qcopy(ref, D_L18_001B97C0);
         ((Hero *)D_00189E20)->h[0x1DC / 2] = 5;
         ((Hero *)D_00189E20)->h[0x1E0 / 2] = 10;
-        if (func_00282978(v + 0x396) != 0) {
+        if (FastDecTimer(v + 0x396) != 0) {
             func_0029B758(0, func_L18_00426AB0);
             ((View *)v)->uh[0x3BC / 2] = ((View *)v)->uh[0x3BE / 2];
             f = ((View *)a0)->f[0xF8 / 4];
@@ -326,23 +326,23 @@ void func_L18_00428F08(u8 *a0) {
             }
             ((View *)v)->i[0x3F0 / 4] = -1;
         }
-        t = 1.0f - func_00283CE0(((View *)v)->h[0x396 / 2]) / (float)D_L18_001B1290;
+        t = 1.0f - IntToFloat(((View *)v)->h[0x396 / 2]) / (float)D_L18_001B1290;
         if (t > 1.0f)
             t = 1.0f;
         else if (t < 0.0f)
             t = 0.0f;
-        func_00282CF0(c, D_00189EA0, a0 + 0x10);
+        FastVecSub(c, D_00189EA0, a0 + 0x10);
         *(Vec4 *)b = *(Vec4 *)c;
         b[2] = 0.0f;
-        func_00282F20(b, b, D_L18_001B1294);
-        func_00282CD8(c, b, a0 + 0x10);
+        vec_scale_to_length(b, b, D_L18_001B1294);
+        add_vectors(c, b, a0 + 0x10);
         b[2] += D_L18_001B1298;
-        func_00282CF0(c, ref, b);
+        FastVecSub(c, ref, b);
         *(Vec4 *)a = *(Vec4 *)c;
-        func_00282F20(a, a, ((View *)v)->f[0x3B8 / 4] * func_00283CE0(((View *)v)->h[0x396 / 2]));
-        func_00282CD8(c, a, b);
+        vec_scale_to_length(a, a, ((View *)v)->f[0x3B8 / 4] * IntToFloat(((View *)v)->h[0x396 / 2]));
+        add_vectors(c, a, b);
         ang[2] = func_00283248(((View *)a0)->f[0x10 / 4] - a[0], ((View *)a0)->f[0x14 / 4] - a[1]);
-        ang[1] = -func_00283248(func_00282E80(a, a0 + 0x10), ((View *)a0)->f[0x18 / 4] - a[2]);
+        ang[1] = -func_00283248(vec_distance_xy(a, a0 + 0x10), ((View *)a0)->f[0x18 / 4] - a[2]);
         ang[0] = D_L18_001B129C * (func_00283198(func_002ABB18(t * 6.28318548f)) * 0.0174532942f);
         func_00335370(a);
         func_003353C8(ang);
@@ -351,7 +351,7 @@ void func_L18_00428F08(u8 *a0) {
         break;
     }
     case 8:
-        func_002B0C28(6, 0, 20);
+        TryClaimNotice(6, 0, 20);
         if ((((Hero *)D_00189E20)->b[0x22B4] != 4 || ((Hero *)D_00189E20)->p[0x2290 / 4] != a0) && ((View *)v)->h[0x392 / 2] == 0) {
             if (((Hero *)D_00189E20)->b[0x22B4] != 4)
                 func_0029B758(0, 0);
@@ -364,7 +364,7 @@ void func_L18_00428F08(u8 *a0) {
                           ((View *)v)->f[0x3D4 / 4] * 4.84813745e-06f, ((View *)v)->f[0x3D0 / 4] * 0.000290888245f);
             ((View *)a0)->uh[0x34 / 2] &= 0xFFBE;
             sel = func_L18_004283F0(a0);
-            func_002ABBB8(a0, D_L18_001A8F20, 0, 2.0f, (float)((View *)v)->b[0x35], 5, 2, 9, 6.0f, 4.0f, 9.0f, 1.10000002f,
+            SpawnExplosionEffects(a0, D_L18_001A8F20, 0, 2.0f, (float)((View *)v)->b[0x35], 5, 2, 9, 6.0f, 4.0f, 9.0f, 1.10000002f,
                           sel, 0.0f, 1, 1, -2, 0, 0x850001);
             func_002A7750(a0, 11, -1);
         }
@@ -425,7 +425,7 @@ void func_L18_00428F08(u8 *a0) {
         break;
     case 12:
         sel = func_L18_004283F0(a0);
-        func_002ABBB8(a0, D_L18_001A8F20, 0, 0.0f, 0.0f, 10, 3, 16, 4.0f, 2.0f, 9.0f, 1.0f,
+        SpawnExplosionEffects(a0, D_L18_001A8F20, 0, 0.0f, 0.0f, 10, 3, 16, 4.0f, 2.0f, 9.0f, 1.0f,
                       sel, 15.0f, 1, 1, -1, 0, 0x810001);
     case 11: {
         u16 b2;

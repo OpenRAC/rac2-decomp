@@ -19,20 +19,20 @@ int func_L03_003E3800(u8 *m) {
     selected = -1;
     for (i = 0; i < 8 && p[0x40+i] != 255; i++) {
         index = p[0x40+i];
-        func_00283098(v, D_L03_0029BBF0[index], m + 0xc0);
-        a = func_00282DB0(v, D_L03_001B9BC0[0]);
-        b = func_00282DB0(v, D_L03_001B9BC0[1]);
+        matrix_mul_vec3(v, D_L03_0029BBF0[index], m + 0xc0);
+        a = FastVecDot(v, D_L03_001B9BC0[0]);
+        b = FastVecDot(v, D_L03_001B9BC0[1]);
         c = func_00283248(a, b);
-        d = func_00283C80(c, angle);
+        d = FastDiffRots(c, angle);
         if (d < best) { selected = index; best = d; }
     }
     index = *(short *)(p+0x5c);
     if (index != *(short *)(p+0x50)) {
-        func_00283098(v, D_L03_0029BBF0[index], m + 0xc0);
-        a = func_00282DB0(v, D_L03_001B9BC0[0]);
-        b = func_00282DB0(v, D_L03_001B9BC0[1]);
+        matrix_mul_vec3(v, D_L03_0029BBF0[index], m + 0xc0);
+        a = FastVecDot(v, D_L03_001B9BC0[0]);
+        b = FastVecDot(v, D_L03_001B9BC0[1]);
         c = func_00283248(a, b);
-        d = func_00283C80(c, angle);
+        d = FastDiffRots(c, angle);
         if (d < best) selected = index;
     }
     if (selected != -1) { *(short *)(p+0x52) = selected; return 1; }

@@ -63,9 +63,9 @@ void func_L00_00418A80(char *object, char *unused)
         for (i = 0; i < 1; i++) {
             char *particle;
             float size, speed;
-            func_00282D30(&position, &m->forward, 0.5f);
+            FastVecScale(&position, &m->forward, 0.5f);
             qcopy(&velocity, &m->position);
-            func_00282CC0(&velocity, &velocity, &position);
+            FastVecAdd(&velocity, &velocity, &position);
             size = D_L00_001B1438 * state->scale * 210000.0f;
             speed = D_L00_001B143C * state->scale * 210000.0f;
             particle = func_002C65A0(&velocity, D_L00_001A8F20, D_L00_001B1440, 0xF78E38, 0, 100, 0, size, speed, 0.0f, 0);
@@ -90,14 +90,14 @@ void func_L00_00418A80(char *object, char *unused)
         int turn, life;
         angle = func_00283248(((EffectCamera *)D_L00_001B8C80)->position[0] - m->position.v[0],
                                ((EffectCamera *)D_L00_001B8C80)->position[1] - m->position.v[1]);
-        turn = func_00283CF0(func_002A78D8(2.0f, 5.0f));
+        turn = FloatToInt(func_002A78D8(2.0f, 5.0f));
         life = func_002A7820(30, 50);
         position.v[0] = m->position.v[0] + func_002A78D8(0.0f, 0.1f) * state->scale;
         position.v[1] = m->position.v[1] + func_002A78D8(0.0f, 0.1f) * state->scale;
         position.v[2] = m->position.v[2] + func_002A78D8(0.0f, 0.1f) * state->scale;
         size = func_002A7878(0.6f, 1.0f) * state->scale;
         speed = 2.0f * (func_002A7878(9.0f, 12.0f) * state->scale);
-        dir = func_00283B98(angle, func_002A78D8(0.0f, 1.396263599395752f));
+        dir = FastAddRotations(angle, func_002A78D8(0.0f, 1.396263599395752f));
         velocity.v[0] = func_00283180(dir) * 0.01666666753590107f * speed;
         velocity.v[1] = func_00283198(dir) * 0.01666666753590107f * speed;
         velocity.v[2] = 0.0f;
@@ -112,14 +112,14 @@ void func_L00_00418A80(char *object, char *unused)
         int turn, life;
         angle = func_00283248(((EffectCamera *)D_L00_001B8C80)->position[0] - m->position.v[0],
                                ((EffectCamera *)D_L00_001B8C80)->position[1] - m->position.v[1]);
-        turn = func_00283CF0(func_002A78D8(2.0f, 5.0f));
+        turn = FloatToInt(func_002A78D8(2.0f, 5.0f));
         life = func_002A7820(30, 50);
         position.v[0] = m->position.v[0] + func_002A78D8(0.0f, 0.1f) * state->scale;
         position.v[1] = m->position.v[1] + func_002A78D8(0.0f, 0.1f) * state->scale;
         position.v[2] = m->position.v[2] + func_002A78D8(0.0f, 0.1f) * state->scale;
         size = func_002A7878(0.75f, 1.5f) * state->scale;
         speed = 2.0f * (func_002A7878(9.0f, 12.0f) * state->scale);
-        dir = func_00283B98(angle, func_002A78D8(0.0f, 1.396263599395752f));
+        dir = FastAddRotations(angle, func_002A78D8(0.0f, 1.396263599395752f));
         velocity.v[0] = func_00283180(dir) * 0.01666666753590107f * speed;
         velocity.v[1] = func_00283198(dir) * 0.01666666753590107f * speed;
         velocity.v[2] = 0.0f;
@@ -132,14 +132,14 @@ void func_L00_00418A80(char *object, char *unused)
         int turn, life;
         angle = func_00283248(((EffectCamera *)D_L00_001B8C80)->position[0] - m->position.v[0],
                                ((EffectCamera *)D_L00_001B8C80)->position[1] - m->position.v[1]);
-        turn = func_00283CF0(func_002A78D8(2.0f, 5.0f));
+        turn = FloatToInt(func_002A78D8(2.0f, 5.0f));
         life = func_002A7820(30, 50);
         position.v[0] = m->position.v[0] + func_002A78D8(0.0f, 0.1f) * state->scale;
         position.v[1] = m->position.v[1] + func_002A78D8(0.0f, 0.1f) * state->scale;
         position.v[2] = m->position.v[2] + func_002A78D8(0.0f, 0.1f) * state->scale;
         size = func_002A7878(0.6f, 1.0f) * state->scale;
         speed = func_002A7878(9.0f, 12.0f) * state->scale;
-        dir = func_00283B98(angle, func_002A78D8(0.0f, 1.396263599395752f));
+        dir = FastAddRotations(angle, func_002A78D8(0.0f, 1.396263599395752f));
         velocity.v[0] = func_00283180(dir) * 0.01666666753590107f * speed;
         velocity.v[1] = func_00283198(dir) * 0.01666666753590107f * speed;
         velocity.v[2] = 0.0f;
@@ -167,16 +167,16 @@ void func_L00_00418A80(char *object, char *unused)
         size = func_002A7878(0.01666666753590107f, 0.03333333507180214f) * state->scale;
         spread = func_002A78D8(0.0f, 1.396263599395752f);
         angle = func_002A78D8(0.0f, 1.5707964897155762f);
-        angle = func_00283B98(heading, angle);
+        angle = FastAddRotations(heading, angle);
         func_002AF000(&velocity, size, angle, spread);
-        particle = func_002BDCE8(&position, 0.0f, 1.0f, 1.0099999904632568f, state->scale * 315000.0f,
+        particle = SpawnSpinningSparkParticle(&position, 0.0f, 1.0f, 1.0099999904632568f, state->scale * 315000.0f,
                                 sign, &velocity, 0x323232, 0);
         if (particle) {
             char *particleState = particle + 0x20;
             particle[3] = 0x44;
             *(short *)(particle + 10) = func_002A7820(40, 70);
-            particle[9] = func_00283CF0(4.0f) + 64;
-            *(float *)(particleState + 0x1C) = func_00283CE0(func_002A7820(1, 10));
+            particle[9] = FloatToInt(4.0f) + 64;
+            *(float *)(particleState + 0x1C) = IntToFloat(func_002A7820(1, 10));
             *(int *)(particleState + 4) = 3;
             particleState[0xA] = 127;
             particleState[0xB] = particle[10];

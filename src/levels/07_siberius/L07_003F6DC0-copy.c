@@ -20,20 +20,20 @@ void func_L07_003F6DC0(u8 *self, float *target)
     u8 *position = self + 0x10;
     float rate, elapsed;
     state = *(u8 **)(self + 0x68);
-    func_00282CF0(&offset, target, position);
+    FastVecSub(&offset, target, position);
     rate = D_L07_001B0FE0 * (1.0f / 3600.0f);
     elapsed = D_L07_001B0FE4 * (1.0f / 60.0f);
     movement = state + 0x50;
     offset.value[2] = 0.0f;
     func_002AA548((float *)(self + 0x18), (float *)(state + 0x5C), *(float *)(state + 0x60), rate, rate, elapsed);
-    func_00282F20(&velocity, &offset, elapsed);
+    vec_scale_to_length(&velocity, &offset, elapsed);
     rotationInput.quad = 0;
     rotationInput.value[2] = *(float *)(state + 0x64);
     angles.quad = rotationInput.quad;
-    func_002833F0(matrix, &angles);
-    func_00283098(&velocity, &velocity, matrix);
-    func_00282CF0(&delta, &velocity, movement);
+    euler_rotation_basis(matrix, &angles);
+    matrix_mul_vec3(&velocity, &velocity, matrix);
+    FastVecSub(&delta, &velocity, movement);
     func_002AC9F8(delta.value, rate);
-    func_00282CC0(movement, movement, &delta);
-    func_00282CC0(position, position, movement);
+    FastVecAdd(movement, movement, &delta);
+    FastVecAdd(position, position, movement);
 }

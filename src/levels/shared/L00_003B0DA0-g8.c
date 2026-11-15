@@ -48,7 +48,7 @@ char *func_L00_003B0DA0(void *unused)
         previous[0] = last->xyz[0];
         previous[1] = last->xyz[1];
         previous[2] = last->xyz[2];
-        gap = func_00282E48(D_00189E20.position, previous);
+        gap = fast_vec_dist(D_00189E20.position, previous);
         if (gap < D_L00_001AF81C) return 0;
     }
     node = &D_L00_0023BB78[D_L00_001AF810];

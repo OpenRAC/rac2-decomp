@@ -82,60 +82,60 @@ void func_L16_00412560(u8 *moby)
     body = *(void **)(state + 0x1f0);
     func_0029FC20(body, joint, bone);
     muzzle = D_L16_001B16D0;
-    func_002830C0(start, muzzle, bone);
+    transform_vector(start, muzzle, bone);
     object = *(u8 **)(state + 0x24c);
     if (object) {
         qcopy(target, (object + 0x10));
         target[2] = func_L16_00416EB8((char *)object);
     } else qcopy(target, (state + 0x210));
-    func_00282CF0(end, moby + 0x10, target);
+    FastVecSub(end, moby + 0x10, target);
     end[2] = drop;
     length = *(float *)(state + 0x250);
     func_00282F70(end, end, length);
-    func_00282CC0(end, end, target);
+    FastVecAdd(end, end, target);
     damage = &D_L16_001A8F20;
-    func_002A8C00(effect, (int)moby, layers, (float)state[0x36], damage);
-    if (func_002761F8(start, end, ignore, moby, effect))
+    make_hit_descriptor(effect, (int)moby, layers, (float)state[0x36], damage);
+    if (CollLine(start, end, ignore, moby, effect))
         qcopy_nc(end, D_L16_001BFF60);
     eye = D_L16_001B9B00;
-    func_00282CF0(camera, eye, start);
-    func_00282CF0(ray, end, start);
-    func_00282DD8(side, ray, camera);
-    func_00282F20(side, side, 1.0f);
+    FastVecSub(camera, eye, start);
+    FastVecSub(ray, end, start);
+    FastVecCross(side, ray, camera);
+    vec_scale_to_length(side, side, 1.0f);
     {
         int i;
         for (i = 0; i < 2; i++) {
             for (j = 0; j < 4; j++) {
-                batch[i].color[j] = func_00283D38(D_L16_001B1820[i] & 0xff000000,
+                batch[i].color[j] = FastTweenColor(D_L16_001B1820[i] & 0xff000000,
                     D_L16_001B1820[i], *(float *)(state + 0x254));
                 batch[i].uv[j][0] = D_L16_001B1800_GP[j][0];
                 batch[i].uv[j][1] = D_L16_001B1800[j][1];
                 pos = batch[i].position[j];
                 if (j & 1)
-                    func_00282D30(pos, side, D_L16_001B17F8[i]);
-                else func_00282D30(pos, side, -D_L16_001B17F8[i]);
-                if (j < lowerRow) func_00282CC0(pos, pos, start);
-                else func_00282CC0(pos, pos, end);
+                    FastVecScale(pos, side, D_L16_001B17F8[i]);
+                else FastVecScale(pos, side, -D_L16_001B17F8[i]);
+                if (j < lowerRow) FastVecAdd(pos, pos, start);
+                else FastVecAdd(pos, pos, end);
                 pos[3] = 1.0f;
             }
-            batch[i].packet[1] = func_0027C878(D_L16_001B17E8[i]);
+            batch[i].packet[1] = GetEffectTextureDescriptor(D_L16_001B17E8[i]);
             batch[i].packet[0] = 0;
             batch[i].packet[2] = 0xff9000000260UL;
             batch[i].packet[3] = 0x8000000048UL;
         }
     }
-    func_00280B90(&batch[0], drawFirst, drawCount);
-    func_00280B90(&batch[1], drawFirst, drawCount);
+    draw_world_quad(&batch[0], drawFirst, drawCount);
+    draw_world_quad(&batch[1], drawFirst, drawCount);
     if (*(int *)(state + 0x258) != D_L16_001B2648) {
         *(int *)(state + 0x258) = D_L16_001B2648;
-        func_00282CF0(delta, end, start);
+        FastVecSub(delta, end, start);
         for (k = 0; k < D_L16_001B1828; k++) {
             texture = func_002A7820(D_L16_001B1840_GP, D_L16_001B1840[1]);
-            seed = func_00283CF0(func_002A78D8(1.0f, 2.0f));
+            seed = FloatToInt(func_002A78D8(1.0f, 2.0f));
             size = func_002A7878(D_L16_001B1848_GP, D_L16_001B1848[1]) * 210000.0f;
             speed = func_002A7878(D_L16_001B1830[2], D_L16_001B1830[3]);
-            func_00282F20(velocity, delta, speed * 0.016666668f);
-            func_00282D08(sample, end, start, func_002A7878(0.0f, 1.0f));
+            vec_scale_to_length(velocity, delta, speed * 0.016666668f);
+            lerp_vector(sample, end, start, func_002A7878(0.0f, 1.0f));
             func_002C16C0(sample, velocity, texture, (int)D_L16_001B182C >> shift,
                 D_L16_001B182C & 0xffffff, seed, size,
                 500.0f, 1.0f, 0.0f, 1.0f);

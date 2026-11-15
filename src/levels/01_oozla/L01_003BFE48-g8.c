@@ -119,8 +119,8 @@ void func_L01_003BFE48(L01_003BFE48_OBJ *obj)
     s->fcf = -1;
     s->fd2 = -1;
     s->fd3 = -1;
-    s->f48 = func_00283CF0(40.0f);
-    s->f4a = func_00283CF0(28.0f);
+    s->f48 = FloatToInt(40.0f);
+    s->f4a = FloatToInt(28.0f);
     s->f2a = 48;
     s->f28 = 4;
     s->f29 = 1;

@@ -23,20 +23,20 @@ void func_L00_00320B70(char *from, char *vec, char *to, int mode, float p0, floa
     float angle;
     float half;
 
-    func_00282CF0(delta, to, from);
-    length = func_00282DF0(delta);
+    FastVecSub(delta, to, from);
+    length = FastVecLength(delta);
     if (length == 0.0f)
         return;
-    func_00282DD8(axis, delta, vec);
-    dot = func_00282DB0(vec, delta);
-    norm = func_00282DF0(vec);
-    norm *= func_00282DF0(delta);
+    FastVecCross(axis, delta, vec);
+    dot = FastVecDot(vec, delta);
+    norm = FastVecLength(vec);
+    norm *= FastVecLength(delta);
     if (norm == 0.0f)
         return;
     angle = 1.5707964f - func_002831B0(dot / norm);
     if (angle > 2.8797936f) {
-        func_00282DD8(quat, vec, side);
-        func_00282DD8(axis, quat, vec);
+        FastVecCross(quat, vec, side);
+        FastVecCross(axis, quat, vec);
         side = quat;
     } else {
         side = quat;
@@ -46,7 +46,7 @@ void func_L00_00320B70(char *from, char *vec, char *to, int mode, float p0, floa
         }
     }
     half = func_002703B0(mode, 0.0f, angle, p0, p1, p2) * 0.5f;
-    func_00282F20(side, axis, func_00283198(half));
+    vec_scale_to_length(side, axis, func_00283198(half));
     *(float *)(quat + 12) = func_00283180(half);
     func_002ACDE8(vec, vec, side);
     if (out != 0)

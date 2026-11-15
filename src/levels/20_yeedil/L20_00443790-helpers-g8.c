@@ -19,7 +19,7 @@ extern int func_00283CF0(float);
 extern void func_L20_00443908(char *);
 
 char *func_L20_00443790(char *arg0, int arg1, char *arg2) {
-    char *obj = (char *)func_0029EFD0(arg1);
+    char *obj = (char *)CreateMoby(arg1);
     char *state;
     char *p;
     float f20;
@@ -30,7 +30,7 @@ char *func_L20_00443790(char *arg0, int arg1, char *arg2) {
     if (obj != 0) {
         func_002B37E8(obj, arg0);
         qcopy(obj + 0xF0, arg0 + 0xF0);
-        func_002833F0(obj + 0xC0, obj + 0xF0);
+        euler_rotation_basis(obj + 0xC0, obj + 0xF0);
         flags = *(unsigned short *)(obj + 0x34);
         flags |= 0x100;
         flags &= 0xEFDF;
@@ -40,14 +40,14 @@ char *func_L20_00443790(char *arg0, int arg1, char *arg2) {
         p = state + 0x10;
         *(unsigned short *)(obj + 0x34) = flags;
         local = 0.0f;
-        func_00282CF0(state, arg2, obj + 0x10);
+        FastVecSub(state, arg2, obj + 0x10);
         *(float *)(state + 8) = 0.0f;
-        func_00282F20(state, state, f20);
-        func_00282DD8(p, state, obj + 0xE0);
+        vec_scale_to_length(state, state, f20);
+        FastVecCross(p, state, obj + 0xE0);
         func_002ACE78((float *)p, (float *)p, func_00283198(D_L20_001B2170 * 0.000290888245f));
         *(float *)(state + 8) = func_L00_0031CDD0(obj + 0x10, arg2, &local, f20, -f21);
         *(float *)(state + 0x20) = f21;
-        *(int *)(state + 0x24) = func_00283CF0(local);
+        *(int *)(state + 0x24) = FloatToInt(local);
         *(void (**)(char *))(obj + 0x64) = func_L20_00443908;
     }
     return obj;

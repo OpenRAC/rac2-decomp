@@ -137,16 +137,16 @@ void func_L11_00451178(u8 *object)
     else
         target.quad = *(TI128 *)(D_00189E20 + 0x80);
     if (*(s16 *)(state + 0x2D8)) {
-        func_00282CF0(&work[0], &target, object + 0x10);
+        FastVecSub(&work[0], &target, object + 0x10);
         pos = object + 0x10;
         heading = 0.0f;
         angle = func_002B04E0(object, &work[0], state + 0x230);
     } else {
         pos = object + 0x10;
         heading = func_00283248(target.f[0] - *(float *)(object + 0x10), target.f[1] - *(float *)(object + 0x14));
-        angle = func_00283C80(heading, *(float *)(object + 0xF8));
+        angle = FastDiffRots(heading, *(float *)(object + 0xF8));
     }
-    range = func_00282E48(pos, &target);
+    range = fast_vec_dist(pos, &target);
     if (object[0x95] == 2) {
         u8 *goal;
         if (func_002B3890(object)) {
@@ -175,7 +175,7 @@ void func_L11_00451178(u8 *object)
         if (angle > 2.7925272f)
             func_L11_004530C0(object);
         goal = state + 0x2A0;
-        if (!object[0xBC] && func_00282E80(pos, goal) < 0.5f)
+        if (!object[0xBC] && vec_distance_xy(pos, goal) < 0.5f)
             object[0xBC] = 1;
         else if (*(s16 *)(state + 0x2D8))
             func_L02_00333438(object, goal);
@@ -225,10 +225,10 @@ void func_L11_00451178(u8 *object)
         } else if (object[0x42] == 12 && D_L11_001B1D1C < range) {
             if (object[0x43] != 9) func_002A7470(object, 9, 0, 15);
         } else if (object[0x42] != 12 && D_L11_001B1D04 < range && range < D_L11_001B1D08 && !func_002A77E0(D_L11_001B1D0C)) {
-            if (func_00282978(state + 0x2D6) && object[0x31]) {
+            if (FastDecTimer(state + 0x2D6) && object[0x31]) {
                 u8 *other;
                 s16 id;
-                if (!func_002761F8(pos, &target, 1, object, 0) ||
+                if (!CollLine(pos, &target, 1, object, 0) ||
                     ((other = D_L11_001C0D18[0]) != 0 && (id = *(s16 *)(other + 0xAA)) != 0xD98 && id != 0xDCF &&
                      id != 0xDF4 && id != 0xDF7 && id != 0xDF9 && id != 0xD37)) {
                     func_002A7750(object, 9, -1);
@@ -241,7 +241,7 @@ void func_L11_00451178(u8 *object)
             else if (!func_L11_004530E0(object))
                 func_002B4FF0(object, target.f, *(float *)(state + 0x2C8));
         } else if (*(s16 *)(state + 0x2D8)) {
-            func_00282CF0(&work[0], &target, pos);
+            FastVecSub(&work[0], &target, pos);
             func_L02_00333480(object, pos, &work[0]);
         } else
             func_002B50E0(object, pos, heading);
@@ -260,12 +260,12 @@ void func_L11_00451178(u8 *object)
                 func_0029FC20(object, 4, &work[2]);
                 qcopy(&work[1], &work[3]);
                 func_0029FCC0(object, 4, &effect);
-                func_00282F20(&near_point, work + 1, 0.85f);
-                func_00282F20(&far_point, work + 1, 1.6f);
-                func_00282F20(&velocity, work + 3, 0.25f);
-                func_00282F20(work + 1, work + 1, 3.0f);
-                func_00282CC0(&near_point, &near_point, &effect);
-                func_00282CC0(&far_point, &far_point, &effect);
+                vec_scale_to_length(&near_point, work + 1, 0.85f);
+                vec_scale_to_length(&far_point, work + 1, 1.6f);
+                vec_scale_to_length(&velocity, work + 3, 0.25f);
+                vec_scale_to_length(work + 1, work + 1, 3.0f);
+                FastVecAdd(&near_point, &near_point, &effect);
+                FastVecAdd(&far_point, &far_point, &effect);
                 near_point.f[2] -= 0.1f;
                 far_point.f[2] -= 0.1f;
                 i = 2;
@@ -331,12 +331,12 @@ void func_L11_00451178(u8 *object)
                 work[2].f[2] = 1.0f;
                 func_0029FCC0(object, 4, &work[0]);
                 if (*(u8 **)(state + 0x2C4))
-                    func_00283098(&work[2], &work[2], *(u8 **)(state + 0x2C4) + 0xC0);
+                    matrix_mul_vec3(&work[2], &work[2], *(u8 **)(state + 0x2C4) + 0xC0);
                 else
-                    func_00283098(&work[2], &work[2], D_0018C0B0 + 0xC0);
-                func_00282CC0(&work[2], &work[2], &target);
-                func_00282CF0(&work[1], &work[2], &work[0]);
-                func_00282F20(&work[1], &work[1], 0.33333334f);
+                    matrix_mul_vec3(&work[2], &work[2], D_0018C0B0 + 0xC0);
+                FastVecAdd(&work[2], &work[2], &target);
+                FastVecSub(&work[1], &work[2], &work[0]);
+                vec_scale_to_length(&work[1], &work[1], 0.33333334f);
                 func_003280C8((float)state[0x35], object, &work[1], &work[0], 0, 0);
             } else if (dist < 17.0f && object[0x43] == 17) {
                 float first;
@@ -381,9 +381,9 @@ void func_L11_00451178(u8 *object)
         if (started) {
             s32 k;
             float *spin;
-            func_00282CF0(launch, func_L11_004417E8(*(u8 **)(object + 0xB8)), pos);
+            FastVecSub(launch, func_L11_004417E8(*(u8 **)(object + 0xB8)), pos);
             *(float *)(state + 0x1A8) = 0.0f;
-            func_00282F20(launch, launch, func_002A7878(3.0f, 5.0f) * 0.016666668f);
+            vec_scale_to_length(launch, launch, func_002A7878(3.0f, 5.0f) * 0.016666668f);
             *(s16 *)(state + 0x2D8) = 0;
             spin = (float *)(state + 0x2B0);
             for (k = 0; k < 3; k++) {
@@ -396,15 +396,15 @@ void func_L11_00451178(u8 *object)
         }
         *(float *)(state + 0x1A8) -= *(float *)(state + 0x12C);
         func_L07_00321D68(object, launch);
-        func_00282D30(state + 0x2B0, state + 0x2B0, 0.98f);
+        FastVecScale(state + 0x2B0, state + 0x2B0, 0.98f);
         {
             float f = *(float *)(object + 0x2C) * 0.0009765625f;
             count = 3;
-            func_002A3F10(object, 1, &count, &work[1]);
-            func_00282D30(&work[0], &work[4], f);
+            get_moby_joint_matrices(object, 1, &count, &work[1]);
+            FastVecScale(&work[0], &work[4], f);
         }
         func_002B4090(*(float *)(state + 0x2B0), *(float *)(state + 0x2B4), *(float *)(state + 0x2B8), object, work);
-        func_002833F0(object + 0xC0, object + 0xF0);
+        euler_rotation_basis(object + 0xC0, object + 0xF0);
         if (*(float *)(object + 0x18) < ((float *)func_L11_004417E8(*(u8 **)(object + 0xB8)))[2] + 5.0f ||
             !func_002A77E0(450) || *(u16 *)(object + 0x96) >= 301) {
             func_L02_003FC248(object, 0, -1);

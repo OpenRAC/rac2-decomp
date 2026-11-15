@@ -45,9 +45,9 @@ void func_L00_003CED50(GateObject *m)
                 o->collision=0;
             } while(*p++>=0);
         }
-        if(func_00282E80(m->position,D_00189EA0)<6.0f &&
-           !func_002ACBC8(D_00189EA0,d->close_volume) &&
-           !func_002ACBC8(D_00189EA0,d->block_volume)) {
+        if(vec_distance_xy(m->position,D_00189EA0)<6.0f &&
+           !IsPointInCuboid(D_00189EA0,d->close_volume) &&
+           !IsPointInCuboid(D_00189EA0,d->block_volume)) {
             m->state=1; m->render_flags=0x24c102;
             if(m->animation!=1) func_002A7470(m,1,0,0);
             m->collision=0;
@@ -60,7 +60,7 @@ void func_L00_003CED50(GateObject *m)
                     o->collision=o->object_class->collision;
                 } while(*p++>=0);
             }
-        } else if(func_002ACBC8(D_00189EA0,d->close_volume)) m->state=5;
+        } else if(IsPointInCuboid(D_00189EA0,d->close_volume)) m->state=5;
         for(i=0;i<4;i++) {
             if(d->child[i]!=-1) {
                 GateObject *o=D_L00_001B1E9C+d->child[i];
@@ -69,10 +69,10 @@ void func_L00_003CED50(GateObject *m)
                         {
     m->state=12;
     qcopy(v,m->position);v[2]+=1.0f;
-    func_002E5CF8(2,0,m);
+    PlayMobySound(2,0,m);
     a[0]=func_00283180(m->angle-1.5707964897155762f)*0.3f;
     a[1]=func_00283198(m->angle-1.5707964897155762f)*0.3f;a[2]=0;
-    func_002ABBB8(m,D_L00_001A8F20,v,0,0,10,3,16,4,2,9,1,-1,15,0,9,-1,0,0x810001);
+    SpawnExplosionEffects(m,D_L00_001A8F20,v,0,0,10,3,16,4,2,9,1,-1,15,0,9,-1,0,0x810001);
     func_002B0A68(m,255,a,3,6,3,6,255);
 
     func_0029F338(m);return;
@@ -92,17 +92,17 @@ void func_L00_003CED50(GateObject *m)
     if(m->state==2) {
         v[0]=func_00283180(m->angle-1.5707964897155762f)*0.3f;
         v[1]=func_00283198(m->angle-1.5707964897155762f)*0.3f;v[2]=0;
-        func_00282CC0(m->position,m->position,v);
+        FastVecAdd(m->position,m->position,v);
         qcopy(a,m->position);qcopy(b,m->position);qcopy(c,m->position);
         a[2]+=0.75f;b[2]+=0.75f;c[2]+=0.75f;
         v[0]=func_00283180(m->angle)*0.8f;
         v[1]=func_00283198(m->angle)*0.8f;v[2]=0;
         v[0]=func_00283180(m->angle+3.1415929794311523f)*0.8f;
         v[1]=func_00283198(m->angle+3.1415929794311523f)*0.8f;v[2]=0;
-        func_00282CC0(b,b,vb);func_00282CC0(c,c,vc);
+        FastVecAdd(b,b,vb);FastVecAdd(c,c,vc);
         if(func_00277258(a,0.6f,0,m) || func_00277258(b,0.68f,0,m) || func_00277258(c,0.68f,0,m)) {
-            func_002E5CF8(2,0,m);
-            func_002ABBB8(m,D_L00_001A8F20,a,0,0,10,3,16,4,2,9,1,-1,15,0,9,-1,0,0x810001);
+            PlayMobySound(2,0,m);
+            SpawnExplosionEffects(m,D_L00_001A8F20,a,0,0,10,3,16,4,2,9,1,-1,15,0,9,-1,0,0x810001);
             {
     func_0029F338(m);return;
 }
@@ -111,14 +111,14 @@ void func_L00_003CED50(GateObject *m)
     goto closing;
     m->state=12;
     qcopy(v,m->position);v[2]+=1.0f;
-    func_002E5CF8(2,0,m);
+    PlayMobySound(2,0,m);
     a[0]=func_00283180(m->angle-1.5707964897155762f)*0.3f;
     a[1]=func_00283198(m->angle-1.5707964897155762f)*0.3f;a[2]=0;
-    func_002ABBB8(m,D_L00_001A8F20,v,0,0,10,3,16,4,2,9,1,-1,15,0,9,-1,0,0x810001);
+    SpawnExplosionEffects(m,D_L00_001A8F20,v,0,0,10,3,16,4,2,9,1,-1,15,0,9,-1,0,0x810001);
     func_002B0A68(m,255,a,3,6,3,6,255);
     func_0029F338(m);return;
 closing:
-    if(m->state==3 && func_002ACBC8(D_00189EA0,d->close_volume)) {
+    if(m->state==3 && IsPointInCuboid(D_00189EA0,d->close_volume)) {
         m->state=4;
         if(m->animation!=3)func_002A7470(m,3,0,0);
     }

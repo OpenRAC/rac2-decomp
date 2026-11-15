@@ -33,13 +33,13 @@ void func_L00_003E64F8(char *owner, int a1, void *a2, void *a3, float f12)
             qcopy(rec, a3);
             qcopy(rec->target, a2);
             rec->target[2] = *(float *)((char *)owner + 0x18);
-            func_00282F20((char *)&local, (char *)a3, 2.0f);
-            func_00282CC0((char *)&local, (char *)&local, (char *)rec->target);
-            func_00282DD8((char *)&rec->dir, (char *)rec->target, (char *)&local);
+            vec_scale_to_length((char *)&local, (char *)a3, 2.0f);
+            FastVecAdd((char *)&local, (char *)&local, (char *)rec->target);
+            FastVecCross((char *)&rec->dir, (char *)rec->target, (char *)&local);
             v = func_002A7940();
             for (j = 47; j >= 0; j--) {
-                func_L00_003E6778((char *)rec, 2, v, 0.0f, 0);
-                v = func_00283B98(v, 0.1336848f);
+                AllocateOwnedEffectParticle((char *)rec, 2, v, 0.0f, 0);
+                v = FastAddRotations(v, 0.1336848f);
             }
             rec->state = 0;
             base[i].count = 0;

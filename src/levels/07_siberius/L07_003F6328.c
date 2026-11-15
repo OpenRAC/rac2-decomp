@@ -49,10 +49,10 @@ void func_L07_003F6328(u8 *object)
         period = D_L07_001B0FA8;
         tick = D_L07_001B1E08;
         if (tick % period == 0) {
-            func_00283098(position, D_L07_001B0FB0, object + 0xC0);
-            func_00282CC0(position, position, object + 0x10);
-            func_00282F20(velocity, object + 0xC0, D_L07_001B0FC0 * 0.0166666675359f);
-            func_002E5CF8(0, 0, (char *)object);
+            matrix_mul_vec3(position, D_L07_001B0FB0, object + 0xC0);
+            FastVecAdd(position, position, object + 0x10);
+            vec_scale_to_length(velocity, object + 0xC0, D_L07_001B0FC0 * 0.0166666675359f);
+            PlayMobySound(0, 0, (char *)object);
             func_L03_003D9820(object, position, velocity, state[0x34]);
         }
         break;

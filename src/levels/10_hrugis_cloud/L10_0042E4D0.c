@@ -16,10 +16,10 @@ void func_L10_0042E4D0(char *object)
     if(hit && FIELD(s16,hit,0xAA)==0xFBF) {
         if(!D_L10_001B1780)return;
         direction.bits=FIELD(Quadword,D_L10_001B1780,0xC0);
-        func_00282F20(&direction,&direction,0.26666668f);
+        vec_scale_to_length(&direction,&direction,0.26666668f);
         FIELD(Quadword,work,0)=direction.bits;
     }else {
         FIELD(Quadword,work,0)=D_L10_001BFB00.bits;
-        func_00282F20(work,work,0.033333335f);
+        vec_scale_to_length(work,work,0.033333335f);
     }
 }

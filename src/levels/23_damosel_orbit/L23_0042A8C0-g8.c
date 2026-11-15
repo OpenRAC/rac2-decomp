@@ -113,8 +113,8 @@ void func_L23_0042A8C0(u8 *moby) {
         if (D_L23_001B1B96 != -1) {
             func_00291450(D_L23_001B1B96);
         }
-        func_00282D30(v60, D_L23_001B1484 + 0xE0, 5.0f);
-        func_00282CC0(v60, v60, D_L23_001B1484 + 0x10);
+        FastVecScale(v60, D_L23_001B1484 + 0xE0, 5.0f);
+        FastVecAdd(v60, v60, D_L23_001B1484 + 0x10);
         r1 = func_002A7878(0.0f, 1.3f) + 1.3f;
         r2 = func_002A7878(0.0f, 1.3f) + 1.3f;
         r3 = func_002A7878(0.0f, 1.35f) + 1.6f;
@@ -142,8 +142,8 @@ void func_L23_0042A8C0(u8 *moby) {
         rot = m;
         qzero_nc(v70);
         v70[2] = *(float *)vars;
-        func_002833F0(m80, v70);
-        func_00283738(rot, rot, m80);
+        euler_rotation_basis(m80, v70);
+        multiply_matrix3x3(rot, rot, m80);
         D_L23_001B1B98 = D_L23_001B1B98 + 1;
         D_L23_001B1B98_2 = D_L23_001B1B98 % 15;
         if (D_L23_001B1694 < 0) {
@@ -153,8 +153,8 @@ void func_L23_0042A8C0(u8 *moby) {
         }
         D_L23_001B3980[D_L23_001B1B98_2] = D_L23_001B3980[D_L23_001B1B98_2] % D_L23_001B3934;
         e = D_L23_0025E9D0[D_L23_001B3980[D_L23_001B1B98_2]];
-        func_002830C0(vB0, D_L23_002A6390[D_L23_002A7A70[e].a], m);
-        func_002830C0(vC0, D_L23_002A6390[D_L23_002A7A70[e].b], m);
+        transform_vector(vB0, D_L23_002A6390[D_L23_002A7A70[e].a], m);
+        transform_vector(vC0, D_L23_002A6390[D_L23_002A7A70[e].b], m);
         qcopy_nc(D_L23_0025EC40[D_L23_001B1B98_2 * 2], vB0);
         qcopy_nc(D_L23_0025EC40[D_L23_001B1B98_2 * 2 + 1], vC0);
         func_L23_004256F0(D_L23_0025EC40[D_L23_001B1B98_2 * 2], moby, D_L23_0025EC40[D_L23_001B1B98_2 * 2 + 1],

@@ -1,5 +1,5 @@
 /* func_L08_0042F938 (392 bytes): a moby's three states, idle, waiting for its model, and
-   burst (ported from func_L06_00402440 / func_L20_00449178). func_0032C700 returns a
+   burst (ported from func_L06_00402440 / func_L20_00449178). SpawnExplosion returns a
    pointer; declared void it swaps the two stack constants of the next call. */
 #include "common.h"
 
@@ -39,8 +39,8 @@ void func_L08_0042F938(char *obj)
     case 2:
         *(TI128 *)vec = 0;
         vec[2] = 7.0f;
-        func_00282CC0(vec, obj + 0x10, vec);
-        func_0032C700(vec, 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 0.75f, 20.0f, 1, 1, 0, 0);
+        FastVecAdd(vec, obj + 0x10, vec);
+        SpawnExplosion(vec, 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 0.75f, 20.0f, 1, 1, 0, 0);
         func_L00_0032A258(obj, &D_L08_001B1EF0, &D_L08_001B1EE8, &D_L08_001B1EE0,
                           0xFFFF, 0, -1, 7, 0xFFFF, 0xFF, 0);
         func_L00_00326110(obj, 5, 4.0f);

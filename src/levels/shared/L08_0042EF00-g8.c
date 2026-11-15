@@ -86,7 +86,7 @@ void func_L08_0042EF00(u8 *object)
         }
         data->rate *= 0.0002908882452175021f;
         data->phase = 0;
-        texture = func_0027C878(D_L08_001B1EBC);
+        texture = GetEffectTextureDescriptor(D_L08_001B1EBC);
         alpha = (unsigned long)((long)((unsigned long)(
                     (long)((unsigned long)D_L08_001B1E58 |
                            ((unsigned long)D_L08_001B1E5C << 2)) |
@@ -98,7 +98,7 @@ void func_L08_0042EF00(u8 *object)
         D_L08_00264F20.tex0 = texture;
         D_L08_00264F20.tag = 0;
         D_L08_00264F20.tex1 = 0xff9000000260UL;
-        texture = func_0027C878(72);
+        texture = GetEffectTextureDescriptor(72);
         second = &D_L08_00264FB0;
         third = &D_L08_00265040;
         /* As in RAC1, each of these packets gets its ALPHA word last. */
@@ -152,18 +152,18 @@ void func_L08_0042EF00(u8 *object)
     if (object[0x95] != 2 || data->phase >= 3.1415927410125732f || data->phase < -3.0f)
         data->rate = 0;
     half = (data->upper - data->lower) * 0.5f;
-    phase = func_00283180(func_00283BE0(data->phase, 3.1415927410125732f));
+    phase = func_00283180(fast_subtract_rotations(data->phase, 3.1415927410125732f));
     *(float *)(object + 0x18) = data->lower + (phase * half + half);
     if (D_00189E20[0x22b4] == 4 ||
         (*(int *)(D_00189E20 + 0x229c) != 20 && *(int *)(D_00189E20 + 0x229c) != 25 &&
          *(int *)(D_00189E20 + 0x2294) != 0x39 && *(int *)(D_00189E20 + 0x2294) != 0x78 &&
          *(int *)(D_00189E20 + 0x2294) != 0x79))
-        data->phase = func_00283B98(data->phase, data->rate);
+        data->phase = FastAddRotations(data->phase, data->rate);
     data->rate = rate;
     if (D_L08_001B2508 != D_L08_001B1EC0) {
-        phase = func_00283198(func_002ABB18(func_00283CE0(D_L08_001B2508) * D_L08_001B1EA4));
+        phase = func_00283198(func_002ABB18(IntToFloat(D_L08_001B2508) * D_L08_001B1EA4));
         D_L08_001B1EC4 = D_L08_001B1EA8 * phase;
-        uv = func_00283D00(func_00283CE0(D_L08_001B2508) * D_L08_001B1EA0, 1.0f);
+        uv = fast_fmod(IntToFloat(D_L08_001B2508) * D_L08_001B1EA0, 1.0f);
         corner = uv + 2.0f;
         D_L08_00264F20.uv[0] = uv;
         D_L08_00264F20.uv[4] = uv;
@@ -180,7 +180,7 @@ void func_L08_0042EF00(u8 *object)
     qcopy(position, object + 0x10);
     position[3] = (*(float *)(object + 0x2c) * 11.319999694824219f) / *(float *)(*(u8 **)(object + 0x24) + 0x24);
     if (func_00283DB8(position, (float)*(short *)(object + 0x32)) != -1) {
-        func_L00_002E6CF0(func_L08_0042E678, object);
+        func_L00_002E6CF0(DrawLayeredDoorQuads, object);
         D_L08_001B1EC8 = object;
         D_L08_002B2540[D_L08_001B1ECC++] = object;
         D_L08_002B2540[D_L08_001B1ECC] = 0;

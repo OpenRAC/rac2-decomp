@@ -115,10 +115,10 @@ void func_L17_003BD310(Moby *moby)
     moby->color = color;
 
     if (moby->oClass == 0x8D8 || moby->oClass == 0x8AD) {
-        if (moby->state == 2 && func_00282E80(moby->position, D_00189EA0) < 80.0f) {
+        if (moby->state == 2 && vec_distance_xy(moby->position, D_00189EA0) < 80.0f) {
             SoundVoice *voice = (SoundVoice *)&D_00188660[vars->sound];
             if (voice->owner != moby || !voice->active)
-                vars->sound = func_002E5CF8(0, 4, moby);
+                vars->sound = PlayMobySound(0, 4, moby);
         } else {
             int sound = vars->sound;
             if (sound != -1) {
@@ -135,8 +135,8 @@ void func_L17_003BD310(Moby *moby)
         vars->sound = -1;
         vars->isLinked = 0;
         if (vars->path == -1 || D_L17_001FE880[vars->path]->count < 2) {
-            func_0026FEB8(D_L17_001AFCF8, moby->oClass, moby->uid);
-            func_0026FEB8(D_L17_001AFD28);
+            STUB_printf(D_L17_001AFCF8, moby->oClass, moby->uid);
+            STUB_printf(D_L17_001AFD28);
             func_0029F338(moby);
             break;
         }
@@ -152,13 +152,13 @@ void func_L17_003BD310(Moby *moby)
                     index = D_L17_001B2C1C[index].vars->next;
                     count++;
                 } while (index != -1);
-                vars->chainSpan = func_00283CE0(count);
+                vars->chainSpan = IntToFloat(count);
             }
         }
         vars->chainTime = vars->chainSpan * 4.0f;
         {
             HazardPath *path = D_L17_001FE880[vars->path];
-            path->length = func_00282E48(path->start, path->end);
+            path->length = fast_vec_dist(path->start, path->end);
         }
         vars->x14 = 0;
         vars->x18 = 0;
@@ -172,7 +172,7 @@ void func_L17_003BD310(Moby *moby)
         moby->state = 1;
         break;
     case 1:
-        func_L17_003BCC30(moby);
+        PlacePathFollowerChainAtStart(moby);
         if (D_L17_001AFCF0 && !vars->isLinked)
             moby->state = 2;
         else
@@ -180,7 +180,7 @@ void func_L17_003BD310(Moby *moby)
         break;
     case 2:
         if (D_L17_001AFCF0)
-            func_L17_003BCEC0(moby);
+            UpdatePathFollowerChain(moby);
         if (func_002A9640(moby, 0x4010000, 1))
             func_002A7750(moby, 5, -1);
         moby->impactSlot = 0xFF;
@@ -208,7 +208,7 @@ void func_L17_003BD310(Moby *moby)
             float a, b;
             Moby *created;
             moby->updateDist = 1000000.0f;
-            func_0032C700(pos, 10.0f, 0, 10, 10, 10, 10, 20, 0, 1, 0, 0, 0, 20.0f);
+            SpawnExplosion(pos, 10.0f, 0, 10, 10, 10, 10, 20, 0, 1, 0, 0, 0, 20.0f);
             rot = moby->rotation;
             func_002B0A68(moby, 11, D_L17_001A8F20, 3.0f, 6.0f, 3.0f, 6.0f, 255);
             a = func_002A7878(-10.0f, 10.0f);
@@ -220,7 +220,7 @@ void func_L17_003BD310(Moby *moby)
             func_0029F338(moby);
         } else {
             moby->updateDist = 1000000.0f;
-            func_0032C700(moby->position, 3.0f, 0, 10, 10, 10, 10, 20, 0, 1, 0, 0, 0, 20.0f);
+            SpawnExplosion(moby->position, 3.0f, 0, 10, 10, 10, 10, 20, 0, 1, 0, 0, 0, 20.0f);
             func_002B0A68(moby, 31, D_L17_001A8F20, 3.0f, 6.0f, 3.0f, 6.0f, 255);
             func_L00_00326110(moby, 1, 0.0f);
             func_0029F338(moby);

@@ -81,7 +81,7 @@ typedef struct {
     ctx->sound = -1; \
 }
 #define START_SOUND() \
-    if (!func_002E59B0(obj, ctx->sound)) ctx->sound = func_002E5CF8(0, 4, obj)
+    if (!func_002E59B0(obj, ctx->sound)) ctx->sound = PlayMobySound(0, 4, obj)
 #define SET_ACTIVE(s) \
     func_002A7750(obj, s, -1); \
     if (obj->animation != 2) func_002A7470(obj, 2, 0, 6); \
@@ -117,7 +117,7 @@ void func_L00_003CE278(LiftObject *obj) {
         }
         ctx->frames = 0;
         ctx->sound = -1;
-        ctx->child = func_0029EFD0(0xC16);
+        ctx->child = CreateMoby(0xC16);
         if (!ctx->child) {
             func_0029F338(obj);
             return;
@@ -135,14 +135,14 @@ void func_L00_003CE278(LiftObject *obj) {
         break;
     }
     case 1:
-        ctx->phase = func_00283B98(ctx->phase, 0.10471977f);
-        value = func_00283CF0((func_00283198(ctx->phase) * 4.0f - 3.0f) * 208.0f);
+        ctx->phase = FastAddRotations(ctx->phase, 0.10471977f);
+        value = FloatToInt((func_00283198(ctx->phase) * 4.0f - 3.0f) * 208.0f);
         if (value > 208) value = 208;
         else if (value < 80) value = 80;
         brightness = (value << 8) | 0x80000000;
         color = (value << 16) | brightness;
         ctx->child->color = color | value;
-        if (func_00282E80(&obj->position, &D_00189E20.position) < 6.0f && obj->animation == 2)
+        if (vec_distance_xy(&obj->position, &D_00189E20.position) < 6.0f && obj->animation == 2)
             func_002A7470(obj, 1, 0, 6);
         if (func_L00_00324120((int)ctx->child)) {
             if (!ctx->active) {
@@ -170,12 +170,12 @@ void func_L00_003CE278(LiftObject *obj) {
     case 2:
         qcopy(&frame.delta, &obj->position);
         frame.delta.f[2] = ctx->upperHeight;
-        if (func_00282E48(&obj->position, &frame.delta) > 0.14f) {
+        if (fast_vec_dist(&obj->position, &frame.delta) > 0.14f) {
             func_002AA3A8(&obj->position.f[2], &ctx->rate, frame.delta.f[2],
                           0.02f, 0.3f, 0.10000001f);
             ++ctx->frames;
         } else {
-            if (func_00282E80(&obj->position, &D_00189E20.position) > 1.2f) {
+            if (vec_distance_xy(&obj->position, &D_00189E20.position) > 1.2f) {
                 ctx->active = 0;
                 STOP_SOUND();
                 func_002A7750(obj, 1, -1);
@@ -184,7 +184,7 @@ void func_L00_003CE278(LiftObject *obj) {
                 ctx->child->animationData = ctx->child->model->animation;
             } else {
                 if (ctx->frames > 0) {
-                    func_002E5CF8(1, 0, obj);
+                    PlayMobySound(1, 0, obj);
                     ctx->frames = 0;
                 }
                 STOP_SOUND();
@@ -197,7 +197,7 @@ void func_L00_003CE278(LiftObject *obj) {
 
         if (ctx->lowerHeight < height) {
             if (height - D_00189E20.position.f[2] < 1.8f && D_00189E20.position.f[2] < height) {
-                if (func_002ACBC8(&D_00189E20.position, ctx->blockFlag)) break;
+                if (IsPointInCuboid(&D_00189E20.position, ctx->blockFlag)) break;
                 func_002AA3A8(&obj->position.f[2], &ctx->rate, ctx->lowerHeight,
                               0.02f, 0.3f, 0.10000001f);
                 ++ctx->frames;
@@ -208,7 +208,7 @@ void func_L00_003CE278(LiftObject *obj) {
             }
             break;
         }
-        if (func_00282E80(&obj->position, &D_00189E20.position) > 1.2f) {
+        if (vec_distance_xy(&obj->position, &D_00189E20.position) > 1.2f) {
             ctx->active = 1;
             STOP_SOUND();
             func_002A7750(obj, 1, -1);
@@ -217,7 +217,7 @@ void func_L00_003CE278(LiftObject *obj) {
             ctx->child->animationData = ctx->child->model->animation;
         } else {
             if (ctx->frames > 0) {
-                func_002E5CF8(1, 0, obj);
+                PlayMobySound(1, 0, obj);
                 ctx->frames = 0;
             }
             STOP_SOUND();
@@ -226,7 +226,7 @@ void func_L00_003CE278(LiftObject *obj) {
         break;
     }
     }
-    func_00282CF0(&frame.delta, &obj->position, &frame.old);
+    FastVecSub(&frame.delta, &obj->position, &frame.old);
     func_002AD6F0((char *)ctx + 0x20, &frame.delta, &frame.rotation, &obj->rotation);
     child = ctx->child;
     qcopy(&child->position, &obj->position);

@@ -86,7 +86,7 @@ void func_002FF450(void)
 
     switch (D_001B2310.state) {
     case 0:
-        if (func_00282978(&D_001B2310.frames)
+        if (FastDecTimer(&D_001B2310.frames)
             && !(D_001AD7E4 && (D_001A63A8.state != 3 || D_001A63A8.id >= 6000)
                  && D_001AD7E8++ < 181)) {
             func_002B6D28();
@@ -95,7 +95,7 @@ void func_002FF450(void)
             D_001B5200.position[1] = 25.0f;
             D_001AD7E4 = 0;
             D_001AD7E8 = 0;
-            func_00283360(D_001B5200.forward);
+            set_identity_rotation_rows(D_001B5200.forward);
             object = D_001B2310.object;
             zero = 0.0f;
             D_001B5200.rotation[2] = zero;
@@ -106,31 +106,31 @@ void func_002FF450(void)
             D_001B2310.s0E = 0;
             qcopy(object + 0xF0, D_001B5200.rotation);
             if (D_001B2310.spin)
-                *(float *)(object + 0xF4) = func_00283B98(*(float *)(object + 0xF4), -1.5707964897155762f);
+                *(float *)(object + 0xF4) = FastAddRotations(*(float *)(object + 0xF4), -1.5707964897155762f);
             angle = 0.5621705651283264f;
             sine = func_00283198(angle);
             tangent = sine / func_00283180(angle);
             D_001B90F0 = tangent;
-            func_0027AB40();
+            UpdateViewContext();
             *(unsigned short *)(object + 0x34) &= ~0x41;
         } else {
             func_0027D098(func_002FFCF8, 0);
         }
         break;
     case 1:
-        func_002FF968(D_001B2310.object);
-        if (func_00282978(&D_001B2310.frames)) {
+        PlaceObjectBeforeCamera(D_001B2310.object);
+        if (FastDecTimer(&D_001B2310.frames)) {
             D_001B2310.frames = D_001AD800;
-            D_001B2310.rate = 1.0f / func_00283CE0(D_001B2310.frames);
+            D_001B2310.rate = 1.0f / IntToFloat(D_001B2310.frames);
             D_001B2310.state = 2;
             D_001B2310.phase = 0;
         }
         break;
     case 2:
         current = D_001B2310.object;
-        func_002FF968(current);
-        func_002FFD78(current);
-        if (func_00282978(&D_001B2310.frames)) {
+        PlaceObjectBeforeCamera(current);
+        EmitParticlesBeforeCamera(current);
+        if (FastDecTimer(&D_001B2310.frames)) {
             D_001B2310.frames = 2;
             D_001B2310.state = 3;
             D_001B2310.alpha = 128;
@@ -140,7 +140,7 @@ void func_002FF450(void)
     case 3:
         current = D_001B2310.object;
         func_0027D098(func_002FFFE0, 0);
-        if (func_00282978(&D_001B2310.frames)) {
+        if (FastDecTimer(&D_001B2310.frames)) {
             D_001B2310.frames = 12;
             D_001B2310.state = 4;
             D_001B2310.object = func_002FFB68(current);
@@ -148,10 +148,10 @@ void func_002FF450(void)
         break;
     case 4:
         if (D_001B2310.object)
-            func_002FF968(D_001B2310.object);
+            PlaceObjectBeforeCamera(D_001B2310.object);
         func_0027D098(func_002FFFE0, 0);
-        D_001B2310.alpha = func_00283CF0(func_00283CE0(D_001B2310.frames) * (1.0f / 12.0f) * 128.0f);
-        if (func_00282978(&D_001B2310.frames)) {
+        D_001B2310.alpha = FloatToInt(IntToFloat(D_001B2310.frames) * (1.0f / 12.0f) * 128.0f);
+        if (FastDecTimer(&D_001B2310.frames)) {
             D_001B2310.state = 5;
             D_001B2310.frames = D_001AD804;
             D_001B2310.alpha = 0;
@@ -159,19 +159,19 @@ void func_002FF450(void)
         break;
     case 5:
         if (D_001B2310.object)
-            func_002FF968(D_001B2310.object);
-        if (func_00282978(&D_001B2310.frames)) {
+            PlaceObjectBeforeCamera(D_001B2310.object);
+        if (FastDecTimer(&D_001B2310.frames)) {
             D_001B2310.frames = 3;
             D_001B2310.state = 6;
         }
         break;
     case 6:
         if (D_001B2310.object)
-            func_002FF968(D_001B2310.object);
+            PlaceObjectBeforeCamera(D_001B2310.object);
         func_0027D098(func_002FFCF8, 0);
-        if (func_00282978(&D_001B2310.frames)) {
+        if (FastDecTimer(&D_001B2310.frames)) {
             D_001B2310.frames = 0;
-            D_001B2310.rate = 1.0f / func_00283CE0(D_001AD7F8);
+            D_001B2310.rate = 1.0f / IntToFloat(D_001AD7F8);
             D_001B2310.b0D = D_001B2310.s0E = 1;
             D_0018A000 = D_001AD7F8 + 5;
             func_002FF3F8();

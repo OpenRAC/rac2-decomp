@@ -54,14 +54,14 @@ void func_0028F410(s32 arg0, s32 arg1, s64 arg2, f32 fparg0, f32 fparg1, f32 fpa
     *(f32 *)(sp + 0x4) = fparg3 * func_00283180(fparg4);
     *(f32 *)(sp + 0x10) = -fparg2 * func_00283180(fparg4);
     *(f32 *)(sp + 0x14) = fparg2 * func_00283198(fparg4);
-    func_00282CC0(sp + 0x30, sp + 0x20, sp);
-    func_00282CF0(sp + 0x30, sp + 0x30, sp + 0x10);
-    func_00282CC0(sp + 0x40, sp + 0x20, sp);
-    func_00282CC0(sp + 0x40, sp + 0x40, sp + 0x10);
-    func_00282CF0(sp + 0x50, sp + 0x20, sp);
-    func_00282CF0(sp + 0x50, sp + 0x50, sp + 0x10);
-    func_00282CF0(sp + 0x60, sp + 0x20, sp);
-    func_00282CC0(sp + 0x60, sp + 0x60, sp + 0x10);
+    FastVecAdd(sp + 0x30, sp + 0x20, sp);
+    FastVecSub(sp + 0x30, sp + 0x30, sp + 0x10);
+    FastVecAdd(sp + 0x40, sp + 0x20, sp);
+    FastVecAdd(sp + 0x40, sp + 0x40, sp + 0x10);
+    FastVecSub(sp + 0x50, sp + 0x20, sp);
+    FastVecSub(sp + 0x50, sp + 0x50, sp + 0x10);
+    FastVecSub(sp + 0x60, sp + 0x20, sp);
+    FastVecAdd(sp + 0x60, sp + 0x60, sp + 0x10);
 
     (*(s32 *)((s8 *)(D_001B22A8) + (0))) = 0x10000007;
     rt1 = ((s64)0xB400 << 48) | 0x8001;

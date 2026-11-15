@@ -49,7 +49,7 @@ void func_L22_003F5688(u8 *object, int fullDensity)
     if ((float)i < count) {
         zero = (float)i;
         do {
-            float progress = func_00283CE0(i) * step;
+            float progress = IntToFloat(i) * step;
             float spread = baseWidth + progress * 0.1f;
             int firstColor, secondColor, kind, duration;
             float size;
@@ -59,11 +59,11 @@ void func_L22_003F5688(u8 *object, int fullDensity)
             scratch.f[1] = func_002A78D8(zero, spread);
             scratch.f[2] = progress;
             position.q = scratch.q;
-            func_00283098(position.f, position.f, object + 0xC0);
-            func_00282CC0(position.f, position.f, object + 0x10);
-            firstColor = func_00283D38(D_L22_001B0A28_gp[0], D_L22_001B0A28[1],
+            matrix_mul_vec3(position.f, position.f, object + 0xC0);
+            FastVecAdd(position.f, position.f, object + 0x10);
+            firstColor = FastTweenColor(D_L22_001B0A28_gp[0], D_L22_001B0A28[1],
                                        func_002A7878(zero, 1.0f));
-            secondColor = func_00283D38(D_L22_001B0A28[2], D_L22_001B0A28[3],
+            secondColor = FastTweenColor(D_L22_001B0A28[2], D_L22_001B0A28[3],
                                         func_002A7878(zero, 1.0f));
             size = D_L22_001B0A38_gp[func_002A77E0(2)];
             func_00282C88(scratch.f);

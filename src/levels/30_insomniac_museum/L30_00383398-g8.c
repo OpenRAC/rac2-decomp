@@ -42,19 +42,19 @@ void func_L30_00383398(GridVec *origin)
                 b.y=D_L30_00235560[i][j+1][1]-D_L30_00235560[i+1][j][1];
                 b.z=D_L30_00233A60[D_L30_001AEBC0][i][j+1]-D_L30_00233A60[D_L30_001AEBC0][i+1][j];
                 a.w=1; b.w=1;
-                func_00282DD8(&n,&a,&b);
-                func_00282F20(&n,&n,1.0f);
+                FastVecCross(&n,&a,&b);
+                vec_scale_to_length(&n,&n,1.0f);
             }
-            n.w=1; func_00282CC0(&p,&p,origin);
-            func_00282CF0(&v,&D_L30_001B9DC0,&p); v.w=1;
-            func_00282F20(&scaled,&v,D_L30_001AEBDC);
-            dot=func_00282DB0(&n,&v);
+            n.w=1; FastVecAdd(&p,&p,origin);
+            FastVecSub(&v,&D_L30_001B9DC0,&p); v.w=1;
+            vec_scale_to_length(&scaled,&v,D_L30_001AEBDC);
+            dot=FastVecDot(&n,&v);
             square=dot*dot;
             ratio=D_L30_001AEBD0 / -D_L30_001AEBD4;
-            t=func_00282C10(1.0f-ratio*ratio*(1.0f-square));
-            func_00282D30(&r,&n,ratio*dot-t);
-            func_00282D30(&scaled,&scaled,ratio);
-            func_00282CF0(&r,&r,&scaled);
+            t=square_root(1.0f-ratio*ratio*(1.0f-square));
+            FastVecScale(&r,&n,ratio*dot-t);
+            FastVecScale(&scaled,&scaled,ratio);
+            FastVecSub(&r,&r,&scaled);
             t=(D_L30_001AEBD8+D_L30_00233A60[D_L30_001AEBC0][i][j])/r.z;
             D_L30_00236760[i][j][0]=(p.x+r.x*t-ox)*quarter+0.5f;
             D_L30_00236760[i][j][1]=(p.y+r.y*t-oy)*quarter+0.5f;
@@ -62,15 +62,15 @@ void func_L30_00383398(GridVec *origin)
             else if(D_L30_00236760[i][j][0]<-4.0f) D_L30_00236760[i][j][0]=-4.0f;
             if(D_L30_00236760[i][j][1]>4.0f) D_L30_00236760[i][j][1]=4.0f;
             else if(D_L30_00236760[i][j][1]<-4.0f) D_L30_00236760[i][j][1]=-4.0f;
-            func_00282F20(&v,&v,D_L30_001AEBDC);
-            func_00282D30(&negative,&n,-1.0f);
+            vec_scale_to_length(&v,&v,D_L30_001AEBDC);
+            FastVecScale(&negative,&n,-1.0f);
             func_00283028(&r,&v,&negative);
-            t=1.0f/(func_00282DF0(&r)*2.0f);
+            t=1.0f/(FastVecLength(&r)*2.0f);
             D_L30_00237960[i][j][0]=r.x*D_L30_001AEBE0*t+0.5f;
             D_L30_00237960[i][j][1]=r.y*D_L30_001AEBE0*t+0.5f;
-            dot=func_00282DB0(&v,&n);
+            dot=FastVecDot(&v,&n);
             square=dot*dot;
-            t=func_00282DB0(&v,&v);
+            t=FastVecDot(&v,&v);
             /* Keep the complete brightness update on one debug source line:
                address arithmetic for the final store is interleaved with the
                bounds loads, and retail has no division label between them. */

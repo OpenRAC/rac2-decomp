@@ -36,14 +36,14 @@ void func_L00_0039E158(char *actor) {
                 char *next = initCurve + 0x20;
                 char *current = initCurve + 0x10;
                 do {
-                    *lengths = func_00282E48(current, next);
+                    *lengths = fast_vec_dist(current, next);
                     j++;
                     next += 16;
                     lengths += 4;
                     current += 16;
                 } while (j < *(int *)initCurve - 1);
             }
-            ((PC *)initCurve)->p[j].f[3] = func_00282E48(initCurve + (j * 16 + 0x10), initCurve + 0x10);
+            ((PC *)initCurve)->p[j].f[3] = fast_vec_dist(initCurve + (j * 16 + 0x10), initCurve + 0x10);
         }
         *(u8 *)(actor + 0x30) = 0xFF;
     }
@@ -52,8 +52,8 @@ void func_L00_0039E158(char *actor) {
     bestDistance = 9999.0f;
     for (i = 0; i < state->count; i++) {
         curve = D_L00_001FDA80[state->paths[i]];
-        func_L00_00341FA8(curve, D_00189E20.point, point, &segment, &t, 0, 999.0f, 5.0f, 0.0f);
-        distance = func_00282E48(D_00189E20.point, point);
+        find_nearest_path_point(curve, D_00189E20.point, point, &segment, &t, 0, 999.0f, 5.0f, 0.0f);
+        distance = fast_vec_dist(D_00189E20.point, point);
         if (distance < bestDistance) {
             bestCurve = curve;
             qcopy(previous, point);
@@ -66,22 +66,22 @@ void func_L00_0039E158(char *actor) {
     advance = 3.7f - (float)D_00189E20.advanceState * 0.02f;
     if (advance < 0.7f) advance = 0.7f;
     {
-        int result = func_L00_00341820(bestCurve, point, &bestSegment, &bestT, 0, advance);
+        int result = Spline_AdvanceByDistance(bestCurve, point, &bestSegment, &bestT, 0, advance);
         if (state->radius < bestDistance) return;
         if (!result) {
-            func_00282CF0(step, point, previous);
-            func_00282CF0(delta, point, D_00189E20.point);
-            D_00189E20.angles.pitch = func_00283248(func_00282E20(step), step[2]);
+            FastVecSub(step, point, previous);
+            FastVecSub(delta, point, D_00189E20.point);
+            D_00189E20.angles.pitch = func_00283248(vec_length_xy(step), step[2]);
             D_00189E20.angles.heading = func_00283248(delta[0], delta[1]);
             delta[2] = 0;
-            func_002AA2E8(&D_00189E20.angles.speed, state->speed, 0.0036111111f);
-            length = func_00282DF0(delta);
-            if (length > 0.001f) func_00282F20(D_00189E20.velocity, delta, D_00189E20.angles.speed);
+            ApproachValue(&D_00189E20.angles.speed, state->speed, 0.0036111111f);
+            length = FastVecLength(delta);
+            if (length > 0.001f) vec_scale_to_length(D_00189E20.velocity, delta, D_00189E20.angles.speed);
             D_00189E20.velocity[3] = 0;
             qcopy(state->velocity, D_00189E20.velocity);
             if (D_00189E20.timer < 30) D_00189E20.timer = 30;
         } else {
-            func_00282D30(state->velocity, state->velocity, 0.99f);
+            FastVecScale(state->velocity, state->velocity, 0.99f);
             qcopy(D_00189E20.velocity, state->velocity);
             D_00189E20.velocity[3] = 0;
         }

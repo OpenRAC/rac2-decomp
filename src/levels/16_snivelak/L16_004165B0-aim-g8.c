@@ -41,26 +41,26 @@ void func_L16_00416FB0(char *self) {
 
     if (!func_00282948(st + 0x8C)) return;
     if (!(D_00138320 & 0xA0)) return;
-    func_00283098(muzzle, D_L16_001B1AD0_gp[*(s32 *)(st + 0x88)], self + 0xC0);
-    func_00282CC0(muzzle, muzzle, self + 0x10);
-    func_00283098(aim, D_L16_001B1AF0_gp, self + 0xC0);
-    func_00282CC0(aim, aim, self + 0x10);
-    func_00282F20(near, D_L16_001B9B00 + 0x230, 2.0f);
-    func_00282CC0(near, near, D_L16_001B9B00);
-    func_00282F20(far, D_L16_001B9B00 + 0x230, 120.0f);
-    func_00282CC0(far, far, D_L16_001B9B00);
+    matrix_mul_vec3(muzzle, D_L16_001B1AD0_gp[*(s32 *)(st + 0x88)], self + 0xC0);
+    FastVecAdd(muzzle, muzzle, self + 0x10);
+    matrix_mul_vec3(aim, D_L16_001B1AF0_gp, self + 0xC0);
+    FastVecAdd(aim, aim, self + 0x10);
+    vec_scale_to_length(near, D_L16_001B9B00 + 0x230, 2.0f);
+    FastVecAdd(near, near, D_L16_001B9B00);
+    vec_scale_to_length(far, D_L16_001B9B00 + 0x230, 120.0f);
+    FastVecAdd(far, far, D_L16_001B9B00);
     *(s32 *)(self + 0x98) = 0;
     if (func_00277F48(aim, 0, ((Hero *)D_00189E20)->ptr[0x2290 / 4], 0, D_L16_001B1AF0[3]) && D_L16_001BFF58)
-        func_00282CF0(velocity, D_L16_001BFF58 + 0x10, muzzle);
-    else if (func_002761F8(near, far, 0, ((Hero *)D_00189E20)->ptr[0x2290 / 4], 0))
-        func_00282CF0(velocity, D_L16_001BFF60, muzzle);
+        FastVecSub(velocity, D_L16_001BFF58 + 0x10, muzzle);
+    else if (CollLine(near, far, 0, ((Hero *)D_00189E20)->ptr[0x2290 / 4], 0))
+        FastVecSub(velocity, D_L16_001BFF60, muzzle);
     else
-        func_00282CF0(velocity, far, muzzle);
-    func_00282F20(velocity, velocity, D_L16_001B1B00 * 0.01666666753590107f);
+        FastVecSub(velocity, far, muzzle);
+    vec_scale_to_length(velocity, velocity, D_L16_001B1B00 * 0.01666666753590107f);
     speed = D_L16_001B1B04;
     *(s32 *)(self + 0x98) = *(s32 *)(*(char **)(self + 0x24) + 0x10);
     if (D_001A7A0A[0]) speed *= 5.0f;
-    func_L13_0040DC20(self, velocity, muzzle, 0, speed);
+    SpawnEA7Moby(self, velocity, muzzle, 0, speed);
     *(s32 *)(st + 0x8C) = D_L16_001B1B08;
     *(s32 *)(st + 0x88) = (*(s32 *)(st + 0x88) + 1) & 1;
 }

@@ -17,7 +17,7 @@ int func_L04_0033C420(void *a0, void *a1, int a2, float f12, float f13)
     v2[2] -= f13;
     if (v2[2] < 0.0f)
         v2[2] = 0.0f;
-    r = func_002761F8(v1, v2, 0x22, a1, 0);
+    r = CollLine(v1, v2, 0x22, a1, 0);
     if (ref_L04_0033C420_00.f1C <= -1)
         r = 0;
     if (a2 != 0 && ref_L04_0033C420_00.f18 != 0)

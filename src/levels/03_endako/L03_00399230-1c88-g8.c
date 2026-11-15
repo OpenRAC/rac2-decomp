@@ -79,17 +79,17 @@ void func_L03_003E1C88(char *obj)
     case 1:
         if (!*(u8 *)(obj + 0x31))
             break;
-        *(float *)(vars + 0x10) = func_00283B98(*(float *)(vars + 0x10), *(float *)(vars + 0x18));
-        *(float *)(vars + 0x14) = func_00283B98(*(float *)(vars + 0x14), *(float *)(vars + 0x1C));
+        *(float *)(vars + 0x10) = FastAddRotations(*(float *)(vars + 0x10), *(float *)(vars + 0x18));
+        *(float *)(vars + 0x14) = FastAddRotations(*(float *)(vars + 0x14), *(float *)(vars + 0x1C));
         *(float *)(obj + 0xF0) = D_L03_001B0AF0 * func_00283198(*(float *)(vars + 0x10));
         *(float *)(obj + 0xF4) = D_L03_001B0AF4 * func_00283198(*(float *)(vars + 0x14));
         *(Quad *)angles = 0;
         angles[0] = *(float *)(vars + 0x10);
         angles[2] = *(float *)(vars + 0x14);
         *(Quad *)v = *(Quad *)angles;
-        func_002833F0(mat, v);
-        func_00282D30(obj + 0x10, mat + 0x10, D_L03_001B0AF8);
-        func_00282CC0(obj + 0x10, obj + 0x10, vars);
+        euler_rotation_basis(mat, v);
+        FastVecScale(obj + 0x10, mat + 0x10, D_L03_001B0AF8);
+        FastVecAdd(obj + 0x10, obj + 0x10, vars);
         if (!*(int *)(vars + 0x30)) {
             char *p = func_002A9640(obj, 0x4010000, 0);
             if (p) {
@@ -99,19 +99,19 @@ void func_L03_003E1C88(char *obj)
         }
         if (func_L02_002F21C0(obj + 0x10, D_00189EA0) < 200.0f) {
             char *hero = D_00189EA0 - 0x80;
-            a = func_00283B98(func_00283248(*(float *)(hero + 0x80) - *(float *)(obj + 0x10),
+            a = FastAddRotations(func_00283248(*(float *)(hero + 0x80) - *(float *)(obj + 0x10),
                                             *(float *)(hero + 0x84) - *(float *)(obj + 0x14)),
                               1.5707964f);
             func_002AAA00(obj + 0xF8, vars + 0x34, 0, a, *(float *)(vars + 0x38),
                           *(float *)(vars + 0x38), *(float *)(vars + 0x3C));
-            a = func_00283248(func_00282E80(D_00189EA0, obj + 0x10),
+            a = func_00283248(vec_distance_xy(D_00189EA0, obj + 0x10),
                               *(float *)(obj + 0x18) - *(float *)(hero + 0x88)) * 0.63661975f;
             if (a > 1.0f)
                 a = 1.0f;
             else if (a < 0.0f)
                 a = 0.0f;
             *(float *)(obj + 0x44) = 1.0f - a;
-            func_0029F390(obj);
+            update_moby_animation_state(obj);
         }
         break;
 
@@ -120,14 +120,14 @@ void func_L03_003E1C88(char *obj)
             *(unsigned short *)(obj + 0x96) = func_002A7820(20, 30);
             *(float *)(obj + 0xF0) *= 4.0f;
             *(float *)(obj + 0xF4) *= 4.0f;
-            func_00282F20(vars + 0x20, vars + 0x20, 1.0f / 6.0f);
+            vec_scale_to_length(vars + 0x20, vars + 0x20, 1.0f / 6.0f);
         }
         *(Quad *)v = 0;
         v[2] = 1.0f / 15.0f;
         if (!func_002A77E0(2))
             func_L01_002E1680(obj + 0x10, v, 1, 0x40202020, 1, 0.0066666672937572f, 0.9f, 1.02f);
-        *(float *)(obj + 0xF8) = func_00283B98(*(float *)(obj + 0xF8), 0.20943954586982727f);
-        func_00282CC0(obj + 0x10, obj + 0x10, vars + 0x20);
+        *(float *)(obj + 0xF8) = FastAddRotations(*(float *)(obj + 0xF8), 0.20943954586982727f);
+        FastVecAdd(obj + 0x10, obj + 0x10, vars + 0x20);
         {
             int timer = *(unsigned short *)(obj + 0x96);
 
@@ -141,7 +141,7 @@ void func_L03_003E1C88(char *obj)
     case 3: {
         char *p;
 
-        func_002E5CF8(0, 0, obj);
+        PlayMobySound(0, 0, obj);
         p = func_L00_00326620(obj, 0x113D, *(u8 *)(obj + 0x30));
         if (p) {
             func_L00_0032A258(p, D_L03_001B0B10_GP, D_L03_001B0B08_GP, D_L03_001B0B00_GP, 65535, 1,
@@ -149,7 +149,7 @@ void func_L03_003E1C88(char *obj)
             func_0029F338(p);
         }
         func_L00_00324F18(obj, v, D_L03_001B0B30, D_L03_001B0B30_1[1], D_L03_001B0B30_1[2]);
-        func_002ABBB8(obj, D_L03_001A8F20, v, 0.0f, 0.0f, 10, 5, 15, 0.0f, 0.0f, 9.0f,
+        SpawnExplosionEffects(obj, D_L03_001A8F20, v, 0.0f, 0.0f, 10, 5, 15, 0.0f, 0.0f, 9.0f,
                       *(float *)(obj + 0x2C) * 30.0f, -1, 0.0f, 0, 0, -1, 0, 0x810001);
         func_0029F338(obj);
         break;

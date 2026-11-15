@@ -30,7 +30,7 @@ void func_0030BBA0(void *m, int a, int b, float sx, float sy, int n, float sz) {
     RW_2BBDE8 w120, w130, w140, w150, r160, r170, a180, b190, s1A0, s1B0;
     int i, col0, col1;
     float len, len0, len2, l0, l1;
-    t.q0 = func_0027C878(*(int *)&D_001AEE98);
+    t.q0 = GetEffectTextureDescriptor(*(int *)&D_001AEE98);
     col0 = *(int *)&D_001AEE54 | (a << 24);
     t.q2 = 0x8000000048L;
     t.q1 = 0xFF9000000260L;
@@ -39,7 +39,7 @@ void func_0030BBA0(void *m, int a, int b, float sx, float sy, int n, float sz) {
     t.c[2] = col0;
     t.c[1] = col0;
     t.c[0] = col0;
-    u.q0 = func_0027C878(*(int *)&D_001AEE9C);
+    u.q0 = GetEffectTextureDescriptor(*(int *)&D_001AEE9C);
     col1 = *(int *)&D_001AEE58 | (b << 24);
     u.q2 = t.q2;
     u.q1 = t.q1;
@@ -57,23 +57,23 @@ void func_0030BBA0(void *m, int a, int b, float sx, float sy, int n, float sz) {
     t.f[5] = 0;
     t.f[6] = 1.0f + D_001AEE4C;
     t.f[7] = 1.0f;
-    func_00282CF0(w140, m, D_001B5340);
-    func_00282CF0(w150, &((P_2BBDE8 *)m)[1], m);
-    func_00282DD8(w120, w150, w140);
-    len0 = func_00282DF0(w120);
+    FastVecSub(w140, m, D_001B5340);
+    FastVecSub(w150, &((P_2BBDE8 *)m)[1], m);
+    FastVecCross(w120, w150, w140);
+    len0 = FastVecLength(w120);
     if (len0 != 0) len0 = 1.0f / len0;
-    func_00282D30(w120, w120, *(float *)&D_001AEE5C * len0);
-    func_00282CC0(q[0], m, w120);
-    func_00282CF0(q[1], m, w120);
+    FastVecScale(w120, w120, *(float *)&D_001AEE5C * len0);
+    FastVecAdd(q[0], m, w120);
+    FastVecSub(q[1], m, w120);
     for (i = 1; i < n - 1; i++) {
-        func_00282CF0(w140, &((P_2BBDE8 *)m)[i], D_001B5340);
-        func_00282CF0(w150, &((P_2BBDE8 *)m)[i + 1], &((P_2BBDE8 *)m)[i]);
-        func_00282DD8(w120, w150, w140);
-        len = func_00282DF0(w120);
+        FastVecSub(w140, &((P_2BBDE8 *)m)[i], D_001B5340);
+        FastVecSub(w150, &((P_2BBDE8 *)m)[i + 1], &((P_2BBDE8 *)m)[i]);
+        FastVecCross(w120, w150, w140);
+        len = FastVecLength(w120);
         if (len != 0) len = 1.0f / len;
-        func_00282D30(w120, w120, *(float *)&D_001AEE5C * len);
-        func_00282CC0(q[2], &((P_2BBDE8 *)m)[i], w120);
-        func_00282CF0(q[3], &((P_2BBDE8 *)m)[i], w120);
+        FastVecScale(w120, w120, *(float *)&D_001AEE5C * len);
+        FastVecAdd(q[2], &((P_2BBDE8 *)m)[i], w120);
+        FastVecSub(q[3], &((P_2BBDE8 *)m)[i], w120);
         if (i == 1) {
             t.c[1] = *(int *)&D_001AEE54;
             t.c[0] = *(int *)&D_001AEE54;
@@ -84,37 +84,37 @@ void func_0030BBA0(void *m, int a, int b, float sx, float sy, int n, float sz) {
             t.c[1] = col0;
             t.c[0] = col0;
         }
-        func_00280B90(q, 0, 0);
+        draw_world_quad(q, 0, 0);
         qcopy(q[0], q[2]);
         qcopy(q[1], q[3]);
     }
     for (i = 0; i < n - 1; i++) {
-        func_00282CF0(a180, &((P_2BBDE8 *)m)[i], D_001B5340);
-        func_00282CF0(b190, &((P_2BBDE8 *)m)[i + 1], D_001B5340);
-        l0 = func_00282DF0(a180);
-        l1 = func_00282DF0(b190);
+        FastVecSub(a180, &((P_2BBDE8 *)m)[i], D_001B5340);
+        FastVecSub(b190, &((P_2BBDE8 *)m)[i + 1], D_001B5340);
+        l0 = FastVecLength(a180);
+        l1 = FastVecLength(b190);
         if (l1 < l0) {
             if (l1 == 0) qcopy(b190, a180);
-            else func_00282D30(b190, b190, l0 / l1);
+            else FastVecScale(b190, b190, l0 / l1);
         } else {
             if (l0 == 0) qcopy(a180, b190);
-            else func_00282D30(a180, a180, l1 / l0);
+            else FastVecScale(a180, a180, l1 / l0);
         }
-        func_00282CC0(r160, D_001B5340, a180);
-        func_00282CC0(r170, D_001B5340, b190);
-        func_00282CF0(w150, r170, r160);
-        func_00282D30(s1B0, w150, sz);
-        func_00282CF0(r160, r160, s1B0);
-        func_00282CC0(r170, r170, s1B0);
-        func_00282CF0(s1A0, D_001B5340, r160);
-        func_00282DD8(w120, s1A0, w150);
-        len2 = func_00282DF0(w120);
+        FastVecAdd(r160, D_001B5340, a180);
+        FastVecAdd(r170, D_001B5340, b190);
+        FastVecSub(w150, r170, r160);
+        FastVecScale(s1B0, w150, sz);
+        FastVecSub(r160, r160, s1B0);
+        FastVecAdd(r170, r170, s1B0);
+        FastVecSub(s1A0, D_001B5340, r160);
+        FastVecCross(w120, s1A0, w150);
+        len2 = FastVecLength(w120);
         if (len2 != 0) len2 = 1.0f / len2;
-        func_00282D30(w130, w120, sy * len2);
-        func_00282CC0(q2[0], r160, w130);
-        func_00282CF0(q2[1], r160, w130);
-        func_00282CC0(q2[2], r170, w130);
-        func_00282CF0(q2[3], r170, w130);
+        FastVecScale(w130, w120, sy * len2);
+        FastVecAdd(q2[0], r160, w130);
+        FastVecSub(q2[1], r160, w130);
+        FastVecAdd(q2[2], r170, w130);
+        FastVecSub(q2[3], r170, w130);
         if (i == 0) {
             u.c[1] = *(int *)&D_001AEE58;
             u.c[0] = *(int *)&D_001AEE58;
@@ -125,7 +125,7 @@ void func_0030BBA0(void *m, int a, int b, float sx, float sy, int n, float sz) {
             u.c[1] = col1;
             u.c[0] = col1;
         }
-        func_00280B90(q2, 0, 0);
+        draw_world_quad(q2, 0, 0);
     }
-    func_002FC560(0x47, 0x5360B);
+    VU1_addGSregister(0x47, 0x5360B);
 }

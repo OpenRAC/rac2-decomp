@@ -26,12 +26,12 @@ void func_L04_0046E428(unsigned char *obj)
     int volume, flags;
     unsigned char *slot;
     scale[2] = scale[1] = scale[0] = *(float *)(obj+12);
-    func_00282CF0(pos,D_L04_001B9680,obj+0x40);
+    FastVecSub(pos,D_L04_001B9680,obj+0x40);
     pos[3] = 0;
-    func_00283098(delta,pos,obj+0x50);
-    func_00283098(extent,scale,obj+0x50);
-    outer = func_00282DF0(extent);
-    distance = func_00282DF0(delta);
+    matrix_mul_vec3(delta,pos,obj+0x50);
+    matrix_mul_vec3(extent,scale,obj+0x50);
+    outer = FastVecLength(extent);
+    distance = FastVecLength(delta);
     if (distance < outer) {
         flags = 16;
         if (func_00282C48(delta[0]) <= 1.0f && func_00282C48(delta[1]) <= 1.0f && func_00282C48(delta[2]) <= 1.0f) {
@@ -40,7 +40,7 @@ void func_L04_0046E428(unsigned char *obj)
             if(delta[0]>1.0f) delta[0]=1.0f; else if(delta[0]<-1.0f) delta[0]=-1.0f;
             if(delta[1]>1.0f) delta[1]=1.0f; else if(delta[1]<-1.0f) delta[1]=-1.0f;
             if(delta[2]>1.0f) delta[2]=1.0f; else if(delta[2]<-1.0f) delta[2]=-1.0f;
-            edge=func_00282DF0(delta);
+            edge=FastVecLength(delta);
             volume=func_002E45C8(D_L04_001B202C+s->sound*32,distance,edge,outer);
         }
         if(s->target!=-1) {
@@ -52,7 +52,7 @@ void func_L04_0046E428(unsigned char *obj)
                 if(s->end*(1.0f/60.0f)<time) time=s->end*(1.0f/60.0f);
                 time-=s->start*(1.0f/60.0f);
                 if(time<0) time=0;
-                cap=func_00283CF0(func_00283CE0(1024)*(time/((s->end-s->start)*(1.0f/60.0f))));
+                cap=FloatToInt(IntToFloat(1024)*(time/((s->end-s->start)*(1.0f/60.0f))));
                 if(cap<volume) volume=cap;
             }
         }
@@ -66,8 +66,8 @@ void func_L04_0046E428(unsigned char *obj)
         }
         if(s->handle!=-1) {
             func_L01_00355BA0(s->handle,volume);
-            func_00283098(pos,delta,obj+0x10);
-            func_00282CC0(pos,pos,obj+0x40);
+            matrix_mul_vec3(pos,delta,obj+0x10);
+            FastVecAdd(pos,pos,obj+0x40);
             qcopy(D_00188660+s->handle*0x70+0x90,pos);
         }
     } else {

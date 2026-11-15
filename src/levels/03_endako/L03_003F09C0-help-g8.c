@@ -92,19 +92,19 @@ void func_L03_003F09C0(u8 *entity) {
         func_002A7750(entity,1,-1);
         break;
     case 1:
-        if (!D_001395B8.bytes[0xD] && func_002ACBC8(D_00189E20.position,I(state,0x6C)))
+        if (!D_001395B8.bytes[0xD] && IsPointInCuboid(D_00189E20.position,I(state,0x6C)))
             D_001395B8.bytes[0xD] = mode;
-        if (!D_001395B8.bytes[9] && func_002ACBC8(D_00189E20.position,I(state,0x4C)) && func_00288AA0(D_L03_001BFB80,0x34)) {
+        if (!D_001395B8.bytes[9] && IsPointInCuboid(D_00189E20.position,I(state,0x4C)) && func_00288AA0(D_L03_001BFB80,0x34)) {
             func_00288BE8(D_L03_001BFB80);
             D_001395B8.bytes[9]=1;
             func_002F5CB8(func_L03_003F1470,entity);
         }
-        if (!D_00189E20.field22B4 && func_002ACBC8(D_00189E20.position,I(state,8))) {
+        if (!D_00189E20.field22B4 && IsPointInCuboid(D_00189E20.position,I(state,8))) {
             if (func_00282948(state+0x60)) {
                 func_00288E18(0x9CB,0x22);
                 I(state,0x60)=600;
             }
-        } else if (func_002ACBC8(D_00189E20.position,I(state,0xC))) {
+        } else if (IsPointInCuboid(D_00189E20.position,I(state,0xC))) {
             if(D_0018C958[34].count!=65535) {
                 D_0018C958[34].count=65535;
                 if (D_L03_00282078.active || D_L03_00282078.key!=-1) {
@@ -112,7 +112,7 @@ void func_L03_003F09C0(u8 *entity) {
                 }
             }
         }
-        if(func_002ACBC8(D_00189E20.position,I(state,0x10)) && !D_L03_00282078.active && D_L03_00282078.key==-1) {
+        if(IsPointInCuboid(D_00189E20.position,I(state,0x10)) && !D_L03_00282078.active && D_L03_00282078.key==-1) {
             u32 now = D_001A7390[0], prev = D_0018C958[35].time;
             if (now - prev > 120) {
                 func_00288E18(0x9CC,0x23);
@@ -120,33 +120,33 @@ void func_L03_003F09C0(u8 *entity) {
             } else {
                 if (prev < now) D_0018C958[35].time = now;
             }
-        } else if(func_002ACBC8(D_00189E20.position,I(state,0x14))) {
+        } else if(IsPointInCuboid(D_00189E20.position,I(state,0x14))) {
             if(D_0018C958[35].count!=65535) {
                 D_0018C958[35].count=65535;
                 if(D_L03_00282078.active || D_L03_00282078.key!=-1) func_00288D90();
             }
         }
-        if(func_002ACBC8(D_00189E20.position,I(state,0x18))) {
+        if(IsPointInCuboid(D_00189E20.position,I(state,0x18))) {
             if(D_001A7390[0]-D_0018C958[36].time>2400) func_00288E18(0x9CD,0x24);
-        } else if(func_002ACBC8(D_00189E20.position,I(state,0x1C))) {
+        } else if(IsPointInCuboid(D_00189E20.position,I(state,0x1C))) {
             D_001395B8.bytes[0xA2]=1;
             D_0018C958[36].count=65535;
             if(D_L03_00282078.active || D_L03_00282078.key!=-1) func_00288D90();
         }
-        if(func_002ACBC8(D_00189E20.position,I(state,0x64)) && !D_0018C958[123].count) {
+        if(IsPointInCuboid(D_00189E20.position,I(state,0x64)) && !D_0018C958[123].count) {
             D_001395B8.bytes[0xA2]=1;
             func_00288E18(0xA24,0x7B);
         }
-        func_L01_002EABA8(0x9D3,0x2A,0,I(state,0x20),-1);
-        if(func_002ACBC8(D_00189E20.position,I(state,0x24)) && ((D_001395B8.bytes[0x78] ^ 1) & 1)) {
+        TriggerSubtitleInCuboid(0x9D3,0x2A,0,I(state,0x20),-1);
+        if(IsPointInCuboid(D_00189E20.position,I(state,0x24)) && ((D_001395B8.bytes[0x78] ^ 1) & 1)) {
             u32 now=D_001A7390[0], prev=D_0018C958[131].time;
             if(now-prev>1080 || !prev) func_00288E18(0xA2C,0x83);
             else if(prev<now) D_0018C958[131].time=now;
         }
-        func_L01_002EABA8(0x9D5,0x2C,0,I(state,0x40),-1);
-        func_L01_002EABA8(0x9E5,0x3C,2,I(state,0x54),-1);
-        if(func_002ACBC8(D_00189E20.position,I(state,0x2C))) D_0018C958[43].count=65535;
-        else if(func_002ACBC8(D_00189E20.position,I(state,0x28))) {
+        TriggerSubtitleInCuboid(0x9D5,0x2C,0,I(state,0x40),-1);
+        TriggerSubtitleInCuboid(0x9E5,0x3C,2,I(state,0x54),-1);
+        if(IsPointInCuboid(D_00189E20.position,I(state,0x2C))) D_0018C958[43].count=65535;
+        else if(IsPointInCuboid(D_00189E20.position,I(state,0x28))) {
             if(D_00189E20.field2294==0x23 && D_00189E20.field1B8==1) ++I(state,0x30);
             if(I(state,0x30)>=3 && D_00189E20.field2294==0x23) func_00288E18(0x9D4,0x2B);
         }
@@ -155,11 +155,11 @@ void func_L03_003F09C0(u8 *entity) {
             point.f[0]=400.0f;
             point.f[1]=222.0f;
             point.f[2]=155.0f;
-            if(func_00282E48(D_00189E20.position,point.f)<24.0f) D_0018C958[37].time=0;
+            if(fast_vec_dist(D_00189E20.position,point.f)<24.0f) D_0018C958[37].time=0;
         }
-        func_L01_002EABA8(0x9CE,0x25,1,I(state,0x28),I(state,0x2C));
-        func_L01_002EABA8(0x9CE,0x25,3,I(state,0x28),I(state,0x2C));
-        if(func_002ACBC8(D_00189E20.position,I(state,0x7C))) {
+        TriggerSubtitleInCuboid(0x9CE,0x25,1,I(state,0x28),I(state,0x2C));
+        TriggerSubtitleInCuboid(0x9CE,0x25,3,I(state,0x28),I(state,0x2C));
+        if(IsPointInCuboid(D_00189E20.position,I(state,0x7C))) {
             if(!D_0018C750.fieldF0 || D_001A7390[0]-D_0018C750.fieldF4>72000) {
                 u32 seen = D_0018C958[32].levels & (1 << D_001A79F0);
                 if (!seen) func_00288E18(0x9C9,0x20);
@@ -168,11 +168,11 @@ void func_L03_003F09C0(u8 *entity) {
         if(!D_001A79F8.field12 && D_L03_001B2548>0 && !(D_L03_001B2548&0x7F) && !D_001A7BED[0] && !func_L03_003112F8()) {
             u32 count = D_0018C958[138].count;
             if (count < 3) {
-                if (!count && func_002ACBC8(D_00189E20.position,I(state,0x78))) func_00288E18(0xA33,0x8A);
+                if (!count && IsPointInCuboid(D_00189E20.position,I(state,0x78))) func_00288E18(0xA33,0x8A);
                 else if (D_001A7390[0] - D_0018C958[138].time > 36000) func_00288E18(0xA33,0x8A);
             }
         }
-        if(D_001A7390[0]-D_0018C750.field70>108000 && func_002ACBC8(D_00189E20.position,I(state,0x78))) {
+        if(D_001A7390[0]-D_0018C750.field70>108000 && IsPointInCuboid(D_00189E20.position,I(state,0x78))) {
             u32 seen = D_0018C958[12].levels & (1 << D_001A79F0);
             if (!seen) func_00288E18(0x9B5,0xC);
         }

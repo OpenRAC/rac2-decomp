@@ -2,7 +2,7 @@
  * written from func_00322CC0 (src/game/00322CC0.c).
  * D_001A8BB0's slot is reached through the address macro (MACRO_ADDR): lui/lw in flow,
  * $gp in delay slots.  The func_00322690 table is an sda incomplete array.
- * func_0032C700 returns a pointer: a value-returning call sets $v0, which gives sched2
+ * SpawnExplosion returns a pointer: a value-returning call sets $v0, which gives sched2
  * retail's `li.s $f12; li $v0,1; li.s $f13` before it.
  */
 #include "common.h"
@@ -166,7 +166,7 @@ void func_00320550(char *self)
         *(int *)(vars + 0x2C0) = -1;
         if ((flags & 1) || *(float *)(vars + 0x20) <= 0.0f) {
             char *child;
-            func_002E5CF8(0xC, 0, self);
+            PlayMobySound(0xC, 0, self);
             child = *(char **)(vars + 0x2AC);
             if (child != 0 && *(s16 *)(child + 0xAA) == 0xAB7)
                 func_0029F338(child);
@@ -175,11 +175,11 @@ void func_00320550(char *self)
             *(u16 *)(self + 0x34) |= 0x41;
             *(u16 *)(self + 0x34) &= ~0x1000;
             *(int *)(self + 0x98) = 0;
-            func_00283098(v, v, self + 0xC0);
-            func_00282CC0(v, v, self + 0x10);
-            func_0032C700(v, 0, 5, 5, 5, 0, 0, 0, 0.5f, 20.0f, 1, 0, 0, 0);
+            matrix_mul_vec3(v, v, self + 0xC0);
+            FastVecAdd(v, v, self + 0x10);
+            SpawnExplosion(v, 0, 5, 5, 5, 0, 0, 0, 0.5f, 20.0f, 1, 0, 0, 0);
             func_00322A30(self);
-            func_002A6C58(self, 0, 3);
+            SetDeathBits(self, 0, 3);
             func_0029F338(self);
             return;
         }
@@ -213,7 +213,7 @@ void func_00320550(char *self)
         float y;
         *(int *)(vars + 0x2A0) += 1;
         if (*(char **)(slot + 0x88) != self || slot[0x74] == 0)
-            *(int *)(vars + 0x2C0) = func_002E5CF8(0xD, 4, self);
+            *(int *)(vars + 0x2C0) = PlayMobySound(0xD, 4, self);
         func_002A7E08(self, *(char **)(vars + 0x240), vars + 0x28C, 0.001f, 0.01f, 0.1f);
         func_002AA3A8(self + 0xF4, 0.0f, vars + 0x290, 0.016666668f, 0.0f, 0.06666667f);
         func_002AA3A8(self + 0xF0, 0.0f, vars + 0x290, 0.016666668f, 0.0f, 0.06666667f);
@@ -255,7 +255,7 @@ void func_00320550(char *self)
         } else {
             int index;
             char *child;
-            func_0026FEB8(D_001AFFD8, *(int *)(vars + 0x2A0));
+            STUB_printf(D_001AFFD8, *(int *)(vars + 0x2A0));
             index = *(int *)(vars + 0x2C0);
             if (index != -1) {
                 u8 *slot = D_00188660 + index * 0x70;
@@ -286,7 +286,7 @@ void func_00320550(char *self)
         float height;
         float above;
         func_002AA3A8(self + 0xF4, 0.0f, vars + 0x290, 0.016666668f, 0.0f, 0.06666667f);
-        func_002833F0(self + 0xC0, self + 0xF0);
+        euler_rotation_basis(self + 0xC0, self + 0xF0);
         func_002A7E08(self, *(char **)(vars + 0x240), vars + 0x28C, 0.001f, 0.01f, 0.1f);
         height = func_002A89A8(self + 0x10, 0, 0.5f);
         above = *(float *)(self + 0x18) - height;
@@ -311,12 +311,12 @@ void func_00320550(char *self)
     case 10:
         qcopy(v, vars + 0x380);
         v[2] -= 3.0f;
-        func_00282CF0(w, v, self + 0x10);
+        FastVecSub(w, v, self + 0x10);
         *(float *)(self + 0xF8) = func_00283248(w[0], w[1]);
-        *(float *)(self + 0xF4) = func_00283248(func_00282E20(w), w[2]);
-        func_002833F0(self + 0xC0, self + 0xF0);
+        *(float *)(self + 0xF4) = func_00283248(vec_length_xy(w), w[2]);
+        euler_rotation_basis(self + 0xC0, self + 0xF0);
         func_002AA458(self + 0x10, v, vars + 0x280, 0.016666668f, 0.0f, 0.33333334f);
-        if (func_00282E48(self + 0x10, v) < 0.4f) {
+        if (fast_vec_dist(self + 0x10, v) < 0.4f) {
             if (*(u8 *)(self + 0x43) != 0xD)
                 func_002A7470(self, 0xD, 0, 0xA);
             func_002A7750(self, 7, -1);
@@ -333,11 +333,11 @@ void func_00320550(char *self)
         break;
     case 12:
         func_002B60B0(self, 0.0011111111f, 0.033333335f, 0.001163553f, 0.10471977f);
-        if (func_00282E80(self + 0x10, *(char **)(vars + 0x240) + 0x10) < 2.8f
-            && func_00283C80(*(float *)(self + 0xF8),
+        if (vec_distance_xy(self + 0x10, *(char **)(vars + 0x240) + 0x10) < 2.8f
+            && FastDiffRots(*(float *)(self + 0xF8),
                              func_00283248(*(float *)(vars + 0x230) - *(float *)(self + 0x10),
                                            *(float *)(vars + 0x234) - *(float *)(self + 0x14))) < 0.38397247f) {
-        } else if (func_00282E80(self + 0x10, *(char **)(vars + 0x240) + 0x10) > 2.8f) {
+        } else if (vec_distance_xy(self + 0x10, *(char **)(vars + 0x240) + 0x10) > 2.8f) {
             func_002B4FF0(self, vars + 0x230, *(float *)(vars + 0x284));
         } else {
             char *target = *(char **)(vars + 0x240);
@@ -360,7 +360,7 @@ void func_00320550(char *self)
     }
     case 14:
         if (*(u8 *)(self + 0x60) & 2) {
-            if (func_00282E80(self + 0x10, *(char **)(vars + 0x240) + 0x10) > 4.0f) {
+            if (vec_distance_xy(self + 0x10, *(char **)(vars + 0x240) + 0x10) > 4.0f) {
                 func_002B60B0(self, 0.0044444446f, 0.13333334f, 0.001163553f, 0.10471977f);
                 func_002A7750(self, 0xC, -1);
                 if (*(u8 *)(self + 0x43) != 0x1C)

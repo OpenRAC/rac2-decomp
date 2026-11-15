@@ -229,7 +229,7 @@ void func_L11_00454AE0(char *p)
     func_002AB8C0(p, q + 0x50);
     if (*(short *)(q + 0x50) == 0) {
         if (*(short *)(q + 0x1FE) == 0) {
-            func_002A0488(p, *(int *)(q + 0x1F0), *(int *)(q + 0x1F4), *(int *)(q + 0x1F8));
+            set_moby_color(p, *(int *)(q + 0x1F0), *(int *)(q + 0x1F4), *(int *)(q + 0x1F8));
             *(short *)(q + 0x1FE) = 1;
         }
     } else {
@@ -310,7 +310,7 @@ void func_L11_00454C78(char *p, int a1, int a2)
     *(float *)(q + 0x1CC) = f;
     if (*(short *)(q + 0x50) != 0) {
         *(short *)(q + 0x50) = 0;
-        func_002A0488(p, *(int *)(q + 0x1F0), *(int *)(q + 0x1F4), *(int *)(q + 0x1F8));
+        set_moby_color(p, *(int *)(q + 0x1F0), *(int *)(q + 0x1F4), *(int *)(q + 0x1F8));
         *(short *)(q + 0x52) = 1;
     }
 }
@@ -333,7 +333,7 @@ void func_L11_00454DD8(char *p)
         func_L11_00441978(*(char **)(p + 0xB8), *(short *)(p + 0xAA));
     }
     if (*(unsigned char *)(p + 0x31) != 0) {
-        func_0032C700(p + 0x10, 0, 10, 30, 0, 10, 45, 1, 0.3f, 0.0f, 0, 0, 0, 0);
+        SpawnExplosion(p + 0x10, 0, 10, 30, 0, 10, 45, 1, 0.3f, 0.0f, 0, 0, 0, 0);
         func_002E5DA0(0, 0, p, 0xDF7);
     }
     func_002A7470(p, 0, 0, 3);
@@ -357,8 +357,8 @@ void func_L11_00455DF8(JobaObject *obj)
     JobaObject *other;
 
     if (obj->stage == 0) {
-        state->f48 = func_00283CF0(15.0f);
-        state->f4A = func_00283CF0(12.0f);
+        state->f48 = FloatToInt(15.0f);
+        state->f4A = FloatToInt(12.0f);
         state->f80 = 0.5f;
         state->f84 = 0.5f;
         state->f108 = 0.5f;
@@ -391,7 +391,7 @@ void func_L11_00455DF8(JobaObject *obj)
                 state->fE4 = 0.837758183f;
             }
         }
-        if (obj->active && func_00282E48(obj->position, D_L11_001BA8C0) < 24.0f) {
+        if (obj->active && fast_vec_dist(obj->position, D_L11_001BA8C0) < 24.0f) {
             func_002A93B0(obj);
             obj->f6F = 22;
         }
@@ -521,9 +521,9 @@ void func_L11_00456A48(JobaObject *source, int kind, float radius, float playerD
                     z = otherZ;
                     damage = otherDamage;
                 }
-                func_00282CF0(impulse, point, source->position);
+                FastVecSub(impulse, point, source->position);
                 impulseStorage[2] = 0.0f;
-                func_00282F20(impulse, impulse, scale);
+                vec_scale_to_length(impulse, impulse, scale);
                 impulseStorage[2] = z;
                 impulseStorage[3] = 5627.925f;
                 func_002A8F70(target, source, 0x10001, damage, point, impulse);
@@ -554,7 +554,7 @@ void func_L11_00456C20(JobaObject *obj)
             newRadius = func_002A7878(state->minRadius, state->maxRadius);
             newAzimuth = func_002A7940();
             func_002AF000(state->points[i], newRadius, newAzimuth, func_002A7940());
-            func_00282CC0(state->points[i], obj->position, state->points[i]);
+            FastVecAdd(state->points[i], obj->position, state->points[i]);
         }
     }
 
@@ -562,19 +562,19 @@ void func_L11_00456C20(JobaObject *obj)
         func_L00_002E6EF8(func_L11_00456EA0, (char *)obj);
         for (j = 0; j < state->count; j++) {
             point = state->points[j];
-            func_00282CF0(scratch, obj->position, point);
+            FastVecSub(scratch, obj->position, point);
             azimuth = func_00283248(point[0] - obj->position[0], point[1] - obj->position[1]);
-            elevation = func_00283248(func_00282E80(obj->position, point),
+            elevation = func_00283248(vec_distance_xy(obj->position, point),
                                       point[2] - obj->position[2]);
-            azimuth = func_00283BE0(azimuth, state->f9C * 0.017453294f);
-            elevation = func_00283BE0(elevation,
+            azimuth = fast_subtract_rotations(azimuth, state->f9C * 0.017453294f);
+            elevation = fast_subtract_rotations(elevation,
                                       func_002A78D8(state->fA4, state->fA0) * 0.017453294f);
             if (state->maxElevation < elevation)
                 elevation = state->maxElevation;
             if (elevation < state->minElevation)
                 elevation = state->minElevation;
 
-            radius = func_00282E48(obj->position, point);
+            radius = fast_vec_dist(obj->position, point);
             step = func_002A78D8(state->f98 * 0.0166666675f, state->f94 * 0.0166666675f);
             radius += step;
             if (state->maxRadius < radius)
@@ -583,7 +583,7 @@ void func_L11_00456C20(JobaObject *obj)
                 radius = state->minRadius;
 
             func_002AF000(point, radius, azimuth, elevation);
-            func_00282CC0(point, obj->position, point);
+            FastVecAdd(point, obj->position, point);
         }
     }
 }
@@ -766,7 +766,7 @@ void func_L11_004600A0(char *pos, int a1, int a2, char *a3, int t0,
     long long r;
 
     func_L11_0045FFB0(pkt);
-    r = func_0027C878(a3);
+    r = GetEffectTextureDescriptor(a3);
 
     *(long long *)(pkt + 136) = ((long long)t0 << 2) | 0x8000000040LL;
     *(long long *)(pkt + 128) = 280993940374112LL;
@@ -780,13 +780,13 @@ void func_L11_004600A0(char *pos, int a1, int a2, char *a3, int t0,
     quat[3] = 0.0f;
     quat[2] = func_00283248(D_L11_001BA780.x_140 - *(float *)(pos + 0),
                            D_L11_001BA780.y_144 - *(float *)(pos + 4));
-    quat[1] = -func_00283248(func_00282E80(pos, &D_L11_001BA780.x_140),
+    quat[1] = -func_00283248(vec_distance_xy(pos, &D_L11_001BA780.x_140),
                              D_L11_001BA780.z_148 - *(float *)(pos + 8));
     quat[0] = fB;
 
-    func_00283410(m, quat);
-    func_00282CF0(off, &D_L11_001BA780.x_140, pos);
-    func_00282F20(off, off, fC);
+    euler_to_matrix(m, quat);
+    FastVecSub(off, &D_L11_001BA780.x_140, pos);
+    vec_scale_to_length(off, off, fC);
 
     m[12] = *(float *)(pos + 0) + off[0];
     m[13] = *(float *)(pos + 4) + off[1];
@@ -794,7 +794,7 @@ void func_L11_004600A0(char *pos, int a1, int a2, char *a3, int t0,
     m[15] = 1.0f;
 
     func_L11_00460038(pkt, fA);
-    func_00280B90(pkt, m, 0);
+    draw_world_quad(pkt, m, 0);
 }
 
 /* func_L11_00461308 lives in L11_00461308.c. */

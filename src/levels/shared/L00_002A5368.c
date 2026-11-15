@@ -83,7 +83,7 @@ void func_L00_002A6008(void) {
     u8 *p;
 
     if (D_00189E20.p1860 == 0) {
-        obj = func_0029EFD0(0x47A);
+        obj = CreateMoby(0x47A);
         D_00189E20.p1860 = obj;
         if (obj == 0) {
             return;
@@ -109,9 +109,9 @@ void func_L00_002A6008(void) {
         func_002A0F48(held);
         func_00282C88(s.euler);
         s.euler[2] = -((float *)&D_00189E20.q090)[2];
-        func_00283410(s.rotation, s.euler);
-        func_00283788(s.matrix, s.matrix, s.rotation);
-        func_00283678(D_00189E20.p1860 + 0xC0, s.matrix);
+        euler_to_matrix(s.rotation, s.euler);
+        multiply_matrix(s.matrix, s.matrix, s.rotation);
+        copy_matrix3x4(D_00189E20.p1860 + 0xC0, s.matrix);
         *(u64 *)(D_00189E20.p1860 + 0x38) = *(u64 *)(D_00189E20.p2290 + 0x38);
         if (D_00189E20.f2294 == 0x4B) {
             if (*(u8 *)(D_00189E20.p1860 + 0x43) != 1) {

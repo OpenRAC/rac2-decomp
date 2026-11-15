@@ -135,9 +135,9 @@ void func_L00_003A2EE0(u8 *moby)
         if (D_L00_001B19C8 & 4) {
             st->target = 0;
             st->locked = 0;
-            func_00282F20(a, D_L00_001B8DC0 + 0x230, 128.0f);
-            func_00282CC0(a, a, D_L00_001B8DC0);
-            if (func_002761F8(D_L00_001B8DC0, a, 0x10, HERO->i[0x2290 / 4], 0) != 0) {
+            vec_scale_to_length(a, D_L00_001B8DC0 + 0x230, 128.0f);
+            FastVecAdd(a, a, D_L00_001B8DC0);
+            if (CollLine(D_L00_001B8DC0, a, 0x10, HERO->i[0x2290 / 4], 0) != 0) {
                 u8 *hit = (u8 *)D_L00_001BF218[0];
                 if (hit != 0 && hit[0x31] != 0) {
                     float *health = func_002AB1F0(hit);
@@ -155,10 +155,10 @@ void func_L00_003A2EE0(u8 *moby)
                 st->blink++;
                 if (st->blink > 20)
                     st->blink = 0;
-                if (st->reload <= 0.0f && func_L00_002D4040(-1) != 0 && st->blink > 10)
+                if (st->reload <= 0.0f && get_ammo(-1) != 0 && st->blink > 10)
                     func_00273318(moby, 1.5f, 0x400000FF, 0, 0x20, 0.0f, -1, 90.0f, 4);
             }
-            func_00273318(moby, 2.0f, (st->reload > 0.0f && func_L00_002D4040(-1) != 0) ? 0x600000FF : 0x600FFF0F,
+            func_00273318(moby, 2.0f, (st->reload > 0.0f && get_ammo(-1) != 0) ? 0x600000FF : 0x600FFF0F,
                           0, 0x27, 0.0f, -1, 90.0f, 4);
         }
     }
@@ -182,7 +182,7 @@ void func_L00_003A2EE0(u8 *moby)
         st->light = -1;
         st->sound = -1;
         st->hud = -1;
-        st->model = func_L00_00329E90(moby, 0, &found);
+        st->model = AcquireEntitySlot(moby, 0, &found);
         if (found == 0) {
             char *record = func_L00_0032A088(*(s16 *)(moby + 0xAA), st->model);
             int *size = func_L00_0032A0B8(*(s16 *)(moby + 0xAA), st->model);
@@ -214,13 +214,13 @@ void func_L00_003A2EE0(u8 *moby)
             if ((GAME->i[0x1A0 / 4] & 8) && st->zoom > 0.17453295f) {
                 SoundSlot *s = &D_00188660[st->sound];
                 if ((u8 *)s->p[0x88 / 4] != moby || s->b[0x74] == 0)
-                    st->sound = func_002E5CF8(2, 4, moby);
+                    st->sound = PlayMobySound(2, 4, moby);
                 D_0018CCD0[0] = 0xFFFF;
                 st->zoom -= 0.01f;
             } else if ((GAME->i[0x1A0 / 4] & 2) && st->zoom < st->zoom_max) {
                 SoundSlot *s = &D_00188660[st->sound];
                 if ((u8 *)s->p[0x88 / 4] != moby || s->b[0x74] == 0)
-                    st->sound = func_002E5CF8(3, 4, moby);
+                    st->sound = PlayMobySound(3, 4, moby);
                 D_0018CCD0[0] = 0xFFFF;
                 st->zoom += 0.01f;
             } else {
@@ -261,16 +261,16 @@ void func_L00_003A2EE0(u8 *moby)
         D_L00_001B15CC = (D_L00_001AF620 - 0.010471977f) * t + 0.010471977f;
         if (HERO->b[0x22BC] == 0 && (GAME->i[0x1A4 / 4] & HERO->i[0x1230 / 4]) && fire) {
             if (func_L00_002D3F30(-1, 1) != 0) {
-                func_L00_002AF568();
+                start_equipped_item_animation();
                 st->hud = func_L00_002D6998(D_L00_00294800);
                 st->fire_timer = 2;
                 moby[0x20] = 2;
                 func_002A7470(moby, 2, 0, 0);
             } else {
-                func_002E5CF8(1, 0, moby);
+                PlayMobySound(1, 0, moby);
             }
         }
-        if (!(GAME->i[0x1A0 / 4] & HERO->i[0x1230 / 4]) || func_L00_002D4040(-1) == 0 || HERO->b[0x22B8] == 0) {
+        if (!(GAME->i[0x1A0 / 4] & HERO->i[0x1230 / 4]) || get_ammo(-1) == 0 || HERO->b[0x22B8] == 0) {
             if (st->hud >= 0) {
                 func_L00_002D6B70(st->hud);
                 st->hud = -1;
@@ -281,7 +281,7 @@ void func_L00_003A2EE0(u8 *moby)
     case 2:
         if (HERO->i[0x1450 / 4] != 0)
             HERO->i[0xBF8 / 4] = HERO->i[0x1450 / 4];
-        if (func_00282978(&st->fire_timer) != 0 || st->zoomed != 0) {
+        if (FastDecTimer(&st->fire_timer) != 0 || st->zoomed != 0) {
             int h = st->sound;
             if (h != -1) {
                 SoundSlot *s = &D_00188660[h];
@@ -289,7 +289,7 @@ void func_L00_003A2EE0(u8 *moby)
                     func_002E59F8(h);
             }
             st->sound = -1;
-            func_002E5CF8(0, 0, moby);
+            PlayMobySound(0, 0, moby);
             func_L00_003A3B58(moby);
             {
                 WeaponEntry *weapon = &D_L00_00262570[D_0013957F[0]];
@@ -317,18 +317,18 @@ void func_L00_003A2EE0(u8 *moby)
                 float f;
                 if (HERO->h[0x24EC / 2] == 1) {
                     func_0029FCC0(moby, 0, a);
-                    func_00282F20(b, moby + 0xD0, -1.5f);
+                    vec_scale_to_length(b, moby + 0xD0, -1.5f);
                 } else {
                     func_0029FCC0(moby, 0, a);
-                    func_00282F20(b, &HERO->f[0x760 / 4], 1.5f);
+                    vec_scale_to_length(b, &HERO->f[0x760 / 4], 1.5f);
                 }
                 {
                     float (*positions)[8] = (float (*)[8])D_L00_001C6F40[0].position;
                     MuzzleLight *lights;
-                    func_00282CC0(positions[st->light], a, b);
+                    FastVecAdd(positions[st->light], a, b);
                     lights = (MuzzleLight *)((char *)positions - 0x10);
                     lights[st->light].position[3] = 15.0f;
-                    f = func_00283CE0(st->flash) / func_00283CE0(30);
+                    f = IntToFloat(st->flash) / IntToFloat(30);
                     lights[st->light].spread = f;
                     lights[st->light].radius = f * 0.75f;
                     lights[st->light].power = lights[st->light].radius;

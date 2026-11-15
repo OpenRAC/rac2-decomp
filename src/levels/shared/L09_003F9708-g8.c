@@ -23,9 +23,9 @@ void func_L09_003F9708(char *obj)
     char *parent;
     int close = 1;
     int side, shift;
-    if (!(func_00282E80(obj + 0x10, *(char **)(state + 0x200)+0x10) < D_L09_001B0F2C))
+    if (!(vec_distance_xy(obj + 0x10, *(char **)(state + 0x200)+0x10) < D_L09_001B0F2C))
         close = 0;
-    if (!*(int *)(state + 0x2F8) || !func_00282978(state + 0x2E4))
+    if (!*(int *)(state + 0x2F8) || !FastDecTimer(state + 0x2E4))
         return;
     side = (*(unsigned short *)(obj + 0x96) / D_L09_001B0F40) & 1;
     shift = side ? 5 : 4;
@@ -43,16 +43,16 @@ void func_L09_003F9708(char *obj)
     {
         *(short *)(state + 0x2E4) = D_L09_001B0F40;
         func_0029FCC0(((Parts9708 *)state)->parts[side], 0, pos);
-        func_00282CF0(dir, (float *)(state + 0x1F0), pos);
-        func_00282F20(dir, dir, D_L09_001B0F28 * 0.016666668f);
+        FastVecSub(dir, (float *)(state + 0x1F0), pos);
+        vec_scale_to_length(dir, dir, D_L09_001B0F28 * 0.016666668f);
         if (!close && !*(u8 *)(state + 0x30D)) {
             if (dir[2] > 0.033333335f)
                 dir[2] = 0.033333335f;
             else if (dir[2] < -0.033333335f)
                 dir[2] = -0.033333335f;
         }
-        func_00282F20(dir, dir, D_L09_001B0F28 * 0.016666668f);
-        func_002E5CF8(1, 0, *(void **)(state + 0x2F8));
+        vec_scale_to_length(dir, dir, D_L09_001B0F28 * 0.016666668f);
+        PlayMobySound(1, 0, *(void **)(state + 0x2F8));
         func_L09_003A06B0(obj, (float)*(u8 *)(state + 0x34), dir, pos);
     }
     return;

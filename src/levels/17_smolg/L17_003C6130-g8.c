@@ -188,7 +188,7 @@ void func_L17_003C6130(u8 *object)
                      D_L17_001B0354 * 4.848137450608192e-06f,
                      D_L17_001B0354 * 4.848137450608192e-06f, 0.20943954586982727f, 0);
         if (D_00189E20.groundObject == object && D_00189E20.mode34E == 0) {
-            func_002B0C28(10, 0x27ED, 1);
+            TryClaimNotice(10, 0x27ED, 1);
             if (D_00138324 & 0x10) {
                 data->progress = 0;
                 moby->state = 4;
@@ -218,7 +218,7 @@ void func_L17_003C6130(u8 *object)
                      D_L17_001B0354 * 4.848137450608192e-06f, 0.20943954586982727f, 0);
         exitRow = (PlatformPathRow *)data->exitPaths;
         if (exitRow->paths[moby->choice] != -1 &&
-            func_00282E48(&moby->position, D_00189EA0) > 15.0f) {
+            fast_vec_dist(&moby->position, D_00189EA0) > 15.0f) {
             moby->state = 7;
             data->point = 1;
         } else if (exitRow->paths[moby->choice] == -1 && D_0018A15C != (char *)object)
@@ -232,7 +232,7 @@ void func_L17_003C6130(u8 *object)
                      D_L17_001B0354 * 4.848137450608192e-06f,
                      D_L17_001B0354 * 4.848137450608192e-06f, 0.20943954586982727f, 0);
         if (D_00189E20.groundObject == object && D_00189E20.mode34E == 0) {
-            func_002B0C28(10, 0x27ED, 1);
+            TryClaimNotice(10, 0x27ED, 1);
             if (D_00138324 & 0x10) {
                 data->progress = 0;
                 moby->state = 9;
@@ -264,6 +264,6 @@ updateSound:
         break;
     }
     func_L17_003C7018(object);
-    func_00282CF0(&delta, &moby->position, &oldPosition);
+    FastVecSub(&delta, &moby->position, &oldPosition);
     func_002AD6F0(data->motion, &delta, &oldRotation, &moby->rotation);
 }

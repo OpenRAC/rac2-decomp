@@ -22,16 +22,16 @@ void func_L07_00410C50(unsigned char *object)
     switch (object[0x20]) {
     case 0:
         *(unsigned short *)(object + 0x34) |= 0x100;
-        func_002833F0(object + 0xc0, object + 0xf0);
-        if (*(int *)(state + 0xc) == 1) func_00282D30(object + 0xe0, object + 0xe0, 2.0f);
-        else if (*(int *)(state + 0xc) == -1) func_00282D30(object + 0xe0, object + 0xe0, 0.5f);
+        euler_rotation_basis(object + 0xc0, object + 0xf0);
+        if (*(int *)(state + 0xc) == 1) FastVecScale(object + 0xe0, object + 0xe0, 2.0f);
+        else if (*(int *)(state + 0xc) == -1) FastVecScale(object + 0xe0, object + 0xe0, 0.5f);
         if (*(int *)(state + 0x24) == 0) {
             *(int *)(state + 0x10) = 0;
             *(int *)(state + 0x14) = 0;
             *(float *)(state + 0x18) = -(func_002A7878(3.0f, 6.0f) * 0.016666668f);
-        } else func_00282D30(state + 0x10, state + 0x10, 0.016666668f);
+        } else FastVecScale(state + 0x10, state + 0x10, 0.016666668f);
         *(float *)(state + 4) = func_002A7878(13.0f, 20.0f) * 0.00027777778f;
-        length = func_00282DF0(object + 0xe0);
+        length = FastVecLength(object + 0xe0);
         ratio = *(float *)(object + 0x2c) / *(float *)(*(char **)(object + 0x24) + 0x24);
         ratio *= length * -10.0f;
         *(float *)(state + 0x20) = ratio;
@@ -45,7 +45,7 @@ void func_L07_00410C50(unsigned char *object)
         object[0xa8] = 255;
         break;
     case 2:
-        func_00282CC0(object + 0x10, object + 0x10, state + 0x10);
+        FastVecAdd(object + 0x10, object + 0x10, state + 0x10);
         *(float *)(state + 0x18) -= *(float *)(state + 4);
         if (*(int *)(state + 0x24)) {
             func_L01_0031A278(object, &effect, 0.0f, 0.0f, *(float *)(state + 0x20));
@@ -55,7 +55,7 @@ void func_L07_00410C50(unsigned char *object)
             func_002A7750(object, 4, -1);
         break;
     case 4:
-        func_002E5CF8(0, 0, object);
+        PlayMobySound(0, 0, object);
         if (object[0x31]) {
             effect = 0;
             ((float *)&effect)[2] = 0.050000004f;

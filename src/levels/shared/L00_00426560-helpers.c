@@ -23,19 +23,19 @@ void func_L00_00426560(u8 *owner)
     Quad scaled;
     u8 mode;
     void *basis;
-    func_00282F20(&direction, D_00189E20.active + 0xE0, 1.0f);
+    vec_scale_to_length(&direction, D_00189E20.active + 0xE0, 1.0f);
     mode = D_00189E20.mode;
     if (mode == 2)
-        func_00282D30(&scaled, &direction, 9.5f);
+        FastVecScale(&scaled, &direction, 9.5f);
     else if (mode == 1)
-        func_00282D30(&scaled, &direction, 0.75f);
+        FastVecScale(&scaled, &direction, 0.75f);
     else
-        func_00282D30(&scaled, &direction, 1.6f);
-    func_00282CC0(owner + 0x30, D_00189EA0, &scaled);
+        FastVecScale(&scaled, &direction, 1.6f);
+    FastVecAdd(owner + 0x30, D_00189EA0, &scaled);
     basis = D_L00_001B8E14;
     qcopy(owner + 0x20, &direction);
-    func_00282DD8(owner + 0x10, basis, &direction);
-    func_00282F20(owner + 0x10, owner + 0x10, 1.0f);
-    func_00282DD8(owner, &direction, owner + 0x10);
+    FastVecCross(owner + 0x10, basis, &direction);
+    vec_scale_to_length(owner + 0x10, owner + 0x10, 1.0f);
+    FastVecCross(owner, &direction, owner + 0x10);
     qcopy(owner + 0x40, owner);
 }

@@ -62,7 +62,7 @@ void func_L00_003EE920(unsigned char *object) {
     case 1:
         qcopy(&work.previous, object + 0x10);
         func_002AFFD8((char *)&work.previous, (char *)&work.aim, 1);
-        func_00282CC0(object + 0x10, object + 0x10, state);
+        FastVecAdd(object + 0x10, object + 0x10, state);
         func_00300190(object + 0x10, object + 0x10);
         func_00300248((int)state, (int)state);
         func_002FEE70(BI(state, 0x34), state, 0);
@@ -81,7 +81,7 @@ void func_L00_003EE920(unsigned char *object) {
         work.query.flags0 = 0;
         work.query.flags1 = 0;
         work.query.active = 0;
-        collision = func_002FE9D0(&work.query);
+        collision = CollideSweptSphere(&work.query);
         qcopy(object + 0x10, &work.query.position);
         qcopy(state, &work.query.velocity);
         qcopy(state + 0x20, &work.query.previous);
@@ -94,33 +94,33 @@ void func_L00_003EE920(unsigned char *object) {
                 func_002FE8D8(work.query.hit + 0x10, work.normal.f);
                 qcopy(&work.point, object + 0x10);
                 if (info) {
-                    func_00282D30(&work.offset, &work.normal, BF(info, 0x10));
-                    func_00282CC0(&work.point, &work.point, &work.offset);
+                    FastVecScale(&work.offset, &work.normal, BF(info, 0x10));
+                    FastVecAdd(&work.point, &work.point, &work.offset);
                 }
-                func_00282D30(&work.normal, &work.normal, -3.0f);
-                func_00282CC0(&work.normal, &work.normal, &work.point);
+                FastVecScale(&work.normal, &work.normal, -3.0f);
+                FastVecAdd(&work.normal, &work.normal, &work.point);
                 object[0x20] = 2;
                 qcopy(object + 0x10, D_L00_001BF220);
                 qcopy(state + 0x20, D_L00_001BF220 + 0x20);
-                func_00282F20(state + 0x20, state + 0x20, 1.0f);
-                if (func_002761F8(&work.point, &work.normal, 6, work.query.hit, 0)) {
+                vec_scale_to_length(state + 0x20, state + 0x20, 1.0f);
+                if (CollLine(&work.point, &work.normal, 6, work.query.hit, 0)) {
                     qcopy(object + 0x10, D_L00_001BF220);
                     qcopy(state + 0x20, D_L00_001BF220 + 0x20);
-                    func_00282F20(state + 0x20, state + 0x20, 1.0f);
+                    vec_scale_to_length(state + 0x20, state + 0x20, 1.0f);
                 }
             }
         }
         break;
     case 2:
-        func_002E5CF8(0, 0, (char *)object);
+        PlayMobySound(0, 0, (char *)object);
         spawn = func_L00_003EF3E0((BounceWord128 *)(object + 0x10), (BounceWord128 *)(state + 0x20));
         BI(spawn, 0xB8) = BI(state, 0x30);
         func_002FEE50(BI(state, 0x34));
         func_0029F338(object);
         return;
     }
-    BF(object, 0xF0) = func_00283B98(BF(object, 0xF0), BF(state, 0x10));
-    BF(object, 0xF4) = func_00283B98(BF(object, 0xF4), BF(state, 0x14));
+    BF(object, 0xF0) = FastAddRotations(BF(object, 0xF0), BF(state, 0x10));
+    BF(object, 0xF4) = FastAddRotations(BF(object, 0xF4), BF(state, 0x14));
     func_002A9288(object, 0.2f);
     if (BF(object, 0x10) < 2.0f || BF(object, 0x10) > 1021.0f ||
         BF(object, 0x14) < 2.0f || BF(object, 0x14) > 1021.0f ||

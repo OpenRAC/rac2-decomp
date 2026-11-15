@@ -185,7 +185,7 @@ void func_L10_00421288(Moby *moby)
         D_L10_001B1430 = 0;
         D_L10_00221CD0.reset = func_L10_004235A0;
         D_L10_00221CD0.resetAll = func_L10_00423698;
-        D_L10_00221CD0.onHit = func_L10_00423788;
+        D_L10_00221CD0.onHit = ProcessObjectCollisionDamage;
         D_L10_00221CD0.controller = moby;
         func_L05_00379F18(1);
         func_L05_00379F28(0);
@@ -230,7 +230,7 @@ void func_L10_00421288(Moby *moby)
         func_L00_002C42E0(0x31, 0);
         if (D_L10_001B1438) {
             func_L05_00379F48(on);
-            D_L10_001B13A0 = func_L05_0041ED18();
+            D_L10_001B13A0 = LockedEntryMenuInput();
             if (D_L10_001B13A0 != -2)
                 func_L05_00445A98();
             break;
@@ -261,12 +261,12 @@ void func_L10_00421288(Moby *moby)
                 func_L10_00424448(moby);
                 break;
             case 3:
-                func_L10_00424528(moby);
+                UpdateGateCourse(moby);
                 break;
             }
         }
         if (D_L10_001A904C && !D_L10_001B13E8 && !D_L10_001B1440) {
-            func_0029B758(0, func_L10_00421790);
+            func_0029B758(0, DrawHrugisMissionHud);
             D_L10_001B13EC = 0;
             D_L10_001B13E8 = 1;
         }

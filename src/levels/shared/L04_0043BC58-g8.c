@@ -29,21 +29,21 @@ void func_L04_0043BC58(unsigned char *m)
         break;
     case 1:
         func_L00_002E6CF0(func_L04_0043BEE8, m);
-        func_002AA2E8(p + 0x4c, 1.0f, *(float *)(p + 0x5c));
+        ApproachValue(p + 0x4c, 1.0f, *(float *)(p + 0x5c));
         if (*(float *)(p + 0x4c) >= 1.0f) {
             func_002A7750(m, 2, -1);
-            func_0032C700(p + 0x20, 0, D_L04_001B1398, D_L04_001B139C, D_L04_001B13A0, D_L04_001B13A4, D_L04_001B13A8, D_L04_001B13AC, D_L04_001B13B0, D_L04_001B13B4, D_L04_001B13B8, D_L04_001B13BC, *(int *)(p + 0x44), 20.0f);
+            SpawnExplosion(p + 0x20, 0, D_L04_001B1398, D_L04_001B139C, D_L04_001B13A0, D_L04_001B13A4, D_L04_001B13A8, D_L04_001B13AC, D_L04_001B13B0, D_L04_001B13B4, D_L04_001B13B8, D_L04_001B13BC, *(int *)(p + 0x44), 20.0f);
         }
         break;
     case 2:
         if (!(*(float *)(p + 0x58) < 1.0f)) {
             *(unsigned short *)(*(unsigned char **)(p + 0x48) + 0x34) = *(unsigned short *)(p + 0x50);
-            func_002A0488(*(void **)(p + 0x48), p[0x54], p[0x55], p[0x56]);
+            set_moby_color(*(void **)(p + 0x48), p[0x54], p[0x55], p[0x56]);
             func_0029F338(m);
             return;
         }
         func_L04_0043BE40(m);
-        func_002AA2E8(p + 0x58, 1.0f, D_L04_001B1394 * 0.016666668f);
+        ApproachValue(p + 0x58, 1.0f, D_L04_001B1394 * 0.016666668f);
         break;
     }
     if (*(int *)(p + 0x40))

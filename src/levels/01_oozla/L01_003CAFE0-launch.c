@@ -39,11 +39,11 @@ void func_L01_003D2890(unsigned char *self)
         POOL = 0;
         for (i = 0; i < 2; i++) {
             if (state->first[i] == -1) {
-                func_0026FEB8(D_L01_001B0548, *(short *)(self + 0xaa), *(short *)(self + 0xb2), i);
+                STUB_printf(D_L01_001B0548, *(short *)(self + 0xaa), *(short *)(self + 0xb2), i);
                 func_002A7750(self, 4, -1);
             }
             if (state->second[i] == -1) {
-                func_0026FEB8(D_L01_001B0580, *(short *)(self + 0xaa), *(short *)(self + 0xb2), i);
+                STUB_printf(D_L01_001B0580, *(short *)(self + 0xaa), *(short *)(self + 0xb2), i);
                 func_002A7750(self, 4, -1);
             }
         }
@@ -93,7 +93,7 @@ void func_L01_003D2890(unsigned char *self)
         func_002A7750(self, 1, -1);
         break;
     }
-    if (self[0x20] == 2 && FIELD(0x38) != -1 && func_002ACBC8(D_00189EA0, FIELD(0x38))) {
+    if (self[0x20] == 2 && FIELD(0x38) != -1 && IsPointInCuboid(D_00189EA0, FIELD(0x38))) {
         if (POOL == 0) {
             POOL = func_L00_002D70A0(5);
             qzero((unsigned char *)POOL + 0x20);

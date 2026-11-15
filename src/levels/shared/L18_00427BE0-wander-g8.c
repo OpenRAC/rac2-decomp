@@ -30,8 +30,8 @@ void func_L18_00428AE8(u8 *o) {
             ((Obj *)m)->i[0x98/4] = 0;
     }
     if (o[0x95] == 13) {
-        func_00282F20(a, D_L18_001B281C + (*(int *)(s+0x3B4)<<8) + 0xC0, 5.0f);
-        func_00282CD8(b, a, D_L18_001B281C + (*(int *)(s+0x3B4)<<8) + 0x10);
+        vec_scale_to_length(a, D_L18_001B281C + (*(int *)(s+0x3B4)<<8) + 0xC0, 5.0f);
+        add_vectors(b, a, D_L18_001B281C + (*(int *)(s+0x3B4)<<8) + 0x10);
         a[2] = *(float *)(o+0x18);
         *(float *)(s+0x128) *= 10.0f;
         *(float *)(s+0x120) *= 10.0f;
@@ -74,7 +74,7 @@ void func_L18_00428AE8(u8 *o) {
                 }
             }
                 if (*(s16 *)(o+0xAA) == 0xEC0 && (unsigned)(o[0x95]-5) < 2) {
-                    if (func_00282E80(o+0x10, *(u8 **)(s+0x230)+0x10) < *(float *)(s+0x3A0)) {
+                    if (vec_distance_xy(o+0x10, *(u8 **)(s+0x230)+0x10) < *(float *)(s+0x3A0)) {
                         *(int *)(s+0x38C) = -1;
                         func_002A7750(o,4,6);
                     }
@@ -97,7 +97,7 @@ wander:
             }
         }
         if (*(float *)(o+0x18) < *(float *)(s+0x90)) {
-            func_002A6C58(o,0,3);
+            SetDeathBits(o,0,3);
             func_002A7750(o,12,10);
         }
 restore:

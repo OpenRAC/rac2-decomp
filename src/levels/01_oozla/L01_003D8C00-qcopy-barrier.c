@@ -34,7 +34,7 @@ void func_L01_003D8C00(char *object, int bubbles, int drops, int splash)
         velocity[2] = height;
         effect = func_00312D58(velocity, 2.25f);
         if (effect)
-            func_002A0488(effect, 0x60, 0x50, 0);
+            set_moby_color(effect, 0x60, 0x50, 0);
     }
     if (bubbles > 0) {
       i = bubbles;

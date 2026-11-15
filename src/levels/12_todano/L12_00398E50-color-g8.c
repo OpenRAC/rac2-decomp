@@ -19,8 +19,8 @@ void func_L12_003A6F48(u8 *object)
         s32 color, alpha;
         s32 r, g, b;
         u32 packed;
-        *(f32 *)state = func_00283B98(*(f32 *)state, D_L12_001AF694 * 0.000290888245f);
-        color = func_00283D38(D_L12_001AF68C, D_L12_001AF690, func_00283198(*(f32 *)state) * 0.5f + 0.5f);
+        *(f32 *)state = FastAddRotations(*(f32 *)state, D_L12_001AF694 * 0.000290888245f);
+        color = FastTweenColor(D_L12_001AF68C, D_L12_001AF690, func_00283198(*(f32 *)state) * 0.5f + 0.5f);
         b = (color >> 16) & 255;
         g = (color >> 8) & 255;
         r = color & 255;
@@ -32,7 +32,7 @@ void func_L12_003A6F48(u8 *object)
         packed |= r;
         *(u32 *)(state + 4) = packed;
         func_L12_003A6EF8(object);
-        func_002A0488(object, color & 255, (color >> 16) & 255, (u32)color >> 24);
+        set_moby_color(object, color & 255, (color >> 16) & 255, (u32)color >> 24);
         break;
     }
     }

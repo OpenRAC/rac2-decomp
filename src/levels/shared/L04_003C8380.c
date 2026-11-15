@@ -47,8 +47,8 @@ void func_L04_003E5830(float *pos, int count) {
     int i;
     int sign;
     char *particle;
-    func_00282CF0(direction, (float *)D_L04_001B9680, pos);
-    func_00282F20((char *)offset, (char *)direction, 0.3f);
+    FastVecSub(direction, (float *)D_L04_001B9680, pos);
+    vec_scale_to_length((char *)offset, (char *)direction, 0.3f);
     direction[2] = 0;
     axis[0] = 0;
     axis[1] = 0;
@@ -60,22 +60,22 @@ void func_L04_003E5830(float *pos, int count) {
         if (!sign) sign--;
         angle = func_002A7878_range(-1.0471977f, 1.0471977f);
         func_002ACEC0(velocity, direction, axis, angle);
-        func_00282F20((char *)velocity, (char *)velocity, func_002A7878_range(0.05f, 3.0f) * 0.0166666675f);
+        vec_scale_to_length((char *)velocity, (char *)velocity, func_002A7878_range(0.05f, 3.0f) * 0.0166666675f);
         velocity[2] = func_002A7878_range(1.0f, 5.0f) * 0.0166666675f;
-        func_00282CC0(origin, pos, offset);
+        FastVecAdd(origin, pos, offset);
         pos[0] += func_002A78D8(0, 0.15f);
         pos[1] += func_002A78D8(0, 0.15f);
         pos[2] += func_002A78D8(0, 0.15f);
         particle = func_002C2210(origin, 60, size * 0.1f, size, 0x80CA00CB, 0, sign, velocity, 0, 0.002f);
-        if (particle) particle[9] = func_00283CF0(4.0f) + 0x70;
+        if (particle) particle[9] = FloatToInt(4.0f) + 0x70;
         particle = func_002C2210(origin, 60, size * 0.07f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, 0.002f);
-        if (particle) particle[9] = func_00283CF0(4.0f) + 0x70;
+        if (particle) particle[9] = FloatToInt(4.0f) + 0x70;
     }
 }
 
 
 void *func_L04_003E5E40(unsigned char *a0, void *a1, float f12) {
-    unsigned char *obj = func_0029EFD0(a1);
+    unsigned char *obj = CreateMoby(a1);
 
     if (obj != 0) {
         obj[0x30] = 0xFF;
@@ -141,7 +141,7 @@ typedef struct Moby {
     s16 uid;                    /* 0xB2 */
     u8 padB4[0xB8 - 0xB4];
     struct Moby *parent;        /* 0xB8 */
-    u8 fBC;                     /* 0xBC: func_L04_003F9ED0's hit: 1 surface, 2 moby */
+    u8 fBC;                     /* 0xBC: SweepProjectileCollision's hit: 1 surface, 2 moby */
     u8 padBD[0xF0 - 0xBD];
     Vec rotation;               /* 0xF0 */
 } Moby;
@@ -175,7 +175,7 @@ typedef struct {
 } ChildInfo;
 
 /* In level 04 these resolve to func_002A8600 (GetFirstMobyInGroup), func_0029F390,
-   func_L00_00345AF0, func_002AB650, func_002A0F48, func_002AB1F0 and func_0026FEB8. */
+   func_L00_00345AF0, func_002AB650, func_002A0F48, func_002AB1F0 and STUB_printf. */
 extern int ref_L04_003EDD40_00(Moby **, int, int, int);
 extern void ref_L04_003EDD40_01(Moby *);
 extern ChildState *ref_L04_003EDD40_02(Moby *);
@@ -457,28 +457,28 @@ Moby *func_L04_003F9ED0(Moby *projectile, ProjectileVars *vars, float *position,
     probe.oClass = projectile->oClass;
     probe.v[2] = 1;
 
-    func_00282CC0(step, pos, direction);
-    lineHit = func_002761F8(pos, step, 0, vars->ignored, &probe);
+    FastVecAdd(step, pos, direction);
+    lineHit = CollLine(pos, step, 0, vars->ignored, &probe);
     if (lineHit) {
         collided = 1;
         remaining = 0;
     } else {
         stride = 0.49f;
-        remaining = func_00282DF0(direction);
+        remaining = FastVecLength(direction);
         if (remaining > 0)
-            func_00282D30(unit, direction, 1.0f / remaining);
+            FastVecScale(unit, direction, 1.0f / remaining);
         else
             qzero(unit);
     }
     while (remaining > 0 && !collided) {
         if (stride < remaining) {
-            func_00282D30(step, unit, stride);
+            FastVecScale(step, unit, stride);
             remaining -= stride;
         } else {
-            func_00282D30(step, unit, remaining);
+            FastVecScale(step, unit, remaining);
             remaining = 0;
         }
-        func_00282CC0(pos, pos, step);
+        FastVecAdd(pos, pos, step);
         if (func_00277F48(0.5f, pos, 0, vars->ignored, &probe))
             collided = 1;
     }
@@ -494,33 +494,33 @@ Moby *func_L04_003F9ED0(Moby *projectile, ProjectileVars *vars, float *position,
                 qcopy(pos, &projectile->position);
             else
                 qcopy(pos, &hitMoby->position);
-            func_00282CF0(hitDelta, &D_L04_001BFAE0.f30, &D_L04_001BFAE0.f40);
-            func_00282F20((char *)hitDelta, (char *)hitDelta, 1);
+            FastVecSub(hitDelta, &D_L04_001BFAE0.f30, &D_L04_001BFAE0.f40);
+            vec_scale_to_length((char *)hitDelta, (char *)hitDelta, 1);
             result = projectile;
             func_00283028(response, direction, &D_L04_001BFAE0.normal);
-            func_00282F20((char *)response, (char *)response, 0.033333335f);
-            func_00282F20((char *)hitNormal, (char *)&D_L04_001BFAE0.normal, 1);
+            vec_scale_to_length((char *)response, (char *)response, 0.033333335f);
+            vec_scale_to_length((char *)hitNormal, (char *)&D_L04_001BFAE0.normal, 1);
         } else if (collision->count > 0) {
             *(Q16_B0e5d8f83 *)forward = *(Q16_B0e5d8f83 *)direction;
             func_001290E0(&collision->hit.normal, &collision->hit.normal);
             func_001290E0(forward, forward);
-            dot = func_00282DB0(forward, &collision->hit.normal);
+            dot = FastVecDot(forward, &collision->hit.normal);
             if (dot > 0 && dot < 0.707f) {
-                func_00282D30(&collision->hit.normal, &collision->hit.normal, dot);
-                func_00282CC0(direction, direction, &collision->hit.normal);
-                func_00282CD8(target, pos, direction);
+                FastVecScale(&collision->hit.normal, &collision->hit.normal, dot);
+                FastVecAdd(direction, direction, &collision->hit.normal);
+                add_vectors(target, pos, direction);
                 projectile->rotation.f[2] = func_00283248(direction[0], direction[1]);
-                projectile->rotation.f[1] = -func_00283248(func_00282E20(direction), direction[2]);
+                projectile->rotation.f[1] = -func_00283248(vec_length_xy(direction), direction[2]);
                 *(Q16_B0e5d8f83 *)hitPoint = collision->hit.point.q;
                 func_L04_0040C0C0(hitPoint, direction, 4, 0);
             } else {
                 projectile->fBC = 1;
                 qcopy(pos, &D_L04_001BFAE0.point);
-                func_00282CF0(hitDelta, &D_L04_001BFAE0.f30, &D_L04_001BFAE0.f40);
-                func_00282F20((char *)hitDelta, (char *)hitDelta, 1);
+                FastVecSub(hitDelta, &D_L04_001BFAE0.f30, &D_L04_001BFAE0.f40);
+                vec_scale_to_length((char *)hitDelta, (char *)hitDelta, 1);
                 func_00283028(response, direction, &D_L04_001BFAE0.normal);
-                func_00282F20((char *)response, (char *)response, 0.033333335f);
-                func_00282F20((char *)hitNormal, (char *)&D_L04_001BFAE0.normal, 1);
+                vec_scale_to_length((char *)response, (char *)response, 0.033333335f);
+                vec_scale_to_length((char *)hitNormal, (char *)&D_L04_001BFAE0.normal, 1);
             }
         }
     }
@@ -537,7 +537,7 @@ unsigned char *func_L04_003FA5A8(unsigned char *owner, float *pos,
     unsigned char *target, float x, float y, float z, float angle, float tilt)
 {
     float origin[4], matrix[16], position[4];
-    unsigned char *m = func_0029EFD0((void *)0xABD);
+    unsigned char *m = CreateMoby((void *)0xABD);
     unsigned char *state;
 
     if (m != 0) {
@@ -645,12 +645,12 @@ void func_L04_003FB990(unsigned char *m, void *vars)
         if (*(float *)(v + 0x7C) > 0) {
             angle = func_00283248(*(float *)(D_L04_001C3B40[count] + 0x10) - *(float *)(m + 0x10),
                                   *(float *)(D_L04_001C3B40[count] + 0x14) - *(float *)(m + 0x14));
-            if (func_00283C80(angle, *(float *)(m + 0xF8)) > 0.741765022277832f) continue;
-            angle = func_00283248(func_00282E80(m + 0x10, D_L04_001C3B40[count] + 0x10),
+            if (FastDiffRots(angle, *(float *)(m + 0xF8)) > 0.741765022277832f) continue;
+            angle = func_00283248(vec_distance_xy(m + 0x10, D_L04_001C3B40[count] + 0x10),
                                   *(float *)(D_L04_001C3B40[count] + 0x18) - *(float *)(m + 0x18));
-            if (func_00283C80(angle, -*(float *)(m + 0xF4)) > 0.523598849773407f) continue;
+            if (FastDiffRots(angle, -*(float *)(m + 0xF4)) > 0.523598849773407f) continue;
         }
-        if (func_00282E48((char *)m + 0x10, (char *)D_L04_001C3B40[count] + 0x10) > radius * 0.75f) {
+        if (fast_vec_dist((char *)m + 0x10, (char *)D_L04_001C3B40[count] + 0x10) > radius * 0.75f) {
             B990Impact impact;
             impact.source = *(void **)(v + 0x74);
             impact.flags = 0x230000;
@@ -665,8 +665,8 @@ void func_L04_003FB990(unsigned char *m, void *vars)
             impact.vector[1] = func_00283198(angle);
             impact.vector[2] = 1.0f;
             impact.vector[3] = 5627.9248046875f;
-            func_002A8E20(D_L04_001C3B40[count], &impact);
-            func_002E5CF8(soundId, soundArg, *(void **)(v + 0x74));
+            QueueMobyImpact(D_L04_001C3B40[count], &impact);
+            PlayMobySound(soundId, soundArg, *(void **)(v + 0x74));
         }
     }
     {
@@ -675,13 +675,13 @@ void func_L04_003FB990(unsigned char *m, void *vars)
     for (side = 0; side < 2; side++) {
         sign = (side & 1) ? 1.0f : -1.0f;
         for (i = 0; i < 5; i++) {
-            angle0 = func_00283C28(func_00283CE0(i) * sign * 0.1396263688802719f);
-            angle1 = func_00283C28(func_00283CE0(i + 1) * sign * 0.1396263688802719f);
-            func_002AF000(ray[0], range, func_00283B98(angle0, *(float *)(m + 0xF8)), -*(float *)(m + 0xF4));
-            func_002AF000(ray[1], range, func_00283B98(angle1, *(float *)(m + 0xF8)), -*(float *)(m + 0xF4));
-            func_00282CD8(ray[2], ray[0], m + 0x10);
-            func_00282CD8(ray[2], ray[1], m + 0x10);
-            if (func_002761F8(ray[0], ray[1], rayMask, *(void **)(v + 0x74), rayResult)) {
+            angle0 = func_00283C28(IntToFloat(i) * sign * 0.1396263688802719f);
+            angle1 = func_00283C28(IntToFloat(i + 1) * sign * 0.1396263688802719f);
+            func_002AF000(ray[0], range, FastAddRotations(angle0, *(float *)(m + 0xF8)), -*(float *)(m + 0xF4));
+            func_002AF000(ray[1], range, FastAddRotations(angle1, *(float *)(m + 0xF8)), -*(float *)(m + 0xF4));
+            add_vectors(ray[2], ray[0], m + 0x10);
+            add_vectors(ray[2], ray[1], m + 0x10);
+            if (CollLine(ray[0], ray[1], rayMask, *(void **)(v + 0x74), rayResult)) {
                 func_002AF000(ray[2], 0.33333334326744f, *(float *)(m + 0xF8), -*(float *)(m + 0xF4));
                 func_L04_0040C0C0(&D_L04_001BFAE0, ray[2], sparkKind, sparkArg);
             }
@@ -727,7 +727,7 @@ void func_L04_003FC678(unsigned char *m)
     L04_C678Slot *e;
 
     *(L04_C678Quad *)(m + 0x10) = *(L04_C678Quad *)(v->owner + 0x10);
-    func_002AA800(m + 0xF8, 0, *(float *)(v->owner + 0xF8), 0.026179943f);
+    StepAngleTowardTarget(m + 0xF8, 0, *(float *)(v->owner + 0xF8), 0.026179943f);
     v->age = v->age + 1.0f;
     if (v->timer != 0 && func_00282948(&v->timer) != 0) {
         s = D_L04_001B0488;
@@ -742,15 +742,15 @@ void func_L04_003FC678(unsigned char *m)
         return;
     }
     if (30.0f < v->age && v->timer == 0) {
-        v->timer = func_00283CF0(15.0f);
+        v->timer = FloatToInt(15.0f);
     } else {
         func_L04_003FB990(m, v);
     }
-    func_L00_002E6DB8(func_L04_003FBEF8, m);
+    func_L00_002E6DB8(DrawDomeEffect, m);
 }
 
 void *func_L04_00400A18(unsigned char *a0, void *a1, float f12) {
-    unsigned char *obj = func_0029EFD0(a1);
+    unsigned char *obj = CreateMoby(a1);
 
     if (obj != 0) {
         obj[0x30] = 0xFF;
@@ -790,33 +790,33 @@ void func_L04_004027B0(unsigned char *object, unsigned char *state) {
     int kind;
     float distance;
     if (*(int *)(state + 0x80) == -1) return;
-    func_002A8600(&nearby, *(int *)(state + 0x80), 0, 0);
+    GetFirstMobyInGroup(&nearby, *(int *)(state + 0x80), 0, 0);
     while (nearby) {
         kind = *(short *)(nearby + 0xAA);
         if (kind == 0x474 || kind == 0xCEF) {
-            func_00282CF0(&delta, nearby + 0x10, object + 0x10);
-            distance = func_00282DB0(&delta, &delta);
+            FastVecSub(&delta, nearby + 0x10, object + 0x10);
+            distance = FastVecDot(&delta, &delta);
             if (!(20.0f < distance)) {
-                func_00283388(&inverse);
-                func_00283698(&inverse, nearby + 0xC0);
-                func_002830C0(&delta, &delta, &inverse);
+                set_identity_matrix(&inverse);
+                matrix_from_basis_rows(&inverse, nearby + 0xC0);
+                transform_vector(&delta, &delta, &inverse);
                 if (func_00282C48(delta.f[0]) < 2.8f && func_00282C48(delta.f[1]) < 1.25f && func_00282C48(delta.f[2]) < 1.5f) {
                     contact = *(unsigned char **)(nearby + 0x68);
                     if (*(short *)(state + 0x140) == 0 && (*(unsigned char **)(state + 0x164))[0x20] != 3)
-                        func_002E5CF8(0, 0, (char *)nearby);
+                        PlayMobySound(0, 0, (char *)nearby);
                     *(unsigned short *)(state + 0x140) = *(unsigned short *)contact;
                 }
             }
         }
-        func_002A86E8(&nearby, nearby, 0, 0);
+        GetNextMobyInGroup(&nearby, nearby, 0, 0);
     }
     if (*(short *)(state + 0x140) != 0) {
         *(short *)(state + 0x142) = 1;
-        func_002AA2E8((float *)(state + 0x13C), 0.10000000894069672f, 0.0055555556900799274f);
-        if (*(short *)(state + 0x140)) func_00282978((short *)(state + 0x140));
+        ApproachValue((float *)(state + 0x13C), 0.10000000894069672f, 0.0055555556900799274f);
+        if (*(short *)(state + 0x140)) FastDecTimer((short *)(state + 0x140));
     } else {
         *(short *)(state + 0x142) = 0;
-        func_002AA2E8((float *)(state + 0x13C), 0.0f, 0.002777777845039964f);
+        ApproachValue((float *)(state + 0x13C), 0.0f, 0.002777777845039964f);
     }
 }
 
@@ -828,7 +828,7 @@ void func_L04_004029D8(unsigned char *m) {
     *(Q16_B0e5d8f83 *)(m+0x10) = *(Q16_B0e5d8f83 *)(s+0xB0);
     *(Q16_B0e5d8f83 *)(m+0xF0) = *(Q16_B0e5d8f83 *)(s+0xC0);
     s[0xA0] = 0;
-    f = func_00283CE0(s[0xA2]-1);
+    f = IntToFloat(s[0xA2]-1);
     *(float *)(s+0x134) = 0.36916667222976685f - f * 0.011666666716337204f - (1.0f - (float)*(int *)(s+0x1A8)*0.1f)*0.03333333507180214f;
     *(int *)(s+0x138)=0;
     *(int *)(s+0x158)=0;
@@ -863,7 +863,7 @@ void func_L04_004029D8(unsigned char *m) {
     o=*(unsigned char **)(s+0x110);
     func_002C96F8(o,s+0x114,s+0x118,s+0xF0,*(float *)(s+0xA8),*(float *)(o+0x1C));
     *(float *)(s+0x16C)=func_002A7878_range(-1.5f,1.5f);
-    *(int *)(s+0x174)=func_00283CF0(func_002A7878_range(3.0f,6.0f)*60.0f);
+    *(int *)(s+0x174)=FloatToInt(func_002A7878_range(3.0f,6.0f)*60.0f);
     *(int *)(s+0x170)=0;
     *(int *)(m+0x98)=*(int *)(*(unsigned char **)(m+0x24)+0x10);
     *(unsigned short *)(m+0x34)=(*(unsigned short *)(m+0x34)&0xFFBE)|0x1400;
@@ -904,7 +904,7 @@ void func_L04_00402C88(char *arg0) {
         for (i = 5; i >= 0; i--, slot++) {
             if (*slot != -1) {
                 obj = D_001FE340[*slot];
-                *(float *)(obj + 0x1C) = func_00282E48(obj + 0x10, obj + 0x20);
+                *(float *)(obj + 0x1C) = fast_vec_dist(obj + 0x10, obj + 0x20);
             }
         }
     }
@@ -917,12 +917,12 @@ void func_L04_00402C88(char *arg0) {
         for (i = 3; i >= 0; i--, slot++) {
             if (*slot != none) {
                 obj = D_001FE340[*slot];
-                *(float *)(obj + 0x1C) = func_00282E48(obj + 0x10, obj + 0x20);
+                *(float *)(obj + 0x1C) = fast_vec_dist(obj + 0x10, obj + 0x20);
             }
         }
     }
     if (*(int *)(state + 0x7C) != -1) {
         obj = D_001FE340[*(int *)(state + 0x7C)];
-        *(float *)(obj + 0x1C) = func_00282E48(obj + 0x10, obj + 0x20);
+        *(float *)(obj + 0x1C) = fast_vec_dist(obj + 0x10, obj + 0x20);
     }
 }

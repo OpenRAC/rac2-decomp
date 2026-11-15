@@ -93,7 +93,7 @@ void func_L04_003C8380(Moby *moby)
 
     if (moby->state == 0) {
         for (i = 0; i < 5; i++) {
-            child = func_0029EFD0(id);
+            child = CreateMoby(id);
             if (child) {
                 func_002B37E8(child, 0);
                 child->rotation = moby->rotation;
@@ -114,10 +114,10 @@ void func_L04_003C8380(Moby *moby)
             offset = start;
         offsets[i] = offset;
 
-        func_00282D30(&shift, moby->forward, offset);
-        func_00282CC0(children[i]->position, moby->position, &shift);
-        func_00282D30(&shift, moby->up, 0.15f);
-        func_00282CC0(children[i]->position, children[i]->position, &shift);
+        FastVecScale(&shift, moby->forward, offset);
+        FastVecAdd(children[i]->position, moby->position, &shift);
+        FastVecScale(&shift, moby->up, 0.15f);
+        FastVecAdd(children[i]->position, children[i]->position, &shift);
 
         t = (offset - start) / length;
         children[i]->scale = children[i]->mclass->scale * (minScale + (1 - t) * scaleRange);
@@ -132,6 +132,6 @@ void func_L04_003C8380(Moby *moby)
         alpha = 1 - t;              /* now the colour fade g */
         alpha *= alpha;
         alpha *= alpha;
-        func_002A0488(children[i], 252 + (int)(alpha * 2), (int)(alpha * 224), (int)(alpha * 6));
+        set_moby_color(children[i], 252 + (int)(alpha * 2), (int)(alpha * 224), (int)(alpha * 6));
     }
 }

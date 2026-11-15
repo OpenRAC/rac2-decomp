@@ -101,7 +101,7 @@ void func_00294F10(void)
         }
         D_001C4FA0[0x238 / 4] = func_002EED58(packed, bytes, 0x3C00, D_001A95A0);
         D_001C4FA0[0x240 / 4] = bytes;
-        func_0029D4D0(packed, scratch);
+        fast_decompress(packed, scratch);
         {
             int size = ((int *)scratch)[1] - ((int *)scratch)[0];
             D_001C4FA0[0] = (int)func_0028B2B8(size, 0, D_001A95B8, 0x2EB);

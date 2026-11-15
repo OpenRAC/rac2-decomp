@@ -137,28 +137,28 @@ update:
         if (length < 1.0f)
             length = 1.0f;
         func_002AFFD8(object + 0x10, forward, 0);
-        func_00282F20(backward, vector, -1.0f);
+        vec_scale_to_length(backward, vector, -1.0f);
         func_002AE730(backward, state + 0x64);
         {
-            float dot = func_00282DB0(forward, vector);
-            func_00282F20(projected, forward, dot);
+            float dot = FastVecDot(forward, vector);
+            vec_scale_to_length(projected, forward, dot);
         }
-        func_00282CF0(vector, vector, projected);
-        if (func_00282DF0(vector) < 1.0f)
-            func_00282F20(vector, vector, 1.0f);
-        func_00282D30(state + 0x80, vector, horizontal);
-        func_00282F20(projected, forward, -vertical * length);
-        func_00282CC0(state + 0x80, state + 0x80, projected);
+        FastVecSub(vector, vector, projected);
+        if (FastVecLength(vector) < 1.0f)
+            vec_scale_to_length(vector, vector, 1.0f);
+        FastVecScale(state + 0x80, vector, horizontal);
+        vec_scale_to_length(projected, forward, -vertical * length);
+        FastVecAdd(state + 0x80, state + 0x80, projected);
     } else {
         func_002B1CC8(object, vector, vector, 5.0f, 0.7853982448577881f, 4.0f);
-        if (func_00282E20(vector) < 1.0f)
+        if (vec_length_xy(vector) < 1.0f)
             func_00282F70(vector, vector, 1.0f);
         if (vector[2] < 1.0f)
             vector[2] = 1.0f;
         F(state, 0x80) = vector[0] * horizontal;
         F(state, 0x84) = vector[1] * horizontal;
         F(state, 0x88) = vector[2] * vertical;
-        F(state, 0x64) = func_00283B98(func_00283248(vector[0], vector[1]), 3.14159f);
+        F(state, 0x64) = FastAddRotations(func_00283248(vector[0], vector[1]), 3.14159f);
     }
     if (U(state, 0x76) && reaction < 4) {
         F(state, 0x4c) = 0.0f;

@@ -71,8 +71,8 @@ void func_L00_003EB8E8(char *self, State3EB8E8 *st)
         st->target = obj;
         if (*(unsigned char *)(self + 0x43) != 2)
             func_002A7470(self, 2, 0, 5);
-        func_00282CF0(v, self + 0x10, D_00189EA0);
-        dot = func_00282DB0(v, self + 0xE0);
+        FastVecSub(v, self + 0x10, D_00189EA0);
+        dot = FastVecDot(v, self + 0xE0);
         if (D_L00_001A8F00[0] != 2 && *(unsigned char *)(self + 0x42) == *(unsigned char *)(self + 0x43) &&
             *(unsigned char *)(self + 0x42) == 2 && dot > 1.1f) {
             qcopy_nc(target, obj + 0x10);
@@ -89,11 +89,11 @@ void func_L00_003EB8E8(char *self, State3EB8E8 *st)
                                  420000.0f, 420000.0f, 0.0f, 0);
             if (part)
                 part[2] = *D_L00_001FEA14;
-            func_00282CF0(dir, target, pos);
-            func_00282F20(dir, dir, D_L00_001B0754);
-            func_00282CC0(pos, pos, dir);
+            FastVecSub(dir, target, pos);
+            vec_scale_to_length(dir, dir, D_L00_001B0754);
+            FastVecAdd(pos, pos, dir);
             func_L00_003ECD80(pos, self, obj);
-            func_002E5CF8(0, 0, self);
+            PlayMobySound(0, 0, self);
             {
                 int selected = D_00139568.selected;
                 entry = D_L00_00262570[selected];

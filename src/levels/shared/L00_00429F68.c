@@ -69,17 +69,17 @@ run:
         yaw = func_00283248_1(
             D_00189E20_6.position[0] - ((Row_429F68 *)D_L00_001B1844)[*(short *)(camera + 0x84)].position[0],
             D_00189E20_6.position[1] - ((Row_429F68 *)D_L00_001B1844)[*(short *)(camera + 0x84)].position[1]);
-        if (func_00283C80(*(float *)(params + 0x30), yaw)>0.03490658849477768f)
-            *(float *)(params + 0x44) = func_00283BE0(*(float *)(params + 0x30), yaw);
+        if (FastDiffRots(*(float *)(params + 0x30), yaw)>0.03490658849477768f)
+            *(float *)(params + 0x44) = fast_subtract_rotations(*(float *)(params + 0x30), yaw);
         position[0] = ((Row_429F68 *)D_L00_001B1844)[*(short *)(camera + 0x84)].position[0];
         position[1] = ((Row_429F68 *)D_L00_001B1844)[*(short *)(camera + 0x84)].position[1];
         position[2] = ((Row_429F68 *)D_L00_001B1844)[*(short *)(camera + 0x84)].position[2];
         position[3] = 0.0f;
-        func_00282CF0(to_position, (char *)position, (char *)D_00189E20_6.position);
-        height = func_00282DB0(to_position, (char *)D_00189E20_6.axis);
-        func_00282D30(gravity_offset, (char *)D_00189E20_6.axis, height);
-        func_00282CF0(horizontal, to_position, gravity_offset);
-        *(float *)(params + 0x38) = func_00282DF0(horizontal);
+        FastVecSub(to_position, (char *)position, (char *)D_00189E20_6.position);
+        height = FastVecDot(to_position, (char *)D_00189E20_6.axis);
+        FastVecScale(gravity_offset, (char *)D_00189E20_6.axis, height);
+        FastVecSub(horizontal, to_position, gravity_offset);
+        *(float *)(params + 0x38) = FastVecLength(horizontal);
         *(float *)(params + 0x3C) =  - height;
         pitch = *(float *)(params + 0x2C);
         if (func_00282C48(pitch)==1.5707964897155762f) *(float *)(params + 0x40) = 0.0f;
@@ -101,11 +101,11 @@ run:
         *(float *)(tail + 0x30) = *(float *)(params + 0x3C);
         *(float *)(reset + 0x28) = *(float *)(params + 0x44);
         *(float *)(follow + 0xB0) = *(float *)(params + 0x40);
-        func_00282D30(gravity_offset, (char *)D_00189E20_6.axis,  - *(float *)(tail + 0x30));
+        FastVecScale(gravity_offset, (char *)D_00189E20_6.axis,  - *(float *)(tail + 0x30));
         func_00282CC0_4(state + 0xB0, (char *)D_00189E20_6.position, gravity_offset);
-        func_00282CF0(tail, (char *)position, state + 0xB0);
+        FastVecSub(tail, (char *)position, state + 0xB0);
         qcopy(state + 0x170, tail);
-        func_00282D30(gravity_offset, (char *)D_00189E20_6.axis,  - *(float *)(follow + 0xB0));
+        FastVecScale(gravity_offset, (char *)D_00189E20_6.axis,  - *(float *)(follow + 0xB0));
         func_00282CC0_4(state + 0xA0, (char *)D_00189E20_6.position, gravity_offset);
         qcopy(state + 0xF0, state + 0xA0);
         qcopy(follow, (char *)D_00189E20_6.position);
@@ -128,12 +128,12 @@ run:
     ++*(int *)(params + 0x20);
     if (*(int *)(params + 0x20)>200) *(int *)(params + 0x20) = 200;
     if (*(float *)(params + 0x38)!=0.0f) {
-        func_L00_00424A08(0, *(float *)(params + 0x38), 0.003f);
+        follow_camera_set_distance(0, *(float *)(params + 0x38), 0.003f);
         func_L00_00424C00();
     }
-    if (*(float *)(params + 0x3C)!=0.0f) func_L00_00424A50(*(float *)(params + 0x3C), 0.003f);
+    if (*(float *)(params + 0x3C)!=0.0f) follow_camera_set_height(*(float *)(params + 0x3C), 0.003f);
     if (*(float *)(params + 0x40)!=0.0f) func_L00_00424A88(0, *(float *)(params + 0x40), 0.005f);
     if (*(float *)(params + 0x28)!=0.0f) func_L00_00424B20(*(float *)(params + 0x28)*0.01745329424738884f);
-    if (*(short *)(params + 0x24)==0) func_L00_00424B48(0);
+    if (*(short *)(params + 0x24)==0) set_follow_camera_orbit_clamp_mode(0);
     if (*(float *)(params + 0x44)!=0.0f) func_L00_00424AD8(*(float *)(params + 0x44), 60.0f, 60.0f);
 }

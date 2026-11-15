@@ -25,7 +25,7 @@ int func_L02_003D52A8(char *self) {
     float sine;
     float cosine;
     *(Vector *)position = *(Vector *)(self + 0x10);
-    distance = func_00282E48(position, *(char **)(state + 0x30C) + 0x10);
+    distance = fast_vec_dist(position, *(char **)(state + 0x30C) + 0x10);
     sine = func_00283180(angle);
     cosine = func_00283198(angle);
     height = D_L02_001B01B8 + distance * sine / cosine;
@@ -34,10 +34,10 @@ int func_L02_003D52A8(char *self) {
         return 0;
     if (p[2] < D_L02_001B01B8 + 0.5f) {
         float scale = 4.7f / (p[2] - D_L02_001B01B8 + 4.2f);
-        func_00282CF0(delta, self + 0x10, *(char **)(state + 0x30C) + 0x10);
+        FastVecSub(delta, self + 0x10, *(char **)(state + 0x30C) + 0x10);
         delta[2] = 0.0f;
-        func_00282D30(delta, delta, scale);
-        func_00282CC0(&position, &position, delta);
+        FastVecScale(delta, delta, scale);
+        FastVecAdd(&position, &position, delta);
         func_002AA548(self + 0x10, state + 0x1B0, p[0], 0.025f, 0.025f, 2.5000002f);
         func_002AA548(self + 0x14, state + 0x1B4, p[1], 0.025f, 0.025f, 2.5000002f);
         func_002AAA00(self + 0xF8, func_00283248(*(float *)(*(char **)(state + 0x30C) + 0x10) - *(float *)(self + 0x10),
@@ -47,7 +47,7 @@ int func_L02_003D52A8(char *self) {
         func_002AAA00(self + 0xF8, func_00283248(*(float *)(*(char **)(state + 0x30C) + 0x10) - *(float *)(self + 0x10),
                          *(float *)(*(char **)(state + 0x30C) + 0x14) - *(float *)(self + 0x14)), 0.003490659f, 0.003490659f, 0.22107507f, state + 0x1C4, 0);
     }
-    if (func_00282E48(self + 0x10, &position) < 0.0001f) {
+    if (fast_vec_dist(self + 0x10, &position) < 0.0001f) {
         *(int *)(state + 0x1B8) = 0;
         return 2;
     }

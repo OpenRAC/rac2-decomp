@@ -17,12 +17,12 @@ extern void func_L02_003FD770(char *);
    updated; otherwise func_L02_003FD770 runs unless the object's state half-word is 5. */
 void func_L02_003FD7C8(char *a0) {
     D_L02_001B32E8 = 1;
-    if (func_00282E48(D_L02_001BA500, D_L02_001B11D0) < 0.0001f) {
+    if (fast_vec_dist(D_L02_001BA500, D_L02_001B11D0) < 0.0001f) {
         if (*(unsigned char *)(a0 + 0x20) == 4)
             func_002A7750(a0, 7, -1);
         else if (*(unsigned char *)(a0 + 0x20) == 5)
             func_002A7750(a0, 6, -1);
-        func_L01_0042A6F0(1, 0);
+        SetCamera5Mode(1, 0);
         func_00335370(D_L02_001B11D0);
         func_003353C8(D_L02_001B11E0);
     } else if (*(short *)(*(char **)(D_L02_001BA500 + 0x50) + 0x86) != 5) {

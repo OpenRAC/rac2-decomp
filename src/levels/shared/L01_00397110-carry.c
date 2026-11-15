@@ -73,7 +73,7 @@ completed:
  }
 flags_checked:
  done=!!done;
- if (d->event!=-1 && !done && func_002ACBC8(D_00189EA0,d->event)) {
+ if (d->event!=-1 && !done && IsPointInCuboid(D_00189EA0,d->event)) {
   done=1; func_L01_00398008(m); func_L01_003990E8(m);
   if (*(u8 *)(m+0x20)==5) func_002A7750(m,1,-1);
  }
@@ -94,7 +94,7 @@ flags_checked:
   *(u8 *)(m+0x30)=255;
   for(i=0;i<3;i++) {
    char **p=d->children+i;
-   *p=func_0029EFD0(0x13B);
+   *p=CreateMoby(0x13B);
    if(*p) {
     *(u16 *)(*p+0x32)=0x40; *(u8 *)(*p+0x31)=1;
     *(u64 *)(*p+0x38)=*(u64 *)(D_00189E20.model+0x38);
@@ -103,7 +103,7 @@ flags_checked:
     qcopy_nc(*p+0xF0, m+0xF0);
     *(u8 *)(*p+0x30)=*(u8 *)(m+0x30);
     if(*(char **)(*p+0x68)) **(char ***)(*p+0x68)=m;
-    *(float *)(*p+0xF8)=func_00283B98(*(float *)(*p+0xF8),i*2.0943954f);
+    *(float *)(*p+0xF8)=FastAddRotations(*(float *)(*p+0xF8),i*2.0943954f);
    }
   }
   if(d->x38||done) func_002A7750(m,6,-1);
@@ -125,7 +125,7 @@ flags_checked:
    D_L01_001A8FF4=4; D_L01_001A8FF0=2;
   } else func_L01_00398A90(m);
   if(!(D_00138324&0x10)) break;
-  func_002E5CF8(0,0,m); func_002A7750(m,2,-1);
+  PlayMobySound(0,0,m); func_002A7750(m,2,-1);
   d->x2C=0; d->x30=-1; d->x28=0;
   func_L00_002D40A0(m+0x10,0,*(float *)(m+0xF8));
   func_002A8C28(m,m+0x10,0x10000,0,1,0,1.5f,20.0f,1.0f);
@@ -136,7 +136,7 @@ flags_checked:
   } else if(d->x24<1.0f) {
    func_002AA548(&d->x24,&d->x2C,1.0f,D_L01_001AF588*0.0002777777845f,D_L01_001AF58C*0.0002777777845f,D_L01_001AF590*0.016666668f);
   } else {
-   func_002E5CF8(1,0,m); func_002A7750(m,8,-1); d->x34=0;
+   PlayMobySound(1,0,m); func_002A7750(m,8,-1); d->x34=0;
   }
   {
   func_L01_00398938(m);
@@ -160,7 +160,7 @@ flags_checked:
   break;
  case 3:
   if(d->x34!=0) {
-   func_L00_002E6CF0(func_L01_00398B50,m); func_002AA2E8(&d->x34,0.0f,0.06666667f); break;
+   func_L00_002E6CF0(DrawShrinkingMobyRings,m); ApproachValue(&d->x34,0.0f,0.06666667f); break;
   } else {
    char *other=D_L01_001B255C+(d->target<<8);
    CarryData *od=*(CarryData **)(other+0x68);
@@ -172,7 +172,7 @@ flags_checked:
    func_002A7750(other,4,-1);
    od->x28=0; od->x2C=0; od->x34=0;
    od->x24=od->x20=1; od->x50=1;
-   func_002E5CF8(1,0,other); func_002A7750(m,1,-1);
+   PlayMobySound(1,0,other); func_002A7750(m,1,-1);
    d->x2C=d->x28=d->x24=d->x20=0;
    d->x34=1.95f; func_L01_00398938(m);
   }
@@ -183,7 +183,7 @@ flags_checked:
    for(i=2;i>=0;i--,p++) if(*p) *(u16 *)(*p+0x34)&=0xFF7F;
   }
   if(d->x34<1.95f) {
-   func_L00_002E6CF0(func_L01_00398B50,m); func_002AA2E8(&d->x34,1.95f,0.06666667f);
+   func_L00_002E6CF0(DrawShrinkingMobyRings,m); ApproachValue(&d->x34,1.95f,0.06666667f);
   } else if(d->x24>0) {
    func_002AA548(&d->x24,&d->x28,0.0f,D_L01_001AF588*0.0002777777845f,D_L01_001AF58C*0.0002777777845f,D_L01_001AF590*0.016666668f);
   } else if(d->x20>0) {

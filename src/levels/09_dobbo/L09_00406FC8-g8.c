@@ -93,7 +93,7 @@ after_active:
             }
             if (!(u8)D_001395B8[0xA3]) {
                 D_001395B8[0xA3] = 1;
-                func_0029B3E0(0,-1);
+                MemcardSave(0,-1);
             }
         }
         if (D_L09_001B2388 < 6) break;

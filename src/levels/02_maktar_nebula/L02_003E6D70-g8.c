@@ -57,7 +57,7 @@ void func_L02_003E6D70(char *actor) {
     float *rate;
     float zero;
     SlotState003E6D70 *setup = (SlotState003E6D70 *)state;
-    if (*(unsigned char *)(actor + 0x31)) func_L00_002E6CF0(func_L02_003E7B58, actor);
+    if (*(unsigned char *)(actor + 0x31)) func_L00_002E6CF0(DrawScrollingTileBands, actor);
     switch (*(unsigned char *)(actor + 0x20)) {
     case 0:
     func_002A7750(actor, 1, -1);
@@ -83,9 +83,9 @@ void func_L02_003E6D70(char *actor) {
         if (FLAG > 0x24 && D_L02_001B0938[5] < 30) {
             D_L02_001B0938[5] += 40;
             D_L02_001B0938[1] -= 40;
-            func_0026FEB8(D_L02_001B0978);
+            STUB_printf(D_L02_001B0978);
         }
-        func_0026FEB8(D_L02_001B09A8, FLAG);
+        STUB_printf(D_L02_001B09A8, FLAG);
     }
     if (*(unsigned char *)(actor + 0x43) == 1) {
         if (*(unsigned char *)(actor + 0x60) & 2) {
@@ -95,7 +95,7 @@ void func_L02_003E6D70(char *actor) {
         } else if (func_002AEB60(actor, 10.0f)) {
             char *slot = D_00188660 + *(int *)(state + 0x54) * 0x70;
             if (*(char **)(slot + 0x88) != actor || *(unsigned char *)(slot + 0x74) == 0)
-                *(int *)(state + 0x54) = func_002E5CF8(1, 4, actor);
+                *(int *)(state + 0x54) = PlayMobySound(1, 4, actor);
         }
     }
         break;
@@ -126,7 +126,7 @@ void func_L02_003E6D70(char *actor) {
     }
     *(int *)(state + 0x54) = -1;
     func_002A7398(actor, 0, 0);
-    func_002E5CF8(0, 0, actor);
+    PlayMobySound(0, 0, actor);
     func_L02_003E7370(actor);
     *(unsigned short *)(actor + 0x34) = (*(unsigned short *)(actor + 0x34) & 0xBFFF) | 2;
     if (*(int *)(state + 0xA4)) {
@@ -136,7 +136,7 @@ void func_L02_003E6D70(char *actor) {
         hit.flags = 1;
         hit.sourceClass = ((SlotActor003E6D70 *)actor)->classId;
         func_00277F48(point, 16, actor, &hit, 4.0f);
-        func_0032C700(actor + 0x10, 1, 25, 20, 20, 20, 45, 0, 1, 1, 0, 0, 1.5f, 20.0f);
+        SpawnExplosion(actor + 0x10, 1, 25, 20, 20, 20, 45, 0, 1, 1, 0, 0, 1.5f, 20.0f);
         if (*(int *)(state + 0x58)) {
             for (i = 0; i < 2; i++) {
                 char *prize = func_L02_003CEBB8(*(int *)(state + 0x58));

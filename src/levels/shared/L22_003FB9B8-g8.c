@@ -30,8 +30,8 @@ void func_L22_003FB9B8(float *position, float *direction, int count) {
         speed = func_002A7878(ref_L22_003FB9B8_02 * 0.016666668f, ref_L22_003FB9B8_03 * 0.016666668f);
         func_002AF000(velocity, speed, yaw, tilt);
         *(BurstVector *)scaled = *(BurstVector *)direction;
-        func_00282D30(scaled, direction, func_002A7878(0.75f, 0.95f));
-        func_00282CD8(difference, velocity, scaled);
+        FastVecScale(scaled, direction, func_002A7878(0.75f, 0.95f));
+        add_vectors(difference, velocity, scaled);
         qcopy(point, position);
         point[0] += func_002A78D8(0.0f, 0.0375f);
         point[1] += func_002A78D8(0.0f, 0.0375f);

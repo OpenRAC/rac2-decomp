@@ -39,7 +39,7 @@ void func_L14_003CB868(char *self) {
     float c;
     float duration;
 
-    func_00283698(mtx, self + 0xC0);
+    matrix_from_basis_rows(mtx, self + 0xC0);
     for (p = D_L14_001FB060[state->groupIndex];
          (state->groupIndex & 0xFF) != 0xFF && state->groupIndex <= D_L14_001B25B8 &&
          p != 0 && ((p != 0 && (short)p[-1] >= 0) || p == D_L14_001FB060[state->groupIndex]);
@@ -49,13 +49,13 @@ void func_L14_003CB868(char *self) {
             break;
         if (e[0x20] != 0xFE) {
             if (e[0x20] != 0xFD) {
-                func_00282CF0(off, e + 0x10, self + 0x10);
+                FastVecSub(off, e + 0x10, self + 0x10);
                 func_002AFDD8(self, (char *)off, (char *)off, (char *)mtx);
                 off[3] = 1.0f;
                 off[0] = off[0] + 2.0f;
                 inside = func_00282C48(off[0]) < 1.0f && func_00282C48(off[1]) < 1.0f;
                 if (inside) {
-                    func_002830C0(tmp, off, &D_L14_001B268C[state->tableIndex]);
+                    transform_vector(tmp, off, &D_L14_001B268C[state->tableIndex]);
                     func_L14_003C96E0((char *)e, tmp,
                                       D_L14_001B268C[state->tableIndex].height +
                                           func_002A7878(1.0f, 2.0f),
@@ -67,20 +67,20 @@ void func_L14_003CB868(char *self) {
     hero = D_00189E20;
     if ((*(char **)(hero + 0x33C) == self && *(int *)(hero + 0x340) != 0) ||
         *(float *)(hero + 0x31C) < 0.5f) {
-        func_00282CF0(off, D_00189E20 + 0x80, self + 0x10);
+        FastVecSub(off, D_00189E20 + 0x80, self + 0x10);
         func_002AFDD8(self, (char *)off, (char *)off, (char *)mtx);
         off[3] = 1.0f;
         off[0] = off[0] + 2.0f;
         inside = func_00282C48(off[0]) < 1.0f && func_00282C48(off[1]) < 1.0f;
         if (inside) {
-            func_002830C0(tmp, off, &D_L14_001B268C[state->tableIndex]);
+            transform_vector(tmp, off, &D_L14_001B268C[state->tableIndex]);
             hero2 = D_00189E20;
             a = D_L14_001B268C[state->tableIndex].height + 1.5f;
             b = a - *(float *)(hero2 + 0x88);
-            b *= 2.0f; duration = func_00282C10(b / 0.0055555557f);
-            c = (a - tmp[2]) * 2.0f; duration += func_00282C10(c / 0.0055555557f);
-            func_00282CF0(vec, tmp, hero2 + 0x80); func_00282D30(vec, vec, 1.0f / duration);
-            vec[2] = func_00282C10(b * 0.0055555557f);
+            b *= 2.0f; duration = square_root(b / 0.0055555557f);
+            c = (a - tmp[2]) * 2.0f; duration += square_root(c / 0.0055555557f);
+            FastVecSub(vec, tmp, hero2 + 0x80); FastVecScale(vec, vec, 1.0f / duration);
+            vec[2] = square_root(b * 0.0055555557f);
             func_L00_002C42E0(0x44, 1);
             qcopy(hero2 + 0xF0, vec);
         }

@@ -105,13 +105,13 @@ void func_L00_004263B8(char *object)
     float first;
 
     D_L00_001A8904 = value;
-    func_00282CC0(local, hero, parameters);
+    FastVecAdd(local, hero, parameters);
     first = *(float *)(hero + 12);
     if (D_L00_001A8FF0 != 0) {
         first = 0.0f;
     }
-    *(float *)(local + 12) = func_00283B98(first, *(float *)(parameters + 12));
-    func_L00_004208C8(self, (float *)local);
+    *(float *)(local + 12) = FastAddRotations(first, *(float *)(parameters + 12));
+    TranslateObjectAndView(self, (float *)local);
     func_L00_004224D0(self);
     func_L00_00421C50(self);
     func_L00_00426340((int)self);
@@ -194,23 +194,23 @@ void func_L00_0042A698(Self_42A698 *self)
         e->f28 = D_L00_001B1644;
         e->f2C = D_L00_001B1648;
     }
-    func_00282F20(l1, e->model->mE0, 0.25f);
-    func_00282CC0((char *)l1, (char *)e->model + 0x10, (char *)l1);
-    func_00282CF0(l2, l1, p);
-    func_00282F20(self, l2, 1.0f);
-    func_00282DD8(self->m10, self, e0);
-    func_00282F20(self->m10, self->m10, 1.0f);
-    func_00282DD8(self->m20, self->m10, self);
+    vec_scale_to_length(l1, e->model->mE0, 0.25f);
+    FastVecAdd((char *)l1, (char *)e->model + 0x10, (char *)l1);
+    FastVecSub(l2, l1, p);
+    vec_scale_to_length(self, l2, 1.0f);
+    FastVecCross(self->m10, self, e0);
+    vec_scale_to_length(self->m10, self->m10, 1.0f);
+    FastVecCross(self->m20, self->m10, self);
     qcopy(e1, e->model->mE0);
     func_002ACF68(e->v60, e->v60, e1, 0, 0.125f);
-    func_00282D30(l2, l2, -1.0f);
-    f = func_00282DB0(l2, e->v60);
-    func_00282D30(l3, e->v60, f);
-    func_00282CF0(l4, l2, l3);
-    func_00282F20(l3, l3, e->f34);
-    func_00282F20(l6, l4, e->f30);
-    func_00282CC0((char *)l6, (char *)l3, (char *)l6);
-    func_00282CC0((char *)l7, (char *)l1, (char *)l6);
+    FastVecScale(l2, l2, -1.0f);
+    f = FastVecDot(l2, e->v60);
+    FastVecScale(l3, e->v60, f);
+    FastVecSub(l4, l2, l3);
+    vec_scale_to_length(l3, l3, e->f34);
+    vec_scale_to_length(l6, l4, e->f30);
+    FastVecAdd((char *)l6, (char *)l3, (char *)l6);
+    FastVecAdd((char *)l7, (char *)l1, (char *)l6);
     func_L00_0042A908(self, l8, l1, l7);
-    func_00282D08(p, p, l8, 0.1f);
+    lerp_vector(p, p, l8, 0.1f);
 }

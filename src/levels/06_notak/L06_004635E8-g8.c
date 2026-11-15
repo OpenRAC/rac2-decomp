@@ -38,13 +38,13 @@ void func_L06_004635E8(char *a0) {
     case 2:
         func_L00_0032A258(a0, &D_L06_001B1CC0, &D_L06_001B1CB8, &D_L06_001B1CB0, 0xFFFF, 0, -1, 6, 0xFF, 0xFF, 0);
         func_L01_0031A278(a0, pos, D_L06_001B1CE0, D_L06_001B1CE4, D_L06_001B1CE8);
-        func_0032C700(pos, 0, 5, 5, 5, 20, 5, 0, 1, 1, 1, 0, 1.0f, 20.0f);
+        SpawnExplosion(pos, 0, 5, 5, 5, 20, 5, 0, 1, 1, 1, 0, 1.0f, 20.0f);
         for (i = 0; i < 4; i++) {
             vel[0] = (i / 2 * 2 - 1) * 0.05000000447f;
             vel[1] = (i % 2 * 2 - 1) * 0.05000000447f;
             vel[2] = 0.1166666746f;
-            func_00283098(vel, vel, a0 + 0xC0);
-            func_L00_003263D0(a0, pos, 3, 0.2f, 1, vel, 5.0f, 0x7F40FFFF, 1.45f, 2.2f, 0);
+            matrix_mul_vec3(vel, vel, a0 + 0xC0);
+            SpawnTintedEffects(a0, pos, 3, 0.2f, 1, vel, 5.0f, 0x7F40FFFF, 1.45f, 2.2f, 0);
         }
         func_00350388(a0);
         break;

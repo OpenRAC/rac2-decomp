@@ -1,6 +1,6 @@
 /* func_L07_003F8C38 (152 bytes): finds the controller's group member, takes the object's
    frame position, and hands both to func_L07_003F6C40 with the record's scale + 0.5. The
-   record table pointer is read with the absolute macro (MACRO_ADDR), and func_002E5CF8
+   record table pointer is read with the absolute macro (MACRO_ADDR), and PlayMobySound
    returns a value. */
 #include "common.h"
 
@@ -22,6 +22,6 @@ void func_L07_003F8C38(u8 *a0)
     if (s1 == 0)
         return;
     func_0029FCC0(a0, 0, buf);
-    func_002E5CF8(5, 0, (char *)a0);
+    PlayMobySound(5, 0, (char *)a0);
     func_L07_003F6C40(s1, a0, buf, D_L07_001B23CC[*(s32 *)(s2 + 0x174)].f38 + 0.5f);
 }

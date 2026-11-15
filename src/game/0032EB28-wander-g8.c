@@ -1,7 +1,7 @@
 /* func_00331800 has its own unit for its jump table and -frac2-hazard-labels,
  * without which it does not match.
  *
- * func_002A7CA0 is void (see 0032EB28-ai-g8.c). With a float declaration the
+ * MobySpringTurn is void (see 0032EB28-ai-g8.c). With a float declaration the
  * call sets F0, which ends the F12 copy's dependence on the later calls, and
  * sched2 issues that copy after F14/F15, A0 and A1.
  * The arguments interleave by bank; each bank keeps its order. */
@@ -54,10 +54,10 @@ void func_00331800(char *object)
     int hit;
 
     if (AI_B(object,0x20) && D_001AD7EC) {
-        func_00283658(work.matrix,object+0xc0);
+        copy_matrix_rotation(work.matrix,object+0xc0);
         func_002AB6D8(work.matrix,dest);
         func_002AD0E0(object,D_001AD7EC,object+0x10,dest,object+0x10,temp);
-        func_002833F0(object+0xc0,temp);
+        euler_rotation_basis(object+0xc0,temp);
         qcopy(object+0xf0,temp);
     }
     if (func_002A9640(object,0x4010000,0)) func_003320F0(object);
@@ -74,7 +74,7 @@ void func_00331800(char *object)
             if (r>=20 && r<50) func_002A7470(object,4,0,10);
             if (r>=50 && r<100) func_002A7470(object,1,0,10);
         }
-        if (func_00282E80(object+0x10,D_00189E20.pos)<2 && !D_001A8CA4 && !D_001A8CA0) {
+        if (vec_distance_xy(object+0x10,D_00189E20.pos)<2 && !D_001A8CA4 && !D_001A8CA0) {
             func_002A7750(object,2,-1);
             func_002A7470(object,2,0,10);
             AI_F(object,0x48)=0.75f;
@@ -109,7 +109,7 @@ void func_00331800(char *object)
             AI_F(object,0x48)=0.75f;
         }
         position=object+0x10;
-        if (func_00282E80(position,D_00189E20.pos)<2) {
+        if (vec_distance_xy(position,D_00189E20.pos)<2) {
             func_002A7750(object,2,-1);
             AI_F(object,0x48)=0.1f;
             func_002A7470(object,2,0,10);
@@ -118,33 +118,33 @@ void func_00331800(char *object)
             func_002A7750(object,1,-1);
             AI_I(state,0x70)=func_002A7820(400,600);
         }
-        angle=func_00283B98(AI_F(object,0xf8),func_002A7878(-30,30)*0.017453294f);
-        func_002A7CA0(angle,object,state+0x58,0.00014544412260875106f,0.00043633237f,0.013089972f);
-        func_00282F20(temp,object+0xc0,0.004166667f);
-        func_00282CC0(dest,position,temp);
+        angle=FastAddRotations(AI_F(object,0xf8),func_002A7878(-30,30)*0.017453294f);
+        MobySpringTurn(angle,object,state+0x58,0.00014544412260875106f,0.00043633237f,0.013089972f);
+        vec_scale_to_length(temp,object+0xc0,0.004166667f);
+        FastVecAdd(dest,position,temp);
         saved=work.matrix;
         qcopy_nc(saved,position);
         if (func_002A7EA0(object,position,dest,0.1f,0.7f,0.25f,0.52359885f,2)) {
             if (func_00277258(position,1,object,0.5f) && D_001BAF80.surface) qcopy(position,saved);
         } else {
-            angle=func_00283B98(AI_F(object,0xf8),func_002A7878(20,135)*0.017453294f);
-            func_002A7CA0(angle,object,state+0x58,4.848137541557662e-05f,0.00043633237f,0.013089972f);
+            angle=FastAddRotations(AI_F(object,0xf8),func_002A7878(20,135)*0.017453294f);
+            MobySpringTurn(angle,object,state+0x58,4.848137541557662e-05f,0.00043633237f,0.013089972f);
         }
         break;
     case 2:
         position=object+0x10;
-        if (func_00282E80(position,D_00189E20.pos)<2) {
-            angle=func_00283B98(AI_F(object,0xf8),func_002A7878(-30,30)*0.017453294f);
-            func_002A7CA0(angle,object,state+0x58,0.00014544412260875106f,0.00043633237f,0.013089972f);
-            func_00282F20(temp,object+0xc0,0.004166667f);
-            func_00282CC0(dest,position,temp);
+        if (vec_distance_xy(position,D_00189E20.pos)<2) {
+            angle=FastAddRotations(AI_F(object,0xf8),func_002A7878(-30,30)*0.017453294f);
+            MobySpringTurn(angle,object,state+0x58,0.00014544412260875106f,0.00043633237f,0.013089972f);
+            vec_scale_to_length(temp,object+0xc0,0.004166667f);
+            FastVecAdd(dest,position,temp);
             saved=work.matrix;
             qcopy_nc(saved,position);
             if (func_002A7EA0(object,position,dest,0.5f,0.7f,0.25f,0.52359885f,2)) {
                 if (func_00277258(position,1,object,0.5f) && D_001BAF80.surface) qcopy(position,saved);
             } else {
-                angle=func_00283B98(AI_F(object,0xf8),func_002A7878(-90,-10)*0.017453294f);
-                func_002A7CA0(angle,object,state+0x58,5.81776475883089e-05f,0.00043633237f,0.013089972f);
+                angle=FastAddRotations(AI_F(object,0xf8),func_002A7878(-90,-10)*0.017453294f);
+                MobySpringTurn(angle,object,state+0x58,5.81776475883089e-05f,0.00043633237f,0.013089972f);
             }
         } else {
             AI_F(object,0x48)=1;
@@ -153,14 +153,14 @@ void func_00331800(char *object)
         break;
     case 4:
         func_002B00B0(object,work.matrix,0);
-        func_00282F20(work.matrix,work.matrix,4);
-        func_00282CC0(work.v.far,object+0x10,work.matrix);
-        func_00282F20(work.matrix,work.matrix,-1);
-        func_00282CC0(work.v.near,object+0x10,work.matrix);
-        if (func_002761F8(work.v.near,work.v.far,0,object,0)) {
+        vec_scale_to_length(work.matrix,work.matrix,4);
+        FastVecAdd(work.v.far,object+0x10,work.matrix);
+        vec_scale_to_length(work.matrix,work.matrix,-1);
+        FastVecAdd(work.v.near,object+0x10,work.matrix);
+        if (CollLine(work.v.near,work.v.far,0,object,0)) {
             if (D_001BAF80.surface!=D_00189E20.surface) qcopy(object+0x10,D_001BAF80.point);
         }
-        hit=func_00278E78();
+        hit=GetCollHitMaterial();
         if (hit>0 && hit!=10 && !D_001A8CA4) {func_003320F0(object);return;}
         func_002A7750(object,0,-1);
         break;

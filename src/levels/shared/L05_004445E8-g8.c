@@ -47,14 +47,14 @@ void func_L05_004445E8(char *object)
             invalid:
             *(int *)(state+0x1c)=*(int *)(state+0x18)=0; return;
         }
-        func_00282CF0(delta,*(char **)(state+0x18)+0x10,object+0x10);
-        length=func_00282DF0(delta);
-        dot=func_00282DB0(object+0xc0,delta);
+        FastVecSub(delta,*(char **)(state+0x18)+0x10,object+0x10);
+        length=FastVecLength(delta);
+        dot=FastVecDot(object+0xc0,delta);
         if(length==0.0f) goto zeroLength;
         {
             *(int *)(object+0x98)=0;
             if(func_00282C48(1.5707964f-func_002831B0(dot/length))>D_L05_001B1B14*0.017453294f ||
-               (D_L05_001B2048%5==0 && func_002761F8(D_L05_001B96C0,*(char **)(state+0x18)+0x10,16,*(void **)(state+0x18),0))) {
+               (D_L05_001B2048%5==0 && CollLine(D_L05_001B96C0,*(char **)(state+0x18)+0x10,16,*(void **)(state+0x18),0))) {
                 *(int *)(state+0x18)=0; *(int *)(state+0x14)=0; *(int *)(state+0x1c)=0;
             } else { if(++*(int *)(state+0x1c)>limit) *(int *)(state+0x1c)=limit; }
             *(int *)(object+0x98)=*(int *)(*(char **)(object+0x24)+0x10);

@@ -73,13 +73,13 @@ void func_00308768(char *m) {
     }
     *(Q_2B4918 *)&up = 0;
     up.y = 1.0f;
-    func_00282CF0(&mtx[2], &out[0], &out[1]);
-    func_00282F20(&mtx[2], &mtx[2], 1.0f);
+    FastVecSub(&mtx[2], &out[0], &out[1]);
+    vec_scale_to_length(&mtx[2], &mtx[2], 1.0f);
     mtx[2].w = 0.0f;
-    func_00282DD8(&mtx[0], &up, &mtx[2]);
-    func_00282F20(&mtx[0], &mtx[0], 1.0f);
+    FastVecCross(&mtx[0], &up, &mtx[2]);
+    vec_scale_to_length(&mtx[0], &mtx[0], 1.0f);
     mtx[0].w = 0.0f;
-    func_00282DD8(&mtx[1], &mtx[2], &mtx[0]);
+    FastVecCross(&mtx[1], &mtx[2], &mtx[0]);
     mtx[1].w = 0.0f;
     qcopy(&mtx[3], &out[1]);
     mtx[3].w = 1.0f;
@@ -87,59 +87,59 @@ void func_00308768(char *m) {
     qcopy(m + 0xD0, &mtx[1]);
     qcopy(m + 0xE0, &mtx[2]);
     qcopy(m + 0x10, &mtx[3]);
-    func_00283388(idm);
+    set_identity_matrix(idm);
     idm[3].w = 1.0f;
     idm[3].z = -0.075f;
     idm[3].x = 0.0f;
     idm[3].y = 0.0f;
-    func_00283788(res, mtx, idm);
-    pk.tag[1] = func_0027C878(0xC);
+    multiply_matrix(res, mtx, idm);
+    pk.tag[1] = GetEffectTextureDescriptor(0xC);
     for (i = 0; i < 4; i++) {
         pk.col[i] = 0x80808080;
         if (i == 0 || i == 2) {
-            func_00282D30(pk.pos[i], D_001AECF0[i], data->f2C);
+            FastVecScale(pk.pos[i], D_001AECF0[i], data->f2C);
         } else {
             float *v = pk.pos[i];
-            func_00282D30(v, D_001AECF0[i], data->f2C);
+            FastVecScale(v, D_001AECF0[i], data->f2C);
             v[2] -= func_002A7878(0.0f, 0.1f);
         }
         pk.uv[i][0] = D_001AED70[i].u;
         pk.uv[i][1] = beam_uv_absolute[i].v;
     }
-    func_00280B90(&pk, res, 0);
+    draw_world_quad(&pk, res, 0);
     for (i = 0; i < 4; i++) {
         if (i == 0 || i == 2) {
-            func_00282D30(pk.pos[i], D_001AED30[i], data->f2C);
+            FastVecScale(pk.pos[i], D_001AED30[i], data->f2C);
         } else {
             float *v = pk.pos[i];
-            func_00282D30(v, D_001AED30[i], data->f2C);
+            FastVecScale(v, D_001AED30[i], data->f2C);
             v[2] -= func_002A7878(0.0f, 0.1f);
         }
     }
-    func_00280B90(&pk, res, 0);
-    pk.tag[1] = func_0027C878(0xB);
-    func_00282D30(&d, &mtx[2], -0.13f);
-    func_00282CC0(&d, &d, &mtx[3]);
-    func_00282CF0(&a, D_001B5340, &d);
-    func_00282F20(&a, &a, 1.0f);
-    func_00282DD8(&b, &a, D_00189E20 + 0x2C0);
-    func_00282F20(&b, &b, -1.0f);
-    func_00282DD8(&c, &b, &a);
+    draw_world_quad(&pk, res, 0);
+    pk.tag[1] = GetEffectTextureDescriptor(0xB);
+    FastVecScale(&d, &mtx[2], -0.13f);
+    FastVecAdd(&d, &d, &mtx[3]);
+    FastVecSub(&a, D_001B5340, &d);
+    vec_scale_to_length(&a, &a, 1.0f);
+    FastVecCross(&b, &a, D_00189E20 + 0x2C0);
+    vec_scale_to_length(&b, &b, -1.0f);
+    FastVecCross(&c, &b, &a);
     pk.col[0] = pk.col[1] = pk.col[2] = pk.col[3] = 0x7F2020FF;
     for (j = 0; j < 4; j++) {
-        func_00282D30(pk.pos[j], D_001AECF0[j], 0.1f);
-        func_002830C0(pk.pos[j], pk.pos[j], &a);
+        FastVecScale(pk.pos[j], D_001AECF0[j], 0.1f);
+        transform_vector(pk.pos[j], pk.pos[j], &a);
     }
-    func_00280B90(&pk, 0, 0);
-    func_002FC560(6, func_0027C878(0xA));
-    func_002FC560(0x42, pk.tag[3]);
-    func_002FC560(8, 0);
-    func_002FC560(0x14, 0xFF9000000260);
-    func_002FC560(0x4A, 0);
-    func_00280328();
+    draw_world_quad(&pk, 0, 0);
+    VU1_addGSregister(6, GetEffectTextureDescriptor(0xA));
+    VU1_addGSregister(0x42, pk.tag[3]);
+    VU1_addGSregister(8, 0);
+    VU1_addGSregister(0x14, 0xFF9000000260);
+    VU1_addGSregister(0x4A, 0);
+    font_queue_vu_state();
     for (i = 0; i < 0xC4; i++) {
-        func_00282D30(&e, D_00265360[i], data->f20);
-        func_002830C0(&e, &e, mtx);
+        FastVecScale(&e, D_00265360[i], data->f20);
+        transform_vector(&e, &e, mtx);
         D_00228840[i].x = e.x;
         D_00228840[i].y = e.y;
         D_00228840[i].z = e.z;

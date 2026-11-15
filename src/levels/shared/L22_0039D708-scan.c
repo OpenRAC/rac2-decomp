@@ -32,7 +32,7 @@ static inline int SlotAt(int i) {
 /* Advances the current slot round-robin to the next one not yet spent (-1),
  * giving up after a full turn. Two point pairs are built from the first and
  * last points of the slot's record, and the slot is marked spent once
- * func_L22_003A2780 accepts both pairs. */
+ * WalkPathIsClear accepts both pairs. */
 void func_L22_003A4938(char *obj) {
     float a[4], b[4], c[4], d[4], e[4], f[4], g[4], h[4], i[4], j[4];
     char *s;
@@ -67,6 +67,6 @@ void func_L22_003A4938(char *obj) {
     func_002F3AF0(j, i, *(float *)(s + 0x114) + *(float *)(s + 0x110));
     func_002F3A80(j, j, e);
     func_002F3A80(d, d, j);
-    if (func_L22_003A2780(obj, a, c) && func_L22_003A2780(obj, b, d))
+    if (WalkPathIsClear(obj, a, c) && WalkPathIsClear(obj, b, d))
         D_L22_001AF3B0[D_L22_001AF3C4] = -1;
 }

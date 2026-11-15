@@ -26,7 +26,7 @@ char *func_002BBCB0(void *pos,void *velocity,int color,int endcolor,int life,int
     if(p) {
         qcopy(p+16,pos);
         *(int *)(p+4)=color;
-        p[9]=func_00283CF0(4.0f)-96;
+        p[9]=FloatToInt(4.0f)-96;
         p[3]=func_002A77E0(100)<20?0x44:0x48;
         p[1]=0;
         *(float *)(p+12)=0;
@@ -38,8 +38,8 @@ char *func_002BBCB0(void *pos,void *velocity,int color,int endcolor,int life,int
         r[1]=func_002A7878(-1.0f,1.0f);
         r[2]=func_002A7878(-1.0f,1.0f);
         *(TI128 *)v=*(TI128 *)r;
-        func_00282F20(v,v,jitter);
-        func_00282CC0(q,velocity,v);
+        vec_scale_to_length(v,v,jitter);
+        FastVecAdd(q,velocity,v);
         q->v[3]=jitter*0.75f;
         *(short *)(p+10)=life;
         q->life=life;q->a=a;

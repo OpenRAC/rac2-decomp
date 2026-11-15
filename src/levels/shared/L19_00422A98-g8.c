@@ -35,7 +35,7 @@ void func_L19_00422A98(char *obj) {
         return;
     case 1:
         if (link[0] != -1) {
-            if (func_002ACBC8(D_L19_001B9A40, link[0]) != 0) {
+            if (IsPointInCuboid(D_L19_001B9A40, link[0]) != 0) {
                 D_L19_001B258C = 2;
             } else if (D_L19_001B258C == 2) {
                 D_L19_001B258C = 0;
@@ -47,7 +47,7 @@ void func_L19_00422A98(char *obj) {
     }
     if (FLD(D_00189E20, int, 0x2294) == 0x31 && (hero_ptr = FLD(D_00189E20, char *, 0x1830)) != 0) {
         func_002AF000(a, D_L19_001B1E94, FLD(hero_ptr, float, 0xF8), -FLD(hero_ptr, float, 0xF4) * 0.5f);
-        func_00282CC0(b, a, FLD(D_00189E20, char *, 0x1830) + 0x10);
+        FastVecAdd(b, a, FLD(D_00189E20, char *, 0x1830) + 0x10);
         if (D_L19_001B1EAC == 0) {
             D_L19_001B1EAC = func_L00_002D70A0(5);
             if (D_L19_001B1EAC == 0) {
@@ -64,7 +64,7 @@ void func_L19_00422A98(char *obj) {
             FLD(D_L19_001B1EAC, float, 8) = D_L19_001B1EA8;
         }
         FLD(D_L19_001B1EAC, u8, 0x1F) = 1;
-        func_00282CF0(D_L19_001B1EAC + 0x20, b, D_L19_001B9A40);
+        FastVecSub(D_L19_001B1EAC + 0x20, b, D_L19_001B9A40);
         return;
     }
     if (D_L19_001B1EAC != 0) {

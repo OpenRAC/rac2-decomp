@@ -163,8 +163,8 @@ void func_00346710(s32 arg0, s32 arg1) {
     *(s32 *)func_00335E20(sp28) = 0x80F0F0F0;
     *(s32 *)func_00335E20(sp2C) = 0x80F0F0F0;
     *(s32 *)func_00335E20(sp30) = 0x80F0F0F0;
-    func_00336A38(sp20, func_00288FB8(0x2D51));
+    func_00336A38(sp20, GetLocalizedString(0x2D51));
     func_00336A38(sp24, arg0 + 0x4A0);
     func_00336A38(sp28, arg0 + 0x4B8);
-    func_00346C60(arg0, 0);
+    UpdateItemGridMenu(arg0, 0);
 }

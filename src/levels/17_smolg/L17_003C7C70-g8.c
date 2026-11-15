@@ -55,9 +55,9 @@ void func_L17_003CC6A8(s32 a0)
     packed |= p[1] << 8;
     packed |= p[0];
     f20 = *(f32 *)&p[4] * 210000.0f;
-    r = func_00283CF0(D_L17_001B04B8 * 60.0f);
+    r = FloatToInt(D_L17_001B04B8 * 60.0f);
     if (func_L17_00340DD0(f20, obj, packed, r) != 0)
-        *(u16 *)(obj + 0x96) = func_00283CF0(D_L17_001B04B8 * 60.0f);
+        *(u16 *)(obj + 0x96) = FloatToInt(D_L17_001B04B8 * 60.0f);
     else
         *(u16 *)(obj + 0x96) = 1;
 }
@@ -81,7 +81,7 @@ void func_L17_00418D10(s32 a0)
     case 2:
         func_L00_0032A258(a0, &D_L17_001B1DE0, &D_L17_001B1DD8, &D_L17_001B1DD0,
                           0xFFFF, 0, D_L17_001B1E00, 0, 0xFFFF, 0xFF, 0);
-        func_0032C700(a0 + 0x10, 0, 12, 10, 10, 10, 0, 0,
+        SpawnExplosion(a0 + 0x10, 0, 12, 10, 10, 10, 0, 0,
                       *(f32 *)(a0 + 0x2C) * 10.0f, 20.0f, 1, 0, 0, 0);
         func_0029F338(a0);
         break;
@@ -225,8 +225,8 @@ void func_L17_003E41A8(u8 *obj)
         }
         p->i420 = 0;
         p->i424 = 0;
-        p->b48 = func_00283CF0(15.0f);
-        p->b4A = func_00283CF0(4.0f);
+        p->b48 = FloatToInt(15.0f);
+        p->b4A = FloatToInt(4.0f);
         p->b29 = 1;
         p->b70 = 7;
         p->iA8 = 3;
@@ -247,10 +247,10 @@ void func_L17_003E41A8(u8 *obj)
         p->bCF = 11;
         p->bD2 = 6;
         p->bD3 = 11;
-        func_L04_0033CB88(&p->t140);
+        MoveCtl_Init(&p->t140);
         p->t140.f0C = 2.5f;
         p->t140.f08 = 2.0f;
-        p->t140.i00 = func_00283CF0(D_L17_001B0CA8 * 1024.0f);
+        p->t140.i00 = FloatToInt(D_L17_001B0CA8 * 1024.0f);
         p->t140.f04 = D_L17_001B0CA8;
         p->t140.f24 = p->f40C * (1.0f / 60.0f);
         if (p->v3D0.f[3] != 12439.4f) {
@@ -273,7 +273,7 @@ void func_L17_003E41A8(u8 *obj)
             func_002A7470(obj, 0, 0, 0);
         p->i450 = p->i428;
     }
-    if (obj[0x31] && func_00282E48(obj + 0x10, D_L17_001B9BC0) < 24.0f) {
+    if (obj[0x31] && fast_vec_dist(obj + 0x10, D_L17_001B9BC0) < 24.0f) {
         func_002A93B0(obj);
         obj[0x6F] = 22;
     }
@@ -293,7 +293,7 @@ void func_L17_003E41A8(u8 *obj)
     p->h404 = func_002B3BA8(obj, -1, 0, 0, 15.0f, 3.0f);
     target = p->target;
     if (!target) {
-        func_0026FEB8(D_L17_001B0CC8);
+        STUB_printf(D_L17_001B0CC8);
         target = D_0018C0B0;
     }
     p->p408 = target;
@@ -364,7 +364,7 @@ void func_L17_0041EAA8(u8 *obj)
     u16 id;
     u8 *counter;
 
-    vars->phase = func_00283B98(vars->phase, 0.10471977f);
+    vars->phase = FastAddRotations(vars->phase, 0.10471977f);
     shade = FloatToInt(func_00283198(vars->phase) * 128.0f);
     if (shade > 128)
         shade = 128;
@@ -404,7 +404,7 @@ void func_L17_0041EAA8(u8 *obj)
                     }
                 }
             }
-            func_002B0CE0(12, 0x27F7, 1);
+            ForceClaimNotice(12, 0x27F7, 1);
             *(s32 *)(obj + 0x78) = (0x80 << 24) | (shade << 8);
             D_00189E20.status = 2;
             if (vars->speed != 0)
@@ -463,7 +463,7 @@ void func_L17_00420E08(u8 *obj)
         break;
     }
     case 1:
-        vars->phase = func_00283B98(vars->phase, 0.10471977f);
+        vars->phase = FastAddRotations(vars->phase, 0.10471977f);
         shade = FloatToInt((func_00283198(vars->phase) * 4.0f - 3.0f) * 128.0f);
         if (shade > 128)
             shade = 128;

@@ -63,7 +63,7 @@ void func_L12_00420950(u8 *object)
             buf.f[j][0] = D_L12_002A38F8[uv][0] + data[4];
             buf.f[j][1] = D_L12_002A38F8[uv][1];
         }
-        func_00280B90(&buf, 0, 0);
+        draw_world_quad(&buf, 0, 0);
     }
     func_00281DE8(&buf, D_L12_001B1F40 + 1, 0, 0x80);
     buf.i[3] = D_L12_001B1F38;
@@ -79,7 +79,7 @@ void func_L12_00420950(u8 *object)
             buf.f[j][0] = D_L12_002A38F8[uv][0] + data[4];
             buf.f[j][1] = D_L12_002A38F8[uv][1];
         }
-        func_00280B90(&buf, 0, 0);
+        draw_world_quad(&buf, 0, 0);
     }
 }
 
@@ -113,7 +113,7 @@ void func_L12_00420B78(u8 *object)
     case 1:
         if (func_L00_00329520(D_00189EA0, *(int *)(data + 6)))
             return;
-        func_L00_002E6CF0(func_L12_00420950, object);
+        func_L00_002E6CF0(DrawScrollingTwoPassQuadMesh, object);
         D_L12_001B363C = 1;
         qcopy(D_L12_001B3640, D_00189EA0);
         D_L12_001B3640[3] = 48.0f;
@@ -186,8 +186,8 @@ void func_L12_00420B78(u8 *object)
         data[5] = func_002A7878(D_L12_001B1F44, D_L12_001B1F48);
         break;
     case 2:
-        if (func_00282E80(object + 0x10, D_00189EA0) < 64.0f)
-            func_L00_002E6EF8(func_L12_00420950, object);
+        if (vec_distance_xy(object + 0x10, D_00189EA0) < 64.0f)
+            func_L00_002E6EF8(DrawScrollingTwoPassQuadMesh, object);
         break;
     }
 }

@@ -275,29 +275,29 @@ void func_002742E8(char *o)
     float *w;
 
     if (m[0x5C] >= 2) {
-        func_00282D08(a, (float *)(*(char **)(m + 0x30) + m[0x59] * 16), (float *)(*(char **)(m + 0x30) + m[0x5A] * 16), 0.5f);
-        func_00282CF0(b, (float *)(*(char **)(m + 0x30) + m[0x59] * 16), (float *)(*(char **)(m + 0x30) + m[0x5A] * 16));
-        func_00283098(b, b, (float *)(o + 0xC0));
+        lerp_vector(a, (float *)(*(char **)(m + 0x30) + m[0x59] * 16), (float *)(*(char **)(m + 0x30) + m[0x5A] * 16), 0.5f);
+        FastVecSub(b, (float *)(*(char **)(m + 0x30) + m[0x59] * 16), (float *)(*(char **)(m + 0x30) + m[0x5A] * 16));
+        matrix_mul_vec3(b, b, (float *)(o + 0xC0));
         w = (float *)(o + 0xC0);
     } else {
         qcopy(a, *(char **)(m + 0x30) + m[0x59] * 16);
         w = (float *)(o + 0xC0);
     }
-    func_00283098(c, a, w);
+    matrix_mul_vec3(c, a, w);
     func_002AFFD8((float *)(o + 0x10), d, 1);
-    func_00282CF0(e, a, (float *)(m + 0x20));
-    func_00283098(e, e, w);
-    func_00282F20(e, e, 1.0f);
-    func_00282DD8(f, e, d);
-    func_00282F20(f, f, *(float *)(m + 0x4C));
+    FastVecSub(e, a, (float *)(m + 0x20));
+    matrix_mul_vec3(e, e, w);
+    vec_scale_to_length(e, e, 1.0f);
+    FastVecCross(f, e, d);
+    vec_scale_to_length(f, f, *(float *)(m + 0x4C));
     func_00274A88(o, (float *)(m + 0x10), f);
     if (m[0x5C] >= 2)
         func_00274B58(o, (float *)(m + 0x10), b);
-    func_00283958((float *)(m + 0x10), g[0]);
-    func_00283738(w, g[0], w);
-    func_00283098(h, a, w);
-    func_00282CF0(i, h, c);
-    func_00282CF0((float *)(o + 0x10), (float *)(o + 0x10), i);
+    quaternion_to_rotation_basis((float *)(m + 0x10), g[0]);
+    multiply_matrix3x3(w, g[0], w);
+    matrix_mul_vec3(h, a, w);
+    FastVecSub(i, h, c);
+    FastVecSub((float *)(o + 0x10), (float *)(o + 0x10), i);
 }
 
 int func_00274500(Obj_F4778f810 *obj)
@@ -314,7 +314,7 @@ int func_00274500(Obj_F4778f810 *obj)
     int hit;
     float scale;
 
-    func_00283098(tmp0, p->vec020, (float *)((char *)obj + 0xC0));
+    matrix_mul_vec3(tmp0, p->vec020, (float *)((char *)obj + 0xC0));
     F4778f810_FUN_00282CC0((char *)tmp0, (char *)tmp0, (char *)obj + 0x10);
     hit = func_00277258(tmp0, 0x62, p->vec020[3], p->p054);
     if (hit != 0) {
@@ -328,7 +328,7 @@ int func_00274500(Obj_F4778f810 *obj)
             }
             if (used)
                 continue;
-            func_00283098(tmp1, p->points030[i], (float *)((char *)obj + 0xC0));
+            matrix_mul_vec3(tmp1, p->points030[i], (float *)((char *)obj + 0xC0));
             F4778f810_FUN_00282CC0((char *)tmp1, (char *)tmp1, (char *)obj + 0x10);
             if (func_00278CE0(tmp0, tmp1, hit, 0) != 0) {
                 v = D_001BAFA0;
@@ -351,11 +351,11 @@ int func_002746C8(Obj_F4778f810 *obj)
     V4_F4778f810 tmp[2];
     HitNudge_002746C8 *p = (HitNudge_002746C8 *)obj->p068;
 
-    func_00283098((char *)&tmp[0], (char *)p + 0x20, (char *)obj + 0xC0);
-    func_00282CC0((char *)&tmp[0], (char *)&tmp[0], (char *)obj + 0x10);
+    matrix_mul_vec3((char *)&tmp[0], (char *)p + 0x20, (char *)obj + 0xC0);
+    FastVecAdd((char *)&tmp[0], (char *)&tmp[0], (char *)obj + 0x10);
     if (func_00277258((float *)&tmp[0], 2, p->f02C, p->p054) != 0) {
-        func_00282CF0((char *)&tmp[1], (char *)D_001BAFB0, (char *)&tmp[0]);
-        func_00282CC0((char *)obj + 0x10, (char *)obj + 0x10, (char *)&tmp[1]);
+        FastVecSub((char *)&tmp[1], (char *)D_001BAFB0, (char *)&tmp[0]);
+        FastVecAdd((char *)obj + 0x10, (char *)obj + 0x10, (char *)&tmp[1]);
         return 1;
     }
     return 0;
@@ -370,8 +370,8 @@ unsigned int func_00274768(OozlaAppendObject164 *object, unsigned int index, con
     ++descriptor->count;
     func_00274810(object, (int)descriptor->count - 1, direction);
     if (descriptor->count != 1) {
-        func_00282CF0(difference, descriptor->points[descriptor->indices[0]], descriptor->points[descriptor->indices[1]]);
-        func_00283098(difference, difference, &object->transform[0][0]);
+        FastVecSub(difference, descriptor->points[descriptor->indices[0]], descriptor->points[descriptor->indices[1]]);
+        matrix_mul_vec3(difference, difference, &object->transform[0][0]);
         func_00274B58(object, descriptor->plane, difference);
     }
     return descriptor->count;
@@ -425,11 +425,11 @@ int func_00274C90(char *object, float *output, int limit)
     remaining = count;
     do {
         remaining--;
-        cursor[0] = func_00283CE0(*(short *)entry);
-        cursor[1] = func_00283CE0(*(short *)(entry + 2));
-        cursor[2] = func_00283CE0(*(short *)(entry + 4));
+        cursor[0] = IntToFloat(*(short *)entry);
+        cursor[1] = IntToFloat(*(short *)(entry + 2));
+        cursor[2] = IntToFloat(*(short *)(entry + 4));
         entry += 8;
-        func_00282D30(cursor, cursor, scale);
+        FastVecScale(cursor, cursor, scale);
         cursor[3] = 1.0f;
         cursor += 4;
     } while (remaining);
@@ -460,7 +460,7 @@ void func_00278F80(void) {
     func_002FC138();
     func_002FC1D8();
     D_001A72D4 = D_001B7F98;
-    func_0027D330(30);
+    FadeToBlack(30);
 }
 
 /* Store ten integer arguments in the indexed record when the unsigned index is below 32; otherwise leave the table unchanged. */
@@ -537,7 +537,7 @@ int func_002799A8(void)
         }
         return 1;
     }
-    if (func_002798A0(D_001B8308.e[(short)g->idx].ptr, &t1, &t2)) {
+    if (AdvanceGroupedTableOffset(D_001B8308.e[(short)g->idx].ptr, &t1, &t2)) {
         if (D_001B8308.e[(short)g->idx].ptr != 0) {
             g->idx = (unsigned short)t1;
             g->idx2 = (unsigned short)t2;
@@ -604,9 +604,9 @@ void func_0027A288(void)
     unsigned char *vis, *gx, *gy, *gz, *previous;
     float *p;
 
-    x = func_00283CF0(D_001B5200.position[0] * scale);
-    y = func_00283CF0(D_001B5200.position[1] * scale);
-    z = func_00283CF0(D_001B5200.position[2] * scale);
+    x = FloatToInt(D_001B5200.position[0] * scale);
+    y = FloatToInt(D_001B5200.position[1] * scale);
+    z = FloatToInt(D_001B5200.position[2] * scale);
     vis = (unsigned char *)Fcdb4d905_FUN_0027A0F8(x, y, z);
     if (vis) {
         D_001B1714 = 0;
@@ -617,15 +617,15 @@ void func_0027A288(void)
         if (D_001B170C == 0) {
             xm = x - 1;
             xp = x + 1;
-            fraction = func_00283CE0(x);
+            fraction = IntToFloat(x);
             yp = y + 1;
             zp = z + 1;
             ym = y - 1;
             zm = z - 1;
             gx = (unsigned char *)func_0027A1D0(D_001B5200.position[0] * scale - fraction, xm, y, z, xp, y, z);
-            fraction = func_00283CE0(y);
+            fraction = IntToFloat(y);
             gy = (unsigned char *)func_0027A1D0(D_001B5200.position[1] * scale - fraction, x, ym, z, x, yp, z);
-            fraction = func_00283CE0(z);
+            fraction = IntToFloat(z);
             gz = (unsigned char *)func_0027A1D0(D_001B5200.position[2] * scale - fraction, x, y, zm, x, y, zp);
             if (gx || gy || gz) {
                 func_00282A88(D_001BAE40, 128);
@@ -674,39 +674,39 @@ void func_0027A288(void)
                     delta[3] = 0;
                     index = 0;
                     if (delta[0] > 0 && delta[1] > 0) {
-                        index = func_00283CF0(func_00283248(delta[0], delta[1]) * 10.185916f) << 6;
-                        delta[0] = func_00282E80(D_001B5200.position, origin);
+                        index = FloatToInt(func_00283248(delta[0], delta[1]) * 10.185916f) << 6;
+                        delta[0] = vec_distance_xy(D_001B5200.position, origin);
                     } else if (delta[0] <= 0 && delta[1] > 0) {
                         index = 1024;
                         if (delta[0] == 0) {
                             delta[0] = delta[1];
                         } else {
-                            index += func_00283CF0(func_00283248(delta[1], -delta[0]) * 10.185916f) << 6;
-                            delta[0] = func_00282E80(D_001B5200.position, origin);
+                            index += FloatToInt(func_00283248(delta[1], -delta[0]) * 10.185916f) << 6;
+                            delta[0] = vec_distance_xy(D_001B5200.position, origin);
                         }
                     } else if (delta[0] < 0 && delta[1] < 0) {
-                        index = func_00283CF0(func_00283248(-delta[0], -delta[1]) * 10.185916f) << 6;
-                        delta[0] = -func_00282E80(D_001B5200.position, origin);
+                        index = FloatToInt(func_00283248(-delta[0], -delta[1]) * 10.185916f) << 6;
+                        delta[0] = -vec_distance_xy(D_001B5200.position, origin);
                     } else if (delta[0] >= 0 && delta[1] < 0) {
                         index = 1024;
                         if (delta[0] == 0) {
                             delta[0] = delta[1];
                         } else {
-                            index += func_00283CF0(func_00283248(-delta[1], delta[0]) * 10.185916f) << 6;
-                            delta[0] = -func_00282E80(D_001B5200.position, origin);
+                            index += FloatToInt(func_00283248(-delta[1], delta[0]) * 10.185916f) << 6;
+                            delta[0] = -vec_distance_xy(D_001B5200.position, origin);
                         }
                     }
                     if (delta[2] > 0 && delta[0] > 0) {
-                        index += func_00283CF0(func_00283248(delta[2], delta[0]) * 10.185916f);
+                        index += FloatToInt(func_00283248(delta[2], delta[0]) * 10.185916f);
                     } else if (delta[2] <= 0 && delta[0] > 0) {
                         index += 16;
-                        if (delta[2] != 0) index += func_00283CF0(func_00283248(delta[0], -delta[2]) * 10.185916f);
+                        if (delta[2] != 0) index += FloatToInt(func_00283248(delta[0], -delta[2]) * 10.185916f);
                     } else if (delta[2] < 0 && delta[0] <= 0) {
                         index += 32;
-                        if (delta[0] != 0) index += func_00283CF0(func_00283248(-delta[2], -delta[0]) * 10.185916f);
+                        if (delta[0] != 0) index += FloatToInt(func_00283248(-delta[2], -delta[0]) * 10.185916f);
                     } else if (delta[2] >= 0 && delta[0] < 0) {
                         index += 48;
-                        if (delta[2] != 0) index += func_00283CF0(func_00283248(-delta[0], delta[2]) * 10.185916f);
+                        if (delta[2] != 0) index += FloatToInt(func_00283248(-delta[0], delta[2]) * 10.185916f);
                     }
                     func_00282B50(D_001BADC0, ((OcclDirectional *)D_001B1708)->visibility[index], 128);
                 } else {
@@ -731,7 +731,7 @@ void func_0027A9A0(void)
     if (D_001B1710 == 0)
         func_00282A60(D_001BADC0, -1, 0x80);
     else if (D_001B1710 == 2)
-        func_0027A288();
+        UpdateVisibilityBitmap();
 }
 
 /* InitViewContext: set the screen extent from the display size and the view's fixed scales. */
@@ -757,8 +757,8 @@ void func_0027A9F0(void)
     view->fA0 = 32.0f;
     view->fA4 = 1048576.0f;
     view->fB0 = 0.62f;
-    view->f200 = func_00283CE0(width) * 0.5f;
-    half_height_f = func_00283CE0(dimensions->height) * 0.5f;
+    view->f200 = IntToFloat(width) * 0.5f;
+    half_height_f = IntToFloat(dimensions->height) * 0.5f;
     view->f204 = half_height_f;
     view->f208 = view->f200 * 4.0f;
     view->f20C = half_height_f * 4.0f;
@@ -769,7 +769,7 @@ void func_0027A9F0(void)
 }
 
 /* ConfigureGraphicsProjection: InitViewContext for a given size and scale, with the four
-   context values from the arguments, then func_0027AB40. */
+   context values from the arguments, then UpdateViewContext. */
 void func_0027B2F8(int width, int height, float scale, float a, float b, float c, float d)
 {
     ScreenState *context = &D_001B9040;
@@ -787,8 +787,8 @@ void func_0027B2F8(int width, int height, float scale, float a, float b, float c
     context->fB0 = scale;
     context->fA0 = 32.0f;
     context->fA4 = 1048576.0f;
-    context->f200 = func_00283CE0(width) * 0.5f;
-    halfHeight = func_00283CE0(height) * 0.5f;
+    context->f200 = IntToFloat(width) * 0.5f;
+    halfHeight = IntToFloat(height) * 0.5f;
     context->f204 = halfHeight;
     context->f208 = context->f200 * 4.0f;
     context->f20C = halfHeight * 4.0f;
@@ -796,7 +796,7 @@ void func_0027B2F8(int width, int height, float scale, float a, float b, float c
     context->f21C = b;
     context->f228 = c;
     context->f22C = d;
-    func_0027AB40();
+    UpdateViewContext();
 }
 
 /* The full-screen anti-aliasing buffer record behind the screen dimensions above: the
@@ -878,19 +878,19 @@ void func_0027B440(int clear) {
         D_001A72DC = 0x1E0000;
         D_001A72D8 = 0;
         D_001A72E4 = 0x2C0000;
-        func_00284268(0x200, 0x1C0, 0x200, 0x200, 4, 0);
+        SetupFS_AA_buffer(0x200, 0x1C0, 0x200, 0x200, 4, 0);
     } else if (D_001A7BB8 != 0) {
         D_001A72E0 = 0x118000;
         D_001A72DC = 0x1E8000;
         D_001A72D8 = 0;
         D_001A72E4 = 0x2C0000;
-        func_00284268(0x200, 0x1A0, 0x280, 0x1C0, 0, 0);
+        SetupFS_AA_buffer(0x200, 0x1A0, 0x280, 0x1C0, 0, 0);
     } else {
         D_001A72E0 = 0x118000;
         D_001A72DC = 0x1E8000;
         D_001A72D8 = 0;
         D_001A72E4 = 0x2C0000;
-        func_00284268(0x200, 0x1A0, 0x200, 0x1C0, 0, 0);
+        SetupFS_AA_buffer(0x200, 0x1A0, 0x200, 0x1C0, 0, 0);
     }
     D_001A72E8 = D_001A72E4;
     D_001A72EC = D_001A72E4 + 0x1000;

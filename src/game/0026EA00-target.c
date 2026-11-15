@@ -84,15 +84,15 @@ void func_00272CB0(void)
         return;
     }
     if (D_00189E20.requested != D_00189E20.current) {
-        func_002AA2E8(&D_00189E20.fade, 0.0f, D_001A85CC * (1.0f / 60.0f));
+        ApproachValue(&D_00189E20.fade, 0.0f, D_001A85CC * (1.0f / 60.0f));
         if (D_00189E20.fade <= 0.0f) {
             D_00189E20.current = D_00189E20.requested;
         }
     } else if (D_00189E20.requested && D_00189E20.fade < 1.0f) {
-        func_002AA2E8(&D_00189E20.fade, 1.0f, D_001A85CC * (1.0f / 60.0f));
-        D_00189E20.angle = func_00283B98(D_00189E20.angle, D_001A8600 * 0.0002908882452175021f);
+        ApproachValue(&D_00189E20.fade, 1.0f, D_001A85CC * (1.0f / 60.0f));
+        D_00189E20.angle = FastAddRotations(D_00189E20.angle, D_001A8600 * 0.0002908882452175021f);
     }
-    D_00189E20.angle = func_00283B98(D_00189E20.angle, D_001A8600 * 0.0002908882452175021f);
+    D_00189E20.angle = FastAddRotations(D_00189E20.angle, D_001A8600 * 0.0002908882452175021f);
     obj = D_00189E20.current;
     if (!obj || D_00189E20.fade == 0.0f) {
         return;
@@ -101,8 +101,8 @@ void func_00272CB0(void)
     maxHealth = health;
     info = func_002AB1F0(obj);
     if (info) {
-        func_00282F20(position, obj + 0xE0, *(float *)(info + 0x10));
-        func_00282CC0(position, position, obj + 0x10);
+        vec_scale_to_length(position, obj + 0xE0, *(float *)(info + 0x10));
+        FastVecAdd(position, position, obj + 0x10);
         maxHealth = *(short *)(info + 4);
         health = *(float *)info;
         pos = position;
@@ -111,13 +111,13 @@ void func_00272CB0(void)
         pos = position;
     }
     func_00279BD8(screen, pos);
-    offset[0] = (screen[0] - func_00283CE0(D_001A7348[2])) * 0.0625f;
-    offset[1] = (screen[1] - func_00283CE0(D_001A7348[3])) * 0.0625f;
+    offset[0] = (screen[0] - IntToFloat(D_001A7348[2])) * 0.0625f;
+    offset[1] = (screen[1] - IntToFloat(D_001A7348[3])) * 0.0625f;
     radius = *(float *)(info + 0x10);
     if (radius > 2.0f) {
         radius = 2.0f;
     }
-    scale = func_00283248(func_00282E48(D_001B5340, obj + 0x10), radius) * D_001A85C0;
+    scale = func_00283248(fast_vec_dist(D_001B5340, obj + 0x10), radius) * D_001A85C0;
     if (scale > D_001A85C4) {
         scale = D_001A85C4;
     } else if (scale < D_001A85C8) {
@@ -136,16 +136,16 @@ void func_00272CB0(void)
             angle = D_001A85FC * 0.01745329424738884f;
             break;
         }
-        texture = func_0027C878(i + 0x33);
-        color = func_00283D38(D_001A85E0[i], D_001A85D0[i], D_00189E20.fade);
+        texture = GetEffectTextureDescriptor(i + 0x33);
+        color = FastTweenColor(D_001A85E0[i], D_001A85D0[i], D_00189E20.fade);
         size = ((D_001A85F0[i] - 1.0f) * (1.0f - D_00189E20.fade) + 1.0f) * scale;
-        func_0027E4A8(offset[0], offset[1], size, size, angle, 64, 64, texture, 0xFFFFF3, color,
+        AppendRotatedSpriteQuad(offset[0], offset[1], size, size, angle, 64, 64, texture, 0xFFFFF3, color,
                       0, 0, 0.0f, 0.0f);
-        func_0027E4A8(offset[0], offset[1], size, size, func_00283B98(angle, 1.57079637f), 64, 64,
+        AppendRotatedSpriteQuad(offset[0], offset[1], size, size, FastAddRotations(angle, 1.57079637f), 64, 64,
                       texture, 0xFFFFF3, color, 0, 0, 0.0f, 0.0f);
-        func_0027E4A8(offset[0], offset[1], size, size, func_00283B98(angle, 3.14159274f), 64, 64,
+        AppendRotatedSpriteQuad(offset[0], offset[1], size, size, FastAddRotations(angle, 3.14159274f), 64, 64,
                       texture, 0xFFFFF3, color, 0, 0, 0.0f, 0.0f);
-        func_0027E4A8(offset[0], offset[1], size, size, func_00283BE0(angle, 1.57079637f), 64, 64,
+        AppendRotatedSpriteQuad(offset[0], offset[1], size, size, fast_subtract_rotations(angle, 1.57079637f), 64, 64,
                       texture, 0xFFFFF3, color, 0, 0, 0.0f, 0.0f);
     }
     if (maxHealth != 0.0f) {
@@ -154,19 +154,19 @@ void func_00272CB0(void)
         uv[2] = D_001A8608[2];
         uv[3] = D_001A8608[3];
         colors[0] = colors[1] = colors[2] = colors[3] =
-            func_00283D38(D_001A8620 & 0xFFFFFF, D_001A8620, D_00189E20.fade);
-        x = func_00283CF0(screen[0]);
-        y = func_00283CF0(screen[1]);
+            FastTweenColor(D_001A8620 & 0xFFFFFF, D_001A8620, D_00189E20.fade);
+        x = FloatToInt(screen[0]);
+        y = FloatToInt(screen[1]);
         bar = D_001A862C * func_00283248(D_001A8628, maxHealth);
         edge = -bar;
-        width = func_00283CF0(scale * (float)D_001A8618);
-        height = func_00283CF0(scale * (float)D_001A861C);
-        func_0027EE58(x, y, width, height, colors, uv, D_001A8604, 16, bar, edge);
+        width = FloatToInt(scale * (float)D_001A8618);
+        height = FloatToInt(scale * (float)D_001A861C);
+        DrawTexturedArc(x, y, width, height, colors, uv, D_001A8604, 16, bar, edge);
         colors[0] = colors[1] = colors[2] = colors[3] =
-            func_00283D38(D_001A8624 & 0xFFFFFF, D_001A8624, D_00189E20.fade);
+            FastTweenColor(D_001A8624 & 0xFFFFFF, D_001A8624, D_00189E20.fade);
         edge = bar - (bar + bar) * (health / maxHealth);
-        width2 = func_00283CF0(scale * (float)D_001A8618);
-        height2 = func_00283CF0(scale * (float)D_001A861C);
-        func_0027EE58(x, y, width2, height2, colors, uv, D_001A8604, 16, bar, edge);
+        width2 = FloatToInt(scale * (float)D_001A8618);
+        height2 = FloatToInt(scale * (float)D_001A861C);
+        DrawTexturedArc(x, y, width2, height2, colors, uv, D_001A8604, 16, bar, edge);
     }
 }

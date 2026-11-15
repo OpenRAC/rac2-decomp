@@ -88,7 +88,7 @@ void func_L02_003D2DE0(char *self)
     D_L02_001B3F58=0.7853981633974483f;
     func_L02_003D4308(self);
     qcopy(target, P(0x30C)+0x10);
-    distance=func_00282E80(self+0x10,target);
+    distance=vec_distance_xy(self+0x10,target);
     yaw=func_00283248(target[0]-*(float *)(self+0x10),target[1]-*(float *)(self+0x14));
     frame=func_0029F530(self);
     flags=*(u8 *)(self+0x95);
@@ -130,7 +130,7 @@ void func_L02_003D2DE0(char *self)
                     func_00283248(target[0]-*(float *)(self+0x10),target[1]-*(float *)(self+0x14)),0.0f);
             }
         }
-        if (func_00282E80(self+0x10,arenaPosition)<18.0f) { H(0x32E)=0; SET_MODE(20,2); }
+        if (vec_distance_xy(self+0x10,arenaPosition)<18.0f) { H(0x32E)=0; SET_MODE(20,2); }
         break;
     case 3:
         if (func_002B3868((u8 *)self)) {
@@ -147,7 +147,7 @@ void func_L02_003D2DE0(char *self)
         func_L02_003D4ED0(self); *(Quadword *)position=*(Quadword *)(state+0x2D0);
         func_L02_003D4FD0(self,(Quadword *)position,
             func_00283248(D_00189E20.position[0]-*(float *)(self+0x10),D_00189E20.position[1]-*(float *)(self+0x14)),0.0f);
-        if (func_00282E48(self+0x10,((WaypointView *)state)->waypoint)<0.5f) SET_MODE(4,1);
+        if (fast_vec_dist(self+0x10,((WaypointView *)state)->waypoint)<0.5f) SET_MODE(4,1);
         break;
     case 4:
         if (func_002B3868((u8 *)self) && *(u8 *)(self+0x43)) func_002A7470(self,0,0,15);
@@ -163,7 +163,7 @@ void func_L02_003D2DE0(char *self)
         if ((*(u8 *)(self+0x42)==1 && frame>1.0f && frame<3.0f) || (frame>16.0f && frame<18.0f)) {
             EFFECT->amount=0.05f; EFFECT->kind=25; EFFECT->detail=0;
         }
-        if (distance<9.0f && func_00283C80(yaw,*(float *)(self+0xF8))<0.087266475f
+        if (distance<9.0f && FastDiffRots(yaw,*(float *)(self+0xF8))<0.087266475f
                 && frame>3.0f && frame<15.0f) SET_MODE(7,1);
         break;
     case 7:
@@ -194,7 +194,7 @@ void func_L02_003D2DE0(char *self)
         } else if (frame>95.0f && frame<97.0f) {
             EFFECT->amount=0.4f; EFFECT->kind=25; EFFECT->detail=0;
         } else if (frame>110.0f) SET_MODE(9,-1);
-        if (func_00282E80(self+0x10,arenaPosition)>18.0f)
+        if (vec_distance_xy(self+0x10,arenaPosition)>18.0f)
             qcopy(self+0x10, position);
         break;
     case 9:
@@ -235,7 +235,7 @@ void func_L02_003D2DE0(char *self)
         *(Quadword *)position=*(Quadword *)(state+0x2D0);
         func_L02_003D4FD0(self,(Quadword *)position,yaw,0.0f);
         if (!func_002A77E0(400)) func_L02_003D4AF0(self,0);
-        if (distance<40.0f && distance>5.0f && func_00282978((short *)(state+0x31C))) {
+        if (distance<40.0f && distance>5.0f && FastDecTimer((short *)(state+0x31C))) {
             if (func_002A77E0(2)) {
                 SET_MODE(12,2);
                 if (!func_002A77E0(6)) func_L02_003D4AF0(self,0);

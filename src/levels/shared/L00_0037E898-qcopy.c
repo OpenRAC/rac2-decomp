@@ -20,13 +20,13 @@ void func_L00_00387BB0(char *owner, char *input)
     qcopy(&local[0], &local[3]);
     local[4].bits = 0;
     local[4].f[2] = 1.0f;
-    func_00282DD8(&local[1], &local[0], &local[4]);
-    func_00282F20(&local[1], &local[1], 1.0f);
-    func_00282DD8(&local[2], &local[1], &local[0]);
+    FastVecCross(&local[1], &local[0], &local[4]);
+    vec_scale_to_length(&local[1], &local[1], 1.0f);
+    FastVecCross(&local[2], &local[1], &local[0]);
     func_002AB600(transform + 0x10, &local[0]);
     func_0029FCC0(owner, 0, &local[5]);
-    func_00283098(&local[3], input, owner + 0xC0);
-    func_00282CC0(&local[6], &local[3], &local[5]);
+    matrix_mul_vec3(&local[3], input, owner + 0xC0);
+    FastVecAdd(&local[6], &local[3], &local[5]);
 }
 
 void func_L00_0038A650(char *owner, char *input)
@@ -37,13 +37,13 @@ void func_L00_0038A650(char *owner, char *input)
     qcopy(&local[0], &local[3]);
     local[4].bits = 0;
     local[4].f[2] = 1.0f;
-    func_00282DD8(&local[1], &local[0], &local[4]);
-    func_00282F20(&local[1], &local[1], 1.0f);
-    func_00282DD8(&local[2], &local[1], &local[0]);
+    FastVecCross(&local[1], &local[0], &local[4]);
+    vec_scale_to_length(&local[1], &local[1], 1.0f);
+    FastVecCross(&local[2], &local[1], &local[0]);
     func_002AB600(transform + 0x10, &local[0]);
     func_0029FCC0(owner, 0, &local[5]);
-    func_00283098(&local[3], input, owner + 0xC0);
-    func_00282CC0(&local[6], &local[3], &local[5]);
+    matrix_mul_vec3(&local[3], input, owner + 0xC0);
+    FastVecAdd(&local[6], &local[3], &local[5]);
 }
 
 extern int func_00282948(int *);
@@ -61,11 +61,11 @@ void func_L00_0038D650(char *object)
     colour.f[2] = 128.0f;
     colour.f[3] = 255.0f;
     func_00282948((int *)(data + 0x10));
-    fraction = func_00283CE0(*(int *)(data + 0x10));
-    fraction /= func_00283CE0(30);
-    r = func_00283CF0((colour.f[0] - 255.0f) * fraction + 255.0f);
-    g = func_00283CF0((colour.f[1] - 64.0f) * fraction + 64.0f);
-    b = func_00283CF0((colour.f[2] - 64.0f) * fraction + 64.0f);
+    fraction = IntToFloat(*(int *)(data + 0x10));
+    fraction /= IntToFloat(30);
+    r = FloatToInt((colour.f[0] - 255.0f) * fraction + 255.0f);
+    g = FloatToInt((colour.f[1] - 64.0f) * fraction + 64.0f);
+    b = FloatToInt((colour.f[2] - 64.0f) * fraction + 64.0f);
     c = (g << 8) | 0xFF000000;
     *(unsigned int *)(object + 0x78) = ((b << 16) | c) | r;
 }
@@ -101,7 +101,7 @@ void func_L00_00382AE8(unsigned char *object)
     }
     case 1: {
         D_L00_001B90C8[0]=func_L00_00382BF0(object);
-        func_L00_002E6CF0(func_L00_00382F28,object);
+        func_L00_002E6CF0(DrawLevelLensFlare,object);
         break;
     }
     }

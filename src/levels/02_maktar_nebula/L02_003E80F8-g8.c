@@ -57,10 +57,10 @@ void func_L02_003E80F8(char *actor) {
     probe[0] = 30.0f;
     probe[3] = 1.0f;
     *(Quad *)point = 0;
-    frame = func_00283CE0(D_L02_001B30C8 % 600);
+    frame = IntToFloat(D_L02_001B30C8 % 600);
     point[0] = (frame * 0.0016666667f + frame * 0.0016666667f) * 3.1415927f - 3.1415927f;
     *(Quad *)angles = *(Quad *)point;
-    func_00283410(rotation, angles);
+    euler_to_matrix(rotation, angles);
     entry = D_L02_001FC060[*(unsigned char *)(actor + 0x21)];
     while (count < 32) {
         char *object;
@@ -68,53 +68,53 @@ void func_L02_003E80F8(char *actor) {
         object = D_L02_001B359C + (id & 0x7FFF) * 0x100;
         visible[count] = (*(unsigned short *)(object + 0x7C) >> 15) ^ 1;
         func_0029FC20(object, 0, matrices[count]);
-        func_002830C0(point, probe, matrices[count]);
+        transform_vector(point, probe, matrices[count]);
         point[3] = 30.0f;
         if (func_00283DB8(point, 512.0f) != -1) {
-            func_00283788(matrices[count], matrices[count], rotation);
+            multiply_matrix(matrices[count], matrices[count], rotation);
             count++;
         }
         if ((short)*entry++ < 0) break;
     }
-    func_L02_002EF968(packet, D_L02_001B0A68_gp, D_L02_001B0A98_gp, D_L02_001B0A78, D_L02_001B0AB0_gp, 1);
-    func_L02_002EF968(packet + 1, D_L02_001B0A68[1], D_L02_001B0A98[2], D_L02_001B0A78, D_L02_001B0AF0_gp, 1);
+    FillQuadPacket(packet, D_L02_001B0A68_gp, D_L02_001B0A98_gp, D_L02_001B0A78, D_L02_001B0AB0_gp, 1);
+    FillQuadPacket(packet + 1, D_L02_001B0A68[1], D_L02_001B0A98[2], D_L02_001B0A78, D_L02_001B0AF0_gp, 1);
     packet[0].color[1] = packet[0].color[3] = D_L02_001B0A98[1];
     packet[1].color[1] = packet[1].color[3] = D_L02_001B0A98[3];
     func_00282C88(angles);
     angles[0] = 0.3926991f;
-    func_002833F0(tilt, angles);
+    euler_rotation_basis(tilt, angles);
     for (i = 0; i < 2; i++) {
-        func_00283098(packet[i].vertex[2], packet[i].vertex[2], tilt);
-        func_00283098(packet[i].vertex[3], packet[i].vertex[3], tilt);
+        matrix_mul_vec3(packet[i].vertex[2], packet[i].vertex[2], tilt);
+        matrix_mul_vec3(packet[i].vertex[3], packet[i].vertex[3], tilt);
     }
-    func_00283738(doubled, tilt, tilt);
+    multiply_matrix3x3(doubled, tilt, tilt);
     for (pass = 0; pass < 16; pass = nextPass) {
         int pair = (pass & 1) ? 2 : 0;
         nextPass = pass + 1;
         for (layer = 0; layer < 1; layer = nextLayer) {
             nextLayer = layer + 1;
-            func_00283098(packet[layer].vertex[pair], packet[layer].vertex[pair], doubled);
-            func_00283098(packet[layer].vertex[pair + 1], packet[layer].vertex[pair + 1], doubled);
+            matrix_mul_vec3(packet[layer].vertex[pair], packet[layer].vertex[pair], doubled);
+            matrix_mul_vec3(packet[layer].vertex[pair + 1], packet[layer].vertex[pair + 1], doubled);
             for (draw = 0; draw < count; draw++) {
-                if (visible[draw]) func_00280B90(packet + layer, matrices[draw], 1);
+                if (visible[draw]) draw_world_quad(packet + layer, matrices[draw], 1);
             }
         }
     }
-    packet[0].state[1] = func_0027C878(D_L02_001B0B30);
+    packet[0].state[1] = GetEffectTextureDescriptor(D_L02_001B0B30);
     for (uvIndex = 0; uvIndex < 4; uvIndex++) {
         packet[0].uv[uvIndex][0] = D_L02_001B0B48_gp[uvIndex][0];
         packet[0].uv[uvIndex][1] = D_L02_001B0B48[uvIndex][1];
         packet[0].color[uvIndex] = D_L02_001B0B38[uvIndex & 1];
     }
-    func_00283388(identity);
+    set_identity_matrix(identity);
     {
     int objectIndex;
     for (objectIndex = 0; objectIndex < count; objectIndex++) {
         int vertex;
         float *geometry;
         if (!visible[objectIndex]) continue;
-        func_00282CF0(point, D_L02_001BA500, matrices[objectIndex] + 12);
-        func_00282DD8(normal, matrices[objectIndex], point);
+        FastVecSub(point, D_L02_001BA500, matrices[objectIndex] + 12);
+        FastVecCross(normal, matrices[objectIndex], point);
         normal[3] = 1.0f;
         qcopy(identity + 12, matrices[objectIndex] + 12);
         geometry = (float *)D_L02_001B0AB0_gp;
@@ -129,34 +129,34 @@ void func_L02_003E80F8(char *actor) {
                 lowerEnd += 2;
                 if ((int)g < (int)lowerEnd) extent += D_L02_001B0B40;
                 else extent -= D_L02_001B0B40;
-                func_00282F20(*v, normal, extent);
-                func_00282F20(offset, matrices[objectIndex], g[0]);
+                vec_scale_to_length(*v, normal, extent);
+                vec_scale_to_length(offset, matrices[objectIndex], g[0]);
                 g += 4;
-                func_00282CC0(*v, *v, offset);
+                FastVecAdd(*v, *v, offset);
                 v++;
                 allEnd = D_L02_001B0AB0;
                 allEnd += 4;
             } while ((int)g < (int)allEnd);
         }
-        func_00280B90(packet, identity, 0);
+        draw_world_quad(packet, identity, 0);
         for (vertex = 0; vertex < 4; vertex++) {
             float extent = geometry[vertex * 4 + 2];
             if (vertex < 2) extent += D_L02_001B0B40;
             else extent -= D_L02_001B0B40;
-            func_00282F20(offset, normal, extent * -2.0f);
-            func_00282CC0(packet[0].vertex[vertex], packet[0].vertex[vertex], offset);
+            vec_scale_to_length(offset, normal, extent * -2.0f);
+            FastVecAdd(packet[0].vertex[vertex], packet[0].vertex[vertex], offset);
         }
-        func_00280B90(packet, identity, 0);
+        draw_world_quad(packet, identity, 0);
         *(Quad *)offset = 0;
         offset[0] = 2.666f;
         offset[3] = 1.0f;
-        func_002830C0(offset, offsetAddress, matrices[objectIndex]);
+        transform_vector(offset, offsetAddress, matrices[objectIndex]);
         frame = func_002A7878(0.0f, 1.0f);
-        color = func_00283D38(D_L02_001B0A98_gp, D_L02_001B0A98[1], frame);
+        color = FastTweenColor(D_L02_001B0A98_gp, D_L02_001B0A98[1], frame);
         frame = func_002A7940();
         func_00281EB8(offset, 11, color, 1, 2.0f, 0.0f, frame);
         frame = func_002A7878(0.0f, 1.0f);
-        color = func_00283D38(D_L02_001B0A98[2], D_L02_001B0A98[3], frame);
+        color = FastTweenColor(D_L02_001B0A98[2], D_L02_001B0A98[3], frame);
         frame = func_002A7940();
         func_00281EB8(offset, 11, color, 1, 2.75f, 0.0f, frame);
         frame = func_002A7940();

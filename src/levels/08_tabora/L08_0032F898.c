@@ -38,7 +38,7 @@ int func_L08_0032F898(char *input, char *out, int a, int b, int c, int d, float 
         selected = 0;
         result = 2;
     } else if (!func_L08_0032E920((char *)&D_00189E20 + 0x80, a, b, c, d)) {
-        if (limit < func_00282E80(input + 0x10, (char *)&D_00189E20 + 0x80)) {
+        if (limit < vec_distance_xy(input + 0x10, (char *)&D_00189E20 + 0x80)) {
             selected = 0;
             result = 2;
         }
@@ -49,7 +49,7 @@ int func_L08_0032F898(char *input, char *out, int a, int b, int c, int d, float 
                        *(short *)(object + 0xAA) == 0xEB0) &&
             *(unsigned char *)(object + 0x20) != 0xFE && *(unsigned char *)(object + 0x20) != 0xFD &&
             *(unsigned char *)(object + 0x20) == 3) {
-            float distance = func_00282E80(input + 0x10, object + 0x10);
+            float distance = vec_distance_xy(input + 0x10, object + 0x10);
             int valid = 1;
             if (minimum <= distance)
                 valid = 0;

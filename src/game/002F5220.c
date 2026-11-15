@@ -198,7 +198,7 @@ u8 func_002F5AF8(void)
     D_001B9040.scale = scale;
     if (D_001A7A40 != 0)
         D_001B9040.scale = scale * D_001A8C74;
-    func_0027AB40();
+    UpdateViewContext();
     qcopy(D_001B5200.pos, rec);
     func_00129178(m);
     func_001292C0(m, m, w[0]);
@@ -215,8 +215,8 @@ u8 func_002F5AF8(void)
     D_001B5200.row2[2] = m[6];
     if (D_001A7A40 != 0 && (k = D_001A8C78) != 0.0f) {
         qcopy(t, D_001B5200.row0);
-        func_00282F20(t, t, k);
-        func_00282CF0(D_001B5200.pos, D_001B5200.pos, t);
+        vec_scale_to_length(t, t, k);
+        FastVecSub(D_001B5200.pos, D_001B5200.pos, t);
     }
     func_00271958(&D_001B5360[0], 0);
     func_00271958(&D_001B5360[4], 1);
@@ -242,7 +242,7 @@ void func_002F5CC8(void)
 {
     D_001A8C7C = 1.2f;
     if (D_001B15A0 < 1.0f)
-        func_0027D330(6);
+        FadeToBlack(6);
 }
 
 int func_002F5D10(void)
@@ -314,9 +314,9 @@ void func_002F5EF8(void)
 {
     if (D_001A7478 == 2)
         *(volatile int *)&D_001A7478 = 0;
-    func_0027D330(4);
+    FadeToBlack(4);
     func_002B6E78(D_001B221C, 1, 0x400);
-    func_002B7320();
+    music_Unpause();
     D_00188660[0x6B] |= 0x10;
     func_002FC1D8();
     if (ref_L00_002F5EF8_00 != 0 && D_001BAD78[0] == 0) {
@@ -420,7 +420,7 @@ void func_002F5FB8(void)
     func_0011AEA0(0);
     func_002E5FE0();
     func_002B7170();
-    func_00133580(0);
+    snd_CheckLoadInProgress(0);
     while (D_001393E0[0x15C/4] >= 3 || D_001393E0[0x164/4] >= 0) func_00298F00();
     frame = 0;
     status = -1;
@@ -460,7 +460,7 @@ void func_002F5FB8(void)
         }
         if (done) break;
     }
-    func_00133580(0);
+    snd_CheckLoadInProgress(0);
     func_00126DC0(D_001339B0);
     func_001244B8(0,0);
     slot = &ref_L00_002F5FB8_07[textureIndex];
@@ -648,7 +648,7 @@ void func_002F9198(void)
     Shop_002F9198 *s = &D_0021F240;
     Five_002F9198 table;
     func_002FC138();
-    func_002E5CF8(5, 17, s->moby);
+    PlayMobySound(5, 17, s->moby);
     if (s->restore) {
         qcopy(D_001B5350, &s->saved);
         { Quad_002F9198 *dst = (Quad_002F9198 *)(D_001B5350 + 0x220);
@@ -668,7 +668,7 @@ void func_002F9198(void)
         if (D_001AD1B8) D_001A79F8.level = D_001AD1BC; else D_001A79F8.level = D_001AD1C0;
         func_002923C0(D_001A79F8.level);
         table = D_001AD308;
-        if (D_001AD1B8) func_0029CC98(func_00288FB8(table.words[D_001A79F8.level]), -1);
+        if (D_001AD1B8) func_0029CC98(GetLocalizedString(table.words[D_001A79F8.level]), -1);
     }
     if (D_0021F240.mode == 2) {
         if (D_00152C00.a != D_001A7AF0) {
@@ -677,8 +677,8 @@ void func_002F9198(void)
             m = D_00152C00.moby;
             if (m && *(int *)(m + 0x98)) *(int *)(m + 0x98) = *(int *)(*(char **)(m + 0x24) + 0x10);
         }
-        if (D_00152C00.b != (D_001A7AF2 & 31)) func_002926B8(D_001A7AF2 & 31);
-        func_002E6178(0);
+        if (D_00152C00.b != (D_001A7AF2 & 31)) LoadDiscTableTexture(D_001A7AF2 & 31);
+        SpawnEquipmentPieces(0);
     }
 }
 
@@ -723,10 +723,10 @@ void func_002F93B0(void)
                         state->animation = animation;
                     }
                     state->scroll += 56;
-                    func_002E5CF8(1, 17, state->moby);
+                    PlayMobySound(1, 17, state->moby);
                     if (state->handle != -1) {
                         if (state->mode == 0)
-                            func_0028B6C8(state->handle, 0);
+                            set_animation_parameter(state->handle, 0);
                     }
                     F93State.handle = -1;
                 }
@@ -752,10 +752,10 @@ void func_002F93B0(void)
                         state->animation = animation;
                     }
                     state->scroll -= 56;
-                    func_002E5CF8(1, 17, state->moby);
+                    PlayMobySound(1, 17, state->moby);
                     if (state->handle != -1) {
                         if (state->mode == 0)
-                            func_0028B6C8(state->handle, 0);
+                            set_animation_parameter(state->handle, 0);
                     }
                     F93State.handle = -1;
                 }
@@ -773,7 +773,7 @@ void func_002F93B0(void)
                     int stride = sizeof(ShopRow_93);
                     int *kinds = &state->rows[0].kind;
                     if (*(int *)((char *)kinds + state->selected * stride) == 0) {
-                        cost = func_002F6510();
+                        cost = GetSelectedShopItemPrice();
                         if ((*(int *)&D_001A79F8) >= cost) goto activate;
                     }
                     if (*(int *)((char *)kinds + state->selected * stride) != 1) goto rejected;
@@ -790,11 +790,11 @@ activate:
                     ShopInput_93 *active = &F93State;
                     if (active->animated) active->animation = 1;
                     active->busy = 1;
-                    func_002E5CF8(0, 17, active->moby);
+                    PlayMobySound(0, 17, active->moby);
                     goto finish;
                 }
 rejected:
-                func_002E5CF8(2, 17, F93State.moby);
+                PlayMobySound(2, 17, F93State.moby);
         }
     }
 finish:
@@ -805,7 +805,7 @@ extern void func_002F93B0(void);
 
 void func_002F9778(void)
 {
-    func_002F93B0();
+    UpdateShopMenuInput();
 }
 
 
@@ -842,7 +842,7 @@ void func_002F97A0(u64 color, u8 *text, int limit, float x, float y, float scale
     u8 *cursor;
     u32 c;
 
-    texture = func_0027C878(2);
+    texture = GetEffectTextureDescriptor(2);
     size = scale * 16.0f;
     glyphs = D_00263EF0;
     color &= 0xFFFFFF;
@@ -851,7 +851,7 @@ void func_002F97A0(u64 color, u8 *text, int limit, float x, float y, float scale
     cursor = text;
     do {
         if (glyphs[*cursor].adv != 0) {
-            top = func_00283CE0(glyphs[*cursor].top) * scale;
+            top = IntToFloat(glyphs[*cursor].top) * scale;
             if (shop->mode == 2) {
                 d = 215.0f - x;
                 if (d < 0)
@@ -894,19 +894,19 @@ void func_002F97A0(u64 color, u8 *text, int limit, float x, float y, float scale
                 gray[1] = shade;
                 gray[2] = shade;
                 gray[3] = shade;
-                func_0027E1A0(x, y + top, scale * 24.0f, scale * 16.0f, glyphs[*cursor].u,
+                EmitTexturedRectangle(x, y + top, scale * 24.0f, scale * 16.0f, glyphs[*cursor].u,
                               glyphs[*cursor].v, 24, 16, gray, texture);
             }
             if ((u8)(*cursor + 0x80) < 0x28) {
                 g = (Glyph_002F97A0 *)((((u8)*cursor + 0x40) << 2) + (int)glyphs);
-                dx = func_00283CE0(g->adv) * scale;
-                dy = func_00283CE0(g->top) * scale;
-                func_0027E1A0(x + dx, y + dy, size, size, g->u, g->v, 16, 16, colors, texture);
+                dx = IntToFloat(g->adv) * scale;
+                dy = IntToFloat(g->top) * scale;
+                EmitTexturedRectangle(x + dx, y + dy, size, size, g->u, g->v, 16, 16, colors, texture);
             } else if ((u8)*cursor > 0x20) {
-                func_0027E1A0(x, y + top, size, size, glyphs[*cursor].u, glyphs[*cursor].v, 16, 16,
+                EmitTexturedRectangle(x, y + top, size, size, glyphs[*cursor].u, glyphs[*cursor].v, 16, 16,
                               colors, texture);
             }
-            x += func_00283CE0(glyphs[*cursor].adv) * scale;
+            x += IntToFloat(glyphs[*cursor].adv) * scale;
         }
         count++;
         if (count == limit)

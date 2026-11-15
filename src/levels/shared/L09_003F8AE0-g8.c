@@ -29,7 +29,7 @@ void func_L09_003F8AE0(u8 *object)
     u8 *state = P(object,0x68), *vars, *moved, **effects;
     int before, result, i, remove = 0;
     if (object[0x95] == 0) func_L09_003F7CE0(object);
-    if (object[0x31] && func_00282E48(object + 0x10, D_L09_001B9A00) < 24.0f) {
+    if (object[0x31] && fast_vec_dist(object + 0x10, D_L09_001B9A00) < 24.0f) {
         func_002A93B0(object); object[0x6F] = 22;
     }
     if (object[0xA8] == 255) {
@@ -64,7 +64,7 @@ void func_L09_003F8AE0(u8 *object)
                 moved = P(P(state,0x2F8),0x68);
                 *(AnimationParameters *)(moved + 0x20) = *(AnimationParameters *)(state + 0x20);
                 func_002B3380(P(state,0x2F8), moved + 0x50, moved + 0x20);
-                func_L09_003F8598(object);
+                TransferStateToNearestEligibleObject(object);
                 func_L09_003F7370(object,0.4f);
                 func_L09_003F77D0(object);
                 if (before >= 4 && !func_002A77E0(2) && !I(state,0x428) &&
@@ -73,7 +73,7 @@ void func_L09_003F8AE0(u8 *object)
                     F(state,0xB0) = (float)*(s8 *)(state + 0xBF);
                     F(state,0xA4) = (float)*(s8 *)(state + 0xBE);
                     I(state,0xCC) = -1;
-                    func_00282D30(state + 0xD0,state + 0xD0,0.05f);
+                    FastVecScale(state + 0xD0,state + 0xD0,0.05f);
                 } else qzero(state + 0xD0);
                 {
                     int j;
@@ -117,7 +117,7 @@ void func_L09_003F8AE0(u8 *object)
             remove = P(child,0x68)[0x2E] == 2;
     }
     if (remove) {
-        func_L09_003F73E8(object); func_L09_003F77D0(object); func_L09_003F8598(object);
-        func_002A6C58(object,0,3); func_0029F338(object);
+        func_L09_003F73E8(object); func_L09_003F77D0(object); TransferStateToNearestEligibleObject(object);
+        SetDeathBits(object,0,3); func_0029F338(object);
     }
 }

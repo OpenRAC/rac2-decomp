@@ -109,7 +109,7 @@ void func_L03_003C7E20(char *a0)
                 func_002A7750(a0,4,-1);
         } else if (p->pending && D_0018C0B4[0]!=0x31) {
             p->pending=0;
-            if (func_002ACBC8((char *)actor->position,p->index)) {
+            if (IsPointInCuboid((char *)actor->position,p->index)) {
                 qcopy((char *)actor->position,D_L03_001B2B0C[p->index].position);
                 id=(u16)actor->uid;
                 if (id&1) {
@@ -127,26 +127,26 @@ void func_L03_003C7E20(char *a0)
         f32 length;
         f32 offset=2.3f;
         p->displacement[2]+=offset;
-        length=func_00282DF0((char *)&p->displacement);
+        length=FastVecLength((char *)&p->displacement);
         if (length!=0.0f) {
             func_002AAC80(&p->damping,length,0.00027777778f,0.00027777778f,0.016666668f);
             length-=p->damping;
             if (length<0.0f) length=0.0f;
-            func_00282F20((char *)&p->displacement,(char *)&p->displacement,length);
+            vec_scale_to_length((char *)&p->displacement,(char *)&p->displacement,length);
         }
         p->displacement[2]-=offset;
         func_0029FCC0(p->node,2,buf);
-        func_00282CC0((char *)actor->position,buf,(char *)&p->displacement);
+        FastVecAdd((char *)actor->position,buf,(char *)&p->displacement);
         break;
     }
     case 3: {
         p->velocity[2]-=0.008333334f;
-        func_00282CC0((char *)actor->position,(char *)actor->position,(char *)&p->velocity);
+        FastVecAdd((char *)actor->position,(char *)actor->position,(char *)&p->velocity);
         func_002C9218(p->effect,(char *)actor->position,(char *)actor->position,1.25f);
         p->ground=func_002A89A8((char *)actor->position,0,0.5f);
         if (actor->position[2]<=p->ground) {
             if (actor->type==0xCFC) {
-                if (func_00278E78()==1) func_002A7750(a0,5,-1);
+                if (GetCollHitMaterial()==1) func_002A7750(a0,5,-1);
                 else func_002A7750(a0,4,-1);
             } else func_002A7750(a0,1,-1);
             func_002E5DA0(3,0,a0,0x94A);
@@ -160,7 +160,7 @@ void func_L03_003C7E20(char *a0)
     }
     case 4:
         if (func_002B3868(a0) && !p->delay) p->delay=130;
-        if (func_00282978((char *)&p->delay)) func_002A7750(a0,5,-1);
+        if (FastDecTimer((char *)&p->delay)) func_002A7750(a0,5,-1);
         if (p->delay%60<10) {
             func_002E5DA0(0,0,a0,0xCFC);
             actor->drawFlags=0x800000C0;
@@ -171,11 +171,11 @@ void func_L03_003C7E20(char *a0)
         qcopy(buf,position);
         *(f32 *)(buf+8)+=1.0f;
         func_002E5DA0(1,0,a0,0xCFC);
-        func_00282CF0(direction,D_L03_001B9980,buf);
-        func_00282F20(direction,direction,1.0f);
+        FastVecSub(direction,D_L03_001B9980,buf);
+        vec_scale_to_length(direction,direction,1.0f);
         *(TI128 *)(hit)=0;
         *(f32 *)(hit+8)=1.0f;
-        func_00282CC0(hit,hit,position);
+        FastVecAdd(hit,hit,position);
         func_002A8C28(a0,hit,0x10001,0,1,0,4.0f,4.0f,1.0f);
         func_0032DA58(a0,buf,direction,0.0f);
         actor->collision=0;
@@ -185,7 +185,7 @@ void func_L03_003C7E20(char *a0)
     }
     case 6:
         if (func_002B3868(a0)) p->respawnDelay=60;
-        if (func_00282978((char *)&p->respawnDelay)) {
+        if (FastDecTimer((char *)&p->respawnDelay)) {
             qcopy((char *)actor->position,(char *)&p->home);
             qcopy(buf,(char *)actor->position);
             *(f32 *)(buf+8)+=1.3f;

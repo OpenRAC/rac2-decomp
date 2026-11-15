@@ -36,7 +36,7 @@ extern char D_L02_001A9420[8] __attribute__((sda));
      (alpha = (frame - 0x10E) / 40 * 127 of the new one, the rest for the old one) from frame 0x10F on;
      0x137-0x17C id 0x47; 0x17D-0x18F id 0x49 with a random extra in 0-2; 0x191-0x1B4 id 0x48, fading out
      (alpha 127 - (frame - 0x1A1) / 15 * 127, at least 0) after frame 0x1A1;
-   - draws the ids (the second one with the complementary alpha) through func_L01_002E2608 with the colour
+   - draws the ids (the second one with the complementary alpha) through DrawQuadWithRotatedUVs with the colour
      (alpha << 24) | 0x808080.
    The window limits sit in variables: retail compares them through registers (`slt` with the limit in
    a2/a3) and keeps every test of the ladder separate, where constants would fold into range tests.
@@ -68,10 +68,10 @@ void func_L02_003007D8(void *unused) {
             id = 0x46;
             if (n > 0) {
                 id = 0x47;
-                frac = func_00283CE0(n);
-                frac = frac / func_00283CE0(0x28);
+                frac = IntToFloat(n);
+                frac = frac / IntToFloat(0x28);
                 id2 = 0x46;
-                alpha = func_00283CF0(frac * 127.0f);
+                alpha = FloatToInt(frac * 127.0f);
             }
         } else if (D_L02_001BE200.time > first_end && D_L02_001BE200.time <= second_end) {
             id = 0x47;
@@ -82,19 +82,19 @@ void func_L02_003007D8(void *unused) {
             n = D_L02_001BE200.time - 0x1A1;
             id = 0x48;
             if (n > 0) {
-                frac = func_00283CE0(n);
-                frac = frac / func_00283CE0(0xF);
-                alpha = 0x7F - func_00283CF0(frac * 127.0f);
+                frac = IntToFloat(n);
+                frac = frac / IntToFloat(0xF);
+                alpha = 0x7F - FloatToInt(frac * 127.0f);
             }
             if (alpha < 0)
                 alpha = 0;
         }
         if (id != -1) {
             if (id2 == -1 || id == id2) {
-                func_L01_002E2608(D_L02_001A9420, id, 0, (alpha << 24) | 0x808080, extra);
+                DrawQuadWithRotatedUVs(D_L02_001A9420, id, 0, (alpha << 24) | 0x808080, extra);
             } else {
-                func_L01_002E2608(D_L02_001A9420, id, 0, (alpha << 24) | 0x808080, extra);
-                func_L01_002E2608(D_L02_001A9420, id2, 0, ((0x7F - alpha) << 24) | 0x808080, extra);
+                DrawQuadWithRotatedUVs(D_L02_001A9420, id, 0, (alpha << 24) | 0x808080, extra);
+                DrawQuadWithRotatedUVs(D_L02_001A9420, id2, 0, ((0x7F - alpha) << 24) | 0x808080, extra);
             }
         }
     }

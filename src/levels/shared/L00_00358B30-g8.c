@@ -95,14 +95,14 @@ void func_L00_00358B30(void) {
         }
         for (i = 0; (entity = D_L00_001B1E9C[0] + (i << 8)) < D_L00_001B1EA0[0]; i++) {
             if (*(short *)(entity + 0xAA) == kind) {
-                func_L00_002B2A40(D_L00_0021DDB0.field54, D_L00_0021DDB0.field5C, entity);
+                SetHeroMode(D_L00_0021DDB0.field54, D_L00_0021DDB0.field5C, entity);
                 break;
             }
         }
     }
 done:
     func_002A0F48(D_00189E20.moby);
-    func_002833F0(D_00189E20.moby + 0xC0, &D_00189E20.rotation);
+    euler_rotation_basis(D_00189E20.moby + 0xC0, &D_00189E20.rotation);
     func_L00_002D9D98();
     func_L00_00358E50();
 }

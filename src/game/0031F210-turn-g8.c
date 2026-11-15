@@ -49,15 +49,15 @@ void func_00325158(TurnObject *object)
     TurnData *data = (TurnData *)object->data;
 
     if (object->f95 != 0 && object->state != 3 && object->f95 != 5 && data->f2C4 == 0) {
-        data->turnAngle = func_00283B98(data->turnAngle, data->turnRate * 0.017453294f);
+        data->turnAngle = FastAddRotations(data->turnAngle, data->turnRate * 0.017453294f);
         func_00325C50(object, data->turnAngle, data->f2A0, 1, D_001A8BD0);
     } else {
         func_00325C50(object, data->turnAngle, data->f2A0, 0, D_001A8BD0);
     }
     func_002AB8C0(object, data->f50);
-    func_00282978(data->f270);
-    func_00282978(data->f272);
-    func_00282978(data->f26);
+    FastDecTimer(data->f270);
+    FastDecTimer(data->f272);
+    FastDecTimer(data->f26);
     func_002AEC48(object, data->f530, 7, 0.03f, 0.3f);
     func_002AEC48(object, data->f5B0, 8, 0.03f, 0.3f);
     if (object->timer < 65535)

@@ -51,9 +51,9 @@ void func_L04_003F9718(unsigned char *m)
     unsigned char **trail;
     float scale, length;
     qcopy(old, (m + 0x10));
-    func_00282CC0(m + 0x10, m + 0x10, v);
+    FastVecAdd(m + 0x10, m + 0x10, v);
     if (*(float *)(m + 0x10) < 0 || *(float *)(m + 0x14) < 0 ||
-        *(float *)(m + 0x18) < 0 || 64.0f < func_00282E80(m + 0x10, D_L04_001B9680)) {
+        *(float *)(m + 0x18) < 0 || 64.0f < vec_distance_xy(m + 0x10, D_L04_001B9680)) {
         func_L04_003F9C60(m, 0);
         func_0029F338(m);
         return;
@@ -74,8 +74,8 @@ void func_L04_003F9718(unsigned char *m)
         func_0029F338(m);
         return;
     }
-    if (func_002761F8(old, m + 0x10, 0, *(void **)(v + 0x18), &probe)) {
-        if (!func_00278E78()) {
+    if (CollLine(old, m + 0x10, 0, *(void **)(v + 0x18), &probe)) {
+        if (!GetCollHitMaterial()) {
             if (*(int *)(v + 0x10) >= 4) *(int *)(v + 0x10) = 3;
         } else {
             qcopy((m + 0x10), D_L04_001BFAE0);
@@ -86,9 +86,9 @@ void func_L04_003F9718(unsigned char *m)
                 random[2] = func_002A7878(-1, 1);
                 *(QuadWord *)delta = *(QuadWord *)random;
                 func_00283028(random, v, D_L04_001BFB00);
-                func_00282F20((char *)delta, (char *)delta, func_00282DF0(random) * 0.5f);
-                func_00282CC0(random, random, delta);
-                func_00282F20((char *)random, (char *)random, func_002A7878(0.050000004f, 0.10000001f));
+                vec_scale_to_length((char *)delta, (char *)delta, FastVecLength(random) * 0.5f);
+                FastVecAdd(random, random, delta);
+                vec_scale_to_length((char *)random, (char *)random, func_002A7878(0.050000004f, 0.10000001f));
                 func_L04_00358AE8(m + 0x10, random, 0x7F2F4F6F, func_002A7820(10, 15), 30000);
             }
             func_L04_003F9C60(m, 0);
@@ -96,32 +96,32 @@ void func_L04_003F9718(unsigned char *m)
             return;
         }
     }
-    *(float *)(m + 0xF4) = func_00283B98(*(float *)(m + 0xF4), ((float *)&turn)[1]);
+    *(float *)(m + 0xF4) = FastAddRotations(*(float *)(m + 0xF4), ((float *)&turn)[1]);
     age = *(int *)(v + 0x14) - *(int *)(v + 0x10);
-    if (age < 13) scale = (func_00283CE0(age) / func_00283CE0(13)) * 0.15f;
+    if (age < 13) scale = (IntToFloat(age) / IntToFloat(13)) * 0.15f;
     else scale = 0.15f;
-    func_00282CF0(delta, old, m + 0x10);
-    func_00282F20((char *)delta, (char *)delta, scale);
+    FastVecSub(delta, old, m + 0x10);
+    vec_scale_to_length((char *)delta, (char *)delta, scale);
     qcopy(random, (m + 0x10));
     { unsigned char *head = *(unsigned char **)(v + 0x1C);
       if (head) qcopy(head + 0x10, random); }
     for (count = 0; count < 16; count++) {
         particle = ((unsigned char **)(v + 0x20))[count];
         if (particle) {
-            func_00282CC0(particle + 0x10, random, delta);
+            FastVecAdd(particle + 0x10, random, delta);
             qcopy(random, (particle + 0x10));
             *(float *)(particle + 0x10) += func_002A78D8(0, 0.075f);
             *(float *)(particle + 0x14) += func_002A78D8(0, 0.075f);
             *(float *)(particle + 0x18) += func_002A78D8(0, 0.075f);
-            func_00282D30(delta, delta, 0.85f);
+            FastVecScale(delta, delta, 0.85f);
         }
     }
     if (func_002A77E0(5) == 0) {
-        func_00282DD8(spark, delta, D_L04_001B98D0);
+        FastVecCross(spark, delta, D_L04_001B98D0);
         func_002ACEC0(spark, spark, delta, func_002A78D8(0, 3.1415927f));
-        length = func_00282DF0(spark);
+        length = FastVecLength(spark);
         if (length != 0) {
-            func_00282D30(velocity, spark, func_002A7878(0.008333334f, 0.033333335f) / length);
+            FastVecScale(velocity, spark, func_002A7878(0.008333334f, 0.033333335f) / length);
             func_L04_00358AE8(m + 0x10, velocity, 0x7F2F4F6F, func_002A7820(10, 15), 30000);
         }
     }

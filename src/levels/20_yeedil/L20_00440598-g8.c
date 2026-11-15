@@ -123,7 +123,7 @@ void func_L20_00440598(char *self) {
         func_L20_00441CB8(self);
         if (AT(u8, self, 0x95) == 6) {
             if (AT(u8, self, 0x20) == 0x18 || AT(u8, self, 0x20) == 0x19) {
-                if (func_002ACBC8(D_00189E20 + 0x80, AT(s32, st, 0x230)) != 0) {
+                if (IsPointInCuboid(D_00189E20 + 0x80, AT(s32, st, 0x230)) != 0) {
                     qcopy(sp, D_L20_001B2100);
                     qzero_nc(&sp[4]);
                     sp[6] = D_L20_001B210C[0];
@@ -168,11 +168,11 @@ void func_L20_00440598(char *self) {
             }
             tb_1 = (char *)D_00188660 + AT(s32, st, 0x1854) * 0x70;
             if (AT(s32, tb_1, 0x88) != (s32)self || AT(u8, tb_1, 0x74) == 0) {
-                AT(s32, st, 0x1854) = func_002E5CF8(1, 4, self);
+                AT(s32, st, 0x1854) = PlayMobySound(1, 4, self);
             }
             if (AT(char *, st, 0x1850) != 0) {
-                func_00283098(sp, D_L20_001B20B0, self + 0xC0);
-                func_00282CC0(sp, sp, self + 0x10);
+                matrix_mul_vec3(sp, D_L20_001B20B0, self + 0xC0);
+                FastVecAdd(sp, sp, self + 0x10);
                 func_L20_0039F210(AT(char *, st, 0x1850), (char *)sp, 1);
             }
             if (func_L20_004421A8(self) != 0) {
@@ -200,12 +200,12 @@ void func_L20_00440598(char *self) {
                 }
             }
             if (AT(char *, st, 0x1850) != 0) {
-                func_00283098(sp, D_L20_001B20B0, self + 0xC0);
-                func_00282CC0(sp, sp, self + 0x10);
+                matrix_mul_vec3(sp, D_L20_001B20B0, self + 0xC0);
+                FastVecAdd(sp, sp, self + 0x10);
                 func_L20_0039F210(AT(char *, st, 0x1850), (char *)sp, 0);
             }
-            func_002AA800((float *)(st + 0x1804), 0, 0.0f, 0.10471977f);
-            if (func_L20_00442550(self) != 0) {
+            StepAngleTowardTarget((float *)(st + 0x1804), 0, 0.0f, 0.10471977f);
+            if (UpdateBouncingMoby(self) != 0) {
                 if (D_0018C0B4[0] != 0x8C && (func_00282948(st + 0x17F8) == 1 || D_L20_001B20C8 != 0)) {
                     if (AT(s32, st, 0x1810) > 0) {
                         AT(s32, st, 0x1810) = -1;
@@ -247,9 +247,9 @@ void func_L20_00440598(char *self) {
                 }
             } else if (func_002AEB60((u8 *)self, 32.0f) != 0) {
                 s0_2 = AT(char *, st, 0x17FC);
-                func_00282D30(sp, D_L20_001B2040, D_L20_001B2030);
-                func_00283098(sp, sp, self + 0xC0);
-                func_00282CC0(sp, sp, self + 0x10);
+                FastVecScale(sp, D_L20_001B2040, D_L20_001B2030);
+                matrix_mul_vec3(sp, sp, self + 0xC0);
+                FastVecAdd(sp, sp, self + 0x10);
                 AT(char *, st, 0x17FC) = func_L20_00443790(s0_2, AT(s16, s0_2, 0xAA), (char *)sp);
                 AT(s32, st, 0x183C) = AT(s16, s0_2, 0xAA);
                 func_L20_00442F30(s0_2);
@@ -271,7 +271,7 @@ void func_L20_00440598(char *self) {
             }
             s0_3 = (char *)(&((Hero *)D_00189E20)->b[0x80]);
             func_L20_004427C8(self, s0_3, func_00283248(((Hero *)D_00189E20)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)D_00189E20)->f[0x84 / 4] - AT(f32, self, 0x14)));
-            if (AT(f32, st, 0x11C) < AT(f32, st, 0x1838) && func_00283C80(AT(f32, self, 0xF8), func_00283248(((Hero *)D_00189E20)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)D_00189E20)->f[0x84 / 4] - AT(f32, self, 0x14))) < 0.087266475f) {
+            if (AT(f32, st, 0x11C) < AT(f32, st, 0x1838) && FastDiffRots(AT(f32, self, 0xF8), func_00283248(((Hero *)D_00189E20)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)D_00189E20)->f[0x84 / 4] - AT(f32, self, 0x14))) < 0.087266475f) {
                 func_002A7750(self, AT(s32, st, 0x1834), -1);
             }
             break;
@@ -285,8 +285,8 @@ void func_L20_00440598(char *self) {
             }
             func_L01_00322288(self, func_00283248(((Hero *)D_00189E20)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)D_00189E20)->f[0x84 / 4] - AT(f32, self, 0x14)));
             AT(s32, st, 0x1808) = D_L20_001B2AC8[0];
-            func_00283098(sp, D_L20_001B2060, self + 0xC0);
-            func_00282CC0(sp, sp, self + 0x10);
+            matrix_mul_vec3(sp, D_L20_001B2060, self + 0xC0);
+            FastVecAdd(sp, sp, self + 0x10);
             for (n = 1; n >= 0; n -= 1) {
                 qcopy(&sp[4], sp);
                 func_002ACB48(&sp[4], 1.5f);
@@ -391,7 +391,7 @@ void func_L20_00440598(char *self) {
                 func_L20_00442740(self, 1.0f);
             }
             func_L20_004427C8(self, s0_4, func_00283248(((Hero *)D_00189E20)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)D_00189E20)->f[0x84 / 4] - AT(f32, self, 0x14)));
-            if (AT(f32, st, 0x11C) < 1.0f && func_00283C80(AT(f32, self, 0xF8), func_00283248(((Hero *)D_00189E20)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)D_00189E20)->f[0x84 / 4] - AT(f32, self, 0x14))) < 0.087266475f) {
+            if (AT(f32, st, 0x11C) < 1.0f && FastDiffRots(AT(f32, self, 0xF8), func_00283248(((Hero *)D_00189E20)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)D_00189E20)->f[0x84 / 4] - AT(f32, self, 0x14))) < 0.087266475f) {
                 func_002A7750(self, 0xE, -1);
             } else if (func_L20_00440398(AT(s32, st, 0x21C)) < 3) {
                 func_002A7750(self, 1, -1);
@@ -402,7 +402,7 @@ void func_L20_00440598(char *self) {
                 func_002A7470(self, 1, 0, 0x14);
             }
             func_L20_00444AA8(self, (float *)(&((Hero *)D_00189E20)->b[0x80]));
-            if (func_00282E80(self + 0x10, D_00189E20 + 0x80) < D_L20_001B209C) {
+            if (vec_distance_xy(self + 0x10, D_00189E20 + 0x80) < D_L20_001B209C) {
                 func_002A7750(self, 0xD, -1);
             }
             if (func_L20_00440398(AT(s32, st, 0x21C)) < 3) {
@@ -413,7 +413,7 @@ void func_L20_00440598(char *self) {
             if (func_002B3868(self) != 0 && AT(u8, self, 0x43) != 0x15) {
                 func_002A7470(self, 0x15, 0, 0xA);
             }
-            { float t = func_002A89A8(self + 0x10, 0, 0.5f); func_002AA2E8((f32 *)(self + 0x18), t, 0.16666667f); }
+            { float t = func_002A89A8(self + 0x10, 0, 0.5f); ApproachValue((f32 *)(self + 0x18), t, 0.16666667f); }
             if (AT(u8, self, 0x60) & 2) {
                 if (AT(u8, self, 0xBC) != 0) {
                     func_002A7750(self, 1, 0);
@@ -507,7 +507,7 @@ void func_L20_00440598(char *self) {
                         if (id == class_reset && s0_6 != 0) {
                             u8 k = AT(u8, s0_6, 0x20);
                             if (k != state_dead && k != state_dying && AT(u8, s0_6, 0x21) == AT(s32, st, 0x21C)) {
-                                func_002A6C58(s0_6, 0, 3);
+                                SetDeathBits(s0_6, 0, 3);
                                 func_L20_0039DE88(s0_6);
                             }
                         }
@@ -558,9 +558,9 @@ void func_L20_00440598(char *self) {
             if (D_L20_001A8F00[0] == 0 && D_L20_001A8F08 <= 0) {
                 int a, b;
                 func_002A7750(self, 0x16, -1);
-                a = func_00288FB8(0x325E);
-                b = func_00288FB8(0x3210);
-                func_00285828(a, b, func_00288FB8(0xA1F), 1);
+                a = GetLocalizedString(0x325E);
+                b = GetLocalizedString(0x3210);
+                func_00285828(a, b, GetLocalizedString(0xA1F), 1);
                 func_00285788(0x40, 0x20);
                 func_002B49E0(4, 1, 9, 0, 0);
             }
@@ -592,14 +592,14 @@ void func_L20_00440598(char *self) {
                 target = D_L20_001B308C[0] + (AT(s32, st, 0x230) << 7);
                 AT(s32, st, 0x17D8) = 0;
                 AT(f32, st, 0x17D4) = y;
-                func_00282CC0(s0_7, s0_7, target + 0x30);
+                FastVecAdd(s0_7, s0_7, target + 0x30);
                 if (AT(u8, self, 0x43) != 2) {
                     func_002A7470(self, 2, 0, 0x14);
                 }
                 func_L20_00442740(self, 1.5f);
             }
             func_L20_004427C8(self, s0_7, func_00283248(((Hero *)D_00189E20)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)D_00189E20)->f[0x84 / 4] - AT(f32, self, 0x14)));
-            if (AT(f32, st, 0x11C) <= 1.5f && func_00283C80(AT(f32, self, 0xF8), func_00283248(((Hero *)D_00189E20)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)D_00189E20)->f[0x84 / 4] - AT(f32, self, 0x14))) < 0.087266475f) {
+            if (AT(f32, st, 0x11C) <= 1.5f && FastDiffRots(AT(f32, self, 0xF8), func_00283248(((Hero *)D_00189E20)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)D_00189E20)->f[0x84 / 4] - AT(f32, self, 0x14))) < 0.087266475f) {
                 func_002A7750(self, 0x19, -1);
             }
             break;

@@ -136,7 +136,7 @@ void func_L05_00442A58(char *obj, float *yawRate, float *pitchRate)
     *(Quad *)axis = 0;
     axis[3] = axis[2] = 1.0f;
     if (state->mode < 2 && ((D_00138180.input.words.pressed & 3) || func_L05_004459B0(obj))) {
-        if (func_00282C48(func_00282DB0(axis, obj)) < 0.7f)
+        if (func_00282C48(FastVecDot(axis, obj)) < 0.7f)
             state->mode = 2;
     }
     if (func_L05_00442F90(obj)) {
@@ -156,13 +156,13 @@ void func_L05_00442A58(char *obj, float *yawRate, float *pitchRate)
     *pitchRate = state->pitch;
     *yawRate = state->yaw;
     roll = (RollState *)(*(char **)(obj + 0x70) + 0xD4);
-    if (roll->rollTimer && func_00282978(&roll->rollTimer))
+    if (roll->rollTimer && FastDecTimer(&roll->rollTimer))
         roll->rollDirection = 0;
     if (roll->rollDelay == 0) {
         if (D_00138180.input.buttons & 0xC) {
             roll->rollTimer = D_L05_001B1AE8;
             {
-                float inverse = 1.0f / func_00283CE0(roll->rollTimer);
+                float inverse = 1.0f / IntToFloat(roll->rollTimer);
                 roll->rollDelay = roll->rollTimer + D_L05_001B1AEC;
                 roll->rollInverse = inverse;
             }
@@ -171,15 +171,15 @@ void func_L05_00442A58(char *obj, float *yawRate, float *pitchRate)
             if (D_001A7A44) roll->rollDirection = roll->rollDirection == -1 ? 1 : -1;
         }
     } else {
-        func_00282978(&roll->rollDelay);
+        FastDecTimer(&roll->rollDelay);
     }
-    if (func_00282978(&roll->comboDelay) && D_L05_002A18E0 && D_001A79F0 != 20) {
+    if (FastDecTimer(&roll->comboDelay) && D_L05_002A18E0 && D_001A79F0 != 20) {
         if ((D_00138180.input.words.held & 3) == 3 || (D_00138180.input.words.held & 0xC) == 0xC) {
             unsigned short duration = D_L05_001B1AF0;
             roll->comboDelay = D_L05_001B1AF4;
             D_L05_001B1B20 = 7;
             roll->comboTimer = duration;
-            roll->comboInverse = 1.0f / func_00283CE0((short)duration);
+            roll->comboInverse = 1.0f / IntToFloat((short)duration);
         }
     }
 }

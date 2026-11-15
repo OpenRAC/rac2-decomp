@@ -169,7 +169,7 @@ void func_00328758(char *self)
             *(int *)(owner + 0x54) = 1;
         }
     } else {
-        func_0026FEB8(D_001B01F0, *(short *)(object + 0xAA));
+        STUB_printf(D_001B01F0, *(short *)(object + 0xAA));
     }
 }
 
@@ -189,7 +189,7 @@ void func_00328848(char *a0)
         *(float *)(rec + 0x0) = func_002A7878(-1.0f, 1.0f);
         *(float *)(rec + 0x4) = func_002A7878(-1.0f, 1.0f);
         *(float *)(rec + 0x8) = func_002A7878(-1.0f, 1.0f);
-        func_00282F20((float *)rec, (float *)rec, 0.1275f);
+        vec_scale_to_length((float *)rec, (float *)rec, 0.1275f);
         owner[0x48 / 4]++;
         break;
     }
@@ -205,9 +205,9 @@ void func_00328918(char *owner)
     char *data = *(char **)(owner + 0x68);
     do {
         if (*(char **)(position + 0x24) == owner) {
-            func_00283098(position, base, owner + 0xC0);
-            func_00282F20((float *)other, (float *)position, 1.0f);
-            func_00282CC0(position, position, owner + 0x10);
+            matrix_mul_vec3(position, base, owner + 0xC0);
+            vec_scale_to_length((float *)other, (float *)position, 1.0f);
+            FastVecAdd(position, position, owner + 0x10);
             *(float *)(position + 0x20) += 0.6283186078071594f;
             if (*(float *)(position + 0x20) >= 6.2831854820251465f) {
                 *(int *)(position + 0x24) = 0;
@@ -352,14 +352,14 @@ void func_00329328(void *obj) {
         p = &base[i];
         if (p->t.owner != obj)
             continue;
-        scale = func_00283CE0(p->t.f30);
-        scale /= func_00283CE0(p->t.f34);
-        p->t.f28 = func_00283CF0((float)p->t.f24 * scale);
-        p->t.f20 = func_00283D38(scale * half, 0, p->t.f1C);
-        p->t.f14 = func_00283B98(p->t.f14, p->t.f10);
+        scale = IntToFloat(p->t.f30);
+        scale /= IntToFloat(p->t.f34);
+        p->t.f28 = FloatToInt((float)p->t.f24 * scale);
+        p->t.f20 = FastTweenColor(scale * half, 0, p->t.f1C);
+        p->t.f14 = FastAddRotations(p->t.f14, p->t.f10);
         p->t.f18 += func_002A7878(0.001f, 0.003f);
-        func_00282CC0(p, p, &p->t);
-        func_00282D30(&p->t, &p->t, 0.99f);
+        FastVecAdd(p, p, &p->t);
+        FastVecScale(&p->t, &p->t, 0.99f);
         if (func_00282948(&p->t.f30)) {
             p->t.owner = 0;
             o->count--;
@@ -381,7 +381,7 @@ void func_00329630(char *self)
     int colour;
 
     F8411efa9_FUN_00328CA8(pkt);
-    r = func_0027C878((char *)0x2E);
+    r = GetEffectTextureDescriptor((char *)0x2E);
 
     *(long long *)(pkt + 0x78) = r;
     *(long long *)(pkt + 0x80) = 280993940374112LL;
@@ -396,11 +396,11 @@ void func_00329630(char *self)
     quat[3] = 0.0f;
     quat[2] = func_00283248(D_001B5200.x_140 - *(float *)(self + 0),
                             D_001B5200.y_144 - *(float *)(self + 4));
-    quat[1] = -func_00283248(func_00282E80(self, &D_001B5200.x_140),
+    quat[1] = -func_00283248(vec_distance_xy(self, &D_001B5200.x_140),
                              D_001B5200.z_148 - *(float *)(self + 8));
     quat[0] = *(float *)(self + 0x24);
 
-    func_00283410(m, quat);
+    euler_to_matrix(m, quat);
 
     m[12] = *(float *)(self + 0);
     m[13] = *(float *)(self + 4);
@@ -408,7 +408,7 @@ void func_00329630(char *self)
     m[15] = 1.0f;
 
     F8411efa9_FUN_00328D30(pkt, *(float *)(self + 0x28));
-    func_00280B90(pkt, m, 0);
+    draw_world_quad(pkt, m, 0);
 }
 
 /* func_00329768 uses small data in 00329768-g8.c. */
@@ -475,9 +475,9 @@ void func_00329F40(char *self)
             if (*(short *)(obj_state + 0x16) == 0) {
                 *(int *)&result[0] = 0;
                 if (mode != 2)
-                    func_002FD828(result, aux, *(float *)(self + 0x10), *(float *)(self + 0x14), *(float *)(self + 0x18));
+                    SampleSurfaceHeightMap(result, aux, *(float *)(self + 0x10), *(float *)(self + 0x14), *(float *)(self + 0x18));
                 else
-                    func_002FD828(result, aux, *(float *)(state + 0x20), *(float *)(state + 0x24), *(float *)(state + 0x28));
+                    SampleSurfaceHeightMap(result, aux, *(float *)(state + 0x20), *(float *)(state + 0x24), *(float *)(state + 0x28));
                 probe = *(char **)(object + 0x68);
                 if (*(float *)(self + 0x18) > result[0] && *(float *)(probe + 0xC) == 0.0f) {
                     *(unsigned char **)(state + 0x48) = object;
@@ -485,7 +485,7 @@ void func_00329F40(char *self)
                     return;
                 }
                 if (obj_state[0x14] == 0) {
-                    func_002FD1B8(D_001B22D0[0], D_001B22D8[0], 1, *(float *)(self + 0x10), *(float *)(self + 0x14), 0.5f, -0.03f);
+                    RippleDisturb(D_001B22D0[0], D_001B22D8[0], 1, *(float *)(self + 0x10), *(float *)(self + 0x14), 0.5f, -0.03f);
                     if (func_0026F800() == 0) {
                         object[0xBC] += 1;
                         if (object[0xBC] >= 25) {
@@ -502,7 +502,7 @@ void func_00329F40(char *self)
                 *(int *)(state + 0x44) = 1;
             }
         } else {
-            func_0026FEB8(D_001B0238, *(short *)(object + 0xAA));
+            STUB_printf(D_001B0238, *(short *)(object + 0xAA));
         }
         *(int *)(state + 0x38) = 1;
     } else {
@@ -523,7 +523,7 @@ void func_0032A978(void)
         float second = func_002A7940();
         float third = func_002A7878(0.0f, 3.1415927f);
         func_002AF000(row, first, second, third);
-        func_00282CC0(row, row, D_L00_00189F00);
+        FastVecAdd(row, row, D_L00_00189F00);
         row += 16;
     }
 }
@@ -589,7 +589,7 @@ void func_0032B3E0(char *pos, int a1, int a2, char *a3, int t0,
     long long r;
 
     func_0032B2F0(pkt);
-    r = func_0027C878(a3);
+    r = GetEffectTextureDescriptor(a3);
 
     *(long long *)(pkt + 136) = ((long long)t0 << 2) | 0x8000000040LL;
     *(long long *)(pkt + 128) = 280993940374112LL;
@@ -603,13 +603,13 @@ void func_0032B3E0(char *pos, int a1, int a2, char *a3, int t0,
     quat[3] = 0.0f;
     quat[2] = func_00283248(D_001B5200.x_140 - *(float *)(pos + 0),
                             D_001B5200.y_144 - *(float *)(pos + 4));
-    quat[1] = -func_00283248(func_00282E80(pos, &D_001B5200.x_140),
+    quat[1] = -func_00283248(vec_distance_xy(pos, &D_001B5200.x_140),
                              D_001B5200.z_148 - *(float *)(pos + 8));
     quat[0] = f13;
 
-    func_00283410(m, quat);
-    func_00282CF0(off, &D_001B5200.x_140, pos);
-    func_00282F20(off, off, f14);
+    euler_to_matrix(m, quat);
+    FastVecSub(off, &D_001B5200.x_140, pos);
+    vec_scale_to_length(off, off, f14);
 
     m[12] = *(float *)(pos + 0) + off[0];
     m[13] = *(float *)(pos + 4) + off[1];
@@ -617,7 +617,7 @@ void func_0032B3E0(char *pos, int a1, int a2, char *a3, int t0,
     m[15] = 1.0f;
 
     func_0032B378(pkt, f12);
-    func_00280B90(pkt, m, 0);
+    draw_world_quad(pkt, m, 0);
 }
 
 void func_00328F18(char *pos, int a1, int a2, char *a3, int t0,
@@ -630,7 +630,7 @@ void func_00328F18(char *pos, int a1, int a2, char *a3, int t0,
     long long r;
 
     func_00328CA8(pkt);
-    r = func_0027C878(a3);
+    r = GetEffectTextureDescriptor(a3);
 
     *(long long *)(pkt + 136) = ((long long)t0 << 2) | 0x8000000040LL;
     *(long long *)(pkt + 128) = 280993940374112LL;
@@ -644,13 +644,13 @@ void func_00328F18(char *pos, int a1, int a2, char *a3, int t0,
     quat[3] = 0.0f;
     quat[2] = func_00283248(D_001B5200.x_140 - *(float *)(pos + 0),
                             D_001B5200.y_144 - *(float *)(pos + 4));
-    quat[1] = -func_00283248(func_00282E80(pos, &D_001B5200.x_140),
+    quat[1] = -func_00283248(vec_distance_xy(pos, &D_001B5200.x_140),
                              D_001B5200.z_148 - *(float *)(pos + 8));
     quat[0] = f13;
 
-    func_00283410(m, quat);
-    func_00282CF0(off, &D_001B5200.x_140, pos);
-    func_00282F20(off, off, f14);
+    euler_to_matrix(m, quat);
+    FastVecSub(off, &D_001B5200.x_140, pos);
+    vec_scale_to_length(off, off, f14);
 
     m[12] = *(float *)(pos + 0) + off[0];
     m[13] = *(float *)(pos + 4) + off[1];
@@ -658,7 +658,7 @@ void func_00328F18(char *pos, int a1, int a2, char *a3, int t0,
     m[15] = 1.0f;
 
     func_00328D30(pkt, f12);
-    func_00280B90(pkt, m, 0);
+    draw_world_quad(pkt, m, 0);
 }
 
 /* func_0032B598 is in 0032B598-qcopy.c. */

@@ -34,7 +34,7 @@ void func_L08_00425628(char *obj)
             anchor = D_L08_001B29DC[0] + (*(s32 *)(s0 + 0x1E8) << 8) + 0x10;
             *(float *)(s0 + 0x184) = c * r;
             *(float *)(s0 + 0x188) = 0.0f;
-            func_00282CC0(s0 + 0x180, s0 + 0x180, anchor);
+            FastVecAdd(s0 + 0x180, s0 + 0x180, anchor);
         }
     } else {
         qcopy(s1, D_00189EA0);

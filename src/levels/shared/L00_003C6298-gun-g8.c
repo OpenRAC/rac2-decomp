@@ -108,7 +108,7 @@ void func_L00_003C6298(char *owner)
         D_L00_001B2A0C = -1;
         D_L00_001B2A08 = 0;
     }
-    func_00282978(&context->timer);
+    FastDecTimer(&context->timer);
     allowed = 1;
     if (D_00189E20.state == 29) {
         if (!func_00282948(&D_00189E20.timer)) allowed = 0;
@@ -118,7 +118,7 @@ void func_L00_003C6298(char *owner)
         (D_00138320 & D_00189E20.input) && allowed) {
         if (FIELD(owner, unsigned char, 0x43) != 2)
             func_002A7470(owner, 2, 0, 0);
-        if (!D_00189E20.flag) func_L00_002AF568();
+        if (!D_00189E20.flag) start_equipped_item_animation();
         if (!context->active) {
             context->active = 1;
             if (D_0018C360[16].count < 65535) D_0018C360[16].count++;
@@ -131,18 +131,18 @@ void func_L00_003C6298(char *owner)
         direction.q = 0;
         if (D_00189E20.state == 29 &&
             (FIELD(D_00189E20.object, unsigned short, 0x34) & 1)) {
-            func_00283678(work.aim.matrix, D_L00_001B8C80);
-            func_00283698(work.aim.inverse, work.aim.matrix);
+            copy_matrix3x4(work.aim.matrix, D_L00_001B8C80);
+            matrix_from_basis_rows(work.aim.inverse, work.aim.matrix);
             direction.f[2] = 1.0f;
-            func_002830C0(&direction, &direction, work.aim.inverse);
+            transform_vector(&direction, &direction, work.aim.inverse);
         } else if (D_00189E20.aiming == 1) {
-            func_00282D30(&direction, owner + 0xD0, -1.0f);
+            FastVecScale(&direction, owner + 0xD0, -1.0f);
         } else {
             direction.f[0] = 1.0f;
-            func_00283098(&direction, &direction, D_00189E20.matrix);
+            matrix_mul_vec3(&direction, &direction, D_00189E20.matrix);
         }
         context->yaw = func_00283248(direction.f[0], direction.f[1]);
-        context->pitch = func_00283248(func_00282E20(&direction), direction.f[2]);
+        context->pitch = func_00283248(vec_length_xy(&direction), direction.f[2]);
         work.aim.matrix[0].q = context->position.q;
         target = ref_L00_003C6298_00(owner, work.aim.matrix, &context->yaw, &context->pitch);
         func_00282948(&context->cooldown);
@@ -161,7 +161,7 @@ clear_target:
             definition = func_002AB1F0(target);
             if (target != context->target && !context->cooldown) {
                 context->target = target;
-                context->health = func_00283CE0(FIELD(definition, short, 4));
+                context->health = IntToFloat(FIELD(definition, short, 4));
                 context->remaining = FIELD(definition, float, 0);
                 context->cooldown = 30;
                 if (context->health <= 1.0f) context->remaining = 0.0f;
@@ -196,7 +196,7 @@ have_target:
                     D_L00_001A903C[0] = 1;
                 }
             }
-            func_002E5CF8(3, 0, owner);
+            PlayMobySound(3, 0, owner);
             func_L00_00403730(context->target);
             D_L00_001AFFAC++;
             context->target = 0;
@@ -208,8 +208,8 @@ have_target:
             float light_x, light_y, light_z;
             Light *light;
             D_L00_001B2A08 = 20;
-            func_00282F20(&work.light.offset, owner + 0xD0, -0.5f);
-            func_00282CC0(&work.light.point, context, &work.light.offset);
+            vec_scale_to_length(&work.light.offset, owner + 0xD0, -0.5f);
+            FastVecAdd(&work.light.point, context, &work.light.offset);
             light_x = work.light.point.f[0];
             light_y = work.light.point.f[1];
             light_z = work.light.point.f[2];
@@ -220,7 +220,7 @@ have_target:
             light->position.f[0] = light_x;
         }
         if (!func_002E59B0(owner, D_L00_001B2A0C))
-            D_L00_001B2A0C_sda = func_002E5CF8(1, 4, owner);
+            D_L00_001B2A0C_sda = PlayMobySound(1, 4, owner);
     } else {
         context->target = 0;
         context->active = 0;
@@ -229,8 +229,8 @@ have_target:
         if (D_L00_001B2A04 >= 0) {
             float light_x2, light_y2, light_z2;
             Light *light;
-            func_00282F20(&direction, owner + 0xD0, -0.5f);
-            func_00282CC0(&work.light.offset, context, &direction);
+            vec_scale_to_length(&direction, owner + 0xD0, -0.5f);
+            FastVecAdd(&work.light.offset, context, &direction);
             light_x2 = work.light.offset.f[0];
             light_y2 = work.light.offset.f[1];
             light_z2 = work.light.offset.f[2];
@@ -239,7 +239,7 @@ have_target:
             light->position.f[3] = 7.5f;
             light->position.f[0] = light_x2;
             light->position.f[1] = light_y2;
-            rate = func_00283CE0(D_L00_001B2A08) * 0.05f;
+            rate = IntToFloat(D_L00_001B2A08) * 0.05f;
             {
                 Light *color = &D_L00_001C6F40[D_L00_001B2A04];
                 FIELD(color, float, 0) = rate;
@@ -266,7 +266,7 @@ sound_cleanup:
             D_L00_001B2A0C = -1;
         }
         if (FIELD(owner, unsigned char, 0x60) & 2) func_002A75E0(owner, 1, 0, 1, 0);
-        func_L00_002AF7D0();
+        cancel_hero_item_animation();
     }
     if (special && D_L00_001B2A04 >= 0) {
         func_00291450(D_L00_001B2A04);

@@ -52,7 +52,7 @@ int func_L23_0041A3B8(char *arg0, char *arg1) {
         if ((*(unsigned short *)(arg0 + 0x96) & 3) != 2)
             return 1;
         do {
-            func_00282F20((char *)vec, D_L23_001B3870, *(short *)(state + 0x33A) * 0.016666668f);
+            vec_scale_to_length((char *)vec, D_L23_001B3870, *(short *)(state + 0x33A) * 0.016666668f);
             tmp = *(float *)(state + 0x300) * 1.5f;
             func_L23_00422540(D_L23_001B3850, (char *)vec, &tmp);
         } while (0);
@@ -66,17 +66,17 @@ int func_L23_0041A3B8(char *arg0, char *arg1) {
         int m = *(short *)(state + 0x336);
         if ((*(unsigned short *)(arg0 + 0x96) & ((1 << (9 - m)) - 1)) != ((1 << (9 - m)) - 1))
             return 1;
-        func_00282CF0((char *)vec, arg1, D_L23_001B3850);
-        func_00282F20((char *)vec, (char *)vec, *(short *)(state + 0x33C) * 0.016666668f);
+        FastVecSub((char *)vec, arg1, D_L23_001B3850);
+        vec_scale_to_length((char *)vec, (char *)vec, *(short *)(state + 0x33C) * 0.016666668f);
         func_L23_004280D8(arg0, (char *)vec, D_L23_001B3850, 0, *(float *)(state + 0x304));
-        func_0032C700(D_L23_001B3850, 0, 2, 3, 2, 2, 0xA, 0, 0.5f, 20.0f, 1, 1, 0, 0);
+        SpawnExplosion(D_L23_001B3850, 0, 2, 3, 2, 2, 0xA, 0, 0.5f, 20.0f, 1, 1, 0, 0);
         func_L00_0035F5A0(0x1A, 0, 0);
     } else {
         int m = *(short *)(state + 0x334);
         if ((*(unsigned short *)(arg0 + 0x96) & ((1 << (9 - m)) - 1)) != ((1 << (9 - m)) - 1))
             return 1;
-        func_00282CF0((char *)vec, arg1, D_L23_001B3870);
-        func_00282F20((char *)vec, (char *)vec, *(short *)(state + 0x33A) * 0.016666668f);
+        FastVecSub((char *)vec, arg1, D_L23_001B3870);
+        vec_scale_to_length((char *)vec, (char *)vec, *(short *)(state + 0x33A) * 0.016666668f);
         func_L23_00422540(D_L23_001B3850, (char *)vec, (float *)(state + 0x300));
         func_L00_0035F5A0(0x21, 0, 0);
     }

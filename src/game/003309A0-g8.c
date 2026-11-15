@@ -45,29 +45,29 @@ void func_003309A0(char *obj)
     a[2] = 0.0f;
     a[3] = 0.0f;
     D_001B2850_1 = 0;
-    if (func_00282DF0(a) != 0.0f) {
+    if (FastVecLength(a) != 0.0f) {
         dir = obj + 0xE0;
         face = obj + 0xC0;
-        func_00282F20(a, a, 1.0f);
-        func_00283098(a, a, D_001B5570);
-        cosine = func_00282DB0(a, dir);
-        func_00282D30(b, dir, cosine);
-        func_00282CF0(a, a, b);
-        func_00282F20(a, a, 1.0f);
-        func_00282F20(c, a, 10.0f);
-        func_00282CC0(c, c, obj + 0x10);
-        func_00282DD8(d, face, a);
-        if (func_00282DF0(d) == 0.0f)
+        vec_scale_to_length(a, a, 1.0f);
+        matrix_mul_vec3(a, a, D_001B5570);
+        cosine = FastVecDot(a, dir);
+        FastVecScale(b, dir, cosine);
+        FastVecSub(a, a, b);
+        vec_scale_to_length(a, a, 1.0f);
+        vec_scale_to_length(c, a, 10.0f);
+        FastVecAdd(c, c, obj + 0x10);
+        FastVecCross(d, face, a);
+        if (FastVecLength(d) == 0.0f)
             qcopy(d, face);
-        cosine = func_00282DB0(face, a);
+        cosine = FastVecDot(face, a);
         D_001B2854_1 = 1.0f - cosine;
         if (cosine > 0.75f)
             D_001B2850 = 1;
         cosine = 1.5707964f - func_002831B0(cosine);
         cosine = cosine * 0.1f;
-        func_00282D30(e, d, func_00283198(cosine));
+        FastVecScale(e, d, func_00283198(cosine));
         e[3] = func_00283180(cosine);
-        func_00283958(e, f);
-        func_00283738(face, f, face);
+        quaternion_to_rotation_basis(e, f);
+        multiply_matrix3x3(face, f, face);
     }
 }

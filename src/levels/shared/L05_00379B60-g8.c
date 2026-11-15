@@ -15,7 +15,7 @@ void func_L05_00379B60(void)
     union { int *state; int found; } phase;
     int *state;
     int *selection;
-    if (D_L05_001B2048[0] < 10) func_L05_00379968();
+    if (D_L05_001B2048[0] < 10) InitSlotFlagsFromEquipment();
     phase.state = D_L05_00221D10;
     if (phase.state[0x84/4] != 0) return;
     {
@@ -36,5 +36,5 @@ void func_L05_00379B60(void)
     state = D_L05_00221D10;
     *(unsigned short *)((char *)state+0x40) = 0;
     *(unsigned short *)((char *)state+0x42) = 0;
-    if (state[0x78/4]) func_L00_002E6EF8(func_L05_0037A218,(void *)state[0x78/4]);
+    if (state[0x78/4]) func_L00_002E6EF8(UpdateSpaceProjectilePool,(void *)state[0x78/4]);
 }

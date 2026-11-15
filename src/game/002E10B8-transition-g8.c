@@ -132,7 +132,7 @@ void func_002E6D88(int mode)
     D_001A63A8.next = 0;
     func_00294070(0);
     while (D_001A63A8.phase != 3 || D_001A63A8.limit >= 6000) {
-        func_002E4AC8();
+        UpdateSoundVoices();
         func_001261F0(0);
     }
     func_002B6D28();

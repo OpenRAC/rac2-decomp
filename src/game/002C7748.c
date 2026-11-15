@@ -80,9 +80,9 @@ extern BatchA_A12_BatchA24 D_L08_001FF980;
  * Signature: int FUN_002cd220(void)
  * Behavior:
  *   - Saves RA on stack
- *   - Calls func_0027C540(0)
+ *   - Calls SetupGifPaging(0)
  *   - Calls func_0029C138()
- *   - Calls func_0027C660()
+ *   - Calls DoGifPaging()
  *   - Restores RA from stack
  *   - Returns 0
  */
@@ -97,9 +97,9 @@ extern void func_0027C660(void);
  *
  * Disassembly summary:
  * - Saves return address on stack
- * - Calls func_0027C540(0) (with zero argument)
+ * - Calls SetupGifPaging(0) (with zero argument)
  * - Calls func_0029C7A0()
- * - Calls func_0027C660()
+ * - Calls DoGifPaging()
  * - Restores return address
  * - Returns 0
  *
@@ -380,13 +380,13 @@ void func_002C8348(char *a0)
     float t;
 
     *(u8 *)(s1 + 8) = *(u8 *)(s1 + 8) + *(u8 *)(s0 + 0x14);
-    *(float *)(s0 + 8) = func_00283B98(*(float *)(s0 + 8), *(float *)(s0 + 0xC));
+    *(float *)(s0 + 8) = FastAddRotations(*(float *)(s0 + 8), *(float *)(s0 + 0xC));
     *(float *)(s1 + 0xC) = *(float *)(s1 + 0xC) + *(float *)(s0 + 0x10);
     *(float *)(s1 + 0x10) = *(float *)(*(char **)(s1 + 0x20)) +
                             *(float *)(s0 + 4) * func_00283180(*(float *)(s0 + 8));
     *(float *)(s1 + 0x18) = *(float *)(*(char **)(s1 + 0x20) + 8) +
                             *(float *)(s0 + 4) * func_00283198(*(float *)(s0 + 8));
-    t = func_00283C80(*(float *)(s0 + 8), *(float *)(*(char **)(s1 + 0x20) + 0x10));
+    t = FastDiffRots(*(float *)(s0 + 8), *(float *)(*(char **)(s1 + 0x20) + 0x10));
     if (t < func_00282C48(*(float *)(s0 + 0xC) + *(float *)(s0 + 0xC)))
         func_002B9180(s1);
 }
@@ -486,31 +486,31 @@ void func_002C8CA0(char *p)
     color |= (color << 16) | (color << 8);
     spin = *(unsigned char *)(d + 13) >> 4;
     fading = *(unsigned char *)(d + 13) & 15;
-    size0 = func_00283CE0(*(unsigned char *)(d + 30)) * 1640.625f;
-    size1 = func_00283CE0(*(unsigned char *)(d + 31)) * 1640.625f;
-    speed0 = func_00283CE0(*(unsigned char *)(d + 28)) * (1.0f / 128);
-    speed1 = func_00283CE0(*(unsigned char *)(d + 29)) * (1.0f / 128);
-    scale = func_00283CE0(*(unsigned char *)(d + 15)) * (1.0f / 128);
+    size0 = IntToFloat(*(unsigned char *)(d + 30)) * 1640.625f;
+    size1 = IntToFloat(*(unsigned char *)(d + 31)) * 1640.625f;
+    speed0 = IntToFloat(*(unsigned char *)(d + 28)) * (1.0f / 128);
+    speed1 = IntToFloat(*(unsigned char *)(d + 29)) * (1.0f / 128);
+    scale = IntToFloat(*(unsigned char *)(d + 15)) * (1.0f / 128);
     func_00300190(p + 16, p + 16);
-    t = func_00283CE0(*(short *)(p + 10));
-    t /= func_00283CE0(*(unsigned char *)(d + 14)); inverse = 1.0f - t;
+    t = IntToFloat(*(short *)(p + 10));
+    t /= IntToFloat(*(unsigned char *)(d + 14)); inverse = 1.0f - t;
     if (!fading) {
-        *(int *)(p + 4) = func_00283D38(0x103080, color, inverse) | (alpha << 24);
+        *(int *)(p + 4) = FastTweenColor(0x103080, color, inverse) | (alpha << 24);
         *(float *)(p + 12) = size0 + (size1 - size0) * inverse;
         speed0 += (speed1 - speed0) * inverse;
-        func_00282D30((char *)scaled, (char *)w, scale * func_002A7790(inverse));
+        FastVecScale((char *)scaled, (char *)w, scale * func_002A7790(inverse));
     } else {
         speed0 = speed1;
-        a = func_00283CE0(alpha); b = func_00283CE0(alpha);
+        a = IntToFloat(alpha); b = IntToFloat(alpha);
         b *= func_002A7790(inverse);
-        *(int *)(p + 4) = color | (func_00283CF0(a - b) << 24);
-        func_00282D30((char *)scaled, (char *)w, scale);
+        *(int *)(p + 4) = color | (FloatToInt(a - b) << 24);
+        FastVecScale((char *)scaled, (char *)w, scale);
     }
-    func_00282F20(tmp, v, speed0);
-    func_00282CC0(p + 16, p + 16, (char *)tmp);
-    func_00282CC0(p + 16, (char *)scaled, p + 16);
+    vec_scale_to_length(tmp, v, speed0);
+    FastVecAdd(p + 16, p + 16, (char *)tmp);
+    FastVecAdd(p + 16, (char *)scaled, p + 16);
     *(unsigned char *)(p + 8) += spin;
-    if (func_00282978(p + 10)) {
+    if (FastDecTimer(p + 10)) {
         if (!fading) {
             *(unsigned char *)(d + 14) = 20;
             *(unsigned char *)(d + 13) |= 1;
@@ -554,21 +554,21 @@ void func_002C9098(char *p)
     float r1, r2, r3, r4;
     int x, y;
 
-    r1 = func_00283CE0(*(short *)(p + 10));
-    r2 = func_00283CE0(*(int *)(s0 + 24));
+    r1 = IntToFloat(*(short *)(p + 10));
+    r2 = IntToFloat(*(int *)(s0 + 24));
     r1 = r1 / r2;
-    r3 = func_00283CE0(*(int *)(s0 + 16));
-    x = func_00283CF0(r3 * r1);
-    y = func_00283D38(0, *(int *)(s0 + 20), r1 * 0.5f);
+    r3 = IntToFloat(*(int *)(s0 + 16));
+    x = FloatToInt(r3 * r1);
+    y = FastTweenColor(0, *(int *)(s0 + 20), r1 * 0.5f);
     *(char *)(p + 8) = *(unsigned char *)(p + 8) + 1;
     r4 = func_002A7878(0.004f, 0.012f);
     *(float *)(p + 12) = *(float *)(p + 12) + r4 * 210000.0f;
-    func_00282CC0(s3, s3, s0);
-    func_00282D30(s0, s0, 0.99f);
+    FastVecAdd(s3, s3, s0);
+    FastVecScale(s0, s0, 0.99f);
     func_00300190(s3, s3);
     func_00300248(s0, s0);
     *(int *)(p + 4) = y | (x << 24);
-    if (func_00282978(p + 10) != 0) {
+    if (FastDecTimer(p + 10) != 0) {
         func_002B9180(p);
     }
 }
@@ -585,7 +585,7 @@ void func_002C9828(char *path, int clamp, float *out, float *angles, int flags, 
     float f[4] __attribute__((aligned(16)));
     float d[4] __attribute__((aligned(16)));
     float e[4] __attribute__((aligned(16)));
-    int idx = func_00283CF0(t);
+    int idx = FloatToInt(t);
     int hit = 0;
     int i0;
     int i1;
@@ -614,18 +614,18 @@ void func_002C9828(char *path, int clamp, float *out, float *angles, int flags, 
     }
     qcopy(a, path + 0x10 + i0 * 16);
     qcopy(b, path + 0x10 + i1 * 16);
-    func_00282D08(out, a, b, t);
+    lerp_vector(out, a, b, t);
     if (flags & 1)
         return;
     if (hit) {
-        func_00282CF0(f, b, a);
+        FastVecSub(f, b, a);
     } else {
         qcopy(c, path + 0x10 + i2 * 16);
-        func_00282CF0(d, b, a);
-        func_00282CF0(e, c, b);
-        func_00282D08(f, d, e, t);
+        FastVecSub(d, b, a);
+        FastVecSub(e, c, b);
+        lerp_vector(f, d, e, t);
     }
-    angles[1] = -func_00283248(func_00282E20(f), f[2]);
+    angles[1] = -func_00283248(vec_length_xy(f), f[2]);
     angles[2] = func_00283248(f[0], f[1]);
     angles[3] = a[3] * (1.0f - t) + b[3] * t;
 }
@@ -708,11 +708,11 @@ void func_002C9C20(void)
 void func_002C9CF8(int mode)
 {
     func_00132AF8(0x5D);
-    func_002B72E8(0);
+    music_Pause(0);
     ((State_2C9CF8 *)D_001F2840)->byteDB = 0;
-    func_00132028();
+    snd_Pump();
     ((State_2C9CF8 *)D_001F2840)->f0 = 1;
-    if (!D_001A8BB0) func_002CAF18();
+    if (!D_001A8BB0) ConfigureMenuChoiceList();
     ((State_2C9CF8 *)D_001F2840)->f144 = 0;
     ((State_2C9CF8 *)D_001F2840)->f148 = 0;
     ((State_2C9CF8 *)D_001F2840)->fE8 = (D_001A7A08 & 0xFFFF0000) || ((State_2C9CF8 *)D_001F2840)->f108 ? 1 : 0;
@@ -813,7 +813,7 @@ void func_002CA8A8(void)
     if (PAUSE->timer) --PAUSE->timer;
     if (D_001393E0.state < 3 && D_001393E0.err < 0) ++PAUSE->card_error_frames;
     else PAUSE->card_error_frames = 0;
-    func_002DDEC8();
+    process_unlock_code_input();
     if ((D_001A7424 & 1) && PAUSE->mode == 4 && D_001B1684 >= 8) {
         if (!func_002B49E0(4, 1, 1, PAUSE->arg, 0)) return;
     }
@@ -824,13 +824,13 @@ void func_002CA8A8(void)
     case 4: func_002CAB00(); break;
     case 5:
         func_002CADB0();
-        func_002E4AC8();
+        UpdateSoundVoices();
         D_0018A000[0] = 10;
         D_001B18A4[1] = 0;
         return;
     }
     func_002B6658();
-    func_002E4AC8();
+    UpdateSoundVoices();
     if (PAUSE->pending) func_002CA5D0();
 }
 #undef PAUSE
@@ -893,7 +893,7 @@ void func_002CADB0(void)
         func_002B7CE0(1);
         id = ((GameState_1F2840 *)D_001F2840)->field40;
         rec = (int *)((char *)D_00239BA0 + D_00139568[id] * 0xE0);
-        func_00294420(rec[5]);
+        LoadClassIntoFreeCacheSlot(rec[5]);
         func_002B7CE0(1);
     }
     func_002B7CE0(1);
@@ -1017,7 +1017,7 @@ int func_002CCF68(char *obj)
         return 0;
     }
 fallback:
-    return func_002D5EC0(obj);
+    return UpdateMenuListActions(obj);
 }
 
 int func_002CD0E8(void)
@@ -1056,9 +1056,9 @@ int func_002CD0E8(void)
 
 int func_002CD220(void)
 {
-  func_0027C540(0);
+  SetupGifPaging(0);
   func_0029C138();
-  func_0027C660();
+  DoGifPaging();
   return 0;
 }
 

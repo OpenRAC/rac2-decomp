@@ -68,7 +68,7 @@ void func_L12_00426C08(char *obj) {
             F(s,0x134)=0.5f;
             H(s,0x35A)=func_002A7820(0,30);
         }
-        if (H(s,0x334)==1 && func_00282978(s+0x35A)) {
+        if (H(s,0x334)==1 && FastDecTimer(s+0x35A)) {
             if (func_002A77E0(3)) func_002A7750(obj,9,2);
             else func_002A7750(obj,8,2);
         } else if (H(s,0x336)) {
@@ -95,7 +95,7 @@ void func_L12_00426C08(char *obj) {
             F(s,0x134)=0.05f;
             H(s,0x35A)=func_002A7820(0,30);
         }
-        if (H(s,0x334)!=1 && func_00282978(s+0x35A)) {
+        if (H(s,0x334)!=1 && FastDecTimer(s+0x35A)) {
             func_002A7750(obj,3,1);
             H(s,0x330)=func_002A7820(580,600);
         }
@@ -127,7 +127,7 @@ void func_L12_00426C08(char *obj) {
         if (B(obj,0x43)==1) {
             if (B(obj,0x60)&2) func_002A7470(obj,0,0,20);
         } else if (H(s,0x332)==0) {
-            if (!H(s,0x358) || func_00282DB0(s+0x320,D_0018A0E0)>0.8f) func_002A7750(obj,2,-1);
+            if (!H(s,0x358) || FastVecDot(s+0x320,D_0018A0E0)>0.8f) func_002A7750(obj,2,-1);
         }
         break;
     case 2:
@@ -137,7 +137,7 @@ void func_L12_00426C08(char *obj) {
             F(s,0x310)=func_00283180(angle)*speed;
             F(s,0x314)=func_00283198(angle)*speed;
             W(s,0x318)=0;
-            func_00282CC0(s+0x310,s+0x310,s+0x300);
+            FastVecAdd(s+0x310,s+0x310,s+0x300);
             if (W(s,0x238)!=-1) {
                 vec=*(Quad *)(s+0x300);
                 func_L02_0032EF10(&vec,s+0x310,s+0x310,W(s,0x238),1.5f);
@@ -150,7 +150,7 @@ void func_L12_00426C08(char *obj) {
         if (func_002B3868(obj)) {
             if (B(obj,0x43)!=func_002A77E0(2)+4) func_002A7470(obj,func_002A77E0(2)+4,0,10);
         }
-        if (func_00282E48(obj+0x10,D_00189EA0)<D_L12_001B21C8_gp[0]) func_002A7750(obj,4,-1);
+        if (fast_vec_dist(obj+0x10,D_00189EA0)<D_L12_001B21C8_gp[0]) func_002A7750(obj,4,-1);
         else if (B(obj,0x60)&2) {
             switch (func_002A77E0(3)) {
             case 0:func_002A7750(obj,6,-1);break;
@@ -176,7 +176,7 @@ void func_L12_00426C08(char *obj) {
             if (B(obj,0x43)!=6) func_002A7470(obj,6,0,10);
             F(s,0x354)=func_002A7878(D_L12_001B21C8_gp[0],D_L12_001B21C8[1])+0.5f;
         }
-        if ((func_L12_00427C58(obj,s+0x300,0)&128) || func_00282E80(obj+0x10,D_00189EA0)>F(s,0x354)) {
+        if ((func_L12_00427C58(obj,s+0x300,0)&128) || vec_distance_xy(obj+0x10,D_00189EA0)>F(s,0x354)) {
             if (func_002A77E0(2)) func_002A7750(obj,6,-1);
             else func_002A7750(obj,7,-1);
         }
@@ -188,7 +188,7 @@ void func_L12_00426C08(char *obj) {
             F(s,0x310)=func_00283180(angle)*speed;
             F(s,0x314)=func_00283198(angle)*speed;
             W(s,0x318)=0;
-            func_00282CC0(s+0x310,s+0x310,s+0x300);
+            FastVecAdd(s+0x310,s+0x310,s+0x300);
             if (W(s,0x238)!=-1) {
                 vec=*(Quad *)(s+0x300);
                 func_L02_0032EF10(&vec,s+0x310,s+0x310,W(s,0x238),1.5f);
@@ -224,7 +224,7 @@ void func_L12_00426C08(char *obj) {
             if (B(obj,0x43)!=10) func_002A7470(obj,10,0,5);
             W(s,0x1BC)=D_L12_001B29C8[0];
         }
-        func_00282F20(&vec,s+0x1A0,1.0f);
+        vec_scale_to_length(&vec,s+0x1A0,1.0f);
         func_L12_00427C58(obj,&vec,0);
         func_L07_003F6F00(obj);
         func_002A8C28(obj,obj+0x10,0x4000000,0,1,0,0.6f,(float)B(s,0x34),1.0f);

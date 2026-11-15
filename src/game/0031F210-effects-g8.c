@@ -25,7 +25,7 @@ void func_00325EC0(unsigned char *self)
             func_0029FCC0(self,4,pos);
             func_0029FCC0(self,5,other);
             func_0029FC20(self,6,matrix);
-            func_002830C0(offset,offset,matrix);
+            transform_vector(offset,offset,matrix);
             func_00325638((int)self,(char *)pos,0.125f,0x36F6,0x20000000,0x20000000);
             func_00325638((int)self,(char *)other,0.15f,0xFF3E00,0x30000000,0x20000000);
             func_00325638((int)self,(char *)offset,0.15f,0xFF3E00,0x10000000,0x30000000);
@@ -43,7 +43,7 @@ void func_00325EC0(unsigned char *self)
                 func_0029FCC0(object,4,pos);
                 func_0029FCC0(object,5,other);
                 func_0029FC20(object,6,matrix);
-                func_002830C0(offset,offset,matrix);
+                transform_vector(offset,offset,matrix);
                 func_00325638((int)object,(char *)pos,0.125f,0x36F6,0x20000000,0x20000000);
                 func_00325638((int)object,(char *)other,0.15f,0xFF3E00,0x30000000,0x20000000);
                 func_00325638((int)object,(char *)offset,0.15f,0xFF3E00,0x10000000,0x30000000);

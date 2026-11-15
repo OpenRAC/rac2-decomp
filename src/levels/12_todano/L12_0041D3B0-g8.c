@@ -96,13 +96,13 @@ Destroy0:
         s32 i3b;
 
         if (func_00282948(v + 0x14)) {
-            func_0032C700(D_L12_001B1DD0, 1, 14, 10, 15, 10, 20, 1,
+            SpawnExplosion(D_L12_001B1DD0, 1, 14, 10, 15, 10, 20, 1,
                           1, 1, 0, 0, 2.0f, 20.0f);
             *(s32 *)(self + 0x98) = 0;
             *(u16 *)(self + 0x34) = (*(u16 *)(self + 0x34) | 0x41) & 0xEFFF;
-            func_00282CF0(temp, self + 0x10, D_00189EA0);
+            FastVecSub(temp, self + 0x10, D_00189EA0);
             func_002AFEB8(self, temp, temp, 0, 0.0f);
-            func_00282F20(temp, temp, 0.10000001f);
+            vec_scale_to_length(temp, temp, 0.10000001f);
             func_002B0A68(self, 0xFFF, temp, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
             func_002A7750(self, 5, -1);
             p3 = (s32 *)v;

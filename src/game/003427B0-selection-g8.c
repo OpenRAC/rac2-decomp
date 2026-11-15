@@ -107,10 +107,10 @@ void func_00342BE8(MenuList *object)
         colours = (char *)&normal;
         if (*(int *)entry && entry[4]) colours = (char *)&alternate;
         current = (float)index;
-        first = func_003427C0((char *)object, low,
+        first = ComputeListEntryAlpha((char *)object, low,
                 object->position->y + object->rowHeight * current + (float)object->scrollOffset,
                 high, D_001AE1D0, D_001AE1D4);
-        second = func_003427C0((char *)object, low,
+        second = ComputeListEntryAlpha((char *)object, low,
                 object->position->y + object->rowHeight * current + object->iconSize + (float)object->scrollOffset,
                 high, D_001AE1D0, D_001AE1D4);
         *(unsigned int *)(colours + 0) = (*(unsigned int *)(colours + 0) & 0xFFFFFF) | ((unsigned int)first << 24);
@@ -127,7 +127,7 @@ void func_00342BE8(MenuList *object)
         }
         func_002FC620(D_001B23B0.x0, D_001B23B0.x1, D_001B23B0.y0, D_001B23B0.y1);
         entry = D_00239BA0 + D_00139568[object->ids[object->selected + index]] * 224;
-        texture = func_0028E588(*(unsigned short *)(entry + 0x3C), 0);
+        texture = GetIconFrame(*(unsigned short *)(entry + 0x3C), 0);
         func_0028EA58(texture, (int)object->position->x,
                 (int)(object->position->y + object->rowHeight * current + (float)object->scrollOffset),
                 (int)object->iconSize, (int)object->iconSize, (int *)colours);

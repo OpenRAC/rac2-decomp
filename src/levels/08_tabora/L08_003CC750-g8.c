@@ -34,7 +34,7 @@ void func_L08_003CC750(char *object) {
         if (F(object,u8,0x43)) func_002A7470(object,0,0,0);
         break;
     case 1:
-        if (func_00282E80(object+0x10,D_00189EA0) < D_L08_001AFED0) {
+        if (vec_distance_xy(object+0x10,D_00189EA0) < D_L08_001AFED0) {
             F(state,float,0) = D_L08_001AFEE4;
             if (F(object,u8,0x43) != 1) func_002A7470(object,1,0,0x14);
             F(object,float,0x48) = F(state,float,0) + F(state,float,0);
@@ -45,9 +45,9 @@ void func_L08_003CC750(char *object) {
     case 2:
         F(state,float,0) += (1.0f - F(state,float,0)) * D_L08_001AFEDC;
         F(object,float,0x48) = F(state,float,0) + F(state,float,0);
-        func_00282CF0(vector,D_00189EA0,object+0x10);
+        FastVecSub(vector,D_00189EA0,object+0x10);
         vector[2] += 0.6f;
-        distance = func_00282E20(vector);
+        distance = vec_length_xy(vector);
         threshold = 0.12f;
         if (F(object,u16,0x96) < 180) {
             if (F(D_00189EA0,int,0x2214) != 0x31)
@@ -58,7 +58,7 @@ void func_L08_003CC750(char *object) {
             }
         } else speed = F(state,float,0) + F(state,float,0);
         func_00282FB8(vector,vector,speed);
-        func_00282CC0(object+0x10,object+0x10,vector);
+        FastVecAdd(object+0x10,object+0x10,vector);
         if (((ObjectView *)object)->scale > 0.1f || distance < threshold || distance < speed)
             ((ObjectView *)object)->scale -= D_L08_001AFEE8 * F(((ObjectView *)object)->descriptor,float,0x24);
         if ((distance < speed && ((ObjectView *)object)->scale < F(((ObjectView *)object)->descriptor,float,0x24)*0.01f) ||

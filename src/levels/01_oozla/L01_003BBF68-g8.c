@@ -63,7 +63,7 @@ void func_L01_003BBF68(char *obj)
     case 1:
         if (D_00189E20.obj == obj && D_00189E20.active) {
             func_002A7750(obj, 2, -1);
-            *(int *)(s + 0x60) = func_00283CF0(*(float *)(s + 0x50) * 60.0f);
+            *(int *)(s + 0x60) = FloatToInt(*(float *)(s + 0x50) * 60.0f);
             *(int *)(s + 0x78) = func_L00_002D6900(7);
             if (*(unsigned char *)(obj + 0x43) != 1) func_002A7470(obj, 1, 0, 10);
         }
@@ -81,7 +81,7 @@ void func_L01_003BBF68(char *obj)
                 *(int *)(s + 0x78) = -1;
             }
             func_002A7750(obj, 3, -1);
-            func_002E5CF8(0, 0, obj);
+            PlayMobySound(0, 0, obj);
             if (*(unsigned char *)(obj + 0x43) != 2) func_002A7470(obj, 2, 0, 6);
             if (D_00189E20.obj == obj && D_00189E20.active)
                 *(int *)(s + 0x78) = func_L00_002D6900(5);
@@ -113,7 +113,7 @@ void func_L01_003BBF68(char *obj)
                 if (D_00189E20.f24CC < 2) func_L00_002B30E8();
                 else {
                     func_002A8BD0(scratch.query, obj, 1, (float)*(unsigned char *)(s + 0x34));
-                    func_002A8E20(D_00189E20.query, scratch.query);
+                    QueueMobyImpact(D_00189E20.query, scratch.query);
                 }
                 D_00189E20.flag = 0;
                 func_L01_002C1988(0);
@@ -132,15 +132,15 @@ void func_L01_003BBF68(char *obj)
             if (*(unsigned char *)(obj + 0x43) != 0) func_002A7470(obj, 0, 0, 10);
         } else if (*(int *)(s + 0x68)) {
             if (D_00189E20.action != 111) {
-                func_L01_002BEB90(111, 1);
-                func_L00_002D2168(10, 0, 10.0f);
+                SetHeroMoveState(111, 1);
+                set_hero_animation(10, 0, 10.0f);
             }
             D_00189E20.control = 2;
             qcopy(scratch.vec.pos, obj + 0x10);
             scratch.vec.pos[2] += 2.0f;
-            func_00282CF0(scratch.vec.delta, scratch.vec.pos, D_00189E20.pos);
+            FastVecSub(scratch.vec.delta, scratch.vec.pos, D_00189E20.pos);
             func_002AC9F8(scratch.vec.delta, 0.06666667f);
-            func_00282CC0(D_00189E20.pos, D_00189E20.pos, scratch.vec.delta);
+            FastVecAdd(D_00189E20.pos, D_00189E20.pos, scratch.vec.delta);
             func_00282C88(D_00189E20.vel);
             func_00282C88(D_00189E20.v110);
             func_00282C88(D_00189E20.v120);

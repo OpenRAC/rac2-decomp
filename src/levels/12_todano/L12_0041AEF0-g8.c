@@ -32,22 +32,22 @@ void func_L12_0041AEF0(unsigned char *self)
     int color;
     angles.quad = 0;
     angles.value[2] = 0.52359885f;
-    func_00283658(&matrix, self + 0xc0);
+    copy_matrix_rotation(&matrix, self + 0xc0);
     qcopy(&matrix.column[3], self + 0x10);
     matrix.column[3].value[3] = 1.0f;
-    func_00283410(&rotation, &angles);
-    fraction = *(float *)(data + 0x70) - (float)func_00283CF0(*(float *)(data + 0x70));
+    euler_to_matrix(&rotation, &angles);
+    fraction = *(float *)(data + 0x70) - (float)FloatToInt(*(float *)(data + 0x70));
     alpha = (D_L12_001B1C80 - *(float *)(data + 0x6c)) * 0.5f;
     if (alpha > 1.0f) alpha = 1.0f;
     else if (alpha < 0.0f) alpha = 0.0f;
     for (i = 0; i < 3; i++) {
-        packets[i].tag[1] = func_0027C878(D_L12_001B1CB8);
+        packets[i].tag[1] = GetEffectTextureDescriptor(D_L12_001B1CB8);
         packets[i].tag[2] = 0xff9000000260UL;
         packets[i].tag[0] = 5;
         packets[i].tag[3] = ((u64)D_L12_001B1CBC << 2) | ((u64)D_L12_001B1CC0 << 6) | 0x8000000000UL;
         radius = *(float *)(data + 0x6c) - (float)i * 0.05f;
         angle = (float)i * 0.17453295f;
-        nextAngle = func_00283B98(angle, 0.52359885f);
+        nextAngle = FastAddRotations(angle, 0.52359885f);
         first.value[0] = func_00283180(angle) * radius;
         first.value[1] = func_00283198(angle) * radius;
         first.value[2] = 0.0f; first.value[3] = 1.0f;
@@ -63,7 +63,7 @@ void func_L12_0041AEF0(unsigned char *self)
         packets[i].vertex[2].value[2] = z;
         qcopy(&packets[i].vertex[3], &second);
         packets[i].vertex[3].value[2] = -z;
-        color = func_00283D38(D_L12_001B1C90, D_L12_001B1C8C, (1.0f - fraction) * alpha);
+        color = FastTweenColor(D_L12_001B1C90, D_L12_001B1C8C, (1.0f - fraction) * alpha);
         for (j = 0; j < 4; j++) {
             packets[i].color[j] = color;
             packets[i].uv[j][0] = D_L12_001B1CD0[j][0];
@@ -72,9 +72,9 @@ void func_L12_0041AEF0(unsigned char *self)
         fraction = fraction >= 0.666f ? fraction + -0.666f : fraction + 0.333f;
     }
     for (n = 11; n >= 0; n--) {
-        func_00283738(&matrix, &matrix, &rotation);
-        func_00280B90(&packets[0], &matrix, 1);
-        func_00280B90(&packets[1], &matrix, 1);
-        func_00280B90(&packets[2], &matrix, 1);
+        multiply_matrix3x3(&matrix, &matrix, &rotation);
+        draw_world_quad(&packets[0], &matrix, 1);
+        draw_world_quad(&packets[1], &matrix, 1);
+        draw_world_quad(&packets[2], &matrix, 1);
     }
 }

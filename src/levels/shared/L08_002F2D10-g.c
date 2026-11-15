@@ -35,9 +35,9 @@ int func_L08_00339220(unsigned char *owner, unsigned char *state, int low, int h
     far_distance = *(float *)(state + 0x14);
     near_distance = *(float *)(state + 0x10);
     if (distance < -999.0f) {
-        func_00282CF0(&difference, owner + 0x10, state);
+        FastVecSub(&difference, owner + 0x10, state);
         position.q = difference.q;
-        distance = func_00282DF0(&position);
+        distance = FastVecLength(&position);
     }
     value = (int)(((float)(high - low) / (far_distance - near_distance)) * (distance - near_distance) + (float)low);
     *(SoundVectorQuad *)state = *(SoundVectorQuad *)(owner + 0x10);
@@ -63,7 +63,7 @@ int func_L08_00339220(unsigned char *owner, unsigned char *state, int low, int h
         next = entry->level - step;
         if (next > low) entry->level = next;
         else entry->level = low;
-        func_0026FEB8(D_L08_001AA400, value);
+        STUB_printf(D_L08_001AA400, value);
         return 2;
     }
     return 0;

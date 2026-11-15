@@ -13,8 +13,8 @@ void func_L00_002CB218(void)
     char *o;
     u64 w;
 
-    func_00282978(D_0018C318);
-    func_00282978(D_0018C318 + 2);
+    FastDecTimer(D_0018C318);
+    FastDecTimer(D_0018C318 + 2);
     b = D_0018C318 - 0x24F8;
     if (0x37 == *(int *)(b + 0x2294))
         return;

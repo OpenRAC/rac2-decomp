@@ -37,7 +37,7 @@ int func_0034FFC0(void) {
                 int off;
                 func_001244B8(0, 0);
                 off = (buf[1] << 14) + 0x1C81C0;
-                func_002B6480((void *)(D_001B23C8[0] + off), 0);
+                BuildFrameDmaChain((void *)(D_001B23C8[0] + off), 0);
                 func_00127218(h, (int)buf + 0x40);
                 buf[0] = 1;
             } else if (D_001AE7DC[0] == 1) {
@@ -46,7 +46,7 @@ int func_0034FFC0(void) {
                     int off;
                     func_001244B8(0, 0);
                     off = (buf[1] << 14) + 0x1C81C0;
-                    func_002B6480((void *)(D_001B23C8[0] + off), 0);
+                    BuildFrameDmaChain((void *)(D_001B23C8[0] + off), 0);
                     func_00127218(h, (int)buf + 0x13880);
                     buf[0] = 0;
                     D_001AE7D8[0] = st;

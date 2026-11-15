@@ -25,7 +25,7 @@ void func_L09_003FE670(unsigned char *obj) {
   *(int *)(obj+0x98)=0; obj[0x30]=255;
   *(unsigned short *)(obj+0x34)=(*(unsigned short *)(obj+0x34)|0x41)&0xEFFF;
   func_002A7750(obj,5,-1);
-  s[0x48]=func_00283CF0(17.0f); s[0x4A]=func_00283CF0(6.0f);
+  s[0x48]=FloatToInt(17.0f); s[0x4A]=FloatToInt(6.0f);
   *(short *)(s+0x424)=func_L09_003FE620(obj);
  } else {
   if (*(int *)(s+0x314)==-1 || !*(int *)D_L09_001FE6C0[*(int *)(s+0x314)] || *(int *)(s+0x318)==-1 || !*(int *)D_L09_001FE6C0[*(int *)(s+0x318)]) {func_0029F338(obj);return;}
@@ -42,7 +42,7 @@ void func_L09_003FE670(unsigned char *obj) {
   *(float *)(s+0x3E8)=*(float *)(s+0x3E4)=*(float *)(s+0x3D8)=0.0f;
   func_002A7750(obj,1,-1);
   {unsigned char *r=D_00188660+*(int *)(s+0x3F0)*0x70;
-   if (*(unsigned char **)(r+0x88)!=obj || !r[0x74]) *(int *)(s+0x3F0)=func_002E5CF8(D_L09_001B11B4,4,obj);
+   if (*(unsigned char **)(r+0x88)!=obj || !r[0x74]) *(int *)(s+0x3F0)=PlayMobySound(D_L09_001B11B4,4,obj);
   }
  }
 }

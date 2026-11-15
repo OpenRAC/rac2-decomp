@@ -32,19 +32,19 @@ void func_L00_003A7E78(char *moby)
         *(VectorBits *)previous = *(VectorBits *)(moby + 0x10);
         position = moby + 0x10;
     }
-    func_00282CC0(position, position, state);
+    FastVecAdd(position, position, state);
     if (*(short *)(state + 0x12) == 1)
-        func_00282CC0(state + 0x30, state + 0x30, state + 0x20);
+        FastVecAdd(state + 0x30, state + 0x30, state + 0x20);
     if (*(unsigned char *)(moby + 0x20) == 0)
         *(unsigned char *)(moby + 0x20) = 1;
     else
         func_L00_003A8670(previous, *(short *)(state + 0x1A));
-    func_00282D08(midpoint, previous, position, 0.5f);
+    lerp_vector(midpoint, previous, position, 0.5f);
     func_L00_003A8670(midpoint, *(short *)(state + 0x1A));
     if (*(float *)(moby + 0x10) < 2.0f || *(float *)(moby + 0x10) > 1021.0f ||
         *(float *)(moby + 0x14) < 2.0f || *(float *)(moby + 0x14) > 1021.0f ||
         *(float *)(moby + 0x18) < 2.0f || *(float *)(moby + 0x18) > 1021.0f ||
-        func_L00_003A80F8(moby, previous) || func_00282978(state + 0x10))
+        func_L00_003A80F8(moby, previous) || FastDecTimer(state + 0x10))
         *(unsigned char *)(moby + 0x20) = 2;
     else
         func_L00_003A85A0(moby);

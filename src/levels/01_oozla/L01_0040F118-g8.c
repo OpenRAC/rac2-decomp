@@ -43,7 +43,7 @@ void func_L01_0040F118(char *obj)
         else
             func_002B0A68(obj, 0xD, D_L01_001A8F60, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
         func_L00_00326110(obj, 4, 0.0f);
-        func_002E5CF8(0, 0, obj);
+        PlayMobySound(0, 0, obj);
         func_002A7750(obj, 3, -1);
         return;
     case 3:

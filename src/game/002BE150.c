@@ -44,7 +44,7 @@ void func_002BE150(char *a0)
         *(float *)(s1 + 0xC) = 1.0f;
     }
     c = *(unsigned int *)(s0 + 4) & 0xFFFFFF;
-    r = func_00283CF0(((func_00283CE0((*(unsigned char **)(s0 + 0x20))[7]) / 256.0f)
+    r = FloatToInt(((IntToFloat((*(unsigned char **)(s0 + 0x20))[7]) / 256.0f)
                        * *(float *)(s1 + 0x10) + *(float *)(s1 + 0xC)) * 256.0f);
     c = c | ((unsigned int)r << 24);
     *(unsigned int *)(s0 + 4) = c;

@@ -71,7 +71,7 @@ void func_L04_00404068(void *arg0) {
     *(float *)(o + 0x1FC) -= 0.1f;
     if (*(float *)(o + 0x1FC) <= -8.0f)
         *(float *)(o + 0x1FC) += 8.0f;
-    func_L00_002ECFE8(arg0, o + 0x200, 3, 0x60005AFF, 0.08f, 0.45f, *(float *)(o + 0x1FC), 0xFF,
+    DrawOrientedQuadsAtPoints(arg0, o + 0x200, 3, 0x60005AFF, 0.08f, 0.45f, *(float *)(o + 0x1FC), 0xFF,
                       0x17);
 }
 
@@ -135,12 +135,12 @@ void func_L04_00404100(unsigned char *m, unsigned char *p)
         }
     }
     if (*(int *)(p + 0x244)) {
-        func_00282CF0(point, *(unsigned char **)(p + 0x164) + 0x10, m + 0x10);
+        FastVecSub(point, *(unsigned char **)(p + 0x164) + 0x10, m + 0x10);
         if (func_L00_002EE290(point) < 100.0f) {
             *(B781AimQuad *)(point) = *(B781AimQuad *)(m + 0x10);
             point[2] -= 0.25f;
             *(B781AimQuad *)(end) = *(B781AimQuad *)(m + 0x10);
-            func_L04_00416390(m, end, p + 0xd0, *(float *)(p + 0x138) + *(float *)(p + 0x13c));
+            EmitTrailEffects(m, end, p + 0xd0, *(float *)(p + 0x138) + *(float *)(p + 0x13c));
         }
     }
 }
@@ -191,52 +191,52 @@ void func_L04_004077A0(unsigned char *m)
     *(unsigned short *)(p + 0x32) += 1;
     switch (m[0x20]) {
     case 1:
-        if (func_00282978(p + 0x30)) {
+        if (FastDecTimer(p + 0x30)) {
             m[0x20] = (*(int *)(p + 0x34) & 1) ? 3 : 2;
-            *(short *)(p + 0x30) = func_00283CF0(10.0f);
+            *(short *)(p + 0x30) = FloatToInt(10.0f);
             return;
         }
         if (*(int *)(p + 0x34) & 4) func_L00_002E6EF8(func_L04_004073E8, m);
         break;
     case 2:
-        func_00283098(oldpoint, p + 0x20, m + 0xc0);
-        func_00282CC0(oldpoint, oldpoint, m + 0x10);
+        matrix_mul_vec3(oldpoint, p + 0x20, m + 0xc0);
+        FastVecAdd(oldpoint, oldpoint, m + 0x10);
         if (*(int *)(p + 0x34) & 2) func_L00_003200F8(m, oldpoint, 0.3f, 10.0f, -1);
-        else func_0032C700(m + 0x10, 0.5f, 0.0f, 0, 25, 20, 20, 20, 45, 0, 0, 0, 0, 0);
+        else SpawnExplosion(m + 0x10, 0.5f, 0.0f, 0, 25, 20, 20, 20, 45, 0, 0, 0, 0, 0);
         goto destroy;
     case 3:
-        if (func_00282978(p + 0x30)) {
+        if (FastDecTimer(p + 0x30)) {
         case 0:
         destroy:
             func_0029F338(m);
             return;
         }
-        m[0x23] = func_00283CF0((float)*(short *)(p + 0x30) * 12.8f);
+        m[0x23] = FloatToInt((float)*(short *)(p + 0x30) * 12.8f);
         break;
     }
-    func_002833F0(rot, p + 0x10);
-    func_00283098(oldpoint, p + 0x20, m + 0xc0);
-    func_00283738(m + 0xc0, rot, m + 0xc0);
-    func_00283098(point, p + 0x20, m + 0xc0);
-    func_00282CF0(delta, point, oldpoint);
-    func_00282CF0(m + 0x10, m + 0x10, delta);
-    func_00282CC0(m + 0x10, m + 0x10, p);
+    euler_rotation_basis(rot, p + 0x10);
+    matrix_mul_vec3(oldpoint, p + 0x20, m + 0xc0);
+    multiply_matrix3x3(m + 0xc0, rot, m + 0xc0);
+    matrix_mul_vec3(point, p + 0x20, m + 0xc0);
+    FastVecSub(delta, point, oldpoint);
+    FastVecSub(m + 0x10, m + 0x10, delta);
+    FastVecAdd(m + 0x10, m + 0x10, p);
     *(float *)(p + 8) -= *(float *)(p + 0x38);
     radius = *(float *)(p + 0x2c);
-    func_00283098(probe, p + 0x20, m + 0xc0);
-    func_00282CC0(probe, probe, m + 0x10);
+    matrix_mul_vec3(probe, p + 0x20, m + 0xc0);
+    FastVecAdd(probe, probe, m + 0x10);
     if (func_00277258(probe, 0, radius, m)) {
-        func_00282F20(D_L04_001BFB00, D_L04_001BFB00, 1.0f);
-        speed = func_00282DF0(p);
-        dot = func_00282DB0(p, D_L04_001BFB00);
+        vec_scale_to_length(D_L04_001BFB00, D_L04_001BFB00, 1.0f);
+        speed = FastVecLength(p);
+        dot = FastVecDot(p, D_L04_001BFB00);
         if (dot < 0.0f) {
             func_00283028(p, p, D_L04_001BFB00);
-            func_00282F20(bounce, D_L04_001BFB00, dot * 0.5f);
-            func_00282CC0(p, p, bounce);
-            func_00282F20(p, p, speed);
-            func_00282DD8(axis, D_L04_001BFB00, p);
-            func_00282F20(axis, axis, 1.0f);
-            func_002AB668(axis, axis, func_00282DF0(p + 0x10));
+            vec_scale_to_length(bounce, D_L04_001BFB00, dot * 0.5f);
+            FastVecAdd(p, p, bounce);
+            vec_scale_to_length(p, p, speed);
+            FastVecCross(axis, D_L04_001BFB00, p);
+            vec_scale_to_length(axis, axis, 1.0f);
+            func_002AB668(axis, axis, FastVecLength(p + 0x10));
             func_002839D0(axis, matrix);
             func_002AB6D8(matrix, p + 0x10);
             if (*(short *)(p + 0x32) >= 16) *(short *)(p + 0x30) = 0;
@@ -463,13 +463,13 @@ void func_L04_0040C0C0(L04Quad *position, L04Quad *direction, int count, int mod
         pitch = func_0033BB18(0.6981318f, 1.5358899f);
         func_002AF000(velocity, func_0033BB18(0.012500001f, 0.025000002f), angle, pitch);
         *(L04Quad *)scaled = *direction;
-        func_00282D30(scaled, direction, func_0033BB18(0.75f, 0.95f));
+        FastVecScale(scaled, direction, func_0033BB18(0.75f, 0.95f));
         if (mode) {
             velocity[0] *= 5.0f;
             velocity[1] *= 5.0f;
             size *= 3.0f;
         }
-        func_00282CD8(result, velocity, scaled);
+        add_vectors(result, velocity, scaled);
         qcopy(point, position);
         point[0] += func_0033BB78(0.0f, 0.0375f);
         point[1] += func_0033BB78(0.0f, 0.0375f);
@@ -488,9 +488,9 @@ void func_L04_0040CDD0(unsigned char *a0)
     unsigned char *s = *(unsigned char **)(a0 + 0x68);
 
     if (*(unsigned int *)(s + 0x4D8) != 0) {
-        func_L04_0040D148(a0, -1);
+        DrawPulsingGlowSphere(a0, -1);
     } else if (*(unsigned int *)(s + 0x768) != 0) {
-        func_L04_0040D148(a0, *(unsigned int *)(s + 0x764));
+        DrawPulsingGlowSphere(a0, *(unsigned int *)(s + 0x764));
     } else if (*(unsigned char *)(a0 + 0xBC) != 6) {
         func_L04_0040CE30(a0);
     }
@@ -545,10 +545,10 @@ void func_L04_0040CE30(char *a0)
         func_0029FCC0(a0, 4, vec4);
 
         s2->row670[i] = s2->row670[i] - s2->row660[i];
-        func_00282D30(tmp, dir, s2->row670[i]);
-        func_00282CC0(vec3, vec3, tmp);
+        FastVecScale(tmp, dir, s2->row670[i]);
+        FastVecAdd(vec3, vec3, tmp);
 
-        f22 = func_00283CE0(i) * 0.25f;
+        f22 = IntToFloat(i) * 0.25f;
         f21 = f22 * 0.1f;
         vec3[2] = vec3[2] + f21;
         f20 = f22 * -0.025f + 0.05f;
@@ -558,8 +558,8 @@ void func_L04_0040CE30(char *a0)
         }
 
         s2->row680[i] = s2->row680[i] - s2->row660[i];
-        func_00282D30(tmp, dir, s2->row680[i]);
-        func_00282CC0(vec2, vec2, tmp);
+        FastVecScale(tmp, dir, s2->row680[i]);
+        FastVecAdd(vec2, vec2, tmp);
         vec2[2] = vec2[2] + f21;
         func_L00_003F8280(vec2, f20, 0.0f, 0.0f, 0.0f, 0.0025f, s2->slot, 1);
         if (s2->row680[i] < -0.2f) {
@@ -567,8 +567,8 @@ void func_L04_0040CE30(char *a0)
         }
 
         s2->row690[i] = s2->row690[i] - s2->row660[i];
-        func_00282D30(tmp, dir, s2->row690[i]);
-        func_00282CC0(vec4, vec4, tmp);
+        FastVecScale(tmp, dir, s2->row690[i]);
+        FastVecAdd(vec4, vec4, tmp);
         vec4[2] = vec4[2] + f21;
         func_L00_003F8280(vec4, f22 * -0.050000004f + 0.075f, 0.0f, 0.0f, 0.0f, 0.0025f, s2->slot, 1);
         if (s2->row690[i] < -0.19f) {
@@ -678,19 +678,19 @@ void func_L04_0040E460(unsigned char *m)
     int *data;
     float wave, active, angle, sine, radius;
     unsigned int color;
-    angle = func_00283CE0(period);
+    angle = IntToFloat(period);
     red = D_L04_001B2008[0] % period;
     {
         float phase = (float)red;
         wave = func_00283198(((phase / angle) * 2.0f) * 3.1415927f + -3.1415927f);
     }
-    red = func_00283CF0(wave * 48.0f) + 104;
-    green = func_00283CF0(wave * 64.0f) + 208;
-    blue = func_00283CF0(wave * 24.0f) + 60;
+    red = FloatToInt(wave * 48.0f) + 104;
+    green = FloatToInt(wave * 64.0f) + 208;
+    blue = FloatToInt(wave * 24.0f) + 60;
     if (green > 255) green = 255;
     if (*(int *)(p + 0x278)) {
-        func_002AA2E8(p + 0x27c, 0.16666669f, 0.00555555569008f);
-        func_002AA2E8(p + 0x28c, 97.0f, 0.5666667f);
+        ApproachValue(p + 0x27c, 0.16666669f, 0.00555555569008f);
+        ApproachValue(p + 0x28c, 97.0f, 0.5666667f);
         if (*(int *)(p + 0x278)) func_00282948(p + 0x278);
         func_L00_00322BE0(p + 0x4e0, 1);
         state = p + 0x4e0;
@@ -700,9 +700,9 @@ void func_L04_0040E460(unsigned char *m)
             --*(int *)(p + 0x33c);
             if (m[0x20] != 3) func_002E5DA0(0, 0, m, 0x474);
             if (!func_002E59B0(m, *(int *)(p + 0x714))) {
-                if (m[0x20] != 3) *(int *)(p + 0x714) = func_002E5CF8(15, 4, m);
+                if (m[0x20] != 3) *(int *)(p + 0x714) = PlayMobySound(15, 4, m);
                 else {
-                    *(int *)(p + 0x714) = func_002E5CF8(24, 5, m);
+                    *(int *)(p + 0x714) = PlayMobySound(24, 5, m);
                     func_L01_00355BA0(*(int *)(p + 0x714), 0x400);
                 }
             }
@@ -729,10 +729,10 @@ void func_L04_0040E460(unsigned char *m)
             active = 1.0f;
             func_L00_00322BE0(state, 1);
         }
-        func_002AA2E8(p + 0x27c, active * 0.10000001f, 0.00138888892252f);
+        ApproachValue(p + 0x27c, active * 0.10000001f, 0.00138888892252f);
         if (*(float *)(p + 0x27c) < 0.0f) *(float *)(p + 0x27c) = 0.0f;
-        if (active > 0.5f) func_002AA2E8(p + 0x28c, 97.0f, 0.5666667f);
-        else func_002AA2E8(p + 0x28c, 80.0f, 0.14166668f);
+        if (active > 0.5f) ApproachValue(p + 0x28c, 97.0f, 0.5666667f);
+        else ApproachValue(p + 0x28c, 80.0f, 0.14166668f);
     }
     if (m[0x20] != 3) {
         float viewAngle = *(float *)(p + 0x28c);
@@ -740,14 +740,14 @@ void func_L04_0040E460(unsigned char *m)
         sine = func_00283198(viewAngle);
         sine /= func_00283180(viewAngle);
         D_L04_001BDC30 = sine;
-        func_0027AB40();
+        UpdateViewContext();
     }
     if (*(int *)(p + 0x25c) != -1) {
-        func_002A8600(&item, *(int *)(p + 0x25c), 0, 0);
+        GetFirstMobyInGroup(&item, *(int *)(p + 0x25c), 0, 0);
         if (item) do {
             if (*(short *)(item + 0xaa) == 0xa99) {
                 data = *(int **)(item + 0x68);
-                func_00282CF0(delta, item + 0x10, m + 0x10);
+                FastVecSub(delta, item + 0x10, m + 0x10);
                 if (*data == 0 && *(int *)(p + 0x33c) < 3 && func_L00_002EE290(delta) < 1.0f) {
                     ++*(int *)(p + 0x33c);
                     if (m[0x20] != 3) func_002E5DA0(0, 0, m, 0xa99);
@@ -755,11 +755,11 @@ void func_L04_0040E460(unsigned char *m)
                     *data = 300;
                 }
             }
-            func_002A86E8(&item, item, 0, 0);
+            GetNextMobyInGroup(&item, item, 0, 0);
         } while (item);
     }
     if (*(int *)(p + 0x254) != -1) {
-        func_002A8600(&other, *(int *)(p + 0x254), 0, 0);
+        GetFirstMobyInGroup(&other, *(int *)(p + 0x254), 0, 0);
         if (other) {
             /* One four-term OR would be rebalanced by fold, so the terms join in steps. */
             unsigned int high = (alpha << 24) | (blue << 16);
@@ -772,22 +772,22 @@ void func_L04_0040E460(unsigned char *m)
                 *(unsigned short *)(other + 0x34) |= 16;
                 *(unsigned int *)(other + 0x78) = color;
                 if (!func_002829A8(other + 0xbc)) goto next;
-                func_00282CF0(delta, other + 0x10, D_00189EA0);
-                if (func_00282DB0(delta, delta) > 20.0f) goto next;
-                func_00283388(rotation);
-                func_00283698(rotation, other + 0xc0);
-                func_002830C0(delta, delta, rotation);
+                FastVecSub(delta, other + 0x10, D_00189EA0);
+                if (FastVecDot(delta, delta) > 20.0f) goto next;
+                set_identity_matrix(rotation);
+                matrix_from_basis_rows(rotation, other + 0xc0);
+                transform_vector(delta, delta, rotation);
                 if (!(func_00282C48(delta[0]) < 2.8f) || !(func_00282C48(delta[1]) < radius) || !(func_00282C48(delta[2]) < 1.5f)) goto next;
                 data = *(int **)(other + 0x68);
                 *(int *)(p + 0x278) += *data;
                 if (!func_002E59B0(m, *(int *)(p + 0x714))) {
-                    if (m[0x20] != 3) *(int *)(p + 0x714) = func_002E5CF8(15, 4, m);
+                    if (m[0x20] != 3) *(int *)(p + 0x714) = PlayMobySound(15, 4, m);
                     else {
-                        *(int *)(p + 0x714) = func_002E5CF8(24, 5, m);
+                        *(int *)(p + 0x714) = PlayMobySound(24, 5, m);
                         func_L01_00355BA0(*(int *)(p + 0x714), 0x400);
                     }
                 }
-                if (m[0x20] != 3) func_002E5CF8(12, 0, m);
+                if (m[0x20] != 3) PlayMobySound(12, 0, m);
                 *(int *)(p + 0x650) = *data;
                 other[0xbc] = 60;
                 if (*(unsigned char **)(p + 0x4c4)) {
@@ -804,7 +804,7 @@ void func_L04_0040E460(unsigned char *m)
                     *(int *)(p + 0x640) = 1;
                 }
 next:
-                func_002A86E8(&other, other, 0, 0);
+                GetNextMobyInGroup(&other, other, 0, 0);
             } while (other);
         }
     }
@@ -827,40 +827,40 @@ void func_L04_0040F5D0(unsigned char *m)
         p->primary = -1;
         return;
     }
-    *(float *)(base + 0x1c) = func_00282E48(base + 0x10, base + 0x20);
+    *(float *)(base + 0x1c) = fast_vec_dist(base + 0x10, base + 0x20);
     for (i = 0; i < 4; i++) {
         if (p->branches[i] == -1) continue;
         path = D_L04_001FE340[p->branches[i]];
         if (*(int *)path >= 4) {
-            *(float *)(path + 0x1c) = func_00282E48(path + 0x10, path + 0x20);
+            *(float *)(path + 0x1c) = fast_vec_dist(path + 0x10, path + 0x20);
             index = 0.0f;
             closest = 999999.0f;
             if (p->parents[i] != -1) other = D_L04_001FE340[p->branches[p->parents[i]]];
             else other = base;
             for (j = 0; j < *(int *)other - 1; j++) {
-                func_00282CF0(delta, other + 0x10 + j * 16, path + 0x10);
+                FastVecSub(delta, other + 0x10 + j * 16, path + 0x10);
                 distance = func_L00_002EE290(delta);
                 if (distance < closest) {
-                    index = func_00283CE0(j);
+                    index = IntToFloat(j);
                     closest = distance;
                 }
             }
             *(float *)(path + 0x2c) = index;
-            *(float *)(path + 0x4c) = func_00282E48(other + 0x10 + func_00283CF0(index) * 16, path + 0x10) + *(float *)(path + 0x2c) * *(float *)(other + 0x1c);
+            *(float *)(path + 0x4c) = fast_vec_dist(other + 0x10 + FloatToInt(index) * 16, path + 0x10) + *(float *)(path + 0x2c) * *(float *)(other + 0x1c);
             index = 0.0f;
             closest = 999999.0f;
             if (p->links[i] != -1) other = D_L04_001FE340[p->branches[p->links[i]]];
             else other = base;
             for (j = 0; j < *(int *)other - 1; j++) {
-                func_00282CF0(delta, other + 0x10 + j * 16, path + *(int *)path * 16);
+                FastVecSub(delta, other + 0x10 + j * 16, path + *(int *)path * 16);
                 distance = func_L00_002EE290(delta);
                 if (distance < closest) {
-                    index = func_00283CE0(j);
+                    index = IntToFloat(j);
                     closest = distance;
                 }
             }
             *(float *)(path + 0x3c) = index;
-            *(float *)(path + 0x5c) = func_00282E48(other + 0x10 + func_00283CF0(index) * 16, path + *(int *)path * 16) + *(float *)(path + 0x3c) * *(float *)(other + 0x1c);
+            *(float *)(path + 0x5c) = fast_vec_dist(other + 0x10 + FloatToInt(index) * 16, path + *(int *)path * 16) + *(float *)(path + 0x3c) * *(float *)(other + 0x1c);
         } else p->branches[i] = -1;
     }
 }

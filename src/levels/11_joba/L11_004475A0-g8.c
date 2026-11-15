@@ -75,7 +75,7 @@ void func_L11_004475A0(char *self)
     if (*(char **)(state+0x350)) *(Quad004475A0 *)target=*(Quad004475A0 *)(*(char **)(state+0x350)+0x10);
     else *(Quad004475A0 *)target=*(Quad004475A0 *)D_00189EA0;
     if (*(short *)(state+0x36E)) {
-        func_00282CF0(temp,target,self+0x10);
+        FastVecSub(temp,target,self+0x10);
         point=self+0x10;
         angle=0.0f;
         difference=func_002B04E0(self,temp,state+0x2F0);
@@ -85,9 +85,9 @@ void func_L11_004475A0(char *self)
         x-=*(float *)(self+0x10);
         y-=*(float *)(self+0x14);
         angle=func_00283248(x,y);
-        difference=func_00283C80(angle,*(float *)(self+0xF8));
+        difference=FastDiffRots(angle,*(float *)(self+0xF8));
     }
-    distance=func_00282E48(point,target);
+    distance=fast_vec_dist(point,target);
     switch (*(u8 *)(self+0x95)) {
     case 2:
         if (func_002B3890(self)) {
@@ -121,7 +121,7 @@ void func_L11_004475A0(char *self)
         break;
     case 3:
         if (*(short *)(state+0x36E)) func_L02_00333438(self,target);
-        else if (!func_L11_00449C70(self)) {
+        else if (!AimAtGroupEntityInCone(self)) {
             switch(*(u8 *)(self+0x42)) {
             case 2: func_L01_00321178(self,target); break;
             case 3: func_002B4FF0(self,target,*(float *)(state+0x358)); break;
@@ -147,7 +147,7 @@ void func_L11_004475A0(char *self)
         }
         if (*(float *)(state+0x20)<=0.0f && !*(u8 *)(state+0x2B1)) {
             func_00282A60(state+0x2B0,0,0x40);
-            func_0029F978(self,3,state+0x2B0);
+            AttachManipulator(self,3,state+0x2B0);
             *(u8 *)(state+0x2B2)=1;
             *(float *)(state+0x2D8)=0.0001f;
             *(float *)(state+0x2D4)=0.0001f;
@@ -266,9 +266,9 @@ void func_L11_004475A0(char *self)
         break;
     case 18:
         if (func_002B3868(self)) {
-            func_00282CF0(state+0x1A0,func_L11_004417E8(*(int *)(self+0xB8)),point);
+            FastVecSub(state+0x1A0,func_L11_004417E8(*(int *)(self+0xB8)),point);
             *(float *)(state+0x1A8)=0;
-            func_00282F20(state+0x1A0,state+0x1A0,func_002A7878(3.0f,5.0f)*0.01666666753590107f);
+            vec_scale_to_length(state+0x1A0,state+0x1A0,func_002A7878(3.0f,5.0f)*0.01666666753590107f);
             *(short *)(state+0x36E)=0;
             for(i=0;i<3;i++) {
                 float *spin=(float *)(state+0x340);
@@ -282,12 +282,12 @@ void func_L11_004475A0(char *self)
         { float gravity=*(float *)(state+0x12C);
           *(float *)(state+0x1A8)=*(float *)(state+0x1A8)-gravity; }
         func_L07_00321D68(self,state+0x1A0);
-        func_00282D30(state+0x340,state+0x340,0.98f);
+        FastVecScale(state+0x340,state+0x340,0.98f);
         *(Quad004475A0 *)matrix=0;
         matrix[2]=*(float *)(state+0x30);
         *(Quad004475A0 *)temp=*(Quad004475A0 *)matrix;
         func_002B4090(self,temp,*(float *)(state+0x340),*(float *)(state+0x344),*(float *)(state+0x348));
-        func_002833F0(self+0xC0,self+0xF0);
+        euler_rotation_basis(self+0xC0,self+0xF0);
         p=func_L11_004417E8(*(int *)(self+0xB8));
         if (*(float *)(self+0x18)<*(float *)(p+8)+5.0f || !func_002A77E0(450) || *(u16 *)(self+0x96)>300) {
             *(int *)(self+0x98)=0;

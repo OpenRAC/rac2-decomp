@@ -9,7 +9,7 @@ extern void func_L22_003FBBF0(void *);
 extern int D_L22_001AF37C;
 
 char *func_L22_003FB1F8(char *obj, TI128 *pos, int arg3, f32 f) {
-    char *o = (char *)func_0029EFD0(0xE3A);
+    char *o = (char *)CreateMoby(0xE3A);
     if (o != 0) {
         u8 *ctl = *(u8 **)(o + 0x68);
         *(short *)(ctl + 0x2A) = arg3;
@@ -29,7 +29,7 @@ char *func_L22_003FB1F8(char *obj, TI128 *pos, int arg3, f32 f) {
         *(f32 *)(ctl + 0x4C) = func_002A7940();
         qcopy(o + 0x10, pos);
         *(u16 *)(o + 0x34) |= 0x41;
-        func_00283360(o + 0xC0);
+        set_identity_rotation_rows(o + 0xC0);
         func_L22_003FBBF0(o);
     }
     return o;

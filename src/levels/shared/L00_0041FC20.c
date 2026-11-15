@@ -23,9 +23,9 @@ void func_L00_0041FC20(float *position, void *unused, int shortLife)
         pitch = func_002A7878(-0.9599312f, -1.3962636f);
         yaw = func_002A7940();
         func_002AF000(&velocity, func_002A7878(0.0f, 0.5f) * 0.016666668f, yaw, pitch);
-        func_00282CF0(&offset, D_L00_001B8DC0, position);
-        func_00282F20(&offset, &offset, 0.15f);
-        func_00282CC0(position, position, &offset);
+        FastVecSub(&offset, D_L00_001B8DC0, position);
+        vec_scale_to_length(&offset, &offset, 0.15f);
+        FastVecAdd(position, position, &offset);
         life = func_002A7878(30000.0f, 60000.0f);
         point.x = position[0] + func_002A78D8(0.0f, 0.15f);
         point.y = position[1] + func_002A78D8(0.0f, 0.15f);

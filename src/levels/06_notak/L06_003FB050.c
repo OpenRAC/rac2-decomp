@@ -79,7 +79,7 @@ void func_L06_003FB050(char *moby)
     {
         char *sound = D_00188660 + *(int *)(state + 0xB0) * 0x70;
     if (*(char **)(sound + 0x88) != moby || !*(unsigned char *)(sound + 0x74))
-        *(int *)(state + 0xB0) = func_002E5CF8(0, 4, moby);
+        *(int *)(state + 0xB0) = PlayMobySound(0, 4, moby);
     }
     func_002AA548(moby + 0x18, state + 0x64, *(float *)(state + 0x88),
                   0.001944444492f, 0.001666666707f, 0.1000000089f);
@@ -103,7 +103,7 @@ void func_L06_003FB050(char *moby)
     } else {
         char *sound = D_00188660 + *(int *)(state + 0xB0) * 0x70;
         if (*(char **)(sound + 0x88) != moby || !*(unsigned char *)(sound + 0x74))
-            *(int *)(state + 0xB0) = func_002E5CF8(0, 4, moby);
+            *(int *)(state + 0xB0) = PlayMobySound(0, 4, moby);
     }
     goto done;
 stop:
@@ -128,6 +128,6 @@ done:
         int mid = (brightness << 16) | hi;
         *(int *)(moby + 0x78) = mid | brightness;
     }
-    func_00282CF0(delta, moby + 0x10, oldPosition);
+    FastVecSub(delta, moby + 0x10, oldPosition);
     func_002AD6F0(state + 0x20, delta, oldRotation, moby + 0xF0);
 }

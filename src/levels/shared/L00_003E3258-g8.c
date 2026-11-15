@@ -23,9 +23,9 @@ void func_L00_003E55B0(char *object)
 
     s1 = *(char **)(object + 0x68);
     if (*(int *)(s1 + 0x24) != 0) {
-        func_002FC560(0x4E, (((long long)(D_001A72E0 >> 13) | 0x1000000) | (1LL << 32)));
+        VU1_addGSregister(0x4E, (((long long)(D_001A72E0 >> 13) | 0x1000000) | (1LL << 32)));
         func_0027DE50(0, D_001A6480[0xA9], 0, D_001A6480[0xA8], (*(int *)(s1 + 0x24) << 24) | 0xFFFFFF);
-        func_002FC560(0x4E, (D_001A72E0_1 >> 13) | 0x1000000);
+        VU1_addGSregister(0x4E, (D_001A72E0_1 >> 13) | 0x1000000);
     }
 }
 
@@ -74,7 +74,7 @@ void func_L00_003E5710(char *object)
     int quad, corner;
     float *first_u, *first_v;
 
-    registers[1] = func_0027C878(D_L00_001B05F4);
+    registers[1] = GetEffectTextureDescriptor(D_L00_001B05F4);
     registers[2] = 0xFF9000000260ULL;
     registers[3] = D_L00_001B05E0 | (unsigned long long)D_L00_001B05E4 << 2;
     registers[3] |= (unsigned long long)D_L00_001B05E8 << 4;
@@ -101,18 +101,18 @@ void func_L00_003E5710(char *object)
             int vertex = D_L00_00297020[quad][corner][0];
             int texel = D_L00_00297020[quad][corner][1];
 
-            func_00282D30(vertices[corner], D_L00_00296B20[vertex], D_L00_001B05FC);
+            FastVecScale(vertices[corner], D_L00_00296B20[vertex], D_L00_001B05FC);
             *u = D_L00_00297420[texel][0];
             *v = D_L00_00297420[texel][1];
-            func_00283098(vertices[corner], vertices[corner], matrix);
-            func_00283098(vertices[corner], vertices[corner], object + 0xC0);
-            func_00282CC0(vertices[corner], vertices[corner], object + 0x10);
-            func_00282F20(matrix[3], matrix[3], 0.5f);
-            func_00282CC0(vertices[corner], vertices[corner], matrix[3]);
+            matrix_mul_vec3(vertices[corner], vertices[corner], matrix);
+            matrix_mul_vec3(vertices[corner], vertices[corner], object + 0xC0);
+            FastVecAdd(vertices[corner], vertices[corner], object + 0x10);
+            vec_scale_to_length(matrix[3], matrix[3], 0.5f);
+            FastVecAdd(vertices[corner], vertices[corner], matrix[3]);
             u += 2;
             v += 2;
         }
-        func_00280B90(vertices, 0, 0);
+        draw_world_quad(vertices, 0, 0);
     } while (++quad < 64);
 }
 
@@ -130,7 +130,7 @@ void func_L00_003E5978(char *object)
     char *position;
     float *first_u, *first_v;
 
-    registers[1] = func_0027C878(D_L00_001B05F4);
+    registers[1] = GetEffectTextureDescriptor(D_L00_001B05F4);
     registers[2] = 0xFF9000000260ULL;
     registers[3] = D_L00_001B05E0 | (unsigned long long)D_L00_001B05E4 << 2;
     registers[3] |= (unsigned long long)D_L00_001B05E8 << 4;
@@ -158,18 +158,18 @@ void func_L00_003E5978(char *object)
             int vertex = D_L00_00297020[quad][corner][0];
             int texel = D_L00_00297020[quad][corner][1];
 
-            func_00282D30(vertices[corner], D_L00_00296B20[vertex], D_L00_001B05FC);
+            FastVecScale(vertices[corner], D_L00_00296B20[vertex], D_L00_001B05FC);
             *u = D_L00_00297420[texel][0];
             *v = D_L00_00297420[texel][1];
-            func_00283098(vertices[corner], vertices[corner], matrix);
-            func_00283098(vertices[corner], vertices[corner], object + 0xC0);
-            func_00282CC0(vertices[corner], vertices[corner], position);
-            func_00282F20(matrix[3], matrix[3], 0.5f);
-            func_00282CC0(vertices[corner], vertices[corner], matrix[3]);
+            matrix_mul_vec3(vertices[corner], vertices[corner], matrix);
+            matrix_mul_vec3(vertices[corner], vertices[corner], object + 0xC0);
+            FastVecAdd(vertices[corner], vertices[corner], position);
+            vec_scale_to_length(matrix[3], matrix[3], 0.5f);
+            FastVecAdd(vertices[corner], vertices[corner], matrix[3]);
             u += 2;
             v += 2;
         }
-        func_00280B90(vertices, 0, 0);
+        draw_world_quad(vertices, 0, 0);
     } while (++quad < 64);
 }
 
@@ -236,7 +236,7 @@ void func_L00_003E4BF0(char *object)
         data->rate=2.0f/3.0f;
         data->alpha=127;
         data->count=111;
-        data->handle=func_L00_00329E90(object,0,&allocation);
+        data->handle=AcquireEntitySlot(object,0,&allocation);
         mem=func_L00_0032A088(*(short *)(object+0xAA),data->handle);
         D_L00_001B2B50=mem;
         D_L00_001B2B54=(char *)func_L00_003E4B80((int)(mem+0x50));
@@ -248,7 +248,7 @@ void func_L00_003E4BF0(char *object)
         *(int *)(D_L00_001B2B50_1+0x30)=0;
         qcopy(center,object+0x10);
         func_002AFFD8(object+0x10,offset,1);
-        func_00282CC0(center,object+0x10,offset);
+        FastVecAdd(center,object+0x10,offset);
         func_002AC728(object,center,-1,2.0f,20.0f);
         func_L00_003E64F8(object,20,object+0x10,data,1.0f/6.0f);
         func_L00_003E5340(object,object+0x10);
@@ -267,21 +267,21 @@ void func_L00_003E4BF0(char *object)
         if(data->count<0) data->count=0;
         data->phase+=data->rate;
         timer=&data->timer;
-        scale=1.0f-func_00283CE0(*timer)/func_00283CE0(20);
+        scale=1.0f-IntToFloat(*timer)/IntToFloat(20);
         scale*=8.0f;
         count=func_00277F48(object+0x10,0,object,0,scale+0.001f);
         for(i=0;i<count;i++) {
             if((func_002AB1F0(D_L00_001C3280[i]) || (*(unsigned short *)(D_L00_001C3280[i]+0x34)&0x4000)) && D_L00_001C3280[i]!=D_00189E20.target && *(short *)(D_L00_001C3280[i]+0xAA)!=0xA5A) {
-                func_00282CF0(direction,D_L00_001C3280[i]+0x10,object+0x10);
-                func_00282F20(direction,direction,1.0f);
-                func_00282F20(&hit,&hit,1.0f);
-                func_002A8C00(((Weapon4BF0 *)((unsigned int)D_L00_00262570 + D_00139568[0x2A] * sizeof(Weapon4BF0)))->damage,&hit,object,0x830000,direction);
+                FastVecSub(direction,D_L00_001C3280[i]+0x10,object+0x10);
+                vec_scale_to_length(direction,direction,1.0f);
+                vec_scale_to_length(&hit,&hit,1.0f);
+                make_hit_descriptor(((Weapon4BF0 *)((unsigned int)D_L00_00262570 + D_00139568[0x2A] * sizeof(Weapon4BF0)))->damage,&hit,object,0x830000,direction);
                 *(TI4BF0 *)hit.point = *(TI4BF0 *)direction;
                 hit.flags=3; hit.type=5; hit.active=1;
                 hit.point[3]=5627.925f;
                 hit.id=*(short *)(D_L00_001C3280[i]+0xAA);
-                func_002A8E20(D_L00_001C3280[i],&hit);
-                func_0032D758(D_L00_001C3280[i],71,*(int *)(object+0xB8));
+                QueueMobyImpact(D_L00_001C3280[i],&hit);
+                StartAttachedEffect(D_L00_001C3280[i],71,*(int *)(object+0xB8));
             }
         }
         if(func_00282948(timer)) {
@@ -292,12 +292,12 @@ void func_L00_003E4BF0(char *object)
     }
     case 2:
         data->phase+=data->rate;
-        scale=func_00283CE0(data->timer)*0.025f;
+        scale=IntToFloat(data->timer)*0.025f;
         if(data->timer==20) func_L00_003E5340(object,object+0x10);
         if(func_00282948(&data->timer)) {
             if(data->alpha) --data->alpha;
             else { data->alpha=0; *(unsigned char *)(object+0x20)=6; }
-        } else data->alpha=func_00283CF0(func_00283CE0(127)*scale);
+        } else data->alpha=FloatToInt(IntToFloat(127)*scale);
         break;
     case 6:
         data->rate-=0.016666668f;

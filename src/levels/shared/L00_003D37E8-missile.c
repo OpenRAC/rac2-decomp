@@ -1,8 +1,8 @@
 #include "common.h"
 
 /* Homing missile, the sibling of func_L00_003ED198 (L00_003EA0E0-seeker.c). The lead correction
- * and the length call share a tail that jump2 cross-jumps, so func_00282CC0 is not the last call
- * of its block, which is what lets a1 be set before a0 for func_00282D30. The store to t on the
+ * and the length call share a tail that jump2 cross-jumps, so FastVecAdd is not the last call
+ * of its block, which is what lets a1 be set before a0 for FastVecScale. The store to t on the
  * other arm is dead: it stops gcse propagating t over tracking_delta past the join, which would
  * keep t alive in a saved register. */
 extern int func_002B4038(int, int);
@@ -71,21 +71,21 @@ void func_L00_003E2510(char *obj)
         if (func_L00_003E39B8(target)) goto clear_target;
         {
             { float *t = delta;
-            func_00282CF0(t, *(char **)(state + 0x1C) + 0x10, obj + 0x10);
+            FastVecSub(t, *(char **)(state + 0x1C) + 0x10, obj + 0x10);
             tracking_delta = t;
             info = func_002AB1F0(*(char **)(state + 0x1C));
             if (info) {
-                func_00282D30((char *)temp, (char *)scratch, *(float *)(info + 0x10));
-                func_00282CC0(tracking_delta, tracking_delta, temp);
-                length = func_00282DF0(tracking_delta);
+                FastVecScale((char *)temp, (char *)scratch, *(float *)(info + 0x10));
+                FastVecAdd(tracking_delta, tracking_delta, temp);
+                length = FastVecLength(tracking_delta);
             } else {
                 t = 0;
-                length = func_00282DF0(tracking_delta);
+                length = FastVecLength(tracking_delta);
             } }
             if (length == 0.0f) goto clear_target;
             {
                 speed = *(float *)(state + 0x2C);
-                func_00282D30(state + 0x20, (char *)tracking_delta, speed / length);
+                FastVecScale(state + 0x20, (char *)tracking_delta, speed / length);
                 *(float *)(state + 0x2C) = speed;
             }
         }
@@ -97,29 +97,29 @@ target_done:
     switch (*(unsigned char *)(obj + 0x20)) {
     case 0:
         func_002FEE70(*(int *)(state + 0x34), state + 0x20, 0);
-        func_00282CC0(obj + 0x10, obj + 0x10, state + 0x20);
+        FastVecAdd(obj + 0x10, obj + 0x10, state + 0x20);
         func_00300190(obj + 0x10, obj + 0x10);
-        *(float *)(obj + 0xF0) = func_00283B98(*(float *)(obj + 0xF0), *(float *)(state + 0x44));
-        *(float *)(obj + 0xF4) = func_00283B98(*(float *)(obj + 0xF4), *(float *)(state + 0x48));
-        *(float *)(obj + 0xF8) = func_00283B98(*(float *)(obj + 0xF8), *(float *)(state + 0x4C));
+        *(float *)(obj + 0xF0) = FastAddRotations(*(float *)(obj + 0xF0), *(float *)(state + 0x44));
+        *(float *)(obj + 0xF4) = FastAddRotations(*(float *)(obj + 0xF4), *(float *)(state + 0x48));
+        *(float *)(obj + 0xF8) = FastAddRotations(*(float *)(obj + 0xF8), *(float *)(state + 0x4C));
         func_L00_003E3890(obj);
         *(char **)(hit + 0x10) = obj;
         *(int *)(hit + 0x14) = 0x10000;
         *(float *)(hit + 0x1C) = ((B2510Entry *)((unsigned char)D_00139568[0x1E] * 0xE0 + (char *)D_L00_00262570))->value;
         *(int *)(hit + 0x20) = 1;
         qcopy(hit, state + 0x20);
-        func_00282F20(hit, hit, 1.0f);
+        vec_scale_to_length(hit, hit, 1.0f);
         *(float *)(hit + 0xC) = 5627.925f;
         *(short *)(hit + 0x1A) = *(unsigned short *)(obj + 0xAA);
         hit[0x18] = 1;
         hit[0x19] = 1;
-        if (func_002761F8(previous, obj + 0x10, 0, D_0018C0B0, hit)) {
+        if (CollLine(previous, obj + 0x10, 0, D_0018C0B0, hit)) {
             if (!D_L00_001BF200.target) func_L00_003E3258(D_L00_001BF200.position, 15, 0);
             else if (*(int *)(D_L00_001BF200.target + 0x98)) {
                 func_L00_003E3258(D_L00_001BF200.position, 10, 1);
                 func_00334160(D_L00_001BF200.target, 0x1E, *(int *)(obj + 0xB8));
             }
-            func_002E5CF8(0, 0, obj);
+            PlayMobySound(0, 0, obj);
             *(unsigned char *)(obj + 0x20) = 1;
             *(char **)(state + 0x1C) = 0;
             *(unsigned short *)(obj + 0x34) |= 0x41;
@@ -137,8 +137,8 @@ target_done:
         p = func_002C65A0(obj + 0x10, D_L00_001A8F20, 2, 0x202080, (work + 128) % 255, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
         if (p) p[2] = *D_L00_001FEA14;
         work = (int)delta;
-        func_00282CF0((void *)work, obj + 0x10, previous);
-        func_00282D30((char *)work, (char *)work, 0.2f);
+        FastVecSub((void *)work, obj + 0x10, previous);
+        FastVecScale((char *)work, (char *)work, 0.2f);
         qcopy(temp, previous);
         tracking_delta = (float *)work;
         for (i = 4; i >= 0; i--) {
@@ -148,7 +148,7 @@ target_done:
             particle[1] = temp[1] + func_002A78D8(0.0f, 0.1f);
             particle[2] = temp[2] + func_002A78D8(0.0f, 0.1f);
             func_002C65A0(particle, D_L00_001A8F20, 15, 0x808080, work, 32, 0, scale * 210000.0f, scale * 42000.0f, 0.0f, 1);
-            func_00282CC0(temp, temp, tracking_delta);
+            FastVecAdd(temp, temp, tracking_delta);
         }
         if (D_L00_001B19C8 % 10 == 0) {
             p = func_002C65A0(obj + 0x10, D_L00_001A8F20, 30, 0x202080, 0, 32, 0, 2100.0f, 420000.0f, 0.0f, 1);

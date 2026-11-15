@@ -85,10 +85,10 @@ PoolRecord *func_L00_003F0198(char *owner, int kind, PoolVector *position, float
             slot->b = slot->a = 90;
             slot->scale = scale * 0.7f;
             slot->strength = 0.075f;
-            func_00282F20(&direction, slot->owner, 0.1f);
-            func_00282CC0(&slot->position, slot->owner + 0x20, &direction);
-            func_00282F20(&offset, &slot->velocity, 0.75f);
-            func_00282CC0(&slot->position, &offset, &slot->position);
+            vec_scale_to_length(&direction, slot->owner, 0.1f);
+            FastVecAdd(&slot->position, slot->owner + 0x20, &direction);
+            vec_scale_to_length(&offset, &slot->velocity, 0.75f);
+            FastVecAdd(&slot->position, &offset, &slot->position);
             slot->angularSpeed = func_002A78D8(0.05235988646745682f, 0.10471977293491364f);
             slot->mode = 2;
             slot->kind = 2;
@@ -123,10 +123,10 @@ PoolRecord *func_L00_003F0198(char *owner, int kind, PoolVector *position, float
             slot->b = slot->a = 90;
             slot->scale = scale * 0.7f;
             slot->strength = 0.20833334f;
-            func_00282F20(&direction, slot->owner, 0.1f);
-            func_00282CC0(&slot->position, slot->owner + 0x20, &direction);
-            func_00282F20(&offset, &slot->velocity, 0.75f);
-            func_00282CC0(&slot->position, &offset, &slot->position);
+            vec_scale_to_length(&direction, slot->owner, 0.1f);
+            FastVecAdd(&slot->position, slot->owner + 0x20, &direction);
+            vec_scale_to_length(&offset, &slot->velocity, 0.75f);
+            FastVecAdd(&slot->position, &offset, &slot->position);
             slot->angularSpeed = func_002A78D8(0.05235988646745682f, 0.10471977293491364f);
             slot->mode = 2;
         }

@@ -33,15 +33,15 @@ int func_L00_00429CE8(char *a)
     }
     if ((unsigned int)(D_00189E20_b0898.mode - 0x62) >= 2 && D_00189E20_b0898.speed > 0.016666668f) return 0;
     if (*(int *)(p + 0xC) >= 0) {
-        if (D_00189E20_b0898.mode == 0x62 && func_00282E80(D_00189E20_b0898.position, D_L00_001B1F8C[*(int *)(p + 0xC)].pos) < 3.0f) return 1;
-        if (func_002ACBC8(D_00189EA0, *(int *)(p + 0xC))) return 1;
+        if (D_00189E20_b0898.mode == 0x62 && vec_distance_xy(D_00189E20_b0898.position, D_L00_001B1F8C[*(int *)(p + 0xC)].pos) < 3.0f) return 1;
+        if (IsPointInCuboid(D_00189EA0, *(int *)(p + 0xC))) return 1;
     }
     if (*(int *)(p + 0x10) >= 0) {
-        if (D_00189E20_b0898.mode == 0x62 && func_00282E80(D_00189E20_b0898.position, D_L00_001B1F8C[*(int *)(p + 0x10)].pos) < 3.0f) return 1;
+        if (D_00189E20_b0898.mode == 0x62 && vec_distance_xy(D_00189E20_b0898.position, D_L00_001B1F8C[*(int *)(p + 0x10)].pos) < 3.0f) return 1;
         if (func_L00_003206B8(D_00189EA0, *(int *)(p + 0x10))) return 1;
     }
     if (*(int *)(p + 8) >= 0) {
-        if (D_00189E20_b0898.mode == 0x62 && func_00282E80(D_00189E20_b0898.position, D_L00_001B1F8C[*(int *)(p + 8)].pos) < 3.0f) return 1;
+        if (D_00189E20_b0898.mode == 0x62 && vec_distance_xy(D_00189E20_b0898.position, D_L00_001B1F8C[*(int *)(p + 8)].pos) < 3.0f) return 1;
         if (func_002ACCA8(D_00189EA0, *(int *)(p + 8))) return 1;
     }
     *(short *)(p + 0x26) = 1;

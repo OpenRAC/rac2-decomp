@@ -73,8 +73,8 @@ void func_L06_00403710(char *obj)
     switch (state) {
     case 0:
         if (data->active) {
-            data->timerA = func_00283CF0(15.0f);
-            data->timerB = func_00283CF0(12.0f);
+            data->timerA = FloatToInt(15.0f);
+            data->timerB = FloatToInt(12.0f);
             B(obj,0x20) = 2;
             {
                 float height = F(obj,0x18);
@@ -99,26 +99,26 @@ void func_L06_00403710(char *obj)
     case 1:
         qcopy(pos,D_L06_001FE500[data->path] + 0x10 + data->point*16);
         func_002AAA00((float *)(obj+0xF8),func_00283248(pos[0]-F(obj,0x10),pos[1]-F(obj,0x14)),0.0008726647356525064f,0.0008726647356525064f,0.05235988646745682f,&data->turn,0);
-        func_00282F20(step,obj+0xC0,0.05000000447034836f);
-        func_00282CC0(obj+0x10,obj+0x10,step);
-        if (func_00282E48(obj+0x10,pos)<3.0f || func_00282948(&data->timeout)) {
+        vec_scale_to_length(step,obj+0xC0,0.05000000447034836f);
+        FastVecAdd(obj+0x10,obj+0x10,step);
+        if (fast_vec_dist(obj+0x10,pos)<3.0f || func_00282948(&data->timeout)) {
             data->point = (data->point+func_002A77E0(I(D_L06_001FE500[data->path],0))) % I(D_L06_001FE500[data->path],0);
             data->timeout = 600;
         }
         break;
     case 2:
         func_00282948(&data->wait);
-        if (func_00282C48(D_00189E20.height-data->homeZ)<0.8f && D_00189E20.action==18 && !func_002ACBC8((char *)&D_00189E20+0x80,data->range)) {
+        if (func_00282C48(D_00189E20.height-data->homeZ)<0.8f && D_00189E20.action==18 && !IsPointInCuboid((char *)&D_00189E20+0x80,data->range)) {
             if (data->wait == 0) {
                 F(obj,0xF4) = -1.5533431768417358f;
-                F(obj,0xF8) = func_00283B98(D_L06_001B9858,1.5707964897155762f);
-                func_002833F0(obj+0xC0,obj+0xF0);
+                F(obj,0xF8) = FastAddRotations(D_L06_001B9858,1.5707964897155762f);
+                euler_rotation_basis(obj+0xC0,obj+0xF0);
                 qcopy(obj+0x10,(char *)&D_00189E20+0x80);
-                func_00282F20(pos,obj+0xE0,D_L06_001B0090);
-                func_00282CF0(obj+0x10,obj+0x10,pos);
+                vec_scale_to_length(pos,obj+0xE0,D_L06_001B0090);
+                FastVecSub(obj+0x10,obj+0x10,pos);
                 data->speed = 0.13333334028720856f;
                 H(obj,0x34) &= 0xFFFE;
-                func_002E5CF8(1,0,obj);
+                PlayMobySound(1,0,obj);
                 if (B(obj,0x43) != 2) func_002A7470(obj,2,10,5);
                 B(obj,0x20) = 3;
                 qcopy(step,(char *)&D_00189E20+0x80);
@@ -128,12 +128,12 @@ void func_L06_00403710(char *obj)
                 D_00189E20.flag = 1;
             }
         } else if (D_00189E20.mode!=18) {
-            if (func_002A8AF0((char *)&D_00189E20+0x80,D_L06_001FE500[data->path]+0x10,I(D_L06_001FE500[data->path],0))) data->wait=data->insideWait;
+            if (point_in_path_xy((char *)&D_00189E20+0x80,D_L06_001FE500[data->path]+0x10,I(D_L06_001FE500[data->path],0))) data->wait=data->insideWait;
             else data->wait=data->outsideWait;
         }
         break;
     case 3:
-        if (func_002B3868(obj)) func_002E5CF8(1,0,obj);
+        if (func_002B3868(obj)) PlayMobySound(1,0,obj);
         qzero_nc((char *)&D_00189E20+0xF0);
         qzero_nc((char *)&D_00189E20+0x110);
         qzero_nc((char *)&D_00189E20+0x120);
@@ -149,12 +149,12 @@ void func_L06_00403710(char *obj)
                 data->speed -= 0.0055555556900799274f;
         }
         if (data->speed<0.03333333507180214f) {
-            func_00282F20(pos,obj+0xE0,D_L06_001B0090);
+            vec_scale_to_length(pos,obj+0xE0,D_L06_001B0090);
             func_002AAA00((float *)(obj+0xF4),1.5533431768417358f,0.0034906589426100254f,0.0034906589426100254f,0.41887909173965454f,&data->turn,0);
-            func_002833F0(obj+0xC0,obj+0xF0);
-            func_00282F20(step,obj+0xE0,D_L06_001B0090);
-            func_00282CF0(delta,step,pos);
-            func_00282CF0(obj+0x10,obj+0x10,delta);
+            euler_rotation_basis(obj+0xC0,obj+0xF0);
+            vec_scale_to_length(step,obj+0xE0,D_L06_001B0090);
+            FastVecSub(delta,step,pos);
+            FastVecSub(obj+0x10,obj+0x10,delta);
         }
         if (data->speed<0.0f && F(obj,0x18)<D_00189E20.height) {
             qcopy_nc(pos,(char *)&D_00189E20+0x80);

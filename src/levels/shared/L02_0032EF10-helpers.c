@@ -12,10 +12,10 @@ void func_L02_0032EF10(MoveVector *start, MoveVector *target, MoveVector *output
     MoveVector source, intersection, destination;
     MoveVector *hit = &intersection;
     source.q = start->q;
-    if (func_002C94C8(path, &source, target, hit)) {
-        func_00282CF0(hit, hit, &source);
-        func_00282D30(hit, hit, 0.9900000095367432f);
-        func_00282CC0(&destination, &intersection, &source);
+    if (SegmentCrossPolyline(path, &source, target, hit)) {
+        FastVecSub(hit, hit, &source);
+        FastVecScale(hit, hit, 0.9900000095367432f);
+        FastVecAdd(&destination, &intersection, &source);
     } else {
         qcopy(&destination, target);
     }

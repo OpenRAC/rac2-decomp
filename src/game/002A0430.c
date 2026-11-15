@@ -176,7 +176,7 @@ void func_002A6C58(RewardMoby *p, int flags, int arg)
             if (D_00188610[D_001A9E70] * 2 > D_001A8698[D_001A9E70])
                 reward = (short)base * D_001A8698[D_001A9E70] / (D_00188610[D_001A9E70] * 2);
             if (!reward) reward = 1;
-            func_0026FEB8(D_001A9E78, D_001A9E70, (short)base, reward);
+            STUB_printf(D_001A9E78, D_001A9E70, (short)base, reward);
         } else {
             int n = D_0019B4A8[(p->id >> 1) + (D_001A79F0 << 10)];
             if (((unsigned short)p->id & 1) ? (n >> 4) & 8 : n & 8) reward = func_00279B70(D_001A8690, (short)count, p->id);
@@ -232,17 +232,17 @@ void func_002A6C58(RewardMoby *p, int flags, int arg)
     bolts += extra;
     dropflags = flags & 0x100 ? 5 : 1;
     if (D_00189E20.option || (flags & 0x200)) dropflags |= 2;
-    if (D_00189E20.state == 16 && func_00282E48(D_00189E20.position, p->position) < 4.0f) dropflags |= 2;
+    if (D_00189E20.state == 16 && fast_vec_dist(D_00189E20.position, p->position) < 4.0f) dropflags |= 2;
     if (flags & 0x400) dropflags |= 0x10;
     dropflags |= 8;
     if (D_001B1A80 <= 99) dropflags |= 2;
     if (bolts < 0.0f) bolts = 0.0f;
     if (bolts > 0.0f) {
         int spread = 0;
-        if (bolts >= 8.0f) spread = func_00283CF0(bolts * 0.25f);
+        if (bolts >= 8.0f) spread = FloatToInt(bolts * 0.25f);
         else if (bolts >= 2.0f) spread = 1;
         {
-            int n = func_00283CF0(bolts);
+            int n = FloatToInt(bolts);
             int hi = n + spread;
             n -= spread;
             func_002ADB78(p, n, hi, dropflags, -1, arg, 0.0f);
@@ -296,9 +296,9 @@ void func_002A7470(unsigned char *object, int animation, int frame, int rate)
 
     object[0x41] = frame;
     object[0x43] = animation;
-    func_0029F390(object);
+    update_moby_animation_state(object);
     *(float *)(object + 0x48) = 1.0f;
-    reciprocal = 1.0f / func_00283CE0(rate);
+    reciprocal = 1.0f / IntToFloat(rate);
     *(unsigned int *)(object + 0x44) = 0;
     object[0x60] &= 0xFD;
     *(float *)(object + 0x4C) = reciprocal;

@@ -25,10 +25,10 @@ void func_L16_0041EE90(char *self) {
         char *old = (char *)&previous;
         char *position = self + 16;
         qcopy(old,position);
-        func_00282CC0(position, position, st);
+        FastVecAdd(position, position, st);
         *(f32 *)(st + 8) -= *(f32 *)(st + 0x24);
         func_L16_0041F150(self);
-        if (func_002761F8(old, position, 0, *(s32 *)(self + 0xB8), 0)) {
+        if (CollLine(old, position, 0, *(s32 *)(self + 0xB8), 0)) {
             qcopy(position ,D_L16_001BFF60);
             if (*(s32 *)(st + 0x20)) func_002A7750(self, 2, -1);
             else func_002A7750(self, 1, -1);
@@ -37,14 +37,14 @@ void func_L16_0041EE90(char *self) {
     }
     case 1: {
         char *position = self + 16;
-        func_0032C700(position, 1.0f, 20.0f, 0, 25, 20, 20, 20, 45, 1, 1, 0, 0, 0);
+        SpawnExplosion(position, 1.0f, 20.0f, 0, 25, 20, 20, 20, 45, 1, 1, 0, 0, 0);
         func_002A8C28(self, position, 2.0f, 6.0f, 0x10001, 0, 1, 0, 1.0f);
         func_0029F338(self);
         break;
     }
     case 2:
         if (func_002B3868(self)) {
-            func_0032C700(self + 16, 0.6660000085830688f, 20.0f, 0, 20, 15, 15, 15, 35, 1, 1, 0, 0, 0);
+            SpawnExplosion(self + 16, 0.6660000085830688f, 20.0f, 0, 20, 15, 15, 15, 35, 1, 1, 0, 0, 0);
             *(s32 *)(self + 0x98) = 0;
             *(u16 *)(self + 0x34) = (*(u16 *)(self + 0x34) | 0x41) & 0xEFFF;
             *(f32 *)(self + 0x18) += 0.5f;
@@ -57,10 +57,10 @@ void func_L16_0041EE90(char *self) {
           f32 limit = D_L16_001B1FF4;
           radius += growth;
           *(f32 *)(st + 0x2C) = radius;
-        if (radius >= limit) func_002AA2E8((f32 *)(st + 0x30), 0.0f, 0.06666667014360428f);
+        if (radius >= limit) ApproachValue((f32 *)(st + 0x30), 0.0f, 0.06666667014360428f);
         }
         if (*(f32 *)(st + 0x30) <= 0.0f) func_0029F338(self);
-        else func_L00_002E6CF0(func_L16_0041F360, self);
+        else func_L00_002E6CF0(SweepAndDrawRibbonRing, self);
         break;
     }
 }

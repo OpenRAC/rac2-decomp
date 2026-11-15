@@ -31,8 +31,8 @@ void func_L01_003CBFF0(u8 *a0)
 {
     OozlaSpawnState *p = *(OozlaSpawnState **)(a0 + 0x68);
 
-    p->field48 = func_00283CF0(5.0f);
-    p->field4a = func_00283CF0(32.0f);
+    p->field48 = FloatToInt(5.0f);
+    p->field4a = FloatToInt(32.0f);
     p->field29 = 1;
     *(float *)(a0 + 0x2C) = *(float *)(*(u8 **)(a0 + 0x24) + 0x24) * 2.5f;
     qcopy(p->field80, a0 + 0x10);

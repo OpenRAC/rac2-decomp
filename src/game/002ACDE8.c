@@ -12,10 +12,10 @@ void func_002ACDE8(void *a0, void *a1, void *a2)
 {
     QI_002ACDE8 m[3];
 
-    func_00282D30(&m[0], a2, -1.0f);
+    FastVecScale(&m[0], a2, -1.0f);
     *(float *)((char *)&m[0] + 0xC) = *(float *)((char *)a2 + 0xC);
     qcopy(&m[1], a1);
     ((int *)m)[7] = 0;
-    func_002837D0(&m[2], a2, &m[1]);
-    func_002837D0(a0, &m[2], &m[0]);
+    multiply_quaternions(&m[2], a2, &m[1]);
+    multiply_quaternions(a0, &m[2], &m[0]);
 }

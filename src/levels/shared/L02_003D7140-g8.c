@@ -51,11 +51,11 @@ void func_L02_003D7140(u8 *self)
                     continue;
             }
         }
-        func_00282CF0(diff, pos, self + 0x10);
+        FastVecSub(diff, pos, self + 0x10);
         push[0] = -diff[1];
         push[1] = diff[0];
         push[2] = 0.0f;
-        func_00282F20(push, push, D_L02_001B0388);
+        vec_scale_to_length(push, push, D_L02_001B0388);
         push[2] = 1.0f;
         push[3] = 5627.9248046875f;
         func_002A8F70(obj, self, 0x10001, pos, push, (float)state[0x14]);

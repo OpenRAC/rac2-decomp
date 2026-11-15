@@ -71,11 +71,11 @@ void func_L06_004587E8(char *o) {
     goto def;
     c0: {
         char collision[112];
-        *(float *)(o + 0xF0) = func_00283B98(*(float *)(o + 0xF0), 0.104719773f);
-        func_00282CC0(pos, o + 0x10, st);
-        func_002A8C00(collision, o, 1, st, *(float *)(st + 0x40));
+        *(float *)(o + 0xF0) = FastAddRotations(*(float *)(o + 0xF0), 0.104719773f);
+        FastVecAdd(pos, o + 0x10, st);
+        make_hit_descriptor(collision, o, 1, st, *(float *)(st + 0x40));
         *(unsigned short *)(collision + 0x1A) = *(unsigned short *)(o + 0xAA);
-        if (func_002761F8(o + 0x10, pos, 0, o, collision) ||
+        if (CollLine(o + 0x10, pos, 0, o, collision) ||
             func_0031EBF8(0.3f, o + 0x10, 0, o) || func_00282948(st + 0x38)) {
             hit = D_L06_001BFC80.hit;
             if (hit) {
@@ -141,15 +141,15 @@ def:
         *t = 2;
         D_L06_001B37A0[i] = 64;
         func_002A7988(velocity.f, 0.2f, 0.2f);
-        if (func_00282DF0(velocity.f) > 0.2f) func_00282F20((char *)velocity.f, (char *)velocity.f, 0.2f);
+        if (FastVecLength(velocity.f) > 0.2f) vec_scale_to_length((char *)velocity.f, (char *)velocity.f, 0.2f);
         qcopy(&((Trail *)D_L06_0025FFC0)[*(int *)(st + 0x48)][i][0], pos);
         direction = 1.0f;
         for (j = 1; j < 4; j++) {
             float *prev = (float *)(&((Trail *)D_L06_0025FFC0)[*(int *)(st + 0x48)][i][j - 1]);
-            func_00282CF0(axis.f, prev, (float *)D_L06_001B9840);
+            FastVecSub(axis.f, prev, (float *)D_L06_001B9840);
             func_002ACEC0(velocity.f, velocity.f, axis.f, func_002A7878(0.17453295f, 0.7853982448577881f) * direction);
             direction = -direction;
-            func_00282CC0(&((Trail *)D_L06_0025FFC0)[*(int *)(st + 0x48)][i][j], &((Trail *)D_L06_0025FFC0)[*(int *)(st + 0x48)][i][j - 1], velocity.f);
+            FastVecAdd(&((Trail *)D_L06_0025FFC0)[*(int *)(st + 0x48)][i][j], &((Trail *)D_L06_0025FFC0)[*(int *)(st + 0x48)][i][j - 1], velocity.f);
         }
     }
     if (!func_002A77E0(2)) {

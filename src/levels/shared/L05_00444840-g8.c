@@ -51,8 +51,8 @@ u8 *func_L05_00444840(void *position, u8 **excluded, u8 *current)
                 goto next;
         }
         func_L05_00444D60(object + 0x10, &target_x, &target_y, 0);
-        dx = func_00283CE0(func_00282C30(target_x - source_x));
-        dy = func_00283CE0(func_00282C30(target_y - source_y));
+        dx = IntToFloat(subtract_integer_with_clamp(target_x - source_x));
+        dy = IntToFloat(subtract_integer_with_clamp(target_y - source_y));
         do {
             range = 40;
             i = 0;
@@ -84,11 +84,11 @@ scan2:
             goto scan2;
         } while (0);
 scan2_done:
-        if (state != 20 && distance < func_00282E48(D_L05_001B96C0, object + 0x10))
+        if (state != 20 && distance < fast_vec_dist(D_L05_001B96C0, object + 0x10))
             goto next;
         if (current && current == object && D_L05_001B2048[0] % 3 != 0)
             return object;
-        if (!func_002761F8(D_L05_001B96C0, object + 0x10, 16, object, 0))
+        if (!CollLine(D_L05_001B96C0, object + 0x10, 16, object, 0))
             return object;
 next:
         cursor++;

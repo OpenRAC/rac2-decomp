@@ -65,16 +65,16 @@ int func_002EBDF0(unsigned int id) {
     func_002FC3C0(1);
     func_001261F0(0);
     D_001B1598 = 1+D_001B1598;
-    func_002FC280();
+    SubmitBufferedDmaChain();
     func_002FC220();
     func_0011AEA0(0);
     func_002E5FE0();
     func_002B7170();
-    func_0027D330(4);
+    FadeToBlack(4);
     func_0011AEA0(0);
     func_002E5FE0();
     func_002B7170();
-    func_00133580(0);
+    snd_CheckLoadInProgress(0);
     arena = (char *)(D_001BAEC0.arena-0x2C0000);
     work = arena-0xE0000;
     buffer = work-0x4000;
@@ -107,7 +107,7 @@ int func_002EBDF0(unsigned int id) {
     func_001244B8(0, 0);
     graphics->desc.texture = 0;
     func_002FC1D8();
-    func_0027D330(4);
+    FadeToBlack(4);
     D_001A8BB0 = 6;
     D_00188660.flags|=16;
     return result;

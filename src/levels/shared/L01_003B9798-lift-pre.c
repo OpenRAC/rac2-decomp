@@ -95,12 +95,12 @@ void func_L01_003B9798(unsigned char *obj)
             if (s->down == 0) {
                 func_002A7750(obj, 3, -1);
                 if (!func_002E59B0(obj, s->sound)) {
-                    s->sound = func_002E5CF8(0, 4, obj);
+                    s->sound = PlayMobySound(0, 4, obj);
                 }
             } else {
                 func_002A7750(obj, 2, -1);
                 if (!func_002E59B0(obj, s->sound)) {
-                    s->sound = func_002E5CF8(0, 4, obj);
+                    s->sound = PlayMobySound(0, 4, obj);
                 }
             }
         }
@@ -118,7 +118,7 @@ void func_L01_003B9798(unsigned char *obj)
             }
 play:
             if (!func_002E59B0(obj, s->sound)) {
-                s->sound = func_002E5CF8(0, 4, obj);
+                s->sound = PlayMobySound(0, 4, obj);
             }
             func_002A7750(obj, 3, -1);
             break;
@@ -138,7 +138,7 @@ second:
             }
 play2:
             if (!func_002E59B0(obj, s->sound)) {
-                s->sound = func_002E5CF8(0, 4, obj);
+                s->sound = PlayMobySound(0, 4, obj);
             }
             func_002A7750(obj, 2, -1);
         }
@@ -146,7 +146,7 @@ play2:
     case 2:
         qcopy(delta, obj + 0x10);
         delta[2] = s->upperZ;
-        if (func_00282E48(obj + 0x10, delta) > 0.04f) {
+        if (fast_vec_dist(obj + 0x10, delta) > 0.04f) {
             func_002AA548((float *)(obj + 0x18), (float *)&s->speed, delta[2], 0.00194444449f, 0.00166666671f, 0.100000009f);
             s->timer++;
         } else if (!func_L00_00324120(obj)) {
@@ -171,7 +171,7 @@ play2:
         func_002B3868(obj);
         if (s->lowerZ < Z(obj)) {
             if (Z(obj) - D_00189E20.position[2] < 2.8f && Z(obj) > D_00189E20.position[2]) {
-                if (func_002ACBC8((char *)&D_00189E20 + 0x80, s->contact) == 0) {
+                if (IsPointInCuboid((char *)&D_00189E20 + 0x80, s->contact) == 0) {
                     func_002AA548((float *)(obj + 0x18), (float *)&s->speed, s->lowerZ, 0.00194444449f, 0.00166666671f, 0.100000009f);
                     s->timer++;
                 }
@@ -197,6 +197,6 @@ play2:
         }
         break;
     }
-    func_00282CF0(delta, obj + 0x10, old);
+    FastVecSub(delta, obj + 0x10, old);
     func_002AD6F0(s->body, delta, oldRot, obj + 0xF0);
 }

@@ -32,7 +32,7 @@ void func_0028CCE0(Selector *object)
     D_00138180.mode = 2;
     x = D_00138180.x;
     y = D_00138180.y;
-    magnitude = func_00282C10(x * x + y * y);
+    magnitude = square_root(x * x + y * y);
     if (magnitude != 0.0f) {
         x /= magnitude;
         y /= magnitude;

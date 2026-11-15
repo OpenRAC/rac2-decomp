@@ -28,7 +28,7 @@ void func_L00_0033E3B8(char *p)
     char *ownerpos;
     float dot;
 
-    if (*(short *)(p + 0xA) >= 0 && func_00282978(p + 0xA)) {
+    if (*(short *)(p + 0xA) >= 0 && FastDecTimer(p + 0xA)) {
         func_002B9180(p);
         return;
     }
@@ -43,31 +43,31 @@ void func_L00_0033E3B8(char *p)
             char *initial = p + 0x10;
             func_0029FC20(owner, *(int *)(q + 4), w.m.matrix);
             w.m.matrix[15] = 0;
-            func_002830C0(w.m.transformed, q + 0x10, w.m.matrix);
-            func_00282CC0(initial, &w.m.matrix[12], w.m.transformed);
+            transform_vector(w.m.transformed, q + 0x10, w.m.matrix);
+            FastVecAdd(initial, &w.m.matrix[12], w.m.transformed);
             pos = initial;
             goto drift;
         } else {
             char *initial = p + 0x10;
             qcopy(initial, ownerpos);
-            func_00283098(w.v[0], q + 0x10, owner + 0xC0);
-            func_00282CC0(initial, initial, w.v[0]);
+            matrix_mul_vec3(w.v[0], q + 0x10, owner + 0xC0);
+            FastVecAdd(initial, initial, w.v[0]);
             pos = initial;
         }
         if (*(short *)(q + 0xE)) {
-            func_00282CF0(w.v[1], pos, D_L00_001B8DC0);
-            p[8] = func_00283CF0(func_00282DB0(w.v[1], D_L00_001B8DC0 + 0x230) * 6.0f);
+            FastVecSub(w.v[1], pos, D_L00_001B8DC0);
+            p[8] = FloatToInt(FastVecDot(w.v[1], D_L00_001B8DC0 + 0x230) * 6.0f);
         }
         if (*(short *)(q + 0xC)) {
-            func_00282CF0(w.v[2], pos, ownerpos);
-            func_00282F20(w.v[1], w.v[1], 1.0f);
-            func_00282F20(w.v[2], w.v[2], 1.0f);
-            dot = -func_00282DB0(w.v[1], w.v[2]);
+            FastVecSub(w.v[2], pos, ownerpos);
+            vec_scale_to_length(w.v[1], w.v[1], 1.0f);
+            vec_scale_to_length(w.v[2], w.v[2], 1.0f);
+            dot = -FastVecDot(w.v[1], w.v[2]);
             if (dot < 0.0f)
                 *(unsigned int *)(p + 4) &= 0x05FFFFFF;
             else
                 *(unsigned int *)(p + 4) = (*(unsigned int *)(p + 4) & 0xFFFFFF) |
-                    (func_00283CF0(func_00283CE0(*(unsigned char *)(p + 7)) * dot) << 24);
+                    (FloatToInt(IntToFloat(*(unsigned char *)(p + 7)) * dot) << 24);
         }
     } else {
         char *initial = p + 0x10;
@@ -75,7 +75,7 @@ void func_L00_0033E3B8(char *p)
         pos = initial;
     }
 drift:
-    func_00282CF0(w.v[0], D_L00_001B8DC0, pos);
-    func_00282F20(w.v[0], w.v[0], *(float *)(q + 8));
-    func_00282CC0(pos, pos, w.v[0]);
+    FastVecSub(w.v[0], D_L00_001B8DC0, pos);
+    vec_scale_to_length(w.v[0], w.v[0], *(float *)(q + 8));
+    FastVecAdd(pos, pos, w.v[0]);
 }

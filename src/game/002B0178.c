@@ -18,7 +18,7 @@ float func_002B0178(Vector *position, void *owner, Vector *output)
         low.f[2] = 0.01f;
         qcopy(&high, position);
         high.f[2] += 0.5f;
-        if (func_002761F8(&high, &low, 2, owner, 0)) {
+        if (CollLine(&high, &low, 2, owner, 0)) {
             if (output != 0)
                 qcopy(output, &D_001BAFA0);
             return position->f[2] - D_001BAFA8;
@@ -33,12 +33,12 @@ float func_002B0178(Vector *position, void *owner, Vector *output)
         func_002B00D8(&low, low.f, low.f, -10.0f);
     }
     func_002B00D8(position, high.f, position->f, -0.5f);
-    distance = func_00282E48(position, &low);
-    if (func_002761F8(&high, &low, 2, owner, 0)) {
+    distance = fast_vec_dist(position, &low);
+    if (CollLine(&high, &low, 2, owner, 0)) {
         if (output != 0)
             qcopy(output, &D_001BAFA0);
-        result = func_00282E48(position, &D_001BAFA0);
-        if (distance < func_00282E48(&D_001BAFA0, &low))
+        result = fast_vec_dist(position, &D_001BAFA0);
+        if (distance < fast_vec_dist(&D_001BAFA0, &low))
             result = -result;
         return result;
     }

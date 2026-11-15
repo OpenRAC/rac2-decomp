@@ -27,21 +27,21 @@ void func_L00_00410690(char *object)
     float fraction, size;
     int alpha, count, n, i;
     unsigned int color;
-    fraction = func_00283CE0(*(short *)(state + 0x1a));
-    fraction /= func_00283CE0(90);
+    fraction = IntToFloat(*(short *)(state + 0x1a));
+    fraction /= IntToFloat(90);
     if (fraction > 1.0f) fraction = 1.0f;
     size = D_L00_001B1260 + (D_L00_001B1264 - D_L00_001B1260) * fraction;
     alpha = *(short *)(state + 0x1a) << 2;
     if (alpha >= 97) alpha = 96;
-    alpha = (unsigned int)(func_00283CF0(func_00283198(*(float *)(state + 0x20)) * 32.0f) + alpha) << 24;
-    *(float *)(state + 0x20) = func_00283B98(*(float *)(state + 0x20), 0.139626354f);
+    alpha = (unsigned int)(FloatToInt(func_00283198(*(float *)(state + 0x20)) * 32.0f) + alpha) << 24;
+    *(float *)(state + 0x20) = FastAddRotations(*(float *)(state + 0x20), 0.139626354f);
     color = alpha | D_L00_001B1268;
     count = D_00139688[D_0018B068];
     n = func_L00_00410840(object);
     if (n < count) count = n;
     for (i = 0; i < count; i++) {
-        func_00283098(position, D_L00_001B1280[i], object + 0xc0);
-        func_00282CC0(position, object + 0x10, position);
+        matrix_mul_vec3(position, D_L00_001B1280[i], object + 0xc0);
+        FastVecAdd(position, object + 0x10, position);
         func_00281EB8(position, 11, color, 1, size, 0.0f, 0.0f);
         func_00281EB8(position, 11, 0x80808080, 1, size * 0.3f, 0.0f, 0.0f);
     }

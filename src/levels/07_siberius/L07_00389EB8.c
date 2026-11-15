@@ -21,8 +21,8 @@ void func_L07_003E5A70(char *arg)
     char *o = *(char **)(arg + 104);
     unsigned short v;
 
-    func_00282978(o + 0x240);
-    func_00282978(o + 0x242);
+    FastDecTimer(o + 0x240);
+    FastDecTimer(o + 0x242);
     v = *(unsigned short *)(arg + 0x96);
     if (v <= 0xFFFE)
         *(unsigned short *)(arg + 0x96) = v + 1;
@@ -161,10 +161,10 @@ void func_L07_003E6FE8(char *arg)
         qcopy(rayEnd, pos);
         rayStart[2] += 2.0f;
         rayEnd[2] -= 3.0f;
-        if (func_002761F8(rayStart, rayEnd, 0, arg, 0) && D_L07_001BF640.object != 0) {
+        if (CollLine(rayStart, rayEnd, 0, arg, 0) && D_L07_001BF640.object != 0) {
             if (*(int *)(func_002AD0B0(D_L07_001BF640.object) + 0x3C) & 2) {
                 *(char **)(state + 0x338) = D_L07_001BF640.object;
-                func_00282CF0(localOffset, pos, *(char **)(state + 0x338) + 0x10);
+                FastVecSub(localOffset, pos, *(char **)(state + 0x338) + 0x10);
                 func_002AFDD8(*(char **)(state + 0x338), localOffset, localOffset, 0);
                 *(float *)(state + 0x33C) = localOffset[2] - 1.0f;
                 func_002AD5F8(arg, *(char **)(state + 0x338), pos, arg + 0xF0,
@@ -178,16 +178,16 @@ void func_L07_003E6FE8(char *arg)
         } else {
             func_002AD0E0(arg, (int)platform, arg + 0x10, arg + 0xF0, arg + 0x10, arg + 0xF0);
         }
-        func_002833F0(arg + 0xC0, arg + 0xF0);
+        euler_rotation_basis(arg + 0xC0, arg + 0xF0);
         func_002B0408(arg + 0xC0, *(char **)(state + 0x338) + 0xE0, 0);
         func_002AB6D8(arg + 0xC0, arg + 0xF0);
         if (*(unsigned short *)(arg + 0x34) & 0x8000)
-            func_00282D30(arg + 0xD0, arg + 0xD0, -1.0f);
+            FastVecScale(arg + 0xD0, arg + 0xD0, -1.0f);
         if (*(unsigned char *)(arg + 0x95) == 3) {
-            func_00282CF0(rayStart, arg + 0x10, *(char **)(state + 0x338) + 0x10);
+            FastVecSub(rayStart, arg + 0x10, *(char **)(state + 0x338) + 0x10);
             func_002AFDD8(*(char **)(state + 0x338), rayStart, rayStart, 0);
             rayStart[2] = *(float *)(state + 0x33C);
-            func_00283098((Quad128 *)rayStart, (Quad128 *)rayStart, *(char **)(state + 0x338) + 0xC0);
+            matrix_mul_vec3((Quad128 *)rayStart, (Quad128 *)rayStart, *(char **)(state + 0x338) + 0xC0);
             *(float *)(state + 0x180) = rayStart[2] + *(float *)(*(char **)(state + 0x338) + 0x18);
         }
     }
@@ -227,14 +227,14 @@ void func_L07_003E7240(char *arg)
     *(unsigned short *)(arg + 0x34) = (*(unsigned short *)(arg + 0x34) | 0x41) & 0xEFFF;
     *(int *)(arg + 0x98) = 0;
     func_00325D30(arg, o + 0x330);
-    func_002A6C58(arg, 0, 3);
+    SetDeathBits(arg, 0, 3);
     v[0] = 0;
     ((float *)v)[2] = 0.75f;
-    func_00283098(v, v, arg + 0xC0);
-    func_00282CC0(v, v, arg + 0x10);
-    func_0032C700(v, 0, 25, 20, 20, 20, 45, 1, 0.6f, 20.0f, 1, 0, 0, *(int *)(o + 0x338));
-    func_002E5CF8(6, 0, arg);
-    func_00282F20(&w, o + 0x1C0, 0.05000000447034836f);
+    matrix_mul_vec3(v, v, arg + 0xC0);
+    FastVecAdd(v, v, arg + 0x10);
+    SpawnExplosion(v, 0, 25, 20, 20, 20, 45, 1, 0.6f, 20.0f, 1, 0, 0, *(int *)(o + 0x338));
+    PlayMobySound(6, 0, arg);
+    vec_scale_to_length(&w, o + 0x1C0, 0.05000000447034836f);
     func_002B0A68(arg, 1016, &w, 3.0f, 6.0f, 3.0f, 6.0f, 255);
 }
 
@@ -309,15 +309,15 @@ void func_L07_003EBAB8(char *actor)
     char *state = *(char **)(actor + 0x68);
     *(int *)(actor + 0x98) = 0;
     *(unsigned short *)(actor + 0x34) = (*(unsigned short *)(actor + 0x34) | 0x41) & 0xefff;
-    func_002A6C58(actor, 0, 3);
+    SetDeathBits(actor, 0, 3);
     *(TI128 *)position = 0;
     position[2] = 0.75f;
-    func_00283098((TI128 *)position, (TI128 *)position, actor + 0xc0);
-    func_00282CC0((TI128 *)position, (TI128 *)position, actor + 0x10);
-    func_0032C700((TI128 *)position, 0, 25, 20, 20, 20, 45, 1, 0.6f, 20.0f,
+    matrix_mul_vec3((TI128 *)position, (TI128 *)position, actor + 0xc0);
+    FastVecAdd((TI128 *)position, (TI128 *)position, actor + 0x10);
+    SpawnExplosion((TI128 *)position, 0, 25, 20, 20, 20, 45, 1, 0.6f, 20.0f,
                  1, 0, 0, *(int *)(state + 0x314));
-    func_002E5CF8(9, 0, actor);
-    func_00282F20((TI128 *)direction, (TI128 *)(state + 0x1c0), 0.0500000045f);
+    PlayMobySound(9, 0, actor);
+    vec_scale_to_length((TI128 *)direction, (TI128 *)(state + 0x1c0), 0.0500000045f);
     func_002B0A68(actor, 0x7f8, (TI128 *)direction, 3.0f, 6.0f, 3.0f, 6.0f, 0xff);
 }
 
@@ -360,7 +360,7 @@ void func_L07_003EE640(char *arg)
         p = o + 8;
         for (i = 0; i < 8; i++) {
             if (p[i] != -1) {
-                if (func_002ACBC8((int)D_00189EA0, *q) != 0) {
+                if (IsPointInCuboid((int)D_00189EA0, *q) != 0) {
                     func_L02_0031F858(p[i], 1);
                     p[i] = -1;
                 }
@@ -395,8 +395,8 @@ void func_L07_003EEBF8(char *arg, char *a1, TI128 *a2, TI128 *a3)
 
     *(int *)(s1 + 0x110) = (int)a1;
 
-    func_00283098((TI128 *)(arg + 0x10), &v[0], a1 + 0xC0);
-    func_00282CC0((TI128 *)(arg + 0x10), (TI128 *)(arg + 0x10),
+    matrix_mul_vec3((TI128 *)(arg + 0x10), &v[0], a1 + 0xC0);
+    FastVecAdd((TI128 *)(arg + 0x10), (TI128 *)(arg + 0x10),
                   (char *)(*(int *)(s1 + 0x110) + 0x10));
 
     w = *(unsigned short *)(arg + 0x34);

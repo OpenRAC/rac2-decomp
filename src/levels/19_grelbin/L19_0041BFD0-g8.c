@@ -18,8 +18,8 @@ int func_L19_0041BFD0(char *obj)
     char *data = *(char **)(obj + 0x68);
     if (*(u8 *)(obj + 0x20) == 0) {
         D_L19_001B1D20 = 0;
-        *(u8 *)(data + 0x48) = func_00283CF0(15.0f);
-        *(u8 *)(data + 0x4A) = func_00283CF0(14.4f);
+        *(u8 *)(data + 0x48) = FloatToInt(15.0f);
+        *(u8 *)(data + 0x4A) = FloatToInt(14.4f);
         *(u8 *)(data + 0x29) = 1;
         if (func_002A77E0(2)) *(u16 *)(obj + 0x34)|=0x8000;
         *(float *)(obj + 0x2C)*=1.45f;

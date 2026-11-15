@@ -1,6 +1,6 @@
 /* Barlow object state and movement update. The object pool entries are 0x100
  * bytes; the array declaration preserves the measured small-data and absolute
- * references to its base. Integer and FP arguments to func_002A7CA0 retain their
+ * references to its base. Integer and FP arguments to MobySpringTurn retain their
  * order within each EE register bank.
  */
 #include "common.h"
@@ -92,7 +92,7 @@ void func_L04_0044C598(u8 *object)
             } else if(HALF(vars,0x306)!=0) {
                 func_002A7750(object,2,1);
                 HALF(vars,0x306)=0;
-                INT(vars,0x2fc)=func_00283CF0(func_002A7878(FLOAT(vars,0x2f8)*0.8f,FLOAT(vars,0x2f8)*1.2f)*60.0f);
+                INT(vars,0x2fc)=FloatToInt(func_002A7878(FLOAT(vars,0x2f8)*0.8f,FLOAT(vars,0x2f8)*1.2f)*60.0f);
                 HALF(vars,0x300)=0;
             }
         }
@@ -111,7 +111,7 @@ void func_L04_0044C598(u8 *object)
     case 2:
         if(INT(vars,0x254)!=1 && func_002A77E0(19)==0) {
             func_002A7750(object,2,1);
-            INT(vars,0x2fc)=func_00283CF0(func_002A7878(FLOAT(vars,0x2f8)*0.8f,FLOAT(vars,0x2f8)*1.2f)*60.0f);
+            INT(vars,0x2fc)=FloatToInt(func_002A7878(FLOAT(vars,0x2f8)*0.8f,FLOAT(vars,0x2f8)*1.2f)*60.0f);
             HALF(vars,0x300)=0;
         }
 
@@ -119,14 +119,14 @@ void func_L04_0044C598(u8 *object)
     case 3:
         if(object[0x20]!=7) {
         flags=func_002B1C20(object,vars+0x60);
-        if(flags&1) { HALF(vars,0x98)=0; func_002A6C58(object,0,3); func_L01_003E9CF8(object,0,0); return; }
+        if(flags&1) { HALF(vars,0x98)=0; SetDeathBits(object,0,3); func_L01_003E9CF8(object,0,0); return; }
         if(flags&2) {
             if(INT(vars,0x254)==1) {
                 func_002A7750(object,4,2);
                 if(object[0x43]!=7) func_002A7470(object,7,0,14);
             } else {
                 func_002A7750(object,2,1);
-                INT(vars,0x2fc)=func_00283CF0(func_002A7878(FLOAT(vars,0x2f8)*0.8f,FLOAT(vars,0x2f8)*1.2f)*60.0f);
+                INT(vars,0x2fc)=FloatToInt(func_002A7878(FLOAT(vars,0x2f8)*0.8f,FLOAT(vars,0x2f8)*1.2f)*60.0f);
                 HALF(vars,0x300)=func_002A7820(120,700);
             }
         }
@@ -137,21 +137,21 @@ void func_L04_0044C598(u8 *object)
 heightCheck:
     if(FLOAT(object,0x18)-FLOAT(vars,0x2e8)>10.0f || FLOAT(object,0x18)<10.0f) {
         HALF(vars,0x98)=0; qzero(object+0xf0);
-        func_002A6C58(object,0,3); func_0029F338(object); return;
+        SetDeathBits(object,0,3); func_0029F338(object); return;
     }
     if(FLOAT(object,0x18)<75.0f && D_001A79F0==11) {
         HALF(vars,0x98)=0; qzero(object+0xf0);
-        func_002A6C58(object,0,3); func_0029F338(object); return;
+        SetDeathBits(object,0,3); func_0029F338(object); return;
     }
     state=(u8)object[0x20];
     switch(state) {
     case 1:
-        func_00282978((short *)(vars+0x300));
+        FastDecTimer((short *)(vars+0x300));
         if(object[0x43]==0 && HALF(vars,0x300)) func_002A7470(object,7,0,14);
         if (HALF(vars,0x300)>=21)
-            func_002AA2E8((float *)(vars+0x124),D_L04_001B1878*0.01666666753590107f,0.0019444444915279746f);
+            ApproachValue((float *)(vars+0x124),D_L04_001B1878*0.01666666753590107f,0.0019444444915279746f);
         else
-            func_002AA2E8((float *)(vars+0x124),0.0f,0.0019444444915279746f);
+            ApproachValue((float *)(vars+0x124),0.0f,0.0019444444915279746f);
         if(object[0x43]==7) {
             FLOAT(object,0x48)=0.8f;
             if(HALF(vars,0x300)==0) {
@@ -167,12 +167,12 @@ heightCheck:
         }
         break;
     case 2:
-        func_00282978((short *)(vars+0x300));
+        FastDecTimer((short *)(vars+0x300));
         if(object[0x43]==0 && HALF(vars,0x300)) func_002A7470(object,7,0,14);
         if (HALF(vars,0x300)>=21)
-            func_002AA2E8((float *)(vars+0x124),D_L04_001B1878*0.01666666753590107f,0.0019444444915279746f);
+            ApproachValue((float *)(vars+0x124),D_L04_001B1878*0.01666666753590107f,0.0019444444915279746f);
         else
-            func_002AA2E8((float *)(vars+0x124),0.0f,0.0019444444915279746f);
+            ApproachValue((float *)(vars+0x124),0.0f,0.0019444444915279746f);
         if(object[0x43]==7) {
             FLOAT(object,0x48)=0.8f;
             if(HALF(vars,0x300)==0) {
@@ -190,7 +190,7 @@ heightCheck:
         break;
     case 4:
         FLOAT(object,0x48)=1.0f;
-        if(func_00282E80(object+0x10,vars+0x240)<=D_L04_001B1874) {
+        if(vec_distance_xy(object+0x10,vars+0x240)<=D_L04_001B1874) {
             func_002A7750(object,5,2);
             if(object[0x43]!=8) func_002A7470(object,8,2,6);
             FLOAT(vars,0x314)=0.0f;
@@ -203,14 +203,14 @@ heightCheck:
         break;
     case 5:
         if(object[0x42]!=8) break;
-        if(func_002AEB60(object,8.0f)) func_002E5CF8(3,0,object);
+        if(func_002AEB60(object,8.0f)) PlayMobySound(3,0,object);
         if(object[0x42]!=8) break;
         if(func_002AEB60(object,10.0f)) {
             func_002A8D70(0.75f,FLOAT(vars,0x330),1.0f,object,0,0x4000001,0,1,0);
             break;
         }
         if(object[0x42]!=8) break;
-        if((object[0x60]&2) && func_00282E80(object+0x10,vars+0x240)>D_L04_001B1874) {
+        if((object[0x60]&2) && vec_distance_xy(object+0x10,vars+0x240)>D_L04_001B1874) {
             func_002A7750(object,4,2);
             if(object[0x43]!=7) func_002A7470(object,7,0,6);
         }
@@ -219,13 +219,13 @@ heightCheck:
         movement.f[0]=func_00283180(FLOAT(object,0xf8))*0.01666666753590107f*(FLOAT(vars,0x30c)+FLOAT(vars,0x30c));
         movement.f[1]=func_00283198(FLOAT(object,0xf8))*0.01666666753590107f*(FLOAT(vars,0x30c)+FLOAT(vars,0x30c));
         movement.f[2]=0.0f;
-        func_00282CD8(&position,object+0x10,&movement);
-        if(func_00282E80(object+0x10,vars+0x2e0)>6.0f) func_002A7750(object,4,2);
+        add_vectors(&position,object+0x10,&movement);
+        if(vec_distance_xy(object+0x10,vars+0x2e0)>6.0f) func_002A7750(object,4,2);
         break;
     case 3:
         delay=func_00283248(FLOAT(vars,0x240)-FLOAT(object,0x10),FLOAT(vars,0x244)-FLOAT(object,0x14));
-        delay=func_00283B98(delay,FLOAT(vars,0x314));
-        func_002A7CA0(object,delay,(float *)(vars+0x310),0.05f,0.3f,0.10471977293491364f);
+        delay=FastAddRotations(delay,FLOAT(vars,0x314));
+        MobySpringTurn(object,delay,(float *)(vars+0x310),0.05f,0.3f,0.10471977293491364f);
         if(object[0x60]&2) {
             func_002A7750(object,4,-1);
             if(object[0x43]!=7) func_002A7470(object,7,0,15);
@@ -233,7 +233,7 @@ heightCheck:
         break;
     case 8:
         if(func_L04_0044D860(object)) {
-            func_002A6C58(object,0,3); func_0029F338(object); return;
+            SetDeathBits(object,0,3); func_0029F338(object); return;
         }
         break;
     }

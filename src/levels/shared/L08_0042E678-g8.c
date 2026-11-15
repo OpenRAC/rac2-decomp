@@ -61,10 +61,10 @@ void func_L08_0042E678(u8 *self)
         float row = -radius, col;
         D_L08_00265040[0].p[0][2] = D_L08_00265040[0].p[1][2] = D_L08_00265040[0].p[2][2] =
             D_L08_00265040[0].p[3][2] = z + sign * 0.1f;
-        D_L08_00265040[0].tex0 = func_0027C878(-1);
+        D_L08_00265040[0].tex0 = GetEffectTextureDescriptor(-1);
         D_L08_00265040[0].color[0] = D_L08_00265040[0].color[1] = D_L08_00265040[0].color[2] =
             D_L08_00265040[0].color[3] = *(u32 *)(state + 0x20);
-        f = func_00283CE0(D_L08_001B2508) * D_L08_001B1EAC;
+        f = IntToFloat(D_L08_001B2508) * D_L08_001B1EAC;
         f = func_002ABB18(f);
         f = func_00283198(f);
         y = *(float *)(self + 0x14) - radius + f * D_L08_001B1EB0;
@@ -87,7 +87,7 @@ void func_L08_0042E678(u8 *self)
                 D_L08_00265040[0].uv[5] = D_L08_00265040[0].uv[7];
                 func_0027C768(D_L08_00265040[0].p[1], D_L08_00265040[0].uv + 2, D_L08_00265040[0].uv + 3);
                 func_0027C768(D_L08_00265040[0].p[3], D_L08_00265040[0].uv + 6, D_L08_00265040[0].uv + 7);
-                func_00280B90(D_L08_00265040, 0, 1);
+                draw_world_quad(D_L08_00265040, 0, 1);
                 qcopy(D_L08_00265040[0].p[0], D_L08_00265040[0].p[1]);
                 qcopy(D_L08_00265040[0].p[2], D_L08_00265040[0].p[3]);
                 D_L08_00265040[0].p[2][0] = D_L08_00265040[0].p[0][0] = D_L08_00265040[0].p[1][0];
@@ -129,8 +129,8 @@ void func_L08_0042E678(u8 *self)
         D_L08_00264F20[0].p[3][0] = D_L08_00264F20[0].p[1][0] = D_L08_00264F20[0].p[1][0] + radius;
         D_L08_00264F20[0].p[1][1] = D_L08_00264F20[0].p[0][1] = D_L08_00264F20[0].p[0][1] - radius;
         D_L08_00264F20[0].p[3][1] = D_L08_00264F20[0].p[2][1] = D_L08_00264F20[0].p[2][1] + radius;
-        D_L08_00264F20[0].tex0 = func_0027C878(*(int *)(state + 0x10) + 0x3F);
-        func_00280B90(D_L08_00264F20, 0, 1);
+        D_L08_00264F20[0].tex0 = GetEffectTextureDescriptor(*(int *)(state + 0x10) + 0x3F);
+        draw_world_quad(D_L08_00264F20, 0, 1);
     }
     for (i = 0; i < D_L08_001B1ECC; i++) {
         u8 *position;
@@ -154,7 +154,7 @@ void func_L08_0042E678(u8 *self)
         D_L08_00264F20[0].p[3][1] = D_L08_00264F20[0].p[2][1] = D_L08_00264F20[0].p[2][1] + radius;
         D_L08_00264F20[0].color[0] = D_L08_00264F20[0].color[1] = D_L08_00264F20[0].color[2] =
             D_L08_00264F20[0].color[3] = *(u32 *)(state + 0x14);
-        func_00280B90(D_L08_00264F20, 0, 1);
+        draw_world_quad(D_L08_00264F20, 0, 1);
     }
     for (i = 0; i < D_L08_001B1ECC; i++) {
         self = D_L08_002B2540[i];
@@ -172,7 +172,7 @@ void func_L08_0042E678(u8 *self)
         D_L08_00264F20[0].p[3][1] = D_L08_00264F20[0].p[2][1] = D_L08_00264F20[0].p[2][1] - radius;
         D_L08_00264F20[0].color[0] = D_L08_00264F20[0].color[1] = D_L08_00264F20[0].color[2] =
             D_L08_00264F20[0].color[3] = *(u32 *)(state + 0x14);
-        func_00280B90(D_L08_00264F20, 0, 1);
+        draw_world_quad(D_L08_00264F20, 0, 1);
     }
     if (*(int *)(state + 0x18) == -1)
         return;
@@ -189,16 +189,16 @@ void func_L08_0042E678(u8 *self)
         D_L08_00264FB0[0].p[3][0] = D_L08_00264FB0[0].p[1][0] = D_L08_00264FB0[0].p[1][0] + radius;
         D_L08_00264FB0[0].p[1][1] = D_L08_00264FB0[0].p[0][1] = D_L08_00264FB0[0].p[0][1] - radius;
         D_L08_00264FB0[0].p[3][1] = D_L08_00264FB0[0].p[2][1] = D_L08_00264FB0[0].p[2][1] + radius;
-        D_L08_00264FB0[0].tex0 = func_0027C878(*(int *)(state + 0x18) + 0x3F);
+        D_L08_00264FB0[0].tex0 = GetEffectTextureDescriptor(*(int *)(state + 0x18) + 0x3F);
         D_L08_00264FB0[0].color[0] = D_L08_00264FB0[0].color[1] = D_L08_00264FB0[0].color[2] =
             D_L08_00264FB0[0].color[3] = *(u32 *)(state + 0x1C);
         for (j = 0; j < 4; j++) {
-            func_00282CF0(delta, D_L08_00264FB0[0].p[j], D_L08_001B9B00);
+            FastVecSub(delta, D_L08_00264FB0[0].p[j], D_L08_001B9B00);
             func_00283028(v, delta, D_L08_001AC5E0);
-            func_00282F20(v, v, 1.0f);
+            vec_scale_to_length(v, v, 1.0f);
             D_L08_00264FB0[0].uv[j * 2] = v[0];
             D_L08_00264FB0[0].uv[j * 2 + 1] = v[1];
         }
-        func_00280B90(D_L08_00264FB0, 0, 1);
+        draw_world_quad(D_L08_00264FB0, 0, 1);
     }
 }

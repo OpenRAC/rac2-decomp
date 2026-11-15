@@ -34,40 +34,40 @@ int func_L08_003CDB78(char *object, void *previous)
     float whole,part,drop;
     ContactHero *hero=&D_00189E20;
 
-    func_00282F20(&temporary,object+0xC0,D_L08_001AFFF4);
-    func_00282CC0(&point,&temporary,object+0x10);
-    func_00282F20(&temporary,object+0xE0,D_L08_001AFFF0);
-    func_00282CC0(&point,&point,&temporary);
+    vec_scale_to_length(&temporary,object+0xC0,D_L08_001AFFF4);
+    FastVecAdd(&point,&temporary,object+0x10);
+    vec_scale_to_length(&temporary,object+0xE0,D_L08_001AFFF0);
+    FastVecAdd(&point,&point,&temporary);
     hit=func_00277258(&point,0,D_L08_001AFFEC,hero->collision);
     if (!hit) {
         func_0029FCC0(object,1,&temporary);
-        hit=func_002761F8(&point,&temporary,0x10,hero->collision,0);
+        hit=CollLine(&point,&temporary,0x10,hero->collision,0);
         if (!hit) {
             func_0029FCC0(object,4,&temporary);
-            hit=func_002761F8(&point,&temporary,0x10,hero->collision,0);
+            hit=CollLine(&point,&temporary,0x10,hero->collision,0);
             if (!hit) {
                 qcopy(&point,previous);
                 qcopy(&temporary,state);
-                hit=func_002761F8(previous,state,0x10,hero->collision,0);
+                hit=CollLine(previous,state,0x10,hero->collision,0);
             }
         }
         if (hit) {
-            whole=func_00282E48(&point,&temporary);
-            part=func_00282E48(&point,D_L08_001BFF60);
-            func_00282CF0(D_L08_001BFF60+0x10,&point,&temporary);
-            func_00282F20(D_L08_001BFF60+0x10,D_L08_001BFF60+0x10,whole-part);
-            func_00282CC0(D_L08_001BFF60+0x10,D_L08_001BFF60+0x10,&point);
+            whole=fast_vec_dist(&point,&temporary);
+            part=fast_vec_dist(&point,D_L08_001BFF60);
+            FastVecSub(D_L08_001BFF60+0x10,&point,&temporary);
+            vec_scale_to_length(D_L08_001BFF60+0x10,D_L08_001BFF60+0x10,whole-part);
+            FastVecAdd(D_L08_001BFF60+0x10,D_L08_001BFF60+0x10,&point);
         }
     }
     if (hit) {
-        func_002ABBB8(object,D_L08_001A8F20,D_L08_001BFF60,0.0f,0.0f,3,3,3,0.0f,0.0f,9.0f,0.8f,-1,0.0f,0,3,-1,7,0x810001);
+        SpawnExplosionEffects(object,D_L08_001A8F20,D_L08_001BFF60,0.0f,0.0f,3,3,3,0.0f,0.0f,9.0f,0.8f,-1,0.0f,0,3,-1,7,0x810001);
         if (!*(int *)(state+0xB0)) {
             func_002E5DA0(4,0,object,0x988);
             *(int *)(state+0xB0)=15;
         }
-        func_00282CF0(&point,state,&point);
-        func_00282CC0(D_L08_001BFF60+0x10,D_L08_001BFF60+0x10,&point);
-        if (D_001A79F0!=9 && (result=func_00278E78())==1) {
+        FastVecSub(&point,state,&point);
+        FastVecAdd(D_L08_001BFF60+0x10,D_L08_001BFF60+0x10,&point);
+        if (D_001A79F0!=9 && (result=GetCollHitMaterial())==1) {
             D_L08_001B2094=D_L08_001B3410;
             D_L08_001B2098=D_L08_001B3414;
             *(int *)(state+0x50)=0;
@@ -83,15 +83,15 @@ int func_L08_003CDB78(char *object, void *previous)
         } else {
             qcopy(state,D_L08_001BFF60+0x10);
             func_00283028(state+0x20,state+0x20,D_L08_001BFF60+0x20);
-            func_00282D30(state+0x20,state+0x20,D_L08_001B0118);
+            FastVecScale(state+0x20,state+0x20,D_L08_001B0118);
             drop=D_L08_001B0120*0.00027777778450399637f;
             *(float *)(state+0x28)-=drop;
             if (*(unsigned char *)(object+0x20)!=9) {
                 if (*(float *)(state+0x28)>0.0f) *(float *)(state+0x28)=-drop;
-                func_L00_002D2168(0x80,0,15.0f);
+                set_hero_animation(0x80,0,15.0f);
                 func_002A7750(object,9,-1);
             }
-            func_00282CC0(object+0x10,object+0x10,state+0x20);
+            FastVecAdd(object+0x10,object+0x10,state+0x20);
         }
     }
     return hit;

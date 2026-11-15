@@ -53,14 +53,14 @@ extern float D_L22_001A7CF8 __attribute__((sda));
 
 void func_L22_002AAA30(void) {
     float v[4] __attribute__((aligned(16)));
-    func_L00_002D24E8();
-    func_L00_002B36E0();
+    AdvanceHeroAnimation();
+    UpdateHeroInputAndHistory();
     func_L00_002ACA08();
     {
         char *g = (char *)&D_00189E20;
         if (*(u8 *)(g + 0x22B4) == 1) {
             func_L00_002ACF88(g + 0x80, g + 0x90, g + 0x550);
-            func_L00_002B8930();
+            UpdateHeroMotionResponseParameters();
         }
         if (*(u8 *)(g + 0x22B4) == 2) {
             if (*(int *)(g + 0x2294) == 0x5B) {
@@ -81,7 +81,7 @@ void func_L22_002AAA30(void) {
                 char *g = (char *)&D_00189E20;
                 if (*(int *)(g + 0x33C)) {
                     func_002AFD88(*(void **)(g + 0x2290), v, 0, 0, 2.5f);
-                    func_00282CC0(v, v, g + 0x80);
+                    FastVecAdd(v, v, g + 0x80);
                     func_002A8C28(*(void **)(g + 0x2290), v, 4, 100, 0x80000, 0, 1, 1, 0);
                 }
                 if (*(short *)(g + 0x1454) && *(float *)(g + 0x24B8) > 0.15f && !*(u8 *)(g + 0x1456)) {
@@ -94,7 +94,7 @@ void func_L22_002AAA30(void) {
                         camera->field1338 = 0.27f;
                     }
                     if (D_L22_001A8FF0) angle = func_L00_002B9B38(g + 0x1440, 0);
-                    else angle = func_00283BE0(*(float *)(g + 0x1458), *(float *)(g + 0x98));
+                    else angle = fast_subtract_rotations(*(float *)(g + 0x1458), *(float *)(g + 0x98));
                     {
                         UpdateCamera *camera = &D_L22_0025DE90;
                         camera->angle = angle;
@@ -105,23 +105,23 @@ void func_L22_002AAA30(void) {
         }
     }
     func_L22_002D0C98();
-    func_L00_002AE0C8();
+    RebuildRegionObjectMembership();
     {
         char *g = (char *)&D_00189E20;
         if (!*(u8 *)(g + 0x22B4)) return;
-        func_L00_002B9CA8();
+        UpdateDelayedSounds();
         func_L00_002A5368();
         if (!*(u8 *)(g + 0x22B4)) return;
         func_L00_002A9600();
         func_L00_002A7958();
-        func_L00_002A7748();
+        ApplyHeroAxisScales();
         if (*(u8 *)(g + 0x22B4) == 1) {
             D_L22_0025DE90.rate = D_L22_001A7CF8;
-            func_L00_002A5840();
-            func_L00_002A5CB0();
+            UpdateHeroGlowAndExtraManipulators();
+            UpdateHeroJointEffect();
             func_L00_002A6008();
             if (*(char **)(g + 0x24E4)) {
-                func_002E5CF8(*(char **)(g + 0x24E4) + 0x10, 0, *(void **)(g + 0x2290));
+                PlayMobySound(*(char **)(g + 0x24E4) + 0x10, 0, *(void **)(g + 0x2290));
                 *(u16 *)(g + 0x2520) = 0x39;
                 *(u16 *)(g + 0x2522) = *(u16 *)(g + 0x24E4);
             }
@@ -135,7 +135,7 @@ void func_L22_002AAA30(void) {
         if (*(u8 *)(g + 0x22B4) == 2) {
             if (*D_001A7A43) D_L22_0025DE90.field13ec = D_L22_001A7CF8 * 1.4f;
             if (*(short *)(g + 0x1E2) < 10000) ++*(u16 *)(g + 0x1E2);
-            func_L00_002A5840();
+            UpdateHeroGlowAndExtraManipulators();
             func_L22_002AA480();
             func_L22_002AA678();
             if ((*(u16 *)(*(char **)(g + 0x2290) + 0x34) ^ 1) & 1) {
@@ -144,7 +144,7 @@ void func_L22_002AAA30(void) {
                 func_L00_002A7A10();
             }
         }
-        func_L00_002A9760();
+        UpdateHeroMobyProbedHeightBounds();
     }
     func_002A677C(D_00189E20.object);
 }

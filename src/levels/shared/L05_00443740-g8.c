@@ -67,15 +67,15 @@ void func_L05_00443740(char *obj)
     qcopy(old, moby + 0x10);
     forward = D_L05_001B1A7C;
     F(moby, 0x2C) = F(P(moby, 0x24), 0x24) * D_L05_001B1A84;
-    func_00282D30(a, obj, forward);
-    func_00282CC0(moby + 0x10, obj + 0x30, a);
-    func_00282D30(b, obj + 0x20, D_L05_001B1A80);
-    func_00282CC0(moby + 0x10, moby + 0x10, b);
+    FastVecScale(a, obj, forward);
+    FastVecAdd(moby + 0x10, obj + 0x30, a);
+    FastVecScale(b, obj + 0x20, D_L05_001B1A80);
+    FastVecAdd(moby + 0x10, moby + 0x10, b);
     t = -F(input, 0x68) / (F(input, 0x78) * 0.017453294f);
     if (t > 1.0f) t = 1.0f;
     else if (t < -1.0f) t = -1.0f;
-    func_00282D30(c, obj + 0x10, F(state, 0x250) * t);
-    func_00282CC0(moby + 0x10, moby + 0x10, c);
+    FastVecScale(c, obj + 0x10, F(state, 0x250) * t);
+    FastVecAdd(moby + 0x10, moby + 0x10, c);
     t = F(input, 0x64) / (F(input, 0x74) * 0.017453294f);
     if (t < 0.0f) {
         t *= F(state, 0x24C);
@@ -85,8 +85,8 @@ void func_L05_00443740(char *obj)
     }
     F(state, 0xC) = func_002702C8(F(state, 0xC), t, D_L05_001B1BF8,
                                   D_L05_001B1BFC, 0.0f, state + 0x10);
-    func_00282D30(b, obj + 0x20, F(state, 0x254) * F(state, 0xC));
-    func_00282CC0(moby + 0x10, moby + 0x10, b);
+    FastVecScale(b, obj + 0x20, F(state, 0x254) * F(state, 0xC));
+    FastVecAdd(moby + 0x10, moby + 0x10, b);
     if (D_L05_00221D10.flag) {
         if (!func_00282948(&D_L05_00221D10.timer)) {
             func_L00_002D6998(D_L05_002B8770);
@@ -95,16 +95,16 @@ void func_L05_00443740(char *obj)
             D_L05_00221D10.timer = 7;
         }
     }
-    func_L05_00445338(obj, old);
+    ResolveLinkedMobyMovementCollisions(obj, old);
     func_L05_00443C18(obj, moby);
-    func_00282CF0(d, state + 0x20, obj + 0x30);
-    func_00282F20(d, d, D_L05_001B1A98);
-    func_00282CC0(e, obj + 0x30, d);
-    func_00282CF0(moby + 0xC0, e, moby + 0x10);
-    func_00282F20(moby + 0xC0, moby + 0xC0, 1.0f);
-    func_00282DD8(moby + 0xD0, moby + 0xC0, obj + 0x20);
-    func_00282F20(moby + 0xD0, moby + 0xD0, 1.0f);
-    func_00282DD8(moby + 0xE0, moby + 0xD0, moby + 0xC0);
+    FastVecSub(d, state + 0x20, obj + 0x30);
+    vec_scale_to_length(d, d, D_L05_001B1A98);
+    FastVecAdd(e, obj + 0x30, d);
+    FastVecSub(moby + 0xC0, e, moby + 0x10);
+    vec_scale_to_length(moby + 0xC0, moby + 0xC0, 1.0f);
+    FastVecCross(moby + 0xD0, moby + 0xC0, obj + 0x20);
+    vec_scale_to_length(moby + 0xD0, moby + 0xD0, 1.0f);
+    FastVecCross(moby + 0xE0, moby + 0xD0, moby + 0xC0);
     I(moby, 0xCC) = 0;
     I(moby, 0xDC) = 0;
     I(moby, 0xEC) = 0;
@@ -113,11 +113,11 @@ void func_L05_00443740(char *obj)
     {
         char *turn = P(obj, 0x70) + 0xD4;
         if (H(turn, 4)) {
-            float wave = func_00283CE0(H(turn, 6));
+            float wave = IntToFloat(H(turn, 6));
             wave = func_002A7C00(1.0f, 0.0f, wave * F(turn, 8));
             wave = func_002ABB18(wave * 12.566371f);
             if (H(turn, 4) == -1) wave = -wave;
-            angle = func_00283B98(angle, wave);
+            angle = FastAddRotations(angle, wave);
         }
     }
     if (func_00282C48(angle) > 0.00001f) {
@@ -125,11 +125,11 @@ void func_L05_00443740(char *obj)
         func_002ACDE8(moby + 0xD0, moby + 0xD0, rotation);
         func_002ACDE8(moby + 0xE0, moby + 0xE0, rotation);
     }
-    func_00282D30(rotation, direction, 0.05f);
-    func_00283098(rotation, rotation, moby + 0xC0);
-    func_00282CC0(moby + 0x10, moby + 0x10, rotation);
+    FastVecScale(rotation, direction, 0.05f);
+    matrix_mul_vec3(rotation, rotation, moby + 0xC0);
+    FastVecAdd(moby + 0x10, moby + 0x10, rotation);
     func_L05_00418508(moby);
-    func_L05_00443D08(moby, obj);
+    UpdateShipWeapons(moby, obj);
     func_L05_004445E8(moby);
     func_L00_002E6CF0(func_L05_00444B20, moby);
     func_L00_002E6EF8(func_L05_00445D60, moby);

@@ -346,7 +346,7 @@ char *func_L00_00300618(int reload)
         D_001A7280.archive1 = (int)heap;
     }
     func_0011AEA0(0);
-    func_0029D4D0((void *)D_001A7280.archive1, hdr);
+    fast_decompress((void *)D_001A7280.archive1, hdr);
     func_0011AEA0(0);
     func_00282A60(D_00189E20, 0, 0x2540);
     func_00282A60(D_L00_001B8C80, 0, 0x410);
@@ -355,10 +355,10 @@ char *func_L00_00300618(int reload)
     func_001163A0(1234);
     if (D_001A7B90) {
         if (D_001A790C == 1.0f)
-            func_L00_00322428(1);
+            SetFrameTimingMode(1);
     } else {
         if (D_001A790C != 1.0f)
-            func_L00_00322428(0);
+            SetFrameTimingMode(0);
     }
     D_L00_001BF200.p4 = D_L00_001BF280;
     D_L00_001BF200.p8 = D_L00_001B1A80;
@@ -428,7 +428,7 @@ char *func_L00_00300618(int reload)
     D_L00_001B255C = 0x3C0;
     D_L00_001B1EB4 = 0x3C0;
     D_L00_001B20C0 = 0x1F4000;
-    func_00284E18(D_L00_001BD2C0.i23C, D_L00_001BD2C0.i240, D_L00_001BD2C0.i244);
+    SetBackgroundColor(D_L00_001BD2C0.i23C, D_L00_001BD2C0.i240, D_L00_001BD2C0.i244);
     func_002FC070(D_00100AE0);
     func_00282A88(D_L00_001C6F40, 0x100);
     func_00282A88(D_L00_001C7040, 0x180);
@@ -441,7 +441,7 @@ char *func_L00_00300618(int reload)
 
         s += 0x10;
         if (n >= 12) {
-            func_0026FEB8(D_L00_002A0ED0);
+            STUB_printf(D_L00_002A0ED0);
             n = 12;
         }
         if (n)
@@ -591,15 +591,15 @@ char *func_L00_00300618(int reload)
             s += 0x50;
             tie->h12 = i;
             m->row[3].f[3] = D_L00_00226700[tie->b1D]->f40;
-            func_00283098(tie, &D_L00_00226700[tie->b1D]->sphere, m);
-            scale = func_00282DF0(&m->row[0]);
-            scale = func_L00_002EE050(scale, func_00282DF0(&m->row[1]));
-            tie->bounds.f[3] = D_L00_00226700[tie->b1D]->sphere.f[3] * func_L00_002EE050(scale, func_00282DF0(&m->row[2]));
-            func_00282D60(tie, tie, m->row[3].f[3]);
-            func_00282CC0(tie, tie, &m->row[3]);
-            (D_L00_001B251C + i)->row[0].f[3] = 1.0f / func_00282DF0(&(D_L00_001B251C + i)->row[0]);
-            (D_L00_001B251C + i)->row[1].f[3] = 1.0f / func_00282DF0(&(D_L00_001B251C + i)->row[1]);
-            (D_L00_001B251C + i)->row[2].f[3] = 1.0f / func_00282DF0(&(D_L00_001B251C + i)->row[2]);
+            matrix_mul_vec3(tie, &D_L00_00226700[tie->b1D]->sphere, m);
+            scale = FastVecLength(&m->row[0]);
+            scale = func_L00_002EE050(scale, FastVecLength(&m->row[1]));
+            tie->bounds.f[3] = D_L00_00226700[tie->b1D]->sphere.f[3] * func_L00_002EE050(scale, FastVecLength(&m->row[2]));
+            scale_vector(tie, tie, m->row[3].f[3]);
+            FastVecAdd(tie, tie, &m->row[3]);
+            (D_L00_001B251C + i)->row[0].f[3] = 1.0f / FastVecLength(&(D_L00_001B251C + i)->row[0]);
+            (D_L00_001B251C + i)->row[1].f[3] = 1.0f / FastVecLength(&(D_L00_001B251C + i)->row[1]);
+            (D_L00_001B251C + i)->row[2].f[3] = 1.0f / FastVecLength(&(D_L00_001B251C + i)->row[2]);
             tie->h18 = *(unsigned short *)s;
             s += 0x10;
         }
@@ -709,8 +709,8 @@ char *func_L00_00300618(int reload)
             if (D_L00_0021EA20[cls]->p1C) {
                 float t;
 
-                shrub->b17 = func_00283CF0(*D_L00_0021EA20[cls]->p1C);
-                t = func_00283CE0(shrub->b17) + 24.0f;
+                shrub->b17 = FloatToInt(*D_L00_0021EA20[cls]->p1C);
+                t = IntToFloat(shrub->b17) + 24.0f;
                 if (shrub->f10 < t)
                     shrub->f10 = t;
             }
@@ -720,10 +720,10 @@ char *func_L00_00300618(int reload)
             qcopy(&m->row[3], s + 0x40);
             s += 0x50;
             m->row[3].f[3] = D_L00_0021EA20[cls]->f20;
-            a = (func_00282DF0(&m->row[0]) + func_00282DF0(&m->row[1])) * 0.5f;
-            b = func_00282DF0(&m->row[2]);
-            w = func_00283CF0(a * 4096.0f);
-            h = func_00283CF0(b * 4096.0f);
+            a = (FastVecLength(&m->row[0]) + FastVecLength(&m->row[1])) * 0.5f;
+            b = FastVecLength(&m->row[2]);
+            w = FloatToInt(a * 4096.0f);
+            h = FloatToInt(b * 4096.0f);
             if (h > 0x10000)
                 h = 0x10000;
             if (w > 0x10000)
@@ -739,12 +739,12 @@ char *func_L00_00300618(int reload)
             m->row[0].i[3] = (bl << 16) | g | r;
             shrub->h1C = *(unsigned short *)s;
             s += 0x10;
-            func_00283098(shrub, D_L00_0021EA20[cls], m);
-            scale = func_00282DF0(&m->row[0]);
-            scale = func_L00_002EE050(scale, func_00282DF0(&m->row[1]));
-            shrub->bounds.f[3] = D_L00_0021EA20[cls]->fC * func_L00_002EE050(scale, func_00282DF0(&m->row[2]));
-            func_00282D60(shrub, shrub, m->row[3].f[3]);
-            func_00282CC0(shrub, shrub, &m->row[3]);
+            matrix_mul_vec3(shrub, D_L00_0021EA20[cls], m);
+            scale = FastVecLength(&m->row[0]);
+            scale = func_L00_002EE050(scale, FastVecLength(&m->row[1]));
+            shrub->bounds.f[3] = D_L00_0021EA20[cls]->fC * func_L00_002EE050(scale, FastVecLength(&m->row[2]));
+            scale_vector(shrub, shrub, m->row[3].f[3]);
+            FastVecAdd(shrub, shrub, &m->row[3]);
         }
     }
     {
@@ -867,7 +867,7 @@ char *func_L00_00300618(int reload)
 
                 func_00282AB0(e, s, 0x90);
                 s += 0x90;
-                func_L00_0035F7E8(e);
+                resolve_lookup_record(e);
             }
         } else {
             D_00188660.table = 0;
@@ -1461,7 +1461,7 @@ char *func_L00_00300618(int reload)
     if (D_001A79F0 >= 0) {
         D_00152C00.hero = 0;
         if (0.0f < startPos[0]) {
-            Moby00618 *m = func_0029EFD0(0xD54);
+            Moby00618 *m = CreateMoby(0xD54);
 
             m->pos.f[0] = startPos[0];
             m->pos.f[1] = startPos[1];
@@ -1717,9 +1717,9 @@ char *func_L00_00300618(int reload)
         D_L00_001C9340.i1C = 0;
     }
     func_0027B7E0();
-    func_L00_002A4928();
+    InitializeHero();
     func_L00_002A4D18();
-    func_L00_002D9E80();
+    SetupLevelCameras();
     func_00272368();
     func_002B8518();
     func_L00_0037E418();

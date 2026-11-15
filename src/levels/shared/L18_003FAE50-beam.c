@@ -44,9 +44,9 @@ void func_L18_003FAE50(char *object)
     int beam,i;
     for(beam=0;beam<11;beam++) {
         qcopy(&local.start,&D_L18_002A08C0[beam]);
-        func_00282CF0(&local.step,&D_L18_002A0970[beam],&local.start);
-        func_00282D30(&local.step,&local.step,1.0f/D_L18_001B0570);
-        func_00282CC0(&local.next,&local.start,&local.step);
+        FastVecSub(&local.step,&D_L18_002A0970[beam],&local.start);
+        FastVecScale(&local.step,&local.step,1.0f/D_L18_001B0570);
+        FastVecAdd(&local.next,&local.start,&local.step);
         alpha=func_002A7878(D_L18_001B0560[0],D_L18_001B0560[1]);
         sourceColor=D_L18_001B0550;
         alphaByte=sourceColor>>24;
@@ -56,13 +56,13 @@ void func_L18_003FAE50(char *object)
         int segment;
         for(segment=0;(float)segment<D_L18_001B0570;) {
             rgb=faded&0xffffffu;
-            func_00282CF0(&local.ray,&local.start,&local.next);
-            func_00282CF0(&local.firstSide,&local.start,D_L18_001B97C0);
-            func_00282CF0(&local.secondSide,&local.next,D_L18_001B97C0);
-            func_00282DD8(&local.firstSide,&local.firstSide,&local.ray);
-            func_00282DD8(&local.secondSide,&local.secondSide,&local.ray);
-            func_00282F20(&local.firstSide,&local.firstSide,D_L18_001B0568);
-            func_00282F20(&local.secondSide,&local.secondSide,D_L18_001B0568);
+            FastVecSub(&local.ray,&local.start,&local.next);
+            FastVecSub(&local.firstSide,&local.start,D_L18_001B97C0);
+            FastVecSub(&local.secondSide,&local.next,D_L18_001B97C0);
+            FastVecCross(&local.firstSide,&local.firstSide,&local.ray);
+            FastVecCross(&local.secondSide,&local.secondSide,&local.ray);
+            vec_scale_to_length(&local.firstSide,&local.firstSide,D_L18_001B0568);
+            vec_scale_to_length(&local.secondSide,&local.secondSide,D_L18_001B0568);
             func_00281DE8(&local.packet.raw,0x17,1,0x80);
             local.packet.view.colors[3]=faded;
             local.packet.view.colors[2]=faded;
@@ -75,24 +75,24 @@ void func_L18_003FAE50(char *object)
                 local.packet.view.uv[i][0]=D_L18_001B0530[i][0]+*(float *)(state+0x8c);
                 local.packet.view.uv[i][1]=D_L18_001B0534[i*2];
             }
-            func_00282CF0(&local.scratch,&local.start,&local.firstSide);
+            FastVecSub(&local.scratch,&local.start,&local.firstSide);
             local.packet.view.vertices[0]=local.scratch;
-            func_00282CC0(&local.scratch,&local.start,&local.firstSide);
+            FastVecAdd(&local.scratch,&local.start,&local.firstSide);
             local.packet.view.vertices[1]=local.scratch;
-            func_00282CF0(&local.scratch,&local.next,&local.secondSide);
+            FastVecSub(&local.scratch,&local.next,&local.secondSide);
             local.packet.view.vertices[2]=local.scratch;
-            func_00282CC0(&local.scratch,&local.next,&local.secondSide);
+            FastVecAdd(&local.scratch,&local.next,&local.secondSide);
             local.packet.view.vertices[3]=local.scratch;
-            func_00280B90(&local.packet.raw,0,0);
-            func_00282F20(&local.firstSide,&local.firstSide,D_L18_001B056C);
-            func_00282F20(&local.secondSide,&local.secondSide,D_L18_001B056C);
-            func_00282CF0(&local.scratch,&local.start,&local.firstSide);
+            draw_world_quad(&local.packet.raw,0,0);
+            vec_scale_to_length(&local.firstSide,&local.firstSide,D_L18_001B056C);
+            vec_scale_to_length(&local.secondSide,&local.secondSide,D_L18_001B056C);
+            FastVecSub(&local.scratch,&local.start,&local.firstSide);
             local.packet.view.vertices[0]=local.scratch;
-            func_00282CC0(&local.scratch,&local.start,&local.firstSide);
+            FastVecAdd(&local.scratch,&local.start,&local.firstSide);
             local.packet.view.vertices[1]=local.scratch;
-            func_00282CF0(&local.scratch,&local.next,&local.secondSide);
+            FastVecSub(&local.scratch,&local.next,&local.secondSide);
             local.packet.view.vertices[2]=local.scratch;
-            func_00282CC0(&local.scratch,&local.next,&local.secondSide);
+            FastVecAdd(&local.scratch,&local.next,&local.secondSide);
             local.packet.view.vertices[3]=local.scratch;
             func_00281DE8(&local.packet.raw,0x2b,1,0x80);
             endColor=D_L18_001B0554;
@@ -109,9 +109,9 @@ void func_L18_003FAE50(char *object)
             }
             segment=index+1;
             }
-            func_00280B90(&local.packet.raw,0,0);
+            draw_world_quad(&local.packet.raw,0,0);
             qcopy(&local.start,&local.next);
-            func_00282CC0(&local.next,&local.next,&local.step);
+            FastVecAdd(&local.next,&local.next,&local.step);
         }
         }
     }

@@ -39,22 +39,22 @@ void func_L02_00421860(u8 *object)
     func_002AFFD8(object+0x10,&query.normal,1);
     qcopy(&query.start,object+0x10);
     if(object[0x20]==0) {
-        func_00282CC0(object+0x10,object+0x10,state+0x40);
+        FastVecAdd(object+0x10,object+0x10,state+0x40);
         query.impact.source=object;
         query.impact.mask=0x10000;
         query.impact.strength=*(float *)(state+0x64);
         query.impact.mode=1;
         qcopy(&query.impact.direction,state+0x40);
-        func_00282F20(&query.impact.direction,&query.impact.direction,1.0f);
+        vec_scale_to_length(&query.impact.direction,&query.impact.direction,1.0f);
         query.impact.direction.f[3]=5627.9248046875f;
         query.impact.kind=1;
         query.impact.enabled=1;
         query.impact.type=*(u16 *)(object+0xAA);
-        if(func_002761F8(&query.start,object+0x10,0,object,0) && D_L02_001C0940.other!=*(u8 **)(state+0x50)) {
-            func_002E5CF8(0,0,object);
+        if(CollLine(&query.start,object+0x10,0,object,0) && D_L02_001C0940.other!=*(u8 **)(state+0x50)) {
+            PlayMobySound(0,0,object);
             if(!D_L02_001C0940.other) func_L02_00421DA0(&D_L02_001C0940.position,5,0);
             else if(*(int *)(D_L02_001C0940.other+0x98)) func_L02_00421DA0(&D_L02_001C0940.position,10,1);
-            func_L02_00422270(object,&D_L02_001C0940.position);
+            SpawnSparkRingBurst(object,&D_L02_001C0940.position);
             func_002A8BD0((char *)&impact,(int)object,0x810001,*(float *)(state+0x64));
             impact.kind=2;impact.enabled=1;
             impact.type=*(u16 *)(*(u8 **)(state+0x50)+0xAA);
@@ -74,7 +74,7 @@ void func_L02_00421860(u8 *object)
             query.impact.direction.f[2]=func_002A7878(-1.0f,1.0f);
             query.impact.direction.f[1]=func_002A7878(-1.0f,1.0f);
             query.impact.direction.f[0]=func_002A7878(-1.0f,1.0f);
-            func_00282F20(&query.impact.direction,&query.impact.direction,0.025f);
+            vec_scale_to_length(&query.impact.direction,&query.impact.direction,0.025f);
             query.impact.direction.f[2]=func_002A7878(0,0.1f);
             func_002C2210(position,60,D_L02_001B1FC8,size*0.35f,size,0,sign,&query.impact.direction,0,D_L02_001B1FB8);
             func_002C2210(position,60,D_L02_001B1FCC,size*0.245f,size*0.7f,1,sign,&query.impact.direction,0,D_L02_001B1FB8);
@@ -84,7 +84,7 @@ void func_L02_00421860(u8 *object)
         return;
     }
     if(*(int *)(state+0x58)<16) {
-        *(float *)(state+0x60)=func_00283CE0(*(int *)(state+0x58))/func_00283CE0(15);
+        *(float *)(state+0x60)=IntToFloat(*(int *)(state+0x58))/IntToFloat(15);
         if(func_001163B0()%3==0) {
             int sign;
             float size;
@@ -93,7 +93,7 @@ void func_L02_00421860(u8 *object)
             query.impact.direction.f[2]=func_002A7878(-1.0f,1.0f);
             query.impact.direction.f[1]=func_002A7878(-1.0f,1.0f);
             query.impact.direction.f[0]=func_002A7878(-1.0f,1.0f);
-            func_00282F20(&query.impact.direction,&query.impact.direction,0.025f);
+            vec_scale_to_length(&query.impact.direction,&query.impact.direction,0.025f);
             func_002C2210(object+0x10,60,D_L02_001B1FC8,size*0.05f,size,0,sign,&query.impact.direction,0,D_L02_001B1FB8);
             func_002C2210(object+0x10,60,D_L02_001B1FCC,size*0.0035f,size*0.035f,1,sign,&query.impact.direction,0,D_L02_001B1FB8);
         }

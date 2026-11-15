@@ -30,9 +30,9 @@ void func_L02_003C4280(void *a0, int a1) {
     } else {
         state->value = 0.4166667f;
     }
-    func_00282CF0(buf, (float *)(state->points + (state->index * 16 + 0x20)), (float *)((char *)a0 + 0x10));
-    func_00282F20(buf, buf, state->value);
-    func_00282CC0((char *)a0 + 0x10, (char *)a0 + 0x10, buf);
-    if (func_00282E80((char *)a0 + 0x10, state->points + (state->index * 16 + 0x20)) <= state->value * 0.88f)
+    FastVecSub(buf, (float *)(state->points + (state->index * 16 + 0x20)), (float *)((char *)a0 + 0x10));
+    vec_scale_to_length(buf, buf, state->value);
+    FastVecAdd((char *)a0 + 0x10, (char *)a0 + 0x10, buf);
+    if (vec_distance_xy((char *)a0 + 0x10, state->points + (state->index * 16 + 0x20)) <= state->value * 0.88f)
         state->index += 1;
 }

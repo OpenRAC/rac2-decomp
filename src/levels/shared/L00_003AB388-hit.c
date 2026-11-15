@@ -52,7 +52,7 @@ void func_L00_003AB388(char *moby, void *direction, void *position)
     hit.mode = 2;
     hit.id = *(unsigned short *)(moby + 0xAA);
     if (target) {
-        func_002A8E20(target, &hit);
+        QueueMobyImpact(target, &hit);
         if (((WeaponDamageClass *)(
         D_00139568[0x18] * 0xE0 + (unsigned int)ref_L00_003AB388_0))[0].mode)
             func_00334160(target, 0x43, *(char **)(moby + 0xB8));
@@ -72,7 +72,7 @@ void func_L00_003AB388(char *moby, void *direction, void *position)
     }
     func_3251D0(moby + 0x10, forward, 1);
     func_2EE178(forward, forward, -1.0f);
-    func_002E5CF8(2, 0, moby);
-    func_0032C700(moby + 0x10, 0.75f, 20.0f, 1, 0, 1, 0, 0x14, 0x2D,
+    PlayMobySound(2, 0, moby);
+    SpawnExplosion(moby + 0x10, 0.75f, 20.0f, 1, 0, 1, 0, 0x14, 0x2D,
                   1, 0, 1, 0, D_L00_001ADB2C);
 }

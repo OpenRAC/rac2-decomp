@@ -27,7 +27,7 @@ char *func_L02_0033C760(TI128 *pos, char *prev, int flag, float scale) {
     if (node != 0) {
         tail = node + 0x20;
         *(int *)(node + 4) = 0x80808080;
-        *(u8 *)(node + 9) = func_00283CF0(4.0f) + 0x40;
+        *(u8 *)(node + 9) = FloatToInt(4.0f) + 0x40;
         *(u8 *)(node + 3) = 0x44;
         *(u8 *)(node + 8) = 0x20;
         *(float *)(node + 0xC) = scale * 210000.0f;

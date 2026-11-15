@@ -25,44 +25,44 @@ int func_L00_003425F8(int pathIndex, const Vector *point, Vector *out, float rad
     const Vector *start;
     qcopy(&position, point);
     path = D_L00_001FDA80[pathIndex];
-    height = func_00282DB0(&position, &D_0018A0E0);
+    height = FastVecDot(&position, &D_0018A0E0);
     for (i = 0; i < path->count - 1; ++i) {
         if (path->points[i].f[3] == 0.0f && path->points[i + 1].f[3] == 0.0f)
             continue;
         start = &path->points[i];
-        func_00282CF0(&relative, &position, start);
-        func_00282CF0(&segment, &path->points[i + 1], start);
-        along = func_00282DB0(&relative, &D_0018A0E0);
-        func_00282F20(&planePart, &D_0018A0E0, along);
-        func_00282CF0(&relative, &relative, &planePart);
-        func_00282F20(&planePart, &D_0018A0E0, func_00282DB0(&segment, &D_0018A0E0));
-        func_00282CF0(&segment, &segment, &planePart);
-        func_00282F20(&unit, &segment, 1.0f);
-        func_00282DD8(&cross, &relative, &unit);
-        side = func_00282C48(func_00282DB0(&cross, &D_0018A0E0));
+        FastVecSub(&relative, &position, start);
+        FastVecSub(&segment, &path->points[i + 1], start);
+        along = FastVecDot(&relative, &D_0018A0E0);
+        vec_scale_to_length(&planePart, &D_0018A0E0, along);
+        FastVecSub(&relative, &relative, &planePart);
+        vec_scale_to_length(&planePart, &D_0018A0E0, FastVecDot(&segment, &D_0018A0E0));
+        FastVecSub(&segment, &segment, &planePart);
+        vec_scale_to_length(&unit, &segment, 1.0f);
+        FastVecCross(&cross, &relative, &unit);
+        side = func_00282C48(FastVecDot(&cross, &D_0018A0E0));
         if (!(side > radius)) {
-            length = func_00282DF0(&segment);
-            along = func_00282DB0(&relative, &unit);
+            length = FastVecLength(&segment);
+            along = FastVecDot(&relative, &unit);
             if (length < along || along < 0.0f) {
-                if (func_00282DF0(&relative) < radius) {
-                    func_00282F20(&displacement, &relative, radius);
-                    func_00282CC0(&position, &displacement, start);
+                if (FastVecLength(&relative) < radius) {
+                    vec_scale_to_length(&displacement, &relative, radius);
+                    FastVecAdd(&position, &displacement, start);
                     hit = 1;
                 }
             } else {
                 hit = 1;
-                func_00282F20(&planePart, &unit, along);
-                func_00282CF0(&displacement, &relative, &planePart);
+                vec_scale_to_length(&planePart, &unit, along);
+                FastVecSub(&displacement, &relative, &planePart);
                 scale_vector_radius(radius, &displacement, &displacement);
-                func_00282CC0(&displacement, &displacement, &planePart);
-                func_00282CC0(&position, &displacement, start);
+                FastVecAdd(&displacement, &displacement, &planePart);
+                FastVecAdd(&position, &displacement, start);
             }
         }
     }
     if (hit) {
-        height -= func_00282DB0(&position, &D_0018A0E0);
-        func_00282F20(&segment, &D_0018A0E0, height);
-        func_00282CC0(out, &position, &segment);
+        height -= FastVecDot(&position, &D_0018A0E0);
+        vec_scale_to_length(&segment, &D_0018A0E0, height);
+        FastVecAdd(out, &position, &segment);
     }
     return hit;
 }

@@ -11,11 +11,11 @@ s32 func_L18_0042F688(char *self, char *point, s32 route, s16 *index, s32 revers
     char *path = D_L18_001FE480[route];
     qcopy(point, path + 16 + (*index << 4));
     if (reverse) {
-        if (func_00282E48(self + 16, point) < radius) --*index;
+        if (fast_vec_dist(self + 16, point) < radius) --*index;
         if (*index < 0)
             return 0;
     } else {
-        if (func_00282E48(self + 16, point) < radius) ++*index;
+        if (fast_vec_dist(self + 16, point) < radius) ++*index;
         if (*index >= *(s32 *)path)
             return 0;
     }

@@ -35,7 +35,7 @@ void func_L11_004461E8(u8 *object)
     case 1: {
         int i;
         u8 *dst, *src;
-        func_00283360((u8 *)&D_L11_001B359C[I32(state,0x1b8)]+0xc0);
+        set_identity_rotation_rows((u8 *)&D_L11_001B359C[I32(state,0x1b8)]+0xc0);
         previous=1.0f;
         dst=D_L11_001FF580[I32(state,0x1c8)];
         src=D_L11_001FF580[I32(state,0x1cc)];
@@ -50,11 +50,11 @@ void func_L11_004461E8(u8 *object)
         /* Initialization deliberately advances the new animation immediately. */
     }
     case 2:
-        func_002AA2E8(&SCALE(state),D_L11_001B1880,D_L11_001B1884);
+        ApproachValue(&SCALE(state),D_L11_001B1880,D_L11_001B1884);
         if (func_00282C48(SCALE(state)-D_L11_001B1880)<0.01f) S16(state,0x1fa)=3;
         break;
     case 4:
-        func_002AA2E8(&SCALE(state),D_L11_001B187C,D_L11_001B1884);
+        ApproachValue(&SCALE(state),D_L11_001B187C,D_L11_001B1884);
         if (func_00282C48(SCALE(state)-D_L11_001B187C)<0.01f) {
             D_L11_001B359C_GP[I32(state,0x1b8)].flags|=1;
             D_L11_001B359C_GP[I32(state,0x1b8)].enabled=0;
@@ -74,13 +74,13 @@ void func_L11_004461E8(u8 *object)
         dst=D_L11_001FF580[I32(state,0x1c8)];
         for (i=0;i<I32(dst,0);i++) {
             vertex=dst+16+i*16;
-            func_00282CF0(vector,vertex,(u8 *)&D_L11_001B359C[I32(state,0x1b8)]+16);
-            func_00282D30(vector,vector,SCALE(state)/previous);
-            func_00282CC0(vertex,(u8 *)&D_L11_001B359C[I32(state,0x1b8)]+16,vector);
+            FastVecSub(vector,vertex,(u8 *)&D_L11_001B359C[I32(state,0x1b8)]+16);
+            FastVecScale(vector,vector,SCALE(state)/previous);
+            FastVecAdd(vertex,(u8 *)&D_L11_001B359C[I32(state,0x1b8)]+16,vector);
             F32(vertex,8)=F32((u8 *)&D_L11_001B359C[I32(state,0x1b8)],0x18);
         }
-        func_00282F20((u8 *)&D_L11_001B359C[I32(state,0x1b8)]+0xc0,(u8 *)&D_L11_001B359C[I32(state,0x1b8)]+0xc0,SCALE(state));
-        func_00282F20((u8 *)&D_L11_001B359C[I32(state,0x1b8)]+0xd0,(u8 *)&D_L11_001B359C[I32(state,0x1b8)]+0xd0,SCALE(state));
+        vec_scale_to_length((u8 *)&D_L11_001B359C[I32(state,0x1b8)]+0xc0,(u8 *)&D_L11_001B359C[I32(state,0x1b8)]+0xc0,SCALE(state));
+        vec_scale_to_length((u8 *)&D_L11_001B359C[I32(state,0x1b8)]+0xd0,(u8 *)&D_L11_001B359C[I32(state,0x1b8)]+0xd0,SCALE(state));
     }
     if (S16(state,0x1fa)==2) {
         int i = 0;

@@ -67,8 +67,8 @@ void func_L07_003E61E0(char *actor)
             if (I(state, 0x2D4) == 1) func_002A7750(actor, 6, 2);
             break;
         case 2:
-            func_L00_00424A08(0, D_L07_001B0AFC, 0.003f);
-            func_L00_00424A50(D_L07_001B0B00, 0.003f);
+            follow_camera_set_distance(0, D_L07_001B0AFC, 0.003f);
+            follow_camera_set_height(D_L07_001B0B00, 0.003f);
             if (func_002B3890(actor))
                 func_002B60B0(actor, D_L07_001B0AEC*0.00027777778f, D_L07_001B0AF0*0.016666668f, D_L07_001B0AF4*4.848137450608192e-06f, D_L07_001B0AF8*0.0002908882452175021f);
             if (I(state, 0x2D4) != 1 && B(actor, 0x20) != 7) {
@@ -104,7 +104,7 @@ cleanup:
             F(state, 0x300) = func_00283180(angle)*radius;
             F(state, 0x304) = func_00283198(angle)*radius;
             F(state, 0x308) = 0;
-            func_00282CC0(state + 0x300, state + 0x300, state + 0x2F0);
+            FastVecAdd(state + 0x300, state + 0x300, state + 0x2F0);
         }
         result = func_L01_00321178(actor, state + 0x300);
         if (result == 128 || (I(state, 0xD0) && H(actor, 0x96) > 40) || H(actor, 0x96) > 180) func_002A7750(actor, 1, -1);
@@ -126,7 +126,7 @@ cleanup:
             F(state, 0x300) = func_00283180(angle)*radius;
             F(state, 0x304) = func_00283198(angle)*radius;
             F(state, 0x308) = 0;
-            func_00282CC0(state + 0x300, state + 0x300, state + 0x2F0);
+            FastVecAdd(state + 0x300, state + 0x300, state + 0x2F0);
         }
         func_L02_00332630(actor, state + 0x210);
         angle = func_00283248(F(state, 0x300)-F(actor, 0x10), F(state, 0x304)-F(actor, 0x14));
@@ -137,7 +137,7 @@ cleanup:
     case 6:
         if (func_002B3868(actor) && B(actor, 0x43) != 11) func_002A7470(actor, 11, 0, 20);
         func_002B4FF0(actor, state + 0x210, 0);
-        if (func_00282E80(actor + 0x10, state + 0x210) < D_L07_001B0AE8) func_002A7750(actor, 7, -1);
+        if (vec_distance_xy(actor + 0x10, state + 0x210) < D_L07_001B0AE8) func_002A7750(actor, 7, -1);
         break;
     case 7:
         if (func_002B3868(actor) && B(actor, 0x43) != 12) func_002A7470(actor, 12, 5, 10);
@@ -148,9 +148,9 @@ cleanup:
             func_002A8C28(actor, *(char **)(state + 0x334)+0x10, 1, 0.333f, (float)B(state, 0x34), 0, 1.0f, 1, 0);
         }
         if (B(actor, 0x60) & 2) {
-            time = func_00282E80(actor + 0x10, state + 0x210);
+            time = vec_distance_xy(actor + 0x10, state + 0x210);
             if (D_L07_001B0AE8+0.5f < time ||
-                func_00283C80(F(actor, 0xF8), func_00283248(F(state, 0x210)-F(actor, 0x10), F(state, 0x214)-F(actor, 0x14))) > 0.349065899848938f)
+                FastDiffRots(F(actor, 0xF8), func_00283248(F(state, 0x210)-F(actor, 0x10), F(state, 0x214)-F(actor, 0x14))) > 0.349065899848938f)
                 func_002A7750(actor, 6, -1);
         }
         break;

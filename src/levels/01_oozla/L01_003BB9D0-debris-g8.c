@@ -50,11 +50,11 @@ initial_path:
         distance=*(float *)(state+0x50);
         if(distance>0.0f) {
             step=distance/ *(float *)(state+0x54);
-            func_00282F20(delta,obj+0xC0,step);
-            func_00282CC0(position,obj+0x10,delta);
+            vec_scale_to_length(delta,obj+0xC0,step);
+            FastVecAdd(position,obj+0x10,delta);
             for(t=step;t<*(float *)(state+0x50);t+=step) {
                 func_L01_003BC490(obj,position);
-                func_00282CC0(position,position,delta);
+                FastVecAdd(position,position,delta);
             }
         }
         *(unsigned char *)(obj+0x20)=1;
@@ -67,14 +67,14 @@ initial_path:
         qcopy(position,obj+0xF0);
         *(BC540Quad *)rotation=0;
         rotation[1]=-1.3790000f; rotation[2]=0.778f; rotation[3]=0.3f;
-        func_002E5CF8(0,0,obj);
+        PlayMobySound(0,0,obj);
         for(i=0;i<4;i++) {
             func_0029FCC0(obj,i,delta);
             position[2]=func_002A7940();
             for(j=2;j>=0;j--) {
                 piece=func_L01_003BCA38(obj,0xA28,delta,position,0,1,D_L01_001A8F60,D_L01_001A8F60,rotation,0.0f);
                 *(float *)(piece+0x2C)*=scale;
-                position[2]=func_00283B98(position[2],2.0943954f);
+                position[2]=FastAddRotations(position[2],2.0943954f);
             }
             scale*=0.85f;
         }
@@ -85,10 +85,10 @@ initial_path:
         for(j=2;j>=0;j--) {
             piece=func_L01_003BCA38(obj,0xA27,delta,position,0,1,D_L01_001A8F60,D_L01_001A8F60,dimensions,0.0f);
             *(float *)(piece+0x2C)*=size;
-            position[2]=func_00283B98(position[2],2.0943954f);
+            position[2]=FastAddRotations(position[2],2.0943954f);
         }
         func_L00_00326620(obj,0xA29,0);
-        func_002A6C58(obj,0,3);
+        SetDeathBits(obj,0,3);
         if(*(short *)(obj+0xB2)&1) {
             idx=(*(short *)(obj+0xB2)>>1)+(D_001A79F0<<10);
             if(((D_0019B4A8[idx]>>4)&7)!=7) D_0019B4A8[idx]+=16;

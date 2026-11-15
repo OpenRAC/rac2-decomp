@@ -134,7 +134,7 @@ void func_L00_002A3B88(void)
     if (!(((unsigned int)D_L00_0025BBA0 - (unsigned int)&D_L00_001B1680_1) & 15) && !((unsigned int)&D_L00_001B1680_1 & 15)) {
         func_00282A88(&D_L00_001B1680_1, (unsigned int)D_L00_0025BBA0 - (unsigned int)&D_L00_001B1680_1);
     } else {
-        func_0026FEB8(D_L00_001A7C88);
+        STUB_printf(D_L00_001A7C88);
         for (i = 0; i < (int)((unsigned int)D_L00_0025BBA0 - (unsigned int)&D_L00_001B1680_1); i++) ((unsigned char *)&D_L00_001B1680_1)[i] = 0;
     }
     func_002EED08();
@@ -147,17 +147,17 @@ void func_L00_002A3B88(void)
     {
         int weapon = D_00139568[10];
         if (D_001A72C0 != D_L00_00262570[weapon].channel)
-            func_00292408(D_L00_00262570[weapon].channel);
+            LoadPackSingleTexture(D_L00_00262570[weapon].channel);
     }
     {
         int output = (D_001A7AF0 >> 16) & 31;
-        if (D_00152C00.output != output) func_002926B8(output);
+        if (D_00152C00.output != output) LoadDiscTableTexture(output);
     }
     if (D_00152C00.mode != (D_001A7AF0 & 3)) func_002925F0(D_001A7AF0 & 3);
     if (!D_L00_00262570[D_00139568[D_00189E20.weapon]].active) func_002AD860(10);
-    func_L00_00303990(1, 0);
+    LoadLevelArchiveResources(1, 0);
     func_00294F10();
-    func_0028AB70();
+    InitializeHudSlotsAndBuffers();
     func_0029CD48();
     func_002C9C20();
     D_00152C00.ready = 1;
@@ -173,10 +173,10 @@ void func_L00_002A3B88(void)
     if (allowed && D_00152C00.announce) func_002B49E0(6, 1, 6, 0, 0);
     D_00152C00.pending = 0;
     D_001A7904 = 0;
-    func_0027D330(4);
+    FadeToBlack(4);
     D_L00_001B18D8[0] = 0;
     func_002B6E78(0, 1, 1024);
-    func_002B72E8(0);
+    music_Pause(0);
     if (D_001A79F0 < 28 && !D_001A7BE8[D_001A79F0]) D_001A7BE8[D_001A79F0] = 1;
     if (D_0018C360[D_001A79F0].visits < 65535) D_0018C360[D_001A79F0].visits++;
     if (D_0018C360[D_001A79F0].maximum < D_001A7390) D_0018C360[D_001A79F0].maximum = D_001A7390;
@@ -184,11 +184,11 @@ void func_L00_002A3B88(void)
     func_00133220();
     func_0011D620(D_001A7248, 3, 0, 0, 0, 0, 0, 0, 0);
     func_002B4C18();
-    if (!D_L00_001A8F00[0]) func_002B7320();
+    if (!D_L00_001A8F00[0]) music_Unpause();
     func_002B7CE0(1);
-    func_00294420(D_L00_00262570[D_00139568[D_001A7398]].sound);
+    LoadClassIntoFreeCacheSlot(D_L00_00262570[D_00139568[D_001A7398]].sound);
     func_002B7CE0(1);
-    func_00294420(D_L00_00262570[D_00139568[D_001A7A04]].sound);
+    LoadClassIntoFreeCacheSlot(D_L00_00262570[D_00139568[D_001A7A04]].sound);
     func_002B7CE0(1);
     while (!D_L00_001A8ED4) {
         D_L00_001B19D4[0] = 0;
@@ -197,12 +197,12 @@ void func_L00_002A3B88(void)
         D_001A7200 += T1_COUNT;
         T1_COUNT = 0;
         func_00280710();
-        func_002FC280();
+        SubmitBufferedDmaChain();
         func_002FC220();
-        func_00284FC0();
+        PutDrawBufferSmall();
         func_L00_002F0930();
         func_00284EA8();
-        func_00132028();
+        snd_Pump();
         oldMode = D_L00_001A8F00[0];
         switch (oldMode) {
         case -1: case 0:
@@ -232,7 +232,7 @@ void func_L00_002A3B88(void)
             func_002B9000();
             func_L00_00370408();
             func_0027C480();
-            func_0027D900();
+            DrawLetterboxBars();
             break;
         case 3:
             func_002B9000();
@@ -241,17 +241,17 @@ void func_L00_002A3B88(void)
             break;
         case 4:
             func_002B9000();
-            func_00286738();
+            UpdateModalState();
             func_0027C4A8();
             break;
         case 5:
             func_002B9000();
-            func_L00_00374C18();
+            UpdatePurchaseMenuAndPreview();
             func_L00_0037A610();
             break;
         case 6:
             func_002B9000();
-            func_002E9268();
+            UpdatePlaybackScene();
             func_002EA8E8();
             break;
         case 9:
@@ -292,18 +292,18 @@ void func_L00_002A3B88(void)
                 else
                     D_L00_001B1680[0] = D_L00_001B1680[0] - 1;
                 period = 55;
-                func_0027C540(0);
+                SetupGifPaging(0);
                 spriteSize = 272.0f;
-                func_002FC560(71, 0x2004bULL);
-                func_0028E868(func_0028E588(0x755d, 0), 425, 250, 64, 64, 128);
+                VU1_addGSregister(71, 0x2004bULL);
+                func_0028E868(GetIconFrame(0x755d, 0), 425, 250, 64, 64, 128);
                 angle = ((float)(D_L00_001B18D8[0] % period) * -6.2831854820251465f) / (float)period;
-                func_0028F410(64, 64, func_0028E640(func_0028E588(0x755d, 1)), 7312.0f, 4512.0f, spriteSize, spriteSize, angle);
-                func_0027C660();
+                DrawRotatedSprite(64, 64, GetFrameTexture(GetIconFrame(0x755d, 1)), 7312.0f, 4512.0f, spriteSize, spriteSize, angle);
+                DoGifPaging();
                 if (D_001A7420 == 2) D_L00_001B1680[0] = 0;
             }
         }
         func_002FC3C0(1);
-        elapsed = func_00283CE0(T1_COUNT);
+        elapsed = IntToFloat(T1_COUNT);
         D_L00_001B19CC = elapsed * (D_001A7B90 ? 0.00008680556f : 0.00010416667f);
         if (!D_00189E20.flush && !D_L00_001B19D4[0]) {
             if (!D_L00_001A8F00[0]) {
@@ -372,21 +372,21 @@ void func_L00_002A3B88(void)
             }
             D_L00_001A8FE0 = 0;
         }
-        func_0027B948();
+        ResetGsRegistersPr();
         if (!D_L00_001A8F00[0] && D_00189E20.flush) { flush = 1; extra = 1; }
         if (flush) {
             func_002FC1D8();
             func_00133230();
-            func_00132028();
+            snd_Pump();
             func_002E5FE0();
             func_002B7170();
             sound = D_001A63F0;
             if (*(int *)D_L00_0021DDB0) sound = *(int *)(D_L00_0021DDB0 + 0xc64);
             func_00288EA0();
-            func_L00_00303990(0, extra);
+            LoadLevelArchiveResources(0, extra);
             func_L00_0032B500(0);
             func_002B6E78(sound, 1, 1024);
-            func_0028AB70();
+            InitializeHudSlotsAndBuffers();
         } else {
             func_002B4C18();
             if (D_L00_001A8F00[0] != oldMode) D_L00_001B19C4[0] = 0;
@@ -396,5 +396,5 @@ void func_L00_002A3B88(void)
     }
     func_00297670(D_0018D278 + D_001A79F0 * 2048);
     if (D_L00_001B19C0 != D_001A79F0) D_00139629 = D_001A79F0;
-    func_002EC408();
+    RunLevelTransition();
 }

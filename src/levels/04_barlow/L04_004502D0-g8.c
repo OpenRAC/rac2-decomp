@@ -37,14 +37,14 @@ int func_L04_004502D0(u8 *object) {
         if (I(data,0x560)) { H(object,0x34) |= 0x41; I(object,0x98)=0; }
         if (I(data,0x548)) {
             I(data,0x540) = func_L02_0032E508(object,I(data,0x544),data+0x340,16);
-            func_0026FEB8(D_L04_001B18A0,I(data,0x540));
+            STUB_printf(D_L04_001B18A0,I(data,0x540));
         }
         if (F(data,0x2A8)==0.0f) F(data,0x2A8)=0.01745329424738884f*func_002A78D8(15.0f,25.0f);
         else F(data,0x2A8)*=0.01745329424738884f;
         if (I(data,0x2B4)) F(data,0x2A8)=func_002A78D8(5.0f,30.0f)*0.01745329424738884f;
         if (func_002A77E0(2)==1) { H(object,0x34)|=0x8000; func_L00_003294F0(object,1); }
-        data[0x48]=func_00283CF0(20.0f);
-        data[0x4A]=func_00283CF0(14.0f);
+        data[0x48]=FloatToInt(20.0f);
+        data[0x4A]=FloatToInt(14.0f);
         data[0x70]=25; I(data,0xA8)=4;
         data[0x71]=21; data[0x72]=16; data[0x76]=18; data[0x77]=19;
         F(data,0x7C)=0.20000001788139343f; F(data,0x80)=0.125f;
@@ -68,19 +68,19 @@ int func_L04_004502D0(u8 *object) {
                 qcopy(object+0x10,other+0x10); qcopy(object+0xF0,other+0xF0);
                 I(object,0x98)=0; H(object,0x34)&=0xAFFF;
                 P(P(P(data,0x284),0x68),0x2AC)=object;
-                P(data,0x290)=func_0029EFD0(0x911);
+                P(data,0x290)=CreateMoby(0x911);
                 if (!P(data,0x290)) return 1;
                 P(data,0x290)[0x30]=object[0x30]; P(data,0x290)[0x31]=0;
                 func_002A0F48(P(data,0x290));
                 { u8 *child=P(data,0x290); qcopy(child+0x10,object+0x10); F(child,0x18)+=0.75f; }
-                P(data,0x288)=func_0029EFD0(0xFF9);
+                P(data,0x288)=CreateMoby(0xFF9);
                 if (!P(data,0x288)) return 1;
                 P(data,0x288)[0x30]=object[0x30]; H(P(data,0x288),0x32)=H(object,0x32);
                 P(data,0x288)[0x31]=1; *(u64 *)(P(data,0x288)+0x38)=*(u64 *)(object+0x38);
                 func_002A0F48(P(data,0x288)); func_002AF1D0(object,P(data,0x288),1,0);
                 I(data,0x2A0)=0;
             } else {
-                func_0026FEB8(D_L04_002CA650); I(data,0x27C)=0; func_002A7750(object,4,0); return 1;
+                STUB_printf(D_L04_002CA650); I(data,0x27C)=0; func_002A7750(object,4,0); return 1;
             }
         } else {
             func_002A7750(object,4,0);
@@ -95,7 +95,7 @@ int func_L04_004502D0(u8 *object) {
                 P(data,0x56C)=D_L04_001B24DC+(I(data,0x568)<<8); func_002A7750(object,5,0);
                 if (object[0x43]!=30) func_002A7470(object,30,0,0);
             }
-            P(data,0x2AC)=func_0029EFD0(0x9AC);
+            P(data,0x2AC)=CreateMoby(0x9AC);
             if (!P(data,0x2AC)) return 1;
             P(data,0x2AC)[0x30]=object[0x30]; H(P(data,0x2AC),0x32)=H(object,0x32);
             P(data,0x2AC)[0x31]=1; *(u64 *)(P(data,0x2AC)+0x38)=*(u64 *)(object+0x38);
@@ -106,7 +106,7 @@ int func_L04_004502D0(u8 *object) {
         F(data,0x120)=1.0f; F(data,0x12C)=F(data,0x298); F(data,0x130)=10.0f;
         I(data,0x294)=func_002A7820(120,700);
     }
-        if (object[0x31] && func_00282E48(object+0x10,D_L04_001B9680)<24.0f) { func_002A93B0(object); object[0x6F]=22; }
+        if (object[0x31] && fast_vec_dist(object+0x10,D_L04_001B9680)<24.0f) { func_002A93B0(object); object[0x6F]=22; }
     if (data[0x2E]==2) { func_L04_00450268(object); return 1; }
     if (P(data,0x2AC)) func_002AF1D0(object,P(data,0x2AC),3,0);
     if (F(data,0x20)<=1.0f) {
@@ -126,7 +126,7 @@ int func_L04_004502D0(u8 *object) {
 
         if (F(object,0x48)!=1.0f) F(object,0x48)=1.0f;
         if (I(data,0x2A0)) { func_0029FCC0(object,3,position); func_L04_00451150(position,8); }
-        if (result==4) func_002E5CF8(24,0,object);
+        if (result==4) PlayMobySound(24,0,object);
         I(data,0x2A0)=0; data[0x57]=210; func_002AB800(object,data+0x50); func_L04_004510C8(object);
         if ((unsigned)(result-4)<2 && D_L04_001B24F8>=object[0x21] && func_002A8508(object[0x21],-1)>=2) {
             u16 *ids=D_L04_001FB1E0[object[0x21]];
@@ -151,7 +151,7 @@ int func_L04_004502D0(u8 *object) {
         if (F(object,0x18)<floor) F(object,0x18)=floor;
     }
     if (F(object,0x18)<40.0f) {
-        func_002A6C58(object,0,3);
+        SetDeathBits(object,0,3);
         if (P(data,0x288)) { func_0029F338(P(data,0x288)); P(data,0x288)=0; }
         if (P(data,0x2AC)) {
             func_002AC728(object,P(data,0x2AC)+0x10,-1,0.5f,3.0f);

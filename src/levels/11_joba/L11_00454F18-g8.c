@@ -137,8 +137,8 @@ void func_L11_00454F18(ActorObject *p)
         heading = func_00283248(D_00189E20.position[0] - p->pos[0],
                                 D_00189E20.position[1] - p->pos[1]);
     }
-    delta = func_00283C80(p->heading, heading);
-    distance = func_00282E80(p->pos, target);
+    delta = FastDiffRots(p->heading, heading);
+    distance = vec_distance_xy(p->pos, target);
     /* The entry substate also selects the initial walking animation. */
     secondaryState = p->secondaryState;
     switch (secondaryState) {
@@ -159,7 +159,7 @@ void func_L11_00454F18(ActorObject *p)
             p->speed = 1.0f;
             func_002A7750(p, 5, 3);
         }
-        if (p->idleStage == 0 && func_00282E80(p->pos, q->goal) < 0.5f)
+        if (p->idleStage == 0 && vec_distance_xy(p->pos, q->goal) < 0.5f)
             p->idleStage = 1;
         else func_L01_00321178(p, q->goal);
         break;
@@ -194,7 +194,7 @@ void func_L11_00454F18(ActorObject *p)
             if (p->nextAnimation != func_002A77E0(2) + 1)
                 func_002A7470(p, func_002A77E0(2) + 1, 0, 10);
         }
-        func_002A7CA0(p, heading, 0.001f, 0.01f, &q->turnRate, 0.1f);
+        MobySpringTurn(p, heading, 0.001f, 0.01f, &q->turnRate, 0.1f);
         if (p->animationFlags & 2) func_L11_00456938(p);
         break;
     case 6:
@@ -220,7 +220,7 @@ void func_L11_00454F18(ActorObject *p)
                 entity = D_L11_001B359C[0] + (*ids & 0x7FFF);
                 if (entity == 0) break;
                 if (entity->classId == 0xDF9) continue;
-                if (func_00283C80(p->heading, func_00283248(entity->pos[0] - p->pos[0],
+                if (FastDiffRots(p->heading, func_00283248(entity->pos[0] - p->pos[0],
                                                         entity->pos[1] - p->pos[1])) < 0.52359885f &&
                     func_L02_002F21C0(p->pos, entity->pos) < 20.0f) {
                     q->aimTarget = entity;
@@ -254,7 +254,7 @@ void func_L11_00454F18(ActorObject *p)
                 entity = D_L11_001B359C[0] + (*ids & 0x7FFF);
                 if (entity == 0) break;
                 if (entity->classId == 0xDF9) continue;
-                if (func_00283C80(p->heading, func_00283248(entity->pos[0] - p->pos[0],
+                if (FastDiffRots(p->heading, func_00283248(entity->pos[0] - p->pos[0],
                                                         entity->pos[1] - p->pos[1])) < 0.52359885f &&
                     func_L02_002F21C0(p->pos, entity->pos) < 20.0f) {
                     q->aimTarget = entity;
@@ -266,13 +266,13 @@ void func_L11_00454F18(ActorObject *p)
         }
         if (q->aimTarget) {
             func_L01_00321178(p, q->aimTarget->pos);
-            func_002A7CA0(p,
+            MobySpringTurn(p,
                           func_00283248(q->aimTarget->pos[0] - p->pos[0],
                                         q->aimTarget->pos[1] - p->pos[1]),
                           0.001f, 0.01f, &q->turnRate, 0.1f);
         } else {
             func_L01_00321178(p, target);
-            func_002A7CA0(p, heading, 0.001f, 0.01f, &q->turnRate, 0.1f);
+            MobySpringTurn(p, heading, 0.001f, 0.01f, &q->turnRate, 0.1f);
         }
         func_0029FCC0(p, 1, scratch);
         func_L11_00456A48(p, (int)scratch, D_L11_001B1D6C, (float)q->contactDamage, 100.0f, D_L11_001B1D74,
@@ -288,7 +288,7 @@ void func_L11_00454F18(ActorObject *p)
         scratch[0] = 4.0f * func_00283180(p->heading);
         scratch[1] = 4.0f * func_00283198(p->heading);
         scratch[2] = 0.0f;
-        func_00282CC0(scratch, p->pos, scratch);
+        FastVecAdd(scratch, p->pos, scratch);
         func_L01_00321178(p, scratch);
         func_0029FCC0(p, 1, hit);
         func_L11_00456A48(p, (int)hit, D_L11_001B1D6C, (float)q->contactDamage, 100.0f, D_L11_001B1D74,
@@ -302,9 +302,9 @@ void func_L11_00454F18(ActorObject *p)
         scratch[0] = 4.0f * func_00283180(p->heading);
         scratch[1] = 4.0f * func_00283198(p->heading);
         scratch[2] = 0.0f;
-        func_00282CC0(scratch, p->pos, scratch);
+        FastVecAdd(scratch, p->pos, scratch);
         func_L01_00321178(p, scratch);
-        func_002A7CA0(p, heading, 0.001f, 0.01f, &q->turnRate, 0.1f);
+        MobySpringTurn(p, heading, 0.001f, 0.01f, &q->turnRate, 0.1f);
         func_0029FCC0(p, 1, hit);
         func_L11_00456A48(p, (int)hit, D_L11_001B1D6C, 0.0f, 100.0f, D_L11_001B1D70,
                           D_L11_001B1D78, D_L11_001B1D80, D_L11_001B1D88);

@@ -61,8 +61,8 @@ void func_L20_0039CF58(unsigned char *object) {
         if ((flags & 1UL) == 1UL) {
             position.q = *(Quadword *)(object + 0x10);
             position.f[2] += 0.5f;
-            func_0032C700(&position, 0, 25, 20, 20, 20, 45, 0, mode, 0, 0, 0, 0.5f, 20.0f);
-            func_002A6C58(object, 0, 3);
+            SpawnExplosion(&position, 0, 25, 20, 20, 20, 45, 0, mode, 0, 0, 0, 0.5f, 20.0f);
+            SetDeathBits(object, 0, 3);
             func_L20_0039DE88((char *)object);
         } else if ((flags & 2UL) == 2UL) {
             func_002A7750(object, 3, 0);
@@ -87,7 +87,7 @@ void func_L20_0039CF58(unsigned char *object) {
             angle = func_00283248(*(float *)(aimTarget + 0x10) - *(float *)(object + 0x10),
                                   *(float *)(aimTarget + 0x14) - *(float *)(object + 0x14));
             func_L01_00322288((int)object, angle);
-            if (func_00283C80(*(float *)(object + 0xF8), angle) < 0.05235988274216652f)
+            if (FastDiffRots(*(float *)(object + 0xF8), angle) < 0.05235988274216652f)
                 func_002A7750(object, 4, -1);
         } else {
             func_L01_00321178((char *)object, (char *)state + 0x260);
@@ -101,9 +101,9 @@ void func_L20_0039CF58(unsigned char *object) {
         if (tick == 0 || tick == 10) {
             hand = tick == 0 ? 4 : 0;
             func_0029FCC0(*(char **)(hand + state + 0x258), 0, (char *)&position);
-            func_00282CF0(&velocity, state + 0x1F0, &position);
-            func_00282F20(&velocity, &velocity, 0.25f);
-            func_002E5CF8(1, 0, *(char **)(state + 0x254));
+            FastVecSub(&velocity, state + 0x1F0, &position);
+            vec_scale_to_length(&velocity, &velocity, 0.25f);
+            PlayMobySound(1, 0, *(char **)(state + 0x254));
             func_L09_003A06B0(object, &velocity, &position, (float)state[0x34]);
         }
         if (*(unsigned short *)(object + 0x96) > 120 || ((target = *(unsigned char **)(state + 0x280)) && (*(unsigned short *)(target + 0x34) & 1)))

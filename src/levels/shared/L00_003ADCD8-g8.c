@@ -33,14 +33,14 @@ void func_L00_003ADCD8(char *a, char *b)
      swap16(&a, &b);
    i++;
    *(TI128 *)position=*(TI128 *)(a+0x10);
-   count=func_00283CF0(func_002A7878(ref_L00_003ADCD8_1*0.5f,ref_L00_003ADCD8_1));
+   count=FloatToInt(func_002A7878(ref_L00_003ADCD8_1*0.5f,ref_L00_003ADCD8_1));
    color=count;
-   func_00282CF0(delta,b+0x10,position);
+   FastVecSub(delta,b+0x10,position);
    *(TI128 *)offset=*(TI128 *)delta;
-   distance=func_00282DF0(offset);
-   func_00282D30(offset,offset,func_002A7878(0,0.9f));
-   func_00282CD8(delta,position,offset);
-   func_00282F20(offset,offset,func_002A7878(1.0f/6.0f,distance/func_00283CE0(count*4)));
+   distance=FastVecLength(offset);
+   FastVecScale(offset,offset,func_002A7878(0,0.9f));
+   add_vectors(delta,position,offset);
+   vec_scale_to_length(offset,offset,func_002A7878(1.0f/6.0f,distance/IntToFloat(count*4)));
    { int c=func_002A77E0(255);
    func_002C3150(position,offset,0x604040FF,color,(unsigned char)c,0,ref_L00_003ADCD8_2); }
  }

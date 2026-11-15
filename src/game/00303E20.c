@@ -11,7 +11,7 @@ int func_00303E20(char *obj, GridPoint *point, int *column, int *row)
     float top;
     if (*(int *)(rec + 0x44) == -1)
         return 0;
-    if (!func_002ACBC8(point, *(int *)(rec + 0x44)))
+    if (!IsPointInCuboid(point, *(int *)(rec + 0x44)))
         return 0;
     top = *(float *)(rec + 0x70) + *(float *)(rec + 4);
     if (top + *(float *)(rec + 0x34) < point->f[2])

@@ -55,7 +55,7 @@ void func_L00_003D2C00(void *object, void *position, int unused)
         D_L00_001B2AF0[i] = 255;
 
         qcopy(D_L00_00247310 + i * 80, position);
-        func_00282D30(delta, D_0018A580, 32.0f);
+        FastVecScale(delta, D_0018A580, 32.0f);
         func_002ACEC0(delta, delta, D_0018A580 - 32, -(func_002A7878(10.0f, 24.0f) * 0.017453294f));
         angle = func_002A7878(22.0f, 30.0f) * 0.017453294f;
         if (i == 5)
@@ -63,13 +63,13 @@ void func_L00_003D2C00(void *object, void *position, int unused)
         else
             func_002ACEC0(delta, delta, D_0018A580 - 16, angle);
 
-        func_00282CC0(end, position, delta);
+        FastVecAdd(end, position, delta);
         qcopy(D_L00_00247350 + i * 80, end);
         for (j = 1; j < 4; j++) {
-            t = func_00283CE0(j) / func_00283CE0(4);
-            func_00282D08(D_L00_00247310 + i * 80 + j * 16, position, end, t);
+            t = IntToFloat(j) / IntToFloat(4);
+            lerp_vector(D_L00_00247310 + i * 80 + j * 16, position, end, t);
             func_002A7A00(jitter, t * 2.0f, t * 2.0f);
-            func_00282CC0(D_L00_00247310 + i * 80 + j * 16, D_L00_00247310 + i * 80 + j * 16, jitter);
+            FastVecAdd(D_L00_00247310 + i * 80 + j * 16, D_L00_00247310 + i * 80 + j * 16, jitter);
         }
     }
 }

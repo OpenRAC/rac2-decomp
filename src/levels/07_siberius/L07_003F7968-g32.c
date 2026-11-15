@@ -65,12 +65,12 @@ void func_L07_003F7968(u8 *obj, void *target, s32 tier)
     *(f32 *)(state + 0x20) = duration - duration * end;
     if (*(f32 *)(state + 0x430) < 0.0f) *(f32 *)(state + 0x430) = 0.0f;
     *(f32 *)(obj + 0xF4) = *(f32 *)(obj + 0xF0) = 0.0f;
-    func_00283098(obj + 0x10, D_L07_001B1060, D_L07_001B9200 + 0x230);
-    func_00282CC0(obj + 0x10, obj + 0x10, D_L07_001B9200);
+    matrix_mul_vec3(obj + 0x10, D_L07_001B1060, D_L07_001B9200 + 0x230);
+    FastVecAdd(obj + 0x10, obj + 0x10, D_L07_001B9200);
     func_002A0F48(obj);
     qzero(state + 0x3F0);
     if (tier >= 0) {
         *(s32 *)(state + 0x420) = tier;
-        *(s32 *)(state + 0x458) = func_00283CF0(func_L07_003F90E8(3, 7, 4.0f, 1.0f));
+        *(s32 *)(state + 0x458) = FloatToInt(func_L07_003F90E8(3, 7, 4.0f, 1.0f));
     }
 }

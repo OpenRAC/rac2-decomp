@@ -54,18 +54,18 @@ void func_00330CA0(char *object)
         target = D_001BF000[i];
         if ((func_002AB1F0(target) || (*(unsigned short *)(target + 0x34) & 0x4000))
             && target != ((DamageHero *)D_00189E20)->owner) {
-            func_00282CF0(&delta, target + 0x10, object + 0x10);
-            func_00282F20(&delta, &delta, 1.0f);
-            func_00282F20(&damage, &damage, 1.0f);
-            func_002A8C00(&damage, object, 0x810000, &delta, (D_00239BA0 + D_00139568[0x20])->value);
+            FastVecSub(&delta, target + 0x10, object + 0x10);
+            vec_scale_to_length(&delta, &delta, 1.0f);
+            vec_scale_to_length(&damage, &damage, 1.0f);
+            make_hit_descriptor(&damage, object, 0x810000, &delta, (D_00239BA0 + D_00139568[0x20])->value);
             damage.flag = 1;
             damage.vector.quad = delta.quad;
             damage.vector.f[3] = 5627.925f;
             damage.type = 5;
             damage.subtype = 3;
             damage.id = *(unsigned short *)(target + 0xAA);
-            func_002A8E20(target, &damage);
-            func_0032D758(target, 0x4E, *(int *)(object + 0xB8));
+            QueueMobyImpact(target, &damage);
+            StartAttachedEffect(target, 0x4E, *(int *)(object + 0xB8));
         }
     }
 }

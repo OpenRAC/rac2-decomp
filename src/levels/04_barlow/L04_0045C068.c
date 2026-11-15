@@ -15,15 +15,15 @@ void func_L04_0045C068(unsigned char *obj)
     float pos[4];
 
     if (func_002A9640(obj, 0x10000, 0) != 0) {
-        func_002E5CF8(0, 0, obj);
+        PlayMobySound(0, 0, obj);
         qcopy(pos, obj + 0x10);
         pos[2] += 0.75f;
         func_002A7A00(vel, 0.06666667f, 0.100000009f);
         vel[2] = func_00282C48(vel[2]) * 1.5f;
-        func_L00_003263D0(obj, pos, 15, 1, vel, 0.5f, 3.0f, 0.75f, 1.25f, 0x50404040, 0);
+        SpawnTintedEffects(obj, pos, 15, 1, vel, 0.5f, 3.0f, 0.75f, 1.25f, 0x50404040, 0);
         func_002A7A00(vel, 0.06666667f, 0.100000009f);
         vel[2] = func_00282C48(vel[2]) * 1.5f;
-        func_L00_003263D0(obj, pos, 15, 1, vel, 0.5f, 3.0f, 0.75f, 1.25f, 0x50404040, 0);
+        SpawnTintedEffects(obj, pos, 15, 1, vel, 0.5f, 3.0f, 0.75f, 1.25f, 0x50404040, 0);
         obj[0xA8] = 0xFF;
         func_0029F338(obj);
         func_0029F338(obj);

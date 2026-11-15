@@ -127,7 +127,7 @@ int func_L04_0040AD28(void)
     tangent /= func_00283180(angle);
     centerf = (float)center;
     D_L04_001BDB80[44] = tangent;
-    func_0027AB40();
+    UpdateViewContext();
     icon = func_00336D50(D_L04_001A904C + 0x8710,0x45);
     py = (float)label_y(icon, 200.0f, D_L04_001B2D44, 0.5f, 1);
     scale = 0.92f;
@@ -141,7 +141,7 @@ int func_L04_0040AD28(void)
     if (D_001A7B90) scale = 0.9f;
     func_00300A00(icon,centerf,0x55f0c070,w,v,scale,0.0f);
     x = D_L04_001B2008 % 50;
-    count = func_00283D38(0x80ffde8d,0x60442d00, x >= 25 ? 1.0f-(float)(x-25)*0.04f : (float)x*0.04f);
+    count = FastTweenColor(0x80ffde8d,0x60442d00, x >= 25 ? 1.0f-(float)(x-25)*0.04f : (float)x*0.04f);
     one = 1;
     input = D_00138180;
     tint = 0x80f0f0f0;
@@ -156,14 +156,14 @@ int func_L04_0040AD28(void)
         float projection_angle = *(float *)(p+0x28c)*0.008726647f;
         float sine = func_00283198(projection_angle);
         D_L04_001BDB80[44] = sine / func_00283180(projection_angle);
-        func_0027AB40();
+        UpdateViewContext();
     }
-    { int n_ = func_00115DA8(buffer,func_00288FB8(0x2f72),D_L04_001B0904+1); int row_ = label_y3((void *)n_, 60.0f, D_L04_001B2D44, 0.5f, 1); int len_ = func_001157AC(buffer); func_0027FBD8(center,row_,0x80f0f0f0UL,buffer,len_); }
-    { int row_ = hud_coord1(286.0f, D_L04_001B2D44, 0.5f, one); char *str_ = func_00288FB8(0x2f40); func_0027F5B8(119,row_,0x80f0f0f0UL,str_,-1); }
+    { int n_ = func_00115DA8(buffer,GetLocalizedString(0x2f72),D_L04_001B0904+1); int row_ = label_y3((void *)n_, 60.0f, D_L04_001B2D44, 0.5f, 1); int len_ = func_001157AC(buffer); func_0027FBD8(center,row_,0x80f0f0f0UL,buffer,len_); }
+    { int row_ = hud_coord1(286.0f, D_L04_001B2D44, 0.5f, one); char *str_ = GetLocalizedString(0x2f40); func_0027F5B8(119,row_,0x80f0f0f0UL,str_,-1); }
     ROW(356,0x2f41);
     ROW(181,0x2f3f);
     ROW(279,0x2f42);
-    TEXT(center,110,func_00288FB8(D_L04_002C63C0[D_L04_001B0904].name));
+    TEXT(center,110,GetLocalizedString(D_L04_002C63C0[D_L04_001B0904].name));
     shift = D_001A79F0 == 11 ? 10 : 5;
     count = func_L04_0040A1D0(D_L04_001B0904);
     if ((D_L04_002C63C0[D_L04_001B0904].flags & 0x10000000) ||
@@ -172,48 +172,48 @@ int func_L04_0040AD28(void)
         if (D_L04_002C63C0[D_L04_001B0904].flags & 4) { lang = D_001A79F0_1; first=0x2f7a; second=0x2f9a; }
         else { lang = D_001A79F0_1; second=0x2f99; first=0x2f79; }
         if (lang != 11) second = first;
-        TEXT(center,150-shift,func_00288FB8(second));
-        { char *label; if (D_L04_002C63C0[D_L04_001B0904].flags&1) label=func_00288FB8(0x2f7c);
-        else label=func_00288FB8(0x2f7b);
+        TEXT(center,150-shift,GetLocalizedString(second));
+        { char *label; if (D_L04_002C63C0[D_L04_001B0904].flags&1) label=GetLocalizedString(0x2f7c);
+        else label=GetLocalizedString(0x2f7b);
         TEXT(center,170-shift,label);
         if (D_001A79F0==11) {
-            if (D_L04_002C63C0[D_L04_001B0904].flags&16) label=func_00288FB8(0x2f9b);
-            else label=func_00288FB8(0x2f9c);
+            if (D_L04_002C63C0[D_L04_001B0904].flags&16) label=GetLocalizedString(0x2f9b);
+            else label=GetLocalizedString(0x2f9c);
             TEXT(center,190-shift,label);
-            if(D_L04_002C63C0[D_L04_001B0904].flags&2) { label=func_00288FB8(0x2fc5); TEXT(center,210-shift,label) }
-        } else if(D_L04_002C63C0[D_L04_001B0904].flags&2) { label=func_00288FB8(0x2fc5); { int row_ = label_y(label, (float)(190-shift), D_L04_001B2D44, 0.5f, 1); int len_ = func_001157AC(label); func_0027FAA8(center,row_,0x80f0f0f0UL,label,len_); } } }
+            if(D_L04_002C63C0[D_L04_001B0904].flags&2) { label=GetLocalizedString(0x2fc5); TEXT(center,210-shift,label) }
+        } else if(D_L04_002C63C0[D_L04_001B0904].flags&2) { label=GetLocalizedString(0x2fc5); { int row_ = label_y(label, (float)(190-shift), D_L04_001B2D44, 0.5f, 1); int len_ = func_001157AC(label); func_0027FAA8(center,row_,0x80f0f0f0UL,label,len_); } } }
         if(count>=3) count=2;
         if(D_L04_002C63C0[D_L04_001B0904].rewards[count]) {
             char *fmt = D_L04_001B0940;
-            char *str = func_00288FB8(0x2f7d);
+            char *str = GetLocalizedString(0x2f7d);
             { unsigned char boost = D_001A7A0A;
             reward = D_L04_002C63C0[D_L04_001B0904].rewards[count];
             if(boost) reward*=10; }
-            func_00115DA8(buffer,fmt,str,reward,func_00288FB8(0x2f5e));
-        } else { char *fmt = D_L04_001B0950; func_00115DA8(buffer,fmt,func_00288FB8(0x2f7d)); }
+            func_00115DA8(buffer,fmt,str,reward,GetLocalizedString(0x2f5e));
+        } else { char *fmt = D_L04_001B0950; func_00115DA8(buffer,fmt,GetLocalizedString(0x2f7d)); }
         TEXT(center,shift+210,buffer);
         { int *times; if (D_001A79F0==4) { times = D_001A7368; time = times[D_L04_001B0904]; } else { times = D_001A737C; time = times[D_L04_001B0904]; } }
         x = 0;
         if(time) {
             x = 110;
-            if (time / 60 % 60 < 10) func_00115DA8(buffer,D_L04_001B0958,func_00288FB8(0x31c8),time/3600%60,time/60%60,time/6%10);
-            else func_00115DA8(buffer,D_L04_001B0968,func_00288FB8(0x31c8),time/3600%60,time/60%60,time/6%10);
+            if (time / 60 % 60 < 10) func_00115DA8(buffer,D_L04_001B0958,GetLocalizedString(0x31c8),time/3600%60,time/60%60,time/6%10);
+            else func_00115DA8(buffer,D_L04_001B0968,GetLocalizedString(0x31c8),time/3600%60,time/60%60,time/6%10);
             { int col = center+46; TEXT(col,shift+230,buffer); }
         }
             { int col = center-x;
-            char *fmt = func_00288FB8(0x2f7e);
+            char *fmt = GetLocalizedString(0x2f7e);
             func_00115DA8(buffer,fmt,func_L04_0040A1D0(D_L04_001B0904));
             TEXT(col,shift+230,buffer); }
     } else {
             char *fmt;
-            CENTER(150,func_00288FB8(0x2f73));
+            CENTER(150,GetLocalizedString(0x2f73));
             fmt = D_L04_001B0940;
-            { char *str = func_00288FB8(0x2f7d);
+            { char *str = GetLocalizedString(0x2f7d);
             reward = D_L04_002C63C0[D_L04_001B0904].rewards[count];
             if(D_001A7A0A) reward*=10;
-            func_00115DA8(buffer,fmt,str,reward,func_00288FB8(0x2f5e)); }
+            func_00115DA8(buffer,fmt,str,reward,GetLocalizedString(0x2f5e)); }
             { int row_ = label_y((void *)center, (float)(shift+210), D_L04_001B2D44, 0.5f, 1); int len_ = func_001157AC(buffer); func_0027FAA8(center,row_,0x80f0f0f0UL,buffer,len_); }
     }
-    func_002FC560(71,0x5360b);
+    VU1_addGSregister(71,0x5360b);
     return 1;
 }

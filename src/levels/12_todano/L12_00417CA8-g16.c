@@ -107,35 +107,35 @@ active:
         direction.q = 0;
         direction.f.z = 1;
         direction.f.w = 1;
-        func_00283098(&direction, &direction, &D_L12_001B2F8C[0][s->transform]);
-        length = func_00282DF0(&direction);
+        matrix_mul_vec3(&direction, &direction, &D_L12_001B2F8C[0][s->transform]);
+        length = FastVecLength(&direction);
         {
             V *transform = &D_L12_001B2F8C[0][s->transform].rows[7];
             s->depth = 1;
-            func_002833F0(rotation, transform);
+            euler_rotation_basis(rotation, transform);
         }
-        func_00283698(matrix, rotation);
-        func_00283098(&hit, &D_L12_001B1BD0, &D_L12_001B2F8C[0][s->base].rows[4]);
+        matrix_from_basis_rows(matrix, rotation);
+        matrix_mul_vec3(&hit, &D_L12_001B1BD0, &D_L12_001B2F8C[0][s->base].rows[4]);
         a.q = 0;
         b.q = 0;
         a.f.x = 1;
         a.f.w = 1;
         b.f.x = 1;
         b.f.w = 1;
-        func_00282CC0(&a, &a, &hit);
-        func_00283098(&a, &a, &D_L12_001B2F8C[0][s->base]);
-        func_00282CF0(&b, &D_L12_001B2F8C[0][s->base].rows[3], &a);
-        func_00282CC0(&a, &D_L12_001B2F8C[0][s->base].rows[3], &a);
+        FastVecAdd(&a, &a, &hit);
+        matrix_mul_vec3(&a, &a, &D_L12_001B2F8C[0][s->base]);
+        FastVecSub(&b, &D_L12_001B2F8C[0][s->base].rows[3], &a);
+        FastVecAdd(&a, &D_L12_001B2F8C[0][s->base].rows[3], &a);
         a.f.z += 2.5f;
         b.f.z += 2.5f;
         s->hit = 0;
         c.q = 0;
-        if (func_002761F8(&a, &b, 0x12, 0, 0)) {
+        if (CollLine(&a, &b, 0x12, 0, 0)) {
             V *collision = &D_L12_001C0240.point;
             V *transform = &D_L12_001B2F8C[0][s->transform].rows[3];
             s->hit = 1;
-            func_00282CF0(&v, collision, transform);
-            func_002830C0(&v, &v, matrix);
+            FastVecSub(&v, collision, transform);
+            transform_vector(&v, &v, matrix);
             {
                 f32 numerator = -v.f.z;
                 f32 denominator = -length;
@@ -144,33 +144,33 @@ active:
             if (*(s16 *)(D_L12_001C0240.hit + 0xAA) == 0xFC4) {
                 func_002AD0E0(self, D_L12_001C0240.hit, &self->position, &self->rotation, &point, &normal);
                 point.f.z = 0;
-                func_00282CF0(&tmp, &point, &self->position);
+                FastVecSub(&tmp, &point, &self->position);
                 point.q = tmp.q;
                 point.f.z = 0;
                 qcopy(&c, &point);
-                func_00282D30(&c, &c, D_L12_001B1BC4);
+                FastVecScale(&c, &c, D_L12_001B1BC4);
             }
         }
         qcopy(&point, &D_00189EA0);
         point.f.z += D_L12_001B1BC0;
-        if (func_002ACBC8(&point, s->transform)) {
-            func_00282CF0(&v, &D_00189EA0, &D_L12_001B2F8C[0][s->transform].rows[3]);
-            func_002830C0(&v, &v, matrix);
+        if (IsPointInCuboid(&point, s->transform)) {
+            FastVecSub(&v, &D_00189EA0, &D_L12_001B2F8C[0][s->transform].rows[3]);
+            transform_vector(&v, &v, matrix);
             v.f.z = -v.f.z / -length;
             if (v.f.z < s->depth - (D_L12_001B1BB0 / length) * 1.5f ||
                 v.f.z >= s->depth + (D_L12_001B1BB4 / length) * 0.5f ||
                 !s->hit || s->mode == 1) {
                 normal.q = 0;
                 normal.f.z = -3;
-                func_00282CF0(&normal, &normal, &c);
-                func_002A8C00(&impulse, self, 0x10001, &normal, (f32)(D_001A7A00[0] / 2));
-                func_002A8E20(D_0018C0B0, &impulse);
+                FastVecSub(&normal, &normal, &c);
+                make_hit_descriptor(&impulse, self, 0x10001, &normal, (f32)(D_001A7A00[0] / 2));
+                QueueMobyImpact(D_0018C0B0, &impulse);
             }
         }
         point.f.z = D_L12_001B2F8C[0][s->transform].rows[3].f.z;
-        if (func_002ACBC8(&point, s->transform)) {
-            func_00282CF0(&v, &point, &D_L12_001B2F8C[0][s->transform].rows[3]);
-            func_002830C0(&v, &v, matrix);
+        if (IsPointInCuboid(&point, s->transform)) {
+            FastVecSub(&v, &point, &D_L12_001B2F8C[0][s->transform].rows[3]);
+            transform_vector(&v, &v, matrix);
             {
                 f32 numerator = -v.f.z;
                 f32 denominator = -length;
@@ -191,7 +191,7 @@ active:
                 }
             }
         }
-        if (s->other != -1 && func_002ACBC8(&point, s->other) && !s->done) {
+        if (s->other != -1 && IsPointInCuboid(&point, s->other) && !s->done) {
             u16 uid;
             s->done = 1;
             uid = self->uid;
@@ -210,7 +210,7 @@ active:
             qcopy_nc(&normal, player + 0x10);
             if (func_00282C48(*(f32 *)(player + 0x18) - D_L12_001B2F8C[0][s->transform].rows[3].f.z) < 2)
                 normal.f.z = D_L12_001B2F8C_gp[s->transform].rows[3].f.z;
-            if (func_002ACBC8(&normal, s->transform))
+            if (IsPointInCuboid(&normal, s->transform))
                 func_L00_003DF6B0(1, -1);
         }
         func_L00_002E6CF0(func_L12_00418418, self);

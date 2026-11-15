@@ -70,7 +70,7 @@ void func_L04_002DBE70(void) {
     float flat[4];
 
     qcopy(old, D_00189E20.position);
-    func_L00_002D4140(D_00189E20.collision_mode, D_00189E20.surface_motion,
+    UpdateHeroAttachment(D_00189E20.collision_mode, D_00189E20.surface_motion,
                       D_00189E20.rotation);
     if (D_00189E20.state == 0x14 || D_00189E20.state == 0x5B ||
         D_00189E20.state == 0x58 || D_00189E20.state == 0x81) {
@@ -90,64 +90,64 @@ void func_L04_002DBE70(void) {
     } else if (D_00189E20.control_mode != 13) {
         if (D_00189E20.control_mode != 14) {
             if (D_00189E20.air_frames == 0) {
-                if (func_00282DF0(D_00189E20.velocity) > D_00189E20.speed_limit - 0.02f) {
-                    func_00282F20(D_00189E20.velocity, D_00189E20.velocity,
+                if (FastVecLength(D_00189E20.velocity) > D_00189E20.speed_limit - 0.02f) {
+                    vec_scale_to_length(D_00189E20.velocity, D_00189E20.velocity,
                                   D_00189E20.speed_limit - 0.02f);
                 }
             }
         }
     }
-    func_00282CC0(D_00189E20.position, D_00189E20.position, D_00189E20.velocity);
-    func_00282CC0(D_00189E20.position, D_00189E20.position, D_00189E20.move_impulse);
+    FastVecAdd(D_00189E20.position, D_00189E20.position, D_00189E20.velocity);
+    FastVecAdd(D_00189E20.position, D_00189E20.position, D_00189E20.move_impulse);
     func_00282C88(D_00189E20.move_impulse);
     D_00189E20.collision_flag = 0;
     D_00189E20.collision_id = 0;
-    if (func_00282DF0(D_00189E20.surface_motion) <= 0.0001f) {
+    if (FastVecLength(D_00189E20.surface_motion) <= 0.0001f) {
         func_L00_002B5A88();
-        func_L04_002DAD10();
-        func_00282CF0(D_00189E20.displacement, D_00189E20.position, old);
-        func_L00_002B5250();
+        Hero_ProbeGround();
+        FastVecSub(D_00189E20.displacement, D_00189E20.position, old);
+        EaseHeroPositionToGoal();
     } else {
-        func_L04_002DAD10();
+        Hero_ProbeGround();
     }
 
     /* the move actually made, projected on the velocity in three variants */
-    func_00282CF0(D_00189E20.resolved_velocity, D_00189E20.position, old);
+    FastVecSub(D_00189E20.resolved_velocity, D_00189E20.position, old);
     qcopy(D_00189E20.resolved_velocity_planar, D_00189E20.resolved_velocity);
     qcopy(D_00189E20.resolved_velocity_xy, D_00189E20.resolved_velocity);
-    func_00282F20(D_00189E20.resolved_velocity, D_00189E20.resolved_velocity, 1.0f);
+    vec_scale_to_length(D_00189E20.resolved_velocity, D_00189E20.resolved_velocity, 1.0f);
     {
-        float dot = func_00282DB0(D_00189E20.resolved_velocity, D_00189E20.velocity);
+        float dot = FastVecDot(D_00189E20.resolved_velocity, D_00189E20.velocity);
 
         if (dot < 0.0f)
             dot = 0.0f;
-        func_00282F20(D_00189E20.resolved_velocity, D_00189E20.velocity, dot);
+        vec_scale_to_length(D_00189E20.resolved_velocity, D_00189E20.velocity, dot);
     }
     qcopy(horizontal, D_00189E20.velocity);
     func_L00_002D3960(horizontal, horizontal);
     func_L00_002D3960(D_00189E20.resolved_velocity_planar, D_00189E20.resolved_velocity_planar);
-    func_00282F20(D_00189E20.resolved_velocity_planar, D_00189E20.resolved_velocity_planar,
+    vec_scale_to_length(D_00189E20.resolved_velocity_planar, D_00189E20.resolved_velocity_planar,
                   1.0f);
     {
-        float dot = func_00282DB0(D_00189E20.resolved_velocity_planar, horizontal);
+        float dot = FastVecDot(D_00189E20.resolved_velocity_planar, horizontal);
 
         if (dot < 0.0f)
             dot = 0.0f;
-        func_00282F20(D_00189E20.resolved_velocity_planar, horizontal, dot);
+        vec_scale_to_length(D_00189E20.resolved_velocity_planar, horizontal, dot);
     }
     qcopy(flat, D_00189E20.velocity);
     func_L00_002D3BD8(flat, flat, 0.0f);
     func_L00_002D3BD8(D_00189E20.resolved_velocity_xy, D_00189E20.resolved_velocity_xy, 0.0f);
-    func_00282F20(D_00189E20.resolved_velocity_xy, D_00189E20.resolved_velocity_xy, 1.0f);
+    vec_scale_to_length(D_00189E20.resolved_velocity_xy, D_00189E20.resolved_velocity_xy, 1.0f);
     {
-        float dot = func_00282DB0(D_00189E20.resolved_velocity_xy, flat);
+        float dot = FastVecDot(D_00189E20.resolved_velocity_xy, flat);
 
         if (dot < 0.0f)
             dot = 0.0f;
-        func_00282F20(D_00189E20.resolved_velocity_xy, flat, dot);
+        vec_scale_to_length(D_00189E20.resolved_velocity_xy, flat, dot);
     }
 
-    D_00189E20.speed = func_00282DF0(D_00189E20.resolved_velocity);
+    D_00189E20.speed = FastVecLength(D_00189E20.resolved_velocity);
     D_00189E20.planar_speed = func_L00_002D3A58(D_00189E20.resolved_velocity);
     *(MovementQuadword *)horizontal = *(MovementQuadword *)D_00189E20.resolved_velocity;
     D_00189E20.forward_speed = func_L00_002B5590(horizontal);
@@ -157,23 +157,23 @@ void func_L04_002DBE70(void) {
 
     /* the part of the move caused by the surface the hero stands on */
     qcopy(horizontal, D_00189E20.position);
-    if (func_00282DF0(D_00189E20.surface_motion) > 0.0001f) {
+    if (FastVecLength(D_00189E20.surface_motion) > 0.0001f) {
         float w;
 
-        func_00282CC0(D_00189E20.position, D_00189E20.position, D_00189E20.surface_motion);
+        FastVecAdd(D_00189E20.position, D_00189E20.position, D_00189E20.surface_motion);
         w = D_00189E20.surface_motion[3];
         func_00282C88(D_00189E20.surface_motion);
         D_00189E20.surface_motion[3] = w;
         func_L00_002B5A88();
-        func_L04_002DAD10();
-        func_00282CF0(D_00189E20.displacement, D_00189E20.position, old);
-        func_L00_002B5250();
+        Hero_ProbeGround();
+        FastVecSub(D_00189E20.displacement, D_00189E20.position, old);
+        EaseHeroPositionToGoal();
     }
-    func_00282CF0(D_00189E20.surface_displacement, D_00189E20.position, horizontal);
-    D_00189E20.surface_speed = func_00282DF0(D_00189E20.surface_displacement);
+    FastVecSub(D_00189E20.surface_displacement, D_00189E20.position, horizontal);
+    D_00189E20.surface_speed = FastVecLength(D_00189E20.surface_displacement);
     D_00189E20.surface_displacement[3] = D_00189E20.surface_motion[3];
     D_00189E20.surface_motion[3] = 0.0f;
-    func_00282CF0(D_00189E20.displacement, D_00189E20.position, old);
+    FastVecSub(D_00189E20.displacement, D_00189E20.position, old);
 
     D_00189E20.slope = 0.0f;
     if (D_00189E20.planar_speed > 0.004f) {
@@ -184,7 +184,7 @@ void func_L04_002DBE70(void) {
             D_00189E20.slope = -0.5f;
     }
     if (D_00189E20.speed > 0.8666667342185974f) {
-        func_00282D30(D_00189E20.displacement, D_00189E20.displacement,
+        FastVecScale(D_00189E20.displacement, D_00189E20.displacement,
                       0.8666667342185974f / D_00189E20.speed);
         D_00189E20.speed = 0.8666667342185974f;
     }
@@ -213,8 +213,8 @@ int func_L04_0033CC00(char *obj,MovementConfig *cfg,float *target,void *out,floa
     float max=cfg->f[0x24/4]*scale;
     float distance,step,height,first,second,speed;
     int flags=0,result;
-    func_00282CF0(move,target,(float *)(obj+0x10));
-    distance=func_00282E20(move);
+    FastVecSub(move,target,(float *)(obj+0x10));
+    distance=vec_length_xy(move);
     old.q=((CollisionVec *)(obj+0x10))->q;
     step=accel*distance;
     if (accel<step) step=accel;
@@ -232,19 +232,19 @@ int func_L04_0033CC00(char *obj,MovementConfig *cfg,float *target,void *out,floa
     if (cfg->i[0x38/4]&1) move[2]=0;
     else { move[2]=cfg->f[0x18/4]; cfg->f[0x18/4]-=0.0025f; }
     height=F(obj,0x18)+0.04f;
-    func_00282CC0(test,obj+0x10,move);
+    FastVecAdd(test,obj+0x10,move);
     test[2]=F(obj,0x18)-cfg->f[0x30/4];
     if (func_L04_0033C420(test,obj,cfg->i[0x38/4]&0x20,cfg->f[8/4],cfg->f[12/4])) {
-        step=func_00283248(D_L04_001BFAC0.normal[2],func_00282E20(D_L04_001BFAC0.normal));
+        step=func_00283248(D_L04_001BFAC0.normal[2],vec_length_xy(D_L04_001BFAC0.normal));
         first=D_L04_001BFAC0.fields[10];
         if (step>0.5f) {
-            if (func_00282E20(move)>0.1f) {
-                func_00282F20(probe,move,0.57f);
-                func_00282CC0(probe,probe,obj+0x10);
+            if (vec_length_xy(move)>0.1f) {
+                vec_scale_to_length(probe,move,0.57f);
+                FastVecAdd(probe,probe,obj+0x10);
                 probe[2]=F(obj,0x18)-cfg->f[0x30/4];
                 if (func_L04_0033C420(probe,obj,cfg->i[0x38/4]&0x20,cfg->f[8/4],cfg->f[12/4])) {
                     second=D_L04_001BFAC0.fields[10];
-                    if (func_00283248(D_L04_001BFAC0.normal[2],func_00282E20(D_L04_001BFAC0.normal))>=0.5f) {
+                    if (func_00283248(D_L04_001BFAC0.normal[2],vec_length_xy(D_L04_001BFAC0.normal))>=0.5f) {
                         flags=0x22;
                         if ((cfg->i[0x38/4]&8) && second<height && first<height) flags=8;
                     }
@@ -259,8 +259,8 @@ int func_L04_0033CC00(char *obj,MovementConfig *cfg,float *target,void *out,floa
         if (cfg->i[0x38/4]&8) flags=8;
     }
     if (!(flags&2)) {
-        speed=func_00282E20(move);
-        func_00282D30(test,move,1.0f/speed);
+        speed=vec_length_xy(move);
+        FastVecScale(test,move,1.0f/speed);
         result=func_L04_0033CB08(cfg->f[4/4],obj,move,cfg->i[0/4],cfg->f[0x30/4],cfg->i[0x38/4]);
         if (result&2) cfg->f[0x18/4]=-0.01f;
         if (result&1) {

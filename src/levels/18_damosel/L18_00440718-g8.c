@@ -63,7 +63,7 @@ void func_L18_00440718(u8 *obj)
         func_L01_003128C0(obj);
         break;
     case 1:
-        if (func_002ACBC8(D_00189EA0, S32_AT(state, 0x120)) && func_00288AA0(D_L18_001BF9C0, 0x90)) {
+        if (IsPointInCuboid(D_00189EA0, S32_AT(state, 0x120)) && func_00288AA0(D_L18_001BF9C0, 0x90)) {
             func_L01_003246D0(obj);
             func_00288BE8(D_L18_001BF9C0);
             func_002A7750(obj, 2, -1);
@@ -164,7 +164,7 @@ void func_L18_00440718(u8 *obj)
             func_002B0A18(0x1231, -1);
             func_00288E18(0xA11, 0x68);
             func_002DF3F8(D_00189EA0, D_00189EA0 + 16);
-            func_0029B3E0(0, -1);
+            MemcardSave(0, -1);
         remove_object:
             func_0029F338(obj);
             return;
@@ -173,8 +173,8 @@ void func_L18_00440718(u8 *obj)
     }
     }
     if (U8_AT(obj, 0x20)) {
-        if (!U8_AT(obj, 0x43) && func_00282978(state + 0x11E)) {
-            U16_AT(state, 0x11E) = func_00283CF0(func_002A7878(1200, 2400));
+        if (!U8_AT(obj, 0x43) && FastDecTimer(state + 0x11E)) {
+            U16_AT(state, 0x11E) = FloatToInt(func_002A7878(1200, 2400));
             if (U8_AT(obj, 0x43) != 1)
                 func_002A7470(obj, 1, 0, 10);
         } else if ((U8_AT(obj, 0x60) & 2) && U8_AT(obj, 0x43)) {
@@ -185,11 +185,11 @@ void func_L18_00440718(u8 *obj)
     active = 0;
     if (!U8_AT(obj, 0x43)) {
         active = 1;
-        if (func_00282E80(obj + 0x10, D_00189EA0) < 8 &&
-            func_00283C80(F32_AT(obj, 0xF8),
+        if (vec_distance_xy(obj + 0x10, D_00189EA0) < 8 &&
+            FastDiffRots(F32_AT(obj, 0xF8),
                           func_00283248(((PurchaseHero *)(D_00189EA0 - 128))->x - F32_AT(obj, 0x10),
                                         ((PurchaseHero *)(D_00189EA0 - 128))->y - F32_AT(obj, 0x14))) < 1.5707965f) {
-            if (func_00282DF0(D_00189EA0 + 0x90) > 0.01f)
+            if (FastVecLength(D_00189EA0 + 0x90) > 0.01f)
                 S32_AT(state, 0x114) = 120;
             else
                 func_00282948(state + 0x114);
@@ -198,11 +198,11 @@ void func_L18_00440718(u8 *obj)
             qcopy_nc(state + 0x100, D_00189EA0 + 0x60);
         }
         if (func_00282948(state + 0x118)) {
-            S32_AT(state, 0x118) = func_00283CF0(func_002A7878(180, 300));
-            random_yaw = func_00283B98(F32_AT(obj, 0xF8), func_002A7878(-90, 90) * 0.017453294f);
+            S32_AT(state, 0x118) = FloatToInt(func_002A7878(180, 300));
+            random_yaw = FastAddRotations(F32_AT(obj, 0xF8), func_002A7878(-90, 90) * 0.017453294f);
             pitch = func_002A7878(0, 30);
             func_002AF000(state + 0x100, 6, random_yaw, pitch * 0.017453294f);
-            func_00282CC0(state + 0x100, state + 0x100, obj + 0x10);
+            FastVecAdd(state + 0x100, state + 0x100, obj + 0x10);
         }
         if (S32_AT(state, 0x114)) {
             qcopy_nc(target, D_00189EA0 + 0x60);
@@ -214,9 +214,9 @@ void func_L18_00440718(u8 *obj)
     if (active) {
         qcopy_nc(position, obj + 0x10);
         position[2] += 2;
-        func_00282CF0(delta, target, position);
-        yaw = func_00283BE0(func_00283248(delta[0], delta[1]), F32_AT(obj, 0xF8));
-        pitch = -func_00283248(func_00282E20(delta), delta[2]);
+        FastVecSub(delta, target, position);
+        yaw = fast_subtract_rotations(func_00283248(delta[0], delta[1]), F32_AT(obj, 0xF8));
+        pitch = -func_00283248(vec_length_xy(delta), delta[2]);
         if (yaw > 1.5707965f)
             yaw = 1.5707965f;
         else if (yaw < -1.5707965f)

@@ -39,12 +39,12 @@ void func_0027C768(s32 arg0, f32 *arg1, f32 *arg2) {
     f32 temp_f2;
 
     base = D_001B5340;
-    func_00282CF0(sp, arg0, base);
-    func_00282D30(sp, sp, 1024.0f);
+    FastVecSub(sp, arg0, base);
+    FastVecScale(sp, sp, 1024.0f);
     sp[3] = 1.0f;
-    func_002830C0(sp, sp, base - 0x100);
+    transform_vector(sp, sp, base - 0x100);
     den = sp[3];
-    func_00282D30(sp, sp, *(f32 *)D_001B9250 / den);
+    FastVecScale(sp, sp, *(f32 *)D_001B9250 / den);
     temp_f1 = sp[0] + (f32)(D_001A7340 >> 1);
     *arg1 = temp_f1;
     *arg1 = temp_f1 / (f32)D_001A7340;

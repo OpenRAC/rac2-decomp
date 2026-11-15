@@ -34,7 +34,7 @@ void func_L00_0040C7D8(char *object)
     float angle = func_00283248(*(float *)(target + 0x10) - *(float *)(globals + 0x80),
                                *(float *)(target + 0x14) - *(float *)(globals + 0x84));
 
-    angle = func_00283C80(angle, *(float *)(globals + 0x98));
+    angle = FastDiffRots(angle, *(float *)(globals + 0x98));
     if (D_L00_001B1000 * 0.017453294f < angle) {
         if (*(int *)(state + 0x1c)) {
             func_00281DE8(packet, 0x17, 1, 0x80);
@@ -55,36 +55,36 @@ void func_L00_0040C7D8(char *object)
             buffer.uv[5] = 0.0f;
             buffer.uv[6] = 1.0f;
             buffer.uv[7] = 1.0f;
-            func_00282CF0(delta, start, end);
-            func_00282CF0(camera, position, D_L00_001B8DC0);
-            func_00282DD8(normal, camera, delta);
-            func_00282F20(normal, normal, D_L00_001B0FF8);
-            func_00282CC0(packet, start, normal);
-            func_00282CF0(packet + 0x10, start, normal);
-            func_00282CC0(packet + 0x20, end, normal);
-            func_00282CF0(packet + 0x30, end, normal);
-            func_00280B90(packet, 0, 0);
-            func_00280B90(packet, 0, 0);
-            func_00282CF0(delta, start, third);
-            func_00282CF0(camera, position, D_L00_001B8DC0);
-            func_00282DD8(normal, camera, delta);
-            func_00282F20(normal, normal, D_L00_001B0FF8);
-            func_00282CC0(packet, start, normal);
-            func_00282CF0(packet + 0x10, start, normal);
-            func_00282CC0(packet + 0x20, third, normal);
-            func_00282CF0(packet + 0x30, third, normal);
-            func_00280B90(packet, 0, 0);
-            func_00280B90(packet, 0, 0);
+            FastVecSub(delta, start, end);
+            FastVecSub(camera, position, D_L00_001B8DC0);
+            FastVecCross(normal, camera, delta);
+            vec_scale_to_length(normal, normal, D_L00_001B0FF8);
+            FastVecAdd(packet, start, normal);
+            FastVecSub(packet + 0x10, start, normal);
+            FastVecAdd(packet + 0x20, end, normal);
+            FastVecSub(packet + 0x30, end, normal);
+            draw_world_quad(packet, 0, 0);
+            draw_world_quad(packet, 0, 0);
+            FastVecSub(delta, start, third);
+            FastVecSub(camera, position, D_L00_001B8DC0);
+            FastVecCross(normal, camera, delta);
+            vec_scale_to_length(normal, normal, D_L00_001B0FF8);
+            FastVecAdd(packet, start, normal);
+            FastVecSub(packet + 0x10, start, normal);
+            FastVecAdd(packet + 0x20, third, normal);
+            FastVecSub(packet + 0x30, third, normal);
+            draw_world_quad(packet, 0, 0);
+            draw_world_quad(packet, 0, 0);
         }
     } else if (*(int *)(state + 0x1c)) {
-        func_L00_0040D058(D_L00_002563A0, 70, 70, 0.2f, 0.35f, 0.2f, 10, 0x7f7f7f, 0x10ff10);
-        func_L00_0040D058(D_L00_002563A0 + 0xa0, 32, 32, 0.1f, 0.19f, 0.2f, 10, 0x7f7f7f, 0xff1010);
-        func_L00_0040D058(D_L00_002563A0 + 0x140, 32, 32, 0.1f, 0.19f, 0.2f, 10, 0x7f7f7f, 0xff1010);
-        func_L00_0040D058(D_L00_002563A0 + 0x1e0, 32, 32, 0.1f, 0.19f, 0.2f, 10, 0x7f7f7f, 0xff1010);
+        DrawRibbonWithHalo(D_L00_002563A0, 70, 70, 0.2f, 0.35f, 0.2f, 10, 0x7f7f7f, 0x10ff10);
+        DrawRibbonWithHalo(D_L00_002563A0 + 0xa0, 32, 32, 0.1f, 0.19f, 0.2f, 10, 0x7f7f7f, 0xff1010);
+        DrawRibbonWithHalo(D_L00_002563A0 + 0x140, 32, 32, 0.1f, 0.19f, 0.2f, 10, 0x7f7f7f, 0xff1010);
+        DrawRibbonWithHalo(D_L00_002563A0 + 0x1e0, 32, 32, 0.1f, 0.19f, 0.2f, 10, 0x7f7f7f, 0xff1010);
     } else {
-        func_L00_0040D058(D_L00_002563A0, 50, 50, 0.07f, 0.15f, 0.2f, 10, 0x7f7f7f, 0x20ff20);
-        func_L00_0040D058(D_L00_002563A0 + 0xa0, 15, 15, 0.03f, 0.09f, 0.2f, 10, 0x7f7f7f, 0x10ffff);
-        func_L00_0040D058(D_L00_002563A0 + 0x140, 15, 15, 0.03f, 0.09f, 0.2f, 10, 0x7f7f7f, 0x10ffff);
-        func_L00_0040D058(D_L00_002563A0 + 0x1e0, 15, 15, 0.03f, 0.09f, 0.2f, 10, 0x7f7f7f, 0x10ffff);
+        DrawRibbonWithHalo(D_L00_002563A0, 50, 50, 0.07f, 0.15f, 0.2f, 10, 0x7f7f7f, 0x20ff20);
+        DrawRibbonWithHalo(D_L00_002563A0 + 0xa0, 15, 15, 0.03f, 0.09f, 0.2f, 10, 0x7f7f7f, 0x10ffff);
+        DrawRibbonWithHalo(D_L00_002563A0 + 0x140, 15, 15, 0.03f, 0.09f, 0.2f, 10, 0x7f7f7f, 0x10ffff);
+        DrawRibbonWithHalo(D_L00_002563A0 + 0x1e0, 15, 15, 0.03f, 0.09f, 0.2f, 10, 0x7f7f7f, 0x10ffff);
     }
 }

@@ -81,9 +81,9 @@ void func_0030CCD0(Actor *actor)
     if (D_001A79F0 == 0x14 && D_L00_001A8F00 == 2)
         s = D_L00_001C58E0;
     len = D_L00_001AF2E4 * 0.05f;
-    D_L00_001AF2FC = func_00283B98(D_L00_001AF2FC, D_L00_001AF300);
-    D_L00_001AF304 = func_00283BE0(D_L00_001AF304, D_L00_001AF308);
-    D_L00_001AF318 = func_00283B98(D_L00_001AF318, D_L00_001AF31C);
+    D_L00_001AF2FC = FastAddRotations(D_L00_001AF2FC, D_L00_001AF300);
+    D_L00_001AF304 = fast_subtract_rotations(D_L00_001AF304, D_L00_001AF308);
+    D_L00_001AF318 = FastAddRotations(D_L00_001AF318, D_L00_001AF31C);
     other = 0;
     if (s->target == 0)
         other = ((Hero *)D_00189E20)->ptr[0x5C0 / 4];
@@ -101,23 +101,23 @@ void func_0030CCD0(Actor *actor)
             goal.f[2] += info->height;
         else
             goal.f[2] += 0.2f;
-        len = func_00282E48(s, &goal) * 0.05f;
+        len = fast_vec_dist(s, &goal) * 0.05f;
     }
     s->segment = 0x14;
-    func_00282CF0(&dir, &s->end, s);
-    func_00282F20(&dir, &dir, 1.0f);
+    FastVecSub(&dir, &s->end, s);
+    vec_scale_to_length(&dir, &dir, 1.0f);
     if (s->target != 0) {
-        func_00282DD8(&side, &dir, D_00189E20 + 0x2C0);
+        FastVecCross(&side, &dir, D_00189E20 + 0x2C0);
         func_002ACEC0(&dir, &dir, &side, 0.17453295f);
     }
-    func_00282D30(&last, &dir, len);
+    FastVecScale(&last, &dir, len);
     qcopy(D_L00_0023A210[0], s);
     qcopy(D_L00_0023A210[1], s);
     i = 1;
     do {
         float fi = i;
         off4 = i * 4;
-        weight = func_00283CE0(i) * 0.05f;
+        weight = IntToFloat(i) * 0.05f;
         wave = D_L00_001AF2F4 + (D_L00_001AF2F8 - D_L00_001AF2F4) * weight;
         wave = wave * func_00283198(func_002ABB18(D_L00_001AF2FC + fi * D_L00_001AF2F0));
         wave = wave + func_002A78D8(D_L00_001AF334, D_L00_001AF338);
@@ -125,37 +125,37 @@ void func_0030CCD0(Actor *actor)
         was = *p;
         *p = wave;
         D_L00_0023A210[0][i].f[2] -= was;
-        func_00282CF0(&side, &D_L00_0023A210[0][i], &D_L00_0023A210[0][i - 1]);
-        func_00282D08(&step, &side, &last, 0.85f);
+        FastVecSub(&side, &D_L00_0023A210[0][i], &D_L00_0023A210[0][i - 1]);
+        lerp_vector(&step, &side, &last, 0.85f);
         zero = 0.0f;
-        d1 = func_00282DF0(&step);
+        d1 = FastVecLength(&step);
         if (d1 == zero) {
             qcopy(&D_L00_0023A210[0][i], &D_L00_0023A210[0][i - 1]);
         } else {
-            func_00282D30(&step, &step, len / d1);
-            func_00282CC0(&D_L00_0023A210[0][i], &D_L00_0023A210[0][i - 1], &step);
+            FastVecScale(&step, &step, len / d1);
+            FastVecAdd(&D_L00_0023A210[0][i], &D_L00_0023A210[0][i - 1], &step);
             qcopy(&last, &step);
         }
         D_L00_0023A210[0][i].f[2] += wave;
-        func_00282CF0(&side, &D_L00_0023A210[0][i], &D_L00_0023A210[0][i - 1]);
+        FastVecSub(&side, &D_L00_0023A210[0][i], &D_L00_0023A210[0][i - 1]);
         if (s->target != 0) {
-            func_00282CF0(&tip, &goal, &D_L00_0023A210[0][i]);
-            dist = func_00282DF0(&tip);
+            FastVecSub(&tip, &goal, &D_L00_0023A210[0][i]);
+            dist = FastVecLength(&tip);
             if (dist != zero) {
                 if (i == 0x13) {
                     sway = 0.5f;
                     len = dist;
                 } else if (i >= 0x10) {
                     sway = 0.5f;
-                    h = func_00283CE0(0x13 - i);
+                    h = IntToFloat(0x13 - i);
                     len = dist / h;
                 } else {
                     sway = 0.1f;
                 }
                 /* Live across the next call: loop.c hoists this copy, which retail's preheader order shows. */
                 to = &last;
-                func_00282D30(&tip, &tip, len / dist);
-                func_00282D08(to, to, &tip, sway);
+                FastVecScale(&tip, &tip, len / dist);
+                lerp_vector(to, to, &tip, sway);
             }
         }
         angle = func_002ABB18(D_L00_001AF304 + (float)i * D_L00_001AF30C);
@@ -164,7 +164,7 @@ void func_0030CCD0(Actor *actor)
         wave = wave * func_00283198(angle);
         D_L00_0023A620[i] = wave;
         D_L00_0023A210[1][i].f[2] += wave;
-        wave = func_00283B98(func_00283248(side.f[0], side.f[1]), 1.5707965f);
+        wave = FastAddRotations(func_00283248(side.f[0], side.f[1]), 1.5707965f);
         {
             float r2 = D_L00_001AF314 * func_00283180(angle);
             delta.f[0] = func_00283180(wave) * r2;
@@ -172,14 +172,14 @@ void func_0030CCD0(Actor *actor)
         }
         delta.f[2] = 0.0f;
         qcopy(&D_L00_0023A4E0[i], &delta);
-        func_00282CC0(&D_L00_0023A210[1][i], &D_L00_0023A210[1][i], &delta);
+        FastVecAdd(&D_L00_0023A210[1][i], &D_L00_0023A210[1][i], &delta);
         i++;
     } while (i < 0x14);
     qcopy(&s->end, D_L00_0023A340);
     {
         float pitch = func_002A78D8(0.52359885f, 1.0471977f);
         float yaw = func_002A7878(-0.52359885f, 1.0471977f);
-        func_00282D30(&tip, &dir, D_L00_001AF384);
+        FastVecScale(&tip, &dir, D_L00_001AF384);
         func_002ACEC0(&tip, &tip, D_00189E20 + 0x740, yaw);
         func_002ACEC0(&tip, &tip, D_00189E20 + 0x750, pitch);
     }

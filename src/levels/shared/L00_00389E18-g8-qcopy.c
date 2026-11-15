@@ -17,8 +17,8 @@ void func_L00_00389E18(void *obj)
     TI128 local;
 
     *(TI128 *)&local = *(TI128 *)s0;
-    func_00282CC0(s0, s0, s1);
+    FastVecAdd(s0, s0, s1);
     func_002FE880(s0, s1, ref_L00_00389E18_00 * 2.7777778e-05f);
-    if (func_002761F8(&local, s0, 0x10, s2, 0) != 0)
+    if (CollLine(&local, s0, 0x10, s2, 0) != 0)
         *(unsigned char *)((char *)s2 + 0x20) = 8;
 }

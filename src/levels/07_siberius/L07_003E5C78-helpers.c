@@ -28,7 +28,7 @@ void func_L07_003E5C78(char *arg, char *a1, char *a2, char *a3)
     *(unsigned char *)(arg + 0x7F) = 0;
 
     if (a3 != 0) {
-        func_00282CF0(s0 + 0x220, a2, a3 + 0x10);
+        FastVecSub(s0 + 0x220, a2, a3 + 0x10);
         func_002AFDD8(a3, s0 + 0x220, s0 + 0x220, 0);
     }
     v = *(unsigned short *)(arg + 0x34);
@@ -36,7 +36,7 @@ void func_L07_003E5C78(char *arg, char *a1, char *a2, char *a3)
     i = 2;
     *(unsigned short *)(arg + 0x34) = v | 0x100;
     do {
-        func_00282F20(s0, s0, 0.1f);
+        vec_scale_to_length(s0, s0, 0.1f);
         s0 += 0x10;
         i--;
     } while (i >= 0);

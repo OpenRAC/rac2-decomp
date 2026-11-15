@@ -51,6 +51,6 @@ void func_L20_0039EBB8(unsigned char *object) {
         *(float *)(object + 0x14) = z + (low + (high - low) * phase);
         break;
     }
-    func_00282CF0(&delta, object + 0x10, &oldPosition);
+    FastVecSub(&delta, object + 0x10, &oldPosition);
     func_002AD6F0(state + 0x20, &delta, &oldRotation, object + 0xF0);
 }

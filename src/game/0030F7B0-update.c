@@ -154,7 +154,7 @@ void func_00310E98(CrateMoby *moby)
 
     if (vars->flags & 0xC) {
         if (vars->frame != D_001B1688) {
-            func_00312600(moby);
+            UpdateCrateStackMotion(moby);
         }
     }
     if (vars->above == 0) {
@@ -183,7 +183,7 @@ void func_00310E98(CrateMoby *moby)
         if (vars->fCC == 0) {
             vars->flags |= 0x14;
             if ((vars->flags ^ 1) & 1) {
-                func_003116E8(moby);
+                GroundAttachedUpdate(moby);
             }
         }
         vars->linked = 0;
@@ -204,7 +204,7 @@ void func_00310E98(CrateMoby *moby)
              (HERO->groundMoby == moby && HERO->airFrames == 0) ||
              HERO->ledgeMoby == moby || touched)) {
             if (HERO->f229C == 15) {
-                func_003120C8(moby, 1, 0);
+                DestroyCrate(moby, 1, 0);
                 func_00311F70(moby);
                 break;
             }
@@ -223,13 +223,13 @@ void func_00310E98(CrateMoby *moby)
                 if (hit->flags & 0x20000) {
                     moby->command = 1;
                 } else {
-                    moby->command = func_00283CF0(func_002A7878(5.0f, 15.0f));
+                    moby->command = FloatToInt(func_002A7878(5.0f, 15.0f));
                 }
                 vars->savedColor = moby->color;
                 doHit = 0;
             }
             if (doHit) {
-                func_003120C8(moby, moby->oClass == 0x1F9, hit);
+                DestroyCrate(moby, moby->oClass == 0x1F9, hit);
                 func_00311F70(moby);
             }
             moby->hitSlot = 255;
@@ -250,9 +250,9 @@ void func_00310E98(CrateMoby *moby)
             burst.f1C = 2.0f;
             qcopy(&burst, moby->forward);
             burst.f20 = 0;
-            func_00282F20(position, moby->up, 0.5f);
-            func_00282CC0(position, position, moby->position);
-            radius = func_00283CE0(vars->burstFrame) * 0.05f;
+            vec_scale_to_length(position, moby->up, 0.5f);
+            FastVecAdd(position, position, moby->position);
+            radius = IntToFloat(vars->burstFrame) * 0.05f;
             burst.f14 = 1;
             func_00277F48(position, 16, moby, &burst, radius + radius);
             burst.f14 = 0x30000;
@@ -294,9 +294,9 @@ void func_00310E98(CrateMoby *moby)
             moby->collision = moby->pclass->collision;
             break;
         }
-        func_002A8600(&found, moby->group, 0, 0);
+        GetFirstMobyInGroup(&found, moby->group, 0, 0);
         while (found != 0) {
-            if (moby != found && !(func_00282E80(moby->position, found->position) > 0.1f) && found->state == 1) {
+            if (moby != found && !(vec_distance_xy(moby->position, found->position) > 0.1f) && found->state == 1) {
                 CrateVars *other = found->vars;
 
                 if (other->above == 0) {
@@ -313,7 +313,7 @@ void func_00310E98(CrateMoby *moby)
                     break;
                 }
             }
-            func_002A86E8(&found, found, 0, 0);
+            GetNextMobyInGroup(&found, found, 0, 0);
         }
         if (moby->state != 1) {
             moby->position[2] = func_002A89A8(moby->position, 0, 0.5f);
@@ -330,19 +330,19 @@ void func_00310E98(CrateMoby *moby)
             moby->command = 179;
             vars->savedColor = moby->color;
         } else if (moby->command >= 16 && hit != 0) {
-            moby->command = func_00283CF0(func_002A7878(5.0f, 15.0f));
+            moby->command = FloatToInt(func_002A7878(5.0f, 15.0f));
         }
         if (moby->command % 60 == 57 || moby->command == 13) {
-            func_002E5CF8(1, 32, moby);
+            PlayMobySound(1, 32, moby);
         }
         if (moby->command % 60 > 40 || moby->command < 15) {
-            func_002A0488(moby, 200, 64, 64);
+            set_moby_color(moby, 200, 64, 64);
         } else {
             moby->color = vars->savedColor;
         }
         if (moby->command == 1 || D_0018C0BC == 22) {
             moby->color = vars->savedColor;
-            func_003120C8(moby, 1, 0);
+            DestroyCrate(moby, 1, 0);
             func_00311F70(moby);
         }
         moby->hitSlot = 255;

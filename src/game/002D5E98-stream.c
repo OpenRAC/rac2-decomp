@@ -250,7 +250,7 @@ int func_002DA328(MenuStream *stream)
 
                 slot += second;
                 func_002DE7A0(*slot);
-                func_0029D4D0(*slot + stream->offset, *slot);
+                fast_decompress(*slot + stream->offset, *slot);
                 stream->offset = 0;
             }
             stream->state++;

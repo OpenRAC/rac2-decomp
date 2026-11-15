@@ -16,7 +16,7 @@ char *func_L23_00422540(char *pos, char *dir, float *damage) {
     char *obj;
     char *state;
     func_002AFFD8(pos, axis, 1);
-    obj = func_0029EFD0(0x118E);
+    obj = CreateMoby(0x118E);
     if (obj) {
         state = *(char **)(obj + 0x68);
         *(float *)(state + 0x1C) = *damage;
@@ -28,11 +28,11 @@ char *func_L23_00422540(char *pos, char *dir, float *damage) {
         qcopy(state, dir);
         *(int *)(state + 0x18) = 0;
         *(int *)(state + 0x14) = 0;
-        func_00282F20((float *)scaled, (float *)dir, 1.0f);
+        vec_scale_to_length((float *)scaled, (float *)dir, 1.0f);
         qcopy(obj + 0xC0, scaled);
-        func_00282DD8((float *)(obj + 0xD0), (float *)(obj + 0xC0), (float *)axis);
-        func_00282F20((float *)(obj + 0xD0), (float *)(obj + 0xD0), 1.0f);
-        func_00282DD8((float *)(obj + 0xE0), (float *)(obj + 0xD0), (float *)(obj + 0xC0));
+        FastVecCross((float *)(obj + 0xD0), (float *)(obj + 0xC0), (float *)axis);
+        vec_scale_to_length((float *)(obj + 0xD0), (float *)(obj + 0xD0), 1.0f);
+        FastVecCross((float *)(obj + 0xE0), (float *)(obj + 0xD0), (float *)(obj + 0xC0));
         *(float *)(obj + 0xCC) = *(float *)(obj + 0xDC) = *(float *)(obj + 0xEC) = 0.0f;
     }
     return obj;
@@ -98,17 +98,17 @@ void func_L23_004260F0(u8 *obj, float *dst, TI16 *src1, TI16 *src2, float scale)
     loc[1] = va;
     loc[0] = vb;
     o68 = *(u8 **)(obj + 0x68);
-    func_00282CF0((float *)&loc[2], (float *)&loc[0], (float *)&loc[1]);
-    func_00282CF0((float *)&loc[3], (float *)&loc[0], D_L23_001BA640);
-    func_00282DD8((float *)&loc[4], (float *)&loc[3], (float *)&loc[2]);
-    func_00282F20((float *)&loc[4], (float *)&loc[4], 1.0f);
+    FastVecSub((float *)&loc[2], (float *)&loc[0], (float *)&loc[1]);
+    FastVecSub((float *)&loc[3], (float *)&loc[0], D_L23_001BA640);
+    FastVecCross((float *)&loc[4], (float *)&loc[3], (float *)&loc[2]);
+    vec_scale_to_length((float *)&loc[4], (float *)&loc[4], 1.0f);
     x = *(s16 *)(o68 + 0xC);
     t = func_002A7820(-x, x);
     t = (((s32)*(u16 *)(obj + 0x96) << *(s16 *)(o68 + 0xE)) + t) % 360 - 180;
     f = func_00283C28((float)t * 0.017453294f);
     h = func_00283198(f) * scale;
-    func_00282D30((float *)&loc[5], (float *)&loc[4], h);
-    func_00282CC0(dst, (float *)&loc[0], (float *)&loc[5]);
+    FastVecScale((float *)&loc[5], (float *)&loc[4], h);
+    FastVecAdd(dst, (float *)&loc[0], (float *)&loc[5]);
 }
 
 /* func_L23_00426248 is defined in L23_00426248-g8.c. */

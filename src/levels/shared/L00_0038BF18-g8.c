@@ -153,7 +153,7 @@ void func_L00_0038BF18(char *m)
             func_00273318(m, 0xFF917267, 0, 0x25, -1, 4, 1.0f, 0.0f, 90.0f);
         }
         if (pv != 0 && *(f32 *)(pv + 0x70) != 0.0f) {
-            ref_L00_0038BF18_00(func_L00_0038B208, m);
+            ref_L00_0038BF18_00(UpdateTrailStrips, m);
         }
         if (D_001A72C0 == 0) {
             *(u16 *)(m + 0x34) &= ~0x10;
@@ -244,16 +244,16 @@ void func_L00_0038BF18(char *m)
         if (((Hero *)D_00189E20)->i[0x2294 / 4] == 0x13 || ((Hero *)D_00189E20)->i[0x2294 / 4] == 0x6D || ((Hero *)D_00189E20)->i[0x2294 / 4] == 0x2A) {
             yaw = func_00283248(((Hero *)D_00189E20)->f[0xB70 / 4] - ((Hero *)D_00189E20)->f[0x80 / 4], ((Hero *)D_00189E20)->f[0xB74 / 4] - ((Hero *)D_00189E20)->f[0x84 / 4]);
             if (D_L00_0025D990[((Hero *)D_00189E20)->h[0xBFC / 2]].i4 == 1) {
-                yaw = func_00283B98(yaw, -1.57079649f);
+                yaw = FastAddRotations(yaw, -1.57079649f);
             } else {
-                yaw = func_00283B98(yaw, 1.57079649f);
+                yaw = FastAddRotations(yaw, 1.57079649f);
             }
         }
         {
-            func_00282CF0(vec[0], &((Hero *)D_00189E20)->b[0xB70], &((Hero *)D_00189E20)->b[0xB60]);
-            func_00282F20(vec[0], vec[0], func_00282DF0(vec[0]) + 0.17f);
+            FastVecSub(vec[0], &((Hero *)D_00189E20)->b[0xB70], &((Hero *)D_00189E20)->b[0xB60]);
+            vec_scale_to_length(vec[0], vec[0], FastVecLength(vec[0]) + 0.17f);
             if (((Hero *)D_00189E20)->i[0x229C / 4] != 0xF && ((Hero *)D_00189E20)->i[0x2294 / 4] != 0x6D && ((Hero *)D_00189E20)->i[0x2294 / 4] != 0x14) {
-                diff = func_00283C80(((Hero *)D_00189E20)->f[0x98 / 4],
+                diff = FastDiffRots(((Hero *)D_00189E20)->f[0x98 / 4],
                                      func_00283248(((Hero *)D_00189E20)->f[0xB70 / 4] - ((Hero *)D_00189E20)->f[0x80 / 4],
                                                    ((Hero *)D_00189E20)->f[0xB74 / 4] - ((Hero *)D_00189E20)->f[0x84 / 4]));
                 if (diff > 1.57079649f) {
@@ -261,7 +261,7 @@ void func_L00_0038BF18(char *m)
                 }
                 func_L00_0038BE70((char *)vec[0]);
             }
-            func_00282CC0(&((Hero *)D_00189E20)->b[0xB70], &((Hero *)D_00189E20)->b[0xB60], vec[0]);
+            FastVecAdd(&((Hero *)D_00189E20)->b[0xB70], &((Hero *)D_00189E20)->b[0xB60], vec[0]);
             if (((Hero *)D_00189E20)->i[0x2294 / 4] != 0x2A && ((Hero *)D_00189E20)->i[0x2294 / 4] != 0x6D && diff < 1.22173059f
                 && ((Hero *)D_00189E20)->i[0x1B8 / 4] >= 11) {
                 qcopy(vec[0], &((Hero *)D_00189E20)->b[0x80]);
@@ -273,11 +273,11 @@ void func_L00_0038BF18(char *m)
                 vec[2][1] = func_00283198(ang) * 1.4f;
                 vec[2][2] = 0.0f;
                 func_L00_0038BE70((char *)vec[2]);
-                func_00282CC0(vec[1], vec[1], vec[2]);
-                if (((Hero *)D_00189E20)->h[0xBFE / 2] == 0 && func_002761F8(vec[0], vec[1], 2, 0, 0) != 0 && func_00278E78() != 0
+                FastVecAdd(vec[1], vec[1], vec[2]);
+                if (((Hero *)D_00189E20)->h[0xBFE / 2] == 0 && CollLine(vec[0], vec[1], 2, 0, 0) != 0 && GetCollHitMaterial() != 0
                     && (D_L00_001BF200.moby == 0 || func_L00_0031F220(D_L00_001BF200.moby) != 0)) {
                     ((Hero *)D_00189E20)->h[0xBFE / 2] = 1;
-                    func_002E5CF8(2, 0, m);
+                    PlayMobySound(2, 0, m);
                     func_L00_0038BA80(m);
                     if (D_L00_001BF200.moby != 0) {
                         if (((Hero *)D_00189E20)->b[0x22C3] == 0) {
@@ -292,12 +292,12 @@ void func_L00_0038BF18(char *m)
                 }
             }
             if (((Hero *)D_00189E20)->i[0x2294 / 4] == 0x14 && func_L00_002B3998(27.0f) != 0) {
-                func_002E5CF8(2, 0, m);
+                PlayMobySound(2, 0, m);
                 qcopy(vec[0], &((Hero *)D_00189E20)->b[0xB70]);
                 qcopy(vec[1], vec[0]);
                 func_L00_002D3778(vec[0], vec[0], 0.7f);
                 func_L00_002D3778(vec[1], vec[1], -0.9f);
-                if (func_002761F8(vec[0], vec[1], 2, 0, 0) != 0) {
+                if (CollLine(vec[0], vec[1], 2, 0, 0) != 0) {
                     func_L00_0038BA80(m);
                 }
             }
@@ -313,7 +313,7 @@ void func_L00_0038BF18(char *m)
             vec[3][0] = func_00283180(yaw);
             vec[3][1] = func_00283198(yaw);
             vec[3][2] = 0.0f;
-            func_002A8C00(vec[0], m, 0x10000, vec[3], range);
+            make_hit_descriptor(vec[0], m, 0x10000, vec[3], range);
             func_00282F70(vec[0], vec[0], sc);
             vec[0][2] = 1.0f;
             vec[0][3] = 5627.9248f;
@@ -330,12 +330,12 @@ void func_L00_0038BF18(char *m)
                 && (D_L00_001BF200.moby == 0 || *(char **)(D_L00_001BF200.moby + 0x24) == 0
                     || *(s16 *)(*(char **)(D_L00_001BF200.moby + 0x24) + 0x46) != 0x14)) {
                 ((Hero *)D_00189E20)->h[0xBFE / 2] = 1;
-                func_002E5CF8(func_L00_0038B7F8(), 0, m);
+                PlayMobySound(func_L00_0038B7F8(), 0, m);
                 func_L00_0038BA80(m);
             }
-            func_00282CF0(vec[5], &((Hero *)D_00189E20)->b[0xB70], &((Hero *)D_00189E20)->b[0xB60]);
-            func_00282F20(vec[5], vec[5], func_00282DF0(vec[5]) - 0.085f);
-            func_00282CC0(vec[4], vec[5], &((Hero *)D_00189E20)->b[0xB60]);
+            FastVecSub(vec[5], &((Hero *)D_00189E20)->b[0xB70], &((Hero *)D_00189E20)->b[0xB60]);
+            vec_scale_to_length(vec[5], vec[5], FastVecLength(vec[5]) - 0.085f);
+            FastVecAdd(vec[4], vec[5], &((Hero *)D_00189E20)->b[0xB60]);
             g = 0.35f;
             if (((Hero *)D_00189E20)->i[0x229C / 4] == 0xF) {
                 g = 0.7f;
@@ -357,7 +357,7 @@ void func_L00_0038BF18(char *m)
                 return;
             }
             ((Hero *)D_00189E20)->h[0xBFE / 2] = 1;
-            func_002E5CF8(func_L00_0038B7F8(), 0, m);
+            PlayMobySound(func_L00_0038B7F8(), 0, m);
             func_L00_0038BA80(m);
         }
         break;
@@ -369,7 +369,7 @@ void func_L00_0038BF18(char *m)
         if (*(u8 *)(m + 0x20) == 10) {
             snd = (char *)D_00188660 + ((Hero *)D_00189E20)->i[0x2430 / 4] * 0x70;
             if (*(void **)(snd + 0x88) != ((Hero *)D_00189E20)->ptr[0x2290 / 4] || *(u8 *)(snd + 0x74) == 0) {
-                ((Hero *)D_00189E20)->i[0x2430 / 4] = func_002E5CF8(0xB, 4, ((Hero *)D_00189E20)->ptr[0x2290 / 4]);
+                ((Hero *)D_00189E20)->i[0x2430 / 4] = PlayMobySound(0xB, 4, ((Hero *)D_00189E20)->ptr[0x2290 / 4]);
             }
         }
         func_L00_00322A18(m, 0.0f, 0.0f, 0.40724355f);
@@ -383,34 +383,34 @@ void func_L00_0038BF18(char *m)
             if (zf - top < 0.8f) {
                 top = top + 0.55f;
                 if (zf < top) {
-                    func_002AA2E8((f32 *)(m + 0x18), top, 0.06666667f);
+                    ApproachValue((f32 *)(m + 0x18), top, 0.06666667f);
                 } else {
-                    func_002AA2E8((f32 *)(m + 0x18), top, 0.016666668f);
+                    ApproachValue((f32 *)(m + 0x18), top, 0.016666668f);
                 }
             }
         }
         qcopy(vec[0], pos);
         if (*(u8 *)(m + 0x20) == 10) {
             qcopy(vec[1], &((Hero *)D_00189E20)->b[0x150]);
-            func_00282D30(vec[1], vec[1], 0.98f);
-            func_00282CC0(pos, pos, vec[1]);
-            func_00282F20(vec[1], pv + 0x40, *(f32 *)(pv + 0x60));
-            func_00282CC0(pos, pos, vec[1]);
+            FastVecScale(vec[1], vec[1], 0.98f);
+            FastVecAdd(pos, pos, vec[1]);
+            vec_scale_to_length(vec[1], pv + 0x40, *(f32 *)(pv + 0x60));
+            FastVecAdd(pos, pos, vec[1]);
             *(f32 *)(pv + 0x64) = *(f32 *)(pv + 0x64) + 0.000787037017f;
-            func_002AA2E8((f32 *)(pv + 0x60), 0.0f, *(f32 *)(pv + 0x64));
+            ApproachValue((f32 *)(pv + 0x60), 0.0f, *(f32 *)(pv + 0x64));
             if (*(f32 *)(pv + 0x60) == 0.0f) {
                 *(u8 *)(m + 0x20) = 11;
             }
         } else {
             qcopy(vec[1], &((Hero *)D_00189E20)->b[0x150]);
-            func_00282D30(vec[1], vec[1], 0.98f);
+            FastVecScale(vec[1], vec[1], 0.98f);
             done = 0;
-            func_00282CC0(pos, pos, vec[1]);
+            FastVecAdd(pos, pos, vec[1]);
             func_L00_0038BD00(m);
-            func_00282CF0(vec[1], &((Hero *)D_00189E20)->b[0x1200], pos);
+            FastVecSub(vec[1], &((Hero *)D_00189E20)->b[0x1200], pos);
             *(f32 *)(pv + 0x64) = *(f32 *)(pv + 0x64) + 0.00025f;
             *(f32 *)(pv + 0x60) = *(f32 *)(pv + 0x60) + *(f32 *)(pv + 0x64);
-            d = func_00282DF0(vec[1]);
+            d = FastVecLength(vec[1]);
             if (d / *(f32 *)(pv + 0x60) < 5.0f && *(u8 *)(m + 0x43) != 1) {
                 func_002A7470(m, 1, 0, 5);
             }
@@ -418,8 +418,8 @@ void func_L00_0038BF18(char *m)
                 *(f32 *)(pv + 0x60) = d;
                 done = 1;
             }
-            func_00282F20(vec[1], vec[1], *(f32 *)(pv + 0x60));
-            func_00282CC0(pos, pos, vec[1]);
+            vec_scale_to_length(vec[1], vec[1], *(f32 *)(pv + 0x60));
+            FastVecAdd(pos, pos, vec[1]);
             if (d / *(f32 *)(pv + 0x60) < 4.0f && ((Hero *)D_00189E20)->i[0xC40 / 4] != -1) {
                 func_L00_002D24D0(2);
                 ((Hero *)D_00189E20)->i[0xC44 / 4] = 0x1A;
@@ -452,7 +452,7 @@ void func_L00_0038BF18(char *m)
             }
         }
         hit = 0;
-        if (func_002761F8(vec[0], pos, 2, 0, 0) != 0 && func_00278E78() != 0
+        if (CollLine(vec[0], pos, 2, 0, 0) != 0 && GetCollHitMaterial() != 0
             && (D_L00_001BF200.moby == 0 || func_002ABB78(D_L00_001BF200.moby) == 0)) {
             hit = D_L00_001BF200.count != 0;
         }
@@ -461,7 +461,7 @@ void func_L00_0038BF18(char *m)
             if (((Hero *)D_00189E20)->h[0xBFE / 2] == 0) {
                 *(int *)(pv + 0x6C) = 0x1E;
                 ((Hero *)D_00189E20)->h[0xBFE / 2] = 1;
-                func_002E5CF8(2, 0, m);
+                PlayMobySound(2, 0, m);
             }
             if (*(u8 *)(m + 0x20) == 10) {
                 func_L00_0038BA80(m);
@@ -473,8 +473,8 @@ void func_L00_0038BF18(char *m)
         if (*(u8 *)(m + 0x20) == 11) {
             k = -0.37f;
         }
-        func_00282F20(vec[4], pv + 0x40, k);
-        func_002A8C00(vec[1], m, 0x10000, vec[4], (&D_L00_00262570[D_00139568[0xA]])->f70);
+        vec_scale_to_length(vec[4], pv + 0x40, k);
+        make_hit_descriptor(vec[1], m, 0x10000, vec[4], (&D_L00_00262570[D_00139568[0xA]])->f70);
         vec[1][2] = 1.0f;
         if (((Hero *)D_00189E20)->b[0x22C3] != 0) {
             qzero_nc(vec[1]);
@@ -493,11 +493,11 @@ void func_L00_0038BF18(char *m)
                 r = func_002AB1F0(D_L00_001BF200.moby);
                 if (r == 0 || *(s16 *)((char *)r + 0x1C) == 0 || *(char **)((char *)r + 0x18) != m) {
                     *(TI128 *)vec[7] = *(TI128 *)(D_L00_001BF200.moby + 0x10);
-                    func_L00_0031D670(vec[6], vec[5], vec[7], 0.5f);
+                    LerpVector4(vec[6], vec[5], vec[7], 0.5f);
                     func_L00_0038B888(vec[6], 5);
                     *(int *)(pv + 0x6C) = 0x1E;
                     ((Hero *)D_00189E20)->h[0xBFE / 2] = 1;
-                    func_002E5CF8(func_L00_0038B7F8(), 0, m);
+                    PlayMobySound(func_L00_0038B7F8(), 0, m);
                 }
             }
         }

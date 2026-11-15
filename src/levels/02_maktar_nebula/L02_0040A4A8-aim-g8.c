@@ -44,19 +44,19 @@ int func_L02_0040BBD8(char *self) {
             return 0;
         if (func_L02_003D7300(e) == 0)
             continue;
-        if (!(func_00282E80(self + 0x10, e + 0x10) < D_L02_001B1918))
+        if (!(vec_distance_xy(self + 0x10, e + 0x10) < D_L02_001B1918))
             continue;
-        if (!(func_00283C80(*(float *)(self + 0xF8), ANGLE()) < D_L02_001B191C * 0.017453294f))
+        if (!(FastDiffRots(*(float *)(self + 0xF8), ANGLE()) < D_L02_001B191C * 0.017453294f))
             continue;
         if (p == 0)
             return 0;
 
-        func_00282CF0(buf, (float *)(self + 0x10), (float *)(e + 0x10));
+        FastVecSub(buf, (float *)(self + 0x10), (float *)(e + 0x10));
         ax = self + 0xE0;
         r = D_L02_001B1920 * 0.017453294f;
         func_002ACEC0(buf, buf, ax,
-                      0.0f <= func_00283BE0(*(float *)(self + 0xF8), ANGLE()) ? -r : r);
-        func_00282CC0(buf, buf, e + 0x10);
+                      0.0f <= fast_subtract_rotations(*(float *)(self + 0xF8), ANGLE()) ? -r : r);
+        FastVecAdd(buf, buf, e + 0x10);
         saved = *(float *)(state + 0x134);
         *(float *)(state + 0x134) = 0.0001f;
         func_L01_00321178(self, buf);

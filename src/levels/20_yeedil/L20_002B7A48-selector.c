@@ -24,7 +24,7 @@ s32 func_L20_002B7A48(s32 allow_weapon)
     if (allow_weapon != 0) {
         char *hero = D_00189E20;
         if (*(u8 *)(hero + 0x22BA) != 0 && *(s16 *)(hero + 0x24EC) == 0) {
-            int idx = func_L00_002ADEA0(0);
+            int idx = hero_slot_item_id(0);
 
             return ((AnimationEntry *)(D_L20_0026D970 + D_00139568[idx] * 224))->animation;
         }

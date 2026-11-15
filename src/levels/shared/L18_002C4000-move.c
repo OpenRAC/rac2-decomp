@@ -49,9 +49,9 @@ void func_L18_003F6CA8(char *object)
         if (*(unsigned char *)(object + 0x20) == 14) {
             float *rotation;
             if (*(unsigned char *)(object + 0xbc) == 0) return;
-            func_00282CF0(local, state + 0x230, object + 0x10);
+            FastVecSub(local, state + 0x230, object + 0x10);
             rotation = (float *)(object + 0xf8);
-            func_00282F20(local, local, *(float *)(state + 0x274) * 0.016666668f);
+            vec_scale_to_length(local, local, *(float *)(state + 0x274) * 0.016666668f);
             heading = func_00283248(*(float *)(state + 0x230) - *(float *)(object + 0x10),
                                     *(float *)(state + 0x234) - *(float *)(object + 0x14));
             func_002AAA00(rotation, (float *)(state + 0x1b4), 0, heading, *(float *)(state + 0x114),
@@ -67,8 +67,8 @@ void func_L18_003F6CA8(char *object)
         float phase = func_0029F530(object);
         if (phase > 10.0f && phase < 17.0f && (*(unsigned int *)(state + 0x194) & 15) == 0 &&
             *(int *)(state + 0x180) == 0 && *(short *)(state + 0x1c2) == 0) {
-            func_00282D30(local, object + 0xc0, 10.0f);
-            func_00282CC0(local, object + 0x10, local);
+            FastVecScale(local, object + 0xc0, 10.0f);
+            FastVecAdd(local, object + 0x10, local);
             func_L01_00321178(object, (char *)local);
             if (!(*(float *)(state + 0x190) <= *(float *)(object + 0x18))) return;
             if (*(float *)(state + 0x1a8) > 0.003333333647f) *(float *)(state + 0x1a8) = 0.003333333647f;
@@ -105,10 +105,10 @@ void func_L18_003F6CA8(char *object)
         if (func_L00_002EE290(state + 0x170) > 0.0f && *(int *)(state + 0x184) == 0) {
             (*(short *)(state + 0x294))++;
             position = object + 0x10;
-            func_00282CC0(position, position, state + 0x170);
+            FastVecAdd(position, position, state + 0x170);
             func_00283028(velocity, local, &D_L18_001BFC40);
-            func_00282D30(velocity, velocity, 0.8f);
-            func_00282CC0(position, position, velocity);
+            FastVecScale(velocity, velocity, 0.8f);
+            FastVecAdd(position, position, velocity);
         }
         *(float *)(state + 0x1a8) -= *(float *)(state + 0x12c);
         return;

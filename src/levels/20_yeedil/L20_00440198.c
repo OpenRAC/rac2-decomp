@@ -52,7 +52,7 @@ u8 *func_L20_00440198(int group, const float position[4], const float velocity[4
             func_002A7750(actor, 7, 3);
             func_002A0F48(actor);
             func_00282C98(origin);
-            func_00282DD8(delta, origin, velocity);
+            FastVecCross(delta, origin, velocity);
             func_002ACE78(delta, delta, 0.10471977293491364f);
             state = *(u8 **)(actor + 0x68);
             *(u8 **)(actor + 0x68) = state + 0x210;

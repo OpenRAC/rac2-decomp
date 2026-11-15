@@ -32,7 +32,7 @@ void func_L03_00419CA0(u8 *e) {
     int i;
     switch (e[0x20]) {
     case 0:
-        func_00282F20(a, e+0xE0, *(float *)(e+0x2C)*20.0f);
+        vec_scale_to_length(a, e+0xE0, *(float *)(e+0x2C)*20.0f);
         func_L00_0033E220(a, e, 0x28208080, -1, 0, -1, 0, 0x60, 367500.0f, 0.0f);
         func_L00_0033E220(a, e, 0x20208080, -1, 1, -1, 0, 0x60, 325500.0f, 0.75f);
         if (*(int *)s)
@@ -51,16 +51,16 @@ void func_L03_00419CA0(u8 *e) {
         func_L00_00326110(e, 1, 3.0f);
         *(Quad *)b = zero;
         func_L01_0031A278(e, a, 0, 0, *(float *)(e+0x2C)*20.0f);
-        func_0032C700(a, 0.0f, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 20.0f);
-        func_002ABBB8(e, b, a, 0.0f, 0.0f, 15, 0, 0, 0.0f, 0.0f, -1, 0, 0, -1, 0, 0x810001, 9.0f, 1.0f, 0.0f);
+        SpawnExplosion(a, 0.0f, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 20.0f);
+        SpawnExplosionEffects(e, b, a, 0.0f, 0.0f, 15, 0, 0, 0.0f, 0.0f, -1, 0, 0, -1, 0, 0x810001, 9.0f, 1.0f, 0.0f);
         func_L01_0031A278(e, c, 0, 0, *(float *)(e+0x2C)*20.0f);
         for (i = 0; i < 4; i++) {
             float d[4] __attribute__((aligned(16)));
             d[0] = (i / 2 * 2 - 1) * 0.033333335f;
             d[1] = (i % 2 * 2 - 1) * 0.033333335f;
             d[2] = 0.06666667f;
-            func_00283098(d, d, e+0xC0);
-            func_L00_003263D0(0.25f, e, c, 6, 1, d, 0x50404040, 0, 5, 0.75f, 1.25f);
+            matrix_mul_vec3(d, d, e+0xC0);
+            SpawnTintedEffects(0.25f, e, c, 6, 1, d, 0x50404040, 0, 5, 0.75f, 1.25f);
         }
         if (D_L03_001B1AD0 >= 0) {
             *(u16 *)(e+0x7C)=(1<<D_L03_001B1AD0)|0x8000;

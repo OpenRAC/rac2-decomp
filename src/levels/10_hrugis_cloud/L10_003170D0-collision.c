@@ -87,7 +87,7 @@ s32 func_L10_00423788(Moby *moby, s32 keep)
             func_002E5DA0(0xD, 0, moby, 0xFBF);
         if (func_00282948(&D_L10_001B354C) != 0 && moby->oClass == 0xF8E) {
             func_002E5DA0(3, 0, moby, 0xF8E);
-            D_L10_001B354C = func_00283CF0(func_002A7878(10.0f, 20.0f));
+            D_L10_001B354C = FloatToInt(func_002A7878(10.0f, 20.0f));
         }
         if (*health <= 0.0f) {
             *health = 0.0f;

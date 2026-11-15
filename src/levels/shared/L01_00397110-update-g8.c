@@ -30,10 +30,10 @@ void func_L01_003D2C88(unsigned char *m) {
     }
     }
     if ((unsigned char)m[0x31]) {
-    float angle = func_00283CE0(D_L01_001B2088%60);
-    angle = angle*6.2831854820251465f/func_00283CE0(60)-3.1415927410125732f;
-    *(int *)(m + 0x78) = func_L01_0031BC68(D_L01_001B05C0, D_L01_001B05C4, angle);
+    float angle = IntToFloat(D_L01_001B2088%60);
+    angle = angle*6.2831854820251465f/IntToFloat(60)-3.1415927410125732f;
+    *(int *)(m + 0x78) = PulseColor(D_L01_001B05C0, D_L01_001B05C4, angle);
     }
-    func_00282CF0(delta, m + 0x10, pos);
+    FastVecSub(delta, m + 0x10, pos);
     func_002AD6F0(p + 0xA0, delta, rot, m + 0xF0);
 }

@@ -83,20 +83,20 @@ void func_0032CA40(char *object, void *radial, void *attachment, float distance)
             char *particle;
             float facing, size, speed, angle;
             facing = func_00283248(D_001B5200.x - F(object, 0x10), D_001B5200.y - F(object, 0x14));
-            spin = func_00283CF0(func_002A78D8(2.0f, 5.0f));
+            spin = FloatToInt(func_002A78D8(2.0f, 5.0f));
             life = func_002A7820(30, 50);
             pos.x = F(object, 0x10) + func_002A78D8(0.0f, 0.1f) * F(state, 0x14);
             pos.y = F(object, 0x14) + func_002A78D8(0.0f, 0.1f) * F(state, 0x14);
             pos.z = F(object, 0x18) + func_002A78D8(0.0f, 0.1f) * F(state, 0x14);
             size = func_002A7878(0.6f, 1.0f) * F(state, 0x14);
             speed = func_002A7878(9.0f, 12.0f) * F(state, 0x14);
-            angle = func_00283B98(facing, func_002A78D8(0.0f, 1.396263599395752f));
+            angle = FastAddRotations(facing, func_002A78D8(0.0f, 1.396263599395752f));
             velocity.x = func_00283180(angle) * 0.01666666753590107f * speed;
             velocity.y = func_00283198(angle) * 0.01666666753590107f * speed;
             velocity.z = 0.0f;
             speed = func_002A7878(0.0f, 12.0f) * F(state, 0x14);
             velocity.z = speed * 0.01666666753590107f;
-            func_00282CC0(&velocity, &velocity, attachment);
+            FastVecAdd(&velocity, &velocity, attachment);
             particle = func_002C7970(&pos, &velocity, life, 0x407FFF, spin, 127, 127, size * 210000.0f, F(state, 0x14) * 2100.0f, 0.004055555909872055f, 1);
             particle = func_002C7970(&pos, &velocity, life, 0x20FF, -(spin * 2), 48, 48, size * 1260000.0f, F(state, 0x14) * 4200.0f, 0.004055555909872055f, 0);
             if (particle) particle[2] = ((EffectTextures *)D_001F2540)->a[0];
@@ -109,20 +109,20 @@ void func_0032CA40(char *object, void *radial, void *attachment, float distance)
             char *particle;
             float facing, size, speed, angle;
             facing = func_00283248(D_001B5200.x - F(object, 0x10), D_001B5200.y - F(object, 0x14));
-            spin = func_00283CF0(func_002A78D8(2.0f, 5.0f));
+            spin = FloatToInt(func_002A78D8(2.0f, 5.0f));
             life = func_002A7820(30, 50);
             pos.x = F(object, 0x10) + func_002A78D8(0.0f, 0.1f) * F(state, 0x14);
             pos.y = F(object, 0x14) + func_002A78D8(0.0f, 0.1f) * F(state, 0x14);
             pos.z = F(object, 0x18) + func_002A78D8(0.0f, 0.1f) * F(state, 0x14);
             size = func_002A7878(0.75f, 1.5f) * F(state, 0x14);
             speed = func_002A7878(9.0f, 12.0f) * F(state, 0x14);
-            angle = func_00283B98(facing, func_002A78D8(0.0f, 1.396263599395752f));
+            angle = FastAddRotations(facing, func_002A78D8(0.0f, 1.396263599395752f));
             velocity.x = func_00283180(angle) * 0.01666666753590107f * speed;
             velocity.y = func_00283198(angle) * 0.01666666753590107f * speed;
             velocity.z = 0.0f;
             speed = func_002A7878(0.0f, 12.0f) * F(state, 0x14);
             velocity.z = speed * 0.01666666753590107f;
-            func_00282CC0(&velocity, &velocity, attachment);
+            FastVecAdd(&velocity, &velocity, attachment);
             particle = func_002C7970(&pos, &velocity, life, 0x8FFF, spin, 127, 127, size * 210000.0f, F(state, 0x14) * 2100.0f, 0.004055555909872055f, 5);
         }
     }
@@ -133,20 +133,20 @@ void func_0032CA40(char *object, void *radial, void *attachment, float distance)
             char *particle;
             float facing, size, speed, angle;
             facing = func_00283248(D_001B5200.x - F(object, 0x10), D_001B5200.y - F(object, 0x14));
-            spin = func_00283CF0(func_002A78D8(2.0f, 5.0f));
+            spin = FloatToInt(func_002A78D8(2.0f, 5.0f));
             life = func_002A7820(30, 50);
             pos.x = F(object, 0x10) + func_002A78D8(0.0f, 0.1f) * F(state, 0x14);
             pos.y = F(object, 0x14) + func_002A78D8(0.0f, 0.1f) * F(state, 0x14);
             pos.z = F(object, 0x18) + func_002A78D8(0.0f, 0.1f) * F(state, 0x14);
             size = func_002A7878(0.6f, 1.0f) * F(state, 0x14);
             speed = func_002A7878(9.0f, 12.0f) * F(state, 0x14);
-            angle = func_00283B98(facing, func_002A78D8(0.0f, 1.396263599395752f));
+            angle = FastAddRotations(facing, func_002A78D8(0.0f, 1.396263599395752f));
             velocity.x = func_00283180(angle) * 0.01666666753590107f * speed;
             velocity.y = func_00283198(angle) * 0.01666666753590107f * speed;
             velocity.z = 0.0f;
             speed = func_002A7878(0.0f, 12.0f) * F(state, 0x14);
             velocity.z = speed * 0.01666666753590107f;
-            func_00282CC0(&velocity, &velocity, attachment);
+            FastVecAdd(&velocity, &velocity, attachment);
             particle = func_002C7970(&pos, &velocity, life, 0x3064FF, spin, 127, 127, size * 210000.0f, F(state, 0x14) * 2100.0f, 0.004055555909872055f, 3);
         }
     }
@@ -156,14 +156,14 @@ void func_0032CA40(char *object, void *radial, void *attachment, float distance)
             float speed, angle, turn;
             int life;
             speed = func_002A7878(15.0f, 20.0f) * F(state, 0x14);
-            func_00282D30(&pos, object + 0xC0, speed * 0.01666666753590107f);
+            FastVecScale(&pos, object + 0xC0, speed * 0.01666666753590107f);
             angle = func_002A78D8(0.2617994248867035f, 1.396263599395752f);
             turn = func_002A78D8(0.2617994248867035f, 1.396263599395752f);
             func_002AB668(&rotated, object + 0xD0, angle);
             func_002ACDE8(&velocity, &pos, &rotated);
             func_002AB668(&rotated, object + 0xC0, turn);
             func_002ACDE8(&velocity, &velocity, &rotated);
-            func_00282CC0(&velocity, &velocity, attachment);
+            FastVecAdd(&velocity, &velocity, attachment);
             life = func_002A7820(20, 35);
             func_002C6DD8(object + 0x10, &velocity, life, 0.004055555909872055f);
         }
@@ -172,10 +172,10 @@ void func_0032CA40(char *object, void *radial, void *attachment, float distance)
         *(EffectQuad *)&velocity = 0;
         velocity.z = F(state, 0x14) * 0.13333334028720856f;
         *(EffectQuad *)&pos = *(EffectQuad *)&velocity;
-        func_00282CC0(&pos, &pos, attachment);
+        FastVecAdd(&pos, &pos, attachment);
         func_00308408(object, object + 0x10, &pos, 16, 255, 0, 0, 40, F(state, 0x14) * 3.5f);
     }
-    func_002ABBB8(object, D_001A8BD0, object + 0x10, 0.0f, 0.0f, 0, 0, 0, 0.0f, 0.0f, 9.0f, 0.0f, -1, distance * F(state, 0x14), 0, 0, -1, 0, 0x810001);
+    SpawnExplosionEffects(object, D_001A8BD0, object + 0x10, 0.0f, 0.0f, 0, 0, 0, 0.0f, 0.0f, 9.0f, 0.0f, -1, distance * F(state, 0x14), 0, 0, -1, 0, 0x810001);
     {
         float angle;
         sign = 1;
@@ -189,16 +189,16 @@ void func_0032CA40(char *object, void *radial, void *attachment, float distance)
             pos.z = F(object, 0x18) + func_002A78D8(0.0f, 1.0f) * F(state, 0x14);
             size = func_002A7878(0.01666666753590107f, 0.03333333507180214f) * F(state, 0x14);
             turn = func_002A78D8(0.0f, 1.396263599395752f);
-            height = func_00283B98(angle, func_002A78D8(0.0f, 1.5707964897155762f));
+            height = FastAddRotations(angle, func_002A78D8(0.0f, 1.5707964897155762f));
             func_002AF000(&velocity, size, height, turn);
-            func_00282CC0(&velocity, &velocity, attachment);
-            particle = func_002BDCE8(&pos, 0.0f, 1.0f, 1.0099999904632568f, F(state, 0x14) * 315000.0f, sign, &velocity, 0x7F60A0FF, 0);
+            FastVecAdd(&velocity, &velocity, attachment);
+            particle = SpawnSpinningSparkParticle(&pos, 0.0f, 1.0f, 1.0099999904632568f, F(state, 0x14) * 315000.0f, sign, &velocity, 0x7F60A0FF, 0);
             if (particle) {
                 EffectParticleData *data = (EffectParticleData *)(particle + 0x20);
                 *(short *)(particle + 0xA) = func_002A7820(40, 70);
-                particle[9] = func_00283CF0(4.0f) + 64;
+                particle[9] = FloatToInt(4.0f) + 64;
                 data->mode = 3;
-                data->growth = func_00283CE0(func_002A7820(1, 10));
+                data->growth = IntToFloat(func_002A7820(1, 10));
                 data->alpha = 64;
                 data->life = particle[0xA];
             }

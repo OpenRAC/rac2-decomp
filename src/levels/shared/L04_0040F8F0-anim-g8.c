@@ -118,10 +118,10 @@ void func_L04_004167B0(char *m,char *s) {
    F(s,0x424)=func_00282C48(F(m,0xf0))*-0.6f-F(m,0xf4);
   } else { F(s,0x424)=F(s,0x428)=0; }
   if(P(s,0x3b0) && D_L04_001A8FE8>=121) {
-   func_00282CF0(v,(char *)P(s,0x3b0)+0x10,m+0x10);
+   FastVecSub(v,(char *)P(s,0x3b0)+0x10,m+0x10);
    if(func_L00_002EE290(v)<9.0f) {
     angle=func_00283248(v[0],v[1]);
-    angle=func_00283BE0(F(m,0xf8),angle);
+    angle=fast_subtract_rotations(F(m,0xf8),angle);
     if(func_00282C48(angle)<1.5707964f) {
      if(I(s,0x3b4)<180) { I(s,0x424)=0; F(s,0x428)=-angle; }
      I(s,0x3b4)++;
@@ -132,7 +132,7 @@ void func_L04_004167B0(char *m,char *s) {
   if(D_001A7A40[1]) F(s,0x430)=2.5f; else F(s,0x430)=1.0f;
   func_002AEC48(obj,s+0x3c0,0,0.08f,0.5f);
   if(!D_L04_001B08F4) {
-   if(D_00139605) D_L04_001B08F4=func_0029EFD0(0x12df); else D_L04_001B08F4=func_0029EFD0(0x50a);
+   if(D_00139605) D_L04_001B08F4=CreateMoby(0x12df); else D_L04_001B08F4=CreateMoby(0x50a);
    if(D_L04_001B08F4) {
     func_002B37E8(D_L04_001B08F4,obj);
     D_L04_001B08F4->scale=D_L04_001B08F4->model->scale*0.25f;
@@ -141,8 +141,8 @@ void func_L04_004167B0(char *m,char *s) {
   } else {
    func_002AF1D0(obj,D_L04_001B08F4,1,0);
    func_0029FC20(obj,1,mat);
-   func_00282D30(v,mat+8,-0.03f);
-   func_00282CC0((char *)D_L04_001B08F4+0x10,(char *)D_L04_001B08F4+0x10,v);
+   FastVecScale(v,mat+8,-0.03f);
+   FastVecAdd((char *)D_L04_001B08F4+0x10,(char *)D_L04_001B08F4+0x10,v);
    qcopy_nc((char *)D_L04_001B08F4+0xc0,mat);
    qcopy_nc((char *)D_L04_001B08F4+0xd0,mat+4);
    qcopy_nc((char *)D_L04_001B08F4+0xe0,mat+8);
@@ -151,9 +151,9 @@ void func_L04_004167B0(char *m,char *s) {
  }
   if(D_L04_001B08F0) {
    *(Quad1006 *)v=*(Quad1006 *)(m+0x10);v[2]=D_0018A138;*(Quad1006 *)mat=*(Quad1006 *)(m+0x10);
-   func_L04_00416390(m,mat,s+0x290,F(s,0x30c)+F(s,0x27c));
+   EmitTrailEffects(m,mat,s+0x290,F(s,0x30c)+F(s,0x27c));
   }
-  F(s,0x6c0)=func_00283B98(F(s,0x6c0),(F(s,0x30c)+F(s,0x27c)*4.0f)*0.2f+0.01f);
+  F(s,0x6c0)=FastAddRotations(F(s,0x6c0),(F(s,0x30c)+F(s,0x27c)*4.0f)*0.2f+0.01f);
   func_002A91F0(s+0x450,s+0x6c0);
   func_L04_0040C368(m);
 }

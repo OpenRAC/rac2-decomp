@@ -2,7 +2,7 @@
 
 /* func_L05_00421B98: draws the Feltzin HUD's two sprite pairs, the timed sprite pair (fading in for
    its first frames and out for its last ones, drawn in full with the countdown icon and the frame
-   count in between) and two more sprite pairs. The same code as func_L10_00424CD0,
+   count in between) and two more sprite pairs. The same code as DrawFadingHudIconPairs,
    func_L15_00431590 and func_L25_0040DE40, with this level's data.
 
    Every sprite and text label y goes through label_y, the HUD label idiom (see its comment). Its
@@ -105,13 +105,13 @@ void func_L05_00421B98(s32 first, s32 timed, s32 third, s32 fourth)
     if (timed && D_L05_001B3548 < D_001A79F0[3]) {
         if (!func_00282948(&vars->timer)) {
             if (vars->timer >= 291) {
-                fade = func_00283CE0(300 - vars->timer) * 0.1f;
+                fade = IntToFloat(300 - vars->timer) * 0.1f;
                 if (fade > 1.0f)
                     fade = 1.0f;
                 else if (fade < 0.0f)
                     fade = 0.0f;
             } else if (vars->timer < 10) {
-                fade = func_00283CE0(vars->timer) * 0.1f;
+                fade = IntToFloat(vars->timer) * 0.1f;
                 if (fade > 1.0f)
                     fade = 1.0f;
                 else if (fade < 0.0f)
@@ -126,7 +126,7 @@ void func_L05_00421B98(s32 first, s32 timed, s32 third, s32 fourth)
             HUD_SPRITE(0xC0, 0x55F0C070, D_L05_001B1430, D_L05_001B1434, 1.0f, 1.0f, 0.0f);
             color = D_L05_001B14A0;
             {
-                s32 icon = func_0028E588(0xEAA2, 3);
+                s32 icon = GetIconFrame(0xEAA2, 3);
                 s32 x = D_L05_001B1430 - 51;
                 s32 y = screen_coord(D_L05_001B2D80, (f32)(D_L05_001B1434 - 13), 1.0f);
 

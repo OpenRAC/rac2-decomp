@@ -22,7 +22,7 @@ void func_L07_003F6CF0(u8 *a0)
     {
         s32 id = func_002A9640(a0, 0x10000, 0);
         f32 angle = func_002A96A0(a0, id);
-        func_002AA2E8(&s1->angle, 0.0f, angle);
+        ApproachValue(&s1->angle, 0.0f, angle);
     }
     if (s1->angle <= 0.0f)
         func_002A7750(a0, 3, -1);

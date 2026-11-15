@@ -155,7 +155,7 @@ void func_L04_00419918(u8 *self)
     int id;
     float d;
 
-    if (self[0x31] != 0 && func_00282E48(self + 0x10, D_L04_001B9680) < 24.0f) {
+    if (self[0x31] != 0 && fast_vec_dist(self + 0x10, D_L04_001B9680) < 24.0f) {
         func_002A93B0(self);
         self[0x6F] = 22;
     }
@@ -183,7 +183,7 @@ void func_L04_00419918(u8 *self)
         D_L04_001AA6A4 = ref_L04_00419918_00;
         D_L04_001AA6A8 = func_L04_0040ACA8;
         D_L04_001AA6AC = ref_L04_00419918_00;
-        func_00283360(D_L04_001B31A0);
+        set_identity_rotation_rows(D_L04_001B31A0);
         D_L04_001B0914 = self;
         func_L04_0043ABE0();
         self[0x30] = 0x40;
@@ -249,7 +249,7 @@ void func_L04_00419918(u8 *self)
             func_002AD7B8(5);
         }
         if (s[0x441] == 0) {
-            func_0029F978(self, 5, s + 0x440);
+            AttachManipulator(self, 5, s + 0x440);
         }
         return;
     case 1:
@@ -273,7 +273,7 @@ void func_L04_00419918(u8 *self)
                 }
             }
         }
-        d = func_00282E48(D_00189E20 + 0x80, self + 0x10);
+        d = fast_vec_dist(D_00189E20 + 0x80, self + 0x10);
         if (D_L04_001B08FC == 0) {
             if (!flag || !(d < 5.5f) || D_L04_001B2008 < 4) {
                 return;
@@ -285,10 +285,10 @@ void func_L04_00419918(u8 *self)
             }
             if (D_L04_001B0924 == 0 && func_002E59B0(self, I(s, 0x330)) == 0) {
                 I(s, 0x330) = func_L00_0035F5A0(D_001A79F0 == 4 ? 0x16 : 0x1A, 5, self);
-                func_L01_00355BA0(I(s, 0x330), func_00283CF0(func_00283CE0(0x400) * 0.75f));
+                func_L01_00355BA0(I(s, 0x330), FloatToInt(IntToFloat(0x400) * 0.75f));
             }
         }
-        func_002B0C28(4, 0x27A1, 1);
+        TryClaimNotice(4, 0x27A1, 1);
         if (D_L04_001B08FC == 0 && D_L04_001B0924 == 0 && !(D_00138324 & 0x10)) {
             return;
         }
@@ -313,7 +313,7 @@ void func_L04_00419918(u8 *self)
                 } else {
                     func_002DF3F8(self + 0x10, self + 0xF0);
                 }
-                func_0027D330(0x10);
+                FadeToBlack(0x10);
                 func_L00_002B9D60(NODE(I(s, 0x198)) + 0x30, NODE(I(s, 0x198)) + 0x70, 0x31, 1);
                 Q(self, 0x10) = Q(NODE(I(s, 0x198)), 0x30);
                 Q(self, 0xF0) = Q(NODE(I(s, 0x198)), 0x70);
@@ -377,8 +377,8 @@ void func_L04_00419918(u8 *self)
         }
         if (D_L04_001B0908 != 0) {
             D_L04_001A8ED0 = 2;
-            func_002E4AC8();
-            func_0027D330(0x10);
+            UpdateSoundVoices();
+            FadeToBlack(0x10);
             if (D_L04_001B0908 == 2) {
                 func_L04_0040A958(self, 1);
             } else {
@@ -399,7 +399,7 @@ void func_L04_00419918(u8 *self)
         switch (self[0xBC]) {
         case 0:
             D_L04_001B0BBC = 0;
-            func_L04_0040BA68(self, s);
+            UpdateRaceSelectionMenu(self, s);
             func_0029B758(0, func_L04_0040AD28);
             return;
         case 1:
@@ -453,23 +453,23 @@ void func_L04_00419918(u8 *self)
         case 4:
             func_L04_00418A58(self, s);
             if (I(s, 0x394) < 120 && D_L04_001B31D4 == 0) {
-                func_002E5CF8(0xD, 0, self);
+                PlayMobySound(0xD, 0, self);
                 D_L04_001B31D4++;
             } else if (I(s, 0x394) < 90 && D_L04_001B31D4 == 1) {
-                func_002E5CF8(0xD, 0, self);
+                PlayMobySound(0xD, 0, self);
                 D_L04_001B31D4++;
             } else if (I(s, 0x394) < 60 && D_L04_001B31D4 == 2) {
-                func_002E5CF8(0xD, 0, self);
+                PlayMobySound(0xD, 0, self);
                 D_L04_001B31D4++;
             } else if (I(s, 0x394) < 30 && D_L04_001B31D4 == 3) {
-                func_002E5CF8(0xD, 0, self);
+                PlayMobySound(0xD, 0, self);
                 D_L04_001B31D4++;
             }
             func_00282948(s + 0x394);
             if (I(s, 0x394) != 0) {
                 return;
             }
-            func_002E5CF8(0xE, 0, self);
+            PlayMobySound(0xE, 0, self);
             self[0xBC] = 5;
             if (D_00138320 & 0x40) {
                 D_L04_001B0930 = 0;
@@ -496,7 +496,7 @@ void func_L04_00419918(u8 *self)
             if (D_L04_001B0900 == 0) {
                 return;
             }
-            func_0027D330(0x10);
+            FadeToBlack(0x10);
             func_L04_0040A958(self, 1);
             I(s, 0x340) = 0;
             D_L04_001B0900 = 0;
@@ -536,7 +536,7 @@ void func_L04_00419918(u8 *self)
             if (--H(self, 0x96) != 0) {
                 return;
             }
-            func_0027D330(0x10);
+            FadeToBlack(0x10);
             ids = (IdList *)(s + 0x110);
             id = ids->v[I(s, 0x270)];
             if (id != -1) {
@@ -567,7 +567,7 @@ void func_L04_00419918(u8 *self)
             I(s, 0x4AC) = 0;
             Q(self, 0x10) = Q(a, 0);
             Q(self, 0xF0) = Q(b, 0);
-            func_L04_00410518(self, s, s + 0x314, s + 0x318, s + 0x310, D_L04_001A8FE4);
+            FindNearestRoutePoint(self, s, s + 0x314, s + 0x318, s + 0x310, D_L04_001A8FE4);
             H(self, 0x34) &= ~0x41;
             if (o != 0) {
                 Q(o, 0x10) = Q(self, 0x10);
@@ -592,11 +592,11 @@ void func_L04_00419918(u8 *self)
         D_L04_001B08F8++;
         if (F(self, 0x18) < F(s, 0x26C) || func_L04_00410E48(I(s, 0x314), I(s, 0x318), F(self, 0x18)) != 0) {
             float ahead, along;
-            int node = func_L04_00400AB0(self, P(s, 0x6D0), 1);
+            int node = FindNearestRoutePointIndex(self, P(s, 0x6D0), 1);
 
             /* The path's points are 16-byte records from +0x10. */
             Q(self, 0x10) = Q(((Vector *)P(s, 0x6D0))[node], 0x10);
-            along = func_00283CE0(node) * F(P(s, 0x6D0), 0x1C);
+            along = IntToFloat(node) * F(P(s, 0x6D0), 0x1C);
             if (D_L04_001B08F0 != 0) {
                 ahead = along + 15.0f;
             } else {
@@ -604,9 +604,9 @@ void func_L04_00419918(u8 *self)
             }
             F(s, 0x6D8) = ahead;
             func_002C96F8(ahead, F(P(s, 0x6D0), 0x1C), P(s, 0x6D0), s + 0x654, s + 0x6D4, s + 0x6A0);
-            func_L04_00410518(self, s, s + 0x314, s + 0x318, s + 0x310, D_L04_001A8FE4);
+            FindNearestRoutePoint(self, s, s + 0x314, s + 0x318, s + 0x310, D_L04_001A8FE4);
         }
-        func_0029B758(0, func_L04_00411298);
+        func_0029B758(0, DrawRaceStandingsHud);
         func_00282948(s + 0x398);
         if (D_L04_001A7CD0 == 0) {
             if (I(s, 0x398) > 0 || !(D_00138324 & 0x10)) {
@@ -620,7 +620,7 @@ void func_L04_00419918(u8 *self)
             return;
         }
         func_00132B28(0x5D);
-        func_00132028();
+        snd_Pump();
         D_L04_001A8ED0_flags[5] = 0;
         func_L04_0040AC30(self, s);
         self[0x20] = 4;
@@ -683,7 +683,7 @@ void func_L04_00419918(u8 *self)
 
                     D_L04_001BDC30 = q;
                 }
-                func_0027AB40();
+                UpdateViewContext();
                 for (k = 0; k < 21; k++) {
                     int id = ((int *)(s + 0x1E4))[k];
 

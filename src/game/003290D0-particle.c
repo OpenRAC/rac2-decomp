@@ -56,8 +56,8 @@ void func_003290D0(char *self, float size, float *pos)
             func_00282C88(v);
             v[3] = 1.0f;
             v[0] = -0.3f;
-            func_00283098(v, v, self + 0xC0);
-            func_00282CC0(p, v, self + 0x10);
+            matrix_mul_vec3(v, v, self + 0xC0);
+            FastVecAdd(p, v, self + 0x10);
         } else {
             qcopy(record->pos, pos);
         }

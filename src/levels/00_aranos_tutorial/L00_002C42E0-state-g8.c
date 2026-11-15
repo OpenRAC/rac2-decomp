@@ -3,10 +3,10 @@
  * Ported from func_L19_002C44F8 (src/levels/19_grelbin/L19_002C44F8.c, whose header explains how the parameter
  * blocks were read off retail) and its other ports. Flags add -frac2-zero-ti-por (the 0x28 arm's zeroed vector).
  * Differences from the L19 routine: the L13 set plus 0x71; one function-scope pos[4] shared by 0x27 and 0x71 keeps retail's frame.
- *   - 0x7A calls func_002E5CF8(7, 0, moby) with moby = PTR(0xC18), whose position it sets first.
+ *   - 0x7A calls PlayMobySound(7, 0, moby) with moby = PTR(0xC18), whose position it sets first.
  *   - The 13-group's inner 0x4D case reads its 5.0f from a local set at the case's top: gcse then propagates the
  *     constant into both calls and retail loads it twice instead of keeping it in $f20.
- *   - The 0x45 arm animates with blend 5 (func_L00_002D2168(7, 5, 5.0f)).
+ *   - The 0x45 arm animates with blend 5 (set_hero_animation(7, 5, 5.0f)).
  */
 #include "common.h"
 
@@ -203,37 +203,37 @@ s32 func_L00_002C42E0(s32 action, s32 animate) {
     case 0:
         WORD(0x229C) = 0;
         BITS(0x24A0) = 0;
-        if (WORD(0x1248) == 0x1A) func_L00_002AF7D0();
+        if (WORD(0x1248) == 0x1A) cancel_hero_item_animation();
         BYTE(0x24EF) = 0;
         WORD(0x11A0) = func_002A7820(50, 100);
         func_L00_002AB3E0();
         if (BYTE(0x22B4)) { func_L00_002C8BA8(0); return 1; }
         COPY_VECTOR(0x160, 0x120);
-        if (BYTE(0x1492) && func_00282E20(VEC(0x160)) > 0.00833333377f) { func_L00_002C42E0(0x2E, 1); return 0; }
+        if (BYTE(0x1492) && vec_length_xy(VEC(0x160)) > 0.00833333377f) { func_L00_002C42E0(0x2E, 1); return 0; }
         if (BYTE(0x149A) && SHORT(0x34C) == 0) { func_L00_002C42E0(0x76, 1); return 0; }
         WORD(0x1188) = 0x68;
         if (!animate) goto finish;
-        if (func_L00_002A4E48(0) == 0x51) func_L00_002D2168(func_L00_002A4E48(0), 0, 18.0f); else func_L00_002D2168(func_L00_002A4E48(0), 0, -1.0f);
+        if (func_L00_002A4E48(0) == 0x51) set_hero_animation(func_L00_002A4E48(0), 0, 18.0f); else set_hero_animation(func_L00_002A4E48(0), 0, -1.0f);
         goto finish;
     case 0x64:
         WORD(0x229C) = 0; BITS(0x24A0) = 0;
         func_00282C88((TI128 *)VEC(0x160)); WORD(0x1188) = 0x68;
         if (!animate) goto finish;
-        if (func_L00_002A4E48(0) == 0x51) func_L00_002D2168(func_L00_002A4E48(0), 0, 18.0f); else func_L00_002D2168(func_L00_002A4E48(0), 0, -1.0f);
+        if (func_L00_002A4E48(0) == 0x51) set_hero_animation(func_L00_002A4E48(0), 0, 18.0f); else set_hero_animation(func_L00_002A4E48(0), 0, -1.0f);
         goto finish;
     case 0x3D:
-        func_L00_002D2168(func_L00_002A4E48(0), 0, 9.0f);
+        set_hero_animation(func_L00_002A4E48(0), 0, 9.0f);
         if (PTR(0x1854)) func_002A7470(PTR(0x1854), 0, 0, 9);
         goto finish;
     case 0x39:
         WORD(0x229C) = 20; BITS(0x24A0) = 0; COPY_VECTOR(0x160, 0x120);
         if (!animate) goto finish;
-        func_L00_002D2168(0x45, 0, 12.0f); goto finish;
+        set_hero_animation(0x45, 0, 12.0f); goto finish;
     case 0x7D:
         WORD(0x229C) = 20; BITS(0x24A0) = 0; WORD(0x24CC) = 0; COPY_VECTOR(0x160, 0x120);
         func_002AC9F8((f32 *)VEC(0x160), 0.0583333373069f);
         if (!animate) goto finish;
-        func_L00_002D2168(0x75, 0, 12.0f); goto finish;
+        set_hero_animation(0x75, 0, 12.0f); goto finish;
     case 0x7C:
         WORD(0x229C) = 20; HALF(0x1F0) = 10000; BITS(0x24A0) = 0;
         REAL(0x79C) = REAL(0x330) - 0.37f; WORD(0x24CC) = 0;
@@ -241,7 +241,7 @@ s32 func_L00_002C42E0(s32 action, s32 animate) {
         if (REAL(0x794) < -0.116666674614f) REAL(0x794) = -0.116666674614f;
         BYTE(0x22B7) = 1; REAL(0x790) = REAL(0x88) - REAL(0x79C); BITS(0x7A0) = 0;
         if (!animate) goto finish;
-        func_L00_002D2168(0x6D, 0, 11.0f); goto finish;
+        set_hero_animation(0x6D, 0, 11.0f); goto finish;
     case 0x32: {
         s32 n;
         WORD(0x229C) = 17; BITS(0x24A0) = 11; BYTE(0x22B7) = 1; BITS(0xA3C) = 0;
@@ -250,14 +250,14 @@ s32 func_L00_002C42E0(s32 action, s32 animate) {
         WORD(0x1188) = 0x68; BITS(0xA20) = 0;
         n = 12;
         if (!animate) goto finish;
-        func_L00_002D2168(0x3B, 0, n); goto finish; }
+        set_hero_animation(0x3B, 0, n); goto finish; }
     case 0x34: {
         s32 f; s32 n;
         WORD(0x229C) = 17; n = 11; BYTE(0x22B7) = 1; WORD(0xA34) = 60; BITS(0x24A0) = n;
         if (WORD(0x22A4) == 18) { func_L00_002B9B88(3, 0); WORD(0x2298) = 1; }
         WORD(0x1188) = 0x68; BITS(0xA20) = 0;
         f = WORD(0x22A0) == 0x32 ? 15 : n;
-        if (animate) func_L00_002D2168(0x3D, 0, f);
+        if (animate) set_hero_animation(0x3D, 0, f);
         goto finish;
     }
     case 0x33:
@@ -265,17 +265,17 @@ s32 func_L00_002C42E0(s32 action, s32 animate) {
         COPY_VECTOR(0x160, 0x120); WORD(0x1188) = 0x68;
         selected_8 = WORD(0x22A0) == 0x34 ? -2 : 35;
         if (!animate) goto finish;
-        func_L00_002D2168(0x3C, 0, (f32)selected_8); goto finish;
+        set_hero_animation(0x3C, 0, (f32)selected_8); goto finish;
     case 0x36:
         WORD(0x229C) = 18; BYTE(0x22B7) = 1; BITS(0x24A0) = 0; HALF(0xA4A) = 0;
         if (WORD(0x22A4) == 17) {
             func_L00_002AABE0(3, 10, 0);
-            if (D_L00_001B2630) func_002FD1B8(D_L00_001B2630, D_L00_001B2638, 0, REAL(0x80), REAL(0x84), 0.4f, 0.3f);
+            if (D_L00_001B2630) RippleDisturb(D_L00_001B2630, D_L00_001B2638, 0, REAL(0x80), REAL(0x84), 0.4f, 0.3f);
         } else if (REAL(0x118) < -0.00833333376795f) {
-            selected_9 = func_00283CF0(func_00282C48(REAL(0x118)) * 300.0f);
+            selected_9 = FloatToInt(func_00282C48(REAL(0x118)) * 300.0f);
             if (selected_9 > 40) selected_9 = 40;
             func_L00_002AABE0(3, selected_9, 1);
-            if (D_L00_001B2630) func_002FD1B8(D_L00_001B2630, D_L00_001B2638, 0, REAL(0x80), REAL(0x84), 0.5f, -0.4f);
+            if (D_L00_001B2630) RippleDisturb(D_L00_001B2630, D_L00_001B2638, 0, REAL(0x80), REAL(0x84), 0.5f, -0.4f);
             HALF(0xA4A) = 75;
         }
         REAL(0x794) = REAL(0x118) * 0.37f; WORD(0x798) = 0;
@@ -286,17 +286,17 @@ s32 func_L00_002C42E0(s32 action, s32 animate) {
         func_002AC9F8((f32 *)VEC(0x160), 0.0916666686535f);
         WORD(0x1188) = 0x68;
         if (!animate) goto finish;
-        func_L00_002D2168(0x3A, 0, 22.0f); goto finish;
+        set_hero_animation(0x3A, 0, 22.0f); goto finish;
     case 0x72: case 0x73:
         WORD(0x229C) = 7; BITS(0x24A0) = 0;
         func_L00_002B6118(0.5f); BYTE(0x22B7) = 1; COPY_VECTOR(0xF0, 0x110);
         hit_10 = func_002A9640(PTR(0x2290), 1, 0);
-        if (hit_10) func_L00_002A4EF8(func_00283CF0(*(f32 *)(hit_10 + 0x2C)));
-        else func_L00_002A4EF8(1);
+        if (hit_10) AdjustPlayerHealth(FloatToInt(*(f32 *)(hit_10 + 0x2C)));
+        else AdjustPlayerHealth(1);
         HALF(0x1DC) = 77;
         if (animate) {
-            if (WORD(0x2294) == 0x72) func_L00_002D2168(0x69, 3, -3.0f);
-            else func_L00_002D2168(0x68, 3, -3.0f);
+            if (WORD(0x2294) == 0x72) set_hero_animation(0x69, 3, -3.0f);
+            else set_hero_animation(0x68, 3, -3.0f);
             *(f32 *)(PTR(0x2290) + 0x44) = D_L00_0025DB20[WORD(0xC30)][WORD(0xC34)++];
             goto finish;
         }
@@ -305,7 +305,7 @@ s32 func_L00_002C42E0(s32 action, s32 animate) {
         BITS(0x24A0) = 0; WORD(0x229C) = 18; BITS(0xA3C) = 0;
         BYTE(0x22B7) = 1; WORD(0x798) = 45; WORD(0x1188) = 0x68;
         if (!animate) goto finish;
-        func_L00_002D2168(0x5E, 0, 17.0f); goto finish;
+        set_hero_animation(0x5E, 0, 17.0f); goto finish;
     case 0x67:
         WORD(0x229C) = 20; BYTE(0x22B7) = 1; BITS(0x24A0) = 0;
         if (SHORT(0xA4E) > 50 && D_0018C750[12].count < 0xFFFF) D_0018C750[12].count++;
@@ -316,31 +316,31 @@ s32 func_L00_002C42E0(s32 action, s32 animate) {
         D_0018C750[29].levels = (D_0018C750[29].levels | (1u << D_001A79F0)) | 0x80000000u;
         COPY_VECTOR(0x160, 0x120);
         if (!animate) goto finish;
-        func_L00_002D2168(0x58, 0, 10.0f); goto finish;
+        set_hero_animation(0x58, 0, 10.0f); goto finish;
     case 0x7F:
         WORD(0x229C) = 20; BYTE(0x22B7) = 1; BITS(0x24A0) = 0; COPY_VECTOR(0x160, 0x120);
         if (!animate) goto finish;
-        func_L00_002D2168(0x79, 0, 10.0f); goto finish;
+        set_hero_animation(0x79, 0, 10.0f); goto finish;
     case 0x85:
         WORD(0x229C) = 32; BITS(0x24A0) = 8; BYTE(0x22B7) = 1; BYTE(0x22C2) = 1;
-        if (animate) func_L00_002D2168(0x4F, 0, 5.0f);
+        if (animate) set_hero_animation(0x4F, 0, 5.0f);
         REAL(0x98) = *(f32 *)(PTR(0x1830) + 0xF8);
         *(TI128 *)VEC(0x80) = *(TI128 *)(PTR(0x1830) + 0x10);
         func_00282C88((TI128 *)VEC(0xF0)); goto finish;
     case 0x86:
         WORD(0x229C) = 32; BITS(0x24A0) = 8; BYTE(0x22B7) = 1; BYTE(0x22C2) = 1;
         if (!animate) goto finish;
-        func_L00_002D2168(0x4F, 0, 5.0f); goto finish;
+        set_hero_animation(0x4F, 0, 5.0f); goto finish;
     case 1:
         BITS(0x24A0) = 4;
         WORD(0x229C) = 0;
         if (BYTE(0x22BA)) goto finish;
         animation_16 = func_L00_002A4E48(1);
         if (PTR(0x2290)[0x43] == animation_16 || !animate) goto finish;
-        func_L00_002D2168(animation_16, 0, 18.0f); goto finish;
+        set_hero_animation(animation_16, 0, 18.0f); goto finish;
     case 0x2F:
         WORD(0x229C) = 8; BITS(0x24A0) = 0; COPY_VECTOR(0x160, 0x110);
-        func_L00_002D2168(func_L00_002A4E48(0), 0, 5.0f); HALF(0x1EC) = 7;
+        set_hero_animation(func_L00_002A4E48(0), 0, 5.0f); HALF(0x1EC) = 7;
         goto finish;
     case 2: case 0x2E: case 0x70:
         WORD(0x229C) = 1;
@@ -352,7 +352,7 @@ s32 func_L00_002C42E0(s32 action, s32 animate) {
         if (REAL(0x1B4) > 0.11666667461395264f) REAL(0x1B4) = 0.11666667461395264f;
         BYTE(0x40F) = 0;
         func_L00_002B39F0(0, 1.0f);
-        value_18 = func_00283C80(REAL(0x98), REAL(0x1A0));
+        value_18 = FastDiffRots(REAL(0x98), REAL(0x1A0));
         if (value_18 > 1.5707964897155762f &&
             (WORD(0x22A4) == 4 || WORD(0x22A0) == 3 || WORD(0x22AC) == 3)) REAL(0x1B4) = 0;
         WORD(0x1188) = 0x68;
@@ -364,10 +364,10 @@ s32 func_L00_002C42E0(s32 action, s32 animate) {
             BITS(0xF8) = 0;
             func_002AC9F8((f32 *)VEC(0xF0), 0.128333330f);
             WORD(0x2294) = 0x2E; BITS(0x404) = 0;
-            func_L00_002D2168(0x37, 0, 8.0f); goto finish;
+            set_hero_animation(0x37, 0, 8.0f); goto finish;
         }
         if (BYTE(0x22B9) || WORD(0x2294) == 0x70) {
-            WORD(0x2294) = 0x70; func_L00_002D2168(0x59, 0, 8.0f); goto finish;
+            WORD(0x2294) = 0x70; set_hero_animation(0x59, 0, 8.0f); goto finish;
         }
         WORD(0x2298) = 0;
         BYTE(0x40C) = 0; BYTE(0x40E) = 0;
@@ -378,28 +378,28 @@ s32 func_L00_002C42E0(s32 action, s32 animate) {
         if (WORD(0x22A0) == 0x13) selected_18 = 13;
         if (WORD(0x22AC) == 6 || WORD(0x22AC) == 0x2C) selected_18 = 18;
         if (WORD(0x22B0) == 4 && BYTE(0x49C) > 5) selected_18 = 13;
-        func_L00_002D2168(WORD(0x2298) + 3, D_L00_001A7DD8[WORD(0x2298)], (f32)selected_18); goto finish;
+        set_hero_animation(WORD(0x2298) + 3, D_L00_001A7DD8[WORD(0x2298)], (f32)selected_18); goto finish;
     case 0x7B: {
         s32 n = -2;
         WORD(0x229C) = 28; WORD(0x1188) = 0x68; BITS(0x24A0) = 0;
         COPY_VECTOR(0xF0, 0x110);
         if (WORD(0x1298) != 0x36) { WORD(0x2304) = WORD(0x1298); WORD(0x22CC) = 0x36; }
         if (!animate) goto finish;
-        func_L00_002D2168(0x8B, 0, n); goto finish; }
+        set_hero_animation(0x8B, 0, n); goto finish; }
     case 0x62:
-        WORD(0x229C) = 1; BITS(0x24A0) = 0; REAL(0x1B4) = func_00282E20(VEC(0x120));
+        WORD(0x229C) = 1; BITS(0x24A0) = 0; REAL(0x1B4) = vec_length_xy(VEC(0x120));
         BYTE(0x22BC) = 1;
-        if (!BYTE(0x22B4)) func_L00_002AF7D0();
+        if (!BYTE(0x22B4)) cancel_hero_item_animation();
         if (!animate) goto finish;
-        if (BYTE(0x22B4) == 1) { func_L00_002D2168(2, 0, 8.0f); goto finish; }
+        if (BYTE(0x22B4) == 1) { set_hero_animation(2, 0, 8.0f); goto finish; }
         if (BYTE(0x22B4) != 0) goto finish;
-        func_L00_002D2168(WORD(0x2298) + 3, D_L00_001A7DD8[WORD(0x2298)], 8.0f); goto finish;
+        set_hero_animation(WORD(0x2298) + 3, D_L00_001A7DD8[WORD(0x2298)], 8.0f); goto finish;
     case 0x30:
         WORD(0x229C) = 16; BITS(0x24A0) = 3; BYTE(0x22B7) = 1;
         func_00282A60((unsigned int *)VEC(0xB40), 0, 0x20);
         COPY_VECTOR(0x160, 0x110);
         if (!animate) goto finish;
-        func_L00_002D2168(0x5D, 0, 15.0f); goto finish;
+        set_hero_animation(0x5D, 0, 15.0f); goto finish;
     case 3:
         WORD(0x229C) = 1; BITS(0x24A0) = 0;
         COPY_VECTOR(0x160, 0x120);
@@ -408,7 +408,7 @@ s32 func_L00_002C42E0(s32 action, s32 animate) {
         if (func_L00_002CAF20()) return 0;
         if (func_L00_002A4E48(0) == 0x51) {
             if (!animate) goto finish;
-            if (func_L00_002C42E0(0, 0)) func_L00_002D2168(func_L00_002A4E48(0), 0, 18.0f);
+            if (func_L00_002C42E0(0, 0)) set_hero_animation(func_L00_002A4E48(0), 0, 18.0f);
             return 0;
         }
         if (!animate) goto finish;
@@ -416,7 +416,7 @@ s32 func_L00_002C42E0(s32 action, s32 animate) {
         {
             value_21 = REAL(0xC38); selected_21 = 6;
             if (func_L00_002A4EF0(animation_21) == 4 && value_21 > 3.0f && value_21 < 16.0f) selected_21 = 5;
-            func_L00_002D2168(selected_21, 4, 9.0f);
+            set_hero_animation(selected_21, 4, 9.0f);
             goto finish;
         }
     case 0x63:
@@ -426,12 +426,12 @@ s32 func_L00_002C42E0(s32 action, s32 animate) {
         animation_22 = objectSnapshot[0x42]; {
             value_22 = REAL(0xC38); selected_22 = 6;
             if (func_L00_002A4EF0(animation_22) == 4 && value_22 > 3.0f && value_22 < 16.0f) selected_22 = 5;
-            func_L00_002D2168(selected_22, 4, 9.0f);
+            set_hero_animation(selected_22, 4, 9.0f);
             goto finish;
         }
     case 4:
         WORD(0x229C) = 12; BITS(0x24A0) = 0;
-        REAL(0x1B4) = func_00282E20(VEC(0x120));
+        REAL(0x1B4) = vec_length_xy(VEC(0x120));
         if (REAL(0x1B4) > 0.11666667461395264f) REAL(0x1B4) = 0.11666667461395264f;
         if (BYTE(0x149A) && SHORT(0x34C) == 0) { func_L00_002C42E0(0x76, 1); return 0; }
         WORD(0x1188) = 0x68;
@@ -439,8 +439,8 @@ s32 func_L00_002C42E0(s32 action, s32 animate) {
         func_002AC9F8((float *)VEC(0x160), 0.11666667461395264f);
         if (REAL(0x178) > 0.05833333730697632f) func_L00_002B9B88(9, 0);
         if (animate) {
-            if (PTR(0x2290)[0x42] == func_L00_002A4E48(0)) func_L00_002D2168(13, 2, 9.0f);
-            else func_L00_002D2168(13, 2, 14.0f);
+            if (PTR(0x2290)[0x42] == func_L00_002A4E48(0)) set_hero_animation(13, 2, 9.0f);
+            else set_hero_animation(13, 2, 14.0f);
             func_L00_002D2470(3, 18);
         }
         goto finish;
@@ -451,7 +451,7 @@ s32 func_L00_002C42E0(s32 action, s32 animate) {
         D_0018C360[13].levels = (D_0018C360[13].levels | (1u << D_001A79F0)) | 0x80000000u;
         REAL(0x1A0) = func_00283248(*(f32 *)(PTR(0xB10) + 0x10) - REAL(0x80),
                                     *(f32 *)(PTR(0xB10) + 0x14) - REAL(0x84));
-        BITS(0xB1C) = 0; { if (animate) { func_L00_002D2168(0x2F, 2, 5.0f); func_L00_002D2470(10, 14); } goto finish; }
+        BITS(0xB1C) = 0; { if (animate) { set_hero_animation(0x2F, 2, 5.0f); func_L00_002D2470(10, 14); } goto finish; }
     case 0x8B:
         WORD(0x229C) = 33; BYTE(0x22BC) = 1; BITS(0x24A0) = 0;
         goto finish;
@@ -463,18 +463,18 @@ s32 func_L00_002C42E0(s32 action, s32 animate) {
         REAL(0x1A0) = func_00283248(*(f32 *)(PTR(0xAA4) + 0x10) - REAL(0x80),
                                     *(f32 *)(PTR(0xAA4) + 0x14) - REAL(0x84));
         if (WORD(0x22A0) == 0x28) COPY_VECTOR(0x160, 0xF0);
-        { if (animate) { func_L00_002D2168(0x2F, 2, 5.0f); func_L00_002D2470(10, 14); } goto finish; }
+        { if (animate) { set_hero_animation(0x2F, 2, 5.0f); func_L00_002D2470(10, 14); } goto finish; }
     case 0x24:
         WORD(0x229C) = 13; BITS(0x24A0) = 7; BITS(0xAA0) = 0;
         BITS(0xAB4) = 0; BYTE(0x22BC) = 1;
         if (!animate) goto finish;
-        func_L00_002D2168(0x30, 1, 10.0f); goto finish;
+        set_hero_animation(0x30, 1, 10.0f); goto finish;
     case 0x25:
         WORD(0x229C) = 13; BITS(0x24A0) = 7; BYTE(0x22BC) = 1;
         BITS(0xAA0) = 0; BITS(0xAB4) = 0;
-        REAL(0xABC) = func_00282E48(VEC(0x80), PTR(0xAA4) + 0x10);
+        REAL(0xABC) = fast_vec_dist(VEC(0x80), PTR(0xAA4) + 0x10);
         if (!animate) goto finish;
-        func_L00_002D2168(0x30, 1, 5.0f); goto finish;
+        set_hero_animation(0x30, 1, 5.0f); goto finish;
     case 0x2B:
         WORD(0x229C) = 14; BITS(0x24A0) = 7;
         if (D_0018C360[13].count < 0xFFFF) D_0018C360[13].count++;
@@ -493,17 +493,17 @@ s32 func_L00_002C42E0(s32 action, s32 animate) {
         if (*(f32 *)(hit_29 + 0x2C) != 0.0f) REAL(0xB0C) = *(f32 *)(hit_29 + 0x2C);
         REAL(0xAEC) = func_00283248(*(f32 *)(PTR(0xAD4) + 0x10) - REAL(0x80),
                                     *(f32 *)(PTR(0xAD4) + 0x14) - REAL(0x84));
-        REAL(0xAE4) = func_00282E48(VEC(0x80), PTR(0xAD4) + 0x10);
+        REAL(0xAE4) = fast_vec_dist(VEC(0x80), PTR(0xAD4) + 0x10);
         REAL(0xAF0) = 0.007500000298f;
         if (WORD(0x22A4) == 4) REAL(0xAF0) = REAL(0x520);
         else if (WORD(0x22A4) == 2) REAL(0xAF0) = REAL(0xA80);
-        if (animate) { func_L00_002D2168(0x34, 0, 11.0f); REAL(0xC20) = 0.7f; }
+        if (animate) { set_hero_animation(0x34, 0, 11.0f); REAL(0xC20) = 0.7f; }
         goto finish;
     case 0x2C:
         WORD(0x229C) = 2; BITS(0x24A0) = 7;
         func_00282C88((TI128 *)VEC(0xA0)); COPY_VECTOR(0xF0, 0x120);
         if (!animate) goto finish;
-        func_L00_002D2168(11, 0, 15.0f); goto finish;
+        set_hero_animation(11, 0, 15.0f); goto finish;
     case 0x27: {
         s32 count;
         f32 value;
@@ -511,61 +511,61 @@ s32 func_L00_002C42E0(s32 action, s32 animate) {
         WORD(0x229C) = 15; BITS(0x24A0) = 3; WORD(0x1188) = 0x68; WORD(0x648) = 1; REAL(0x658) = -1.57079649f; WORD(0x640) = 0; WORD(0x6C8) = 0; WORD(0x65C) = 0;
         if (WORD(0x22A4) != 15) { WORD(0x674) = 0; WORD(0x67C) = -1; REAL(0x680) = 0.0f; }
         start = REAL(0x638); WORD(0x6B0) = 0; WORD(0x6B4) = 0; HALF(0x6BE) = 0; WORD(0x684) = 0; WORD(0x688) = 0; HALF(0x68C) = 0; WORD(0x690) = 0; count = WORD(0x634); value = start;
-        func_L00_00341820(WORD(0x630), pos, &count, &value, WORD(0x654), 1.0f);
-        func_00282CF0(dir, pos, VEC(0x80));
-        if (func_00282DF0(dir) > 0.001f) {
-            func_00282F20(dir, dir, 1.0f);
-            if (WORD(0x22A4) != 15) REAL(0x680) = func_00282DB0(VEC(0x110), dir);
+        Spline_AdvanceByDistance(WORD(0x630), pos, &count, &value, WORD(0x654), 1.0f);
+        FastVecSub(dir, pos, VEC(0x80));
+        if (FastVecLength(dir) > 0.001f) {
+            vec_scale_to_length(dir, dir, 1.0f);
+            if (WORD(0x22A4) != 15) REAL(0x680) = FastVecDot(VEC(0x110), dir);
         }
         if (PTR(0x6A8)) {
             f32 toward = func_00283248(*(f32 *)(PTR(0x6A8) + 0x10) - REAL(0x80), *(f32 *)(PTR(0x6A8) + 0x14) - REAL(0x84));
-            if (func_00283C80(toward, func_00283B98(REAL(0x658), func_00283248(dir[0], dir[1]))) > 1.57079649f) {
+            if (FastDiffRots(toward, FastAddRotations(REAL(0x658), func_00283248(dir[0], dir[1]))) > 1.57079649f) {
                 REAL(0x658) = 1.57079649f; WORD(0x65C) = 1;
             }
         }
         if (!animate) goto finish;
-        func_L00_002D2168(WORD(0x65C) + 0x31, 0, 6.0f); goto finish; }
+        set_hero_animation(WORD(0x65C) + 0x31, 0, 6.0f); goto finish; }
     case 0x71: {
         s32 count;
         f32 value;
         f32 start;
         WORD(0x229C) = 26; BITS(0x24A0) = 3; BYTE(0x22B7) = 1; WORD(0x1188) = 0x68; WORD(0x6F0) = 0; WORD(0x708) = 0;
         start = REAL(0x6E8); count = WORD(0x6E4); value = start;
-        func_L00_00341820(WORD(0x6E0), pos, &count, &value, WORD(0x6FC), 1.0f);
-        func_00282CF0(dir, pos, VEC(0x80));
-        if (func_00282DF0(dir) > 0.001f) {
-            func_00282F20(dir, dir, 1.0f);
-            REAL(0x6F4) = func_00282DB0(VEC(0x110), dir);
+        Spline_AdvanceByDistance(WORD(0x6E0), pos, &count, &value, WORD(0x6FC), 1.0f);
+        FastVecSub(dir, pos, VEC(0x80));
+        if (FastVecLength(dir) > 0.001f) {
+            vec_scale_to_length(dir, dir, 1.0f);
+            REAL(0x6F4) = FastVecDot(VEC(0x110), dir);
         }
         REAL(0x6F4) = REAL(0x6F4) * 0.5f;
         if (REAL(0x6F4) < 0.0f) REAL(0x6F4) = 0.0f;
-        func_L00_002D2168(0x6C, 0, 8.0f); goto finish; }
+        set_hero_animation(0x6C, 0, 8.0f); goto finish; }
     case 0x17:
         WORD(0x229C) = 3; BITS(0x24A0) = 13;
         REAL(0x57C) = 0.0061111114919f; REAL(0x580) = REAL(0x88);
         if (WORD(0x22A4) == 4) { REAL(0x57C) = REAL(0x520); REAL(0x580) = REAL(0x490); }
         BYTE(0x22BF) = 1; BYTE(0x22BC) = 1;
         if (!animate) goto finish;
-        if (REAL(0x174) > 0.0583333373069f) func_L00_002D2168(0x20, 0, 9.0f);
-        else func_L00_002D2168(0x20, 1, 11.0f);
+        if (REAL(0x174) > 0.0583333373069f) set_hero_animation(0x20, 0, 9.0f);
+        else set_hero_animation(0x20, 1, 11.0f);
         goto finish;
     case 0x18:
         WORD(0x229C) = 3; BYTE(0x22BF) = 1; BITS(0x24A0) = 13;
         BYTE(0x22BC) = 1; WORD(0x1188) = 0x68;
         if (!animate) goto finish;
-        func_L00_002D2168(0x21, 0, 6.0f); goto finish;
+        set_hero_animation(0x21, 0, 6.0f); goto finish;
     case 0x19:
         WORD(0x229C) = 3; BITS(0x24A0) = 13; BYTE(0x22BF) = 1; BYTE(0x22BC) = 1;
         if (!animate) goto finish;
-        func_L00_002D2168(0x24, 0, 6.0f); goto finish;
+        set_hero_animation(0x24, 0, 6.0f); goto finish;
     case 0x1A:
         WORD(0x229C) = 3; BITS(0x24A0) = 13; BYTE(0x22BF) = 1; BYTE(0x22BC) = 1;
         if (!animate) goto finish;
-        func_L00_002D2168(0x25, 0, 6.0f); goto finish;
+        set_hero_animation(0x25, 0, 6.0f); goto finish;
     case 0x76:
         WORD(0x229C) = 2; BITS(0x24A0) = 0; COPY_VECTOR(0xF0, 0x120);
         if (!animate) goto finish;
-        func_L00_002D2168(11, 0, 12.0f); goto finish;
+        set_hero_animation(11, 0, 12.0f); goto finish;
     case 6: case 0x74:
         WORD(0x229C) = 2; BITS(0x24A0) = 0;
         if (WORD(0x2294) == 0x74) {
@@ -585,9 +585,9 @@ s32 func_L00_002C42E0(s32 action, s32 animate) {
         WORD(0x1188) = 0x68; WORD(0x2298) = 0;
         COPY_VECTOR(0xF0, 0x120);
         if (!animate) goto finish;
-        if (BYTE(0x22B4) == 1) { func_L00_002D2168(4, 0, 8.0f); return 1; }
-        if (REAL(0x31C) > 1.75f) { func_L00_002D2168(11, 0, 12.0f); WORD(0x2298) = 1; goto finish; }
-        func_L00_002D2168(10, 0, 10.0f); goto finish;
+        if (BYTE(0x22B4) == 1) { set_hero_animation(4, 0, 8.0f); return 1; }
+        if (REAL(0x31C) > 1.75f) { set_hero_animation(11, 0, 12.0f); WORD(0x2298) = 1; goto finish; }
+        set_hero_animation(10, 0, 10.0f); goto finish;
     case 0x82: {
         s32 n = -2;
         WORD(0x229C) = 30; BITS(0x24A0) = 0;
@@ -599,14 +599,14 @@ s32 func_L00_002C42E0(s32 action, s32 animate) {
         HALF(0x5BE) = 0; WORD(0x5A8) = 0; WORD(0x5A4) = 0;
         COPY_VECTOR(0xF0, 0x110); HALF(0x5BC) = 7;
         if (!animate) goto finish;
-        func_L00_002D2168(0x13, 0, n); goto finish; }
+        set_hero_animation(0x13, 0, n); goto finish; }
     case 8: {
         s32 n = -2;
         WORD(0x229C) = 5; WORD(0x1188) = 0x68; BITS(0x24A0) = 0;
         if (REAL(0x170) > 0.075f) func_L00_002B6118(0.075f / REAL(0x170));
         WORD(0x24C8) = 0; COPY_VECTOR(0xF0, 0x110);
         if (!animate) goto finish;
-        func_L00_002D2168(0x13, 0, n); goto finish; }
+        set_hero_animation(0x13, 0, n); goto finish; }
     case 7: case 9: case 0xA: case 0xB: case 0xC: case 0xD: case 0xE: case 0xF: case 0x10: case 0x11:
     case 0x12: case 0x1B: case 0x28: case 0x29: case 0x38: case 0x45: case 0x48: case 0x5B: case 0x66:
     case 0x6E: case 0x81: case 0x89: case 0x92:
@@ -689,7 +689,7 @@ s32 func_L00_002C42E0(s32 action, s32 animate) {
             REAL(0x4C8) = 18.0f; REAL(0x4CC) = 26.0f; REAL(0x4D0) = 13.0f;
             REAL(0x50C) = 5.55f; REAL(0x4A8) = 5.5f;
             REAL(0x508) = 5.5f; HALF(0x518) = 2; HALF(0x51A) = 120; BYTE(0x49F) = 1;
-            func_L00_002A4EF8(1);
+            AdjustPlayerHealth(1);
             if (WORD(0x22A0) == 0x38 || WORD(0x22AC) == 0x38 || WORD(0x24CC) == 0) {
                 WORD(0x18C0)++;
                 if (WORD(0x18C0) > 2 || WORD(0x24CC) == 0) {
@@ -715,7 +715,7 @@ s32 func_L00_002C42E0(s32 action, s32 animate) {
                 *(TI128 *)dir = 0;
                 REAL(0x4A8) = 7.1f; REAL(0x508) = 7.1f; REAL(0x50C) = 7.14999962f; REAL(0x520) = 0.00388888898f;
                 dir[0] = 331.0f; dir[1] = 104.0f; dir[2] = 145.0f;
-                if (func_00282E48(VEC(0x80), dir) < 10.0f) {
+                if (fast_vec_dist(VEC(0x80), dir) < 10.0f) {
                     REAL(0x4A8) += 0.7f; REAL(0x508) += 0.7f; REAL(0x50C) += 0.7f;
                 }
             }
@@ -833,42 +833,42 @@ s32 func_L00_002C42E0(s32 action, s32 animate) {
         }
         if (REAL(0x510) == 0.0f) REAL(0x510) = REAL(0x4A8) * 1.5f;
         if (!animate) goto finish;
-        if (WORD(0x2294) == 7) { func_L00_002D2168(7, 0, 5.0f); goto finish; }
-        else if (WORD(0x2294) == 0x6E) { func_L00_002D2168(7, 0, 5.0f); goto finish; }
-        else if (WORD(0x2294) == 0x81) { func_L00_002D2168(7, 0, 5.0f); goto finish; }
-        else if (WORD(0x2294) == 0x12) { func_L00_002D2168(0x6B, 1, -1.0f); goto finish; }
-        else if (WORD(0x2294) == 0x38) { func_L00_002D2168(0x43, 0, 4.0f); goto finish; }
-        else if (WORD(0x2294) == 0x66) { func_L00_002D2168(7, 0, 5.0f); goto finish; }
-        else if (WORD(0x2294) == 0x28) { func_L00_002D2168(0x4D, 4, 5.0f); goto finish; }
+        if (WORD(0x2294) == 7) { set_hero_animation(7, 0, 5.0f); goto finish; }
+        else if (WORD(0x2294) == 0x6E) { set_hero_animation(7, 0, 5.0f); goto finish; }
+        else if (WORD(0x2294) == 0x81) { set_hero_animation(7, 0, 5.0f); goto finish; }
+        else if (WORD(0x2294) == 0x12) { set_hero_animation(0x6B, 1, -1.0f); goto finish; }
+        else if (WORD(0x2294) == 0x38) { set_hero_animation(0x43, 0, 4.0f); goto finish; }
+        else if (WORD(0x2294) == 0x66) { set_hero_animation(7, 0, 5.0f); goto finish; }
+        else if (WORD(0x2294) == 0x28) { set_hero_animation(0x4D, 4, 5.0f); goto finish; }
         else if (WORD(0x2294) == 0x29) {
             s32 turn = 0x1E;
-            if (func_00283C80(REAL(0x98), func_00283248(REAL(0x5D0) - REAL(0x610), REAL(0x5D4) - REAL(0x614))) > 1.57079649f) turn = 0x1F;
-            func_L00_002D2168(turn, 0, 5.0f); goto finish;
+            if (FastDiffRots(REAL(0x98), func_00283248(REAL(0x5D0) - REAL(0x610), REAL(0x5D4) - REAL(0x614))) > 1.57079649f) turn = 0x1F;
+            set_hero_animation(turn, 0, 5.0f); goto finish;
         }
         else if (WORD(0x2294) == 9) {
-            animation_41 = 8; index = func_00283CF0(REAL(0xC38));
+            animation_41 = 8; index = FloatToInt(REAL(0xC38));
             if (func_L00_002A4EF0(objectSnapshot[0x42]) == 4) animation_41 = D_L00_001A7DE0[index];
-            func_L00_002D2168(animation_41, 0, 5.0f); goto finish;
+            set_hero_animation(animation_41, 0, 5.0f); goto finish;
         }
-        else if (WORD(0x2294) == 0x45) { func_L00_002D2168(7, 5, 5.0f); goto finish; }
-        else if (WORD(0x2294) == 10) { func_L00_002D2168(18, 0, 5.0f); goto finish; }
+        else if (WORD(0x2294) == 0x45) { set_hero_animation(7, 5, 5.0f); goto finish; }
+        else if (WORD(0x2294) == 10) { set_hero_animation(18, 0, 5.0f); goto finish; }
         else if (WORD(0x2294) == 0x10) {
             if (WORD(0x22A4) == 4 || (WORD(0x22A0) == 4 && WORD(0x1B8) < 7)) {
-                func_L00_002D2168(0x26, 0, 8.0f); SHORT(0x4AC) += 3; goto finish;
+                set_hero_animation(0x26, 0, 8.0f); SHORT(0x4AC) += 3; goto finish;
             }
-            func_L00_002D2168(0x26, 0, 5.0f); goto finish;
-        } else if (WORD(0x2294) == 0x1B) { func_L00_002D2168(0x22, 0, 4.0f); goto finish; }
-        else if (WORD(0x2294) == 0x89) { func_L00_002D2168(0x7D, 11, 9.0f); goto finish; }
-        else if (WORD(0x2294) == 0x48) { func_L00_002D2168(9, 0, 4.0f); goto finish; }
-        else if (WORD(0x2294) == 0x11) { frames = 7.0f; animation_41 = 0x23; { func_L00_002D2168(animation_41, 2, frames); goto finish; } }
-        else if (WORD(0x2294) == 0xD) { func_L00_002D2168(17, 0, 5.0f); goto finish; }
-        else if (WORD(0x2294) == 0xE) { func_L00_002D2168(0x16, 3, 7.0f); REAL(0xC20) = 0.8f; goto finish; }
-        else if (WORD(0x2294) == 0xF) { func_L00_002D2168(21, 0, 5.0f); goto finish; }
+            set_hero_animation(0x26, 0, 5.0f); goto finish;
+        } else if (WORD(0x2294) == 0x1B) { set_hero_animation(0x22, 0, 4.0f); goto finish; }
+        else if (WORD(0x2294) == 0x89) { set_hero_animation(0x7D, 11, 9.0f); goto finish; }
+        else if (WORD(0x2294) == 0x48) { set_hero_animation(9, 0, 4.0f); goto finish; }
+        else if (WORD(0x2294) == 0x11) { frames = 7.0f; animation_41 = 0x23; { set_hero_animation(animation_41, 2, frames); goto finish; } }
+        else if (WORD(0x2294) == 0xD) { set_hero_animation(17, 0, 5.0f); goto finish; }
+        else if (WORD(0x2294) == 0xE) { set_hero_animation(0x16, 3, 7.0f); REAL(0xC20) = 0.8f; goto finish; }
+        else if (WORD(0x2294) == 0xF) { set_hero_animation(21, 0, 5.0f); goto finish; }
         else if (WORD(0x2294) == 0xB) {
             s32 anim = WORD(0x4D4) + 28;
             if (D_001A7A40[5]) { if (anim == 28) anim = 29; else if (anim == 29) anim = 28; }
-            if (WORD(0x22A4) == 4) { func_L00_002D2168(anim, 1, 4.0f); SHORT(0x4AC) = 1; goto finish; }
-            func_L00_002D2168(anim, 0, 5.0f); goto finish;
+            if (WORD(0x22A4) == 4) { set_hero_animation(anim, 1, 4.0f); SHORT(0x4AC) = 1; goto finish; }
+            set_hero_animation(anim, 0, 5.0f); goto finish;
         }
         goto finish;
     case 0x13: case 0x14: case 0x15: case 0x1F: case 0x22: case 0x4D: case 0x83: case 0x93:
@@ -894,7 +894,7 @@ s32 func_L00_002C42E0(s32 action, s32 animate) {
             func_L00_002B75A0(8.0f, 1.047197699546814f, -1.0f); BITS(0xC00) = 0;
             if (animate) {
                 selected_14 = WORD(0x22A0) == 11 && WORD(0x22A8) < 42 ? 17 : 11;
-                func_L00_002D2168(0x2B, 4, (f32)selected_14);
+                set_hero_animation(0x2B, 4, (f32)selected_14);
                 animation_14 = func_L00_002ADE68(0);
                 if (func_L00_002B3248((u8 *)animation_14)) func_002A7470((u8 *)animation_14, 10, 4, selected_14 + 2);
             }
@@ -912,23 +912,23 @@ s32 func_L00_002C42E0(s32 action, s32 animate) {
             if (animate) {
                 selected_15 = PTR(0x2290)[0x43] == 0x1A ? 3 : 10;
                 if (WORD(0x22A0) == 1) selected_15 = 17;
-                func_L00_002D2168(0x1A, 0, (f32)selected_15); func_L00_002D2470(6, 21);
+                set_hero_animation(0x1A, 0, (f32)selected_15); func_L00_002D2470(6, 21);
             }
             goto finish;
         case 0x83:
             SHORT(0xBFC) = 3;
-            func_L00_0041E958(64.0f, 0.174532949924469f, 0.349065899848938f);
+            UpdateHeroAimTarget(64.0f, 0.174532949924469f, 0.349065899848938f);
             if (animate) {
                 selected_83 = PTR(0x2290)[0x43] == 0x1A ? 3 : 10;
                 if (WORD(0x22A0) == 1) selected_83 = 17;
-                func_L00_002D2168(0x1A, 0, (f32)selected_83);
+                set_hero_animation(0x1A, 0, (f32)selected_83);
             }
             goto finish;
         case 0x1F:
             if (WORD(0x1220)) {
                 func_L00_002D6900(19);
                 if (animate) {
-                    func_L00_002D2168(0x60, 4, -1.0f);
+                    set_hero_animation(0x60, 4, -1.0f);
                     func_002A7470(PTR(0x1220), 3, 4, -1);
                 }
                 func_L00_002B75A0(11.0f, 0.8726646900177002f, -1.0f);
@@ -953,11 +953,11 @@ s32 func_L00_002C42E0(s32 action, s32 animate) {
             else { current = 4; selected_13 = 7; }
             if (WORD(0xBE8) && mode < 2) {
                 if (BYTE(0x22C3)) angle_13 = func_L00_002B9B38(VEC(0xBC0), 0);
-                else angle_13 = func_00283C80(REAL(0xBEC), REAL(0x98));
-                selected_13 += func_00283CF0(angle_13 * 1.5f);
+                else angle_13 = FastDiffRots(REAL(0xBEC), REAL(0x98));
+                selected_13 += FloatToInt(angle_13 * 1.5f);
             }
             current /= 2;
-            func_L00_002D2168(mode + 0x17, current, (f32)selected_13);
+            set_hero_animation(mode + 0x17, current, (f32)selected_13);
             animation_13 = func_L00_002ADE68(0);
             if (func_L00_002B3248((u8 *)animation_13)) func_002A7470((u8 *)animation_13, mode + 3, current, selected_13);
         }
@@ -971,15 +971,15 @@ s32 func_L00_002C42E0(s32 action, s32 animate) {
                 row[0] == 0 && (f32)row[2] > REAL(0xC38)) m4d = (row[1] + 1) % 2;
             SHORT(0xBFC) = m4d + 7;
             func_L00_002B75A0(rate, 0.785398244857788f, 0.785398244857788f);
-            if (animate) func_L00_002D2168(m4d + 0xF, 1, rate);
+            if (animate) set_hero_animation(m4d + 0xF, 1, rate);
             goto finish; }
         case 0x22:
-            if (animate) func_L00_002D2168(0x2C, 7, 9.0f);
+            if (animate) set_hero_animation(0x2C, 7, 9.0f);
             if (WORD(0x1248) == 12 && PTR(0xBE0)) {
                 WORD(0xBE8) = 1;
                 REAL(0xBEC) = func_00283248(*(f32 *)(PTR(0xBE0) + 0x10) - REAL(0x80),
                                             *(f32 *)(PTR(0xBE0) + 0x14) - REAL(0x84));
-                func_00282CF0(VEC(0xBC0), PTR(0xBE0) + 0x10, VEC(0x80));
+                FastVecSub(VEC(0xBC0), PTR(0xBE0) + 0x10, VEC(0x80));
             }
             goto finish;
         }
@@ -994,7 +994,7 @@ s32 func_L00_002C42E0(s32 action, s32 animate) {
             u32 object;
             if (!animate) goto finish;
             still = kind == 0;
-            func_L00_002D2168(kind + 0x17, still, 5.0f);
+            set_hero_animation(kind + 0x17, still, 5.0f);
             object = func_L00_002ADE68(0);
             if (func_L00_002B3248((u8 *)object)) func_002A7470((u8 *)object, kind + 0xC, still, 5);
         }
@@ -1003,7 +1003,7 @@ s32 func_L00_002C42E0(s32 action, s32 animate) {
         WORD(0x229C) = 15; HALF(0xBFE) = 0;
         if (WORD(0x22A0) == 0x2A) SHORT(0xBFC) = SHORT(0xBFC) == 0; else SHORT(0xBFC) = 0;
         if (!animate) goto finish;
-        func_L00_002D2168(SHORT(0xBFC) + 0x4B, 0, 4.0f);
+        set_hero_animation(SHORT(0xBFC) + 0x4B, 0, 4.0f);
         {
             u32 object = func_L00_002ADE68(0);
             if (func_L00_002B3248((u8 *)object)) func_002A7470((u8 *)object, SHORT(0xBFC) + 0xC, 0, 4);
@@ -1011,31 +1011,31 @@ s32 func_L00_002C42E0(s32 action, s32 animate) {
         goto finish;
     case 0x77:
         WORD(0x229C) = 10; BITS(0x24A0) = 0;
-        REAL(0xBF0) = func_00283B98(REAL(0x98), 3.14159297943f);
-        func_00282D30(VEC(0xBD0), VEC(0), -1.0f); REAL(0x1B4) = 0.15f;
+        REAL(0xBF0) = FastAddRotations(REAL(0x98), 3.14159297943f);
+        FastVecScale(VEC(0xBD0), VEC(0), -1.0f); REAL(0x1B4) = 0.15f;
         if (!animate) goto finish;
-        frames = 8.0f; animation_43 = 0x29; { func_L00_002D2168(animation_43, 5, frames); goto finish; }
+        frames = 8.0f; animation_43 = 0x29; { set_hero_animation(animation_43, 5, frames); goto finish; }
     case 0x16:
         WORD(0x229C) = 7; BITS(0x24A0) = 0;
         func_L00_002B6118(0.5f); func_L00_002D6900(18); HALF(0x20E) = 45;
         COPY_VECTOR(0xF0, 0x120); func_002AC9F8((f32 *)VEC(0xF0), 0.1166666746f);
         hit_44 = func_002A9640(PTR(0x2290), 1, 0);
-        if (hit_44) func_L00_002A4EF8(func_00283CF0(*(f32 *)(hit_44 + 0x2C)));
-        else func_L00_002A4EF8(1);
+        if (hit_44) AdjustPlayerHealth(FloatToInt(*(f32 *)(hit_44 + 0x2C)));
+        else AdjustPlayerHealth(1);
         HALF(0x1DC) = 77;
         if (!animate) goto finish;
-        func_L00_002D2168(0x10, 3, -3.0f);
+        set_hero_animation(0x10, 3, -3.0f);
         *(f32 *)(PTR(0x2290) + 0x44) = D_L00_0025DB20[WORD(0xC30)][WORD(0xC34)++];
         goto finish;
     case 0x8C:
         WORD(0x229C) = 7; BITS(0x24A0) = 0; func_L00_002B6118(0.5f);
         BYTE(0x22BC) = 1; func_L00_002D6900(18);
         hit_45 = func_002A9640(PTR(0x2290), 8, 0);
-        if (hit_45) func_L00_002A4EF8(func_00283CF0(*(f32 *)(hit_45 + 0x2C)));
-        else func_L00_002A4EF8(1);
+        if (hit_45) AdjustPlayerHealth(FloatToInt(*(f32 *)(hit_45 + 0x2C)));
+        else AdjustPlayerHealth(1);
         HALF(0x1DC) = 77;
         if (!animate) goto finish;
-        func_L00_002D2168(0x96, 1, -3.0f);
+        set_hero_animation(0x96, 1, -3.0f);
         *(f32 *)(PTR(0x2290) + 0x44) = D_L00_0025DB20[WORD(0xC30)][WORD(0xC34)++];
         goto finish;
     case 0x65:
@@ -1043,102 +1043,102 @@ s32 func_L00_002C42E0(s32 action, s32 animate) {
         func_L00_002B9B88(7, 0);
         BITS(0x3A0) = 0; BITS(0x1B0) = 0; BITS(0x1B4) = 0; WORD(0x1188) = 0x68;
         if (!animate) goto finish;
-        func_L00_002D2168(0x6A, 0, 8.0f); goto finish;
+        set_hero_animation(0x6A, 0, 8.0f); goto finish;
     case 0x78:
         WORD(0x229C) = 25; HALF(0x1F0) = 10000; BITS(0x24A0) = 0;
         func_L00_002B9B88(7, 0);
         WORD(0x1188) = 0x68;
         if (!animate) goto finish;
-        func_L00_002D2168(0x6A, 0, 8.0f); goto finish;
+        set_hero_animation(0x6A, 0, 8.0f); goto finish;
     case 0x79:
         WORD(0x229C) = 20; REAL(0x334) = REAL(0x318); HALF(0x1F0) = 10000;
         WORD(0x24CC) = 0; BITS(0x24A0) = 0; func_L00_002B9B88(7, 0);
         if (!animate) goto finish;
-        func_L00_002D2168(0x6A, 0, 8.0f); goto finish;
+        set_hero_animation(0x6A, 0, 8.0f); goto finish;
     case 0x7A:
         WORD(0x229C) = 20; HALF(0x1F0) = 10000; REAL(0x334) = REAL(0x318);
         BITS(0x24A0) = 0; WORD(0x24CC) = 0;
         { u8 *moby = PTR(0xC18); *(TI128 *)(moby + 0x10) = *(TI128 *)VEC(0x80);
-        func_002E5CF8(7, 0, moby); }
+        PlayMobySound(7, 0, moby); }
         if (!animate) goto finish;
-        func_L00_002D2168(0x11, 0, 8.0f); goto finish;
+        set_hero_animation(0x11, 0, 8.0f); goto finish;
     case 0x3F:
         WORD(0x229C) = 0; BITS(0x24A0) = 0;
         if (BYTE(0x149A) && SHORT(0x34C) == 0) { func_L00_002C42E0(0x4E, 1); return 0; }
         if (!animate) goto finish;
-        func_L00_002D2168(0, 0, 9.0f); goto finish;
+        set_hero_animation(0, 0, 9.0f); goto finish;
     case 0x4B:
         WORD(0x229C) = 5; BITS(0x24A0) = 0;
         if (REAL(0x170) > 0.075f) func_L00_002B6118(0.075f / REAL(0x170));
         COPY_VECTOR(0xF0, 0x110);
         if (!animate) goto finish;
-        func_L00_002D2168(14, 0, 12.0f); goto finish;
+        set_hero_animation(14, 0, 12.0f); goto finish;
     case 0x41:
         WORD(0x229C) = 2; REAL(0xA84) = 0.0019444445f; BITS(0x24A0) = 0;
         COPY_VECTOR(0xF0, 0x120);
         if (!animate) goto finish;
-        func_L00_002D2168(4, 0, 8.0f); goto finish;
+        set_hero_animation(4, 0, 8.0f); goto finish;
     case 0x44:
         WORD(0x229C) = 2; BITS(0x24A0) = 0;
         if (!animate) goto finish;
-        func_L00_002D2168(4, 0, 8.0f); goto finish;
+        set_hero_animation(4, 0, 8.0f); goto finish;
     case 0x4E:
         WORD(0x229C) = 2; BITS(0x24A0) = 0;
         COPY_VECTOR(0xF0, 0x120);
         if (!animate) goto finish;
-        func_L00_002D2168(4, 0, 12.0f); goto finish;
+        set_hero_animation(4, 0, 12.0f); goto finish;
     case 0x42:
         WORD(0x229C) = 7; BITS(0x24A0) = 0;
         func_L00_002B6118(0.5f);
         COPY_VECTOR(0xF0, 0x120); func_002AC9F8((f32 *)VEC(0xF0), 0.083333336f);
-        func_L00_002A4EF8(1);
+        AdjustPlayerHealth(1);
         HALF(0x20E) = 45; HALF(0x1DC) = 50;
         if (!animate) goto finish;
-        func_L00_002D2168(6, 3, -3.0f);
+        set_hero_animation(6, 3, -3.0f);
         *(f32 *)(PTR(0x2290) + 0x44) = D_L00_0025DB20[WORD(0xC30)][WORD(0xC34)++];
         goto finish;
     case 0x40:
         if (BYTE(0x149A) && SHORT(0x34C) == 0) { func_L00_002C42E0(0x4E, 1); return 0; }
         WORD(0x229C) = 1; BITS(0x24A0) = 0;
-        REAL(0x1B4) = func_00282E20(VEC(0x120));
+        REAL(0x1B4) = vec_length_xy(VEC(0x120));
         if (WORD(0x22A0) == 3) BITS(0x1B4) = 0;
-        if (WORD(0x22A4) == 0) REAL(0x1B4) = func_00282E20(VEC(0x160));
+        if (WORD(0x22A4) == 0) REAL(0x1B4) = vec_length_xy(VEC(0x160));
         BYTE(0x40C) = 0; BYTE(0x40F) = 0;
         if (!animate) goto finish;
-        func_L00_002D2168(2, 0, 8.0f); goto finish;
+        set_hero_animation(2, 0, 8.0f); goto finish;
     case 0x43:
         WORD(0x229C) = 20; BITS(0x24A0) = 0; WORD(0x24CC) = 0;
         COPY_VECTOR(0x160, 0x120);
         if (!animate) goto finish;
-        func_L00_002D2168(5, 0, 12.0f); goto finish;
+        set_hero_animation(5, 0, 12.0f); goto finish;
     case 0x46:
         WORD(0x229C) = 3; BITS(0x24A0) = 13;
         REAL(0x57C) = 0.0033333334f; REAL(0x580) = REAL(0x88);
         if (WORD(0x22A4) == 4) { REAL(0x57C) = REAL(0x520); REAL(0x580) = REAL(0x490); }
         if (!animate) goto finish;
-        func_L00_002D2168(8, 14, 7.0f); goto finish;
+        set_hero_animation(8, 14, 7.0f); goto finish;
     case 0x47:
         WORD(0x229C) = 3; BITS(0x24A0) = 13;
         if (!animate) goto finish;
-        func_L00_002D2168(10, 0, 6.0f); goto finish;
+        set_hero_animation(10, 0, 6.0f); goto finish;
     case 0x49:
         WORD(0x229C) = 3; BITS(0x24A0) = 13;
         if (!animate) goto finish;
-        func_L00_002D2168(11, 0, 6.0f); goto finish;
+        set_hero_animation(11, 0, 6.0f); goto finish;
     case 0x4A:
         WORD(0x229C) = 3; BITS(0x24A0) = 13;
         if (!animate) goto finish;
-        func_L00_002D2168(12, 0, 6.0f); goto finish;
+        set_hero_animation(12, 0, 6.0f); goto finish;
     case 0x3E:
         WORD(0x229C) = 15; BITS(0x24A0) = 0;
         if (!WORD(0x640)) {
-            if (PTR(0x6C4)) { func_L00_002A4EF8(func_00283CF0(*(f32 *)(PTR(0x6C4) + 0x2C))); PTR(0x6C4) = 0; }
-            else func_L00_002A4EF8(1);
+            if (PTR(0x6C4)) { AdjustPlayerHealth(FloatToInt(*(f32 *)(PTR(0x6C4) + 0x2C))); PTR(0x6C4) = 0; }
+            else AdjustPlayerHealth(1);
         }
         func_L00_002B9B88(20, 0);
         if (WORD(0x24CC) < 1) {
-            angle_53 = func_00283B98(func_00283248(REAL(0xF0), REAL(0xF4)), 3.14159297943f);
-            angle_53 = func_00283B98(angle_53, func_002A78D8(0.523598849774f, 0.610865294933f));
+            angle_53 = FastAddRotations(func_00283248(REAL(0xF0), REAL(0xF4)), 3.14159297943f);
+            angle_53 = FastAddRotations(angle_53, func_002A78D8(0.523598849774f, 0.610865294933f));
             REAL(0x120) = func_00283180(angle_53) * REAL(0x644) * 0.7f;
             REAL(0x124) = func_00283198(angle_53) * REAL(0x644) * 0.7f; REAL(0x128) = 0.075f;
             if (WORD(0x640) > 15 && WORD(0x24CC) < 2) WORD(0x24CC) = 2;
@@ -1150,38 +1150,38 @@ s32 func_L00_002C42E0(s32 action, s32 animate) {
         BITS(0x674) = 0; func_00282C88((TI128 *)VEC(0xF0)); func_00282C88((TI128 *)VEC(0x110));
         REAL(0xF8) = 0.1833333373f;
         if (!animate) goto finish;
-        frames = -3.0f; animation_53 = 16; { func_L00_002D2168(animation_53, 2, frames); goto finish; }
+        frames = -3.0f; animation_53 = 16; { set_hero_animation(animation_53, 2, frames); goto finish; }
     case 0x1C:
         WORD(0x229C) = 9; BYTE(0x22BC) = 1; BITS(0x24A0) = 0;
-        func_L00_002D2168(func_L00_002A4E48(0), 0, 10.0f); goto finish;
+        set_hero_animation(func_L00_002A4E48(0), 0, 10.0f); goto finish;
     case 0x1D:
         BITS(0x24A0) = 0x51; WORD(0x229C) = 0;
         if (func_L00_002A4EF0(PTR(0x2290)[0x42]) == func_L00_002A4E48(0)) goto finish;
-        func_L00_002D2168(func_L00_002A4E48(0), 0, 5.0f); goto finish;
+        set_hero_animation(func_L00_002A4E48(0), 0, 5.0f); goto finish;
     case 0x1E:
         WORD(0x229C) = 9; BITS(0x24A0) = 0;
-        func_L00_002D2168(func_L00_002A4E48(0), 0, 10.0f); goto finish;
+        set_hero_animation(func_L00_002A4E48(0), 0, 10.0f); goto finish;
     case 0x6F:
         WORD(0x229C) = 9; BYTE(0x22BC) = 1; BITS(0x24A0) = 0;
-        func_L00_002AF7D0();
+        cancel_hero_item_animation();
         if (!animate) goto finish;
-        func_L00_002D2168(func_L00_002A4E48(0), 0, 10.0f); goto finish;
+        set_hero_animation(func_L00_002A4E48(0), 0, 10.0f); goto finish;
     case 0x26:
         WORD(0x229C) = 8; BITS(0x24A0) = 0;
-        func_L00_002D2168(func_L00_002A4E48(0), 0, 10.0f); goto finish;
+        set_hero_animation(func_L00_002A4E48(0), 0, 10.0f); goto finish;
     case 0x31:
         WORD(0x229C) = 9; BITS(0x24A0) = 0; BYTE(0x22B7) = 1;
         BYTE(0x22BD) = 1; BYTE(0x22BC) = 1; func_L00_00322EC8((Rac2Native_5b4b17178a13f443_SmallSlotReset128Owner *)VEC(0x1A30));
         if (!animate) goto finish;
-        func_L00_002D2168(func_L00_002A4E48(0), 0, -1.0f); goto finish;
+        set_hero_animation(func_L00_002A4E48(0), 0, -1.0f); goto finish;
     case 0x75:
         WORD(0x229C) = 9; BITS(0x24A0) = 0; BYTE(0x22B7) = 1; BYTE(0x22BC) = 1;
         func_00282C88((TI128 *)VEC(0xF0));
         if (!animate) goto finish;
-        func_L00_002D2168(11, 0, -1.0f); goto finish;
+        set_hero_animation(11, 0, -1.0f); goto finish;
     case 0x37:
         WORD(0x229C) = 9; BYTE(0x22B7) = 1; BYTE(0x22BC) = 1;
-        func_L00_002D2168(0x44, 2, 8.0f);
+        set_hero_animation(0x44, 2, 8.0f);
         {
             u8 *held = PTR(0x1220);
             if (func_L00_002B3248(held)) func_002A7470(held, 11, 2, 13);
@@ -1189,8 +1189,8 @@ s32 func_L00_002C42E0(s32 action, s32 animate) {
         goto finish;
     case 0x60: case 0x61:
         WORD(0x229C) = 24; BYTE(0x22BC) = 1;
-        func_L00_00322EC8((Rac2Native_5b4b17178a13f443_SmallSlotReset128Owner *)VEC(0x1A30)); func_L00_002AF7D0();
-        if (animate) func_L00_002D2168(func_L00_002A4E48(0), 0, -1.0f);
+        func_L00_00322EC8((Rac2Native_5b4b17178a13f443_SmallSlotReset128Owner *)VEC(0x1A30)); cancel_hero_item_animation();
+        if (animate) set_hero_animation(func_L00_002A4E48(0), 0, -1.0f);
         goto finish;
     default:
         goto finish;
@@ -1200,7 +1200,7 @@ finish:
     if (SHORT(0x348) == 0 && WORD(0x1298) == 0x13 && WORD(0x2304)) BITS(0x2320) = 1;
     if ((u32)(WORD(0x229C) - 13) > 2 && (WORD(0x2294) != 6 || WORD(0x22A0) != 0x24) &&
         WORD(0x1298) == 20 && WORD(0x2304)) BITS(0x2320) = 1;
-    if (WORD(0x229C) == 20) { func_L00_002AF7D0(); BYTE(0x22BC) = 1; }
+    if (WORD(0x229C) == 20) { cancel_hero_item_animation(); BYTE(0x22BC) = 1; }
     if ((!func_L00_002ADF80() || WORD(0x229C) == 18) &&
         (REAL(0x330) < D_L00_001B8C80.f148 || WORD(0x229C) == 0)) D_L00_001B8C80.i400 = 0;
     if (WORD(0x229C) != WORD(0x22A4)) func_L00_002A6708();

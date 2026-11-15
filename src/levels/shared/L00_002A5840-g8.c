@@ -45,9 +45,9 @@ void func_L00_002A5840(void) {
     int alpha, k, t3, red, blue, green, g_wave, r_wave, b_wave, period;
     float normalized, wave, amplitude;
     if (D_001A7A43)
-        func_002AA2E8(&D_L00_001A7CF8, 1.8f, 0.05f);
+        ApproachValue(&D_L00_001A7CF8, 1.8f, 0.05f);
     else
-        func_002AA2E8(&D_L00_001A7CF8, 1.0f, 0.05f);
+        ApproachValue(&D_L00_001A7CF8, 1.0f, 0.05f);
     h0 = (unsigned char *)&D_00189E20;
     if ((unsigned int)(h0[0x22B4] - 1) < 2)
         object = *(unsigned char **)(h0 + 0x2290);
@@ -63,17 +63,17 @@ void func_L00_002A5840(void) {
     blue = 56;
     if (*(int *)(g + 0x24CC) == 1) blue = green;
     period = 110;
-    normalized = func_00283CE0(period);
+    normalized = IntToFloat(period);
     normalized = (float)(D_L00_001B19C8 % period) / normalized;
     normalized = normalized + normalized;
     normalized = normalized * 3.1415927f;
     wave = func_00283198(normalized + -3.1415927f);
     amplitude = wave * 24.0f;
-    b_wave = func_00283CF0(amplitude) + 12;
+    b_wave = FloatToInt(amplitude) + 12;
     blue += b_wave;
-    k = func_00283CF0(wave * 48.0f);
+    k = FloatToInt(wave * 48.0f);
     g_wave = k + 24;
-    t3 = func_00283CF0(amplitude);
+    t3 = FloatToInt(amplitude);
     green = k + 160;
     r_wave = t3 + 12;
     red = t3 + 76;
@@ -82,14 +82,14 @@ void func_L00_002A5840(void) {
         int max = 40;
         int age = *(short *)(g + 0x20E);
         if (max < age)
-            blend = func_00283CE0(45 - *(short *)(g + 0x20E)) / func_00283CE0(5);
+            blend = IntToFloat(45 - *(short *)(g + 0x20E)) / IntToFloat(5);
         if (*(short *)(g + 0x20E) < 20)
-            blend = func_00283CE0(*(short *)(g + 0x20E)) / func_00283CE0(20);
-        blue -= func_00283CF0((float)b_wave * blend);
-        green -= func_00283CF0((float)g_wave * blend);
-        red -= func_00283CF0((float)r_wave * blend);
-        blue += func_00283CF0(blend * 112.0f);
-        green -= func_00283CF0(blend * 72.0f);
+            blend = IntToFloat(*(short *)(g + 0x20E)) / IntToFloat(20);
+        blue -= FloatToInt((float)b_wave * blend);
+        green -= FloatToInt((float)g_wave * blend);
+        red -= FloatToInt((float)r_wave * blend);
+        blue += FloatToInt(blend * 112.0f);
+        green -= FloatToInt(blend * 72.0f);
     }
     {
         int color = (alpha << 24) | (red << 16);
@@ -99,7 +99,7 @@ void func_L00_002A5840(void) {
     }
     g2 = (unsigned char *)&D_00189E20;
     if (g2[0x22B4] != 0 || *(int *)(g2 + 0x2294) == 124) return;
-    if (func_00282978((short *)(g2 + 0x118C)) && object[0x43] == 1) {
+    if (FastDecTimer((short *)(g2 + 0x118C)) && object[0x43] == 1) {
         *(short *)(g2 + 0x118C) = func_002A7820(50, 200);
         *(short *)(g2 + 0x118E) = 1;
     }
@@ -116,12 +116,12 @@ void func_L00_002A5840(void) {
         const Vector *scale = D_L00_001A7EA0;
         for (i = 0; i < 4; scale++, i++) {
             if (!D_00189E20.effects[i].attached) {
-                func_0029F978(object, D_L00_001A7F20[i], (unsigned char *)&D_00189E20.effects[i]);
+                AttachManipulator(object, D_L00_001A7F20[i], (unsigned char *)&D_00189E20.effects[i]);
                 D_00189E20.effects[i].absolute = 1;
                 qcopy(&D_00189E20.effects[i].quat, &D_L00_001A7E60[i]);
                 qcopy(&D_00189E20.effects[i].scale, scale);
                 qcopy(&D_00189E20.effects[i].translation, &D_L00_001A7EE0[i]);
-                func_00282D30(&D_00189E20.effects[i].translation, &D_00189E20.effects[i].translation, *(float *)(object + 0x2C));
+                FastVecScale(&D_00189E20.effects[i].translation, &D_00189E20.effects[i].translation, *(float *)(object + 0x2C));
             }
         }
         for (j = 0; j < 4; j++)

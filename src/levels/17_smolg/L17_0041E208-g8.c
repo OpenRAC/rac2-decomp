@@ -76,7 +76,7 @@ void func_L17_0041E208(s32 obj) {
         func_L01_003128C0(obj);
         break;
     case 1:
-        if (func_002ACBC8(D_00189E20.obj, I(data, 0x120)) && func_00288AA0(D_L17_001BFDC0, 0x89)) {
+        if (IsPointInCuboid(D_00189E20.obj, I(data, 0x120)) && func_00288AA0(D_L17_001BFDC0, 0x89)) {
             func_L01_003246D0(obj);
             func_00288BE8(D_L17_001BFDC0);
             func_002A7750(obj, 2, -1);
@@ -157,7 +157,7 @@ void func_L17_0041E208(s32 obj) {
                 func_002AD7B8(0x12);
                 func_002AF0A8(0x12);
                 if (I(data, 0x124) != -1) B((I(data, 0x124) << 8) + D_L17_001B2C1C, 0xbc) = 1;
-                func_0029B3E0(0, -1);
+                MemcardSave(0, -1);
 destroy:
                 func_0029F338(obj);
                 return;
@@ -167,8 +167,8 @@ destroy:
     }
 
     if (B(obj, 0x20)) {
-        if (!B(obj, 0x43) && func_00282978(data + 0x11e))
-            H(data, 0x11e) = func_00283CF0(func_002A7878(1200.f, 2400.f));
+        if (!B(obj, 0x43) && FastDecTimer(data + 0x11e))
+            H(data, 0x11e) = FloatToInt(func_002A7878(1200.f, 2400.f));
         else if ((B(obj, 0x60) & 2) && B(obj, 0x43))
             func_002A7470(obj, 0, 0, 10);
     }
@@ -177,21 +177,21 @@ destroy:
     active = 0;
     if (!B(obj, 0x43)) {
         active = 1;
-        if (func_00282E80(obj + 0x10, D_00189E20.obj) < 8.f
-            && func_00283C80(F(obj, 0xf8), func_00283248(D_00189E20.pos.f[0] - F(obj, 0x10),
+        if (vec_distance_xy(obj + 0x10, D_00189E20.obj) < 8.f
+            && FastDiffRots(F(obj, 0xf8), func_00283248(D_00189E20.pos.f[0] - F(obj, 0x10),
                                                          D_00189E20.pos.f[1] - F(obj, 0x14))) < 1.5707964897155762f) {
-            if (func_00282DF0(D_00189E20.obj + 0x90) > .01f) I(data, 0x114) = 120;
+            if (FastVecLength(D_00189E20.obj + 0x90) > .01f) I(data, 0x114) = 120;
             else func_00282948(data + 0x114);
         } else if (I(data, 0x114)) {
             I(data, 0x114) = 0;
             qcopy((void *)(data + 0x100), &D_00189E20.pos);
         }
         if (func_00282948(data + 0x118)) {
-            I(data, 0x118) = func_00283CF0(func_002A7878(180.f, 300.f));
-            ang = func_00283B98(F(obj, 0xf8), func_002A7878(-90.f, 90.f) * 0.01745329424738884f);
+            I(data, 0x118) = FloatToInt(func_002A7878(180.f, 300.f));
+            ang = FastAddRotations(F(obj, 0xf8), func_002A7878(-90.f, 90.f) * 0.01745329424738884f);
             pitch = func_002A7878(0.f, 30.f) * 0.01745329424738884f;
             func_002AF000(data + 0x100, 6.f, ang, pitch);
-            func_00282CC0(data + 0x100, data + 0x100, obj + 0x10);
+            FastVecAdd(data + 0x100, data + 0x100, obj + 0x10);
         }
         if (I(data, 0x114)) {
             qcopy(&target, &D_00189E20.pos);
@@ -204,9 +204,9 @@ destroy:
     if (active) {
         qcopy(&raised, (void *)(obj + 0x10));
         raised.f[2] += 2.f;
-        func_00282CF0(&delta, &target, &raised);
-        yaw = func_00283BE0(func_00283248(delta.f[0], delta.f[1]), F(obj, 0xf8));
-        pitch = -func_00283248(func_00282E20(&delta), delta.f[2]);
+        FastVecSub(&delta, &target, &raised);
+        yaw = fast_subtract_rotations(func_00283248(delta.f[0], delta.f[1]), F(obj, 0xf8));
+        pitch = -func_00283248(vec_length_xy(&delta), delta.f[2]);
         if (yaw > 1.5707964897155762f) yaw = 1.5707964897155762f;
         else if (yaw < -1.5707964897155762f) yaw = -1.5707964897155762f;
         if (pitch > .52359885f) pitch = .52359885f;

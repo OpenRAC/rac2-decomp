@@ -24,7 +24,7 @@ void func_L00_003851A0(void *unused, void *source)
         float scale = 0.01666666753590107f;
         int state, random;
         func_002A7A00(buffer, 0.0f, 0.0333000011742115f);
-        func_00282CC0(buffer, buffer, source);
+        FastVecAdd(buffer, buffer, source);
         func_002A7A00(second, D_L00_001AEE70 * scale, D_L00_001AEE74 * scale);
         state = (unsigned char)func_002A7820(D_L00_001AEE90, D_L00_001AEE94);
         random = (unsigned char)func_002A77E0(255);

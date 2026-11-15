@@ -1,5 +1,5 @@
 /* func_L00_004079C8 needs -G64 -Wa,-G64: its 64-byte corner table D_L00_001B0F20 is reached
-   through $gp. Same packet layout as func_L00_00407C18 and func_L00_00396078. The packet's GS
+   through $gp. Same packet layout as DrawTwoPassCameraQuad and func_L00_00396078. The packet's GS
    registers are set in RAC1's order (texture, flags, mode, primitive); the record is reached by
    pointer arithmetic (product + base, as retail adds them) and the colour is masked in the
    loop, where loop.c hoists the mask into the preheader as retail does. */
@@ -48,7 +48,7 @@ void func_L00_004079C8(void)
     unsigned int color, c;
     int i, j;
 
-    packet.regs[1] = func_0027C878(8);
+    packet.regs[1] = GetEffectTextureDescriptor(8);
     packet.regs[3] = 0x8000000048ULL;
     packet.regs[2] = 0xFF9000000260ULL;
     packet.regs[0] = 0;
@@ -57,20 +57,20 @@ void func_L00_004079C8(void)
     color = (D_L00_00262570 + D_001395B0)->active ? D_L00_001B0EC0 : D_L00_001B0EBC;
     for (i = 0; i < 3; i++) {
         if (D_L00_001B2D30[i]) {
-            c = (color & 0xFFFFFF) | (func_00283CF0(D_L00_001B2D00[i]) << 24);
+            c = (color & 0xFFFFFF) | (FloatToInt(D_L00_001B2D00[i]) << 24);
             packet.colours[0] = packet.colours[1] = packet.colours[2] = packet.colours[3] = c;
             qcopy(&basis[3], &D_L00_001B2C90[i]);
             qcopy(&basis[0], &D_L00_001B2CC0[i]);
-            func_00282D30(&basis[2], &D_0018A0E0, -1.0f);
-            func_00282DD8(&basis[1], &basis[0], &basis[2]);
-            func_00282F20(&basis[1], &basis[1], 1.0f);
-            func_00282DD8(&basis[2], &basis[1], &basis[0]);
+            FastVecScale(&basis[2], &D_0018A0E0, -1.0f);
+            FastVecCross(&basis[1], &basis[0], &basis[2]);
+            vec_scale_to_length(&basis[1], &basis[1], 1.0f);
+            FastVecCross(&basis[2], &basis[1], &basis[0]);
             corner = D_L00_001B0F20;
             for (j = 3; j >= 0; corner++, j--) {
-                func_00282D30(&vertex, corner, D_L00_001B2D20[i]);
-                func_002830C0(&packet.points[3 - j], &vertex, basis);
+                FastVecScale(&vertex, corner, D_L00_001B2D20[i]);
+                transform_vector(&packet.points[3 - j], &vertex, basis);
             }
-            func_00280B90(&packet, 0, 0);
+            draw_world_quad(&packet, 0, 0);
         }
     }
 }

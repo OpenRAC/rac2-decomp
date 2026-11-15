@@ -46,7 +46,7 @@ void func_L05_004276E8(char *object, char *state, float *pos)
         p.scale = D_L05_001B1538;
     p.one = 1;
     qcopy(&p.pos, state);
-    func_00282F20(&p, &p, 1.0f);
+    vec_scale_to_length(&p, &p, 1.0f);
     p.pos.f[3] = 5627.925f;
     p.type = 3;
     p.subtype = 2;
@@ -66,7 +66,7 @@ void func_L05_004276E8(char *object, char *state, float *pos)
             b = func_002A7940();
             func_002AF000(&direction, 0.050000004f, a, b);
             spin = func_002A7820(-3, 3);
-            particle = func_002BDCE8(pos, 0.0f, 1.0f, 1.0f, speed * 210000.0f, spin,
+            particle = SpawnSpinningSparkParticle(pos, 0.0f, 1.0f, 1.0f, speed * 210000.0f, spin,
                                      &direction, 0x7fffffff, 0);
             if (particle) {
                 *(short *)(particle + 0xA) = 120;

@@ -98,7 +98,7 @@ void func_L23_0041A7A0(char *object) {
         D_L23_001B378C = D_L23_001B159C;
         D_L23_001B15A0 = func_00282C48(D_L23_001B15A0);
         D_L23_001B3788 = D_L23_001B15A4;
-        func_002E5CF8(5, 0, object);
+        PlayMobySound(5, 0, object);
     } else {
         if (D_L23_001B3788) {
             func_00282948(&D_L23_001B3788);
@@ -112,7 +112,7 @@ void func_L23_0041A7A0(char *object) {
         }
     }
     if (D_L23_001B1560) func_L23_0041A648(object);
-    if (D_L23_001B1418 == -1) D_L23_001B1418 = func_002E5CF8(1, 4, object);
+    if (D_L23_001B1418 == -1) D_L23_001B1418 = PlayMobySound(1, 4, object);
     if (D_L23_001B1598 * 0.5f < D_L23_001B378C) {
         char *joint;
         if (D_L23_001B146C != -1) func_00291450(D_L23_001B146C);
@@ -129,27 +129,27 @@ void func_L23_0041A7A0(char *object) {
     qcopy_nc(&local.axes[1],(object + 0xD0));
     qcopy_nc(&local.axes[2],(object + 0xE0));
     random = func_002A7878(0.98f, 1.02f);
-    *(float *)(state + 0x380) = func_00283B98(*(float *)(state + 0x380), D_L23_001B1578 * random * 0.00029088825f);
+    *(float *)(state + 0x380) = FastAddRotations(*(float *)(state + 0x380), D_L23_001B1578 * random * 0.00029088825f);
     qzero_nc(&local.euler);
     ((float *)&local.euler)[2] = *(float *)(state + 0x380);
-    func_002833F0((char *)local.matrix, (char *)&local.euler);
-    func_00283738((char *)local.axes, (char *)local.axes, (char *)local.matrix);
+    euler_rotation_basis((char *)local.matrix, (char *)&local.euler);
+    multiply_matrix3x3((char *)local.axes, (char *)local.axes, (char *)local.matrix);
     qcopy_nc(&local.scaled[0],&local.axes[0]);
     qcopy_nc(&local.scaled[1],&local.axes[1]);
-    func_00282D30((char *)&local.scaled[0], (char *)&local.scaled[0], D_L23_001B36A4);
-    func_00282D30((char *)&local.scaled[1], (char *)&local.scaled[1], D_L23_001B36A4);
+    FastVecScale((char *)&local.scaled[0], (char *)&local.scaled[0], D_L23_001B36A4);
+    FastVecScale((char *)&local.scaled[1], (char *)&local.scaled[1], D_L23_001B36A4);
     qcopy_nc(&local.vertex[0],&local.scaled[0]);
-    func_00282D30((char *)&local.vertex[4], (char *)&local.vertex[0], -1.0f);
-    func_00282CC0((char *)&local.vertex[1], (char *)&local.scaled[0], (char *)&local.scaled[1]);
-    func_00282D30((char *)&local.vertex[1], (char *)&local.vertex[1], 0.5f);
+    FastVecScale((char *)&local.vertex[4], (char *)&local.vertex[0], -1.0f);
+    FastVecAdd((char *)&local.vertex[1], (char *)&local.scaled[0], (char *)&local.scaled[1]);
+    FastVecScale((char *)&local.vertex[1], (char *)&local.vertex[1], 0.5f);
     qcopy_nc(&local.vertex[2],&local.scaled[1]);
-    func_00282CC0((char *)&local.vertex[3], (char *)&local.scaled[1], (char *)&local.vertex[4]);
-    func_00282D30((char *)&local.vertex[3], (char *)&local.vertex[3], 0.5f);
-    func_00282D30((char *)&local.vertex[5], (char *)&local.vertex[1], -1.0f);
-    func_00282D30((char *)&local.vertex[6], (char *)&local.vertex[2], -1.0f);
-    func_00282D30((char *)&local.vertex[7], (char *)&local.vertex[3], -1.0f);
+    FastVecAdd((char *)&local.vertex[3], (char *)&local.scaled[1], (char *)&local.vertex[4]);
+    FastVecScale((char *)&local.vertex[3], (char *)&local.vertex[3], 0.5f);
+    FastVecScale((char *)&local.vertex[5], (char *)&local.vertex[1], -1.0f);
+    FastVecScale((char *)&local.vertex[6], (char *)&local.vertex[2], -1.0f);
+    FastVecScale((char *)&local.vertex[7], (char *)&local.vertex[3], -1.0f);
     for (i = 0; i < 8; i++) {
-        func_00282CC0((char *)&local.vertex[i], (char *)&local.vertex[i], (char *)&D_L23_001B37A0);
+        FastVecAdd((char *)&local.vertex[i], (char *)&local.vertex[i], (char *)&D_L23_001B37A0);
         func_L23_00418650((char *)&local.vertex[i], D_L23_001B157C);
         func_L23_0041AFE8(object, (char *)&D_L23_001B37A0, (char *)&local.vertex[i], D_L23_002593E0[i], D_L23_00259320[i]);
     }
@@ -175,11 +175,11 @@ void func_L23_0041A7A0(char *object) {
         }
     }
     if (D_L23_001B378C != D_L23_001B1598) return;
-    if (func_00282E48((char *)&D_00189E20.position, (char *)&D_L23_001B3760) < D_L23_001B1500) {
+    if (fast_vec_dist((char *)&D_00189E20.position, (char *)&D_L23_001B3760) < D_L23_001B1500) {
         if ((*(float *)(state + 0x5C0) < D_L23_001B1504) && !*(int *)(state + 0x5C4)) {
-            func_00282D30((char *)&local.blast, D_00189E20.object + 0xE0, 3.0f);
-            func_00282CC0((char *)&local.blast, (char *)&local.blast, (char *)&D_00189E20.position);
-            func_0032C700(&local.blast, 1, 35, 20, 20, 15, 25, 1, 2.5f, 20.0f, 0, 1, 0, 0);
+            FastVecScale((char *)&local.blast, D_00189E20.object + 0xE0, 3.0f);
+            FastVecAdd((char *)&local.blast, (char *)&local.blast, (char *)&D_00189E20.position);
+            SpawnExplosion(&local.blast, 1, 35, 20, 20, 15, 25, 1, 2.5f, 20.0f, 0, 1, 0, 0);
             local.position = *(Quad *)(object + 16);
             func_L23_0041E5B0((unsigned char *)object, 3, (int)D_L23_001B1508, &local.position, 0, 1);
             *(int *)(state + 0x5C4) = 25;
@@ -199,7 +199,7 @@ void func_L23_0041A7A0(char *object) {
         /* contactIndex + -1, not - 1: the negative index wraps in sizetype, so table-16 stays its own
          * constant and cse does not rebuild it from the table address (use_related_value). */
         for (contactIndex = 1; contactIndex < 3; contactIndex++) {
-            func_002761F8(&D_L23_002593E0[0][contactIndex + -1], &D_L23_002593E0[0][contactIndex], 0, 0, &hit);
+            CollLine(&D_L23_002593E0[0][contactIndex + -1], &D_L23_002593E0[0][contactIndex], 0, 0, &hit);
         }
     }
 }

@@ -54,13 +54,13 @@ void func_L00_003B5BF8(unsigned char *object)
     func_L00_003B6158(object);
     if(D_00189E20.field1500 || D_00189E20.field2294==29 || D_00189E20.field2294==1) {
         unsigned int color;
-        if(F(ctx,0xC)>0.0f && func_L00_002D4040(-1)) color=0x600000FF;
+        if(F(ctx,0xC)>0.0f && get_ammo(-1)) color=0x600000FF;
         else color=0x600FFF0F;
         func_00273318(object,1.0f,color,0,38,0.0f,-1,90.0f,4);
     }
     switch(object[0x20]) {
     case 0: {
-        other=func_L00_00329E90(object,func_L00_003B60E8,&existing);
+        other=AcquireEntitySlot(object,func_L00_003B60E8,&existing);
         state->data=other;
         if(!existing) {
             cursor=func_L00_0032A088(H(object,0xAA),other);
@@ -93,20 +93,20 @@ void func_L00_003B5BF8(unsigned char *object)
         if(object[0x20]==1) {
             if(func_002829D8((float *)(ctx+0xC)) && allowed &&
                (D_00138320 & D_00189E20.field1230) && D_00189E20.field1240>=23 &&
-               (D_00189E20.field1500 || D_00189E20.field2294==1 || D_00189E20.field2294==29) && func_L00_002D4040(22)) {
+               (D_00189E20.field1500 || D_00189E20.field2294==1 || D_00189E20.field2294==29) && get_ammo(22)) {
                 { WeaponEntry *w=&D_L00_00262570[D_0013957E];
                 F(ctx,0xC)=1.0f/w->rate; }
                 triggered=1;
             }
             secondary=0;
-            if(D_00189E20.field2294==0x83 && !D_00189E20.fieldc2c && func_L00_002B3998(33.0f)) secondary=func_L00_002D4040(22)!=0;
+            if(D_00189E20.field2294==0x83 && !D_00189E20.fieldc2c && func_L00_002B3998(33.0f)) secondary=get_ammo(22)!=0;
             if(D_00189E20.field229c==4 && allowed && !D_00189E20.field49c &&
-               F(ctx,0xC)==0.0f && (D_00138320&0x20) && D_00189E20.field1240>=23 && func_L00_002D4040(22)) {
-                func_L00_002AF568();
+               F(ctx,0xC)==0.0f && (D_00138320&0x20) && D_00189E20.field1240>=23 && get_ammo(22)) {
+                start_equipped_item_animation();
                 other=*(char **)((char *)&D_00189E20+0xE98);
                 if(other) {
                     F(other,8)=0.0f;
-                    func_L00_00311080(D_00189E20.field2290,other,D_00189E20.field24b0,1,1,1);
+                    initialize_moby_animation_blend(D_00189E20.field2290,other,D_00189E20.field24b0,1,1,1);
                 }
                 object[0x20]=2;
                 { WeaponEntry *w=&D_L00_00262570[D_0013957E];
@@ -115,7 +115,7 @@ void func_L00_003B5BF8(unsigned char *object)
             }
         } else if(func_00282948((int *)(ctx+0x10))) {finished=1;object[0x20]=1;}
         if(triggered || secondary || finished) {
-            func_L00_002D3F30(-1,1);func_002E5CF8(2,0,object);
+            func_L00_002D3F30(-1,1);PlayMobySound(2,0,object);
             result=func_L00_0041C2D0(object,object+0x10,triggered,*(void **)ctx,I(ctx,0x14),1);
             if(result) *(void **)(result+0xB8)=object;
         }

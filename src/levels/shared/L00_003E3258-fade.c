@@ -39,7 +39,7 @@ void func_L00_003E7C88(void) {
                 int callbacks = (int)&base->callback;
                 void (**callback)(char *) = (void (**)(char *))(i * 32 + callbacks);
                 if (*callback) {
-                    func_002A0488(o, p->rgb[0], p->rgb[1], p->rgb[2]);
+                    set_moby_color(o, p->rgb[0], p->rgb[1], p->rgb[2]);
                     *(unsigned char *)(o + 35) = 128;
                     *(unsigned short *)(o + 52) &= ~2;
                     (*callback)(o);

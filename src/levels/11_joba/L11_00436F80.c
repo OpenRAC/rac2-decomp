@@ -52,17 +52,17 @@ void func_L11_00436F80(char *obj)
     char *p;
     func_L11_004375B8(obj);
     qcopy(target,s+0x50);
-    func_00282E80(obj+0x10,(char *)target);
+    vec_distance_xy(obj+0x10,(char *)target);
     { float x=target[0], y=target[1];
       float ox=*(float *)(obj+0x10), oy=*(float *)(obj+0x14);
       x-=ox;
       y-=oy;
-      func_00283C80(*(float *)(obj+0xF8),func_00283248(x,y)); }
+      FastDiffRots(*(float *)(obj+0xF8),func_00283248(x,y)); }
 
     switch (*(unsigned char *)(obj+0x95)) {
     case 0: break;
     case 1:
-        if (!func_373978(obj,*(int *)(s+0x38C))) *(int *)(s+0x38C)=func_002E5CF8(0,4,obj);
+        if (!func_373978(obj,*(int *)(s+0x38C))) *(int *)(s+0x38C)=PlayMobySound(0,4,obj);
         break;
     }
     switch (*(unsigned char *)(obj+0x20)) {
@@ -73,8 +73,8 @@ void func_L11_00436F80(char *obj)
             p=*(char **)(s+0x324);
             qcopy(obj+0x10,p+0x10);
             *(float *)(obj+0xF8)=func_00283248(*(float *)(p+0x20)-*(float *)(obj+0x10),*(float *)(p+0x24)-*(float *)(obj+0x14));
-            func_002833F0(obj+0xC0,obj+0xF0);
-            func_L11_00438248(obj);
+            euler_rotation_basis(obj+0xC0,obj+0xF0);
+            LayOutVerletChain(obj);
         } else if (func_L11_004390D0(obj)==1) func_002A7750(obj,3,-1);
         break;
     case 3:
@@ -117,12 +117,12 @@ void func_L11_00436F80(char *obj)
             if (*(unsigned char *)(obj+0x43)!=4) func_002A7470(obj,4,0,10);
         }
         if (*(unsigned short *)(obj+0x96)>10) {
-            func_00282CF0(direction,(float *)D_L11_001BA8C0,(float *)(obj+0x10));
-            func_00282F20((char *)direction,(char *)direction,0.5f);
+            FastVecSub(direction,(float *)D_L11_001BA8C0,(float *)(obj+0x10));
+            vec_scale_to_length((char *)direction,(char *)direction,0.5f);
             qcopy(pos,s+0x100);
             func_L11_00439640(obj,(char *)pos);
             func_002A7A00(random,0.03333333507180214f,0.06666667014360428f);
-            func_00282CC0((char *)velocity,(char *)direction,(char *)random);
+            FastVecAdd((char *)velocity,(char *)direction,(char *)random);
                 count=0;
             func_002B0A68(obj,1,velocity,3,6,3,6,255);
             for (i=0;i<10;i++) {
@@ -130,7 +130,7 @@ void func_L11_00436F80(char *obj)
                     if (count>=4) {
                         qcopy(pos,s+0x100+i*16);
                         func_002A7A00(random,0.1666666716337204f,0.3333333432674408f);
-                        func_00282CC0((char *)velocity,(char *)direction,(char *)random);
+                        FastVecAdd((char *)velocity,(char *)direction,(char *)random);
                         func_002B0A68(CHILD(obj,i),3,velocity,3,6,3,6,255);
                         func_L11_00439640(obj,(char *)pos);
                         func_L11_0043AB28(CHILD(obj,i));
@@ -145,7 +145,7 @@ void func_L11_00436F80(char *obj)
             }
             qcopy(pos,s+0x1B0);
             func_002A7A00(random,0.3333333432674408f,0.5f);
-            func_00282CC0((char *)velocity,(char *)direction,(char *)random);
+            FastVecAdd((char *)velocity,(char *)direction,(char *)random);
             func_002B0A68((char *)(D_L11_001B359C+(*(int *)(*(char **)(obj+0x68)+0x358)<<8)),7,velocity,3,6,3,6,255);
             func_L11_00439640(obj,(char *)pos);
             func_L02_003FC248(obj,0,-1);

@@ -83,14 +83,14 @@ void func_L03_003CF0C0(char *obj)
             if ((*cell & 7) != 7)
                 ++*cell;
         }
-        func_002E5CF8(0, 0, obj);
+        PlayMobySound(0, 0, obj);
         func_00282C98(velocity);
         if (collision)
             func_00282F70(target, collision + 0x10, D_L03_001B0460 * 0.0166666675f);
         else
             func_00282F70(target, D_00189E20.position, D_L03_001B0460 * 0.0166666675f);
         target[2] = D_L03_001B0464 * 0.0166666675f;
-        func_00282DD8(position, velocity, target);
+        FastVecCross(position, velocity, target);
         value = func_00283198(D_L03_001B0468 * 0.000290888245f);
         func_002ACE78(position, position, value * 0.5f);
         func_00273978(obj, 0, -1, target, position, 255, 15.0f);
@@ -99,14 +99,14 @@ void func_L03_003CF0C0(char *obj)
         break;
     case 2:
         func_00282C98(target);
-        value = func_00282DB0(obj + 0xE0, target);
+        value = FastVecDot(obj + 0xE0, target);
         if ((D_L03_001B2548 & 3) == (((int)obj >> 8) & 3) && value < 0.9f && value > 0.1f) {
             int kind;
             char *child;
 
             i = func_002A77E0(4);
-            func_00283098(position, D_L03_001B0470 + (i << 4), obj + 0xC0);
-            func_00282CC0(position, position, obj + 0x10);
+            matrix_mul_vec3(position, D_L03_001B0470 + (i << 4), obj + 0xC0);
+            FastVecAdd(position, position, obj + 0x10);
             kind = 0x9D7;
             if (func_002A77E0(2))
                 kind = 0x9D4;
@@ -115,9 +115,9 @@ void func_L03_003CF0C0(char *obj)
             temporary[1] = func_002A78D8(0, 2);
             temporary[2] = func_002A7878(4, 8);
             *(Quad *)velocity = *(Quad *)temporary;
-            value = func_00282DF0(velocity);
-            func_00282F20(velocity, velocity, value * 0.0166666675f);
-            func_00283098(velocity, velocity, obj + 0xC0);
+            value = FastVecLength(velocity);
+            vec_scale_to_length(velocity, velocity, value * 0.0166666675f);
+            matrix_mul_vec3(velocity, velocity, obj + 0xC0);
             *(Quad *)angles = 0;
             angles[0] = func_002A7940();
             angles[1] = func_002A7940();
@@ -127,7 +127,7 @@ void func_L03_003CF0C0(char *obj)
                 func_002A78D8(45, 180) * 0.000290888245f, 20.0f);
             if (child) {
                 *(void (**)(char *))(child + 0x64) = func_L03_003D0300;
-                func_002E5CF8(1, 0, obj);
+                PlayMobySound(1, 0, obj);
             }
         }
         if (func_00273B70(obj))
@@ -146,21 +146,21 @@ void func_L03_003CF0C0(char *obj)
         func_002B0A68(obj, 0x1FF, D_L03_001A8F20, 255, 3.0f, 5.0f, 5.0f, 10.0f);
         *(Quad *)target = 0;
         target[2] = 0.5f;
-        func_00283098(target, target, obj + 0xC0);
-        func_00282CC0(target, target, obj + 0x10);
+        matrix_mul_vec3(target, target, obj + 0xC0);
+        FastVecAdd(target, target, obj + 0x10);
         for (i = 0x13; i >= 0; --i) {
             int kind;
             char *child;
 
             func_002A7A00(position, 0, 0.5f);
-            func_00282CC0(position, position, target);
+            FastVecAdd(position, position, target);
             *(Quad *)temporary = 0;
             temporary[0] = func_002A78D8(0, 2);
             temporary[1] = func_002A78D8(0, 2);
             temporary[2] = func_002A7878(5, 12);
             *(Quad *)velocity = *(Quad *)temporary;
-            value = func_00282DF0(velocity);
-            func_00282F20(velocity, velocity, value * 0.0166666675f);
+            value = FastVecLength(velocity);
+            vec_scale_to_length(velocity, velocity, value * 0.0166666675f);
             kind = 0x9D7;
             if (func_002A77E0(2))
                 kind = 0x9D4;

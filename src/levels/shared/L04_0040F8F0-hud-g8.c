@@ -124,7 +124,7 @@ tick:
     }
     angle = 0.56217057f;
     D_L04_001BDB80.tangent = func_00283198(angle) / func_00283180(angle);
-    func_0027AB40();
+    UpdateViewContext();
     flag = *(s32 *)(state + 0x320);
     if (flag == 1) {
         lap = func_L04_0040A1D0(D_L04_001B090C);
@@ -133,13 +133,13 @@ tick:
         func_00300A00(sprite, 0x60442D00, (f32)(D_001A7340 / 2), (f32)label_y(sprite, 194.0f, D_L04_001B2D44, 0.5f, 1), 0.92f, D_001A7B90 ? 0.9f : 0.92f, 0.0f);
         sprite = func_00336D50(D_L04_001A904C + 0x8710, 0x38);
         func_00300A00(sprite, 0x55F0C070, (f32)(D_001A7340 / 2), (f32)label_y(sprite, 194.0f, D_L04_001B2D44, 0.5f, 1), 0.92f, D_001A7B90 ? 0.9f : 0.92f, 0.0f);
-        { char *str_ = func_00288FB8(0x2F93); int x_ = D_001A7340 / 2; int row_ = label_y((void *)x_, 32.0f, D_L04_001B2D44, 0.5f, 1); int len_ = func_001157AC(str_); func_0027FAA8(x_, row_, 0x80F0F0F0ULL, str_, len_); }
+        { char *str_ = GetLocalizedString(0x2F93); int x_ = D_001A7340 / 2; int row_ = label_y((void *)x_, 32.0f, D_L04_001B2D44, 0.5f, 1); int len_ = func_001157AC(str_); func_0027FAA8(x_, row_, 0x80F0F0F0ULL, str_, len_); }
         if (D_L04_001B093C > 0) {
-            { int x_ = D_001A7340 / 2; int row_ = label_y((void *)x_, 65.0f, D_L04_001B2D44, 0.5f, 1); char *str_ = func_00288FB8(0x1233); func_0027FAA8(x_, row_, 0x80F0F0F0ULL, str_, -1); }
+            { int x_ = D_001A7340 / 2; int row_ = label_y((void *)x_, 65.0f, D_L04_001B2D44, 0.5f, 1); char *str_ = GetLocalizedString(0x1233); func_0027FAA8(x_, row_, 0x80F0F0F0ULL, str_, -1); }
             D_L04_001B093C--;
         } else if (D_L04_002C63C0[D_L04_001B090C].times[lap - 1]) {
             s32 recordTime;
-            char *recordFormat = func_00288FB8(0x2FC6);
+            char *recordFormat = GetLocalizedString(0x2FC6);
             recordTime = D_L04_002C63C0[D_L04_001B090C].times[lap - 1];
             if (D_001A7A0A) recordTime *= 10;
             { int n_ = func_00115DA8(text, recordFormat, recordTime); int x_ = D_001A7340 / 2; int row_ = label_y((void *)x_, 65.0f, D_L04_001B2D44, 0.5f, 1); int len_ = func_001157AC(text); func_0027FAA8(x_, row_, 0x80F0F0F0ULL, text, len_); }
@@ -155,10 +155,10 @@ tick:
     func_00300A00(sprite, 0x60442D00, (f32)(D_001A7340 / 2), (f32)label_y(sprite, 196.0f, D_L04_001B2D44, 0.5f, 1), 0.92f, D_001A7B90 ? 0.9f : 0.92f, alpha);
     sprite = func_00336D50(D_L04_001A904C + 0x8710, 0x46);
     func_00300A00(sprite, 0x55F0C070, (f32)(D_001A7340 / 2), (f32)label_y(sprite, 196.0f, D_L04_001B2D44, 0.5f, 1), 0.92f, D_001A7B90 ? 0.9f : 0.92f, alpha);
-    { int x_, row_, len_; func_00115DA8(text, D_L04_001B0A40, func_00288FB8(0x2F7F),
-        func_00288FB8(D_L04_002CA1E0[*(s32 *)(state + 0x320) - 1]), func_00288FB8(0x2F80));
+    { int x_, row_, len_; func_00115DA8(text, D_L04_001B0A40, GetLocalizedString(0x2F7F),
+        GetLocalizedString(D_L04_002CA1E0[*(s32 *)(state + 0x320) - 1]), GetLocalizedString(0x2F80));
       x_ = D_001A7340 / 2; row_ = label_y((void *)x_, 106.0f, D_L04_001B2D44, 0.5f, 1); len_ = func_001157AC(text); func_0027FAA8(x_, row_, 0x80F0F0F0ULL, text, len_); }
-    { int row_ = hud_coord(fbottom, D_L04_001B2D44, 0.5f); char *str_ = func_00288FB8(0x2F42); func_0027F5B8(339, row_, 0x80F0F0F0ULL, str_, -1); }
+    { int row_ = hud_coord(fbottom, D_L04_001B2D44, 0.5f); char *str_ = GetLocalizedString(0x2F42); func_0027F5B8(339, row_, 0x80F0F0F0ULL, str_, -1); }
     y = 138;
     ahead = 0;
     racer = *(u8 **)(state + 0x39C);
@@ -185,7 +185,7 @@ tick:
             if (*(s32 *)(state + 0x320) < rank) {
                 s32 projected = D_L04_001A8FE8 + D_L04_001B08F8;
                 if (projected < time) { D_L04_001B0A38 = 0; ahead++; }
-                if (time == projected) func_002E5CF8(22, 17, object);
+                if (time == projected) PlayMobySound(22, 17, object);
             }
         }
         if (y < 128) { if (rank <= 10) row++; continue; }
@@ -193,48 +193,48 @@ tick:
         if (rank == *(s32 *)(state + 0x320)) { color2 = 0x8000C0C0; color1 = 0x8000C0C0; }
         else { color2 = 0x80F0F0F0; color1 = 0xF0F0F0; }
         if (y < 138) {
-            color = func_00283D38(color1, color2, ((f32)y - 128.0f) * fade);
+            color = FastTweenColor(color1, color2, ((f32)y - 128.0f) * fade);
         }
         else if (*(s32 *)(state + 0x320) < rank && bottom - y <= 20)
         {
-            color = func_00283D38(color1, color2, (f32)(bottom - y - 10) * fade);
+            color = FastTweenColor(color1, color2, (f32)(bottom - y - 10) * fade);
         }
         else { color = color2; }
         fy = (f32)y;
-        func_00115DA8(text, D_L04_001B0A50, func_00288FB8(D_L04_002CA1E0[rank - 1]), func_00288FB8(0x2F81));
+        func_00115DA8(text, D_L04_001B0A50, GetLocalizedString(D_L04_002CA1E0[rank - 1]), GetLocalizedString(0x2F81));
         half = 0.5f;
         func_0027FB40(175, label_y((void *)color, fy, D_L04_001B2D44, half, one), (s64)color, text, -1);
         if (ahead > 0) {
-            if (D_L04_001B0A24 == 3 || ahead >= 2) func_00115DA8(text, D_L04_001B0A58, func_00288FB8(0x2FB0));
-            else if (D_L04_001B0A24 == 2) func_00115DA8(text, D_L04_001B0A70, func_00288FB8(0x2FB0));
-            else if (D_L04_001B0A24 == 1) func_00115DA8(text, D_L04_001B0A88, func_00288FB8(0x2FB0));
-            else func_00115DA8(text, D_L04_001B0A98, func_00288FB8(0x2FB0));
+            if (D_L04_001B0A24 == 3 || ahead >= 2) func_00115DA8(text, D_L04_001B0A58, GetLocalizedString(0x2FB0));
+            else if (D_L04_001B0A24 == 2) func_00115DA8(text, D_L04_001B0A70, GetLocalizedString(0x2FB0));
+            else if (D_L04_001B0A24 == 1) func_00115DA8(text, D_L04_001B0A88, GetLocalizedString(0x2FB0));
+            else func_00115DA8(text, D_L04_001B0A98, GetLocalizedString(0x2FB0));
         } else {
             if (time / 60 % 60 < 10)
-                func_00115DA8(text, D_L04_001B0AA8, func_00288FB8(0x2F83), time / 216000, time / 3600 % 60, time / 60 % 60, time / 6 % 10);
+                func_00115DA8(text, D_L04_001B0AA8, GetLocalizedString(0x2F83), time / 216000, time / 3600 % 60, time / 60 % 60, time / 6 % 10);
             else
-                func_00115DA8(text, D_L04_001B0AC0, func_00288FB8(0x2F83), time / 216000, time / 3600 % 60, time / 60 % 60, time / 6 % 10);
+                func_00115DA8(text, D_L04_001B0AC0, GetLocalizedString(0x2F83), time / 216000, time / 3600 % 60, time / 60 % 60, time / 6 % 10);
         }
         half = 0.5f;
         func_0027F5B8(220, hud_coord(fy, D_L04_001B2D44, half), (s64)color, text, -1); row++;
         if (row >= 10) break;
     }
     if (*(s32 *)(state + 0x320) > 10 && !D_L04_001B0A28 && !playerSeen) {
-        func_00115DA8(text, D_L04_001B0A50, func_00288FB8(D_L04_002CA1E0[*(s32 *)(state + 0x320) - 1]), func_00288FB8(0x2F81));
+        func_00115DA8(text, D_L04_001B0A50, GetLocalizedString(D_L04_002CA1E0[*(s32 *)(state + 0x320) - 1]), GetLocalizedString(0x2F81));
         y += 15;
         { int row_ = hud_coord((f32)y, D_L04_001B2D44, 0.5f); func_0027FB40(175, row_, 0x8000C0C0ULL, text, -1); }
         if (D_L04_001A8FE8 / 60 % 60 < 10)
-            func_00115DA8(text, D_L04_001B0AA8, func_00288FB8(0x2F83), D_L04_001A8FE8 / 216000, D_L04_001A8FE8 / 3600 % 60, D_L04_001A8FE8 / 60 % 60, D_L04_001A8FE8 / 6 % 10);
+            func_00115DA8(text, D_L04_001B0AA8, GetLocalizedString(0x2F83), D_L04_001A8FE8 / 216000, D_L04_001A8FE8 / 3600 % 60, D_L04_001A8FE8 / 60 % 60, D_L04_001A8FE8 / 6 % 10);
         else
-            func_00115DA8(text, D_L04_001B0AC0, func_00288FB8(0x2F83), D_L04_001A8FE8 / 216000, D_L04_001A8FE8 / 3600 % 60, D_L04_001A8FE8 / 60 % 60, D_L04_001A8FE8 / 6 % 10);
+            func_00115DA8(text, D_L04_001B0AC0, GetLocalizedString(0x2F83), D_L04_001A8FE8 / 216000, D_L04_001A8FE8 / 3600 % 60, D_L04_001A8FE8 / 60 % 60, D_L04_001A8FE8 / 6 % 10);
         { int row_ = hud_coord((f32)y, D_L04_001B2D44, 0.5f); func_0027F5B8(220, row_, 0x8000C0C0ULL, text, -1); }
     }
     if (*(u8 *)(object + 0x20) != 3) {
         f32 angle;
         angle = *(f32 *)(state + 0x28C) * 0.008726647f;
         D_L04_001BDB80.tangent = func_00283198(angle) / func_00283180(angle);
-        func_0027AB40();
+        UpdateViewContext();
     }
-    func_002FC560(0x47, 0x5360B);
+    VU1_addGSregister(0x47, 0x5360B);
     return 1;
 }

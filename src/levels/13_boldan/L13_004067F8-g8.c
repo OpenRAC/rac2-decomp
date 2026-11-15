@@ -36,46 +36,46 @@ void func_L13_004067F8(u8 *m) {
         H(m,0x96)=0; m[0x20]=1; m[0x30]=255; H(m,0x32)=800;
         I(d,0xC)=0; I(d,0x20)=0;
         func_001256D8(time); func_00131A98(time);
-        P(d,0x10)=func_0029EFD0(0xE9F);
+        P(d,0x10)=CreateMoby(0xE9F);
         if (P(d,0x10)) {
             P(d,0x10)[0x30]=255; H(P(d,0x10),0x32)=800;
             P(d,0x10)[0x31]=1; P(d,0x10)[0x20]=0;
             *(u64 *)(P(d,0x10)+0x38)=*(u64 *)(m+0x38);
             { u8 *hand=P(d,0x10); qcopy_nc(hand+0x10,m+0x10); qcopy_nc(hand+0xF0,m+0xF0);
-            func_002833F0(hand+0xC0,hand+0xF0); }
+            euler_rotation_basis(hand+0xC0,hand+0xF0); }
         }
-        P(d,0x14)=func_0029EFD0(0xEA0);
+        P(d,0x14)=CreateMoby(0xEA0);
         if (P(d,0x14)) {
             P(d,0x14)[0x30]=255; H(P(d,0x14),0x32)=800;
             P(d,0x14)[0x31]=1; P(d,0x14)[0x20]=0;
             *(u64 *)(P(d,0x14)+0x38)=*(u64 *)(m+0x38);
             { u8 *hand=P(d,0x14); qcopy_nc(hand+0x10,m+0x10); qcopy_nc(hand+0xF0,m+0xF0);
-            func_002833F0(hand+0xC0,hand+0xF0); }
+            euler_rotation_basis(hand+0xC0,hand+0xF0); }
         }
-        a=func_0029EFD0(0xEA1);
+        a=CreateMoby(0xEA1);
         if(a) {
             a[0x30]=255; H(a,0x32)=800; a[0x31]=1; a[0x20]=0;
             *(u64 *)(a+0x38)=*(u64 *)(m+0x38);
             qcopy_nc(a+0x10,m+0x10); qcopy_nc(a+0xF0,m+0xF0);
-            func_002833F0(a+0xC0,P(d,0x14)+0xF0);
+            euler_rotation_basis(a+0xC0,P(d,0x14)+0xF0);
         }
         /* The RTC returns packed BCD hours, minutes and seconds. */
-        I(d,0)=func_00283CF0(time[3]); I(d,8)=func_00283CF0(time[2]); I(d,4)=func_00283CF0(time[1]);
-        slo=func_00283CF0(func_00283D00((float)I(d,4),16.0f));
-        sec=func_00283CF0((float)(I(d,4)/16))*10+slo;
-        mlo=func_00283CF0(func_00283D00((float)I(d,8),16.0f));
-        min=func_00283CF0((float)(I(d,8)/16))*10+mlo;
-        hlo=func_00283CF0(func_00283D00((float)I(d,0),16.0f));
-        initialHour=func_00283CF0((float)(I(d,0)/16))*10+hlo;
+        I(d,0)=FloatToInt(time[3]); I(d,8)=FloatToInt(time[2]); I(d,4)=FloatToInt(time[1]);
+        slo=FloatToInt(fast_fmod((float)I(d,4),16.0f));
+        sec=FloatToInt((float)(I(d,4)/16))*10+slo;
+        mlo=FloatToInt(fast_fmod((float)I(d,8),16.0f));
+        min=FloatToInt((float)(I(d,8)/16))*10+mlo;
+        hlo=FloatToInt(fast_fmod((float)I(d,0),16.0f));
+        initialHour=FloatToInt((float)(I(d,0)/16))*10+hlo;
         I(d,8)=min; I(d,4)=sec; I(d,0)=initialHour;
     }
     if(m[0x20]==1 && H(m,0x96)==60) {
         if(++I(d,4)>=60) { I(d,4)=0; ++I(d,8); }
         if(I(d,8)>=60) { I(d,8)=0; ++I(d,0); }
         if(I(d,0)>=24) I(d,0)=0;
-        h=(float)I(d,0); hour=func_00283CF0(h);
+        h=(float)I(d,0); hour=FloatToInt(h);
         if(h>12.0f) h-=12.0f;
-        t=func_00283CF0(h);
+        t=FloatToInt(h);
         if(t==0 || t==2 || t==4 || t==6 || t==8 || t==10 || t==12) {
             ClockMoby *a=&D_L13_001B291C[I(d,0x28)];
             int collision;
@@ -94,7 +94,7 @@ void func_L13_004067F8(u8 *m) {
             if(I(d,0x24)!=-1) { u8 *a=P(D_L13_001B291C_gp+(I(d,0x24)<<8),0x68); if(I(a,0x38)) I(a,0x38)=0; }
         }
         if(I(d,4)==0 && I(d,8)==0) {
-            I(d,0x18)=func_L00_0035F5A0(0x10,0x21,m); I(d,0xC)=10; I(d,0x20)=func_00283CF0(h);
+            I(d,0x18)=func_L00_0035F5A0(0x10,0x21,m); I(d,0xC)=10; I(d,0x20)=FloatToInt(h);
         }
         H(m,0x96)=0;
     }

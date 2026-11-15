@@ -24,7 +24,7 @@ int func_L22_003A4128(char *obj, Quad0792 *out) {
             char **slot = D_L22_0023B530[i];
             for (n = 49; n >= 0; n--, slot++) {
                 if (*slot) {
-                    float dist = func_00282E48(*slot + 0x10, obj + 0x10);
+                    float dist = fast_vec_dist(*slot + 0x10, obj + 0x10);
                     if (dist < best && func_002B0360(*slot + 0x10) - D_L22_001B2AA4 < 3.0f) {
                         qcopy_nc(out, *slot + 0x10);
                         best = dist;

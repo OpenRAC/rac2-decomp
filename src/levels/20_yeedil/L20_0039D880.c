@@ -34,7 +34,7 @@ void func_L20_0039D880(char *self) {
         float maximum = (float)*(short *)(state + 0x24);
         float fraction;
         fraction = health / maximum;
-        threshold = func_00283CF0(fraction * 255.0f) & 0xFF;
+        threshold = FloatToInt(fraction * 255.0f) & 0xFF;
         global = D_L20_001B9E80;
         callback = func_00310C88;
         for (i = 0; i < 10; i++) {
@@ -43,7 +43,7 @@ void func_L20_0039D880(char *self) {
             bit = 1 << i;
             if ((*(unsigned short *)(*(char **)(state + 0x254) + 0x7C) & bit) == 0) continue;
             if (threshold >= *(unsigned char *)(state + i + 0x270)) continue;
-            angle = func_00283B98(func_002A78D8(90.0f, 120.0f) * 0.017453294f, *(float *)(global + 0x158));
+            angle = FastAddRotations(func_002A78D8(90.0f, 120.0f) * 0.017453294f, *(float *)(global + 0x158));
             speed = func_002A7878(2.0f, 4.0f) * 0.016666668f;
             buf[0] = func_00283180(angle) * speed;
             buf[1] = func_00283198(angle) * speed;
@@ -72,7 +72,7 @@ void func_L20_0039D880(char *self) {
             *(char **)(state + 0x254) = 0;
             qcopy(buf, self + 0x10);
             buf[2] += 1.0f;
-            func_0032C700(buf, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 0, 0.5f, 20.0f, 1, 0, 0, 0);
+            SpawnExplosion(buf, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 0, 0.5f, 20.0f, 1, 0, 0, 0);
         }
     }
 }

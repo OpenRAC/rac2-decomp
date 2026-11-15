@@ -48,7 +48,7 @@ int func_L00_002C40C0(void)
             if (D_00189E20.state == 0xF) heading = D_00189E20.alternate_heading;
             score = func_L00_002AE388((char *)node, heading, 30.0f, &blocked, horizontal, vertical);
             if (blocked != 0) continue;
-            if (func_00282E80(D_00189E20.position, node + 0x10) < 4.0f) continue;
+            if (vec_distance_xy(D_00189E20.position, node + 0x10) < 4.0f) continue;
             active = node[0x31];
             if (active == 0) score += 10.0f;
             if (score < closest) { closest = score; best = node; }
@@ -59,7 +59,7 @@ int func_L00_002C40C0(void)
         qcopy(first, D_00189E20.position);
         first[2] += 0.5f;
         qcopy(second, best + 0x10);
-        if (!func_002761F8(first, second, 2, 0, 0)) D_00189E20.ready_b14 = 1;
+        if (!CollLine(first, second, 2, 0, 0)) D_00189E20.ready_b14 = 1;
     }
     return D_00189E20.ready_b14;
 }

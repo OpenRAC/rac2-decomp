@@ -78,10 +78,10 @@ void func_L04_004044B8(void *a0, L04_004044B8_Record *s0)
     char *s1 = (char *)a0 + 0x10;
     int v;
 
-    if (func_002ACBC8(s1, s0->f88)) {
+    if (IsPointInCuboid(s1, s0->f88)) {
         s0->f15c = 1;
     }
-    if (!func_002ACBC8(s1, s0->f84)) {
+    if (!IsPointInCuboid(s1, s0->f84)) {
         return;
     }
     if (s0->f15c == 0) {
@@ -174,20 +174,20 @@ void func_L04_0040EF50(unsigned char *m)
  float origin[4],dir[4],delta[4],probe[4],temp[4];
  unsigned char *target; float pitch,yaw,aimPitch,aimYaw,extra; AttackState *p=*(AttackState **)(m+0x68); unsigned char *d; int count,i,state,choice;
  choices=D_L04_001B0A10;
- func_00282D30(probe,p->offset,3);
- func_00282CC0(probe,probe,((unsigned char *)&D_00189E20 + 0xe0));
+ FastVecScale(probe,p->offset,3);
+ FastVecAdd(probe,probe,((unsigned char *)&D_00189E20 + 0xe0));
  count=func_00277F48(probe,0.7f,0,D_00189E20.hero,0);
  if(count) {
-  func_00282D30(delta,p->offset,7);
+  FastVecScale(delta,p->offset,7);
   for(i=0;i<count;i++) if(func_002ABB78(D_L04_001C3B40[i]) || H(D_L04_001C3B40[i],0xaa)==0x85)
    func_002A8F70(D_L04_001C3B40[i],D_00189E20.hero,0x10000,D_00189E20.position,delta,1);
  }
  func_L04_0040E460(m);
  if((D_L04_002C63C0[D_L04_001B090C].flags&1) && p->triggerList!=-1) {
-  func_002A8600(&target,p->triggerList,0,0);
+  GetFirstMobyInGroup(&target,p->triggerList,0,0);
   while(target) {
    if(H(target,0xaa)==0xab8) {
-    d=P(target,0x68);func_00282CF0(delta,target+16,m+16);
+    d=P(target,0x68);FastVecSub(delta,target+16,m+16);
     if(!I(d,0) && func_L00_002EE290(delta)<1) {
      choice=p->state;state=choice;
      if(I(d,4)==-1) do {choice=func_002A7820(1,4);} while(state==choice && I(d,4)==-1);
@@ -197,7 +197,7 @@ void func_L04_0040EF50(unsigned char *m)
      func_L04_0040C0C0(target+16,p->offset,8,0);I(d,0)=300;
     }
    }
-   func_002A86E8(&target,target,0,0);
+   GetNextMobyInGroup(&target,target,0,0);
   }
  }
  if(p->alternate) {
@@ -213,7 +213,7 @@ void func_L04_0040EF50(unsigned char *m)
    p->timer=3;func_0029FCC0(m,((p->duration^1)&1),origin);
    if(p->elevated)func_002AF000(dir,p->length+0.5f,F(m,0xf8),-p->tilt);
    else func_002AF000(dir,p->length+0.5f,F(m,0xf8),-F(m,0xf4));
-   func_00282CD8(temp,origin,dir);func_L04_003F9320(m,origin,dir,120);func_002E5CF8(7,0,m);
+   add_vectors(temp,origin,dir);SpawnHomingShot(m,origin,dir,120);PlayMobySound(7,0,m);
    if(func_00282948(&p->duration))p->state=0;
   }return;
  case 2: {
@@ -225,16 +225,16 @@ void func_L04_0040EF50(unsigned char *m)
    pitch=tilt;yaw-=0.3490659f;
    target=func_L04_0040EC80(m,origin,dir,&aimPitch,&aimYaw,&extra,0.78539824f,30);
    if(target) {
-    func_00282CF0(delta,origin,target+16);
+    FastVecSub(delta,origin,target+16);
     if(func_L00_002EE290(delta)<25) {pitch=aimPitch;yaw=aimYaw;}
    } else {aimPitch=pitch;aimYaw=yaw;extra=0.2f;}
-   func_L00_002D6900(47);func_00282CD8(temp,origin,dir);
-   func_L04_003FA5A8(m,origin,target,aimPitch,aimYaw,extra,pitch,yaw);func_002E5CF8(8,0,m);
+   func_L00_002D6900(47);add_vectors(temp,origin,dir);
+   func_L04_003FA5A8(m,origin,target,aimPitch,aimYaw,extra,pitch,yaw);PlayMobySound(8,0,m);
    if(func_00282948(&p->duration))p->state=0;
   }return; }
  case 3:
   if(func_00282948(&p->timer) && (D_00138324&5)) {
-   p->timer=30;func_00282CC0(temp,m+16,p->offset);*(AttackQuad *)origin=*(AttackQuad *)temp;func_L04_003FBD80(m,origin);
+   p->timer=30;FastVecAdd(temp,m+16,p->offset);*(AttackQuad *)origin=*(AttackQuad *)temp;func_L04_003FBD80(m,origin);
    if(func_00282948(&p->duration))p->state=0;
   }
   break;

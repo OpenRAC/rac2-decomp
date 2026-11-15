@@ -50,35 +50,35 @@ void func_002BABE8(char *self)
     if (*(short *)(s3 + 0x10) != 0) {
         D_10000000[0] = 0;
         func_002AE838((char *)&t0, s3);
-        func_00282CC0(s2 + 0x10, s2 + 0x10, (char *)&t0);
-        f = func_00283CE0(*(short *)(s2 + 0xA)) / func_00283CE0(*(short *)(s3 + 0x10));
-        *(int *)(s2 + 4) = func_00283D38(*(int *)(s3 + 8) & 0xFFFFFF, *(int *)(s3 + 8), 1.0f - f);
+        FastVecAdd(s2 + 0x10, s2 + 0x10, (char *)&t0);
+        f = IntToFloat(*(short *)(s2 + 0xA)) / IntToFloat(*(short *)(s3 + 0x10));
+        *(int *)(s2 + 4) = FastTweenColor(*(int *)(s3 + 8) & 0xFFFFFF, *(int *)(s3 + 8), 1.0f - f);
         *(float *)(s2 + 0xC) = (float)(*(short *)(s3 + 0x16) * 1000);
-        if (func_00282978((short *)(s2 + 0xA)) != 0) {
+        if (FastDecTimer((short *)(s2 + 0xA)) != 0) {
             *(short *)(s3 + 0x10) = 0;
             *(short *)(s2 + 0xA) = *(unsigned short *)(s3 + 0x12);
         }
     } else if (*(short *)(s3 + 0x12) != 0) {
         func_002AE838((char *)&t1, s3);
         func_002AE838((char *)&t2, s2 + 0x24);
-        f = func_00283CE0(*(short *)(s2 + 0xA)) / func_00283CE0(*(short *)(s3 + 0x12));
-        func_00282D08((float *)&t0, (char *)&t2, (char *)&t1, f);
-        func_00282CC0(s2 + 0x10, s2 + 0x10, (char *)&t0);
+        f = IntToFloat(*(short *)(s2 + 0xA)) / IntToFloat(*(short *)(s3 + 0x12));
+        lerp_vector((float *)&t0, (char *)&t2, (char *)&t1, f);
+        FastVecAdd(s2 + 0x10, s2 + 0x10, (char *)&t0);
         *(float *)(s2 + 0xC) = ((float)(*(short *)(s3 + 0x16) - *(short *)(s3 + 0x18)) * f
                                + (float)*(short *)(s3 + 0x18)) * 1000.0f;
-        *(int *)(s2 + 4) = func_00283D38(*(int *)(s3 + 0xC), *(int *)(s3 + 8), f);
-        if (func_00282978((short *)(s2 + 0xA)) != 0) {
+        *(int *)(s2 + 4) = FastTweenColor(*(int *)(s3 + 0xC), *(int *)(s3 + 8), f);
+        if (FastDecTimer((short *)(s2 + 0xA)) != 0) {
             *(short *)(s3 + 0x12) = 0;
             *(short *)(s2 + 0xA) = *(unsigned short *)(s3 + 0x14);
         }
     } else {
         func_002AE838((char *)&t0, s2 + 0x24);
-        func_00282CC0(s2 + 0x10, s2 + 0x10, (char *)&t0);
-        *(int *)(s2 + 4) = func_00283D38(*(int *)(s3 + 0xC) & 0xFFFFFF, *(int *)(s3 + 0xC),
-                                         func_00283CE0(*(short *)(s2 + 0xA))
-                                             / func_00283CE0(*(short *)(s3 + 0x14)));
+        FastVecAdd(s2 + 0x10, s2 + 0x10, (char *)&t0);
+        *(int *)(s2 + 4) = FastTweenColor(*(int *)(s3 + 0xC) & 0xFFFFFF, *(int *)(s3 + 0xC),
+                                         IntToFloat(*(short *)(s2 + 0xA))
+                                             / IntToFloat(*(short *)(s3 + 0x14)));
         *(float *)(s2 + 0xC) = (float)(*(short *)(s3 + 0x18) * 1000);
-        if (func_00282978((short *)(s2 + 0xA)) != 0) {
+        if (FastDecTimer((short *)(s2 + 0xA)) != 0) {
             func_002B9180(s2);
         }
     }
@@ -191,7 +191,7 @@ void func_002B8108(char *owner, DialogState_002B8108 *st, int enter)
     kind = node->kind;
     if (kind == 6) {
         seps = D_001AA250;
-        func_00115690((char *)0x70000000, func_00288FB8(node->message));
+        func_00115690((char *)0x70000000, GetLocalizedString(node->message));
         {
             char *p = func_001163E0((char *)0x70000000, D_001AA288);
             if (p != 0) {
@@ -204,7 +204,7 @@ void func_002B8108(char *owner, DialogState_002B8108 *st, int enter)
         }
         func_00115DA8(text, (char *)0x70000000, number);
     } else {
-        func_00115DA8(text, func_00288FB8(node->message));
+        func_00115DA8(text, GetLocalizedString(node->message));
     }
     if (D_001B178C.message != 0) {
         func_0028BCA0(text);
@@ -329,7 +329,7 @@ void func_002B85F8(void *arg)
             }
             for (i = n; i < 4; i++)
                 p->act[i] = buf[i];
-            func_002B8888(p);
+            ClearPadInput(p);
             break;
         }
         case 1:
@@ -342,15 +342,15 @@ void func_002B85F8(void *arg)
 
                 vibration = shifted | (p->vibration0 & 1);
             }
-            func_00128FD0(p->socket, 1, p->act, 2, &vibration);
+            sceVibSetActParam(p->socket, 1, p->act, 2, &vibration);
             func_002B88F0(p, buf, n);
             break;
         case 2:
-            func_002B8888(p);
+            ClearPadInput(p);
             break;
         }
     } else {
-        func_002B8888(p);
+        ClearPadInput(p);
         p->profile_state = 0;
     }
     p->vibration0 = 0;

@@ -77,11 +77,11 @@ void func_L18_00437190(u8 *obj) {
     float t, x, minimum;
     switch(mode) {
     case 0: case 1:
-        if(func_002B3868(obj)) func_002E5CF8(1,0,obj);
-        func_00282CC0((char *)delta,(char *)obj+0x10,(char *)st+0x10);
+        if(func_002B3868(obj)) PlayMobySound(1,0,obj);
+        FastVecAdd((char *)delta,(char *)obj+0x10,(char *)st+0x10);
         STATE->f[0x6]-=STATE->f[0x7];
         if(obj[0x20]==1 && STATE->f[0x6]<0) func_002A7750(obj,0,-1);
-        func_00282978(st+0x28);
+        FastDecTimer(st+0x28);
         {s16 life=STATE->h[0x14];
         if(life) {
             for(i=0;i<D_L18_001B1900;i++) {
@@ -89,35 +89,35 @@ void func_L18_00437190(u8 *obj) {
                 Particle *spark;
                 *(TI128 *)temp=*(TI128 *)(obj+0x10);
                 fraction=(float)i; fraction*=0.3333f;
-                func_L00_0031D670(pos,temp,delta,fraction);
+                LerpVector4(pos,temp,delta,fraction);
                 {s16 particleLifetime=120;
                 amount=func_002A77E0(6);
                 if(func_002A77E0(2)) amount=-amount;
-                denominator=func_00283CE0(D_L18_001B18FC);
+                denominator=IntToFloat(D_L18_001B18FC);
                 ratio=(float)STATE->h[0x14]; ratio/=denominator;
                 random=func_002A7878(0.9f,1.0f);
-                spark=func_002BDCE8(pos,D_L18_001B1910,1,1,random*(D_L18_001B1908+(D_L18_001B190C-D_L18_001B1908)*ratio),amount,&D_001A8F20,D_L18_001B1904,0);
+                spark=SpawnSpinningSparkParticle(pos,D_L18_001B1910,1,1,random*(D_L18_001B1908+(D_L18_001B190C-D_L18_001B1908)*ratio),amount,&D_001A8F20,D_L18_001B1904,0);
                 if(spark) { ParticleRender *particle; spark->lifetime=particleLifetime; particle=&spark->render; particle->flags=2; particle->alpha=127; particle->lifetime=*(u8 *)&spark->lifetime; }
                 }
             }
         }
         }
-        if(func_002761F8(obj+0x10,delta,0,obj,0) && !same_group(st)) qcopy(obj+0x10,&COLL->q[2]);
+        if(CollLine(obj+0x10,delta,0,obj,0) && !same_group(st)) qcopy(obj+0x10,&COLL->q[2]);
         else qcopy(obj+0x10,delta);
         if(func_00277258(obj+0x10,0,obj,D_L18_001B18F8) && (obj[0x20]==0 || OBJ->f[0x6]-COLL->f[10]<0)) {
             if(!same_group(st)) {
-                func_00282F20((char *)pos,(char *)(u8 *)&COLL->q[4],D_L18_001B18F8);
-                func_00282CC0((char *)obj+0x10,(char *)(u8 *)&COLL->q[2],(char *)pos);
+                vec_scale_to_length((char *)pos,(char *)(u8 *)&COLL->q[4],D_L18_001B18F8);
+                FastVecAdd((char *)obj+0x10,(char *)(u8 *)&COLL->q[2],(char *)pos);
                 func_00283028(st+0x10,st+0x10,(u8 *)&COLL->q[4]);
-                func_002E5CF8(1,0,obj);
+                PlayMobySound(1,0,obj);
                 if(obj[0x20]!=0) goto bounce_done;
                 func_002A7750(obj,1,-1);
                 if(++STATE->h[0x15]==1) {
                     func_00282F70(st+0x10,st+0x10,D_L18_001B1928*0.016666668f);
                     STATE->f[0x6]*=D_L18_001B1924;
                 } else {
-                    func_00282D30(temp,st+0x10,D_L18_001B1924);
-                    if(func_00282E20(temp)<D_L18_001B1914*0.016666668f) {
+                    FastVecScale(temp,st+0x10,D_L18_001B1924);
+                    if(vec_length_xy(temp)<D_L18_001B1914*0.016666668f) {
                         func_00282F70(st+0x10,st+0x10,D_L18_001B1914*0.016666668f);
                         STATE->f[0x6]*=D_L18_001B1924;
                     } else qcopy(st+0x10,temp);
@@ -125,12 +125,12 @@ void func_L18_00437190(u8 *obj) {
 bounce_done:
                 if(STATE->h[0x15]>=4) {
                     func_002A7750(obj,2,-1); STATE->f[0x6]=0;
-                    STATE->f[0x7]=func_00282E20(st+0x10);
+                    STATE->f[0x7]=vec_length_xy(st+0x10);
                     STATE->f[0x7]*=D_L18_001B1924;
                     minimum=D_L18_001B1914*0.016666668f;
                     if(STATE->f[0x7]<minimum) STATE->f[0x7]=minimum;
-                    func_00282F20((char *)st+0x10,(char *)st+0x10,STATE->f[0x7]);
-                    STATE->f[0xb]=1.0f/func_00283CE0(STATE->i[0x8]);
+                    vec_scale_to_length((char *)st+0x10,(char *)st+0x10,STATE->f[0x7]);
+                    STATE->f[0xb]=1.0f/IntToFloat(STATE->i[0x8]);
                 }
             }
         }
@@ -138,22 +138,22 @@ bounce_done:
     case 2:
         { typedef struct { float a,b,c; } Triple; *(Triple *)delta=*(Triple *)D_L18_001B1940; }
         t=(float)STATE->i[0x8]*STATE->f[0xb];
-        r=func_00283CF0((delta[0]-255.0f)*t+255.0f);
-        g=func_00283CF0(delta[1]*t); b=func_00283CF0(delta[2]*t);
+        r=FloatToInt((delta[0]-255.0f)*t+255.0f);
+        g=FloatToInt(delta[1]*t); b=FloatToInt(delta[2]*t);
         {u32 color=(u32)b<<16; color|=0xff000000; color|=g<<8; color|=r; OBJ->i[0x1e]=color;}
         {float speed=STATE->f[0x7]*((D_L18_001B1918-1.0f)+1.0f);
         minimum=D_L18_001B1914*0.016666668f;
         STATE->f[0x7]=speed;
         if(speed<minimum) STATE->f[0x7]=minimum;}
-        func_00282F20((char *)st+0x10,(char *)st+0x10,STATE->f[0x7]);
-        func_00282CC0((char *)obj+0x10,(char *)obj+0x10,(char *)st+0x10);
+        vec_scale_to_length((char *)st+0x10,(char *)st+0x10,STATE->f[0x7]);
+        FastVecAdd((char *)obj+0x10,(char *)obj+0x10,(char *)st+0x10);
         if(func_00282948(st+0x20)) func_002A7750(obj,3,-1);
         break;
     case 3:
         if(func_002B3868(obj)) {
             func_L18_00437BA8(obj+0x10,D_L18_001B1938);
-            func_002ABBB8(obj,st+0x10,obj+0x10,0,0,3,3,5,1,0.2f,9,1,-1,0,1,1,-1,0,0x810001);
-            func_002E5CF8(0,0,obj);
+            SpawnExplosionEffects(obj,st+0x10,obj+0x10,0,0,3,3,5,1,0.2f,9,1,-1,0,1,1,-1,0,0x810001);
+            PlayMobySound(0,0,obj);
         }
         else {
         if(D_L18_001B192C+D_L18_001B1930<OBJ->u[0x4b]) {func_0029F338(obj);return;}
@@ -180,7 +180,7 @@ bounce_done:
     if(OBJ->u[0x4b]<65535) OBJ->u[0x4b]++;
     {
         float speed, angle;
-        if(obj[0x20]<2) speed=func_00282E20(st+0x10);
+        if(obj[0x20]<2) speed=vec_length_xy(st+0x10);
         else if(obj[0x20]==2) speed=STATE->f[0x7];
         else return;
         speed=clamp_speed(speed,0.0033333336f,0.10000001f);
@@ -190,7 +190,7 @@ bounce_done:
         angle*=7.0f;
         angle+=1.0f;
         angle*=0.017453294f;
-        OBJ->f[0x3d]=func_00283B98(angle,OBJ->f[0x3d]);
+        OBJ->f[0x3d]=FastAddRotations(angle,OBJ->f[0x3d]);
     }
     if(OBJ->f[0x4]<2 || OBJ->f[0x4]>1021 || OBJ->f[0x5]<2 || OBJ->f[0x5]>1021 || OBJ->f[0x6]<2 || OBJ->f[0x6]>1021)func_0029F338(obj);
 }

@@ -35,20 +35,20 @@ int func_L17_003C69A8(char *object,int pathIndex,int *sound)
     int complete=0;
     float speedSquared,deceleration,distance,pitch;
     qcopy(&target,*path+16+*(int *)(state+0x94)*16);
-    func_00282CF0(&delta,&target,object+16);
-    if(func_00282DF0(&delta)<(D_L17_001B0344*0.016666668f)*2.0f) {
+    FastVecSub(&delta,&target,object+16);
+    if(FastVecLength(&delta)<(D_L17_001B0344*0.016666668f)*2.0f) {
         (*(int *)(state+0x94))++;
         complete=*(int *)(state+0x94)==*(int *)*path;
     }
-    distance=func_00282E48(object+16,*path+*(int *)*path*16);
+    distance=fast_vec_dist(object+16,*path+*(int *)*path*16);
     deceleration=D_L17_001B0348*0.0002777777845f;
     speedSquared=*(float *)(state+0x90)* *(float *)(state+0x90);
     if(distance<=speedSquared/(deceleration*2.0f))
-        func_002AA2E8(state+0x90,0.0f,speedSquared/(distance*2.0f));
-    else func_002AA2E8(state+0x90,D_L17_001B0344*0.016666668f,deceleration);
-    func_00282F20(&delta,&delta,*(float *)(state+0x90));
-    func_00282CC0(object+16,&delta,object+16);
-    pitch=-func_00283248(func_00282E20(&delta),delta.f[2]);
+        ApproachValue(state+0x90,0.0f,speedSquared/(distance*2.0f));
+    else ApproachValue(state+0x90,D_L17_001B0344*0.016666668f,deceleration);
+    vec_scale_to_length(&delta,&delta,*(float *)(state+0x90));
+    FastVecAdd(object+16,&delta,object+16);
+    pitch=-func_00283248(vec_length_xy(&delta),delta.f[2]);
     if(pitch>0.261799425f) pitch=0.261799425f;
     else if(pitch< -0.261799425f) pitch= -0.261799425f;
     func_002AAA00(object+0xf4,pitch,state+0x9c,0,D_L17_001B034C*0.00000484813743f,D_L17_001B034C*0.00000484813743f,0.209439546f);

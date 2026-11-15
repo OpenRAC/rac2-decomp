@@ -55,11 +55,11 @@ void func_L09_003FD460(char *moby) {
     qcopy(dir, src[0]);
     qcopy(mat[3], src[3]);
     mat[3][3] = 1.0f;
-    func_00282CF0(v, D_L09_001B9A00, mat[3]);
+    FastVecSub(v, D_L09_001B9A00, mat[3]);
     rot[2] = func_00283248(v[0], v[1]);
-    rot[1] = -func_00283248(func_00282E20(v), v[2]);
+    rot[1] = -func_00283248(vec_length_xy(v), v[2]);
     rot[0] = 0.0f;
-    func_002833F0(rm, rot);
+    euler_rotation_basis(rm, rot);
     qcopy(mat[0], rm[0]);
     qcopy(mat[1], rm[1]);
     qcopy(mat[2], rm[2]);
@@ -75,7 +75,7 @@ void func_L09_003FD460(char *moby) {
     g = 100;
     b = 70;
     a = 90;
-    func_002FC560(0x47, 0x51001);
+    VU1_addGSregister(0x47, 0x51001);
     size = 0.1f;
     step = 0.025f;
     for (i = 0; i < 16; i++) {
@@ -86,17 +86,17 @@ void func_L09_003FD460(char *moby) {
         pk.col[2] = col;
         pk.col[1] = col;
         pk.col[0] = col;
-        func_00282D30(t, dir, step);
+        FastVecScale(t, dir, step);
         for (j = 0; j < 4; j++) {
-            func_00282D30(pk.m[j], D_L09_001B1200[j], size);
-            func_002830C0(pk.m[j], pk.m[j], mat);
-            func_00282CC0(pk.m[j], pk.m[j], t);
+            FastVecScale(pk.m[j], D_L09_001B1200[j], size);
+            transform_vector(pk.m[j], pk.m[j], mat);
+            FastVecAdd(pk.m[j], pk.m[j], t);
         }
-        func_00280B90(&pk, 0, 0);
-        func_00282D30(t, dir, step * -2.0f);
+        draw_world_quad(&pk, 0, 0);
+        FastVecScale(t, dir, step * -2.0f);
         for (j = 0; j < 4; j++)
-            func_00282CC0(pk.m[j], pk.m[j], t);
-        func_00280B90(&pk, 0, 0);
+            FastVecAdd(pk.m[j], pk.m[j], t);
+        draw_world_quad(&pk, 0, 0);
         g -= 16;
         b -= 16;
         a -= 8;
@@ -111,7 +111,7 @@ void func_L09_003FD460(char *moby) {
         if (a < 0)
             a = 0;
     }
-    *(float *)(d + 0x380) = func_00283B98(*(float *)(d + 0x380), -0.06981318f);
+    *(float *)(d + 0x380) = FastAddRotations(*(float *)(d + 0x380), -0.06981318f);
 }
 
 /* Per-moby state of the beam emitter, reached through the moby's +0x68 pointer. */
@@ -140,18 +140,18 @@ void func_L09_003FCF68(char *moby)
 
     qcopy(pos, state->glow_pos);
     pos[3] = 1.0f;
-    func_00282D30(offset, state->glow_dir, 0.5f);
-    func_00282CC0(pos, pos, offset);
-    quad.b = func_0027C878(11);
+    FastVecScale(offset, state->glow_dir, 0.5f);
+    FastVecAdd(pos, pos, offset);
+    quad.b = GetEffectTextureDescriptor(11);
     quad.c = 0x0000FF9000000260ULL;
     quad.d = 0x8000000048ULL;
     quad.a = 0;
-    func_002FC560(0x47, 0x51001);
-    func_00282CF0(to_camera, D_L09_001B9A00, pos);
+    VU1_addGSregister(0x47, 0x51001);
+    FastVecSub(to_camera, D_L09_001B9A00, pos);
     rot[2] = func_00283248(to_camera[0], to_camera[1]);
-    rot[1] = -func_00283248(func_00282E20(to_camera), to_camera[2]);
+    rot[1] = -func_00283248(vec_length_xy(to_camera), to_camera[2]);
     rot[0] = 0.0f;
-    func_002833F0(mat, rot);
+    euler_rotation_basis(mat, rot);
     quad.uv[0] = 1.0f;
     quad.uv[1] = 1.0f;
     quad.uv[2] = 0.0f;
@@ -172,8 +172,8 @@ void func_L09_003FCF68(char *moby)
         quad.col[0] = 0x7F7F7F7F;
     }
     for (i = 0; i < 4; i++) {
-        func_00282D30(quad.m[i], D_L09_001B1200[i], 0.75f);
-        func_002830C0(quad.m[i], quad.m[i], mat);
+        FastVecScale(quad.m[i], D_L09_001B1200[i], 0.75f);
+        transform_vector(quad.m[i], quad.m[i], mat);
     }
-    func_00280B90(&quad, 0, 0);
+    draw_world_quad(&quad, 0, 0);
 }

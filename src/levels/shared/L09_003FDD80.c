@@ -55,7 +55,7 @@ void func_L09_003FDD80(Moby3FDD80 *self) {
     total += vars->extra;
     index = 0;
     offset = 0.0f;
-    func_L00_00341820(D_L09_001FE6C0[vars->dest], out, &index, &offset, vars->wrap, total / vars->speed * vars->scale);
+    Spline_AdvanceByDistance(D_L09_001FE6C0[vars->dest], out, &index, &offset, vars->wrap, total / vars->speed * vars->scale);
     func_002AA3A8(&self->pos[0], &vars->vel[0], out[0], 0.02f, 0.2f, 0.0f);
     func_002AA3A8(&self->pos[1], &vars->vel[1], out[1], 0.02f, 0.2f, 0.0f);
     func_002AA3A8(&self->pos[2], &vars->vel[2], out[2], 0.02f, 0.2f, 0.0f);

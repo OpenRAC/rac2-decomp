@@ -143,7 +143,7 @@ void func_0026EDE8(void)
     float time;
 
     D_001A8C88[0] = 1;
-    func_00290C60();
+    InitOnce();
     {
         LoaderMemory *memory = &D_001BAEC0;
         LoaderDisc *disc = &D_0014B540;
@@ -188,7 +188,7 @@ void func_0026EDE8(void)
     func_00290758();
     if (loaded) {
         int i;
-        func_0027D330(5);
+        FadeToBlack(5);
         for (i = 29; i >= 0; i--)
             func_001261F0(0);
     }
@@ -196,11 +196,11 @@ void func_0026EDE8(void)
         LoaderMemory *memory = &D_001BAEC0;
         func_002B7CE0(1);
         func_0011AEA0(0);
-        func_0029D4D0((int)memory->archive + 0x400000, (int)memory->archive);
+        fast_decompress((int)memory->archive + 0x400000, (int)memory->archive);
         func_0011AEA0(0);
         func_002EED08();
         archive = memory->archive;
-        func_0026EA00(archive->offsets[0x50 / 4] + (int)archive);
+        ShowSplashImage(archive->offsets[0x50 / 4] + (int)archive);
         D_001A7280[2] = memory->archive;
         func_00292888();
         func_002B67E0(archive->offsets[8 / 4] + (int)archive, 0);
@@ -232,13 +232,13 @@ void func_0026EDE8(void)
         for (i = 44; i >= 0; i--)
             func_001261F0(0);
     }
-    func_0027D330(30);
+    FadeToBlack(30);
     {
         int i;
         for (i = 29; i >= 0; i--)
             func_001261F0(0);
     }
-    func_0026EA00(archive->offsets[0x58 / 4] + (int)archive);
+    ShowSplashImage(archive->offsets[0x58 / 4] + (int)archive);
     {
         LoaderSound *sound;
         D_00189E20.enabled = 1;
@@ -253,7 +253,7 @@ void func_0026EDE8(void)
         D_001B1684[0] = 0;
     }
     func_00294F10();
-    func_0028AB70();
+    InitializeHudSlotsAndBuffers();
     func_0029CD48();
     func_002C9C20();
     {
@@ -261,7 +261,7 @@ void func_0026EDE8(void)
         for (i = 24; i >= 0; i--)
             func_001261F0(0);
     }
-    func_0027D330(30);
+    FadeToBlack(30);
     frames = 1800;
     D_001B1598[0] = 0;
     func_001261F0(0);
@@ -278,12 +278,12 @@ void func_0026EDE8(void)
         D_001A7200 += T1_COUNT;
         T1_COUNT = 0;
         func_00280710();
-        func_002FC280();
+        SubmitBufferedDmaChain();
         func_002FC220();
-        func_00284FC0();
+        PutDrawBufferSmall();
         func_00285338();
         func_00284EA8();
-        func_00132028();
+        snd_Pump();
         state = D_001A8BB0[0];
         switch (state) {
         case -1:
@@ -305,10 +305,10 @@ void func_0026EDE8(void)
             func_002F5FB8();
             if (extra) {
                 int i;
-                func_0026EA00((int)extra);
+                ShowSplashImage((int)extra);
                 for (i = 29; i >= 0; i--)
                     func_001261F0(0);
-                func_0027D330(30);
+                FadeToBlack(30);
                 extra = 0;
             }
             break;
@@ -326,12 +326,12 @@ void func_0026EDE8(void)
             break;
         case 4:
             func_002B9000();
-            func_00286738();
+            UpdateModalState();
             func_0027C4A8();
             break;
         case 6:
             func_002B9000();
-            func_002E9268();
+            UpdatePlaybackScene();
             func_002EA8E8();
             break;
         default:
@@ -345,9 +345,9 @@ void func_0026EDE8(void)
         func_00298F00();
         func_00298178();
         func_002FC3C0(1);
-        time = func_00283CE0(T1_COUNT);
+        time = IntToFloat(T1_COUNT);
         D_001B168C = time * (D_001A7B90[0] ? 0.0000868055578f : 0.000104166669f);
-        func_0027B948();
+        ResetGsRegistersPr();
         func_002B4C18();
         D_001B1598[0]++;
         func_001261F0(0);
@@ -355,10 +355,10 @@ void func_0026EDE8(void)
     if (D_001A7290[0] != D_001A7A10[4])
         func_00292078(D_001A7A10[4]);
     if (D_001A72C0[0] != (D_00239BA0 + D_00139568.index)->mode)
-        func_00292408((D_00239BA0 + D_00139568.index)->mode);
+        LoadPackSingleTexture((D_00239BA0 + D_00139568.index)->mode);
     if (D_00152C00.audio != (D_001A7AF2[0] & 31))
-        func_002926B8(D_001A7AF2[0] & 31);
+        LoadDiscTableTexture(D_001A7AF2[0] & 31);
     if (D_00152C00.format != (D_001A7AF0[0] & 3))
         func_002925F0(D_001A7AF0[0] & 3);
-    func_002EC408();
+    RunLevelTransition();
 }

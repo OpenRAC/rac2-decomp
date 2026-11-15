@@ -95,23 +95,23 @@ int func_00334160(char *object,int id,int owner)
                         char *p=P(P(slot->object,0x68),0x10);
                         if(p && H(p,0)) {r=B(p,4);g=B(p,5);b=B(p,6);colored=1;}
                     }
-                    if(!colored) func_002A04B8(slot->object,&r,&g,&b);
+                    if(!colored) get_moby_color(slot->object,&r,&g,&b);
                     }
                     slot->color=(b<<16)+(g<<8)+r;
                     slot->alpha=0xff0000;slot->zero=0.0f;slot->active=1;
                     result=0;
                     if(*health<=slot->zero && D_001B1000) {
-                        func_00282D30(backwards,slot->object+0xc0,-1.0f);
-                        func_00282F20(damage.vector,damage.vector,0.0016666668234393f);
+                        FastVecScale(backwards,slot->object+0xc0,-1.0f);
+                        vec_scale_to_length(damage.vector,damage.vector,0.0016666668234393f);
                         D_001B1000->owner=slot->owner;
-                        func_002A8C00(damage.vector,D_001B1000,0x810000,backwards,0.001f);
+                        make_hit_descriptor(damage.vector,D_001B1000,0x810000,backwards,0.001f);
                         *(Quad341 *)damage.vector=*(Quad341 *)backwards;
                         damage.vector[3]=5627.9248046875f;
                         damage.flag=1;
                         damage.type=5;
                         damage.source=1;
                         damage.oclass=*(unsigned short *)(slot->object+0xaa);
-                        func_002A8E20(slot->object,&damage);
+                        QueueMobyImpact(slot->object,&damage);
                         slot->object=0;
                     }
                     break;

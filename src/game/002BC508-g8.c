@@ -31,28 +31,28 @@ void func_002BC508(char *p)
     float speed, a, b, t;
 
     p[8] = (unsigned char)p[8] + (unsigned char)q[0x1E];
-    func_00282CC0(p + 0x10, p + 0x10, q);
-    speed = -func_00282DF0(q);
+    FastVecAdd(p + 0x10, p + 0x10, q);
+    speed = -FastVecLength(q);
     func_002AA548(p + 0x30, &speed, 0.0f, 0.0f, D_001AA348 * 0.00027777778f, speed);
-    func_00282F20(q, q, -speed);
+    vec_scale_to_length(q, q, -speed);
     *(float *)(p + 0x18) += D_001AA34C * 0.016666667f;
-    a = func_00283CE0(*(short *)(p + 0xA));
-    b = func_00283CE0((unsigned char)q[0x1D]);
+    a = IntToFloat(*(short *)(p + 0xA));
+    b = IntToFloat((unsigned char)q[0x1D]);
     t = a / b;
     if (q[0x1F] & 1)
         *(float *)(p + 0xC) = LERP(D_001AA33C, D_001AA338, t) * 210000.0f;
     else
         *(float *)(p + 0xC) = LERP(D_001AA31C, D_001AA318, t) * 210000.0f;
-    *(int *)(p + 4) = func_00283D38(*(int *)(q + 0x18), *(int *)(q + 0x14), t);
+    *(int *)(p + 4) = FastTweenColor(*(int *)(q + 0x18), *(int *)(q + 0x14), t);
     if (*(short *)(p + 0xA) < 15) {
-        a = func_00283CE0(*(short *)(p + 0xA));
-        b = func_00283CE0(10);
-        *(int *)(p + 4) = func_00283D38(*(int *)(p + 4) & 0xFFFFFF, *(int *)(p + 4), a / b);
+        a = IntToFloat(*(short *)(p + 0xA));
+        b = IntToFloat(10);
+        *(int *)(p + 4) = FastTweenColor(*(int *)(p + 4) & 0xFFFFFF, *(int *)(p + 4), a / b);
     }
     if (*(float *)(p + 0x10) < 2.0f || *(float *)(p + 0x10) > 1021.0f ||
         *(float *)(p + 0x14) < 2.0f || *(float *)(p + 0x14) > 1021.0f ||
         *(float *)(p + 0x18) < 2.0f || *(float *)(p + 0x18) > 1021.0f ||
-        func_00282978(p + 0xA)) {
+        FastDecTimer(p + 0xA)) {
         func_002B9180(p);
         return;
     }

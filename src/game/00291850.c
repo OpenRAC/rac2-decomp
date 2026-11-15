@@ -72,8 +72,8 @@ s32 func_00291850(MipTexture *tex, unsigned long *regs)
     default:
         break;
     }
-    upload.width_log2 = func_00282A18(tex->width);
-    upload.height_log2 = func_00282A18(tex->height);
+    upload.width_log2 = log2dim(tex->width);
+    upload.height_log2 = log2dim(tex->height);
     upload.mip_addresses[0] = (s32)tex->data + upload.palette_size;
     switch (tex->psm) {
     case 0:

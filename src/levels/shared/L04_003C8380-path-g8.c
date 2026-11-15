@@ -38,7 +38,7 @@ void func_L04_00400D48(u8 *a0, u8 *a1, s32 a2)
     if (a2 != 0) {
         *(Q16_B0e5d8f83 *)(a0 + 0x10) = *(Q16_B0e5d8f83 *)(*(u8 **)(a1 + 0x110) + a3 * 16 + 0x10);
     }
-    t = func_00283CE0(a3);
+    t = IntToFloat(a3);
     t = t * *(f32 *)(*(u8 **)(a1 + 0x110) + 0x1C);
     if (*(s32 *)(a1 + 0x244) != 0) {
         f = t + 15.0f;
@@ -104,7 +104,7 @@ int func_L04_00400AB0(Moby *moby, Route *path, int clamp)
     float delta[4];
 
     for (i = 0; i < path->count; i += 5) {
-        func_00282CF0(delta, moby->position, path->points[i]);
+        FastVecSub(delta, moby->position, path->points[i]);
         distance = func_L00_002EE290(delta);
         if (distance < nearest) {
             nearest = distance;
@@ -119,7 +119,7 @@ int func_L04_00400AB0(Moby *moby, Route *path, int clamp)
             index += count;
         else if (index >= count)
             index -= count;
-        func_00282CF0(delta, moby->position, path->points[index]);
+        FastVecSub(delta, moby->position, path->points[index]);
         distance = func_L00_002EE290(delta);
         if (distance < nearest) {
             best = index;

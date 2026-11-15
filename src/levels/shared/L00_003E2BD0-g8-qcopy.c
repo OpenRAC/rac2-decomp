@@ -34,11 +34,11 @@ void func_L00_003E2BD0(void *self)
     firstCount=20; if(count<=19) firstCount=count;
     alpha=255; glow=64;
     if(*(unsigned char *)(object+0x20)==1) {
-        fraction=func_00283CE0(*(int *)(state+0x38)); fraction/=func_00283CE0(6);
-        alpha=func_00283CF0(func_00283CE0(255)*fraction);
-        glow=func_00283CF0(func_00283CE0(64)*fraction);
+        fraction=IntToFloat(*(int *)(state+0x38)); fraction/=IntToFloat(6);
+        alpha=FloatToInt(IntToFloat(255)*fraction);
+        glow=FloatToInt(IntToFloat(64)*fraction);
     }
     color=((unsigned int)alpha<<24)|0xffffff; edge=((unsigned int)glow<<24)|0x204080;
-    func_L00_003E2E80(table[bank],23,14,firstCount,color,edge,0.0f,4.0f,D_L00_001B05B4);
-    if(*(int *)(state+0x10)>20) func_L00_003E2E80(table[bank],23,14,*(int *)(state+0x10),color,edge,0.0f,4.0f,D_L00_001B05B4);
+    DrawFadingTwoPassRibbon(table[bank],23,14,firstCount,color,edge,0.0f,4.0f,D_L00_001B05B4);
+    if(*(int *)(state+0x10)>20) DrawFadingTwoPassRibbon(table[bank],23,14,*(int *)(state+0x10),color,edge,0.0f,4.0f,D_L00_001B05B4);
 }

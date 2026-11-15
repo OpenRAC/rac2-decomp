@@ -90,7 +90,7 @@ void func_L20_003C0048(ScriptMoby *self) {
         self->mode = 2;
         state->timer = 120;
         {
-            float duration = func_00283CE0(120);
+            float duration = IntToFloat(120);
             state->inverseDuration = 1.0f / duration;
         }
         func_L00_00429020(state->parameter);

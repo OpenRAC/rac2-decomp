@@ -31,9 +31,9 @@ void func_L05_003D1AB8(char *obj)
     *(TI128 *)speed = 0;
     a[2] = 0.045f;
     a[3] = 1.0f;
-    func_00283098(p, a, obj + 0xC0);
+    matrix_mul_vec3(p, a, obj + 0xC0);
     factor = 0.4f;
-    func_00282CC0(p, p, obj + 0x10);
+    FastVecAdd(p, p, obj + 0x10);
     p[3] = 0;
     qcopy(p1, p);
     qcopy(p2, p);
@@ -54,8 +54,8 @@ void func_L05_003D1AB8(char *obj)
     b[1] = y;
     b[2] = 0.045f;
     b[3] = 1.0f;
-    func_00283098(p, b, obj + 0xC0);
-    func_00282CC0(p, p, obj + 0x10);
+    matrix_mul_vec3(p, b, obj + 0xC0);
+    FastVecAdd(p, p, obj + 0x10);
     p[3] = 0;
     qcopy(p1, p);
     qcopy(p2, p);

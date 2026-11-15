@@ -101,19 +101,19 @@ void func_L04_003FA7E0(unsigned char *m) {
         if (target[0xBC] == 6) goto destroy;
         ownerState = BP(target,0x68);
         qcopy(&targetPos,target+0x10);
-        func_00282D30(&steeringTemp,target+0xC0,1.75f);
-        func_00282CC0(&targetPos,&targetPos,&steeringTemp);
+        FastVecScale(&steeringTemp,target+0xC0,1.75f);
+        FastVecAdd(&targetPos,&targetPos,&steeringTemp);
         if (BI(ownerState,0x744)) {
             jitter = func_002A7878(-0.25f,0.25f);
             if (!(BI(ownerState,0x744)&1)) jitter += 1.5f;
             else jitter -= 1.5f;
-            func_00282D30(&steeringTemp,target+0xD0,jitter);
-            func_00282CC0(&targetPos,&targetPos,&steeringTemp);
-            func_00282D30(&steeringTemp,target+0xC0,1.0f);
-            func_00282CC0(&targetPos,&targetPos,&steeringTemp);
+            FastVecScale(&steeringTemp,target+0xD0,jitter);
+            FastVecAdd(&targetPos,&targetPos,&steeringTemp);
+            FastVecScale(&steeringTemp,target+0xC0,1.0f);
+            FastVecAdd(&targetPos,&targetPos,&steeringTemp);
         }
         yaw = func_00283248(targetPos.v[0]-BF(m,0x10),targetPos.v[1]-BF(m,0x14));
-        pitch = -func_00283248(func_00282E80(m+0x10,&targetPos),targetPos.v[2]-BF(m,0x18));
+        pitch = -func_00283248(vec_distance_xy(m+0x10,&targetPos),targetPos.v[2]-BF(m,0x18));
     } else {
         if (!target) {
             *(HomingUpdateQuad *)&temp = *(HomingUpdateQuad *)(m+0x10);
@@ -124,14 +124,14 @@ void func_L04_003FA7E0(unsigned char *m) {
         owner = BP(state,0x20);
         if (owner && *(short *)(owner+0xAA)==0xBBC) {
             unsigned char *ownerData = BP(owner,0x68);
-            func_00282978(state+0x4C);
-            jitter = func_00283CE0(*(short *)(state+0x4C));
-            jitter /= func_00283CE0(*(short *)(state+0x4E));
-            func_00282D30(&acceleration,ownerData+0x290,jitter);
+            FastDecTimer(state+0x4C);
+            jitter = IntToFloat(*(short *)(state+0x4C));
+            jitter /= IntToFloat(*(short *)(state+0x4E));
+            FastVecScale(&acceleration,ownerData+0x290,jitter);
         }
         if (target) {
-            func_00282CF0(&motion,target+0x10,m+0x10);
-            jitter = func_00282DB0(&motion,&motion);
+            FastVecSub(&motion,target+0x10,m+0x10);
+            jitter = FastVecDot(&motion,&motion);
         } else jitter=200.0f;
         if (jitter>32.0f && (target || BI(state,0x24)>60)) {
             func_L04_003FA350(m,state+0x3C,state+0x40);
@@ -140,9 +140,9 @@ void func_L04_003FA7E0(unsigned char *m) {
         } else if (target && BI(state,0x24)<300 && (signed char)target[0x20]>=0) {
             qcopy(&targetPos,target+0x10);
             targetPos.v[2]+=BF(state,0x2C);
-            func_00282CF0(&motion,&targetPos,m+0x10);
+            FastVecSub(&motion,&targetPos,m+0x10);
             yaw=func_00283248(motion.v[0],motion.v[1]);
-            pitch=-func_00283248(func_00282E20(&motion),motion.v[2]);
+            pitch=-func_00283248(vec_length_xy(&motion),motion.v[2]);
         } else if (BI(state,0x24)<300) {
             yaw=BF(state,0x3C); pitch=BF(state,0x40);
         } else { yaw=BF(m,0xF8); pitch=BF(m,0xF4); }
@@ -165,29 +165,29 @@ void func_L04_003FA7E0(unsigned char *m) {
     random.v[1]=func_002A7878(-1.0f,1.0f);
     random.v[2]=func_002A7878(-1.0f,1.0f);
     *(HomingUpdateQuad *)&temp = *(HomingUpdateQuad *)(&random);
-    func_00282F20(&temp,&temp,func_002A7878(0.1f,0.2f)*0.016666668f);
-    func_00282F20(&trailMotion,&direction,-func_002A7878(0.00166666682343930006f,0.016666668f));
-    func_00282CC0(&temp,&temp,&trailMotion);
-    func_00282F20(&trailMotion,&direction,func_002A7878(0,1)*BF(state,0x30));
-    func_00282CC0(&trailMotion,&trailMotion,m+0x10);
+    vec_scale_to_length(&temp,&temp,func_002A7878(0.1f,0.2f)*0.016666668f);
+    vec_scale_to_length(&trailMotion,&direction,-func_002A7878(0.00166666682343930006f,0.016666668f));
+    FastVecAdd(&temp,&temp,&trailMotion);
+    vec_scale_to_length(&trailMotion,&direction,func_002A7878(0,1)*BF(state,0x30));
+    FastVecAdd(&trailMotion,&trailMotion,m+0x10);
     particle=func_002C16C0(&trailMotion,&temp,60,127,0x606060,3,40000,1000,1,-0.0002f,0);
     if(particle) { unsigned char b=*D_L04_001FF25C; particle[3]=0x44; particle[2]=b; }
     func_002C16C0(m+0x10,&temp,6,127,0xB0B0B0,3,40000,1000,1,-0.0004f,0);
     random.q = 0; random.v[2]=0.02f;
-    func_00283098(&random,&random,m+0xC0);
+    matrix_mul_vec3(&random,&random,m+0xC0);
     func_002ACEC0(&random,&random,m+0xC0,func_002A7940());
     func_002BD8B0(&trailMotion,&random,0x4F007FFF,0x1FFFFFFF,5,1,20000);
     qcopy(&oldPos,m+0x10);
-    func_00282CD8(&temp,&direction,&acceleration);
+    add_vectors(&temp,&direction,&acceleration);
     if(target && *(short *)(target+0xAA)==0xBBC) {
-        func_00282CC0(m+0x10,m+0x10,&direction);
-        func_00282CF0(&direction,m+0x10,&targetPos);
+        FastVecAdd(m+0x10,m+0x10,&direction);
+        FastVecSub(&direction,m+0x10,&targetPos);
         threshold=0.5f;
         if(BI(BP(target,0x68),0x744)) threshold=1;
-        if(func_00282DB0(&direction,&direction)<threshold) { func_L04_0040ACC8(); m[0xBC]=2; }
+        if(FastVecDot(&direction,&direction)<threshold) { func_L04_0040ACC8(); m[0xBC]=2; }
     } else {
         if(BF(m,0x10)<0 || BF(m,0x14)<0 || BF(m,0x18)<0) goto destroy;
-        collision=func_L04_003F9ED0(m,state,m+0x10,&direction,&velocity,&normal,&hitPos);
+        collision=SweepProjectileCollision(m,state,m+0x10,&direction,&velocity,&normal,&hitPos);
     }
     if(!m[0xBC]) goto finish;
     func_002E5DA0(11,0,m,0xBBC);
@@ -200,32 +200,32 @@ void func_L04_003FA7E0(unsigned char *m) {
     cross[1]=normal.v[2]; cross[5]=0; cross[9]=-normal.v[0]; cross[13]=0;
     cross[2]=-normal.v[1]; cross[6]=normal.v[0]; cross[10]=0; cross[14]=0;
     cross[3]=0; cross[7]=0; cross[11]=0; cross[15]=0;
-    func_00283788(crossSquared,cross,cross);
+    multiply_matrix(crossSquared,cross,cross);
     for(i=0;i<10;i++) {
         angle=func_002A7940();
         func_L03_002EFB60(matA,crossSquared,1-func_00283180(angle));
         func_L03_002EFB60(matB,cross,func_00283198(angle));
         func_L04_0030FA30(matB,matB,matA);
-        func_00283388(matA);
+        set_identity_matrix(matA);
         func_L04_0030FA30(matC,matB,matA);
-        func_002830C0(&temp,&hitPos,matC);
-        func_00282F20(&temp,&temp,func_002A7878(8.5f,16.5f)*0.016666668f);
+        transform_vector(&temp,&hitPos,matC);
+        vec_scale_to_length(&temp,&temp,func_002A7878(8.5f,16.5f)*0.016666668f);
         temp.v[2]+=0.083333336f;
-        func_00282CC0(&temp,&temp,&velocity);
+        FastVecAdd(&temp,&temp,&velocity);
         func_002BCB00(m+0x10,&temp,0x4F007FFF,0x1F00007F,func_002A7820(60,120),1,-1,-1,0,40000);
     }
     random.q = 0;
     random.v[0]=func_002A7878(-1,1); random.v[1]=func_002A7878(-1,1); random.v[2]=func_002A7878(-1,1);
     *(HomingUpdateQuad *)&temp = *(HomingUpdateQuad *)(&random);
-    func_00282CF0(&cameraMotion,D_L04_001B9680,m+0x10);
-    camDist=func_00282DF0(&cameraMotion);
+    FastVecSub(&cameraMotion,D_L04_001B9680,m+0x10);
+    camDist=FastVecLength(&cameraMotion);
     cameraMotion.v[2]+=camDist*0.5f;
-    func_00282F20(&temp,&temp,camDist*0.00333333364687860012f);
-    func_00282F20(&cameraMotion,&cameraMotion,(camDist+camDist)*0.016666668f);
-    func_00282CC0(&temp,&temp,&cameraMotion);
+    vec_scale_to_length(&temp,&temp,camDist*0.00333333364687860012f);
+    vec_scale_to_length(&cameraMotion,&cameraMotion,(camDist+camDist)*0.016666668f);
+    FastVecAdd(&temp,&temp,&cameraMotion);
     func_00282FB8(&temp,&temp,0.16666667f);
     func_00308600(m+0x10,&temp,func_002A7820(60,90),0,0);
-    if(camDist<6) count=func_00283CF0(camDist)/2;
+    if(camDist<6) count=FloatToInt(camDist)/2;
     else count=3;
     fade=0;
     if(camDist<7) fade=7-camDist;
@@ -248,7 +248,7 @@ void func_L04_003FA7E0(unsigned char *m) {
         random.q = 0;
         random.v[0]=func_002A7878(-1,1); random.v[1]=func_002A7878(-1,1); random.v[2]=func_002A7878(-1,1);
         *(HomingUpdateQuad *)&colorsB = *(HomingUpdateQuad *)(&random);
-        func_00282F20(&colorsB,&colorsB,func_002A7878(0,3)*0.016666668f);
+        vec_scale_to_length(&colorsB,&colorsB,func_002A7878(0,3)*0.016666668f);
         {
             unsigned int *ca=colorsA.colors.v+func_002A77E0(6), *cb=colorsC.v+func_002A77E0(6);
             func_002BB838(m+0x10,&colorsB,*ca,*cb,func_002A7820(20,35),200000);
@@ -270,10 +270,10 @@ void func_L04_003FA7E0(unsigned char *m) {
     camera=(HomingCamera *)D_L04_001B9540;
     camera->shakeTimeA=25; camera->shakeClockA=0;
     func_00312B70(&settings,m+0x10,0,0);
-    func_00282CF0(&random,m+0x10,camera->focus);
-    if(func_00282DF0(&random)<64) {
-        func_00282CF0(&colorsA.vectors[1],camera->focus,&colorsA);
-        func_00282F20(&colorsA.vectors[1],&colorsA.vectors[1],1);
+    FastVecSub(&random,m+0x10,camera->focus);
+    if(FastVecLength(&random)<64) {
+        FastVecSub(&colorsA.vectors[1],camera->focus,&colorsA);
+        vec_scale_to_length(&colorsA.vectors[1],&colorsA.vectors[1],1);
         func_0032DA58(m,m+0x10,&colorsA.vectors[1],5);
         camera->shakeB=0.1f; camera->shakeTimeB=90;
         camera->shakeA=0.2f; camera->shakeTimeA=60; camera->shakeClockA=0;
@@ -283,7 +283,7 @@ destroy:
     return;
 finish:
     if(target && *(short *)(target+0xAA)==0xBBC) return;
-    if(func_00282948(state+0x24) || !BP(state,0x20) || func_00282E80(m+0x10,BP(state,0x20)+0x10)>260) func_0029F338(m);
+    if(func_00282948(state+0x24) || !BP(state,0x20) || vec_distance_xy(m+0x10,BP(state,0x20)+0x10)>260) func_0029F338(m);
 }
 #undef BF
 #undef BI

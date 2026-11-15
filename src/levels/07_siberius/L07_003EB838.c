@@ -42,10 +42,10 @@ void func_L07_003EB838(char *arg)
         *(Quad *)b = *(Quad *)pos;
         a[2] += 2.0f;
         b[2] -= 3.0f;
-        if (func_002761F8(a, b, 0, arg, 0) && D_L07_001BF640.object != 0) {
+        if (CollLine(a, b, 0, arg, 0) && D_L07_001BF640.object != 0) {
             if (*(int *)(func_002AD0B0(D_L07_001BF640.object) + 0x3C) & 2) {
                 *(char **)(o + 0x314) = D_L07_001BF640.object;
-                func_00282CF0(c, pos, *(char **)(o + 0x314) + 0x10);
+                FastVecSub(c, pos, *(char **)(o + 0x314) + 0x10);
                 func_002AFDD8(*(char **)(o + 0x314), c, c, 0);
                 *(float *)(o + 0x318) = c[2] - 1.0f;
                 func_002AD5F8(arg, *(char **)(o + 0x314), pos, arg + 0xF0, o + 0x2F0, o + 0x300);
@@ -58,14 +58,14 @@ void func_L07_003EB838(char *arg)
             func_002AD470(arg, platform, o + 0x2F0, o + 0x300, arg + 0x10, arg + 0xF0);
         else
             func_002AD0E0(arg, platform, arg + 0x10, arg + 0xF0, arg + 0x10, arg + 0xF0);
-        func_002833F0(arg + 0xC0, arg + 0xF0);
+        euler_rotation_basis(arg + 0xC0, arg + 0xF0);
         func_002B0408(arg + 0xC0, *(char **)(o + 0x314) + 0xE0, 0);
         func_002AB6D8(arg + 0xC0, arg + 0xF0);
         if (*(unsigned char *)(arg + 0x95) == 3) {
-            func_00282CF0(a, arg + 0x10, *(char **)(o + 0x314) + 0x10);
+            FastVecSub(a, arg + 0x10, *(char **)(o + 0x314) + 0x10);
             func_002AFDD8(*(char **)(o + 0x314), a, a, 0);
             a[2] = *(float *)(o + 0x318);
-            func_00283098(a, a, *(char **)(o + 0x314) + 0xC0);
+            matrix_mul_vec3(a, a, *(char **)(o + 0x314) + 0xC0);
             *(float *)(o + 0x180) = a[2] + *(float *)(*(char **)(o + 0x314) + 0x18);
             if (*(float *)(arg + 0x18) < *(float *)(o + 0x180))
                 func_002A8F70(arg, D_0018C0B0, 0x10000, arg + 0x10, D_L07_001A8F20, 7.0f);

@@ -48,15 +48,15 @@ void func_00329488(void *obj) {
         if (p->t.owner != obj)
             continue;
         if (p->t.f30 < (p->t.f34 >> 1))
-            scale = func_00283CE0(p->t.f30) / func_00283CE0((p->t.f34 >> 1));
+            scale = IntToFloat(p->t.f30) / IntToFloat((p->t.f34 >> 1));
         else
             scale = 1.0f;
-        n = func_00283CF0(scale * full);
+        n = FloatToInt(scale * full);
         s = func_00283180(p->t.f14);
         a = (s + 1.0f) * 0.5f;
         b = a * (scale * -0.025f);
         v[2] = v[1] = v[0] = s * 0.05f;
-        func_00282CC0(v, v, pos);
+        FastVecAdd(v, v, pos);
         func_002820D0((p->t.f18 + p->t.f18) * a, b, 0.08f, v, n, 0);
     }
     func_002820C8();

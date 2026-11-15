@@ -50,7 +50,7 @@ void func_L20_0044A658(char *arg0) {
         }
     }
     f = func_002A96A0(arg0, p);
-    func_002AA2E8((float *)(state + 0x20), 0.0f, f);
+    ApproachValue((float *)(state + 0x20), 0.0f, f);
     *(u8 *)(arg0 + 0xA8) = 0xFF;
     if (*(float *)(state + 0x20) == 0.0f) {
         func_L20_0044AB68(arg0);

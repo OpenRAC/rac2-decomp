@@ -7,7 +7,7 @@ extern float func_00282E80(void *, void *);
 
 /* Walks the id lists that arg0's state names for arg1's class (0xD0F: two lists,
    0x119E/0x12EF: one) and returns the last moby, not flagged at +0x34 bit 0, for which
-   func_00282E80(moby + 0x10, arg0 + 0x10) < 1025.0f; 0 if none.  Built with -G8 and
+   vec_distance_xy(moby + 0x10, arg0 + 0x10) < 1025.0f; 0 if none.  Built with -G8 and
    split addresses: the list limit and the moby bank are single absolute loads, the
    list table is reached through a %hi/%lo pair. */
 char *func_L20_004448A8(char *arg0, char *arg1) {
@@ -46,7 +46,7 @@ char *func_L20_004448A8(char *arg0, char *arg1) {
                 break;
             }
             if (!(*(u16 *)(e + 0x34) & 1)) {
-                if (func_00282E80(e + 0x10, arg0 + 0x10) < range) {
+                if (vec_distance_xy(e + 0x10, arg0 + 0x10) < range) {
                     best = e;
                 }
             }

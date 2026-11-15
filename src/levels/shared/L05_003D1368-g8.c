@@ -36,14 +36,14 @@ void func_L05_003D1368(char *obj, char *input, float *output)
         hit.damage = D_L05_001AFC54;
     hit.one = 1;
     qcopy(hit.pos, input);
-    func_00282F20(&hit, &hit, 1.0f);
+    vec_scale_to_length(&hit, &hit, 1.0f);
     table = D_L05_001BFB00;
     hit.pos[3] = 5627.9248046875f;
     hit.type = 3;
     hit.subtype = 2;
     hit.id = *(unsigned short *)(obj + 0xAA);
     if (*(char **)(table + 0x18))
-        func_002A8E20(*(char **)(table + 0x18), &hit);
+        QueueMobyImpact(*(char **)(table + 0x18), &hit);
     func_L05_003D1E60(obj + 0x10, 0, 0);
     if (*(char **)(table + 0x18) && *(short *)(*(char **)(table + 0x18) + 0xAA) == 0x956) {
         float count = 20.0f, scale = 3.0f, spread = 2.0f;
@@ -57,7 +57,7 @@ void func_L05_003D1368(char *obj, char *input, float *output)
             a = func_002A7940();
             b = func_002A7940();
             func_002AF000(vel, 0.05000000447034836f, a, b);
-            p = func_002BDCE8(output, func_002A7820(-3, 3), 0.0f, 1.0f, 1.0f, vel, 0x7FFFFFFF, 0, scale * 210000.0f);
+            p = SpawnSpinningSparkParticle(output, func_002A7820(-3, 3), 0.0f, 1.0f, 1.0f, vel, 0x7FFFFFFF, 0, scale * 210000.0f);
             if (p) {
                 char *q = p + 0x20;
                 *(short *)(p + 0xA) = 120;

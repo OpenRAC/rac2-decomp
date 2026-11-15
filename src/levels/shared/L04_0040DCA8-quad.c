@@ -50,13 +50,13 @@ void func_L04_0040DCA8(B781AimQuad *position, int texture, int color, int flags,
         }
     }
     qcopy(transform[3], position);
-    func_00282CF0(transform[0], D_L04_001B9680, transform[3]);
-    func_00282F20(transform[0], transform[0], 1.0f);
-    func_00282DD8(transform[1], transform[0], D_0018A0E0);
-    func_00282F20(transform[1], transform[1], 1.0f);
-    func_00282DD8(transform[2], transform[1], transform[0]);
-    func_00282D30(scratch.angles, transform[0], size);
-    func_00282CC0(transform[3], transform[3], scratch.angles);
+    FastVecSub(transform[0], D_L04_001B9680, transform[3]);
+    vec_scale_to_length(transform[0], transform[0], 1.0f);
+    FastVecCross(transform[1], transform[0], D_0018A0E0);
+    vec_scale_to_length(transform[1], transform[1], 1.0f);
+    FastVecCross(transform[2], transform[1], transform[0]);
+    FastVecScale(scratch.angles, transform[0], size);
+    FastVecAdd(transform[3], transform[3], scratch.angles);
     corners[0].bits = 0; corners[1].bits = 0; corners[2].bits = 0; corners[3].bits = 0;
     corners[0].f[1] = -1; corners[0].f[2] = 1 - skew * 0.3f; corners[0].f[3] = 1;
     corners[1].f[1] = -1; corners[1].f[2] = -(1 - skew * 0.3f); corners[1].f[3] = 1;
@@ -64,10 +64,10 @@ void func_L04_0040DCA8(B781AimQuad *position, int texture, int color, int flags,
     corners[3].f[1] = 1; corners[3].f[2] = -(1 - skew * 0.3f); corners[3].f[3] = 1;
     for (i = 0; i < 4; i++) {
         out = packet.vertices[i];
-        func_00282D30(out, corners[i].f, scale);
-        func_002830C0(out, out, transform);
+        FastVecScale(out, corners[i].f, scale);
+        transform_vector(out, out, transform);
     }
-    func_002FC560(0x47, 0x33001);
-    func_00280B90(&packet, 0, 0);
-    func_002FC560(0x47, 0x5360b);
+    VU1_addGSregister(0x47, 0x33001);
+    draw_world_quad(&packet, 0, 0);
+    VU1_addGSregister(0x47, 0x5360b);
 }

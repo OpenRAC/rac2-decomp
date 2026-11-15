@@ -28,12 +28,12 @@ int func_L00_003A87D8(char *object)
     for (i = 0; i < 80; i = j) {
         j = i + 1;
         if (base[i].active != 0) {
-            if (func_00282978(base[i].timer) != 0) {
+            if (FastDecTimer(base[i].timer) != 0) {
                 base[i].active = 0;
             } else {
                 float *scaled;
                 active++;
-                base[i].value = func_00283B98(base[i].value, base[i].target);
+                base[i].value = FastAddRotations(base[i].value, base[i].target);
                 scaled = local[1];
                 for (k = 0; k < 9; k++)
                     base[i].pos[k] += base[i].vel[k];
@@ -42,8 +42,8 @@ int func_L00_003A87D8(char *object)
                 local[0][3] = 1.0f;
                 if (D_L00_001A8FF0[0] != 0)
                     func_002AFFD8(&base[i], local[0], 1);
-                func_00282D30(scaled, local[0], base[i].scale);
-                func_00282CC0(&base[i], &base[i], scaled);
+                FastVecScale(scaled, local[0], base[i].scale);
+                FastVecAdd(&base[i], &base[i], scaled);
             }
         }
     }

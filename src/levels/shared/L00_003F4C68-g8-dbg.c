@@ -48,7 +48,7 @@ char *func_L00_003F4C68(char *position,char *velocity,int id,int mode)
     unsigned char stamp;
     int next;
     if (id == -1 || func_002B4038(0xc04,id) == 0) return 0;
-    object=func_0029EFD0(0xcf7);
+    object=CreateMoby(0xcf7);
     if (object != 0) {
         *(unsigned char *)(object + 0x30) = 0xFF;
         *(unsigned short *)(object + 0x32) = 0xFF;
@@ -59,18 +59,18 @@ char *func_L00_003F4C68(char *position,char *velocity,int id,int mode)
         object[0x20]=0;
         func_003001E0(state,velocity,position);
         frames=0.016666668f * (D_L00_00262570 + D_0013957F[0])->speed;
-        state->frames=func_00283CF0(128.0f / frames);
+        state->frames=FloatToInt(128.0f / frames);
         /* Call and division in one statement: retail has no line label between them,
            so no division padding (docs/build/compiler-notes.md). */
-        state->rate=1.0f/func_00283CE0(state->frames);
+        state->rate=1.0f/IntToFloat(state->frames);
         state->id=id;
         state->target=func_L00_0032A088(0xc04,id);
         state->age=0;
         state->fadeFrames=D_L00_001B0938;
-        state->fadeRate=1.0f/func_00283CE0(state->fadeFrames);
+        state->fadeRate=1.0f/IntToFloat(state->fadeFrames);
         state->mode=mode;
         func_002AFFD8(location,&direction,1);
-        func_00282D30(&direction,&direction,-1.0f);
+        FastVecScale(&direction,&direction,-1.0f);
         func_L00_003F51A0(object,(char *)&direction);
         if (D_L00_001B0934 > 3) D_L00_001B0934=0;
         state->slot=D_L00_001B0934;
@@ -78,11 +78,11 @@ char *func_L00_003F4C68(char *position,char *velocity,int id,int mode)
         func_L00_003F5F90(object);
         if (mode == 1) {
             qcopy(&state->origin,D_L00_001B8DC0);
-            func_00282F20(&state->velocity,D_L00_001B8DC0 + 0x230,func_00282DF0(velocity));
+            vec_scale_to_length(&state->velocity,D_L00_001B8DC0 + 0x230,FastVecLength(velocity));
         }
         if (mode == 2) {
             qcopy(&previous,position);
-            func_00282CC0(location,position,velocity);
+            FastVecAdd(location,position,velocity);
             if (func_L00_003F5238(object,(char *)&previous) != 0) object[0x20]=2;
         }
     }

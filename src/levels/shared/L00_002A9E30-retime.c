@@ -56,7 +56,7 @@ float func_L00_002A9E30(float arg0, float arg1, float arg2, float arg3)
                 D_00189E20_2.value = value;
                 return negone;
             }
-            return func_002AA2E8(&D_00189E20_2.value, value, arg3);
+            return ApproachValue(&D_00189E20_2.value, value, arg3);
         }
     }
     return 0.0f;

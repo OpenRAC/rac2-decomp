@@ -30,9 +30,9 @@ void func_L00_003FF530(char *object) {
     int i;
     int j;
 
-    func_002E5CF8(0, 0, object);
+    PlayMobySound(0, 0, object);
     for (j = 1; j >= 0; j--) {
-        func_0032C700(strength, 20.0f, object + 0x10, 1, 14, 10, 15, 10, 20, 1,
+        SpawnExplosion(strength, 20.0f, object + 0x10, 1, 14, 10, 15, 10, 20, 1,
                        0, 1, 0, D_L00_001ADB2C);
         strength += 0.3f;
     }
@@ -40,8 +40,8 @@ void func_L00_003FF530(char *object) {
     perpendicular[0] = basis[2][2];
     perpendicular[1] = basis[2][2];
     perpendicular[2] = -(basis[2][0] + basis[2][1]);
-    func_00282F20(basis[0], perpendicular, 1.0f);
-    func_00282DD8(basis[1], basis[0], basis[2]);
+    vec_scale_to_length(basis[0], perpendicular, 1.0f);
+    FastVecCross(basis[1], basis[0], basis[2]);
     basis[0][3] = basis[1][3] = basis[2][3] = 0.0f;
     for (i = 0; i < D_L00_001B0C24; i++) {
         heading = func_002A7940();
@@ -54,7 +54,7 @@ void func_L00_003FF530(char *object) {
         }
         func_002AF000(direction, speed, heading, elevation);
         direction[3] = 0.0f;
-        func_00283098(direction, direction, basis);
+        matrix_mul_vec3(direction, direction, basis);
         fragment = func_L00_00409558(position, direction, i, *(int *)(state + 0x2C));
         if (fragment != 0) *(int *)(fragment + 0xB8) = *(int *)(object + 0xB8);
     }

@@ -122,12 +122,12 @@ int func_00346C60(ItemMenu *menu, int buttons)
         if (D_001A7AF8[entry]) {
             text = menu->detail;
             D_001ADB10 = D_00239BA0[D_00139568[entry]].material;
-            func_00115DA8(menu->name, func_00288FB8(D_00239BA0[D_00139568[entry]].name));
+            func_00115DA8(menu->name, GetLocalizedString(D_00239BA0[D_00139568[entry]].name));
             record = &D_00239BA0[D_00139568[entry]];
             ammo = D_00139688[entry];
             maxAmmo = record->maxAmmo;
             if (record->usesAmmo) {
-                text += func_00115DA8(text, D_001AE528, func_00288FB8(0x2DC9));
+                text += func_00115DA8(text, D_001AE528, GetLocalizedString(0x2DC9));
                 if (ammo < 1000)
                     text += func_00115DA8(text, D_001AE530, ammo);
                 else
@@ -137,7 +137,7 @@ int func_00346C60(ItemMenu *menu, int buttons)
                 else
                     func_00115DA8(text, D_001AE548, maxAmmo / 1000, maxAmmo % 1000);
             } else {
-                func_00115DA8(text, ref_00346C60_00, func_00288FB8(0x2DB9));
+                func_00115DA8(text, ref_00346C60_00, GetLocalizedString(0x2DB9));
             }
             if (buttons & 0x40) {
                 result = selection;

@@ -77,7 +77,7 @@ void func_L03_003C4800(unsigned char *a0) {
             qcopy(v, &vecs[j]);
             w = v[3];
             v[3] = 1.0f;
-            func_002830C0(v, v, m);
+            transform_vector(v, v, m);
             func_L00_00325AE8(v, *(int *)(e + 0x78), w, 0.08f);
         }
     }

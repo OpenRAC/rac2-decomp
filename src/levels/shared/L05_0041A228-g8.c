@@ -95,14 +95,14 @@ void func_L05_0041A228(char *o)
         }
         return;
     }
-    func_002FC560(6,func_0027C878(D_L05_001B11D0));
-    func_002FC560(0x42,0x8000000048LL);
-    func_002FC560(8,0);
-    func_002FC560(0x14,0xFF9000000260LL);
-    func_00280328();
-    func_00283658(basis[0],o+0xC0);
-    func_00282D30(&point,basis[0],-D_L05_001B11E8);
-    func_00282CC0(basis[3],o+0x10,&point);
+    VU1_addGSregister(6,GetEffectTextureDescriptor(D_L05_001B11D0));
+    VU1_addGSregister(0x42,0x8000000048LL);
+    VU1_addGSregister(8,0);
+    VU1_addGSregister(0x14,0xFF9000000260LL);
+    font_queue_vu_state();
+    copy_matrix_rotation(basis[0],o+0xC0);
+    FastVecScale(&point,basis[0],-D_L05_001B11E8);
+    FastVecAdd(basis[3],o+0x10,&point);
     width=D_L05_001B1200;
     height=D_L05_001B1214;
     if (*(short *)(st->owner+0xAA)==0x97C) width=height=0.2f;
@@ -110,77 +110,77 @@ void func_L05_0041A228(char *o)
         int i;
         for(i=0;i<34;i++) {
         point.x=D_L05_002B8330[i][0]*width; point.y=D_L05_002B8330[i][1]*D_L05_001B1204; point.z=D_L05_002B8330[i][2]*D_L05_001B1204; point.w=1.0f;
-        func_002830C0(&point,&point,basis[0]);
+        transform_vector(&point,&point,basis[0]);
         {EffectPosition *out=&vertices[i];out->x=point.x;out->y=point.y;out->z=point.z;}
         colors[i]=D_L05_001B11D4|st->alpha;
         }
     }
     func_00281810(D_L05_001B1078,vertices,colors,D_L05_002B8550,1);
-    func_00282CF0(view,D_L05_001B96C0,basis[3]);
-    func_00282DD8(basis[1],basis[0],view);func_00282F20(basis[1],basis[1],1.0f);
-    func_00282DD8(basis[2],basis[1],basis[0]);
-    func_002FC560(6,func_0027C878(11));
-    func_002FC560(0x42,0x7F00000044LL);
+    FastVecSub(view,D_L05_001B96C0,basis[3]);
+    FastVecCross(basis[1],basis[0],view);vec_scale_to_length(basis[1],basis[1],1.0f);
+    FastVecCross(basis[2],basis[1],basis[0]);
+    VU1_addGSregister(6,GetEffectTextureDescriptor(11));
+    VU1_addGSregister(0x42,0x7F00000044LL);
     {
         int i;
         for(i=0;i<8;i++) {
         point.x=D_L05_002B8670[i][0]*width; point.y=D_L05_002B8670[i][1]*D_L05_001B1204; point.z=D_L05_002B8670[i][2]; point.w=1.0f;
-        func_002830C0(&point,&point,basis[0]);
+        transform_vector(&point,&point,basis[0]);
         {EffectPosition *out=&vertices[i];out->x=point.x;out->y=point.y;out->z=point.z;}
         colors[i]=D_L05_001B11D8|st->alpha;
         }
     }
     func_00281810(8,vertices,colors,D_L05_001B1090,1);
-    func_002FC560(0x42,0x7F00000048LL);
+    VU1_addGSregister(0x42,0x7F00000048LL);
     {
         int i;
         float scale_x=1.1f;
         float scale_y=3.0f;
         for(i=0;i<8;i++) {
         point.x=D_L05_002B8670[i][0]*width*scale_x; point.y=D_L05_002B8670[i][1]*D_L05_001B1204*scale_y; point.z=D_L05_002B8670[i][2]; point.w=1.0f;
-        func_002830C0(&point,&point,basis[0]);
+        transform_vector(&point,&point,basis[0]);
         {EffectPosition *out=&vertices[i];out->x=point.x;out->y=point.y;out->z=point.z;}
         colors[i]=D_L05_001B11DC|st->alpha;
         }
     }
     func_00281810(8,vertices,colors,D_L05_001B1090,1);
-    func_002FC560(0x42,0x7F00000044LL);
-    func_00282D30(&point,basis[0],height);func_00282CC0(basis[3],basis[3],&point);
+    VU1_addGSregister(0x42,0x7F00000044LL);
+    FastVecScale(&point,basis[0],height);FastVecAdd(basis[3],basis[3],&point);
     {
         int i;
         for(i=0;i<4;i++) {
-        func_00282F20(&point,D_L05_001B1160[i],D_L05_001B120C);
-        func_002830C0(&point,&point,basis[0]);
+        vec_scale_to_length(&point,D_L05_001B1160[i],D_L05_001B120C);
+        transform_vector(&point,&point,basis[0]);
         {EffectPosition *out=&vertices[i];out->x=point.x;out->y=point.y;out->z=point.z;}
         colors[i]=D_L05_001B11E0|st->alpha;
         }
     }
     func_00281810(4,vertices,colors,D_L05_001B11A0,1);
-    func_002FC560(0x42,0x7F00000048LL);
+    VU1_addGSregister(0x42,0x7F00000048LL);
     {
         int i;
         for(i=0;i<4;i++) {
-        func_00282F20(&point,D_L05_001B1160[i],D_L05_001B1210);
-        func_002830C0(&point,&point,basis[0]);
+        vec_scale_to_length(&point,D_L05_001B1160[i],D_L05_001B1210);
+        transform_vector(&point,&point,basis[0]);
         {EffectPosition *out=&vertices[i];out->x=point.x;out->y=point.y;out->z=point.z;}
         colors[i]=D_L05_001B11E4|st->alpha;
         }
     }
     func_00281810(4,vertices,colors,D_L05_001B11A0,1);
     uv.q=0;uv.f[2]=1.0f;uv.f[3]=1.0f;
-    func_002FC560(6,func_0027C878(0x40));
-    func_00282CF0(basis[0],D_L05_001B96C0,basis[3]);func_00282F20(basis[0],basis[0],1.0f);
-    func_00282DD8(basis[1],basis[0],uv.f);func_00282F20(basis[1],basis[1],1.0f);func_00282DD8(basis[2],basis[1],basis[0]);
+    VU1_addGSregister(6,GetEffectTextureDescriptor(0x40));
+    FastVecSub(basis[0],D_L05_001B96C0,basis[3]);vec_scale_to_length(basis[0],basis[0],1.0f);
+    FastVecCross(basis[1],basis[0],uv.f);vec_scale_to_length(basis[1],basis[1],1.0f);FastVecCross(basis[2],basis[1],basis[0]);
     radius=st->radius;
     func_002ACEC0(basis[1],basis[1],basis[0],radius);func_002ACEC0(basis[2],basis[2],basis[0],radius);
-    st->radius=func_00283B98(st->radius,st->speed*0.017453294f*D_L05_001B11FC);
+    st->radius=FastAddRotations(st->radius,st->speed*0.017453294f*D_L05_001B11FC);
     func_002AB668(rotation,basis[0],1.5707965f);
     for(j=0;j<4;j++) {
         {
             int i;
             for(i=0;i<4;i++) {
             {float *row=D_L05_001B10F0[i];point.x=row[0]; point.y=row[1]*D_L05_001B11F0; point.z=row[2]*D_L05_001B11F4; point.w=1.0f;}
-            func_002830C0(&point,&point,basis[0]);
+            transform_vector(&point,&point,basis[0]);
             (vertices+i)->x=point.x;(vertices+i)->y=point.y;(vertices+i)->z=point.z;
             colors[i]=D_L05_001B11F8|st->alpha;
             }

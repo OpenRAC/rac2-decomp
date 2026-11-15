@@ -71,9 +71,9 @@ void func_L03_00425310(u8 *a0)
             if (e == 0)
                 break;
             s0 = *(u8 **)(e + 0x68);
-            *(f32 *)(s0 + 0xC) = func_00283B98(*(f32 *)(s0 + 0xC), *(f32 *)(state + 4));
+            *(f32 *)(s0 + 0xC) = FastAddRotations(*(f32 *)(s0 + 0xC), *(f32 *)(state + 4));
             *(s32 *)(e + 0x78) =
-                func_00283D38(*(s32 *)(s0 + 4), *(s32 *)(s0 + 8),
+                FastTweenColor(*(s32 *)(s0 + 4), *(s32 *)(s0 + 8),
                               func_00283198(*(f32 *)(s0 + 0xC)) * 0.5f + 0.5f);
         }
         break;

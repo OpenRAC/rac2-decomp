@@ -62,22 +62,22 @@ void func_00301F18(u8 *object, void *outPosition, void *outAngles)
     default: step=0.0175f; tilt=-0.35f; radius=0.135f; lift=0.3f; break;
     }
     if (*(u8 *)(state+0x55)&1) {
-        *(float *)(state+0x50)=func_00283B98(*(float *)(state+0x50),step);
-        *(float *)(state+0x58)=func_00283B98(*(float *)(state+0x58),-0.0125f);
+        *(float *)(state+0x50)=FastAddRotations(*(float *)(state+0x50),step);
+        *(float *)(state+0x58)=FastAddRotations(*(float *)(state+0x58),-0.0125f);
     } else {
-        *(float *)(state+0x50)=func_00283BE0(*(float *)(state+0x50),step);
-        *(float *)(state+0x58)=func_00283BE0(*(float *)(state+0x58),-0.0125f);
+        *(float *)(state+0x50)=fast_subtract_rotations(*(float *)(state+0x50),step);
+        *(float *)(state+0x58)=fast_subtract_rotations(*(float *)(state+0x58),-0.0125f);
     }
     qcopy(&rotation, state+0x50);
     rotation.f[1]=tilt;
-    func_002833F0(spinMatrix,&rotation);
-    func_002833F0(anchorMatrix,&angles);
-    func_00283738(object+0xc0,anchorMatrix,spinMatrix);
-    func_00282D30(origin,&anchorMatrix[2],radius);
-    func_00282D30(&offset,object+0xc0,lift);
-    func_00282CC0(origin,origin,&offset);
+    euler_rotation_basis(spinMatrix,&rotation);
+    euler_rotation_basis(anchorMatrix,&angles);
+    multiply_matrix3x3(object+0xc0,anchorMatrix,spinMatrix);
+    FastVecScale(origin,&anchorMatrix[2],radius);
+    FastVecScale(&offset,object+0xc0,lift);
+    FastVecAdd(origin,origin,&offset);
     } while (0);
-    slot = (char *)origin; func_00282CC0(slot,slot,&position);
+    slot = (char *)origin; FastVecAdd(slot,slot,&position);
     if (outPosition) qcopy(outPosition, &position);
     if (outAngles) qcopy(outAngles, &angles);
 }

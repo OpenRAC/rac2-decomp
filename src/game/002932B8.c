@@ -1,7 +1,7 @@
 /* Carried from rac3-decomp (src/frontbin/397D48.c, func_00399810): the same instructions.
    For each of N 16-byte batch records (pointer, count << 16 | last), stores the last index
    back alone and walks the batch's 64-byte entries in steps of four: each entry's index
-   (+0x20) is remapped through C, then the entry is drawn with func_00292B88 when B is given
+   (+0x20) is remapped through C, then the entry is drawn with build_indexed_resident_render_packet when B is given
    (its 16-byte record at that index), else with func_00292EB0. */
 
 #include "common.h"
@@ -23,7 +23,7 @@ void func_002932B8(s32 *a0, u8 *b, u8 *c, s32 n) {
             idx = e[8];
             if (idx >= 0) idx = c[idx];
             if (b) {
-                func_00292B88(e, b + (idx << 4), e[0], e[1], e[4], e[5], idx);
+                build_indexed_resident_render_packet(e, b + (idx << 4), e[0], e[1], e[4], e[5], idx);
             } else {
                 func_00292EB0((unsigned long *)e, e[0], e[1], e[4], e[5], idx);
             }

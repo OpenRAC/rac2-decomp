@@ -19,9 +19,9 @@ void func_L18_002CFD68(s32 mode, s32 index, u8 *object)
 {
     u8 *base = D_00189E20;
     u8 *current;
-    func_L00_002AF7D0();
+    cancel_hero_item_animation();
     base[0x22B6] = 1;
-    func_L00_002B1F90();
+    UpdateHeroSlotCallbacks();
     *(u8 **)(base + 0x2290) = *(u8 **)(base + 0xC18);
     func_L00_00322EC8((Rac2Native_5b4b17178a13f443_SmallSlotReset128Owner *)(base + 0x18E0));
     func_L00_00322EC8((Rac2Native_5b4b17178a13f443_SmallSlotReset128Owner *)(base + 0x1A30));
@@ -49,7 +49,7 @@ void func_L18_002CFD68(s32 mode, s32 index, u8 *object)
         *(s32 *)(D_00189E20 + 0x24CC) = 3;
     }
     func_L18_002E0070(index, 2);
-    if (mode == 4) func_L00_002D2168(15, 0, 5.0f);
+    if (mode == 4) set_hero_animation(15, 0, 5.0f);
 }
 
 extern u8 D_00189E20[];

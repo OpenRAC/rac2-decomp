@@ -67,7 +67,7 @@ void func_L18_0042FBC8(u8 *a)
         func_002A7750(a, 1, -1);
         break;
     case 1:
-        if (s->firstId != -1 && func_002ACBC8(D_00189EA0, s->firstId)) {
+        if (s->firstId != -1 && IsPointInCuboid(D_00189EA0, s->firstId)) {
             func_L18_003F75E8(s->group, &count1);
             if (count1 >= 4)
                 func_002A7750(a, 2, -1);
@@ -83,22 +83,22 @@ void func_L18_0042FBC8(u8 *a)
             s->angles[0] = func_002A7878(zero, D_L18_001B1534 * 0.0002908882452175021f);
             s->angles[1] = func_002A7878(zero, D_L18_001B1538 * 0.0002908882452175021f);
             object->position[2] = s->restHeight;
-            func_002E5CF8(0, 0, a);
+            PlayMobySound(0, 0, a);
         }
         if (object->position[2] >= s->restHeight) {
             object->position[2] += s->verticalSpeed;
             s->verticalSpeed -= D_L18_001B155C * 0.000277777785f;
             if (s->verticalSpeed > 0) {
-                object->rotation[0] = func_00283B98(s->angles[0], object->rotation[0]);
-                object->rotation[1] = func_00283B98(s->angles[1], object->rotation[1]);
+                object->rotation[0] = FastAddRotations(s->angles[0], object->rotation[0]);
+                object->rotation[1] = FastAddRotations(s->angles[1], object->rotation[1]);
             } else {
-                object->rotation[0] = func_00283B98(-s->angles[0], object->rotation[0]);
-                object->rotation[1] = func_00283B98(-s->angles[1], object->rotation[1]);
+                object->rotation[0] = FastAddRotations(-s->angles[0], object->rotation[0]);
+                object->rotation[1] = FastAddRotations(-s->angles[1], object->rotation[1]);
             }
         } else {
             func_002A7750(a, 2, -1);
         }
-        if (s->secondId != -1 && func_002ACBC8(D_00189EA0, s->secondId)) {
+        if (s->secondId != -1 && IsPointInCuboid(D_00189EA0, s->secondId)) {
             func_L18_003F75E8(s->group, &count2);
             if (count2 >= 4)
                 func_002A7750(a, 3, -1);
@@ -116,15 +116,15 @@ void func_L18_0042FBC8(u8 *a)
                     func_00282C88(velocity);
                     velocity[2] = D_L18_001B153C * 0.0166666675f;
                     func_002ACB48(velocity, D_L18_001B1540 * 0.0166666675f);
-                    func_00282CC0(position, a + 0x10, D_L18_001B1560);
+                    FastVecAdd(position, a + 0x10, D_L18_001B1560);
                     func_L18_003F76F0(p, position, velocity);
                     *(u8 **)(p + 0xB8) = a;
                 }
             }
             if (i) {
-                func_0032C700(a + 0x10, 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 1,
+                SpawnExplosion(a + 0x10, 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 1,
                               1.0f, 20.0f, 1, 1, 0, 0);
-                func_002E5CF8(0, 0, a);
+                PlayMobySound(0, 0, a);
                 s->verticalSpeed += func_002A7878(D_L18_001B1544, D_L18_001B1548) * 0.0166666675f;
                 duration = (float)func_L11_00439D78(object->position[2], s->restHeight,
                                                    s->verticalSpeed, D_L18_001B155C * 0.000277777785f);
@@ -136,9 +136,9 @@ void func_L18_0042FBC8(u8 *a)
         if (object->position[2] >= s->restHeight) {
             object->position[2] += s->verticalSpeed;
             s->verticalSpeed -= D_L18_001B155C * 0.000277777785f;
-            object->rotation[0] = func_00283B98(s->angles[0], object->rotation[0]);
-            object->rotation[1] = func_00283B98(s->angles[1], object->rotation[1]);
-            object->rotation[2] = func_00283B98(s->angles[2], object->rotation[2]);
+            object->rotation[0] = FastAddRotations(s->angles[0], object->rotation[0]);
+            object->rotation[1] = FastAddRotations(s->angles[1], object->rotation[1]);
+            object->rotation[2] = FastAddRotations(s->angles[2], object->rotation[2]);
         } else {
             func_002A7750(a, 4, -1);
         }
@@ -148,15 +148,15 @@ void func_L18_0042FBC8(u8 *a)
             func_00282C88(s);
             func_00282C88(a + 0xF0);
             object->position[2] = s->restHeight;
-            s->period = func_00283CE0(D_L18_001B1554);
+            s->period = IntToFloat(D_L18_001B1554);
             s->amplitude = D_L18_001B1558;
-            func_002E5CF8(0, 0, a);
+            PlayMobySound(0, 0, a);
         }
         if (s->amplitude >= 0.1f) {
             object->rotation[0] = s->amplitude * func_00283198(func_00283C28(
-                func_00283CE0(object->timer) * 6.28318548f / s->period));
+                IntToFloat(object->timer) * 6.28318548f / s->period));
             object->rotation[1] = s->amplitude * func_00283180(func_00283C28(
-                func_00283CE0(object->timer) * 6.28318548f / s->period));
+                IntToFloat(object->timer) * 6.28318548f / s->period));
             s->amplitude *= D_L18_001B1550;
             s->period *= D_L18_001B1550;
         } else {

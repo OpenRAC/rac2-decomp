@@ -105,7 +105,7 @@ void func_L00_003B7680(char *object, float *position)
         unsigned char kind, random;
         int *color;
         func_002A7A00(point, 0.0f, 0.333f);
-        func_00282CC0(point, point, position);
+        FastVecAdd(point, point, position);
         func_002A7A00(velocity, D_L00_001AFAE8 * (1.0f / 60.0f), D_L00_001AFAEC * (1.0f / 60.0f));
         kind = func_002A7820(D_L00_001AFB0C[1], D_L00_001AFB0C[2]);
         color = &D_L00_001AFB70[(unsigned char)object[0xbc]];
@@ -146,11 +146,11 @@ void func_L00_003B77A8(char *object)
         vectors[1].f[1] = func_002A78D8(0.0f, D_L00_001AFB88);
         vectors[1].f[2] = func_002A78D8(0.0f, D_L00_001AFB8C);
         vectors[0].q = vectors[1].q;
-        func_00283098(&vectors[0], &vectors[0], D_L00_001B8DC0 + 0x230);
-        func_00282CC0(&vectors[0], &vectors[0], D_L00_001B8DC0);
+        matrix_mul_vec3(&vectors[0], &vectors[0], D_L00_001B8DC0 + 0x230);
+        FastVecAdd(&vectors[0], &vectors[0], D_L00_001B8DC0);
         speed = func_002A7878(D_L00_001AFB90[0], D_L00_001AFB90[1]);
         blend = func_002A7878(0.0f, 1.0f);
-        color = func_00283D38(D_L00_001AFB80[0], D_L00_001AFB80[1], blend);
+        color = FastTweenColor(D_L00_001AFB80[0], D_L00_001AFB80[1], blend);
         random = func_002A77E0(255);
         func_002C3150(&vectors[0], D_L00_001A8F20, color, 2, speed, random, 0);
     }

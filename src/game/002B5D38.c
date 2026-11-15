@@ -25,7 +25,7 @@ int func_002B5D38(char *obj, char *moby)
     Z.q = zero;
     Z.f[2] = *(float *)(moby + 4) + *(float *)moby;
     B.q = Z.q;
-    func_00282CC0(&V, obj + 0x10, &B);
+    FastVecAdd(&V, obj + 0x10, &B);
     mode = (*(unsigned int *)(moby + 0x38) & 2) ? 6 : 4;
     r = func_00277258(&V, mode, obj, *(float *)moby);
     if (r != 0) {
@@ -39,7 +39,7 @@ int func_002B5D38(char *obj, char *moby)
                 *(float *)(g + 0x38) = V.f[2];
         }
         qcopy(&V, D_001BAFB0);
-        func_00282CF0(obj + 0x10, &V, &B);
+        FastVecSub(obj + 0x10, &V, &B);
         return 1;
     }
     return 0;

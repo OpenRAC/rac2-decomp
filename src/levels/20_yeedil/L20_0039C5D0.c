@@ -32,8 +32,8 @@ void func_L20_0039C5D0(unsigned char *object) {
     if (particle) {
         particle[2] = *D_L20_001FFC14;
     }
-    func_00282CF0(&delta, object + 0x10, state);
-    func_00282D30(&delta, &delta, 0.1f);
+    FastVecSub(&delta, object + 0x10, state);
+    FastVecScale(&delta, &delta, 0.1f);
     qcopy(&position, state);
     count = 4;
     do {
@@ -45,7 +45,7 @@ void func_L20_0039C5D0(unsigned char *object) {
         jitter.f[2] = position.f[2] + func_002A78D8(0.0f, 0.05f);
         func_002C65A0(&jitter, &D_L20_001A8F20, 15, 0x808080, shade, 32, 0,
                       size * 210000.0f, size * 42000.0f, 0.0f, 0);
-        func_00282CC0(&position, &position, &delta);
+        FastVecAdd(&position, &position, &delta);
     } while (count >= 0);
     if (D_L20_001B2AC8[0] % 10 == 0) {
         particle = func_002C65A0(object + 0x10, &D_L20_001A8F20, 30, 0x202080, 0, 32, 0,

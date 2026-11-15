@@ -70,7 +70,7 @@ void func_L06_0033BDC0(void)
         if (obj && obj->class_id == 0xE29)
             obj->flags |= 0x800;
         if (obj->class_id == 0xD54)
-            func_002E64A0(obj);
+            UpdateEquipmentPieces(obj);
         if (obj && obj->class_id == 0xFA0) {
             char *state = obj->state;
 
@@ -89,35 +89,35 @@ void func_L06_0033BDC0(void)
     func_0029FCC0(ship, 0, left);
     func_0029FCC0(ship, 1, right);
     rotation = func_002A77E0(16);
-    func_00282F20(velocity, ship->velocity, 0.7333333492f);
+    vec_scale_to_length(velocity, ship->velocity, 0.7333333492f);
     if (func_002A77E0(2))
         rotation = -rotation;
     qcopy(position, left);
 
-    first = func_002BDCE8(position, 0.1f, 1.0f, 0.9f, rotation, velocity, 315000.0f, 0xDF204080, 0);
+    first = SpawnSpinningSparkParticle(position, 0.1f, 1.0f, 0.9f, rotation, velocity, 315000.0f, 0xDF204080, 0);
     if (first) {
         ParticleTail *tail = &first->tail;
         first->f0A.word = 7;
-        first->life = func_00283CF0(4.0f) + 0x70;
+        first->life = FloatToInt(4.0f) + 0x70;
         tail->mode = 2;
         tail->tint = 0xDF;
         tail->frame = first->f0A.byte;
     }
 
-    second = func_002BDCE8(position, 0.1f, 1.0f, 0.9f, rotation, velocity, 315000.0f, 0xDF204080, 0);
+    second = SpawnSpinningSparkParticle(position, 0.1f, 1.0f, 0.9f, rotation, velocity, 315000.0f, 0xDF204080, 0);
     if (second) {
         ParticleTail *tail = &second->tail;
         first->f0A.word = 7;
-        first->life = func_00283CF0(4.0f) + 0x70;
+        first->life = FloatToInt(4.0f) + 0x70;
         tail->mode = 2;
         tail->tint = 0xDF;
         tail->frame = first->f0A.byte;
     }
 
-    spark = func_002BDCE8(position, 0.05f, 1.0f, 0.97f, 16, velocity, 210000.0f, 0xDFFFFFFF, 0);
+    spark = SpawnSpinningSparkParticle(position, 0.05f, 1.0f, 0.97f, 16, velocity, 210000.0f, 0xDFFFFFFF, 0);
     if (spark) {
         ParticleTail *tail = &spark->tail;
-        spark->life = func_00283CF0(4.0f) + 0x70;
+        spark->life = FloatToInt(4.0f) + 0x70;
         spark->f0A.word = 7;
         spark->f08 = func_002A77E0(255);
         tail->mode = 2;
@@ -126,33 +126,33 @@ void func_L06_0033BDC0(void)
     }
 
     *(VectorBits *)shift = *(VectorBits *)ship->offset;
-    func_00282F20(shift, shift, 0.3f);
-    func_00282CC0(position, position, shift);
+    vec_scale_to_length(shift, shift, 0.3f);
+    FastVecAdd(position, position, shift);
 
-    first = func_002BDCE8(position, 0.1f, 1.0f, 0.9f, 16, velocity, 315000.0f, 0xDF204080, 0);
+    first = SpawnSpinningSparkParticle(position, 0.1f, 1.0f, 0.9f, 16, velocity, 315000.0f, 0xDF204080, 0);
     if (first) {
         ParticleTail *tail = &first->tail;
         first->f0A.word = 7;
-        first->life = func_00283CF0(4.0f) + 0x70;
+        first->life = FloatToInt(4.0f) + 0x70;
         tail->mode = 2;
         tail->tint = 0xDF;
         tail->frame = first->f0A.byte;
     }
 
-    second = func_002BDCE8(position, 0.1f, 1.0f, 0.9f, 16, velocity, 315000.0f, 0xDF204080, 0);
+    second = SpawnSpinningSparkParticle(position, 0.1f, 1.0f, 0.9f, 16, velocity, 315000.0f, 0xDF204080, 0);
     if (second) {
         ParticleTail *tail = &second->tail;
         first->f0A.word = 7;
-        first->life = func_00283CF0(4.0f) + 0x70;
+        first->life = FloatToInt(4.0f) + 0x70;
         tail->mode = 2;
         tail->tint = 0xDF;
         tail->frame = first->f0A.byte;
     }
 
-    spark = func_002BDCE8(position, 0.05f, 1.0f, 0.97f, 16, velocity, 210000.0f, 0xDFFFFFFF, 0);
+    spark = SpawnSpinningSparkParticle(position, 0.05f, 1.0f, 0.97f, 16, velocity, 210000.0f, 0xDFFFFFFF, 0);
     if (spark) {
         ParticleTail *tail = &spark->tail;
-        spark->life = func_00283CF0(4.0f) + 0x70;
+        spark->life = FloatToInt(4.0f) + 0x70;
         spark->f0A.word = 7;
         spark->f08 = func_002A77E0(255);
         tail->mode = 2;

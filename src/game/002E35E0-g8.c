@@ -27,7 +27,7 @@ void func_002E35E0(void)
 
     func_002E37B0();
     *(short *)(ref_L00_002E35E0_00 + 4) = 0;
-    func_00283388(ref_L00_002E35E0_01);
+    set_identity_matrix(ref_L00_002E35E0_01);
     func_00282C88(vec);
     for (; i < *(short *)(ref_L00_002E35E0_00 + 6); i++) {
         switch (i) {
@@ -36,16 +36,16 @@ void func_002E35E0(void)
             vec[2] = ref_L00_002E35E0_04;
         case 1:
             vec[1] = 0;
-            vec[2] = func_00283B98(ref_L00_002E35E0_04, 0);
+            vec[2] = FastAddRotations(ref_L00_002E35E0_04, 0);
             break;
         case 2:
             vec[1] = -0.075f;
-            vec[2] = func_00283B98(ref_L00_002E35E0_04, -0.15f);
+            vec[2] = FastAddRotations(ref_L00_002E35E0_04, -0.15f);
             break;
         case 3:
             vec[0] = -0.06f;
             vec[1] = 0.05f;
-            vec[2] = func_00283B98(ref_L00_002E35E0_04, 0.125f);
+            vec[2] = FastAddRotations(ref_L00_002E35E0_04, 0.125f);
             break;
         }
         func_00283430(ref_L00_002E35E0_01, vec);
@@ -53,6 +53,6 @@ void func_002E35E0(void)
         func_002E3940(i);
     }
     func_002E3820();
-    func_002FC560(0x47, 0x5360B);
-    func_002FC560(0x4E, 0x1000000 | (D_001A72E0 >> 13));
+    VU1_addGSregister(0x47, 0x5360B);
+    VU1_addGSregister(0x4E, 0x1000000 | (D_001A72E0 >> 13));
 }

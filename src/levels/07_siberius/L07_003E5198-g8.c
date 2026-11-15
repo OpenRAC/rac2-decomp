@@ -42,8 +42,8 @@ void func_L07_003E5198(unsigned char *o)
     case 1:
         if (func_002B3868(o) && o[0x43]) func_002A7470(o,0,0,20);
         if (*(char **)(p+0x260)) {
-            func_00283098(v,p+0x220,*(char **)(p+0x260)+0xC0);
-            func_00282CC0(v,v,*(char **)(p+0x260)+0x10);
+            matrix_mul_vec3(v,p+0x220,*(char **)(p+0x260)+0xC0);
+            FastVecAdd(v,v,*(char **)(p+0x260)+0x10);
         } else qcopy(v,p+0x220);
         func_L07_003E5910(o,v,0,1);
         break;
@@ -71,27 +71,27 @@ void func_L07_003E5198(unsigned char *o)
         break;
     case 9: {
         float tolerance=0.08333333582f;
-        func_00282CF0(v,p+0x230,o+0x10);
-        if(func_00282DF0(v)>tolerance) func_002AC9F8(v,tolerance);
+        FastVecSub(v,p+0x230,o+0x10);
+        if(FastVecLength(v)>tolerance) func_002AC9F8(v,tolerance);
         else func_002A7750(o,10,-1);
-        func_00282CC0(o+0x10,o+0x10,v);
+        FastVecAdd(o+0x10,o+0x10,v);
         func_L07_003E5FA8(o);
         break;
     }
     case 10:
         if(func_002B3868(o)) *(int *)(o+0x98)=*(int *)(*(char **)(o+0x24)+0x10);
-        len[1]=func_00282DF0(o+0xC0);
-        len[0]=func_00282DF0(o+0xE0);
+        len[1]=FastVecLength(o+0xC0);
+        len[0]=FastVecLength(o+0xE0);
         {
             float a=D_L07_001B0A88*0.0002777777845f;
             float b=D_L07_001B0A8C*0.01666666754f;
             func_002AA548(&len[0],1,p+0x254,a,a,b);
             if(len[0]>D_L07_001B0A90) func_002AA548(&len[1],1,p+0x258,a,a,b);
         }
-        for(i=0;i<2;i++) func_00282F20(o+0xC0+i*16,o+0xC0+i*16,len[1]);
-        func_00282F20(o+0xE0,o+0xE0,len[0]);
+        for(i=0;i<2;i++) vec_scale_to_length(o+0xC0+i*16,o+0xC0+i*16,len[1]);
+        vec_scale_to_length(o+0xE0,o+0xE0,len[0]);
         if(len[1]>=1) {
-            for(i=0;i<3;i++) func_00282F20(o+0xC0+i*16,o+0xC0+i*16,1);
+            for(i=0;i<3;i++) vec_scale_to_length(o+0xC0+i*16,o+0xC0+i*16,1);
             func_002A7750(o,3,2);
         }
         func_L07_003E5FA8(o);

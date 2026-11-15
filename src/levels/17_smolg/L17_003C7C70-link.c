@@ -67,12 +67,12 @@ next_row:;
     case 0:
         if(target) {
             *(unsigned short *)(s+0x14)=*(unsigned short *)(target+0xaa);
-            *(float *)(s+0x44)=func_00283CE0(target[0x23]);
+            *(float *)(s+0x44)=IntToFloat(target[0x23]);
             if(*(int *)(s+8)&0x10)qcopy(o+0x10,target+0x10);
             else if(*(int *)(s+8)&0x40)qcopy(target+0x10,o+0x10);
             if(*(int *)(s+8)&0x20)qcopy(o+0xf0,target+0xf0);
             else if(*(int *)(s+8)&0x80)qcopy(target+0xf0,o+0xf0);
-        } else func_0026FEB8(D_L17_001B1FB8);
+        } else STUB_printf(D_L17_001B1FB8);
         { int i; unsigned char *diag;
         for(diag=(unsigned char *)row,i=0;i<5;++i,diag+=8) {
             if(*(int *)diag!=-1) {
@@ -80,8 +80,8 @@ next_row:;
                 unsigned int offset=*(int *)diag<<8;
                 unsigned char *e=(unsigned char *)(offset+(unsigned int)base);
                 *(unsigned short *)(diag+4)=*(unsigned short *)(e+0xaa);
-                func_0026FEB8(D_L17_001B1FE8,((char *)o-base)>>8,i,*(int *)diag,*(short *)(diag+4));
-            } else func_0026FEB8(D_L17_001B2018,((char *)o-entity_base_abs[0])>>8,i);
+                STUB_printf(D_L17_001B1FE8,((char *)o-base)>>8,i,*(int *)diag,*(short *)(diag+4));
+            } else STUB_printf(D_L17_001B2018,((char *)o-entity_base_abs[0])>>8,i);
         }
         }
         { float factor=*(float *)(*(char **)(o+0x24)+0x24);
@@ -99,9 +99,9 @@ next_row:;
         break;
     case 2:
         if(target && !(*(int *)(s+8)&2)) {
-            f=func_00283CE0(*(int *)(s+0x40));
-            f=*(float *)(s+0x44)*f/func_00283CE0(*(int *)(s+0xc));
-            target[0x23]=func_00283CF0(f);
+            f=IntToFloat(*(int *)(s+0x40));
+            f=*(float *)(s+0x44)*f/IntToFloat(*(int *)(s+0xc));
+            target[0x23]=FloatToInt(f);
         }
         if(!(*(int *)(s+8)&4) && target && *(signed char *)(s+0x17)!=-1 && target[0x20]==*(signed char *)(s+0x17))o[0x20]=3;
         if(!(*(int *)(s+8)&8) && func_00282948(s+0x40))o[0x20]=3;

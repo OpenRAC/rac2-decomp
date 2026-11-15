@@ -13,7 +13,7 @@ char *func_002C7BB8(char *pos, char *vel, int life, int color, int speed, int al
         qcopy(obj + 16, pos);
         *(int *)(obj+4) = (alpha << 24) | color;
         p = obj+32;
-        obj[9] = func_00283CF0(4.0f)+64;
+        obj[9] = FloatToInt(4.0f)+64;
         obj[1] = 0;
         *(float *)(obj+12) = size;
         obj[3] = 72;
@@ -25,7 +25,7 @@ char *func_002C7BB8(char *pos, char *vel, int life, int color, int speed, int al
         *(float *)(p+8) = *(float *)(vel+8);
         *(float *)(p+12) = gravity;
         p[21] = speed;
-        *(float *)(p+16) = (endSize-size)/func_00283CE0(life);
+        *(float *)(p+16) = (endSize-size)/IntToFloat(life);
         { int delta = (endAlpha-alpha)/life;
         p[20] = delta; }
         *(void (**)(char *))(p+28) = func_002C7D58;

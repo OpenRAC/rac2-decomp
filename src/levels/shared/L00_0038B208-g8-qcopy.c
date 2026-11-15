@@ -115,7 +115,7 @@ void func_L00_0038B208(char *object)
             state->phase = 0.0f;
         return;
     }
-    packet.texture = func_0027C878(texture);
+    packet.texture = GetEffectTextureDescriptor(texture);
     packet.tag = 0xFF9000000260ULL;
     packet.count = 5;
     packet.primitive = ((u64)primitive << 2) | 0x8000000040ULL;
@@ -135,13 +135,13 @@ void func_L00_0038B208(char *object)
                 packet.colors[vertex] = shape->colors[3][vertex];
             else
                 packet.colors[vertex] = 0x50808080;
-            packet.colors[vertex] = (func_00283CF0((float)(packet.colors[vertex] >> 24) * alpha) << 24) | baseColor;
-            func_00282D30(&packet.position[vertex], &shape->vertices[index], scale);
+            packet.colors[vertex] = (FloatToInt((float)(packet.colors[vertex] >> 24) * alpha) << 24) | baseColor;
+            FastVecScale(&packet.position[vertex], &shape->vertices[index], scale);
             uvIndex = shape->indices[segment][vertex * 2 + 1];
             scroll = 1.0f - state->phase * shape->scroll;
             packet.uv[vertex][0] = (shape->uv[uvIndex][0] - 0.5f) * D_L00_001AEFD8 + 0.5f;
             packet.uv[vertex][1] = (shape->uv[uvIndex][1] - 0.5f) * D_L00_001AEFD8 + 0.5f + scroll;
         }
-        func_00280B90(&packet, state, 0);
+        draw_world_quad(&packet, state, 0);
     }
 }

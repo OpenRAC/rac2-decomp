@@ -31,11 +31,11 @@ void func_L18_004401E0(u8 *o) {
     float pos[4] __attribute__((aligned(16)));
     State *s = *(State **)(o+0x68);
     int flag;
-    func_00282CC0(pos,o+0x10,s);
+    FastVecAdd(pos,o+0x10,s);
     flag = 0;
     if (D_L18_001B234C > 0.9f || D_L18_001B2350 > 0.9f) flag = 1;
     if (!flag || !(D_L18_001B2348 & 1)) {
-        float len = func_00282DF0(s);
+        float len = FastVecLength(s);
         {
         float v[4], a[4], b[4], c[4];
         *(TI *)b = 0;
@@ -43,16 +43,16 @@ void func_L18_004401E0(u8 *o) {
         b[1] = func_002A7878(-1.0f,1.0f);
         b[2] = func_002A7878(-1.0f,1.0f);
         *(TI *)a = *(TI *)b;
-        func_00282F20(a,a,func_002A7878(D_L18_002BDA10.f[0],D_L18_002BDA10.f[1]) * (1.0f/60.0f));
-        func_00282D30(v,s,func_002A7878(D_L18_002BDA10.f[2],D_L18_002BDA10.f[3]));
-        func_00282CC0(a,a,v);
-        func_00282F20(v,s,func_002A7878(0.0f,1.0f)*len);
-        func_00282CC0(v,v,o+0x10);
+        vec_scale_to_length(a,a,func_002A7878(D_L18_002BDA10.f[0],D_L18_002BDA10.f[1]) * (1.0f/60.0f));
+        FastVecScale(v,s,func_002A7878(D_L18_002BDA10.f[2],D_L18_002BDA10.f[3]));
+        FastVecAdd(a,a,v);
+        vec_scale_to_length(v,s,func_002A7878(0.0f,1.0f)*len);
+        FastVecAdd(v,v,o+0x10);
         func_002C16C0(o+0x10,a,D_L18_002BDA10.i[4],D_L18_002BDA10.i[5],D_L18_002BDA10.i[6],D_L18_002BDA10.i[7],D_L18_002BDA10.f[8],D_L18_002BDA10.f[9],D_L18_002BDA10.f[10],D_L18_002BDA10.f[11],0.0f);
         *(TI *)c = 0;
         c[2] = D_L18_002BDA10.f[12];
         *(TI *)b = *(TI *)c;
-        func_00283098(b,b,o+0xC0);
+        matrix_mul_vec3(b,b,o+0xC0);
         func_002ACEC0(b,b,o+0xC0,func_002A7940());
         if (func_001163B0() & 1)
             func_002BD8B0(v,b,D_L18_002BDA10.i[13],D_L18_002BDA10.i[14],(float)D_L18_002BDA10.i[15],D_L18_002BDA10.i[16],D_L18_002BDA10.i[17]);
@@ -65,21 +65,21 @@ void func_L18_004401E0(u8 *o) {
     request.f[7] = s->f[8];
     request.i[8] = 1;
     qcopy(&request,s);
-    func_00282F20(&request,&request,s->f[9]);
+    vec_scale_to_length(&request,&request,s->f[9]);
     request.f[3] = 5627.925f;
     request.b[0x18] = s->b[0x28];
     request.b[0x19] = s->b[0x2C];
     request.h[0x1A/2] = *(u16 *)(o+0xAA);
-    if (func_002761F8(o+0x10,pos,0,s->i[4],&request) || func_00277258(0.2f,pos,0,s->i[4]) || func_00282948(s->b+0x34)) {
+    if (CollLine(o+0x10,pos,0,s->i[4],&request) || func_00277258(0.2f,pos,0,s->i[4]) || func_00282948(s->b+0x34)) {
         if (D_L18_001BFC18) {
             if (D_L18_001BFC18 != s->i[4]) {
                 func_00277F48(o+0x10,0,s->i[4],0.5f,&request);
-                func_002ABBB8(o,D_L18_001A8F20,0,0.0f,0.0f,0,2,10,0.0f,0.0f,9.0f,0.666f,0,0.0f,0,1,-1,0,0x810001);
+                SpawnExplosionEffects(o,D_L18_001A8F20,0,0.0f,0.0f,0,2,10,0.0f,0.0f,9.0f,0.666f,0,0.0f,0,1,-1,0,0x810001);
                 func_0029F338(o);
                 return;
             }
         } else {
-            func_002ABBB8(o,D_L18_001A8F20,0,0.0f,0.0f,0,2,8,0.0f,0.0f,9.0f,0.5f,0,0.0f,0,1,-1,0,0x810001);
+            SpawnExplosionEffects(o,D_L18_001A8F20,0,0.0f,0.0f,0,2,8,0.0f,0.0f,9.0f,0.5f,0,0.0f,0,1,-1,0,0x810001);
             func_0029F338(o);
             return;
         }

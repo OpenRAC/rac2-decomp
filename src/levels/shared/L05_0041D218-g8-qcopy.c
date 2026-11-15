@@ -27,7 +27,7 @@ void func_L05_0041D218(Vector4 *start, Vector4 *end, unsigned int color, int tex
     Beam strip;
     Vector4 basis[4], size;
 
-    strip.tex = func_0027C878(texture);
+    strip.tex = GetEffectTextureDescriptor(texture);
     size.bits = 0;
     strip.alpha = 0xFF9000000260UL;
     strip.test = 0x8000000048UL;
@@ -38,19 +38,19 @@ void func_L05_0041D218(Vector4 *start, Vector4 *end, unsigned int color, int tex
     func_L05_0041D1B0(&strip);
     strip.uv[0] = 0; strip.uv[1] = 0; strip.uv[2] = 0; strip.uv[3] = 1;
     strip.uv[4] = 1; strip.uv[5] = 0; strip.uv[6] = 1; strip.uv[7] = 1;
-    func_00282CF0(&basis[0], end, start); func_00282F20(&basis[0], &basis[0], 1);
-    func_00282CF0(&basis[1], &D_L05_001B96C0, start); func_00282DD8(&basis[2], &basis[1], &basis[0]);
-    func_00282F20(&basis[2], &basis[2], 1); func_00282DD8(&basis[1], &basis[0], &basis[2]);
+    FastVecSub(&basis[0], end, start); vec_scale_to_length(&basis[0], &basis[0], 1);
+    FastVecSub(&basis[1], &D_L05_001B96C0, start); FastVecCross(&basis[2], &basis[1], &basis[0]);
+    vec_scale_to_length(&basis[2], &basis[2], 1); FastVecCross(&basis[1], &basis[0], &basis[2]);
     basis[3].bits = start->bits;
     strip.point[0].bits = size.bits;
-    func_00282D30(&strip.point[1], &strip, -1);
-    func_002830C0(&strip, &strip, basis); func_002830C0(&strip.point[1], &strip.point[1], basis);
-    func_00282CF0(&basis[0], end, start); func_00282F20(&basis[0], &basis[0], 1);
-    func_00282CF0(&basis[1], &D_L05_001B96C0, end); func_00282DD8(&basis[2], &basis[1], &basis[0]);
-    func_00282F20(&basis[2], &basis[2], 1); func_00282DD8(&basis[1], &basis[0], &basis[2]);
+    FastVecScale(&strip.point[1], &strip, -1);
+    transform_vector(&strip, &strip, basis); transform_vector(&strip.point[1], &strip.point[1], basis);
+    FastVecSub(&basis[0], end, start); vec_scale_to_length(&basis[0], &basis[0], 1);
+    FastVecSub(&basis[1], &D_L05_001B96C0, end); FastVecCross(&basis[2], &basis[1], &basis[0]);
+    vec_scale_to_length(&basis[2], &basis[2], 1); FastVecCross(&basis[1], &basis[0], &basis[2]);
     basis[3].bits = end->bits;
     strip.point[2].bits = size.bits;
-    func_00282D30(&strip.point[3], &strip.point[2], -1);
-    func_002830C0(&strip.point[2], &strip.point[2], basis); func_002830C0(&strip.point[3], &strip.point[3], basis);
-    func_00280B90(&strip, 0, 0);
+    FastVecScale(&strip.point[3], &strip.point[2], -1);
+    transform_vector(&strip.point[2], &strip.point[2], basis); transform_vector(&strip.point[3], &strip.point[3], basis);
+    draw_world_quad(&strip, 0, 0);
 }

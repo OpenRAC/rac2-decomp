@@ -40,7 +40,7 @@ extern int func_L04_00400AB0(void *, void *, int);
 /* Joins the current route at the point nearest the object, a little ahead of it. */
 #define JOIN_ROUTE(route)                                                                   \
     {                                                                                      \
-        float base_ = func_00283CE0(func_L04_00400AB0(self, route, 0)) * F(P(s, 0x110), 0x1C); \
+        float base_ = IntToFloat(FindNearestRoutePointIndex(self, route, 0)) * F(P(s, 0x110), 0x1C); \
         float ahead_;                                                                       \
                                                                                             \
         if (I(s, 0x244) != 0) {                                                             \
@@ -117,7 +117,7 @@ void func_L04_00402D90(u8 *self)
     }
     if ((int)ref_L04_00402D90_00 == 40 || D_001A79F0 == 4) {
         if (P(s, 0x110) == D_L04_001FE340[I(s, 0x54)] && I(s, 0x124) >= 0x1AA && I(s, 0x124) < 0x1B3
-            && I(s, 0x1AC) >= 2 && func_002ACBC8(self + 0x10, I(p, 0x1A0)) != 0) {
+            && I(s, 0x1AC) >= 2 && IsPointInCuboid(self + 0x10, I(p, 0x1A0)) != 0) {
             START_ROUTE(0x7C, 2.0f);
         }
         if (P(s, 0x110) == D_L04_001FE340[I(s, 0x6C)] && I(s, 0x124) >= 0xAB && I(s, 0x124) < 0xAF
@@ -136,7 +136,7 @@ void func_L04_00402D90(u8 *self)
             if (id != -1) {
                 u8 *branch = D_L04_001FE340[id];
 
-                func_00282CF0(delta, branch + 0x10, s + 0xF0);
+                FastVecSub(delta, branch + 0x10, s + 0xF0);
                 if (func_L00_002EE290(delta) < 25.0f) {
                     if (func_002A77E0(2) == 0) {
                         P(s, 0x110) = branch;
@@ -153,7 +153,7 @@ void func_L04_00402D90(u8 *self)
                 if (id != -1) {
                     u8 *branch = D_L04_001FE340[id];
 
-                    func_00282CF0(delta, branch + 0x10, s + 0xF0);
+                    FastVecSub(delta, branch + 0x10, s + 0xF0);
                     if (func_L00_002EE290(delta) < 25.0f) {
                         if (func_002A77E0(2) == 0) {
                             P(s, 0x110) = branch;

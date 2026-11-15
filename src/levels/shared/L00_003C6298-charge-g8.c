@@ -139,21 +139,21 @@ void func_L00_003C8A90(Moby *moby)
         ((Hero *)D_00189E20)->i[0xBF8 / 4] = ((Hero *)D_00189E20)->i[0x1450 / 4];
     vars->unknown20 = 0;
     if (((Hero *)D_00189E20)->h[0x24EC / 2] != 0) {
-        func_00282D30(&direction, &moby->forward, -1.0f);
+        FastVecScale(&direction, &moby->forward, -1.0f);
     } else {
         qcopy(&direction, &((Hero *)D_00189E20)->q[0x760 / 16]);
     }
-    func_00282D30(&origin, ((Hero *)D_00189E20)->ptr[0x2290 / 4] + 0xE0, 0.75f);
-    func_00282CC0(&origin, &((Hero *)D_00189E20)->q[0x80 / 16], &origin);
+    FastVecScale(&origin, ((Hero *)D_00189E20)->ptr[0x2290 / 4] + 0xE0, 0.75f);
+    FastVecAdd(&origin, &((Hero *)D_00189E20)->q[0x80 / 16], &origin);
     count = 0;
     func_00282A88(list, 0x80);
-    func_L00_0037E000(moby);
+    ReleaseDeadOrExpiredSlots(moby);
     /* Two scopes: config shares its slot with the vectors declared further down. */
     {
     {
         AimConfig config = D_L00_001B00F0;
 
-        func_002AF580(&moby->position, &direction, 0.436332345f, 0.436332345f, &count, list, 0x20, 0, 48.0f, 0.785398245f, 0.785398245f, 1, &config);
+        SelectBestTargetInCone(&moby->position, &direction, 0.436332345f, 0.436332345f, &count, list, 0x20, 0, 48.0f, 0.785398245f, 0.785398245f, 1, &config);
     }
     }
     i = 0;
@@ -166,10 +166,10 @@ void func_L00_003C8A90(Moby *moby)
             if (info != 0)
                 height = info[4];
             if (((Hero *)D_00189E20)->i[0x1450 / 4] == 0) {
-                float distance = func_00282E48(D_L00_001B8DC0, &mobys[i]->position) * 0.00666666683f;
+                float distance = fast_vec_dist(D_L00_001B8DC0, &mobys[i]->position) * 0.00666666683f;
 
-                func_00282D30(&aim, &mobys[i]->up, height);
-                func_00282CC0(&aim, &mobys[i]->position, &aim);
+                FastVecScale(&aim, &mobys[i]->up, height);
+                FastVecAdd(&aim, &mobys[i]->position, &aim);
                 MarkTarget(moby, func_00282C48(0.9f - distance * 0.65f), 0xFF0FFF0F, &aim, 0x26, 0.0f, -1, 90.0f, 4);
             }
             i++;
@@ -180,18 +180,18 @@ void func_L00_003C8A90(Moby *moby)
         (D_00138180[0x1A0 / 4] & ((Hero *)D_00189E20)->u[0x1230 / 4]) && ((Hero *)D_00189E20)->i[0x1240 / 4] >= 0x17 && ready != 0) {
         if (((Hero *)D_00189E20)->i[0x1450 / 4] != 0)
             ((Hero *)D_00189E20)->i[0xBF8 / 4] = ((Hero *)D_00189E20)->i[0x1450 / 4];
-        if (func_L00_002D4040(-1)) {
+        if (get_ammo(-1)) {
             Vec start, step, muzzle, offset;
             int hits;
             float strength;
             float *info;
             Moby *shot;
 
-            func_L00_002AF568();
-            func_00282D30(start, &moby->forward, -1.0f);
-            func_00282CC0(start, start, &moby->position);
-            func_00282D30(step, &moby->right, 0.275f);
-            func_00282CC0(start, start, step);
+            start_equipped_item_animation();
+            FastVecScale(start, &moby->forward, -1.0f);
+            FastVecAdd(start, start, &moby->position);
+            FastVecScale(step, &moby->right, 0.275f);
+            FastVecAdd(start, start, step);
             hits = func_00277F48(1.0f, start, 1, ((Hero *)D_00189E20)->ptr[0x2290 / 4], 0);
             if (hits != 0) {
                 for (j = 0; j < hits; j++) {
@@ -208,7 +208,7 @@ void func_L00_003C8A90(Moby *moby)
                 }
             }
             strength = 0.0f;
-            func_002E5CF8(1, 0, moby);
+            PlayMobySound(1, 0, moby);
             vars->timer = 0xF;
             func_L00_003C94D8(moby);
             func_002A75E0(moby, 2, 0, 1, 0);
@@ -219,8 +219,8 @@ void func_L00_003C8A90(Moby *moby)
             offset[1] = -1.0f;
             offset[2] = 0.182999998f;
             offset[3] = 1.0f;
-            func_00283098(offset, offset, &moby->right);
-            func_00282CC0(muzzle, &moby->position, offset);
+            matrix_mul_vec3(offset, offset, &moby->right);
+            FastVecAdd(muzzle, &moby->position, offset);
             if (target == 0) {
                 int locked = 0;
 
@@ -228,29 +228,29 @@ void func_L00_003C8A90(Moby *moby)
                 if (target == 0)
                     goto fire;
                 if (locked != 0)
-                    func_L00_0037DD18(moby, target, 0x14);
+                    KeyOwnerTableInsert(moby, target, 0x14);
             }
             info = (float *)func_002AB1F0(target);
             if (info != 0)
                 strength = info[4];
         fire:
             if (((Hero *)D_00189E20)->ptr[0xBF8 / 4] != 0)
-                shot = func_L00_00409E48(moby, muzzle, ((Hero *)D_00189E20)->ptr[0xBF8 / 4], D_L00_001A8F20, strength, 2.0f, 5.0f, 0.6f);
+                shot = SpawnAimedProjectile(moby, muzzle, ((Hero *)D_00189E20)->ptr[0xBF8 / 4], D_L00_001A8F20, strength, 2.0f, 5.0f, 0.6f);
             else
-                shot = func_L00_00409E48(moby, muzzle, target, D_L00_001A8F20, strength, 2.0f, 5.0f, 0.6f);
+                shot = SpawnAimedProjectile(moby, muzzle, target, D_L00_001A8F20, strength, 2.0f, 5.0f, 0.6f);
             if (shot != 0)
                 shot->owner = moby;
             func_L00_002D3F30(-1, 1);
             D_L00_001B2AD0 = 1;
         } else if ((D_00138180[0x1A4 / 4] & ((Hero *)D_00189E20)->u[0x1230 / 4]) || D_L00_001B2AD0 == 1) {
-            func_002E5CF8(2, 0, moby);
+            PlayMobySound(2, 0, moby);
             D_L00_001B2AD0 = 0;
         }
         if (!(D_00138180[0x1A0 / 4] & ((Hero *)D_00189E20)->u[0x1230 / 4]) || ((Hero *)D_00189E20)->b[0x22B8] == 0) {
             if (vars->sound >= 0) {
                 func_L00_002D6B70(vars->sound);
                 vars->sound = -1;
-                func_L00_002AF7D0();
+                cancel_hero_item_animation();
             }
         }
         {
@@ -271,31 +271,31 @@ void func_L00_003C8A90(Moby *moby)
         Vec spot, flash, offset;
 
         if (vars->timer >= 0xD) {
-            float scale = 1.0f / func_00283CE0(3);
+            float scale = 1.0f / IntToFloat(3);
 
-            red = func_00283CE0(0xF - vars->timer) * scale;
-            green = func_00283CE0(0xF - vars->timer) * (scale * 0.8f);
-            t = func_00283CE0(0xF - vars->timer);
+            red = IntToFloat(0xF - vars->timer) * scale;
+            green = IntToFloat(0xF - vars->timer) * (scale * 0.8f);
+            t = IntToFloat(0xF - vars->timer);
             scale *= 0.5f;
             blue = t * scale;
         } else {
-            float scale = 1.0f / func_00283CE0(0xC);
+            float scale = 1.0f / IntToFloat(0xC);
 
-            red = func_00283CE0(vars->timer) * scale;
-            green = func_00283CE0(vars->timer) * (scale * 0.8f);
-            t = func_00283CE0(vars->timer);
+            red = IntToFloat(vars->timer) * scale;
+            green = IntToFloat(vars->timer) * (scale * 0.8f);
+            t = IntToFloat(vars->timer);
             scale *= 0.5f;
             blue = t * scale;
         }
         if (((Hero *)D_00189E20)->h[0x24EC / 2] != 0) {
-            func_00282D30(flash, &moby->forward, -1.0f);
+            FastVecScale(flash, &moby->forward, -1.0f);
             *(Quad *)offset = 0;
             offset[0] = 0.513000011f;
             offset[1] = -1.0f;
             offset[2] = 0.182999998f;
             offset[3] = 1.0f;
-            func_00283098(offset, offset, &moby->right);
-            func_00282CC0(spot, &moby->position, offset);
+            matrix_mul_vec3(offset, offset, &moby->right);
+            FastVecAdd(spot, &moby->position, offset);
         } else {
             qcopy(flash, &((Hero *)D_00189E20)->q[0x760 / 16]);
             *(Quad *)offset = 0;
@@ -303,12 +303,12 @@ void func_L00_003C8A90(Moby *moby)
             offset[1] = -1.0f;
             offset[2] = 0.182999998f;
             offset[3] = 1.0f;
-            func_00283098(offset, offset, &moby->right);
-            func_00282CC0(spot, &moby->position, offset);
+            matrix_mul_vec3(offset, offset, &moby->right);
+            FastVecAdd(spot, &moby->position, offset);
         }
-        func_00282CC0(spot, spot, flash);
-        func_00282D30(offset, ((Hero *)D_00189E20)->ptr[0x2290 / 4] + 0xE0, 0.3f);
-        func_00282CC0(spot, spot, offset);
+        FastVecAdd(spot, spot, flash);
+        FastVecScale(offset, ((Hero *)D_00189E20)->ptr[0x2290 / 4] + 0xE0, 0.3f);
+        FastVecAdd(spot, spot, offset);
         if (vars->light == -1) {
             vars->light = func_L00_002FCF18(spot, 8.0f, 0.0f, red, green, blue);
         } else {
@@ -320,7 +320,7 @@ void func_L00_003C8A90(Moby *moby)
             light->green = green;
             light->blue = blue;
         }
-        func_00282978(&vars->timer);
+        FastDecTimer(&vars->timer);
         return;
     }
 done:

@@ -10,7 +10,7 @@ void func_L02_00410E58(u8 *object)
     u8 **slot=(u8 **)(*(u8 **)(object+0x68)+0x14);
     int i=0;
     do {
-        *slot=func_0029EFD0(0xC61);
+        *slot=CreateMoby(0xC61);
         *(u16 *)(*slot+0x32)=0x40;
         (*slot)[0x31]=1;
         *(u64 *)(*slot+0x38)=*(u64 *)(((ResidentView *)D_00189E20)->current+0x38);
@@ -20,7 +20,7 @@ void func_L02_00410E58(u8 *object)
             float heading;
             qcopy(child+0x10,object+0x10);
             qcopy(child+0xF0,object+0xF0);
-            heading=func_00283B98(*(float *)(child+0xF8),(float)i*2.0943954f);
+            heading=FastAddRotations(*(float *)(child+0xF8),(float)i*2.0943954f);
             *(float *)(*slot+0xF8)=heading;
         }
         slot++;

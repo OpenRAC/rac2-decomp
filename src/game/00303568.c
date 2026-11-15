@@ -14,12 +14,12 @@ void func_00303568(char *obj, float *out)
     float f, dx, dy;
     out[0] = D_00222AE0[index][0];
     out[1] = D_00222AE0[index][1];
-    f = func_00283CB8(x);
+    f = FloatFraction(x);
     dx = D_00222AE0[index + 1][0] - D_00222AE0[index][0];
     dy = D_00222AE0[index + 1][1] - D_00222AE0[index][1];
     out[0] += dx * f;
     out[1] += dy * f;
-    f = func_00283CB8(y);
+    f = FloatFraction(y);
     dx = D_00222AE0[base + (iy + 1) * 8 + ix][0] - D_00222AE0[index][0];
     dy = D_00222AE0[base + (iy + 1) * 8 + ix][1] - D_00222AE0[index][1];
     out[0] += dx * f;

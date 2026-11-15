@@ -22,10 +22,10 @@ void func_L04_0046D6A8(char *obj) {
     u.q = 0;
     u.f[2] = 1.0f;
     u.f[3] = 1.0f;
-    func_00282CF0(obj, &v, obj + 0x30);
-    func_00282F20(obj, obj, 1.0f);
+    FastVecSub(obj, &v, obj + 0x30);
+    vec_scale_to_length(obj, obj, 1.0f);
     s1 = obj + 0x10;
-    func_00282DD8(s1, obj, &u);
-    func_00282F20(s1, s1, 1.0f);
-    func_00282DD8(obj + 0x20, s1, obj);
+    FastVecCross(s1, obj, &u);
+    vec_scale_to_length(s1, s1, 1.0f);
+    FastVecCross(obj + 0x20, s1, obj);
 }

@@ -33,8 +33,8 @@ void func_L05_0037BF48(char *obj)
                     if (++count == *(int *)(child + 0x20)) {
                         *(int *)(child + 8) = 0;
                         row = i / 5;
-                        *(float *)child = func_00283CE0(row) * left;
-                        *(float *)(child + 4) = func_00283CE0(i - (i / 5) * 5 - 2) * right;
+                        *(float *)child = IntToFloat(row) * left;
+                        *(float *)(child + 4) = IntToFloat(i - (i / 5) * 5 - 2) * right;
                         break;
                     }
                 }

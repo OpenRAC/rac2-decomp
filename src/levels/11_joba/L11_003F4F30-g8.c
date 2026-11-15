@@ -27,8 +27,8 @@ void func_L11_003F4F30(u8 *arg0) {
 
     for (i = 0; i < 4; i++) {
         func_0029FC20(arg0, i + 8, s0);
-        func_002830C0(buf, (void *)&((TI128 *)D_L11_001B06A0)[i], s0);
-        func_00282CC0(buf, buf, buf + 0x40);
+        transform_vector(buf, (void *)&((TI128 *)D_L11_001B06A0)[i], s0);
+        FastVecAdd(buf, buf, buf + 0x40);
         func_L00_00325AE8(buf, D_L11_001B0674, D_L11_001B0688[i], D_L11_001B0678[i]);
     }
 }

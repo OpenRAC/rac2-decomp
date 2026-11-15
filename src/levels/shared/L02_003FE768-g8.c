@@ -29,10 +29,10 @@ void func_L02_003FE768(float fraction)
     int left;
     int right;
     float t;
-    func_002FC560(0x42, 0x8000000044ULL);
+    VU1_addGSregister(0x42, 0x8000000044ULL);
     if (fraction < 0.0f)
         fraction = 0.0f;
-    width = func_00283CF0((float)(D_L02_001B1338[0] - D_L02_001B1330) * fraction);
+    width = FloatToInt((float)(D_L02_001B1338[0] - D_L02_001B1330) * fraction);
     if (fraction > 0.5f)
         color = func_L00_0031C998(D_L02_001B134C[0], D_L02_001B1348, fraction + fraction - 1.0f);
     else
@@ -51,5 +51,5 @@ void func_L02_003FE768(float fraction)
     } while (0);
     if (D_001A7B90[0])
         bottom -= D_L02_001B1340;
-    func_0028FC48(left, top, right, bottom, color, 0);
+    AppendScreenRectPacket(left, top, right, bottom, color, 0);
 }

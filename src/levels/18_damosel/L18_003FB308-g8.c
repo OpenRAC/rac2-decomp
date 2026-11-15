@@ -17,14 +17,14 @@ void func_L18_003FB308(u8 *a0) {
     switch (a0[0x20]) {
     case 0:
         qcopy_nc(s, a0 + 0x10);
-        func_00282F20(s + 0x10, a0 + 0xC0, D_L18_001B0584 / D_L18_001B0580);
+        vec_scale_to_length(s + 0x10, a0 + 0xC0, D_L18_001B0584 / D_L18_001B0580);
         func_002A7750(a0, 1, -1);
         *(int *)(s + 0x20) = 0;
         break;
     case 1: {
         if (*(int *)(s + 0x20) >= 2) {
-            func_00282CF0(a0 + 0x10, a0 + 0x10, s + 0x10);
-            func_00282CC0(D_L18_001B281C[0] + (*(int *)(s + 0x24) << 8) + 0x10,
+            FastVecSub(a0 + 0x10, a0 + 0x10, s + 0x10);
+            FastVecAdd(D_L18_001B281C[0] + (*(int *)(s + 0x24) << 8) + 0x10,
                          D_L18_001B281C[0] + (*(int *)(s + 0x24) << 8) + 0x10,
                          s + 0x10);
             --*(int *)(s + 0x20);
@@ -40,8 +40,8 @@ void func_L18_003FB308(u8 *a0) {
         if (func_002B3868(a0))
             func_002E5DA0(0, 0, a0, 0x1152);
         if (*(int *)(s + 0x20) < D_L18_001B0580) {
-            func_00282CC0(a0 + 0x10, a0 + 0x10, s + 0x10);
-            func_00282CF0(D_L18_001B281C[0] + (*(int *)(s + 0x24) << 8) + 0x10,
+            FastVecAdd(a0 + 0x10, a0 + 0x10, s + 0x10);
+            FastVecSub(D_L18_001B281C[0] + (*(int *)(s + 0x24) << 8) + 0x10,
                          D_L18_001B281C[0] + (*(int *)(s + 0x24) << 8) + 0x10,
                          s + 0x10);
             ++*(int *)(s + 0x20);

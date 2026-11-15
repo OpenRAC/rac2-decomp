@@ -87,19 +87,19 @@ void func_L01_003BD178(char *m, void *position, int count,
             y *= func_002A7878(minRadius, maxRadius);
             offset[1] = y;
             offset[2] = 0;
-            func_00283098(offset, offset, m + 0xC0);
+            matrix_mul_vec3(offset, offset, m + 0xC0);
             {
-                float range = speed * ((maxRadius - func_00282DF0(offset)) * 0.01666666753590107f) / maxRadius;
-                func_00282F20(velocity, offset, func_002A7878(range * 0.25f, range));
+                float range = speed * ((maxRadius - FastVecLength(offset)) * 0.01666666753590107f) / maxRadius;
+                vec_scale_to_length(velocity, offset, func_002A7878(range * 0.25f, range));
             }
             velocity[2] += func_002A7878(rise * 0.25f, rise) * 0.01666666753590107f;
             qzero_nc(accel);
-            func_00282CC0(offset, offset, position);
+            FastVecAdd(offset, offset, position);
             velocity[3] = size;
             accel[3] = endSize;
-            a = func_00283CF0(func_002A7878(15.0f, 25.0f));
-            b = func_00283CF0(func_002A7878(20.0f, 40.0f));
-            c = func_00283CF0(func_002A7878(30.0f, 60.0f));
+            a = FloatToInt(func_002A7878(15.0f, 25.0f));
+            b = FloatToInt(func_002A7878(20.0f, 40.0f));
+            c = FloatToInt(func_002A7878(30.0f, 60.0f));
             particle = func_002BAA28(offset, velocity, accel, 0x50204050, 0x7F7F7F, a, b, c, -1);
             if (particle && (func_001163B0() & 1))
                 particle[3] = 0x48;
@@ -126,10 +126,10 @@ void func_L01_003D6B00(char *object, int count, float low, float high, float rad
         position.f[0] = radius * func_00283180(angle);
         position.f[1] = radius * func_00283198(angle);
         position.f[2] = func_002A7878(0.0f, 1.0f);
-        func_00282F20(&velocity, &position, func_002A7878(speed * 0.75f, speed * 1.25f));
+        vec_scale_to_length(&velocity, &position, func_002A7878(speed * 0.75f, speed * 1.25f));
         position.f[2] = func_002A7878(low, high);
-        func_00282CC0(&position, object + 0x10, &position);
-        func_L00_003263D0(object, &position, 0.0f, 1, 1, &velocity, 0.0f, 1.0f,
+        FastVecAdd(&position, object + 0x10, &position);
+        SpawnTintedEffects(object, &position, 0.0f, 1, 1, &velocity, 0.0f, 1.0f,
                           0x50808040, 0, 5.5f);
     }
 }
@@ -199,18 +199,18 @@ void func_L01_003FFFE8(char *m)
     switch (*(unsigned char *)(m + 0x20)) {
     case 0:
         if (*(int *)d == -1)
-            func_0026FEB8(ref_L01_003FFFE8_01, *(short *)(m + 0xB2));
+            STUB_printf(ref_L01_003FFFE8_01, *(short *)(m + 0xB2));
         if (*(short *)(d + 4) == -1)
-            func_0026FEB8(ref_L01_003FFFE8_02, *(short *)(m + 0xB2));
+            STUB_printf(ref_L01_003FFFE8_02, *(short *)(m + 0xB2));
         if (*(int *)(d + 8) == -1)
-            func_0026FEB8(ref_L01_003FFFE8_03, *(short *)(m + 0xB2));
+            STUB_printf(ref_L01_003FFFE8_03, *(short *)(m + 0xB2));
         if (*(unsigned char *)(m + 0xB0) != 255) {
             if (D_0019B2E8[*(unsigned char *)(m + 0xB0) + (D_001A79F0 << 4)] & 128) {
                 func_0029F338(m);
                 break;
             }
         } else
-            func_0026FEB8(ref_L01_003FFFE8_04, *(short *)(m + 0xB2));
+            STUB_printf(ref_L01_003FFFE8_04, *(short *)(m + 0xB2));
         func_002A7750(m, 1, -1);
         break;
     case 1:
@@ -223,7 +223,7 @@ void func_L01_003FFFE8(char *m)
             int ready;
 
             *(unsigned char *)(m + 0x30) = 255;
-            func_0027D330(20);
+            FadeToBlack(20);
             if (*(int *)(d + 0xC) != -1) {
                 char *p = ref_L01_003FFFE8_05 + (*(int *)(d + 0xC) << 7);
 
@@ -267,9 +267,9 @@ void func_L01_003FFFE8(char *m)
             }
         }
         func_L01_002C1988(0);
-        func_L01_002BEB90(0, 1);
+        SetHeroMoveState(0, 1);
         func_L01_00323310(*(int *)(d + 0x14), *(int *)(d + 0x10));
-        func_0029B3E0(0, -1);
+        MemcardSave(0, -1);
         func_0029F338(m);
         break;
     }
@@ -343,7 +343,7 @@ void func_L01_004132D8(char *m) {
         if (!D_L01_00257920[i].target)
             continue;
         s = (char *)&D_L01_00257920[i];
-        *(float *)(s + 0xC) = func_00283B98(*(float *)(s + 0xC), 0.20943954586982727f);
+        *(float *)(s + 0xC) = FastAddRotations(*(float *)(s + 0xC), 0.20943954586982727f);
         dead = 0;
         if (*(signed char *)(*(char **)(s + 0x18) + 0x20) < 0)
             dead = 1;
@@ -402,10 +402,10 @@ void func_L01_004132D8(char *m) {
         goto random_particles;
     timer:
         if (*(int *)(s + 0x24) == 0) {
-            int c = func_00283D38(*(int *)(s + 4), *(int *)(s + 8),
+            int c = FastTweenColor(*(int *)(s + 4), *(int *)(s + 8),
                                   (func_00283180(*(float *)(s + 0xC)) + 1.0f) * 0.5f);
 
-            func_002A0488(*(char **)(s + 0x18), c & 255, (c >> 8) & 255, (c >> 16) & 255);
+            set_moby_color(*(char **)(s + 0x18), c & 255, (c >> 8) & 255, (c >> 16) & 255);
         } else
             --*(int *)(s + 0x24);
     }

@@ -21,7 +21,7 @@ typedef struct SpawnedObjectPrefix {
 
 void *func_L08_003D3D80(SpawnedObjectPrefix *source)
 {
-    SpawnedObjectPrefix *object = func_0029EFD0(0x987);
+    SpawnedObjectPrefix *object = CreateMoby(0x987);
     if (object != 0) {
         SpawnedObjectPrefix **payload = object->payload;
         object->unk30 = source->unk30;

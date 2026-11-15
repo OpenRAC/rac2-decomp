@@ -64,18 +64,18 @@ void func_L01_0042C540(void *arg) {
                 marks->indices[marked]=i;
                 marked++;
             }
-            distance=func_00282E48(&path->points[i],&path->points[(i+1)%path->count]);
+            distance=fast_vec_dist(&path->points[i],&path->points[(i+1)%path->count]);
             path->points[i].f[3]=distance;
             if(i<path->count-1) motion->distance+=distance;
         }
     }
     if(settings->duration>0)
-        settings->speed=(motion->distance/func_00283CE0(settings->duration))*60.0f;
+        settings->speed=(motion->distance/IntToFloat(settings->duration))*60.0f;
     if(settings->rotationPath>=0) {
         s32 i; PathRecord *path;
         path=D_L01_001FE180[settings->rotationPath];
         for(i=0;i<path->count;i++) {
-            distance=func_00282E48(&path->points[i],&path->points[(i+1)%path->count]);
+            distance=fast_vec_dist(&path->points[i],&path->points[(i+1)%path->count]);
             path->points[i].f[3]=distance;
             if(i<path->count-1) motion->angleDistance+=distance;
         }
@@ -92,7 +92,7 @@ void func_L01_0042C540(void *arg) {
     qcopy(pos,template+0x10);
     qcopy(angles,template+0x20); }
     { s32 cameraIndex=settings->camera;
-    if(cameraIndex<0) func_L01_002BEB90(111,1);
+    if(cameraIndex<0) SetHeroMoveState(111,1);
     else {
         u8 (*cameras)[128]=(void *)D_L01_001B264C;
         orientation.q=0; orientation.f[3]=1;

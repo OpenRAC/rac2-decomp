@@ -20,12 +20,12 @@ int func_L06_0047A268(char *moby) {
     if (disabled) return 0;
     if (*(s16 *)(st+0x2C)==2 && D_0018C0BC==26 && *(s16 *)(st+0x2E)>0) force=1;
     else if (*(s16 *)(st+0x2C)==4 && D_0018C2C0==3) force=*(s16 *)(st+0x2E)>0;
-    if (*(int *)(st+0xC)>=0 && (force || func_002ACBC8(D_00189EA0,*(int *)(st+0xC)))) return 1;
-    if (*(int *)(st+0x4C)>=0 && (force || func_002ACBC8(D_00189EA0,*(int *)(st+0x4C)))) return 1;
+    if (*(int *)(st+0xC)>=0 && (force || IsPointInCuboid(D_00189EA0,*(int *)(st+0xC)))) return 1;
+    if (*(int *)(st+0x4C)>=0 && (force || IsPointInCuboid(D_00189EA0,*(int *)(st+0x4C)))) return 1;
     if (*(int *)(st+0x10)>=0 && (force || func_L00_003206B8(D_00189EA0,*(int *)(st+0x10)))) return 1;
     if (*(int *)(st+8)>=0 && (force || func_002ACCA8(D_00189EA0,*(int *)(st+8)))) return 1;
     if (*(int *)(st+0x14)>=0) {
-        if (force || func_002A8AF0(D_00189EA0,
+        if (force || point_in_path_xy(D_00189EA0,
             D_L06_001FE500[*(int *)(st+0x14)]+16,
             *(int *)D_L06_001FE500[*(int *)(st+0x14)])) return 1;
     }

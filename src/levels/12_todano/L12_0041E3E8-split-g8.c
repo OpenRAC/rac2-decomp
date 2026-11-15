@@ -29,11 +29,11 @@ void func_L12_0041EDB8(u8 *a0)
         a0[0x30] = 0x7F;
         break;
     case 1:
-        if (func_00282E80(a0 + 0x10, D_L12_001B2E9C + (s[0] << 8) + 0x10) < 5.0f) {
+        if (vec_distance_xy(a0 + 0x10, D_L12_001B2E9C + (s[0] << 8) + 0x10) < 5.0f) {
             s[0xB] = state;
             s[8] = 0x3C;
-        } else if ((func_002ACBC8(D_00189EA0, s[1]) && s[0xB] != 0) ||
-                   (func_002ACBC8(D_L12_001B9E00, s[1]) && s[0xB] != 0)) {
+        } else if ((IsPointInCuboid(D_00189EA0, s[1]) && s[0xB] != 0) ||
+                   (IsPointInCuboid(D_L12_001B9E00, s[1]) && s[0xB] != 0)) {
             s[8] = 0x3C;
         }
         if (func_00282948((u8 *)s + 0x20))
@@ -44,11 +44,11 @@ void func_L12_0041EDB8(u8 *a0)
             *(TI128 *)v = 0;
             v[0] = 1.0f;
             v[2] = 3.0f;
-            func_00283098(v, v, a0 + 0xC0);
-            func_00282D30(*(f32 *)((u8 *)s + 0x24), v, v);
-            func_00282CC0(a0 + 0x10, (u8 *)s + 0x10, v);
+            matrix_mul_vec3(v, v, a0 + 0xC0);
+            FastVecScale(*(f32 *)((u8 *)s + 0x24), v, v);
+            FastVecAdd(a0 + 0x10, (u8 *)s + 0x10, v);
             if (s[0xC] % 120 == 0)
-                func_002E5CF8(0, 0, (s32)a0);
+                PlayMobySound(0, 0, (s32)a0);
             s[0xC]++;
         } else {
             s[0xC] = 0;

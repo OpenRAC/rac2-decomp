@@ -31,25 +31,25 @@ int func_002C94C8(int idx, float *a, float *b, float *c)
     float *prev;
     float *cur;
 
-    func_00282CF0(v, b, a);
+    FastVecSub(v, b, a);
     v[2] = 0;
-    func_00282F20(v, v, 1.0f / func_00282DF0(v));
+    vec_scale_to_length(v, v, 1.0f / FastVecLength(v));
     func_00282C88(w);
     w[0] = v[1];
     w[1] = -v[0];
     func_00282C88(z);
     z[2] = 1.0f;
     best = 1.0f;
-    func_00282CF0(t, (float *)((char *)D_001F1700[idx] + 0x10), a);
-    func_00283098(t, t, v);
+    FastVecSub(t, (float *)((char *)D_001F1700[idx] + 0x10), a);
+    matrix_mul_vec3(t, t, v);
     prev = t;
     cur = u;
     if (i < D_001F1700[idx]->count) {
         offset = 0x20;
         zero = 0.0f;
         do {
-            func_00282CF0(cur, (float *)((char *)D_001F1700[idx] + offset), a);
-            func_00283098(cur, cur, v);
+            FastVecSub(cur, (float *)((char *)D_001F1700[idx] + offset), a);
+            matrix_mul_vec3(cur, cur, v);
             if (t[3] != zero || u[3] != zero) {
                 if (u[1] * t[1] < 0.0f) {
                     float q = (t[0] - u[0]) / (t[1] - u[1]);
@@ -68,6 +68,6 @@ int func_002C94C8(int idx, float *a, float *b, float *c)
             offset += 0x10;
         } while (i < D_001F1700[idx]->count);
     }
-    func_00282D08(c, a, b, best);
+    lerp_vector(c, a, b, best);
     return found;
 }

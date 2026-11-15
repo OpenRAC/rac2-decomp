@@ -36,7 +36,7 @@ void func_0032B0A8(s32 arg0) {
         s32 p = (s32)D_002329A0 + i * 0x50;
         if (*(s32 *)(p + 0x44) == arg0) {
             f32 f24;
-            func_00282CC0(tmp, (void *)p, *(s32 *)(base + 0x2290) + 0x10);
+            FastVecAdd(tmp, (void *)p, *(s32 *)(base + 0x2290) + 0x10);
             func_0032B3E0(tmp, 0x7F7F7F, *(s32 *)(p + 0x34), 0x31, 2, *(f32 *)(p + 0x20), *(f32 *)(p + 0x2C), 0.001f);
             f24 = *(volatile f32 *)(p + 0x24);
             func_0032B3E0(tmp, *(s32 *)(p + 0x38), *(s32 *)(p + 0x34) >> 1, 0x31, 2, f24, *(f32 *)(p + 0x2C), 0.001f);

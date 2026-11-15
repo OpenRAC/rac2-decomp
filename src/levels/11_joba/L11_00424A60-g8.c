@@ -93,12 +93,12 @@ int func_L11_00424A60(unsigned char *object)
         WORD(state, 0x554) = 0;
         WORD(state, 0x560) = 0;
         WORD(state, 0x568) = 0;
-        BYTE(state, 0x48) = func_00283CF0(20.0f);
-        BYTE(state, 0x4a) = func_00283CF0(14.0f);
+        BYTE(state, 0x48) = FloatToInt(20.0f);
+        BYTE(state, 0x4a) = FloatToInt(14.0f);
         if (WORD(state, 0x528) != 0) {
             index = func_L02_0032E508(object, WORD(state, 0x524), state + 0x320, 16);
             WORD(state, 0x520) = index;
-            func_0026FEB8(D_L11_001B0FD8, index);
+            STUB_printf(D_L11_001B0FD8, index);
         }
         angle = REAL(state, 0x298);
         if (angle == 0.0f) {
@@ -160,7 +160,7 @@ int func_L11_00424A60(unsigned char *object)
                 WORD(object, 0x98) = 0;
                 UHALF(object, 0x34) &= 0xafff;
                 POINTER(POINTER(POINTER(state, 0x274), 0x68), 0x27c) = (char *)object;
-                POINTER(state, 0x280) = func_0029EFD0(0x911);
+                POINTER(state, 0x280) = CreateMoby(0x911);
                 if (POINTER(state, 0x280) == 0) return 1;
                 BYTE(POINTER(state, 0x280), 0x30) = BYTE(object, 0x30);
                 BYTE(POINTER(state, 0x280), 0x31) = 0;
@@ -170,7 +170,7 @@ int func_L11_00424A60(unsigned char *object)
                     qcopy(child + 0x10, ((char *)object + 0x10));
                     REAL(child, 0x18) += 0.75f;
                 }
-                POINTER(state, 0x278) = func_0029EFD0(0xff9);
+                POINTER(state, 0x278) = CreateMoby(0xff9);
                 if (POINTER(state, 0x278) == 0) return 1;
                 BYTE(POINTER(state, 0x278), 0x30) = BYTE(object, 0x30);
                 UHALF(POINTER(state, 0x278), 0x32) = UHALF(object, 0x32);
@@ -180,7 +180,7 @@ int func_L11_00424A60(unsigned char *object)
                 func_002AF1D0(object, POINTER(state, 0x278), 1, 0);
                 WORD(state, 0x290) = 0;
             } else {
-                func_0026FEB8(D_L11_002BACF0);
+                STUB_printf(D_L11_002BACF0);
                 --D_L11_001AED04;
                 WORD(state, 0x26c) = 0;
                 func_002A7750(object, 4, 0);
@@ -219,7 +219,7 @@ int func_L11_00424A60(unsigned char *object)
                 if (BYTE(object, 0x43) != 0x10) func_002A7470(object, 0x10, 0, 0);
                 if (WORD(state, 0x578) != 0) func_002A7750(object, 0xf, 0);
             }
-            POINTER(state, 0x29c) = func_0029EFD0(0x9ac);
+            POINTER(state, 0x29c) = CreateMoby(0x9ac);
             if (POINTER(state, 0x29c) == 0) return 1;
             BYTE(POINTER(state, 0x29c), 0x30) = BYTE(object, 0x30);
             UHALF(POINTER(state, 0x29c), 0x32) = UHALF(object, 0x32);
@@ -230,7 +230,7 @@ int func_L11_00424A60(unsigned char *object)
             func_002AF1D0(object, POINTER(state, 0x29c), 3, 0);
         }
         if (WORD(state, 0x270) != -1 && POINTER(state, 0x278) == 0) {
-            POINTER(state, 0x278) = func_0029EFD0(0xff9);
+            POINTER(state, 0x278) = CreateMoby(0xff9);
             if (POINTER(state, 0x278) == 0) return 1;
             BYTE(POINTER(state, 0x278), 0x30) = BYTE(object, 0x30);
             UHALF(POINTER(state, 0x278), 0x32) = UHALF(object, 0x32);
@@ -245,7 +245,7 @@ int func_L11_00424A60(unsigned char *object)
         REAL(state, 0x12c) = 8.0f;
         REAL(state, 0x130) = 10.0f;
     }
-    if (BYTE(object, 0x31) != 0 && func_00282E48(((char *)object + 0x10), &D_L11_001BA8C0) < 24.0f) {
+    if (BYTE(object, 0x31) != 0 && fast_vec_dist(((char *)object + 0x10), &D_L11_001BA8C0) < 24.0f) {
         func_002A93B0(object);
         BYTE(object, 0x6f) = 0x16;
     }
@@ -353,7 +353,7 @@ int func_L11_00424A60(unsigned char *object)
         if (BYTE(object, 0x43) != 0x23) func_002A7470(object, 0x23, 0, 10);
     }
     if (REAL(object, 0x18) < 75.0f && D_L11_001B30C8 >= 6) {
-        func_002A6C58(object, 0, 3);
+        SetDeathBits(object, 0, 3);
         if (D_L11_001B35B8 >= BYTE(object, 0x21) && func_002A8508(BYTE(object, 0x21), -1) >= 2) {
             unsigned short *ids;
             unsigned short id;

@@ -83,7 +83,7 @@ void func_L00_002B1350(int slot) {
             ((HeroState *)D_00189E20)->request[slot] = 0;
         }
         if (((HeroState *)D_00189E20)->request[slot] == 0x2D) {
-            func_L00_003C3A70(ITEM_ENTRY(0x2D).fancy != 0);
+            CreateTrailOwnerMoby(ITEM_ENTRY(0x2D).fancy != 0);
             ((HeroState *)D_00189E20)->request[slot] = 0;
         }
     }
@@ -94,7 +94,7 @@ void func_L00_002B1350(int slot) {
     }
     changed = 0;
 
-    if (func_L00_0032EF10(0x80, 3, 0) || ((HeroState *)D_00189E20)->pending) {
+    if (PadPressedWithin(0x80, 3, 0) || ((HeroState *)D_00189E20)->pending) {
         if (slot == 0 && ((HeroState *)D_00189E20)->slots[slot].item != 10) {
             if (((HeroState *)D_00189E20)->pending) {
                 if (((HeroState *)D_00189E20)->slots[slot].item != 0 && ((HeroState *)D_00189E20)->slots[slot].item != 0x1F && ((HeroState *)D_00189E20)->slots[slot].item != 0x2D && ((HeroState *)D_00189E20)->slots[slot].item != 9)
@@ -198,7 +198,7 @@ void func_L00_002B1350(int slot) {
         ((HeroState *)D_00189E20)->request[slot] = 0;
     }
     if (((HeroState *)D_00189E20)->request[slot] == 0x2D) {
-        func_L00_003C3A70(ITEM_ENTRY(0x2D).fancy != 0);
+        CreateTrailOwnerMoby(ITEM_ENTRY(0x2D).fancy != 0);
         ((HeroState *)D_00189E20)->request[slot] = 0;
     }
     if (((HeroState *)D_00189E20)->request[slot]) {
@@ -242,7 +242,7 @@ void func_L00_002B1350(int slot) {
         if (((HeroState *)D_00189E20)->queued) {
             sound = ITEM_ENTRY(((HeroState *)D_00189E20)->queued).sound;
             if (!func_00294630(sound)) {
-                func_00294420(sound);
+                LoadClassIntoFreeCacheSlot(sound);
             } else {
                 changed = 1;
                 *(int *)(pose + 0x10AB) = ((HeroState *)D_00189E20)->queued;
@@ -255,7 +255,7 @@ void func_L00_002B1350(int slot) {
         func_L00_002AB3E0();
         ((HeroState *)D_00189E20)->quickTimer = func_002A7820(0x32, 0x5A);
         func_L00_002B1308(((HeroState *)D_00189E20)->current[slot]);
-        if (((HeroState *)D_00189E20)->refresh) func_L00_002AF7D0();
+        if (((HeroState *)D_00189E20)->refresh) cancel_hero_item_animation();
         if (slot == 0) {
             if (((HeroState *)D_00189E20)->current[0] == 10) D_001A7A00[8] = 1;
             else D_001A7A00[8] = 0;

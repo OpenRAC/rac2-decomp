@@ -33,7 +33,7 @@ void func_L03_003D11E0(char *obj)
     int color, alpha, count;
     char *spawn, *particle;
 
-    func_00282F20(velocityOffset, obj + 0xc0, -(D_L03_001B0610*(1.0f/60.0f)));
+    vec_scale_to_length(velocityOffset, obj + 0xc0, -(D_L03_001B0610*(1.0f/60.0f)));
     { int i = 0; float f, g;
     do {
         angle = func_002A7940();
@@ -42,7 +42,7 @@ void func_L03_003D11E0(char *obj)
         vector[1] = func_00283198(angle)*radius;
         vector[2] = 0.0f;
         vector[2] = func_002A7878(D_L03_001B05F0, D_L03_001B05F0_1[1])*(1.0f/60.0f);
-        func_00282CC0(vector, vector, velocityOffset);
+        FastVecAdd(vector, vector, velocityOffset);
         f = func_002A7878(D_L03_001B0600, D_L03_001B0600_1[1]);
         g = func_002A7878(D_L03_001B0608, D_L03_001B0608_1[1]);
         spawn = func_00273730(obj, 2, *(short *)(obj + 0xaa), i, obj + 0x10, obj + 0xf0, vector, 255, f, g);
@@ -61,12 +61,12 @@ void func_L03_003D11E0(char *obj)
         particleVector[1] = func_002A78D8(0.0f, 1.4f);
         particleVector[2] = func_002A7878(0.3f, 1.5f);
         *(TI128 *)(vector) = *(TI128 *)(particleVector);
-        func_00283098(vector, vector, obj + 0xc0);
-        func_00282CC0(vector, vector, obj + 0x10);
+        matrix_mul_vec3(vector, vector, obj + 0xc0);
+        FastVecAdd(vector, vector, obj + 0x10);
         f = func_002A7878(D_L03_001B0628, D_L03_001B0628_1[1])*210000.0f;
         g = func_002A7878(D_L03_001B0620, D_L03_001B0620_1[1])*0.000277777785f;
         angle = func_002A7878(0.0f, 1.0f);
-        color = func_00283D38(D_L03_001B0630, D_L03_001B0630_1[1], angle);
+        color = FastTweenColor(D_L03_001B0630, D_L03_001B0630_1[1], angle);
         alpha = color>>24;
         count = func_002A7820(D_L03_001B0638, D_L03_001B0638_1[1]);
         *(TI128 *)verticalVelocity = 0;

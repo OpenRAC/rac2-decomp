@@ -100,12 +100,12 @@ void func_L17_003E7068(u8 *self) {
     Moby *pool;
 
     func_L17_003E8A58();
-    dist = func_00282E80(self + 0x10, st + 0x240);
+    dist = vec_distance_xy(self + 0x10, st + 0x240);
     ang = func_00283248(*(float *)(st + 0x240) - ((UView *)(self))->f[0x4], *(float *)(st + 0x244) - ((UView *)(self))->f[0x5]);
     idx = *(int *)(st + 0x6B8);
     if (idx != -1) {
         if (((Moby *)D_L17_001B2C1C[0])[idx].oclass != 0x929) {
-            func_0026FEB8(D_L17_001B0ED0);
+            STUB_printf(D_L17_001B0ED0);
         } else {
             func_L17_003C7250((u8 *)&((Moby *)D_L17_001B2C1C[0])[idx], self);
         }
@@ -137,7 +137,7 @@ void func_L17_003E7068(u8 *self) {
     case 0:
     case0:
         if (*(s16 *)(st + 0x69E) == 1) {
-            if (*(int *)(st + 0x730) == 0 || D_L17_001FB720[self[0x21]] == 0 || func_L17_003E6DE8(self) != 0) {
+            if (*(int *)(st + 0x730) == 0 || D_L17_001FB720[self[0x21]] == 0 || ClaimNearestObjectSlot(self) != 0) {
                 func_002A7750(self, 0xF, 2);
             } else {
                 func_002A7750(self, 7, 6);
@@ -150,9 +150,9 @@ void func_L17_003E7068(u8 *self) {
         break;
     case 2:
         if (*(s16 *)(st + 0x69E) == 1) *(s16 *)(st + 0x69C) = 0xC8;
-        if (func_00282978((short *)(st + 0x69C)) != 0) {
+        if (FastDecTimer((short *)(st + 0x69C)) != 0) {
             func_002A7750(self, 5, 4);
-            if (self[0x43] != self[0x42]) func_0026FEB8(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
+            if (self[0x43] != self[0x42]) STUB_printf(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
             if (self[0x43] != 3) func_002A7470(self, 3, 0, 0x14);
             *(s16 *)(st + 0x69C) = 0xDC;
         }
@@ -161,7 +161,7 @@ void func_L17_003E7068(u8 *self) {
         if (*(s16 *)(st + 0x69E) == 1) goto alert;
         goto b62;
     case 6:
-        if (func_L17_003E6DE8(self) != 0) {
+        if (ClaimNearestObjectSlot(self) != 0) {
             if ((self[0x42] != 1 && self[0x43] != 1) || (self[0x60] & 2)) {
 alert:
                 func_002A7750(self, 0xB, 2);
@@ -182,12 +182,12 @@ alert:
             } else {
 b60:
                 if (self[0x42] == 1) {
-                    func_002AA800(self + 0xF8, 0, func_00283248(*(float *)(st + 0x240) - ((UView *)(self))->f[0x4], *(float *)(st + 0x244) - ((UView *)(self))->f[0x5]), 0.10471977f);
+                    StepAngleTowardTarget(self + 0xF8, 0, func_00283248(*(float *)(st + 0x240) - ((UView *)(self))->f[0x4], *(float *)(st + 0x244) - ((UView *)(self))->f[0x5]), 0.10471977f);
                 }
             }
 b62:
-            if (func_00282978((short *)(st + 0x69C)) != 0) {
-                if (self[0x43] != self[0x42]) func_0026FEB8(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
+            if (FastDecTimer((short *)(st + 0x69C)) != 0) {
+                if (self[0x43] != self[0x42]) STUB_printf(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
                 if (self[0x43] != 2) func_002A7470(self, 2, 0, 0x14);
                 func_002A7750(self, 3, 0);
             }
@@ -202,17 +202,17 @@ b62:
         if (((UView *)(self))->f[0x6] < D_L17_001B0E3C) goto b262;
         if (*(float *)(st + 0xE8) > 0.016666668f) {
             *(float *)(st + 0xE8) = 0.016666668f;
-            func_0026FEB8(D_L17_001B0F10);
+            STUB_printf(D_L17_001B0F10);
         }
         hit = func_002B1C20(self, st + 0x60);
         if (hit & 1) {
             func_L01_003E9CF8(self, 0, 0);
-            func_002A6C58(self, 0, 3);
+            SetDeathBits(self, 0, 3);
         }
         fb = func_0029F530(self);
         if (fb >= 13.0f && fb <= 14.0f && self[0x42] == self[0x43]
-            && func_00283C80(func_00283248(*(float *)(st + 0x240) - ((UView *)(self))->f[0x4], *(float *)(st + 0x244) - ((UView *)(self))->f[0x5]), ((UView *)(self))->f[0x3E]) < 1.9198624f
-            && func_00282E48(self + 0x10, st + 0x240) < D_L17_001B0E58) {
+            && FastDiffRots(func_00283248(*(float *)(st + 0x240) - ((UView *)(self))->f[0x4], *(float *)(st + 0x244) - ((UView *)(self))->f[0x5]), ((UView *)(self))->f[0x3E]) < 1.9198624f
+            && fast_vec_dist(self + 0x10, st + 0x240) < D_L17_001B0E58) {
             if (self[0x42] == 4) {
                 if (func_L17_003E7010(self) != 0) {
                     h.obj = self;
@@ -267,8 +267,8 @@ b62:
                 qcopy(&v40, &((Vec *)D_L17_001FE880[*(int *)(st + 0x684)])[n + 1]);
                 v30.f[2] = v30.f[2] + 1.0f;
                 v40.f[2] = v30.f[2];
-                if (func_002761F8(&v30, &v40, 0, self, 0) != 0) {
-                    if (!(func_00282E80(self + 0x10, &D_L17_001C0020) < 2.0f)) {
+                if (CollLine(&v30, &v40, 0, self, 0) != 0) {
+                    if (!(vec_distance_xy(self + 0x10, &D_L17_001C0020) < 2.0f)) {
                         qcopy(st + 0x710, &D_L17_001C0020);
                         break;
                     }
@@ -286,7 +286,7 @@ b62:
             }
         }
         hit8 = func_L01_00321178(self, st + 0x710);
-        func_002AA800(self + 0xF8, 0, func_00283248(*(float *)(st + 0x710) - ((UView *)(self))->f[0x4], *(float *)(st + 0x714) - ((UView *)(self))->f[0x5]), 0.043633237f);
+        StepAngleTowardTarget(self + 0xF8, 0, func_00283248(*(float *)(st + 0x710) - ((UView *)(self))->f[0x4], *(float *)(st + 0x714) - ((UView *)(self))->f[0x5]), 0.043633237f);
         if (!(hit8 & 0x80) && *(int *)(st + 0x190) < 0xB && !(hit8 & 0x10F)) {
         } else {
             func_002A7750(self, 3, -1);
@@ -324,22 +324,22 @@ s6_159:
             (&v30)->f[0] = func_00283180(((UView *)(self))->f[0x3E]) * 3.0f;
             (&v30)->f[1] = func_00283198(((UView *)(self))->f[0x3E]) * 3.0f;
             (&v30)->f[2] = 0.0f;
-            func_00282CC0(&v40, self + 0x10, (&v30));
+            FastVecAdd(&v40, self + 0x10, (&v30));
             ((UView *)(self))->f[0x6] = func_002A89A8(self + 0x10, 0, 0.5f);
             func_L01_00321178(self, &v40);
-            if (!(func_00282E80(self + 0x10, st + 0x6C0) > 4.9f)) {
-            } else if (*(int *)(st + 0x730) == 0 || D_L17_001FB720[self[0x21]] == 0 || (((UView *)(self))->f[0x12] = 1.0f, func_L17_003E6DE8(self) != 0)) {
+            if (!(vec_distance_xy(self + 0x10, st + 0x6C0) > 4.9f)) {
+            } else if (*(int *)(st + 0x730) == 0 || D_L17_001FB720[self[0x21]] == 0 || (((UView *)(self))->f[0x12] = 1.0f, ClaimNearestObjectSlot(self) != 0)) {
                 func_002A7750(self, 0xB, 2);
             } else {
                 func_002A7750(self, 7, 6);
-                if (self[0x43] != self[0x42]) func_0026FEB8(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
+                if (self[0x43] != self[0x42]) STUB_printf(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
                 if (self[0x43] != 3) func_002A7470(self, 3, 0, 0x14);
             }
         }
         break;
     case 11:
         if (func_002B3868(self) != 0) {
-            if (self[0x43] != self[0x42]) func_0026FEB8(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
+            if (self[0x43] != self[0x42]) STUB_printf(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
             if (self[0x43] != 0xA) func_002A7470(self, 0xA, 0, D_L17_001B0E9C);
             fc = D_L17_001B0EB8;
             ((UView *)(self))->f[0x12] = -fc;
@@ -348,15 +348,15 @@ s6_159:
         if (self[0x42] == 0xA) {
             if (dist < D_L17_001B0E7C) {
                 qcopy((&v30), &D_L17_001B9BC0);
-                if (func_00282E80((&v30), self + 0x10) < D_L17_001B0EA4) {
+                if (vec_distance_xy((&v30), self + 0x10) < D_L17_001B0EA4) {
                     if (*(int *)(st + 0x738) < D_L17_001B0EA8) {
                         (&v30)->f[2] = *(float *)(st + 0x248);
-                        func_00282CF0((&v30), st + 0x240, (&v30));
-                        func_00282F20((&v30), (&v30), 2.0f * D_L17_001B0EA4);
-                        func_00282CC0((&v30), &D_L17_001B9BC0, (&v30));
+                        FastVecSub((&v30), st + 0x240, (&v30));
+                        vec_scale_to_length((&v30), (&v30), 2.0f * D_L17_001B0EA4);
+                        FastVecAdd((&v30), &D_L17_001B9BC0, (&v30));
                         v40.q = *(Quad *)(self + 0x10);
                         func_L02_0032EF10(&v40, (&v30), (&v30), *(int *)(st + 0x684), 3.0f);
-                        fx = func_00282E80(self + 0x10, (&v30));
+                        fx = vec_distance_xy(self + 0x10, (&v30));
                         if (D_L17_001B0EA4 + 0.3f < fx) {
                             func_L01_00321178(self, (&v30));
                             *(int *)(st + 0x738) = *(int *)(st + 0x738) + 1;
@@ -368,22 +368,22 @@ s6_159:
                 }
                 if (*(int *)(st + 0x738) >= D_L17_001B0EA8) {
 s11_184:
-                    func_0026FEB8(D_L17_001B0F20);
+                    STUB_printf(D_L17_001B0F20);
                 }
                 *(int *)(st + 0x738) = 0;
                 func_002A7750(self, 0xC, -1);
                 ((UView *)(self))->f[0x12] = 1.0f;
-                if (self[0x43] != self[0x42]) func_0026FEB8(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
+                if (self[0x43] != self[0x42]) STUB_printf(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
                 if (self[0x43] != func_002A77E0(2) + 4) func_002A7470(self, func_002A77E0(2) + 4, 2, 0x14);
             } else {
-                func_L02_0032E998(self + 0x10, st + 0x240, &f60, st + 0x280, *(int *)(st + 0x750), st + 0x758, st + 0x754, 0.0f, 0.5f);
+                ComputeRegionRouteHeading(self + 0x10, st + 0x240, &f60, st + 0x280, *(int *)(st + 0x750), st + 0x758, st + 0x754, 0.0f, 0.5f);
                 func_002B50E0(self, st + 0x240, f60);
-                func_002AA800(self + 0xF8, 0, ang, 0.05817765f);
+                StepAngleTowardTarget(self + 0xF8, 0, ang, 0.05817765f);
                 if (*(int *)(st + 0x190) >= 0x3D) {
                     *(int *)(st + 0x704) = D_L17_001B0E8C;
                     func_002A7750(self, 4, -1);
                     ((UView *)(self))->f[0x12] = 1.0f;
-                    if (self[0x43] != self[0x42]) func_0026FEB8(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
+                    if (self[0x43] != self[0x42]) STUB_printf(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
                     if (self[0x43] != 2) func_002A7470(self, 2, 0, 0x14);
                 }
             }
@@ -391,15 +391,15 @@ s11_184:
         break;
     case 15:
         if (func_002B3868(self) != 0 && self[0x43] != 1) func_002A7470(self, 1, 0, 0x14);
-        func_002AA800(self + 0xF8, 0, func_00283248(*(float *)(st + 0x240) - ((UView *)(self))->f[0x4], *(float *)(st + 0x244) - ((UView *)(self))->f[0x5]), 0.10471977f);
+        StepAngleTowardTarget(self + 0xF8, 0, func_00283248(*(float *)(st + 0x240) - ((UView *)(self))->f[0x4], *(float *)(st + 0x244) - ((UView *)(self))->f[0x5]), 0.10471977f);
         if (self[0x60] & 2) func_002A7750(self, 0xB, -1);
         break;
     case 12:
-        func_002AA800(self + 0xF8, 0, ang, 0.05817765f);
+        StepAngleTowardTarget(self + 0xF8, 0, ang, 0.05817765f);
         fd = func_0029F530(self);
         if (fd >= 13.0f && fd <= 14.0f && self[0x42] == self[0x43]
-            && func_00283C80(func_00283248(*(float *)(st + 0x240) - ((UView *)(self))->f[0x4], *(float *)(st + 0x244) - ((UView *)(self))->f[0x5]), ((UView *)(self))->f[0x3E]) < 1.9198624f
-            && func_00282E48(self + 0x10, st + 0x240) < D_L17_001B0E58
+            && FastDiffRots(func_00283248(*(float *)(st + 0x240) - ((UView *)(self))->f[0x4], *(float *)(st + 0x244) - ((UView *)(self))->f[0x5]), ((UView *)(self))->f[0x3E]) < 1.9198624f
+            && fast_vec_dist(self + 0x10, st + 0x240) < D_L17_001B0E58
             && func_L17_003E7010(self) != 0) {
             h.obj = self;
             h.flags = 0x10001;
@@ -419,29 +419,29 @@ s11_184:
     case 4:
         if (func_00282948(st + 0x704) != 0) {
             func_002A7750(self, 0xC, -1);
-            if (self[0x43] != self[0x42]) func_0026FEB8(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
+            if (self[0x43] != self[0x42]) STUB_printf(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
             if (self[0x43] != func_002A77E0(2) + 4) func_002A7470(self, func_002A77E0(2) + 4, 0, 0x14);
         }
         break;
     case 13:
         if (func_002B3868(self) != 0) {
-            fe = func_00283B98(((UView *)(self))->f[0x3E], 3.141593f);
+            fe = FastAddRotations(((UView *)(self))->f[0x3E], 3.141593f);
             (&v30)->f[0] = func_00283180(fe) * D_L17_001B0E88;
             (&v30)->f[1] = func_00283198(fe) * D_L17_001B0E88;
             (&v30)->f[2] = 0.0f;
-            func_00282CC0((&v30), (&v30), self + 0x10);
+            FastVecAdd((&v30), (&v30), self + 0x10);
             v40.q = *(Quad *)(self + 0x10);
             func_L02_0032EF10(&v40, (&v30), (&v30), *(int *)(st + 0x684), 3.0f);
-            if (func_00282E48(self + 0x10, (&v30)) < D_L17_001B0E88 * 0.5f) {
+            if (fast_vec_dist(self + 0x10, (&v30)) < D_L17_001B0E88 * 0.5f) {
                 func_L17_0032C070(self + 0x10, st + 0x240, (&v30), *(int *)(st + 0x684), D_L17_001B0E90, 1.0f);
             }
             qcopy(&v40, self + 0x10);
             v40.f[2] += 0.5f;
             qcopy(&v50, (&v30));
             v50.f[2] += 0.5f;
-            if (func_002761F8(&v40, &v50, 2, 0, 0) != 0) qcopy((&v30), &D_L17_001C0020);
+            if (CollLine(&v40, &v50, 2, 0, 0) != 0) qcopy((&v30), &D_L17_001C0020);
             qcopy(st + 0x710, (&v30));
-            if (self[0x43] != self[0x42]) func_0026FEB8(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
+            if (self[0x43] != self[0x42]) STUB_printf(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
             if (self[0x43] != 0xA) func_002A7470(self, 0xA, 0, D_L17_001B0E9C);
             func_002B60B0(self, (float)D_L17_001B0E6C * 0.00027777778f, D_L17_001B0E74 * 0.016666668f, 0.10471977f, 0.10471977f);
             *(int *)(st + 0x708) = D_L17_001B0E94;
@@ -457,21 +457,21 @@ s11_184:
             ((UView *)(self))->f[0x12] = 1.0f;
             if (dist < D_L17_001B0E7C + D_L17_001B0E80) {
                 func_002A7750(self, 0xC, -1);
-                if (self[0x43] != self[0x42]) func_0026FEB8(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
+                if (self[0x43] != self[0x42]) STUB_printf(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
                 if (self[0x43] != func_002A77E0(2) + 4) func_002A7470(self, func_002A77E0(2) + 4, 0, 0x14);
             } else {
                 func_002A7750(self, 7, 6);
-                if (self[0x43] != self[0x42]) func_0026FEB8(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
+                if (self[0x43] != self[0x42]) STUB_printf(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
                 if (self[0x43] != 3) func_002A7470(self, 3, 0, 0x14);
             }
         }
         if (func_00282948(st + 0x708) != 0 && dist < D_L17_001B0E7C) {
             func_002A7750(self, 0xC, -1);
             ((UView *)(self))->f[0x12] = 1.0f;
-            if (self[0x43] != self[0x42]) func_0026FEB8(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
+            if (self[0x43] != self[0x42]) STUB_printf(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
             if (self[0x43] != func_002A77E0(2) + 4) func_002A7470(self, func_002A77E0(2) + 4, 0, 0x14);
         }
-        func_002AA800(self + 0xF8, 0, ang, 0.05817765f);
+        StepAngleTowardTarget(self + 0xF8, 0, ang, 0.05817765f);
         break;
     case 9:
         if (func_002B3868(self) != 0 && self[0x43] != 7) func_002A7470(self, 7, 0, 0x14);
@@ -481,7 +481,7 @@ s11_184:
         ((UView *)(self))->f[0x6] = ff;
         if (ff < 70.0f) {
 b262:
-            func_002A6C58(self, 0, 3);
+            SetDeathBits(self, 0, 3);
             func_0029F338(self);
             return;
         }

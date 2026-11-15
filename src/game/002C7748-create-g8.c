@@ -16,7 +16,7 @@ char *func_002C7748(char *pos, char *velocity, int life)
     if (p) {
         state = p + 32;
         scale = 2.0f;
-        p[9] = func_00283CF0(scale) + 64;
+        p[9] = FloatToInt(scale) + 64;
         p[3] = 0x44;
         p[1] = 0;
         p[2] = D_001F26C0[0][0];

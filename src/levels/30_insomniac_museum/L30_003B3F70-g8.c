@@ -144,12 +144,12 @@ void func_L30_003B3F70(HoverMoby *obj) {
         break;
     case 1:
         if(func_002A0558(obj,D_00189E20.moby)<D_L30_001AF8A0 && D_00189E20.mode!=0x31) {
-            int request = func_002B0C28(7,0x2798,1)!=0;
+            int request = TryClaimNotice(7,0x2798,1)!=0;
             if(D_00138324&16) in.active=request;
         }
         if(in.active) {
             func_L00_002C42E0(0x31,0);
-            func_L00_002D2168(D_L30_001AF8D8,0,15.0f);
+            set_hero_animation(D_L30_001AF8D8,0,15.0f);
             qcopy_nc(&D_00189E20.rotation,&obj->rotation);
             qcopy_nc(&D_00189E20.position,&obj->position);
             D_00189E20.vehicle=obj;
@@ -161,19 +161,19 @@ void func_L30_003B3F70(HoverMoby *obj) {
         obj->flags=0;
         in.w=in.z=in.y=in.x=0.0f;
         if(obj->state==3) {
-            if(D_L30_001AF8DC!=D_L30_001AF8D8)func_L00_002D2168(D_L30_001AF8D8,0,15.0f);
+            if(D_L30_001AF8DC!=D_L30_001AF8D8)set_hero_animation(D_L30_001AF8D8,0,15.0f);
             func_L30_003B3E60(&in.x,&in.y,&in.z,&in.w);
         }
         st->throttle=in.y;
         in.z*=0.01745329424738884f;
         in.z*=D_L30_001AF908;
-        speed=func_00282DF0(st);
+        speed=FastVecLength(st);
         cap=D_L30_001AF8C8*(1.0f/60.0f);
         limit=D_L30_001AF910*(1.0f/60.0f);
         {
             float amount=in.x*((speed<limit?speed:limit)/limit*D_L30_001AF90C+(1-D_L30_001AF90C));
             amount*=0.0002908882452175021f;
-            st->heading=func_00283B98(st->heading,D_L30_001AF8B8*amount);
+            st->heading=FastAddRotations(st->heading,D_L30_001AF8B8*amount);
         }
         {
             float rad=in.x*0.01745329424738884f;
@@ -188,23 +188,23 @@ void func_L30_003B3F70(HoverMoby *obj) {
         sign=1.0f;
         if(in.y<0) sign=-1.0f;
         {
-            float magnitude=func_00282C48(in.x), throttle=func_L08_003277C0(2,(cap-speed)/cap);
+            float magnitude=func_00282C48(in.x), throttle=IntegerPower(2,(cap-speed)/cap);
             float amount=in.y+D_L30_001AF8F8*magnitude*sign;
             amount*=0.00027777778450399637f;
             amount*=D_L30_001AF8C4;
             thrust=amount*throttle;
         }
-        func_00282CC0(&frame.old,&obj->position,st);
+        FastVecAdd(&frame.old,&obj->position,st);
         height=func_002A89A8(&frame.old,0,0.5f);
         st->velocity.f[2]-=D_L30_001AF8E0*0.00027777778450399637f;
         if(height!=0) {
             target=height+D_L30_001AF8CC;
             if(target<frame.old.f[2]) {
-                st->pitch=func_00283B98(st->pitch,func_00283BE0(in.z,st->pitch)*D_L30_001AF904);
+                st->pitch=FastAddRotations(st->pitch,fast_subtract_rotations(in.z,st->pitch)*D_L30_001AF904);
                 goto physics;
             } else if(frame.old.f[2]+0.1f<height) {
                 frame.old.f[2]=height;
-                func_00282D30(st,st,D_L30_001AF8E8);
+                FastVecScale(st,st,D_L30_001AF8E8);
             } else {
                 st->velocity.f[2]+=((target-frame.old.f[2])*D_L30_001AF8D0-st->velocity.f[2])*D_L30_001AF8D0;
             }
@@ -216,38 +216,38 @@ void func_L30_003B3F70(HoverMoby *obj) {
             }
             {
                 Vec *right=&frame.matrix[0], *up, *ahead=&frame.matrix[2];
-                func_00282F20(ahead,&D_L30_001C0200.normal,1.0f);
+                vec_scale_to_length(ahead,&D_L30_001C0200.normal,1.0f);
                 up=&frame.matrix[1];
-                func_00282DD8(up,obj->basis,ahead);
-                func_00282DD8(right,up,ahead);
+                FastVecCross(up,obj->basis,ahead);
+                FastVecCross(right,up,ahead);
             }
             qzero_nc(&frame.matrix[3]);
             func_002AB6D8(&frame.matrix[0],&frame.pos);
-            st->pitch=func_00283B98(st->pitch,func_00283BE0(func_00283B98(-frame.pos.f[1],in.z),st->pitch)*D_L30_001AF900);
-            func_00282D30(st,st,D_L30_001AF8BC);
-            func_00283698(frame.scratch.inverse,obj->basis);
-            func_002830C0(st,st,frame.scratch.inverse);
+            st->pitch=FastAddRotations(st->pitch,fast_subtract_rotations(FastAddRotations(-frame.pos.f[1],in.z),st->pitch)*D_L30_001AF900);
+            FastVecScale(st,st,D_L30_001AF8BC);
+            matrix_from_basis_rows(frame.scratch.inverse,obj->basis);
+            transform_vector(st,st,frame.scratch.inverse);
             st->velocity.f[1]*=D_L30_001AF8C0;
-            func_00283098(st,st,obj->basis);
-            func_00282F20(&frame.accel,obj->basis,thrust);
-            func_00282CC0(st,st,&frame.accel);
+            matrix_mul_vec3(st,st,obj->basis);
+            vec_scale_to_length(&frame.accel,obj->basis,thrust);
+            FastVecAdd(st,st,&frame.accel);
         }
 physics:
-        func_002A8C00(&frame.matrix[0],obj,0x10000,st,D_L30_001AF954);
+        make_hit_descriptor(&frame.matrix[0],obj,0x10000,st,D_L30_001AF954);
         qcopy_nc(&obj->position,&frame.old);
         func_0029FCC0(obj,0,&frame.matrix[3]);
         frame.matrix[3].f[2]+=D_L30_001AF8D4;
-        func_00282CF0(&frame.pos,&obj->position,&frame.matrix[3]);
+        FastVecSub(&frame.pos,&obj->position,&frame.matrix[3]);
         if(func_00277258(&frame.matrix[3],0,obj,D_L30_001AF8D4) && D_L30_001C0200.hit!=D_00189E20.moby) {
-            func_00282CC0(&obj->position,&D_L30_001C0200.point,&frame.pos);
-            func_00282DD8(&frame.scratch.contact.normal,&D_L30_001C0200.normal,st);
-            func_00282DD8(&frame.scratch.contact.delta,&frame.scratch.contact.normal,&D_L30_001C0200.normal);
-            func_00282F20(&frame.scratch.contact.delta,&frame.scratch.contact.delta,1.0f);
-            func_00282F20(st,&frame.scratch.contact.delta,func_00282DB0(st,&frame.scratch.contact.delta));
-            func_00282D30(st,st,D_L30_001AF8E4);
+            FastVecAdd(&obj->position,&D_L30_001C0200.point,&frame.pos);
+            FastVecCross(&frame.scratch.contact.normal,&D_L30_001C0200.normal,st);
+            FastVecCross(&frame.scratch.contact.delta,&frame.scratch.contact.normal,&D_L30_001C0200.normal);
+            vec_scale_to_length(&frame.scratch.contact.delta,&frame.scratch.contact.delta,1.0f);
+            vec_scale_to_length(st,&frame.scratch.contact.delta,FastVecDot(st,&frame.scratch.contact.delta));
+            FastVecScale(st,st,D_L30_001AF8E4);
             func_L00_00335558(&D_L30_001C0200.vector,obj->basis,0.0f);
         }
-        speed = func_00282DF0(st);
+        speed = FastVecLength(st);
         if(D_L30_001AF960*(1.0f/60.0f)<speed) {
             frame.matrix[3].f[2]+=D_L30_001AF95C;
             func_00277F48(&frame.matrix[3],0,obj,&frame.matrix[0],D_L30_001AF8D4);
@@ -268,7 +268,7 @@ physics:
         I(D_00189E20.moby,0x9c)=0;
         func_L00_002C42E0(0,1);
         func_0029FCC0(obj,0,&frame.dir);
-        func_002ABBB8(obj,st,&frame.dir,0.0f,0.0f,10,3,16,4.0f,2.0f,9.0f,1.0f,-1,15.0f,1,1,-1,0,0x810001);
+        SpawnExplosionEffects(obj,st,&frame.dir,0.0f,0.0f,10,3,16,4.0f,2.0f,9.0f,1.0f,-1,15.0f,1,1,-1,0,0x810001);
         func_0029F338(obj);
         return;
     case 2:
@@ -276,20 +276,20 @@ physics:
         break;
     }
     st->baseHeight=obj->position.f[2];
-    st->phase=func_00283B98(st->phase,D_L30_001AF8A8*0.0002908882452175021f);
+    st->phase=FastAddRotations(st->phase,D_L30_001AF8A8*0.0002908882452175021f);
     st->bob=func_00283198(st->phase)*D_L30_001AF8A4;
     obj->position.f[2]+=st->bob;
     func_002AEF28(obj,&st->tiltX,&st->tiltY,D_L30_001AF8AC*0.01745329424738884f,D_L30_001AF8B0*0.0002908882452175021f,D_L30_001AF8B4*0.0002908882452175021f);
     obj->rotation.f[2]=st->heading;
-    obj->rotation.f[0]=func_00283B98(obj->rotation.f[0],st->lean);
-    obj->rotation.f[1]=func_00283B98(obj->rotation.f[1],st->pitch);
+    obj->rotation.f[0]=FastAddRotations(obj->rotation.f[0],st->lean);
+    obj->rotation.f[1]=FastAddRotations(obj->rotation.f[1],st->pitch);
     if(obj->state==3) {
         func_0029FCC0(obj,1,&D_00189E20.position);
         qcopy_nc(&D_00189E20.rotation,&obj->rotation);
         func_L00_002E6CF0(func_L30_003B3C18,obj);
     }
     obj->flags=obj->mclass->flags;
-    if(obj->interaction && func_00282E48(&obj->position,D_L30_001B9DC0)<64.0f) {
+    if(obj->interaction && fast_vec_dist(&obj->position,D_L30_001B9DC0)<64.0f) {
         func_002A93B0(obj);
         obj->touchTimer=60;
     }

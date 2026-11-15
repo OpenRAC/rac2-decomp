@@ -37,7 +37,7 @@ static __inline__ int projectile_upgraded_weapon(void) {
 }
 /* Creates a projectile and retires the oldest live entries when the shared list is full. */
 char *func_L00_00398810(char *position, char *direction) {
-    char *actor = func_0029EFD0(0xCB);
+    char *actor = CreateMoby(0xCB);
     char *state, *hero, *oldest;
     int i, count, age, oldestAge;
     if (actor) {
@@ -84,11 +84,11 @@ char *func_L00_00398810(char *position, char *direction) {
             }
             if (oldest) {
                 *(unsigned char *)(oldest + 0x20) = retired;
-                func_002ACAD0((int)oldest, (unsigned short *)&D_L00_001B1FF0);
+                RemoveMobyFromIndexList((int)oldest, (unsigned short *)&D_L00_001B1FF0);
                 *(int *)(*(char **)(oldest + 0x68) + 0x40) = 1;
             }
         }
-        func_002ACA50((int)actor, (short *)&D_L00_001B1FF0, 31);
+        AddMobyToIndexList((int)actor, (short *)&D_L00_001B1FF0, 31);
         func_002A0F48(actor);
     }
     return actor;

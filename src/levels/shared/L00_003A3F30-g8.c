@@ -36,14 +36,14 @@ void func_L00_003A3F30(char *moby)
     if (*(unsigned char *)(moby + 0x42) == *(unsigned char *)(moby + 0x43) &&
         (*(unsigned char *)(moby + 0x60) & 2))
         func_002A75E0(moby, 1, 0, 2, 0);
-    func_L00_0037E000(H->ptr[0x2290 / 4]);
+    ReleaseDeadOrExpiredSlots(H->ptr[0x2290 / 4]);
     *(float *)(moby + 0x2C) = *(float *)(*(char **)(moby + 0x24) + 0x24) * D_L00_001AF624;
     D_L00_0025C64C = 0.1f;
     if (H->i[0x2294 / 4] == 1)
         func_L00_002C42E0(29, 1);
     if (H->i[0x2294 / 4] == 29) {
         unsigned int color;
-        if (*cooldown > 0.0f && func_L00_002D4040(-1))
+        if (*cooldown > 0.0f && get_ammo(-1))
             color = 0x600000FF;
         else
             color = 0x600FFF0F;
@@ -63,13 +63,13 @@ void func_L00_003A3F30(char *moby)
             char *effect;
             D_L00_001B2860 = 1;
             func_0029FCC0(moby, 0, (char *)position);
-            func_002E5CF8(1, 0, moby);
+            PlayMobySound(1, 0, moby);
             func_002A75E0(moby, 2, 0, 2, 0);
             effect = func_L00_003AB8B8(position, moby);
             if (effect)
                 *(char **)(effect + 0xB8) = moby;
         } else if ((PAD->u[0x1A4 / 4] & H->u[0x1230 / 4]) || D_L00_001B2860 == 1) {
-            func_002E5CF8(0, 0, moby);
+            PlayMobySound(0, 0, moby);
             D_L00_001B2860 = 0;
         }
         {

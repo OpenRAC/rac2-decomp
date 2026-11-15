@@ -86,17 +86,17 @@ void func_L00_003D1258(char *m)
         qcopy(a,d);
         func_00273B70(m);
         changed=0;
-        if(func_00282E48(a,d)>F(d,0x48)*2.0f)changed=1;
+        if(fast_vec_dist(a,d)>F(d,0x48)*2.0f)changed=1;
         yes=1;
         if(B(d,0x5c)||changed) {
             if(func_00282948(d+0x7c)) {
                 if(func_00282C48(F(m,0x18)-PLAYER->position[2])>PLAYER->height)yes=0;
-                else if(func_00282E80(m+0x10,PLAYER->position)>PLAYER->range)yes=0;
+                else if(vec_distance_xy(m+0x10,PLAYER->position)>PLAYER->range)yes=0;
             }
         } else {
             yes=0;
             if(func_00282C48(F(m,0x18)-PLAYER->position[2])<PLAYER->height &&
-               func_00282E80(m+0x10,PLAYER->position)<PLAYER->range)I(d,0x7c)=3;
+               vec_distance_xy(m+0x10,PLAYER->position)<PLAYER->range)I(d,0x7c)=3;
         }
         if(D_00139688[I(d,0x68)] >=
            ((PickupResource *)(D_00139568[I(d,0x68)] * 224 + (unsigned int)D_L00_00262570))->capacity)yes=0;
@@ -125,38 +125,38 @@ check_enabled:
             func_002A7750(m,2,-1);
             F(d,0x74)=0.13333334f;
             func_00282C88(d);
-            if(func_00282C30(D_L00_001B19C8[0]-D_L00_001B2ADC[0])>10) {
-                func_002E5CF8(0,0,m);D_L00_001B2ADC[0]=D_L00_001B19C8[0];
+            if(subtract_integer_with_clamp(D_L00_001B19C8[0]-D_L00_001B2ADC[0])>10) {
+                PlayMobySound(0,0,m);D_L00_001B2ADC[0]=D_L00_001B19C8[0];
             }
         }
         break;
     case 2:
-        func_00282CF0(a,m+0x10,PLAYER->position);
-        func_00283098(a,a,PLAYER->matrix);
+        FastVecSub(a,m+0x10,PLAYER->position);
+        matrix_mul_vec3(a,a,PLAYER->matrix);
         target_speed=8.0f;
         if(a[2]>0.0f)target_speed=0.0f;
-        func_002AA2E8(d+0x74,target_speed,0.0066666668f);
-        func_00282F20(b,PLAYER->axis,F(d,0x74));
-        func_00282CC0(m+0x10,m+0x10,b);
-        func_00282CC0(m+0x10,m+0x10,PLAYER->motion);
-        speed=func_00282DF0(d);
-        func_002AA2E8(&speed,1.0666667f,0.0066666668f);
-        func_00282CF0(c,PLAYER->target,m+0x10);
-        time=func_00282DF0(c)/speed;
-        if(time<30.0f)func_002AA2E8(m+0x2c,0.0f,F(*(char **)(m+0x24),0x24)*0.033333335f);
+        ApproachValue(d+0x74,target_speed,0.0066666668f);
+        vec_scale_to_length(b,PLAYER->axis,F(d,0x74));
+        FastVecAdd(m+0x10,m+0x10,b);
+        FastVecAdd(m+0x10,m+0x10,PLAYER->motion);
+        speed=FastVecLength(d);
+        ApproachValue(&speed,1.0666667f,0.0066666668f);
+        FastVecSub(c,PLAYER->target,m+0x10);
+        time=FastVecLength(c)/speed;
+        if(time<30.0f)ApproachValue(m+0x2c,0.0f,F(*(char **)(m+0x24),0x24)*0.033333335f);
         if(F(m,0x2c)==0.0f) {func_0029F338(m);return;}
         if(time<=1.0f) {func_0029F338(m);return;}
-        func_00282F20(d,c,speed);
-        func_00282CC0(m+0x10,m+0x10,d);
-        func_00282DD8(v,PLAYER->axis,d);
+        vec_scale_to_length(d,c,speed);
+        FastVecAdd(m+0x10,m+0x10,d);
+        FastVecCross(v,PLAYER->axis,d);
         func_002ACE78(v,v,0.087266475f);
         *(Quadword *)up=0;up[2]=0.3f;
-        func_00283098(v2,up,m+0xc0);
-        func_00283958(v,matrix);
-        func_00283738(m+0xc0,matrix,m+0xc0);
-        func_00283098(v3,up,m+0xc0);
-        func_00282CF0(v4,v3,v2);
-        func_00282CF0(m+0x10,m+0x10,v4);
+        matrix_mul_vec3(v2,up,m+0xc0);
+        quaternion_to_rotation_basis(v,matrix);
+        multiply_matrix3x3(m+0xc0,matrix,m+0xc0);
+        matrix_mul_vec3(v3,up,m+0xc0);
+        FastVecSub(v4,v3,v2);
+        FastVecSub(m+0x10,m+0x10,v4);
         break;
     }
     if(B(m,0x20)==1 && func_00282ED8(m,D_0018C0B0)) {

@@ -30,7 +30,7 @@ void func_00132498(int bank, int offset, int callback, long callback_data) {
         func_00115D48(D_001A7600);
         return;
     }
-    if (func_00133580(1) == 1) {
+    if (snd_CheckLoadInProgress(1) == 1) {
         if (D_001A74F8 != 0) return;
         func_00115D48(D_001A7630);
         return;
@@ -42,7 +42,7 @@ void func_00132498(int bank, int offset, int callback, long callback_data) {
     D_001A74D0_1[1] = callback_data;
     while (func_0011D810(&D_001A7140)) {
         if (D_001A74F8 == 0) func_00115D48(D_001A7578);
-        func_00132028();
+        snd_Pump();
         func_0011AEA0(0);
     }
     D_001A74C8 = 1;

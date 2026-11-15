@@ -43,13 +43,13 @@ void func_L16_0040C5F0(char *object)
     triangle.rows[0]=D_L16_001B1600.rows[0];
     triangle.rows[1]=D_L16_001B1600.rows[1];
     triangle.rows[2]=D_L16_001B1600.rows[2];
-    func_00282D30(point,&triangle.rows[0],weights[0]);
-    func_00282D30(temporary,&triangle.rows[1],weights[1]);
-    func_00282CC0(point,point,temporary);
-    func_00282D30(temporary,&triangle.rows[2],weights[2]);
-    func_00282CC0(point,point,temporary);
-    func_00283098(point,point,matrix);
-    func_00282CC0(point,point,translation);
+    FastVecScale(point,&triangle.rows[0],weights[0]);
+    FastVecScale(temporary,&triangle.rows[1],weights[1]);
+    FastVecAdd(point,point,temporary);
+    FastVecScale(temporary,&triangle.rows[2],weights[2]);
+    FastVecAdd(point,point,temporary);
+    matrix_mul_vec3(point,point,matrix);
+    FastVecAdd(point,point,translation);
     effect=func_002C6DD8(point,D_L16_001A8F20,lifetime,amount);
     if(effect!=0) {
         *(int *)(effect+4)=D_L16_001B15E0;

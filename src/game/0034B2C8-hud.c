@@ -131,7 +131,7 @@ void func_0034B2C8(char *o, char *font, s32 arg)
     func_003361E0(self + 0x98, D_001AE688, arg);
     func_00335E38(self + 0x98, 10.0f, 18.5f, 0.0f, 0.0f);
     func_00336390(self + 0x98, font + 0x8710, 5);
-    func_00115484(self + 0xE4, 0, 0x18);
+    memset(self + 0xE4, 0, 0x18);
     func_003369A8(self + 0x100, D_001AE690, arg);
     func_00335F88(self + 0x100, 0.9f, 0.0f, 0.0f, 0.0f);
     func_00336A38(self + 0x100, self + 0xE4);
@@ -147,7 +147,7 @@ void func_0034B2C8(char *o, char *font, s32 arg)
     func_003361E0(self + 0x1D0, D_001AE6C0, arg);
     func_00335E38(self + 0x1D0, 498.0f, 10.0f, 0.0f, 0.0f);
     func_00336390(self + 0x1D0, font + 0x8710, 4);
-    func_00115484(self + 0x21C, 0, 0x18);
+    memset(self + 0x21C, 0, 0x18);
     func_003369A8(self + 0x238, D_001AE6D0, arg);
     func_00335F88(self + 0x238, 0.9f, 0.0f, 0.0f, 0.0f);
     func_00336A38(self + 0x238, self + 0x21C);
@@ -207,7 +207,7 @@ void func_0034B2C8(char *o, char *font, s32 arg)
         ico = self + (i * 0x3C + 0x604);
         func_00336710(ico, buf, arg);
         func_00335E68(ico, 0);
-        angle = func_00283B98((f32)i * 2.0f * 0.39269909f - 3.14159274f, 1.57079637f);
+        angle = FastAddRotations((f32)i * 2.0f * 0.39269909f - 3.14159274f, 1.57079637f);
         x = (s32)(func_00283180(angle) * 82.14f) + 109;
         func_00335E38(ico, x, (s32)(func_00283198(angle) * 76.442f) + 189, 0.0f, 0.0f);
         func_00335F88(ico, 32.0f, 32.0f, 0.0f, 0.0f);

@@ -28,7 +28,7 @@ int func_L00_00384070(char *owner)
 
     FIELD(int, work, 0x68) = func_002A77E0(255);
     do {
-        *slot = func_0029EFD0(0xCB2);
+        *slot = CreateMoby(0xCB2);
         func_002B37E8(*slot, 0);
         func_002A7398((signed char *)*slot, 1, 0);
         FIELD(unsigned short, *slot, 0x34) |= 0x4002;
@@ -47,7 +47,7 @@ int func_L00_00384070(char *owner)
     basis = &D_L00_001AED50;
     j = 23;
     do {
-        *slot = func_0029EFD0(0xE7D);
+        *slot = CreateMoby(0xE7D);
         if (*slot) {
             func_002B37E8(*slot, 0);
             result = func_002A77E0(FIELD(unsigned char,

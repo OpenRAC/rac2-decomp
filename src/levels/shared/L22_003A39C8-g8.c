@@ -38,7 +38,7 @@ s32 func_L22_003A39C8(char *obj, TI128 *pos, s32 type, s32 arg3)
     if (i != -1) {
         switch (type) {
         case 0:
-            ref_L22_003A39C8_00[type][i] = (s32)func_L22_003FB1F8(obj, pos, arg3, ref_L22_003A39C8_03);
+            ref_L22_003A39C8_00[type][i] = (s32)SpawnLinkedScaledObject(obj, pos, arg3, ref_L22_003A39C8_03);
             break;
         case 1:
             ref_L22_003A39C8_00[type][i] = (s32)func_L22_003FC780(obj, pos, arg3, ref_L22_003A39C8_04);

@@ -142,6 +142,6 @@ check_clear:
         if (!func_L17_003C3A00(obj, &frame.probe2))
             s->blocked = 0;
     }
-    func_00282CF0(&frame.delta, obj + 0x10, &frame.old);
+    FastVecSub(&frame.delta, obj + 0x10, &frame.old);
     func_002AD6F0((char *)s + 0x50, &frame.delta, obj + 0xF0, obj + 0xF0);
 }

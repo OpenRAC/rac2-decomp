@@ -41,8 +41,8 @@ void func_00308DB8(X *x) {
     l0.f[1] = func_00283198(func_002A7940()) * 0.05f;
     l0.f[2] = 0.0f;
     l0.f[2] = -func_002A7878(0.01f, 0.03f);
-    func_00283098(&l0, &l0, &x->vC0);
-    func_00282CC0(&l0, &l0, &D_00189E20.v150);
+    matrix_mul_vec3(&l0, &l0, &x->vC0);
+    FastVecAdd(&l0, &l0, &D_00189E20.v150);
     qcopy(&a, &x->v10);
     if (D_00189E20.i2294 == 0x7B) {
         if (D_001B1688 % 3 == 0) {
@@ -52,11 +52,11 @@ void func_00308DB8(X *x) {
         func_002BD8B0(&a, &l0, 0x4F007FFF, 0x1FFFFFFF, 10, 1, 10000.0f);
     }
     if (g->f0C) {
-        s = func_00282E48(&g->v10, &a) * 0.5f;
-        func_00282CF0(&d, &g->v10, &a);
+        s = fast_vec_dist(&g->v10, &a) * 0.5f;
+        FastVecSub(&d, &g->v10, &a);
         for (i = 1; i < 2; i++) {
-            func_00282F20(&t, &d, s * (f32)i);
-            func_00282CC0(&t, &a, &t);
+            vec_scale_to_length(&t, &d, s * (f32)i);
+            FastVecAdd(&t, &a, &t);
             func_002BD8B0(&t, &l0, 0x4F007FFF, 0x1FFFFFFF, 10, 1, 10000.0f);
         }
     }
@@ -67,15 +67,15 @@ void func_00308DB8(X *x) {
     l0.f[1] = 0.0f;
     l0.f[2] = -0.3f;
     l0.f[3] = 1.0f;
-    func_00283098(&l0, &l0, &x->vC0);
-    func_00282CC0(&a, &x->v10, &l0);
+    matrix_mul_vec3(&l0, &l0, &x->vC0);
+    FastVecAdd(&a, &x->v10, &l0);
     l0.f[3] = 1.0f;
     l0.f[2] = -0.075f;
     l0.f[0] = 0.0f;
     l0.f[1] = 0.0f;
-    func_00283098(&l0, &l0, &x->vC0);
+    matrix_mul_vec3(&l0, &l0, &x->vC0);
     l0.f[2] = 0.025f;
-    func_00282CC0(&l0, &l0, &D_00189E20.v150);
+    FastVecAdd(&l0, &l0, &D_00189E20.v150);
     if (D_00189E20.i2294 == 8) {
         col = 0xA0A0A0;
         q = 1.0165f;
@@ -86,19 +86,19 @@ void func_00308DB8(X *x) {
         q = 1.037f;
         l0.f[2] -= 0.0500000045f;
     }
-    p = func_002BDCE8(&a, 0.05f, 1.01f, q, 30000.0f, 6, &l0, col, 0);
+    p = SpawnSpinningSparkParticle(&a, 0.05f, 1.01f, q, 30000.0f, 6, &l0, col, 0);
     if (p) p[3] = 0x44;
     if (g->f0C) {
-        s = func_00282E48(&g->v10, &a) * 0.16667f;
-        func_00282CF0(&d, &g->v10, &a);
+        s = fast_vec_dist(&g->v10, &a) * 0.16667f;
+        FastVecSub(&d, &g->v10, &a);
         m = D_00189E20.i2294;
         n = 4;
         if (m == 8) n = 2;
         if (m == 0x7B) n = 1;
         for (i = 1; i < n; i++) {
-            func_00282F20(&t, &d, s * (f32)i);
-            func_00282CC0(&t, &a, &t);
-            p = func_002BDCE8(&t, 0.05f, 1.01f, q, 30000.0f, 6, &l0, col, 0);
+            vec_scale_to_length(&t, &d, s * (f32)i);
+            FastVecAdd(&t, &a, &t);
+            p = SpawnSpinningSparkParticle(&t, 0.05f, 1.01f, q, 30000.0f, 6, &l0, col, 0);
             if (p) p[3] = 0x44;
         }
     }
@@ -164,12 +164,12 @@ void func_0030E700(char *object)
                 *(int *)(state + 0x30) = 0;
             }
         }
-        func_002E5CF8(0, 0, object);
+        PlayMobySound(0, 0, object);
         *(float *)(state + 0x24) -= *(float *)(hit + 0x2C);
         func_002AB800(object, state);
         if (*(float *)(state + 0x24) < 0.0f) {
             func_002ACB48(direction, 0.5f);
-            func_002ABBB8(object, direction, 0, 0.0f, 0.0f, 0, 0, 0,
+            SpawnExplosionEffects(object, direction, 0, 0.0f, 0.0f, 0, 0, 0,
                          4.0f, 3.0f, 9.0f, 1.0f, 2, 12.0f, 1, 1, -1, 0, 0x810001);
             object[0x20] = 6;
         }

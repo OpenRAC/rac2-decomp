@@ -171,7 +171,7 @@ void func_L14_003F4F98(char *obj)
     case 1:
         if (func_002B3868(obj))
             st->count = 0;
-        if (func_002ACBC8(D_00189EA0, st->zone[0])) {
+        if (IsPointInCuboid(D_00189EA0, st->zone[0])) {
             if (!prisonGadgetUpgraded())
                 func_002A7750(obj, 2, -1);
         }
@@ -200,15 +200,15 @@ void func_L14_003F4F98(char *obj)
         break;
     }
 
-    if (func_002ACBC8(D_00189EA0, st->zone[1]) && !(D_00139630 & 2))
+    if (IsPointInCuboid(D_00189EA0, st->zone[1]) && !(D_00139630 & 2))
         prisonHelpTimed(0xA2C, 131);
-    if (func_002ACBC8(D_00189EA0, st->zone[2])) {
+    if (IsPointInCuboid(D_00189EA0, st->zone[2])) {
         prisonHelp(0xA09, 96);
         D_0018C958[97].count = 0xFFFF;
     }
-    if (func_002ACBC8(D_00189EA0, st->zone[3]) && D_L14_001B22E0[2])
+    if (IsPointInCuboid(D_00189EA0, st->zone[3]) && D_L14_001B22E0[2])
         prisonHelp(0xA0A, 97);
-    if (func_002ACBC8(D_00189EA0, st->hintZone) && !(D_0019B2E8[st->row + D_001A79F0 * 16] & 0x80) &&
+    if (IsPointInCuboid(D_00189EA0, st->hintZone) && !(D_0019B2E8[st->row + D_001A79F0 * 16] & 0x80) &&
         D_0018C958[94].count < 2)
         prisonHelp(0xA07, 94);
     st->count++;
@@ -237,7 +237,7 @@ void func_L14_00413CD8(char *self, char *p1, int p2)
     func_00282CC0_6(a, a, self + 16);
     func_00282CC0_6(b, b, self + 16);
 
-    if (func_002761F8(a, b, 2, self, 0))
+    if (CollLine(a, b, 2, self, 0))
         func_00282F20_2(p1, D_L14_001BF980, 1.0f);
     else
         func_00282F20_2(p1, self + 224, -1.0f);
@@ -534,7 +534,7 @@ void func_L14_004265B8(unsigned char *moby) {
         moby[0x30] = 0xFF;
         state->fadeLength = 0x7D;
         if (D_0019B2E8[state->text5C + D_001A79F0 * 16] & 0x80) {
-            if (func_002ACBC8(D_00189EA0, state->enterTrigger)) {
+            if (IsPointInCuboid(D_00189EA0, state->enterTrigger)) {
                 func_L00_002B9D60(D_L14_001B268C + state->doorCamera * 128 + 0x30,
                                   D_L14_001B268C + state->doorCamera * 128 + 0x70, 0, 1);
                 *(short *)(D_00189EA0 + 0x247C) = 0;
@@ -570,7 +570,7 @@ void func_L14_004265B8(unsigned char *moby) {
         }
         break;
     case 1:
-        if (func_002ACBC8(D_00189EA0, state->enterTrigger)) {
+        if (IsPointInCuboid(D_00189EA0, state->enterTrigger)) {
             func_L00_0030DDB0((int)D_L14_001B17A0, 1);
             D_L14_001A8FB0 = 2;
             D_L14_001A8FB4 = 8;
@@ -582,7 +582,7 @@ void func_L14_004265B8(unsigned char *moby) {
         if (func_002B3868(moby)) {
             unsigned char *liftNow = D_L14_001B259C + state->lift * 256;
             func_L00_002B9D60(liftNow + 0x10, liftNow + 0xF0, 0x6F, 1);
-            func_L00_002B2A40(1, 0x3F, liftNow);
+            SetHeroMode(1, 0x3F, liftNow);
             if (D_001A63F0[0] != state->music7C)
                 func_L01_00323310(state->music7C, state->music88);
         }
@@ -621,12 +621,12 @@ void func_L14_004265B8(unsigned char *moby) {
             beam->target = 0;
             beam->flags = (beam->flags | 0x41) & ~0x1000;
             func_L00_002B9D60(guard + 0x10, guard + 0xF0, 0x6F, 1);
-            func_L00_002B2A40(1, 0x3F, lift);
+            SetHeroMode(1, 0x3F, lift);
             if (D_001A63F0[0] != state->music7C)
                 func_L01_00323310(state->music7C, state->music88);
         }
         func_L14_00426E60(moby);
-        if (func_002ACBC8(D_00189EA0, state->exitTrigger)) {
+        if (IsPointInCuboid(D_00189EA0, state->exitTrigger)) {
             func_002A0430(state->text58);
             func_002DF3F8(&pos, panel + 0xF0);
             state->nextState = 5;
@@ -766,13 +766,13 @@ void func_L14_004298F0(unsigned char *self) {
     if (*(unsigned short *)(self + 0x96) < 65535)
         ++*(unsigned short *)(self + 0x96);
     func_00325DA0(self, state + 0x308);
-    func_00282CF0(delta, self + 0x10, state + 0x2d0);
+    FastVecSub(delta, self + 0x10, state + 0x2d0);
     qcopy(state + 0x2d0, self + 0x10);
     if (self[0x95] == 1) {
-        *(float *)(state + 0x2fc) = func_00283B98(*(float *)(state + 0x2fc), 0.2094395459f);
+        *(float *)(state + 0x2fc) = FastAddRotations(*(float *)(state + 0x2fc), 0.2094395459f);
         func_00325C50(self, state + 0x300, 1, delta, *(float *)(state + 0x2fc));
     } else {
-        *(float *)(state + 0x2fc) = func_00283B98(*(float *)(state + 0x2fc), 0.01163553074002266f);
+        *(float *)(state + 0x2fc) = FastAddRotations(*(float *)(state + 0x2fc), 0.01163553074002266f);
         func_00325C50(self, state + 0x300, 0, delta, *(float *)(state + 0x2fc));
     }
     func_002B0990(self, state + 0x230, 7, 1, 2.0f);
@@ -878,9 +878,9 @@ void func_L14_0042FDA8(PrisonEntity *self)
             } while ((group = (short)*list++) >= 0);
         }
 
-        if (func_00282E80(&self->pos, D_00189EA0) < 6.0f && func_002B38B8(self) &&
-            !func_002ACBC8(D_00189EA0, state->f14) &&
-            !func_002ACBC8(D_00189EA0, state->f18)) {
+        if (vec_distance_xy(&self->pos, D_00189EA0) < 6.0f && func_002B38B8(self) &&
+            !IsPointInCuboid(D_00189EA0, state->f14) &&
+            !IsPointInCuboid(D_00189EA0, state->f18)) {
             self->mode = 1;
             self->f78 = 0x24C102;
             if (self->anim != 1)
@@ -899,7 +899,7 @@ void func_L14_0042FDA8(PrisonEntity *self)
                     other->flags &= 0xFFBC;
                 } while ((group = (short)*list++) >= 0);
             }
-        } else if (func_002ACBC8(D_00189EA0, state->f14)) {
+        } else if (IsPointInCuboid(D_00189EA0, state->f14)) {
             self->mode = 5;
         }
 
@@ -914,7 +914,7 @@ void func_L14_0042FDA8(PrisonEntity *self)
                         qcopy(temp, self->pos);
                         temp[2] += 1.0f;
                         prisonStartSound(2, 0, self);
-                        func_002ABBB8(self, D_L14_001A8F20, temp, 0.0f, 0.0f, 10, 3, 16,
+                        SpawnExplosionEffects(self, D_L14_001A8F20, temp, 0.0f, 0.0f, 10, 3, 16,
                             4.0f, 2.0f, 9.0f, 1.0f, -1, 15.0f, 0, 9, -1, 0, 0x810001);
                         return;
                     }
@@ -938,7 +938,7 @@ void func_L14_0042FDA8(PrisonEntity *self)
         temp[0] = func_00283180(self->angle - 1.57079649f) * 0.3f;
         temp[1] = func_00283198(self->angle - 1.57079649f) * 0.3f;
         temp[2] = 0;
-        func_00282CC0(self->pos, self->pos, temp);
+        FastVecAdd(self->pos, self->pos, temp);
         qcopy(front, self->pos);
         qcopy(left, self->pos);
         qcopy(right, self->pos);
@@ -951,18 +951,18 @@ void func_L14_0042FDA8(PrisonEntity *self)
         temp[0] = func_00283180(self->angle + 3.14159298f) * 0.8f;
         temp[1] = func_00283198(self->angle + 3.14159298f) * 0.8f;
         temp[2] = 0;
-        func_00282CC0(left, left, offset1);
-        func_00282CC0(right, right, offset2);
+        FastVecAdd(left, left, offset1);
+        FastVecAdd(right, right, offset2);
         if (func_00277258(front, 0.6f, 0, self) || func_00277258(left, 0.68f, 0, self) || func_00277258(right, 0.68f, 0, self)) {
             prisonStartSound(2, 0, self);
-            func_002ABBB8(self, D_L14_001A8F20, front, 0.0f, 0.0f, 10, 3, 16,
+            SpawnExplosionEffects(self, D_L14_001A8F20, front, 0.0f, 0.0f, 10, 3, 16,
                 4.0f, 2.0f, 9.0f, 1.0f, -1, 15.0f, 0, 9, -1, 0, 0x810001);
             func_0029F338(self);
             return;
         }
     }
 
-    if (self->mode == 3 && func_002ACBC8(D_00189EA0, state->f14)) {
+    if (self->mode == 3 && IsPointInCuboid(D_00189EA0, state->f14)) {
         self->mode = 4;
         if (self->anim != 3)
             func_002A7470(self, 3, 0, 0);
@@ -1022,13 +1022,13 @@ void func_L14_004308D0(void *position, int texture, int color, int mode,
         v += 8;
     }
     qcopy(center, position);
-    func_00282CF0(forward, D_L14_001B9500, center);
-    func_00282F20(forward, forward, 1.0f);
-    func_00282DD8(right, forward, D_0018A0E0);
-    func_00282F20(right, right, 1.0f);
-    func_00282DD8(up, right, forward);
-    func_00282D30(offset, forward, distance);
-    func_00282CC0(center, center, offset);
+    FastVecSub(forward, D_L14_001B9500, center);
+    vec_scale_to_length(forward, forward, 1.0f);
+    FastVecCross(right, forward, D_0018A0E0);
+    vec_scale_to_length(right, right, 1.0f);
+    FastVecCross(up, right, forward);
+    FastVecScale(offset, forward, distance);
+    FastVecAdd(center, center, offset);
     matrix.v[0] = D_L14_001B1A00.v[0];
     matrix.v[1] = D_L14_001B1A00.v[1];
     matrix.v[2] = D_L14_001B1A00.v[2];
@@ -1036,13 +1036,13 @@ void func_L14_004308D0(void *position, int texture, int color, int mode,
     dst = q.pos;
     mat = (float (*)[4])&matrix;
     for (j = 3; j >= 0; j--, dst++) {
-        func_00282D30(*dst, *mat, scale);
+        FastVecScale(*dst, *mat, scale);
         mat++;
-        func_002830C0(*dst, *dst, forward);
+        transform_vector(*dst, *dst, forward);
     }
-    func_002FC560(0x47, 0x53001);
-    func_00280B90(&q, 0, 0);
-    func_002FC560(0x47, 0x5360B);
+    VU1_addGSregister(0x47, 0x53001);
+    draw_world_quad(&q, 0, 0);
+    VU1_addGSregister(0x47, 0x5360B);
 }
 
 /* func_L14_00430B70 is defined in L14_00430B70-visual.c. */

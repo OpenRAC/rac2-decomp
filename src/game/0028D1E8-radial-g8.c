@@ -51,10 +51,10 @@ int func_0028D1E8(unsigned char *o)
     char *label;
     int i, selectedAvailable, x, y, frame, available, color, previous;
     unsigned char *fade = o + 0x70;
-    open = func_00283CE0(o[0x70]) / func_00283CE0(8);
+    open = IntToFloat(o[0x70]) / IntToFloat(8);
     if (open > 1.0f) open = 1.0f;
     else if (open < 0.0f) open = 0.0f;
-    text = func_00283CE0(fade[1]) / func_00283CE0(8);
+    text = IntToFloat(fade[1]) / IntToFloat(8);
     if (text > 1.0f) text = 1.0f;
     else if (text < 0.0f) text = 0.0f;
     b0 = 0x8710;
@@ -98,13 +98,13 @@ int func_0028D1E8(unsigned char *o)
         draw_background((char *)func_00336D50(D_001A8CFC + b3, 16), colors[0], one, one, (float)previous, scale, half);
         {
             int k = *(int *)(o+0x74);
-            func_0028FC48(positions.xy[k][0],(int)((float)positions.xy[k][1]*D_001B23A4+half),
+            AppendScreenRectPacket(positions.xy[k][0],(int)((float)positions.xy[k][1]*D_001B23A4+half),
                 positions.xy[k][0]+33,(int)((float)(positions.xy[k][1]+7)*D_001B23A4+half),colors[0],0);
         }
     }
     selectedAvailable = 0;
     for (i=0;i<D_001B18D0;i++) {
-        angle = func_00283B98((float)i * 2.0f * 3.1415927f / (float)D_001B18D0 - 3.1415927f,1.5707964f);
+        angle = FastAddRotations((float)i * 2.0f * 3.1415927f / (float)D_001B18D0 - 3.1415927f,1.5707964f);
         x = (int)(func_00283180(angle)*80.0f)+114;
         y = (int)(func_00283198(angle)*75.0f)+192;
         if (!D_001B18D4[D_001A8D48][i].icon) continue;
@@ -154,25 +154,25 @@ int func_0028D1E8(unsigned char *o)
             if (D_001B189C[0]) { if (i == *(int *)(o+0x74)) selectedAvailable=1; available=1; }
             break;
         }
-        if (previous) func_0028EA58(func_0028E588(D_001B18D4[D_001A8D48][i].icon,10),x+2,y+2,28,26,colors);
+        if (previous) func_0028EA58(GetIconFrame(D_001B18D4[D_001A8D48][i].icon,10),x+2,y+2,28,26,colors);
         if (available) {
             colors2[3]=colors2[2]=colors2[1]=colors2[0]=0x80FFDE8D;
         } else {
             colors2[3]=colors2[2]=colors2[1]=colors2[0]=0x40808080;
         }
-        func_0028EA58(func_0028E588(D_001B18D4[D_001A8D48][i].icon,frame),x,y,30,28,colors2);
+        func_0028EA58(GetIconFrame(D_001B18D4[D_001A8D48][i].icon,frame),x,y,30,28,colors2);
     }
     sel = *(int *)(o+0x74);
     if (selectedAvailable && sel>=0 && sel<8) {
         RadialLabels labels=D_001A8E70;
         int id=labels.ids[sel];
         if (id==0x2F34 && D_001B189C[1]) id=0x2F35;
-        label=(char *)func_00288FB8(id);
+        label=(char *)GetLocalizedString(id);
         if (label && func_001157AC(label)) {
             float alpha = text * open;
             do {
-                color=func_00283D38(0x00E0C0A0,0x80E0C0A0,alpha);
-                previous=func_00283D38(0,0x80000000,alpha);
+                color=FastTweenColor(0x00E0C0A0,0x80E0C0A0,alpha);
+                previous=FastTweenColor(0,0x80000000,alpha);
                 func_0027FAA8(128,(int)(D_001B23A4*200.0f+0.5f),previous,label,-1);
                 func_0027FAA8(129,(int)(D_001B23A4*201.0f+0.5f),color,label,-1);
             } while (0);

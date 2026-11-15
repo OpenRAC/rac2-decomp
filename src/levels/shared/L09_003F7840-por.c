@@ -27,7 +27,7 @@ void func_L09_003F7840(char *obj)
                 tmp.q = 0;
                 tmp.f[2] = -(func_002A7878(tgt, 1.7f, 3.0f) * 0.016666668f);
                 org.q = tmp.q;
-                func_00282CC0(&org, &org, rec + 0x1A0);
+                FastVecAdd(&org, &org, rec + 0x1A0);
                 func_0029FCC0(*(char **)(rec + 0x2F8), 5, &a);
                 func_0029FCC0(*(char **)(rec + 0x2F8), 6, &b);
                 if (D_L09_001B2388[0] & 1) {

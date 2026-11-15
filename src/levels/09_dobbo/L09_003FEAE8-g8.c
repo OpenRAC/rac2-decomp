@@ -22,19 +22,19 @@ void func_L09_003FEAE8(char *a0) {
     float va[4];
 
     {
-        if (*(u8 *)(s2 + 0x42B) != 0 && func_00282E80(s2 + 0x390, *(char **)(s2 + 0x150) + 0x10) < 3.0f) {
+        if (*(u8 *)(s2 + 0x42B) != 0 && vec_distance_xy(s2 + 0x390, *(char **)(s2 + 0x150) + 0x10) < 3.0f) {
             *(s16 *)(s2 + 0x412) = 600;
             if (*(s16 *)(s2 + 0x426) == 0 && *(u8 *)(s2 + 0x428) == 0) {
                 func_0029FC20(a0, *(u8 *)(s2 + 0x429) + 4, matrix);
-                if (*(u8 *)(s2 + 0x441) && func_00282E80(s2 + 0x140, s2 + 0x390) < 3.0f) {
-                    func_00282CF0(va, s2 + 0x140, matrix + 12);
+                if (*(u8 *)(s2 + 0x441) && vec_distance_xy(s2 + 0x140, s2 + 0x390) < 3.0f) {
+                    FastVecSub(va, s2 + 0x140, matrix + 12);
                 } else {
-                    func_00282CF0(va, s2 + 0x390, matrix + 12);
+                    FastVecSub(va, s2 + 0x390, matrix + 12);
                 }
-                func_00282F20(D_L09_001B11C0 * 0.016666668f, va, va);
+                vec_scale_to_length(D_L09_001B11C0 * 0.016666668f, va, va);
                 func_L09_003AE8C8(matrix + 12, a0, va, 1, 1, (float)*(u8 *)(s2 + 0x34), D_L09_001B11D0, 1.0f, 0.5f);
                 if (*(u8 *)(s2 + 0x42A) % D_L09_001B1280 == 0)
-                    func_002E5CF8(D_L09_001B11B8, 0, a0);
+                    PlayMobySound(D_L09_001B11B8, 0, a0);
                 *(u8 *)(s2 + 0x429) ^= 1;
                 *(u8 *)(s2 + 0x42A) += 1;
                 *(u8 *)(s2 + 0x428) = D_L09_001B11C8;

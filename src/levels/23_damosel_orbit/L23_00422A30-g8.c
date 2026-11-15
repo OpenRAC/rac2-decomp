@@ -65,7 +65,7 @@ u8 *func_L23_00422A30(u8 *src, TI16 *pos, u8 *target, s32 a3, s32 a4) {
     TI16 c2;
     TI16 *reverse;
 
-    obj = func_0029EFD0(0x118F);
+    obj = CreateMoby(0x118F);
     if (obj != 0) {
         st = *(u8 **)(obj + 0x68);
         func_002B37E8(obj, src);
@@ -110,23 +110,23 @@ u8 *func_L23_00422A30(u8 *src, TI16 *pos, u8 *target, s32 a3, s32 a4) {
         if (st[0x28] == 0 && *(s32 *)(st + 0x18) != 0) {
             qcopy(&loc[0], *(void **)(st + 0x2C));
             func_L23_00418650(&loc[0], 0.0f);
-            func_00282CF0(st + 0x30, *(u8 **)(st + 0x2C), obj + 0x10);
+            FastVecSub(st + 0x30, *(u8 **)(st + 0x2C), obj + 0x10);
             qcopy(&loc[1], obj + 0x10);
             func_L23_00418650(&loc[1], 0.0f);
-            func_00282CF0(&loc[2], &loc[0], &loc[1]);
+            FastVecSub(&loc[2], &loc[0], &loc[1]);
             flag = 0;
-            func_00282F20(&loc[2], &loc[2], 1.0f);
-            func_00282F20(st + 0x30, st + 0x30, 1.0f);
+            vec_scale_to_length(&loc[2], &loc[2], 1.0f);
+            vec_scale_to_length(st + 0x30, st + 0x30, 1.0f);
             f21 = func_002B0360(src + 0x10);
             f20 = func_002B0360(*(u8 **)(st + 0x2C));
-            f22 = func_00282E48(&loc[0], &loc[1]);
+            f22 = fast_vec_dist(&loc[0], &loc[1]);
             if (f22 < 5.0f) {
                 if (func_00282C48(f21 - f20) > 10.0f) {
                     flag = 1;
                 }
             }
             qcopy(&loc[3], obj + 0xC0);
-            dot = func_00282DB0(&loc[2], &loc[3]);
+            dot = FastVecDot(&loc[2], &loc[3]);
             if ((src == D_00189E20.f2290 && *(*(u8 **)(st + 0x18) + 0x31) == 0) ||
                 dot < D_L23_001B1928 || 50.0f < f22 || flag != 0 || func_L23_0041B948() != 0) {
                 *(s32 *)(st + 0x18) = 0;
@@ -137,7 +137,7 @@ u8 *func_L23_00422A30(u8 *src, TI16 *pos, u8 *target, s32 a3, s32 a4) {
                 } else if (D_00189E20.f2294 == 0x5B) {
                     reverse = (TI16 *)(src + 0xE0);
                     qcopy(&D_L23_001B1FB0, reverse);
-                    func_00282D30(&D_L23_001B1FB0, &D_L23_001B1FB0, -1.0f);
+                    FastVecScale(&D_L23_001B1FB0, &D_L23_001B1FB0, -1.0f);
                     D_00189E20.f188C = (u8 *)&D_L23_001B1FB0;
                     qcopy(st + 0x30, &D_L23_001B1FB0);
                     st[0x28] = 0;
@@ -147,7 +147,7 @@ u8 *func_L23_00422A30(u8 *src, TI16 *pos, u8 *target, s32 a3, s32 a4) {
             }
         }
         *(s32 *)(st + 0x20) = 0;
-        func_002E5CF8(1, 0, obj);
+        PlayMobySound(1, 0, obj);
         *(u16 *)(obj + 0x34) = *(u16 *)(obj + 0x34) | 0x41;
         obj[0xBC] = 0;
     }

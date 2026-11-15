@@ -77,7 +77,7 @@ void func_L11_003F8510(unsigned char *moby) {
         }
         break;
     case 1:
-        if (func_002ACBC8(D_00189E20.position, *(int *)(data + 0x120))) {
+        if (IsPointInCuboid(D_00189E20.position, *(int *)(data + 0x120))) {
             func_L01_003246D0((int)moby);
             if (func_00288AA0(D_L11_001C0AC0, 0x70)) {
                 func_00288BE8(D_L11_001C0AC0);
@@ -100,7 +100,7 @@ void func_L11_003F8510(unsigned char *moby) {
         break;
     case 3:
         if (D_0013960F &&
-            func_002ACBC8(D_00189E20.position, *(int *)(data + 0x120))) {
+            IsPointInCuboid(D_00189E20.position, *(int *)(data + 0x120))) {
             func_L01_003246D0((int)moby);
             if (func_00288AA0(D_L11_001C0AC0, 0x71)) {
                 func_00288BE8(D_L11_001C0AC0);
@@ -128,7 +128,7 @@ void func_L11_003F8510(unsigned char *moby) {
                         func_002A0430(moby[0xB0]);
                     func_002DF3F8(D_00189E20.position, D_00189E20.rotation);
                 } else {
-                    func_0029B3E0(0, -1);
+                    MemcardSave(0, -1);
                 }
             }
             func_0029F338(moby);
@@ -138,8 +138,8 @@ void func_L11_003F8510(unsigned char *moby) {
     }
 
     if (moby[0x20] != 0) {
-        if (moby[0x43] == 1 && func_00282978(data + 0x11E)) {
-            *(u16 *)(data + 0x11E) = func_00283CF0(func_002A7878(1200.0f, 2400.0f));
+        if (moby[0x43] == 1 && FastDecTimer(data + 0x11E)) {
+            *(u16 *)(data + 0x11E) = FloatToInt(func_002A7878(1200.0f, 2400.0f));
         } else if ((moby[0x60] & 2) && moby[0x43] != 1) {
             func_002A7470(moby, 1, 0, 10);
         }
@@ -149,11 +149,11 @@ void func_L11_003F8510(unsigned char *moby) {
     track = 0;
     if (moby[0x43] == 1) {
         track = 1;
-        if (func_00282E80(moby + 0x10, D_00189E20.position) < 8.0f &&
-            func_00283C80(*(float *)(moby + 0xF8),
+        if (vec_distance_xy(moby + 0x10, D_00189E20.position) < 8.0f &&
+            FastDiffRots(*(float *)(moby + 0xF8),
                 func_00283248(D_00189E20.aim[0] - *(float *)(moby + 0x10),
                               D_00189E20.aim[1] - *(float *)(moby + 0x14))) < 1.5707964897155762f) {
-            if (func_00282DF0(D_00189E20.velocity) > 0.01f)
+            if (FastVecLength(D_00189E20.velocity) > 0.01f)
                 *(int *)(data + 0x114) = 120;
             else
                 func_00282948(data + 0x114);
@@ -162,12 +162,12 @@ void func_L11_003F8510(unsigned char *moby) {
             qcopy(data + 0x100, D_00189F00);
         }
         if (func_00282948(data + 0x118)) {
-            *(int *)(data + 0x118) = func_00283CF0(func_002A7878(180.0f, 300.0f));
-            heading = func_00283B98(*(float *)(moby + 0xF8),
+            *(int *)(data + 0x118) = FloatToInt(func_002A7878(180.0f, 300.0f));
+            heading = FastAddRotations(*(float *)(moby + 0xF8),
                 func_002A7878(-90.0f, 90.0f) * 0.01745329424738884f);
             angle = func_002A7878(0.0f, 30.0f);
             func_002AF000(data + 0x100, 6.0f, heading, angle * 0.01745329424738884f);
-            func_00282CC0(data + 0x100, data + 0x100, moby + 0x10);
+            FastVecAdd(data + 0x100, data + 0x100, moby + 0x10);
         }
         if (*(int *)(data + 0x114)) {
             qcopy(target, D_00189F00);
@@ -180,9 +180,9 @@ void func_L11_003F8510(unsigned char *moby) {
     if (track) {
         qcopy(origin, moby + 0x10);
         origin[2] += 2.0f;
-        func_00282CF0(delta, target, origin);
-        angle = func_00283BE0(func_00283248(delta[0], delta[1]), *(float *)(moby + 0xF8));
-        pitch = -func_00283248(func_00282E20(delta), delta[2]);
+        FastVecSub(delta, target, origin);
+        angle = fast_subtract_rotations(func_00283248(delta[0], delta[1]), *(float *)(moby + 0xF8));
+        pitch = -func_00283248(vec_length_xy(delta), delta[2]);
         if (angle > 1.5707964897155762f)
             angle = 1.5707964897155762f;
         else if (angle < -1.5707964897155762f)

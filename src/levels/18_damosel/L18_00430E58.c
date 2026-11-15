@@ -64,14 +64,14 @@ void func_L18_00430E58(u8 *self)
                 *(int *)(vars + 0x188) = 0;
                 func_L18_00432E78(self, 2, 0, 3);
                 self[0xBC] = 1;
-                func_00282F20(v, self + 0xC0, 2.0f);
-                func_00282CC0(v, v, self + 0x10);
+                vec_scale_to_length(v, self + 0xC0, 2.0f);
+                FastVecAdd(v, v, self + 0x10);
                 v[2] -= 6.0f;
                 func_L02_003329C8(self, v, 0.033333335f, 0.0055555557f);
             }
             if (self[0xBC] == 1) {
-                func_002AA2E8(self + 0xF0, 0.0f, 0.052359886f);
-                func_002AA2E8(self + 0xF4, 0.0f, 0.052359886f);
+                ApproachValue(self + 0xF0, 0.0f, 0.052359886f);
+                ApproachValue(self + 0xF4, 0.0f, 0.052359886f);
                 *(int *)(vars + 0x138) |= 2;
                 if (*(u8 **)(vars + 0x7EC) != 0)
                     *(int *)(*(u8 **)(vars + 0x7EC) + 0x98) = 0;
@@ -90,7 +90,7 @@ void func_L18_00430E58(u8 *self)
                 if (*(u8 **)(vars + 0x7EC) != 0)
                     *(int *)(*(u8 **)(vars + 0x7EC) + 0x98) = *(int *)(*(u8 **)(*(u8 **)(vars + 0x7EC) + 0x24) + 0x10);
             } else if (self[0xBC] == 2) {
-                if (func_00282E80(self + 0x10, D_L18_001B290C + (*(int *)(vars + 0x7D0) << 7) + 0x30) < 0.5f)
+                if (vec_distance_xy(self + 0x10, D_L18_001B290C + (*(int *)(vars + 0x7D0) << 7) + 0x30) < 0.5f)
                     func_002A7750(self, 4, 1);
             }
         }
@@ -384,7 +384,7 @@ void func_L18_00430E58(u8 *self)
         flags = func_002B1C20(self, vars + 0x50);
         fr = func_0029F530(self);
         if (*(u16 *)(self + 0x96) >= 0xB5 || (flags & 1)) {
-            func_002A6C58(self, 0, 3);
+            SetDeathBits(self, 0, 3);
             func_L18_004329B0(self);
         } else if ((self[0x42] == 0x10 && fr > 27.0f) || (self[0x42] == 0x11 && fr > 47.0f) || (flags & 2)) {
             if (*(u8 **)(vars + 0x7C0) != 0) {
@@ -417,7 +417,7 @@ void func_L18_00430E58(u8 *self)
                 *(s16 *)(vars + 0x80A) = 600;
             if (*(u8 **)(vars + 0x7C0) != 0) {
                 func_0029FCC0(self, 0, v);
-                func_0032C700(v, 1, 10, 30, 0, 10, 45, 1, 0.5f, 20.0f, 0, 0, 0, 0);
+                SpawnExplosion(v, 1, 10, 30, 0, 10, 45, 1, 0.5f, 20.0f, 0, 0, 0, 0);
                 func_0029F338(*(u8 **)(vars + 0x7C0));
                 *(u8 **)(vars + 0x7C0) = 0;
             }
@@ -435,8 +435,8 @@ void func_L18_00430E58(u8 *self)
             qcopy(vars + 0x750, vars + 0x1F0);
             if (func_L18_00432598(self, vars + 0x1F0) != 0) {
                 func_002A7750(self, 0xB, -1);
-            } else if (func_00282978(vars + 0x80A) != 0) {
-                func_002A6C58(self, 0, 3);
+            } else if (FastDecTimer(vars + 0x80A) != 0) {
+                SetDeathBits(self, 0, 3);
                 func_L18_004329B0(self);
             }
         }

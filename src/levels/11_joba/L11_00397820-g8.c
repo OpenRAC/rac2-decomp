@@ -15,17 +15,17 @@ void func_L11_00397820(u8 *obj) {
  u8 *ctx=*(u8 **)(obj+0x68); int i; float *out,*in; QuadDrawPacket11 *draw;
  qcopy(frame.direction,obj+0xe0);qcopy(frame.position,obj+0x10);
  in=(float *)D_L11_001AA2D0;
- func_00282CF0(frame.forward,D_L11_001BA8C0,frame.position);
+ FastVecSub(frame.forward,D_L11_001BA8C0,frame.position);
  i=3;
- func_00282F20(frame.forward,frame.forward,1.0f);
- func_00282DD8(frame.side,frame.forward,frame.direction);
- func_00282F20(frame.side,frame.side,1.0f);
- func_00282DD8(frame.up,frame.side,frame.forward);
- func_00282F20(frame.forward,frame.forward,D_L11_001AEC88);
- func_00282F20(frame.side,frame.side,D_L11_001AEC8C);
- func_00282F20(frame.up,frame.up,D_L11_001AEC90);
- func_00282D30(frame.offset,frame.forward,D_L11_001AEC70);
- func_00282CC0(frame.position,frame.position,frame.offset);
+ vec_scale_to_length(frame.forward,frame.forward,1.0f);
+ FastVecCross(frame.side,frame.forward,frame.direction);
+ vec_scale_to_length(frame.side,frame.side,1.0f);
+ FastVecCross(frame.up,frame.side,frame.forward);
+ vec_scale_to_length(frame.forward,frame.forward,D_L11_001AEC88);
+ vec_scale_to_length(frame.side,frame.side,D_L11_001AEC8C);
+ vec_scale_to_length(frame.up,frame.up,D_L11_001AEC90);
+ FastVecScale(frame.offset,frame.forward,D_L11_001AEC70);
+ FastVecAdd(frame.position,frame.position,frame.offset);
  draw=&frame.draw;
  frame.draw.tag=0x8000000048ULL;
  frame.draw.reg=0xff9000000260ULL;
@@ -35,8 +35,8 @@ void func_L11_00397820(u8 *obj) {
  frame.draw.param=1.0f;
  frame.draw.color[0]=frame.draw.color[1]=frame.draw.color[2]=frame.draw.color[3]=*(u32 *)(ctx+0x30);
  out=draw->v[0];
- do {func_00282D30(out,in,*(float *)(ctx+0x2c));--i;in+=4;func_002830C0(out,out,frame.forward);out+=4;}while(i>=0);
- frame.draw.texture=func_0027C878(11);func_00280B90(draw,0,0);
- frame.draw.texture=func_0027C878(6);func_00280B90(draw,0,0);
+ do {FastVecScale(out,in,*(float *)(ctx+0x2c));--i;in+=4;transform_vector(out,out,frame.forward);out+=4;}while(i>=0);
+ frame.draw.texture=GetEffectTextureDescriptor(11);draw_world_quad(draw,0,0);
+ frame.draw.texture=GetEffectTextureDescriptor(6);draw_world_quad(draw,0,0);
 }
 

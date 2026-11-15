@@ -53,7 +53,7 @@ void func_L00_00423290(CameraInitPrefix *camera)
     obj = pos;
     pos = buf0;
 
-    func_00282D30(pos, hero, -1.0f);
+    FastVecScale(pos, hero, -1.0f);
     /* The hero's position, 0x240 below the facing direction the call above uses. */
     hpos = hero - 0x240;
     *(V4_F0fba48d3 *)v60 = *(V4_F0fba48d3 *)hpos;
@@ -61,20 +61,20 @@ void func_L00_00423290(CameraInitPrefix *camera)
     *dst = *(V4_F0fba48d3 *)v60;
     vB0 = obj + 0xB0;
     vF0 = obj + 0xF0;
-    func_00282D30(obj + 0x70, buf0, func_00282DB0_1(v60, buf0));
+    FastVecScale(obj + 0x70, buf0, func_00282DB0_1(v60, buf0));
     func_00282C88(obj + 0xD0);
     func_00282C88(obj + 0xE0);
     func_00282C88(obj + 0x100);
-    func_00282D30(buf1, buf0, *(float *)(v160 + 0x30));
-    func_00282CC0(vB0, buf1, v60);
-    func_00282D30(buf1, buf0, *(float *)(v60 + 0xB0));
-    func_00282CC0(vF0, buf1, v60);
+    FastVecScale(buf1, buf0, *(float *)(v160 + 0x30));
+    FastVecAdd(vB0, buf1, v60);
+    FastVecScale(buf1, buf0, *(float *)(v60 + 0xB0));
+    FastVecAdd(vF0, buf1, v60);
     dst = (V4_F0fba48d3 *)(obj + 0xA0);
     *dst = *(V4_F0fba48d3 *)vF0;
     func_00282CF0_2(v160, (char *)camera + 0x30, vB0);
     dst = (V4_F0fba48d3 *)(obj + 0x170);
     *dst = *(V4_F0fba48d3 *)v160;
     *(V4_F0fba48d3 *)obj = *(V4_F0fba48d3 *)((char *)camera + 0x30);
-    func_00282CC0(obj + 0x210, vB0, v160);
+    FastVecAdd(obj + 0x210, vB0, v160);
     *(int *)(obj + 0x240) = 0;
 }

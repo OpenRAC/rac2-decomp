@@ -86,8 +86,8 @@ void func_L00_003A0F30(char *moby)
             func_002A7470(moby, 1, 0, 0);
         *(int *)(state + 0xC) = 0;
         *(int *)(state + 0x10) = 0;
-        func_0029F978((u8 *)moby, 0, (u8 *)state + 0x20);
-        handle = func_L00_00329E90(moby, 0, query);
+        AttachManipulator((u8 *)moby, 0, (u8 *)state + 0x20);
+        handle = AcquireEntitySlot(moby, 0, query);
         *(int *)(state + 4) = handle;
         *(char **)(state + 8) = func_L00_0032A088(*(short *)(moby + 0xAA), handle);
         for (i = 0; i < 4; i++) {
@@ -121,7 +121,7 @@ void func_L00_003A0F30(char *moby)
         func_L00_002C42E0(29, 1);
     if (D_00189E20.mode == 29) {
         unsigned int color;
-        if (*(float *)state != 0.0f && func_L00_002D4040(-1))
+        if (*(float *)state != 0.0f && get_ammo(-1))
             color = 0x600000FF;
         else
             color = 0x600FFF0F;
@@ -131,7 +131,7 @@ void func_L00_003A0F30(char *moby)
         !func_L00_003BB5F0() && D_00189E20.inputTicks > 22) {
         if (func_L00_002D3F30(-1, 1)) {
             D_L00_001B2840.mode = 1;
-            func_002E5CF8(2, 0, moby);
+            PlayMobySound(2, 0, moby);
             {
                 float cooldown;
                 switch (D_L00_001AF5E4) {
@@ -158,7 +158,7 @@ void func_L00_003A0F30(char *moby)
                 *(float *)state = cooldown;
             }
         } else if ((D_00138180[0x69] & D_00189E20.buttons) || D_L00_001B2840.mode == 1) {
-            func_002E5CF8(6, 0, moby);
+            PlayMobySound(6, 0, moby);
             D_L00_001B2840.mode = 0;
         }
     }
@@ -185,9 +185,9 @@ updateCharge:
             speed = 0.3333333433f;
             if (D_00189E20.viewMode == 1) {
                 speed = -speed;
-                func_00282F20(velocity, moby + 0xD0, speed);
+                vec_scale_to_length(velocity, moby + 0xD0, speed);
             } else
-                func_00282F20(velocity, D_00189E20.facing, speed);
+                vec_scale_to_length(velocity, D_00189E20.facing, speed);
             if (D_00189E20.aimTarget)
                 func_L00_0032A1A8(D_00189E20.aimTarget, (char *)origin, (char *)velocity, 0.3333333433f);
             D_L00_001AF5E8 = func_L00_003BB080(moby, (char *)*(int *)(state + 4), (char *)origin, (char *)velocity);
@@ -210,7 +210,7 @@ updateCharge:
     }
     if (*(unsigned char *)(moby + 0x31))
         ref_L00_003A0F30_00(func_L00_003A1580, moby);
-    *(float *)(state + 0x10) = func_00283B98(*(float *)(state + 0x10), *(float *)(state + 0xC) * 0.3141593039f);
+    *(float *)(state + 0x10) = FastAddRotations(*(float *)(state + 0x10), *(float *)(state + 0xC) * 0.3141593039f);
     *(float *)(state + 0x30) = func_00283198(*(float *)(state + 0x10) * 0.5f);
     *(float *)(state + 0x3C) = func_00283180(*(float *)(state + 0x10) * 0.5f);
     }

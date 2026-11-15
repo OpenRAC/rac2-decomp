@@ -131,14 +131,14 @@ void func_00337210(Grid *grid)
                 if (grid->cells[index].item && grid->cells[index].item == grid->selectedItem &&
                     func_00335E88(grid->sprite)) {
                     int count;
-                    func_00336A38((int)grid->label, func_00288FB8(WEAPON(grid->cells[index].item)->textId));
+                    func_00336A38((int)grid->label, GetLocalizedString(WEAPON(grid->cells[index].item)->textId));
                     if (func_00336950(grid->sprite) == WEAPON(49)->icon)
-                        func_00336A38((int)grid->label, func_00288FB8(WEAPON(49)->textId));
+                        func_00336A38((int)grid->label, GetLocalizedString(WEAPON(49)->textId));
                     if (func_00336950(grid->sprite) == WEAPON(55)->icon && !D_001A7AF8[55]) {
                         count = !!D_001395B8[0x84] + !!D_001395B8[0x86] + !!D_001395B8[0x89];
                         if (count > 0) {
                             GridLabels labels = *(GridLabels *)D_001ADB18;
-                            func_00336A38((int)grid->label, func_00288FB8(labels.value[count]));
+                            func_00336A38((int)grid->label, GetLocalizedString(labels.value[count]));
                         }
                     }
                     func_00335E38(grid->label, grid->labelOrigin[0] + grid->origin[0],

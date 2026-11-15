@@ -30,17 +30,17 @@ void func_L03_0041F178(u8 *self) {
         if (*(s16 *)(st + 0x336) < 3)
             ++*(s16 *)(st + 0x336);
         D_L03_001B1C20.f[0] = *(float *)(st + 0x33C);
-        func_00283098(&from, &D_L03_001B1C10, self + 0xC0);
-        func_00282CC0(&from, &from, self + 0x10);
+        matrix_mul_vec3(&from, &D_L03_001B1C10, self + 0xC0);
+        FastVecAdd(&from, &from, self + 0x10);
         enabled = 0;
-        func_00283098(&to, &D_L03_001B1C20, self + 0xC0);
-        func_00282CC0(&to, &to, self + 0x10);
-        func_002A8C00(hit, self, self[0x95] == 2 ? 0x10001 : 1,
+        matrix_mul_vec3(&to, &D_L03_001B1C20, self + 0xC0);
+        FastVecAdd(&to, &to, self + 0x10);
+        make_hit_descriptor(hit, self, self[0x95] == 2 ? 0x10001 : 1,
                      D_L03_001A8F20, (float)st[0x34]);
-        if (func_002761F8(&from, &to, 0, self, hit)) {
+        if (CollLine(&from, &to, 0, self, hit)) {
             u8 *direction = D_L03_001BFE00;
             u8 *ctx = direction - 0x40;
-            if (func_00283248(func_00282E20(direction), *(float *)(ctx + 0x48)) > 1.396263599395752f)
+            if (func_00283248(vec_length_xy(direction), *(float *)(ctx + 0x48)) > 1.396263599395752f)
                 enabled = 1;
             qcopy(&to, direction - 0x20);
             if (*(u8 **)(ctx + 0x18)) {
@@ -51,8 +51,8 @@ void func_L03_0041F178(u8 *self) {
                 if (type >= 0x209)
                     goto no_damage;
                 {
-                    func_002A8C00(hit, self, 0x10000, D_L03_001A8F20, (float)st[0x34]);
-                    func_002A8E20(*(u8 **)(ctx + 0x18), hit);
+                    make_hit_descriptor(hit, self, 0x10000, D_L03_001A8F20, (float)st[0x34]);
+                    QueueMobyImpact(*(u8 **)(ctx + 0x18), hit);
                 }
             }
         }

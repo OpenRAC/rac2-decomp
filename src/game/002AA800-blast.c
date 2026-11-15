@@ -96,8 +96,8 @@ void func_002ABBB8(char *owner, void *direction, float *position,
             }
         }
     }
-    func_00282CF0(delta, D_001B5340, position);
-    distance = func_00282DF0(delta);
+    FastVecSub(delta, D_001B5340, position);
+    distance = FastVecLength(delta);
     if (debris) {
         {
             ExplosionVectors v;
@@ -109,9 +109,9 @@ void func_002ABBB8(char *owner, void *direction, float *position,
             *(Quad *)v.vector = *(Quad *)v.random;
             if (distance < 14.0f) {
                 delta[2] += distance * 0.5f;
-                func_00282F20(v.vector, v.vector, distance * 0.0033333336468786f);
-                func_00282F20(delta, delta, (distance + distance) * 0.01666666753590107f);
-                func_00282CC0(v.vector, v.vector, delta);
+                vec_scale_to_length(v.vector, v.vector, distance * 0.0033333336468786f);
+                vec_scale_to_length(delta, delta, (distance + distance) * 0.01666666753590107f);
+                FastVecAdd(v.vector, v.vector, delta);
                 func_00282FB8(v.vector, v.vector, 0.1666666716337204f);
                 func_00308600(position, v.vector, func_002A7820(60, 90), 0, 0);
             }
@@ -141,8 +141,8 @@ void func_002ABBB8(char *owner, void *direction, float *position,
         int count;
         float under;
         int i;
-        if (distance < func_00283CE0(flashes) * 2.0f)
-        count = func_00283CF0(distance) / 2;
+        if (distance < IntToFloat(flashes) * 2.0f)
+        count = FloatToInt(distance) / 2;
         else
         count = flashes;
         under = 0.0f;
@@ -191,7 +191,7 @@ void func_002ABBB8(char *owner, void *direction, float *position,
                 *(Quad *)v.vector = *(Quad *)v.random;
                 k = 0.01666666753590107f;
                 speed = func_002A7878(0.0f, 3.0f);
-                func_00282F20(v.vector, v.vector, scale * k * speed);
+                vec_scale_to_length(v.vector, v.vector, scale * k * speed);
                 c1 = func_002AAFA0(colors1.colors[func_002A77E0(6)], channels);
                 c2 = func_002AAFA0(colors2.colors[func_002A77E0(6)], channels);
                 func_002BB838(position, v.vector, c1, c2, func_002A7820(30, 45) - quality * 5, 200000.0f);
@@ -228,7 +228,7 @@ void func_002ABBB8(char *owner, void *direction, float *position,
             }
         }
     }
-    if (owner && sound != -1) func_002E5CF8(sound, 0, owner);
+    if (owner && sound != -1) PlayMobySound(sound, 0, owner);
     if (blast != 0.0f && quality == 0) {
         {
             float vector[4];

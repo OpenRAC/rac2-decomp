@@ -17,7 +17,7 @@ typedef int EffectVector __attribute__((mode(TI)));
 
 char *func_L05_00419CC8(char *owner, void *pos, void *dir, int color1, int color2, int orient, int kind, int value, float scale)
 {
-    char *obj = func_0029EFD0(0xFFA);
+    char *obj = CreateMoby(0xFFA);
     float up[4];
     char *st;
     float speed;
@@ -33,7 +33,7 @@ char *func_L05_00419CC8(char *owner, void *pos, void *dir, int color1, int color
         if (kind) speed = D_L05_001B1034 * (1.0f / 60.0f);
         obj[0x20] = 0;
         *(unsigned char *)(obj+0x30) = 0xFF;
-        life = func_00283CF0(D_L05_001B1038 / speed);
+        life = FloatToInt(D_L05_001B1038 / speed);
         end = D_L05_001B1058;
         start = D_L05_001B1054;
         *(char **)(st+4) = owner;
@@ -55,12 +55,12 @@ char *func_L05_00419CC8(char *owner, void *pos, void *dir, int color1, int color
             qcopy(obj+0xc0,owner+0xc0);
             qcopy(obj+0xd0,owner+0xd0);
             qcopy(obj+0xe0,owner+0xe0);
-            func_00282F20(st+0x10,dir,speed);
+            vec_scale_to_length(st+0x10,dir,speed);
         } else {
-            func_00282F20(obj+0xc0,dir,1.0f);
-            func_00282DD8(obj+0xd0,obj+0xc0,up);
-            func_00282F20(obj+0xd0,obj+0xd0,1.0f);
-            func_00282DD8(obj+0xe0,obj+0xd0,obj+0xc0);
+            vec_scale_to_length(obj+0xc0,dir,1.0f);
+            FastVecCross(obj+0xd0,obj+0xc0,up);
+            vec_scale_to_length(obj+0xd0,obj+0xd0,1.0f);
+            FastVecCross(obj+0xe0,obj+0xd0,obj+0xc0);
             qcopy(st+0x10,dir);
         }
         qcopy(obj+0x10,pos);

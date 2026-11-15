@@ -30,12 +30,12 @@ void func_L20_00441CB8(char *obj) {
   *(short *)(obj+0x32)=255; *(u8 *)(obj+0x30)=255;
   { float scale=func_L20_00444B48(5,20,1.0f,0.5f);
   *(float *)(st+0x20)=*(float *)(st+0x20)*scale;
-  *(short *)(st+0x24)=func_00283CF0((float)*(short *)(st+0x24)*scale); }
+  *(short *)(st+0x24)=FloatToInt((float)*(short *)(st+0x24)*scale); }
   *(float *)(st+0x54)=0.5f; *(float *)(st+0x50)=4.0f;
   *(float *)(st+0xE0)=func_002A89A8(obj+0x10,0,0.5f);
   *(float *)(st+0x58)=2.0f; *(float *)(st+0x5C)=2.0f;
   *(float *)(st+0x60)=3.1415927f; *(int *)(st+0x184C)=15;
-  f=func_00283CE0(*(short *)(st+0x24));
+  f=IntToFloat(*(short *)(st+0x24));
   *(float *)(st+0x1828)=(2.0f-(float)*(int *)(st+0x182C))*(f*0.33333f);
   func_L20_00442E68(obj); func_L20_00444138(obj,0);
   *(float *)(obj+0x18)+=5.0f;
@@ -43,8 +43,8 @@ void func_L20_00441CB8(char *obj) {
   *(u16 *)(obj+0x34)|=0x400; *(int *)(obj+0x9C)=2;
   func_002A7750(obj,24,6);
   if (*(u8 *)(obj+0x43)!=1) func_002A7470(obj,1,0,0);
-  *(u8 *)(st+0x48)=func_00283CF0(15.0f);
-  *(u8 *)(st+0x4A)=func_00283CF0(12.8f);
+  *(u8 *)(st+0x48)=FloatToInt(15.0f);
+  *(u8 *)(st+0x4A)=FloatToInt(12.8f);
   *(u16 *)(obj+0x34)|=0x1000;
   qcopy(st+0x17E0,obj+0x10);
  }
@@ -56,17 +56,17 @@ void func_L20_00441CB8(char *obj) {
   switch (*(short *)(p+0xAA)) { case 0x5DE: case 0x3A6: case 0xD0F: *(u8 *)(obj+0xA8)=255; }
  }
  h=func_002A96A0(obj,func_002A9640(obj,0x10000,0));
- func_002AA2E8(st+0x20,0.0f,h); *(u8 *)(obj+0xA8)=255;
+ ApproachValue(st+0x20,0.0f,h); *(u8 *)(obj+0xA8)=255;
  f=*(float *)(st+0x20);
  if(f<=0.0f || *(u8 *)(st+0x2E)==2) {
   *(float *)(st+0x20)=0.0f;
   if(!func_00288AA0(D_L20_001C01C0,0xA1)) goto done;
-  if(*(u8 *)(st+0x2E)!=2) func_002A6C58(obj,0,3);
+  if(*(u8 *)(st+0x2E)!=2) SetDeathBits(obj,0,3);
   func_00288AA0(D_L20_001C01C0,0xA0); func_00288BE8(D_L20_001C01C0);
   func_002A7750(obj,17,6); func_002F5CB8(func_L20_00444C68,obj);
  } else if(f<=*(float *)(st+0x1828)) {
   func_002A7750(obj,15,5); ++*(int *)(st+0x182C);
-  f=func_00283CE0(*(short *)(st+0x24));
+  f=IntToFloat(*(short *)(st+0x24));
   *(float *)(st+0x1804)=0.0f; *(float *)(st+0x1800)=0.0f;
   *(float *)(st+0x1828)=(2.0f-(float)*(int *)(st+0x182C))*(f*0.33333f);
   if(*(int *)(st+0x182C)==2) func_L20_0039E890(*(int *)(st+0x244),-1.0f);
@@ -78,6 +78,6 @@ done:
  func_002B3BA8(obj,*(int *)(st+0x220),64.0f,0.0f,0,0);
  qcopy(obj+0x10,st+0x17E0);
  if(*(float *)(obj+0xF0)!=0.0f || *(float *)(obj+0xF4)!=0.0f) {
-  *(float *)(obj+0xF4)=0.0f; *(float *)(obj+0xF0)=0.0f; func_002833F0(obj+0xC0,obj+0xF0);
+  *(float *)(obj+0xF4)=0.0f; *(float *)(obj+0xF0)=0.0f; euler_rotation_basis(obj+0xC0,obj+0xF0);
  }
 }

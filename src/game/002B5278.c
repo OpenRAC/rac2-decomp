@@ -42,14 +42,14 @@ void func_002B5BC0(char *obj, char *moby, float factor)
         qcopy(&t, obj + 0x10);
         t.f[2] = t.f[2] - (*(float *)(moby + 0xC) + 0.1f);
     }
-    hit = func_002761F8(&v, &t, 0, obj, 0);
+    hit = CollLine(&v, &t, 0, obj, 0);
     if (hit) {
         data = D_001BAF80;
         *(float *)(moby + 0x90) = *(float *)(data + 0x28);
         *(void **)(moby + 0x88) = *(void **)(data + 0x18);
         *(void **)(moby + 0x8C) = *(void **)(data + 0x1C);
-        *(int *)(moby + 0xD8) = func_00278E78();
-        func_00282F20(moby + 0x50, data + 0x40, 1.0f);
+        *(int *)(moby + 0xD8) = GetCollHitMaterial();
+        vec_scale_to_length(moby + 0x50, data + 0x40, 1.0f);
     } else {
         *(float *)(moby + 0x90) = 0.0f;
         *(void **)(moby + 0x88) = 0;

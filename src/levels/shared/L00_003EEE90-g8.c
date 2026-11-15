@@ -62,7 +62,7 @@ void func_L00_003EEE90(char *object)
         data->rate=2.0f/3.0f;
         data->alpha=127;
         data->count=111;
-        data->handle=func_L00_00329E90(object,0,&allocation);
+        data->handle=AcquireEntitySlot(object,0,&allocation);
         mem=func_L00_0032A088(*(short *)(object+0xAA),data->handle);
         D_L00_001B2BB4=mem;
         D_L00_001B2BB8=(char *)func_L00_003EEE20((int)(mem+0x50));
@@ -91,21 +91,21 @@ void func_L00_003EEE90(char *object)
         if(data->count<0) data->count=0;
         data->phase+=data->rate;
         timer=&data->timer;
-        scale=1.0f-func_00283CE0(*timer)/func_00283CE0(20);
+        scale=1.0f-IntToFloat(*timer)/IntToFloat(20);
         scale*=6.0f;
         count=func_00277F48(object+0x10,0,object,0,scale+0.001f);
         for(i=0;i<count;i++) {
             if((func_002AB1F0(D_L00_001C3280[i]) || (*(unsigned short *)(D_L00_001C3280[i]+0x34)&0x4000)) && D_L00_001C3280[i]!=D_00189E20.target && *(short *)(D_L00_001C3280[i]+0xAA)!=0xA5A) {
-                func_00282CF0(direction,D_L00_001C3280[i]+0x10,object+0x10);
-                func_00282F20(direction,direction,1.0f);
-                func_00282F20(&hit,&hit,1.0f);
-                func_002A8C00(((Weapon4BF0 *)((unsigned int)D_L00_00262570 + D_00139568[0x2A] * sizeof(Weapon4BF0)))->damage,&hit,object,0x830000,direction);
+                FastVecSub(direction,D_L00_001C3280[i]+0x10,object+0x10);
+                vec_scale_to_length(direction,direction,1.0f);
+                vec_scale_to_length(&hit,&hit,1.0f);
+                make_hit_descriptor(((Weapon4BF0 *)((unsigned int)D_L00_00262570 + D_00139568[0x2A] * sizeof(Weapon4BF0)))->damage,&hit,object,0x830000,direction);
                 *(TI4BF0 *)hit.point = *(TI4BF0 *)direction;
                 hit.flags=3; hit.type=5; hit.active=1;
                 hit.point[3]=5627.925f;
                 hit.id=*(short *)(D_L00_001C3280[i]+0xAA);
-                func_002A8E20(D_L00_001C3280[i],&hit);
-                func_0032D758(D_L00_001C3280[i],42,*(int *)(object+0xB8));
+                QueueMobyImpact(D_L00_001C3280[i],&hit);
+                StartAttachedEffect(D_L00_001C3280[i],42,*(int *)(object+0xB8));
             }
         }
         if(func_00282948(timer)) {
@@ -116,11 +116,11 @@ void func_L00_003EEE90(char *object)
     }
     case 2:
         data->phase+=data->rate;
-        scale=func_00283CE0(data->timer)*0.025f;
+        scale=IntToFloat(data->timer)*0.025f;
         if(func_00282948(&data->timer)) {
             if(data->alpha) --data->alpha;
             else { data->alpha=0; *(unsigned char *)(object+0x20)=6; }
-        } else data->alpha=func_00283CF0(func_00283CE0(127)*scale);
+        } else data->alpha=FloatToInt(IntToFloat(127)*scale);
         break;
     case 6:
         data->phase+=data->rate;

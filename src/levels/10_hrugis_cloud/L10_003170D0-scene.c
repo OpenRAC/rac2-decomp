@@ -33,7 +33,7 @@ void func_L10_00317528(void) {
     for(i=0;i<D_L10_001BD380.count;i++) {
         u8 *object=D_L10_001BD380.objects[i];
         if(object && *(s16 *)(object+0xAA)==0xE29) *(u16 *)(object+0x34)|=0x800;
-        if(*(s16 *)(object+0xAA)==0xD54) func_002E64A0(object);
+        if(*(s16 *)(object+0xAA)==0xD54) UpdateEquipmentPieces(object);
         if(object && *(s16 *)(object+0xAA)==0xFA0) {
             state=*(u8 **)(object+0x68);
             if(state) func_L00_00326048(object,state+0xC,0x80AAAAD2,0x80396464,0.061086535f);
@@ -43,7 +43,7 @@ void func_L10_00317528(void) {
     p=D_L10_001BD380.objects[2];
     if(D_L10_001BD380.frame==0x195) {
         func_00283AF0(*(u8 **)(p+0x58)+0x10,scratch.matrix);
-        func_00283958(scratch.matrix,(f32 *)(p+0xC0));
+        quaternion_to_rotation_basis(scratch.matrix,(f32 *)(p+0xC0));
         func_L01_0031A278(p,pos,4.0f,3.0f,5.0f);
         func_L10_00425930(pos,1,1.5f,25,20,20,20,45,1,1,1,0);
         func_L01_0031A278(p,pos,9.0f,4.0f,4.0f);
@@ -59,8 +59,8 @@ void func_L10_00317528(void) {
     scratch.vectors.v[0]+=func_002A78D8(0.5f,1.5f);
     scratch.vectors.v[1]+=func_002A78D8(0.5f,1.5f);
     scratch.vectors.v[2]+=func_002A78D8(0.5f,1.5f);
-    func_00282CF0((u8 *)scratch.vectors.d,(u8 *)scratch.vectors.v,(u8 *)pos);
-    func_00282F20(scratch.vectors.d,scratch.vectors.d,1.16666675f);
+    FastVecSub((u8 *)scratch.vectors.d,(u8 *)scratch.vectors.v,(u8 *)pos);
+    vec_scale_to_length(scratch.vectors.d,scratch.vectors.d,1.16666675f);
     /* The two packed RGB colours become the effect's start/end colours. */
     func_L05_00419CC8(p,pos,scratch.vectors.d,0x46BE20,0x327814,1,0,1,sign);
 }

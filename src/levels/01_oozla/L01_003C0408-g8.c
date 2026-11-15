@@ -43,11 +43,11 @@ float func_L01_003C0408(u8 *obj)
     float distance, angle, delta, magnitude;
 
     if (*(int *)(s + 0x124) == 1) {
-        distance = func_00282E80(obj + 0x10, *(u8 **)(s + 0x120) + 0x10);
+        distance = vec_distance_xy(obj + 0x10, *(u8 **)(s + 0x120) + 0x10);
         angle = func_00283248(
             *(float *)(obj + 0x10) - D_L01_001B264C[0][*(int *)(s + 0x2CC)].centre[0],
             *(float *)(obj + 0x14) - D_L01_001B264C[0][*(int *)(s + 0x2CC)].centre[1]);
-        delta = func_00283BE0(
+        delta = fast_subtract_rotations(
             func_00283248(
                 *(float *)(*(u8 **)(s + 0x120) + 0x10) - D_L01_001B264C[0][*(int *)(s + 0x2CC)].centre[0],
                 *(float *)(*(u8 **)(s + 0x120) + 0x14) - D_L01_001B264C[0][*(int *)(s + 0x2CC)].centre[1]),
@@ -62,8 +62,8 @@ float func_L01_003C0408(u8 *obj)
                 delta = delta / magnitude;
                 delta = delta * 0.087266474f;
                 qcopy(s + 0x2A0, D_L01_001B264C[0][*(int *)(s + 0x2CC)].centre);
-                *(float *)(s + 0x2A0) += func_00283180(func_00283B98(angle, delta)) * 38.0f;
-                *(float *)(s + 0x2A4) += func_00283198(func_00283B98(angle, delta)) * 38.0f;
+                *(float *)(s + 0x2A0) += func_00283180(FastAddRotations(angle, delta)) * 38.0f;
+                *(float *)(s + 0x2A4) += func_00283198(FastAddRotations(angle, delta)) * 38.0f;
             }
             func_L01_00321178(obj, s + 0x2A0);
             *(float *)(obj + 0x18) = *(float *)(s + 0x2E8);

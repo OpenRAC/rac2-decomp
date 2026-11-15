@@ -42,25 +42,25 @@ void func_L20_003E6728(Vector *points,int count,int texture1,int texture2,
     bevel.uv[0]=0; bevel.uv[1]=0; bevel.uv[2]=0; bevel.uv[3]=1;
     bevel.uv[4]=1; bevel.uv[5]=0; bevel.uv[6]=1; bevel.uv[7]=1;
     next=(first+1)%count;
-    func_00282CF0(&radial,&points[first],&D_L20_001B9FC0);
-    func_00282CF0(&tangent,&points[next],&points[first]);
-    func_00282DD8(&cross,&tangent,&radial);
-    func_00282F20(&cross,&cross,width1);
-    func_00282CC0(&strip.vertex[0],&points[first],&cross);
-    func_00282CF0(&strip.vertex[1],&points[first],&cross);
-    step=1.0f/func_00283CE0(segments-1);
+    FastVecSub(&radial,&points[first],&D_L20_001B9FC0);
+    FastVecSub(&tangent,&points[next],&points[first]);
+    FastVecCross(&cross,&tangent,&radial);
+    vec_scale_to_length(&cross,&cross,width1);
+    FastVecAdd(&strip.vertex[0],&points[first],&cross);
+    FastVecSub(&strip.vertex[1],&points[first],&cross);
+    step=1.0f/IntToFloat(segments-1);
     fraction=step;
     current=next;
     previous=first;
     while (current!=last) {
-        func_00282CF0(&radial,&points[current],&D_L20_001B9FC0);
-        func_00282CF0(&tangent,&points[current],&points[previous]);
-        func_00282DD8(&cross,&tangent,&radial);
-        func_00282F20(&cross,&cross,width1);
-        func_00282CC0(&strip.vertex[2],&points[current],&cross);
-        func_00282CF0(&strip.vertex[3],&points[current],&cross);
-        strip.color[2]=strip.color[3]=func_00283D38(colorStart1,colorEnd1,fraction);
-        func_00280B90(&strip,0,0);
+        FastVecSub(&radial,&points[current],&D_L20_001B9FC0);
+        FastVecSub(&tangent,&points[current],&points[previous]);
+        FastVecCross(&cross,&tangent,&radial);
+        vec_scale_to_length(&cross,&cross,width1);
+        FastVecAdd(&strip.vertex[2],&points[current],&cross);
+        FastVecSub(&strip.vertex[3],&points[current],&cross);
+        strip.color[2]=strip.color[3]=FastTweenColor(colorStart1,colorEnd1,fraction);
+        draw_world_quad(&strip,0,0);
         qcopy(&strip.vertex[0],&strip.vertex[2]);
         qcopy(&strip.vertex[1],&strip.vertex[3]);
         strip.color[0]=strip.color[1]=strip.color[2];
@@ -68,42 +68,42 @@ void func_L20_003E6728(Vector *points,int count,int texture1,int texture2,
         previous=current;
         current=(previous+1)%count;
     }
-    func_00282CF0(&previousRadial,&points[first],&D_L20_001B9FC0);
-    previousLength=func_00282DF0(&previousRadial);
+    FastVecSub(&previousRadial,&points[first],&D_L20_001B9FC0);
+    previousLength=FastVecLength(&previousRadial);
     fraction=step;
     current=next;
     while (current!=last) {
-        func_00282CF0(&nextRadial,&points[current],&D_L20_001B9FC0);
-        nextLength=func_00282DF0(&nextRadial);
+        FastVecSub(&nextRadial,&points[current],&D_L20_001B9FC0);
+        nextLength=FastVecLength(&nextRadial);
         if (previousLength<nextLength) {
             if (previousLength==0.0f) qcopy(&equalRadial1,&nextRadial);
-            else func_00282D30(&equalRadial1,&previousRadial,nextLength/previousLength);
-            func_00282CC0(&left,&D_L20_001B9FC0,&nextRadial);
-            func_00282CC0(&right,&D_L20_001B9FC0,&equalRadial1);
+            else FastVecScale(&equalRadial1,&previousRadial,nextLength/previousLength);
+            FastVecAdd(&left,&D_L20_001B9FC0,&nextRadial);
+            FastVecAdd(&right,&D_L20_001B9FC0,&equalRadial1);
         } else {
             if (nextLength==0.0f) qcopy(&equalRadial2,&previousRadial);
-            else func_00282D30(&equalRadial2,&nextRadial,previousLength/nextLength);
-            func_00282CC0(&left,&D_L20_001B9FC0,&equalRadial2);
-            func_00282CC0(&right,&D_L20_001B9FC0,&previousRadial);
+            else FastVecScale(&equalRadial2,&nextRadial,previousLength/nextLength);
+            FastVecAdd(&left,&D_L20_001B9FC0,&equalRadial2);
+            FastVecAdd(&right,&D_L20_001B9FC0,&previousRadial);
         }
-        func_00282CF0(&tangent,&right,&left);
-        func_00282D30(&offset,&tangent,inset);
-        func_00282CF0(&left,&left,&offset);
-        func_00282CC0(&right,&right,&offset);
-        func_00282CF0(&scaledRadial,&D_L20_001B9FC0,&left);
-        func_00282DD8(&cross,&scaledRadial,&tangent);
-        func_00282F20(&scaledCross,&cross,width2);
-        func_00282CC0(&bevel.vertex[0],&left,&scaledCross);
-        func_00282CF0(&bevel.vertex[1],&left,&scaledCross);
-        func_00282CC0(&bevel.vertex[2],&right,&scaledCross);
-        func_00282CF0(&bevel.vertex[3],&right,&scaledCross);
-        bevel.color[2]=bevel.color[3]=func_00283D38(colorStart2,colorEnd2,fraction);
-        func_00280B90(&bevel,0,0);
+        FastVecSub(&tangent,&right,&left);
+        FastVecScale(&offset,&tangent,inset);
+        FastVecSub(&left,&left,&offset);
+        FastVecAdd(&right,&right,&offset);
+        FastVecSub(&scaledRadial,&D_L20_001B9FC0,&left);
+        FastVecCross(&cross,&scaledRadial,&tangent);
+        vec_scale_to_length(&scaledCross,&cross,width2);
+        FastVecAdd(&bevel.vertex[0],&left,&scaledCross);
+        FastVecSub(&bevel.vertex[1],&left,&scaledCross);
+        FastVecAdd(&bevel.vertex[2],&right,&scaledCross);
+        FastVecSub(&bevel.vertex[3],&right,&scaledCross);
+        bevel.color[2]=bevel.color[3]=FastTweenColor(colorStart2,colorEnd2,fraction);
+        draw_world_quad(&bevel,0,0);
         qcopy(&previousRadial,&nextRadial);
         bevel.color[0]=bevel.color[1]=bevel.color[2];
         current=(current+1)%count;
         fraction+=step;
         previousLength=nextLength;
     }
-    func_002FC560(0x47,0x5360b);
+    VU1_addGSregister(0x47,0x5360b);
 }

@@ -100,7 +100,7 @@ void func_L00_00405808(char *object)
     int permitted=1;
     if (player->current==29) { if (!func_00282948(&player->timer)) permitted=0; }
     else D_00189E20.timer=40;
-    func_00282978(&state->timer);
+    FastDecTimer(&state->timer);
     if ((unsigned int)D_00189E20.control<2 && (D_00138320&D_00189E20.buttons) && permitted) {
         if (B(object,0x43)!=2) func_002A7470(object,2,0,0);
         if (!state->seen) {
@@ -112,22 +112,22 @@ void func_L00_00405808(char *object)
         if (!state->timer) state->timer=15;
         *(Quad *)&offset=0;
         offset.x=0.15f; offset.y=-1.0f; offset.z=0.06f; offset.w=1.0f;
-        func_00283098(&offset,&offset,object+0xc0);
-        func_00282CC0(state,object+0x10,&offset);
+        matrix_mul_vec3(&offset,&offset,object+0xc0);
+        FastVecAdd(state,object+0x10,&offset);
         if (D_00189E20.current==1) func_L00_002C42E0(29,1);
         *(Quad *)&direction=0;
         if (D_00189E20.current==29 && (U(D_00189E20.object,0x34)&1)) {
-            func_00283678(matrix,D_L00_001B8C80);
-            func_00283698(basis,matrix);
+            copy_matrix3x4(matrix,D_L00_001B8C80);
+            matrix_from_basis_rows(basis,matrix);
             direction.z=1.0f;
-            func_002830C0(&direction,&direction,basis);
-        } else if (D_00189E20.direction==1) func_00282D30(&direction,object+0xd0,-1.0f);
+            transform_vector(&direction,&direction,basis);
+        } else if (D_00189E20.direction==1) FastVecScale(&direction,object+0xd0,-1.0f);
         else {
             direction.x=1.0f;
-            func_00283098(&direction,&direction,D_00189E20.basis);
+            matrix_mul_vec3(&direction,&direction,D_00189E20.basis);
         }
         state->yaw=func_00283248(direction.x,direction.y);
-        value=func_00282E20(&direction);
+        value=vec_length_xy(&direction);
         state->pitch=func_00283248(value,direction.z);
         *(Quad *)matrix=*(Quad *)state;
         target=func_L00_004051C8(object,matrix,&state->yaw,&state->pitch);
@@ -144,7 +144,7 @@ clear_target:
                 info=func_002AB1F0(target);
                 if (target!=state->target && !state->delay) {
                     state->target=target;
-                    state->total=func_00283CE0(H(info,4));
+                    state->total=IntToFloat(H(info,4));
                     state->left=F(info,0);
                     state->delay=30;
                     if (state->total<=1.0f) state->left=0;
@@ -170,27 +170,27 @@ clear_target:
                     D_001A7A60[22]=1; func_002E5E58(1,0,0); func_002B0A18(4659,-1); D_L00_001A903C=1;
                 }
             }
-            func_002E5CF8(3,0,object);
+            PlayMobySound(3,0,object);
             func_L00_00408800(state->target); state->target=0;
         }
         func_L00_00406150(object);
         if (D_L00_001B2C74==-1) D_L00_001B2C74=func_00291308(object+0x10,7.5f,0.0f,0x207f7f);
         if (D_L00_001B2C74>=0) {
             D_L00_001B2C78=20;
-            func_00282F20(matrix,object+0xd0,-0.5f);
-            func_00282CC0(&matrix[1],state,matrix);
+            vec_scale_to_length(matrix,object+0xd0,-0.5f);
+            FastVecAdd(&matrix[1],state,matrix);
             { Light *light=&D_L00_001C6F40[D_L00_001B2C74];
             float x=matrix[1].x, y=matrix[1].y, z=matrix[1].z; light->pos[0]=x; light->pos[1]=y; light->pos[2]=z; light->radius=7.5f; }
         }
-        if (!func_002E59B0(object,D_L00_001B2C7C)) D_L00_001B2C7C=func_002E5CF8(1,4,object);
+        if (!func_002E59B0(object,D_L00_001B2C7C)) D_L00_001B2C7C=PlayMobySound(1,4,object);
     } else {
         state->target=0; state->seen=0; state->delay=0; D_L00_001B2C70=1;
         if (D_L00_001B2C74>=0) {
-            func_00282F20(&offset,object+0xd0,-0.5f);
-            func_00282CC0(&direction,state,&offset);
+            vec_scale_to_length(&offset,object+0xd0,-0.5f);
+            FastVecAdd(&direction,state,&offset);
             entry=&D_L00_001C6F40[D_L00_001B2C74];
             { float x=direction.x, y=direction.y, z=direction.z; entry->pos[0]=x; entry->pos[1]=y; entry->pos[2]=z; entry->radius=7.5f; }
-            value=func_00283CE0(D_L00_001B2C78)*0.05f;
+            value=IntToFloat(D_L00_001B2C78)*0.05f;
             entry=&D_L00_001C6F40[D_L00_001B2C74];
             entry->color[0]=value; entry->color[1]=value; entry->color[2]=value*0.25f;
             if (func_00282948(&D_L00_001B2C78)) { func_00291450(D_L00_001B2C74); D_L00_001B2C74=-1; }

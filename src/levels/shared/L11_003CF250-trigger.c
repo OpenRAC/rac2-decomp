@@ -39,7 +39,7 @@ void func_L11_003CF250(char *obj)
         hero = D_00189E20;
         if (*(char **)(hero + 0x33C) == obj && *(int *)(hero + 0x340) != 0) {
             if (D_001A7A40[0xC0] != 0) {
-                func_002B0CE0(0xC, 0x27F7, 1);
+                ForceClaimNotice(0xC, 0x27F7, 1);
                 *(short *)(hero + 0x1F2) = 0xA;
                 turn = *(float *)(rig + 0xC);
                 if (turn != 0.0f)
@@ -49,16 +49,16 @@ void func_L11_003CF250(char *obj)
             other = D_00189E20;
             if (*(int *)(other + 0x2294) == 0x82) {
                 level = *(int *)(rig + 8);
-                if (level >= 0 && func_002ACBC8(other + 0x80, level) != 0)
+                if (level >= 0 && IsPointInCuboid(other + 0x80, level) != 0)
                     func_L11_002D8EF8(6, 1);
             }
         }
         break;
     }
     if (*(unsigned char *)(obj + 0x31) != 0) {
-        pulse = func_00283B98(*(float *)(rig + 4), 0.10471977f);
+        pulse = FastAddRotations(*(float *)(rig + 4), 0.10471977f);
         *(float *)(rig + 4) = pulse;
-        glow = func_00283CF0(func_00283198(pulse) * 128.0f);
+        glow = FloatToInt(func_00283198(pulse) * 128.0f);
         if (glow > 0x80)
             glow = 0x80;
         else if (glow < 0x20)

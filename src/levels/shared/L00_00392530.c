@@ -58,18 +58,18 @@ void func_L00_00392530(char *actor) {
     D_0025C64C = 0.9f;
     active = 0;
     permitted = 1;
-    ammo = func_L00_002D4040(-1);
+    ammo = get_ammo(-1);
     if (D_00189E20.i[0x2294 / 4] == 1) {
         if (!func_00282948(&D_00189E20.i[0x2534 / 4])) permitted = 0;
-        else func_00273318(actor, !func_L00_002D4040(-1) ? 0x600000FF : 0x600FFF0F, 0, 31, -1, 4, 1, 0, 90);
+        else func_00273318(actor, !get_ammo(-1) ? 0x600000FF : 0x600FFF0F, 0, 31, -1, 4, 1, 0, 90);
     } else D_00189E20.i[0x2534 / 4] = 40;
     if ((D_00138180[0x1A0 / 4] & D_00189E20.u[0x1230 / 4]) && (u8)actor[0x20] != 4 && (u8)actor[0x20] &&
         !D_00189E20.b[0x22BC] && D_00189E20.i[0x2294 / 4] != 0x6F && D_00189E20.i[0x1240 / 4] >= 23 && permitted) {
         if (!beam->timer) {
             if (ammo > 0) {
-            if (func_00282978(&beam->ammoTimer)) {
-                func_00282978(&beam->targetTimer);
-                func_00282978(&beam->secondaryTimer);
+            if (FastDecTimer(&beam->ammoTimer)) {
+                FastDecTimer(&beam->targetTimer);
+                FastDecTimer(&beam->secondaryTimer);
                 func_L00_002D3F30(-1, 1);
                 beam->ammoTimer = 10;
             }
@@ -77,27 +77,27 @@ void func_L00_00392530(char *actor) {
             else if (beam->fade < 10) beam->fade++;
             active = 1;
             if (beam->target) {
-                if (func_00283C80(D_00189E20.f[0x98 / 4],
+                if (FastDiffRots(D_00189E20.f[0x98 / 4],
                                   func_00283248(*(float *)(beam->target + 0x10) - D_00189E20.f[0x80 / 4],
                                                 *(float *)(beam->target + 0x14) - D_00189E20.f[0x84 / 4])) > 2.0943f ||
-                    !((u8 *)beam->target)[0x31] || func_00282E48(beam->target + 0x10, &D_00189E20.f[0x80 / 4]) > 20) {
+                    !((u8 *)beam->target)[0x31] || fast_vec_dist(beam->target + 0x10, &D_00189E20.f[0x80 / 4]) > 20) {
                     beam->target = 0;
                     beam->targetReady = 0;
                 }
             }
             if (beam->secondary) {
-                if (func_00283C80(D_00189E20.f[0x98 / 4],
+                if (FastDiffRots(D_00189E20.f[0x98 / 4],
                                   func_00283248(*(float *)(beam->secondary + 0x10) - D_00189E20.f[0x80 / 4],
                                                 *(float *)(beam->secondary + 0x14) - D_00189E20.f[0x84 / 4])) > 2.0943f ||
-                    !((u8 *)beam->secondary)[0x31] || func_00282E48(beam->secondary + 0x10, &D_00189E20.f[0x80 / 4]) > 20) {
+                    !((u8 *)beam->secondary)[0x31] || fast_vec_dist(beam->secondary + 0x10, &D_00189E20.f[0x80 / 4]) > 20) {
                     beam->secondary = 0;
                     beam->secondaryReady = 0;
                 }
             }
             func_002AFFD8(beam, &direction, 1);
             qcopy(&beam->start, actor + 0x10);
-            func_00282D30(&offset, &direction, 0.7f);
-            func_00282CC0(&beam->start, &beam->start, &offset);
+            FastVecScale(&offset, &direction, 0.7f);
+            FastVecAdd(&beam->start, &beam->start, &offset);
             qcopy(&beam->end, &beam->start);
             if (beam->target && beam->targetReady) {
                 limit = 50;
@@ -125,14 +125,14 @@ void func_L00_00392530(char *actor) {
                 local[0] = 0;
                 local[1] = -beam->length;
                 local[2] = 0;
-                func_00283098(local, local, actor + 0xC0);
-                func_00282CC0(&beam->end, &beam->start, local);
+                matrix_mul_vec3(local, local, actor + 0xC0);
+                FastVecAdd(&beam->end, &beam->start, local);
             } else {
                 func_0029FCC0(actor, 0, &beam->start);
-                func_00282F20(&beam->end, &D_00189E20.f[0x730 / 4], beam->length);
-                func_00282CC0(&beam->end, &beam->start, &beam->end);
+                vec_scale_to_length(&beam->end, &D_00189E20.f[0x730 / 4], beam->length);
+                FastVecAdd(&beam->end, &beam->start, &beam->end);
             }
-            func_0030A188(actor);
+            InitializeElectricWaterBoltEffect(actor);
             func_L00_00393148(actor);
             ref_L00_00392530_00(func_0030BA38, actor);
             } else {
@@ -159,7 +159,7 @@ void func_L00_00392530(char *actor) {
         }
         beam->sound = -1;
     } else {
-        if (!func_002E59B0(actor, beam->sound)) beam->sound = func_002E5CF8(4, 4, actor);
+        if (!func_002E59B0(actor, beam->sound)) beam->sound = PlayMobySound(4, 4, actor);
     }
     if (!beam->target || (u8)beam->target[0x20] == 0xFE || (u8)beam->target[0x20] == 0xFD ||
         !(*(u16 *)(beam->target + 0x34) & 0x1000))
@@ -186,7 +186,7 @@ void func_L00_00392530(char *actor) {
     case 1:
         func_00282948(&beam->timer);
         if (active) {
-            func_L00_002AF568();
+            start_equipped_item_animation();
             actor[0x20] = 3;
         }
         if ((D_00138180[0x1A4 / 4] & D_00189E20.u[0x1230 / 4]) && !D_00189E20.b[0x22BC]) {
@@ -194,7 +194,7 @@ void func_L00_00392530(char *actor) {
                 if (D_0018C360[18].count < 0xFFFF) D_0018C360[18].count++;
                 if (D_001A7390 > D_0018C360[18].maximum) D_0018C360[18].maximum = D_001A7390;
                 D_0018C360[18].levels = (D_0018C360[18].levels | (1u << D_001A79F0)) | 0x80000000u;
-                func_L00_002AF568();
+                start_equipped_item_animation();
                 actor[0x20] = 3;
             } else {
                 beam->target = 0;
@@ -202,8 +202,8 @@ void func_L00_00392530(char *actor) {
                 beam->targetReady = 0;
                 beam->secondaryReady = 0;
                 actor[0x20] = 1;
-                func_002E5CF8(0, 0, actor);
-                func_L00_002AF7D0();
+                PlayMobySound(0, 0, actor);
+                cancel_hero_item_animation();
             }
         }
         break;
@@ -221,7 +221,7 @@ void func_L00_00392530(char *actor) {
         beam->targetReady = 0;
         beam->secondaryReady = 0;
         beam->length = 0;
-        func_L00_002AF7D0();
+        cancel_hero_item_animation();
         actor[0x20] = 1;
         break;
     case 2:
@@ -233,12 +233,12 @@ void func_L00_00392530(char *actor) {
         qzero_nc(&direction);
         direction.f[0] = 2;
         direction.f[2] = 2;
-        func_00283098(&direction, &direction, &D_00189E20.f[0x730 / 4]);
+        matrix_mul_vec3(&direction, &direction, &D_00189E20.f[0x730 / 4]);
         (D_L00_001C6F40 + beam->light)->pos[0] = D_00189E20.f[0x80 / 4] + direction.f[0];
         (D_L00_001C6F40 + beam->light)->pos[1] = D_00189E20.f[0x84 / 4] + direction.f[1];
         (D_L00_001C6F40 + beam->light)->pos[2] = D_00189E20.f[0x88 / 4] + direction.f[2];
         (D_L00_001C6F40 + beam->light)->radius = 7.5f;
-        fade = func_00283CE0(beam->fade) * 0.1f;
+        fade = IntToFloat(beam->fade) * 0.1f;
         (D_L00_001C6F40 + beam->light)->color[2] = fade;
         (D_L00_001C6F40 + beam->light)->color[1] = fade * 0.7f;
         (D_L00_001C6F40 + beam->light)->color[0] = (D_L00_001C6F40 + beam->light)->color[1];

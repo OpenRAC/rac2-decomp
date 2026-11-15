@@ -83,27 +83,27 @@ void func_L19_00417F88(char *o)
     qcopy(origin, matrix[3]);
     inner = 0.25f;
     outer = 0.45f;
-    func_00282F20(tmp, matrix, inner);
-    func_00282CC0(origin, origin, tmp);
+    vec_scale_to_length(tmp, matrix, inner);
+    FastVecAdd(origin, origin, tmp);
     origin[2] += 1;
 
     func_002A7988(jitter, inner, outer);
-    func_00282CC0(end, jitter, origin);
+    FastVecAdd(end, jitter, origin);
     func_00281EB8(origin, sprite, 0x60804020, layer, *(float *)(d + 0x228) * 2, 0.08f, func_002A7940());
     func_00281EB8(origin, sprite, 0x80808080, layer, *(float *)(d + 0x228) * 1.5f, 0.08f, func_002A7940());
     func_002A7988(jitter, inner, outer);
-    func_00282CC0(end, jitter, origin);
+    FastVecAdd(end, jitter, origin);
     func_00281EB8(end, sprite, 0x60804020, layer, *(float *)(d + 0x228) * 2, 0.08f, func_002A7940());
     func_00281EB8(end, sprite, 0x80808080, layer, *(float *)(d + 0x228) * 1.5f, 0.08f, func_002A7940());
     func_002A7988(jitter, inner, outer);
-    func_00282CC0(end, jitter, origin);
+    FastVecAdd(end, jitter, origin);
     func_00281EB8(end, sprite, 0x60804020, layer, *(float *)(d + 0x228) * 2, 0.08f, func_002A7940());
     func_00281EB8(end, sprite, 0x80808080, layer, *(float *)(d + 0x228) * 1.5f, 0.08f, func_002A7940());
 
-    func_00282CF0(ray, d + 0x2e0, origin);
-    func_00282F20(ray, ray, *(float *)(d + 0x238) * 60);
-    func_00282CC0(ray, ray, origin);
-    hit = func_002761F8(origin, ray, mask, o, flags);
+    FastVecSub(ray, d + 0x2e0, origin);
+    vec_scale_to_length(ray, ray, *(float *)(d + 0x238) * 60);
+    FastVecAdd(ray, ray, origin);
+    hit = CollLine(origin, ray, mask, o, flags);
     if (hit) {
         qcopy_nc(impact, D_L19_001BFEA0);
     } else {
@@ -114,17 +114,17 @@ void func_L19_00417F88(char *o)
     factor[1] = 0;
     factor[2] = 1;
     factor[3] = 1;
-    func_00282CF0(jitter, origin, D_L19_001B9A40);
-    func_00282CF0(other, impact, D_L19_001B9A40);
-    func_00282F20(jitter, jitter, 1);
-    func_00282F20(other, other, 1);
-    func_00282DD8(jitter, jitter, factor);
-    func_00282F20(jitter, jitter, *(float *)(d + 0x234) * 2);
-    func_00282DD8(other, other, factor);
-    func_00282F20(other, other, *(float *)(d + 0x234) * 2);
+    FastVecSub(jitter, origin, D_L19_001B9A40);
+    FastVecSub(other, impact, D_L19_001B9A40);
+    vec_scale_to_length(jitter, jitter, 1);
+    vec_scale_to_length(other, other, 1);
+    FastVecCross(jitter, jitter, factor);
+    vec_scale_to_length(jitter, jitter, *(float *)(d + 0x234) * 2);
+    FastVecCross(other, other, factor);
+    vec_scale_to_length(other, other, *(float *)(d + 0x234) * 2);
 
     texture = 14;
-    q.texture = func_0027C878(texture);
+    q.texture = GetEffectTextureDescriptor(texture);
     q.state = 0xff9000000260L;
     q.flags = 0x8000000048L;
     q.zero = 0;
@@ -134,22 +134,22 @@ void func_L19_00417F88(char *o)
         q.uv[i].v = D_L19_001B1C08[i].v;
     }
 
-    func_00282CF0(corner, origin, jitter);
+    FastVecSub(corner, origin, jitter);
     *(TI128 *)q.p[0] = *(TI128 *)corner;
-    func_00282CC0(corner, origin, jitter);
+    FastVecAdd(corner, origin, jitter);
     *(TI128 *)q.p[1] = *(TI128 *)corner;
-    func_00282CF0(corner, impact, other);
+    FastVecSub(corner, impact, other);
     *(TI128 *)q.p[2] = *(TI128 *)corner;
     tag = 0;
     mode = 0;
-    func_00282CC0(corner, impact, other);
+    FastVecAdd(corner, impact, other);
     *(TI128 *)q.p[3] = *(TI128 *)corner;
-    func_00280B90(&q, tag, mode);
+    draw_world_quad(&q, tag, mode);
 
-    func_00282F20(jitter, jitter, *(float *)(d + 0x234) * 1.5f);
-    func_00282F20(other, other, *(float *)(d + 0x234) * 1.5f);
+    vec_scale_to_length(jitter, jitter, *(float *)(d + 0x234) * 1.5f);
+    vec_scale_to_length(other, other, *(float *)(d + 0x234) * 1.5f);
     q.color[0] = q.color[1] = q.color[2] = q.color[3] = 0x80806060;
-    func_00280B90(&q, tag, mode);
+    draw_world_quad(&q, tag, mode);
     qcopy(d + 0x2c0, impact);
 }
 
@@ -221,8 +221,8 @@ void func_L19_00420818(char *obj)
 
     switch (*(u8 *)(obj + 0x20)) {
     case 0:
-        func_00282F20(offset, obj + 0xC0, *(float *)(data + 4));
-        func_00282CC0(data + 0x30, offset, obj + 0x10);
+        vec_scale_to_length(offset, obj + 0xC0, *(float *)(data + 4));
+        FastVecAdd(data + 0x30, offset, obj + 0x10);
         *(float *)(data + 0x38) += *(float *)data;
         qcopy(data + 0x20, obj + 0x10);
         *(int *)(data + 0x40) = -1;
@@ -237,27 +237,27 @@ void func_L19_00420818(char *obj)
                       *(float *)(data + 8) * 0.00027777778f, *(float *)(data + 8) * 0.016666668f);
         sound = D_00188660 + *(int *)(data + 0x40) * 0x70;
         if (*(char **)(sound + 0x88) != obj || !*(u8 *)(sound + 0x74))
-            *(int *)(data + 0x40) = func_002E5CF8(0, 4, obj);
-        if (func_00282E48(obj + 0x10, data + 0x30) < *(float *)(data + 8) * 0.016666668f)
+            *(int *)(data + 0x40) = PlayMobySound(0, 4, obj);
+        if (fast_vec_dist(obj + 0x10, data + 0x30) < *(float *)(data + 8) * 0.016666668f)
             func_002A7750(obj, 3, -1);
         break;
     case 3:
         sound = D_00188660 + *(int *)(data + 0x40) * 0x70;
         if (*(char **)(sound + 0x88) != obj || !*(u8 *)(sound + 0x74))
-            *(int *)(data + 0x40) = func_002E5CF8(0, 4, obj);
+            *(int *)(data + 0x40) = PlayMobySound(0, 4, obj);
         func_002AA458(obj + 0x10, data + 0x20, data + 0x14, *(float *)(data + 8) * 0.00027777778f,
                       *(float *)(data + 8) * 0.00027777778f, *(float *)(data + 8) * 0.016666668f);
-        if (func_00282E48(obj + 0x10, data + 0x20) < *(float *)(data + 8) * 0.016666668f)
+        if (fast_vec_dist(obj + 0x10, data + 0x20) < *(float *)(data + 8) * 0.016666668f)
             func_002A7750(obj, 2, -1);
         break;
     }
     if (*(u8 *)(obj + 0x20) >= 2) {
         func_L00_002E6CF0(func_L19_00420B48, obj);
-        func_002A8C00(4.0f, query, obj, 1, D_L19_001A8F20);
+        make_hit_descriptor(4.0f, query, obj, 1, D_L19_001A8F20);
         *(u16 *)(query + 0x1A) = *(u16 *)(obj + 0xAA);
-        func_00282F20(offset, obj + 0xE0, *(float *)(data + 0xC));
-        func_00282CC0(offset, obj + 0x10, offset);
-        func_002761F8(obj + 0x10, offset, 0, obj, query);
+        vec_scale_to_length(offset, obj + 0xE0, *(float *)(data + 0xC));
+        FastVecAdd(offset, obj + 0x10, offset);
+        CollLine(obj + 0x10, offset, 0, obj, query);
     }
 }
 
@@ -281,13 +281,13 @@ void func_L19_00420EF0(char *obj)
     case 0:
         if (*(long *)rig != -1) {
             { u8 a = 0xFF; *(u8 *)(obj + 0x30) = a; }
-            func_L00_00323448(obj, rig + 0x30, 0x32, *(s32 *)(rig + 4), *(s32 *)rig, *(s32 *)(rig + 8), 7, 0);
+            BuildObjectAttachmentTransforms(obj, rig + 0x30, 0x32, *(s32 *)(rig + 4), *(s32 *)rig, *(s32 *)(rig + 8), 7, 0);
             if (*(u8 *)(rig + 0x7A) == 0) {
                 func_0029F338((u8 *)obj);
             } else {
                 *(u8 *)(rig + 0x7D) = 1;
                 *(u16 *)(obj + 0x34) |= 0x104;
-                func_002833F0(obj + 0xC0, obj + 0xF0);
+                euler_rotation_basis(obj + 0xC0, obj + 0xF0);
                 *(u8 *)(obj + 0x20) = 1;
             }
         }
@@ -297,15 +297,15 @@ void func_L19_00420EF0(char *obj)
             turn[0] = *(float *)(rig + 0x10) * 0.00029088825f;
             turn[1] = *(float *)(rig + 0x14) * 0.00029088825f;
             turn[2] = *(float *)(rig + 0x18) * 0.00029088825f;
-            func_002833F0(mat, turn);
-            func_00283738(obj + 0xC0, obj + 0xC0, mat);
+            euler_rotation_basis(mat, turn);
+            multiply_matrix3x3(obj + 0xC0, obj + 0xC0, mat);
             joint = rig + 0x30;
             do {
                 turn[0] = *(float *)(rig + 0x1C) * 0.00029088825f;
                 turn[1] = *(float *)(rig + 0x20) * 0.00029088825f;
                 turn[2] = *(float *)(rig + 0x24) * 0.00029088825f;
-                func_002833F0(mat, turn);
-                func_00283738(joint, joint, mat);
+                euler_rotation_basis(mat, turn);
+                multiply_matrix3x3(joint, joint, mat);
                 tag = *(u8 *)(joint + 0x4A);
                 joint += 0x50;
             } while (tag != 1);
@@ -443,8 +443,8 @@ void func_L19_00423270(char *obj)
     float inv255, half, three;
 
     if (*(short *)(obj + 0xAA) == 0x11C7) {
-        func_00282F20(point, obj + 0xE0, 1.5f);
-        func_00282CC0(origin, obj + 0x10, point);
+        vec_scale_to_length(point, obj + 0xE0, 1.5f);
+        FastVecAdd(origin, obj + 0x10, point);
     } else {
         func_0029FCC0(obj, 0, origin);
     }
@@ -457,7 +457,7 @@ void func_L19_00423270(char *obj)
         }
         for (i = 2; i >= 0; i--) {
             func_002A7A00(jitter, D_L19_001B1ED4[0] * 0.016666668f, D_L19_001B1ED8[0] * 0.016666668f);
-            func_00282CC0(velocity, velocity, jitter);
+            FastVecAdd(velocity, velocity, jitter);
             {
                 int glowAlpha = D_L19_001B1EDC[0];
                 func_002C3150(origin, velocity, D_L19_001B1EE4[0], glowAlpha, func_002A77E0(255), 0,
@@ -468,13 +468,13 @@ void func_L19_00423270(char *obj)
     inv255 = 1.0f / 255.0f;
     half = 0.5f;
     three = 3.0f;
-    func_00282CF0(point, D_L19_001B9A40, origin);
-    func_00282F20(point, point, -0.3f);
-    func_00282F20(step, point, 0.1f);
-    func_00282CC0(point, point, origin);
+    FastVecSub(point, D_L19_001B9A40, origin);
+    vec_scale_to_length(point, point, -0.3f);
+    vec_scale_to_length(step, point, 0.1f);
+    FastVecAdd(point, point, origin);
     for (i = 0; i < 4; i++) {
-        color = func_00283D38(D_L19_001B1EF0[0], D_L19_001B1EF4[0],
-                              func_00282C48(half - func_00283CE0(255 - ((D_L19_001B2508[0] + i * 20) & 255)) * inv255));
+        color = FastTweenColor(D_L19_001B1EF0[0], D_L19_001B1EF4[0],
+                              func_00282C48(half - IntToFloat(255 - ((D_L19_001B2508[0] + i * 20) & 255)) * inv255));
         alpha = *(u8 *)D_L19_001B2508;
         if (i & 2)
             alpha *= 2;
@@ -482,8 +482,8 @@ void func_L19_00423270(char *obj)
             alpha = 255 - alpha;
         spriteAlpha = (u8)alpha;
         func_002C2FD8(point, color, spriteAlpha, D_L19_001B1F00[0], D_L19_001B1EFC[0], 2, 0,
-                      (func_00283CE0(i) + three) * (*(float *)(obj + 0x2C) / *(float *)(*(char **)(obj + 0x24) + 0x24)));
-        func_00282CC0(point, point, step);
+                      (IntToFloat(i) + three) * (*(float *)(obj + 0x2C) / *(float *)(*(char **)(obj + 0x24) + 0x24)));
+        FastVecAdd(point, point, step);
     }
 }
 
@@ -563,8 +563,8 @@ void func_L19_00423EC0(u8 *obj)
         t = (func_00283180(*(float *)(s + 0x74) * 3.1415927f) + 1.0f) * 0.5f;
         qzero_nc(delta);
         delta[2] = -6.0f;
-        func_00282D30(delta, delta, t);
-        func_00282CC0(obj + 0x10, s + 0x60, delta);
+        FastVecScale(delta, delta, t);
+        FastVecAdd(obj + 0x10, s + 0x60, delta);
         if (*(float *)(s + 0x74) >= 1.0f) func_002A7750(obj, 4, -1);
         break;
     case 4:
@@ -573,7 +573,7 @@ void func_L19_00423EC0(u8 *obj)
         break;
     }
     if (obj[0x20] < 4) {
-        func_00282CF0(delta, obj + 0x10, oldPos);
+        FastVecSub(delta, obj + 0x10, oldPos);
         func_002AD6F0(s + 0x20, delta, oldRot, obj + 0xF0);
     }
 }

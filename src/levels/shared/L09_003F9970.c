@@ -24,8 +24,8 @@ void func_L09_003F9970(char *object)
     if (*(int *)(state + 0x2BC) != 255) {
         path = D_L09_001FE6C0[*(int *)(state + 0x2BC)];
         qcopy(endpoint, path + *(int *)path * 16);
-        func_00282CF0(endpoint, endpoint, path + 0x10);
-        func_00282CC0(endpoint, endpoint, D_00189EA0);
+        FastVecSub(endpoint, endpoint, path + 0x10);
+        FastVecAdd(endpoint, endpoint, D_00189EA0);
         data = *(char **)(*(char **)(object + 0x68) + 0x18);
         func_002AA458(object + 0x10, endpoint, state + 0x4B8, *(float *)(state + 0x120),
             *(float *)(state + 0x124), *(float *)(state + 0x128));

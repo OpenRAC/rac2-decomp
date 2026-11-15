@@ -25,7 +25,7 @@ void func_00319780(char *self)
     short *list;
     char *moby;
     if(B(self,0x20)==0) func_00319B38(self);
-    if(B(self,0x31) && func_00282E48(self+0x10,D_001B5340)<24.0f) {
+    if(B(self,0x31) && fast_vec_dist(self+0x10,D_001B5340)<24.0f) {
         func_002A93B0(self);
         B(self,0x6F)=22;
     }
@@ -36,8 +36,8 @@ void func_00319780(char *self)
     func_00282C88(d+0x330);
     F(d,0x338)=0.0f;
     F(d,0x330)=0.25f;
-    func_002830C0(d+0x330,d+0x330,matrix);
-    func_00282CC0(d+0x330,d+0x330,matrix+12);
+    transform_vector(d+0x330,d+0x330,matrix);
+    FastVecAdd(d+0x330,d+0x330,matrix+12);
     result=func_002B0ED8(self,d+0x80,0);
     height=func_002A89A8(self+0x10,0,0.5f);
     if(height==0.0f || F(self,0x18)-height>20.0f) {
@@ -54,10 +54,10 @@ void func_00319780(char *self)
         qcopy(a,self+0x10);
         qcopy(b,self+0x10);
         b[2]-=1.0f;
-        if(func_002761F8(a,b,0,self,0)) {
-            kind=func_00278E78();
+        if(CollLine(a,b,0,self,0)) {
+            kind=GetCollHitMaterial();
             if(kind==1 || kind==11) {
-                func_002A6C58(self,0,3);
+                SetDeathBits(self,0,3);
                 func_0029F338(self);
                 return;
             }

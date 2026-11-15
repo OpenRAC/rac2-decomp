@@ -22,7 +22,7 @@ int func_L01_0042A568(void)
         result = *(int *)(motion + 0xE0) == 0;
     } else if (state != 1 && vel[0] < 0.001f && vel[1] < 0.001f && vel[2] < 0.001f
                && spin[0] < 0.0001f && spin[1] < 0.0001f && spin[2] < 0.0001f) {
-        d = func_00282E48(ship + 0x30, dock);
+        d = fast_vec_dist(ship + 0x30, dock);
         if (d < 0.01f)
             result = 1;
         else if (*(int *)(pad + 0x40) != 0 && 0.1f < d)

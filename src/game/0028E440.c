@@ -115,7 +115,7 @@ void func_0028E868(int a0, int a1, int a2, int a3, int a4, int a5)
     q = (char *)ref_L00_001B2608_00;
     *(long long *)(p + 4) = 0x7400000000008001LL;
     *(long long *)(q + 8) = 0x05353106;
-    result = func_0028E640(a0);
+    result = GetFrameTexture(a0);
     *(long long *)(q + 16) = result;
     *(long long *)(q + 24) = 0x156;
     *(long long *)(q + 32) = ((long long)a5 << 24) | 0x7F7F7F;
@@ -143,7 +143,7 @@ void func_0028ECD8(int a0, int a1, int a2, int a3, int a4, int a5)
     q = (char *)ref_L00_001B2608_00;
     *(long long *)(p + 4) = 0x7400000000008001LL;
     *(long long *)(q + 8) = 0x05353106;
-    result = func_0028E640(a0);
+    result = GetFrameTexture(a0);
     *(long long *)(q + 16) = result;
     *(long long *)(q + 24) = 0x156;
     *(long long *)(q + 32) = ((long long)a5 << 24) | 0x7F7F7F;
@@ -175,7 +175,7 @@ void func_0028EE98(int a0, int a1, int a2, int a3, int a4, int a5)
     q = (char *)ref_L00_001B2608_00;
     *(long long *)(p + 4) = 0x7400000000008001LL;
     *(long long *)(q + 8) = 0x05353106;
-    result = func_0028E640(a0);
+    result = GetFrameTexture(a0);
     *(long long *)(q + 16) = result;
     *(long long *)(q + 24) = 0x156;
     *(long long *)(q + 32) = ((long long)a5 << 24) | 0x7F7F7F;
@@ -207,7 +207,7 @@ void func_0028F078(int a0, int a1, int a2, int a3, int a4, int a5, unsigned int 
     q = (char *)ref_L00_001B2608_00;
     *(long long *)(p + 4) = 0x7400000000008001LL;
     *(long long *)(q + 8) = 0x05353106;
-    result = func_0028E640(a0);
+    result = GetFrameTexture(a0);
     *(long long *)(q + 16) = result;
     *(long long *)(q + 24) = 0x156;
     rgba = (unsigned char)color;
@@ -282,7 +282,7 @@ void func_0028F788(int a0, int a1, int a2, int a3, int a4, int a5, int a6, int a
     q = (char *)ref_L00_001B2608_00;
     *(long long *)(p + 4) = 0x7400000000008001LL;
     *(long long *)(q + 8) = 0x05353106;
-    result = func_0028E640(a0);
+    result = GetFrameTexture(a0);
     *(long long *)(q + 16) = result;
     *(long long *)(q + 24) = 0x156;
     *(long long *)(q + 32) = ((long long)a9 << 24) | 0x7F7F7F;

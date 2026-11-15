@@ -121,7 +121,7 @@ void func_L11_00439D78(float a, float b, float c, float d)
 {
     float v = (d + d) * (a - b);
 
-    func_00283CF0((c + func_00282C10(c * c + v)) / d);
+    FloatToInt((c + square_root(c * c + v)) / d);
 }
 
 /* func_L11_0044FFA0 lives in L11_0044FFA0-g8.c. */
@@ -225,7 +225,7 @@ void func_L11_00458DF0(char *a0, void *a1, void *a2, int a3, int t0, float f12, 
     float x;
 
     ref_L11_00458DF0_00((char *)&local);
-    local.v120 = func_0027C878(a3);
+    local.v120 = GetEffectTextureDescriptor(a3);
     local.v128 = 0xFF9000000260LL;
     local.v136 = ((long long)t0 << 2) | 0x0000008000000040LL;
     local.k3 = (int)a1 + ((int)a2 << 24);
@@ -236,17 +236,17 @@ void func_L11_00458DF0(char *a0, void *a1, void *a2, int a3, int t0, float f12, 
     local.v220 = 0.0f;
     local.f216 = func_00283248(D_L11_001BA780[0x50] - *(float *)a0,
                                 D_L11_001BA780[0x51] - *(float *)(a0 + 4));
-    x = func_00283248(func_00282E80(a0, D_L11_001BA780 + 0x50),
+    x = func_00283248(vec_distance_xy(a0, D_L11_001BA780 + 0x50),
                       D_L11_001BA780[0x52] - *(float *)(a0 + 8));
     local.f212 = -x;
     local.v208 = f13;
-    func_00283410(&local.m00, &local.v208);
+    euler_to_matrix(&local.m00, &local.v208);
     local.v192 = *(float *)a0;
     local.v196 = *(float *)(a0 + 4);
     local.v200 = *(float *)(a0 + 8);
     local.v204 = 1.0f;
     ref_L11_00458DF0_01((char *)&local, f12);
-    func_00280B90(&local, &local.m00, 0);
+    draw_world_quad(&local, &local.m00, 0);
 }
 
 /* Emits two effects at the object's position with independently sampled
@@ -349,7 +349,7 @@ void func_L11_00472008(char *p)
 
 void func_L11_00474888(char *a0)
 {
-    if (func_002ACBC8(D_L11_00189EA0, *(int *)(*(char **)(a0 + 0x68))) == 0) return;
+    if (IsPointInCuboid(D_L11_00189EA0, *(int *)(*(char **)(a0 + 0x68))) == 0) return;
     if (*(int *)(D_L11_00189EA0 + 0x2214) != 0x82) return;
     func_002829D8(D_L11_00189EA0 + 0x530);
     func_002829D8(D_L11_00189EA0 + 0x530);

@@ -52,7 +52,7 @@ Moby40B838 *func_L00_0040B838(f32 *pos, int arg1, f32 *parent, int arg3)
     Link40B838 *link;
     int i;
 
-    m = func_0029EFD0(0xED8);
+    m = CreateMoby(0xED8);
     if (m != 0) {
         vars = m->vars;
         m->alpha = 0xFF;
@@ -68,8 +68,8 @@ Moby40B838 *func_L00_0040B838(f32 *pos, int arg1, f32 *parent, int arg3)
             link = func_002AB1F0(parent);
             if (link != 0) {
                 func_002AFFD8(parent + 4, vec, 1);
-                func_00282D30(vec, vec, link->f10);
-                func_00282CC0(tmp, tmp, vec);
+                FastVecScale(vec, vec, link->f10);
+                FastVecAdd(tmp, tmp, vec);
             }
         }
         qcopy(m->pos, pos);

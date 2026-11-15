@@ -45,14 +45,14 @@ void func_L00_002CA0B0(void)
     }
     if (D_00189E20.flag_1454 != 0 && D_00189E20.flag_1456 != 0) {
         if (((unsigned char *)D_00189E20.object)[0x43] != 20)
-            func_L00_002D2168(20, 0, 11.0f);
+            set_hero_animation(20, 0, 11.0f);
         D_00189E20.animation_scale = D_00189E20.animation_time * 25.0f;
         if (D_00189E20.animation_scale < 0.7f) D_00189E20.animation_scale = 0.7f;
         if (2.2f < D_00189E20.animation_scale) D_00189E20.animation_scale = 2.2f;
         return;
     }
     if (((unsigned char *)D_00189E20.object)[0x43] == 20) {
-        func_L00_002D2168(D_00189E20.frame + 3, 0, 7.0f);
+        set_hero_animation(D_00189E20.frame + 3, 0, 7.0f);
     } else if (D_00189E20.count_1c0 > 4 && D_00189E20.flag_40e == 0) {
         float time = D_00189E20.animation_time;
         float start;
@@ -78,7 +78,7 @@ void func_L00_002CA0B0(void)
                 int before = frames->entry[old + 3][0x10];
                 int after = frames->entry[D_00189E20.frame + 3][0x10];
                 int offset = D_L00_001A7DC8[old][D_00189E20.frame];
-                func_L00_002D2168(D_00189E20.frame + 3, ((unsigned char)object[0x41] * after / before + offset) % after, 8.0f);
+                set_hero_animation(D_00189E20.frame + 3, ((unsigned char)object[0x41] * after / before + offset) % after, 8.0f);
             }
         }
     }

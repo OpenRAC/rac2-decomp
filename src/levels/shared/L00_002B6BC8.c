@@ -194,7 +194,7 @@ void func_L00_002B6BC8(void) {
         HOP_PLAYER.ground_speed = HOP_PLAYER.flat_speed;
     } else if (HOP_PLAYER.state == 16) {
         if (HOP_PLAYER.state_timer >= 55) {
-            func_002AA2E8(&HOP_PLAYER.jump_gravity, 0.0069444444961845875f, 0.0019444444915279746f);
+            ApproachValue(&HOP_PLAYER.jump_gravity, 0.0069444444961845875f, 0.0019444444915279746f);
         }
         if (HOP_PLAYER.state_timer < 55) {
             HOP_PLAYER.target_speed = HOP_PLAYER.field454;
@@ -207,31 +207,31 @@ void func_L00_002B6BC8(void) {
     } else if (HOP_PLAYER.state == 27) {
         if (HOP_PLAYER.state_timer >= 41) {
             func_L00_002B3EF8(0, 0.04f, 0.2f, 0.2501639127731323f);
-            func_L00_002B6198(0.0055555556900799274f);
+            ApproachHeroVelocity(0.0055555556900799274f);
         }
         if (HOP_PLAYER.anim_frame >= 13.0f && HOP_PLAYER.anim_frame <= 30.0f) {
             if (HOP_PLAYER.anim_frame > 27.0f) {
-                func_002AA2E8(&HOP_PLAYER.ledge_jump_speed, 0.0f, 0.002222222276031971f);
+                ApproachValue(&HOP_PLAYER.ledge_jump_speed, 0.0f, 0.002222222276031971f);
             } else {
-                func_002AA2E8(&HOP_PLAYER.ledge_jump_speed, 0.03333333507180214f, 0.002222222276031971f);
+                ApproachValue(&HOP_PLAYER.ledge_jump_speed, 0.03333333507180214f, 0.002222222276031971f);
             }
         }
         probe_start[1] = 0.0f;
         probe_start[0] = HOP_PLAYER.ledge_jump_speed;
-        probe_start[2] = func_00282DB0(HOP_PLAYER.velocity.f, HOP_PLAYER.field20.f);
-        func_00283098(HOP_PLAYER.velocity.f, probe_start, &HOP_PLAYER);
+        probe_start[2] = FastVecDot(HOP_PLAYER.velocity.f, HOP_PLAYER.field20.f);
+        matrix_mul_vec3(HOP_PLAYER.velocity.f, probe_start, &HOP_PLAYER);
     } else if (HOP_PLAYER.state == 72) {
         if (HOP_PLAYER.anim_frame >= 5.0f && HOP_PLAYER.anim_frame <= 18.0f) {
             if (HOP_PLAYER.anim_frame > 15.0f) {
-                func_002AA2E8(&HOP_PLAYER.ledge_jump_speed, 0.0f, 0.002222222276031971f);
+                ApproachValue(&HOP_PLAYER.ledge_jump_speed, 0.0f, 0.002222222276031971f);
             } else {
-                func_002AA2E8(&HOP_PLAYER.ledge_jump_speed, 0.02083333395421505f, 0.002222222276031971f);
+                ApproachValue(&HOP_PLAYER.ledge_jump_speed, 0.02083333395421505f, 0.002222222276031971f);
             }
         }
         probe_start[1] = 0.0f;
         probe_start[0] = HOP_PLAYER.ledge_jump_speed;
-        probe_start[2] = func_00282DB0(HOP_PLAYER.velocity.f, HOP_PLAYER.field20.f);
-        func_00283098(HOP_PLAYER.velocity.f, probe_start, &HOP_PLAYER);
+        probe_start[2] = FastVecDot(HOP_PLAYER.velocity.f, HOP_PLAYER.field20.f);
+        matrix_mul_vec3(HOP_PLAYER.velocity.f, probe_start, &HOP_PLAYER);
     } else if (HOP_PLAYER.state == 11) {
         HOP_PLAYER.move_yaw = HOP_PLAYER.takeoff_yaw;
         qcopy(HOP_PLAYER.move_dir.f, HOP_PLAYER.field480.f);
@@ -245,12 +245,12 @@ void func_L00_002B6BC8(void) {
             float drift = HOP_PLAYER.stick_magnitude * 0.0833333358168602f;
 
             if (drift < 0.03333333507180214f) drift = 0.03333333507180214f;
-            func_002AA2E8(&HOP_PLAYER.high_jump_drift_speed, drift, 0.010277777910232544f);
+            ApproachValue(&HOP_PLAYER.high_jump_drift_speed, drift, 0.010277777910232544f);
             HOP_PLAYER.ground_speed = HOP_PLAYER.flat_speed;
         } else if (HOP_PLAYER.field49E && HOP_PLAYER.field4AE < 12) {
-            func_002AA2E8(&HOP_PLAYER.high_jump_drift_speed, 0.0f, 0.002222222276031971f);
+            ApproachValue(&HOP_PLAYER.high_jump_drift_speed, 0.0f, 0.002222222276031971f);
         } else {
-            func_002AA2E8(&HOP_PLAYER.high_jump_drift_speed, 0.07f, 0.002222222276031971f);
+            ApproachValue(&HOP_PLAYER.high_jump_drift_speed, 0.07f, 0.002222222276031971f);
         }
         if (!HOP_PLAYER.field22C3) {
             HOP_PLAYER.velocity.f[0] = func_00283180(HOP_PLAYER.high_jump_drift_yaw) * HOP_PLAYER.high_jump_drift_speed;
@@ -259,10 +259,10 @@ void func_L00_002B6BC8(void) {
             func_L00_002D3BD8(probe_start, HOP_PLAYER.field470.f, HOP_PLAYER.high_jump_drift_speed);
             func_L00_002D3B58(probe_start, probe_start, 0.0f);
             func_L00_002D3BD8(HOP_PLAYER.velocity.f, HOP_PLAYER.velocity.f, 0.0f);
-            func_00282CC0(HOP_PLAYER.velocity.f, HOP_PLAYER.velocity.f, probe_start);
+            FastVecAdd(HOP_PLAYER.velocity.f, HOP_PLAYER.velocity.f, probe_start);
         }
         if (!HOP_PLAYER.field22C3 && !HOP_PLAYER.field52D) {
-            float drift = HOP_PLAYER.air_target_speed * func_00283198(func_00283C80(HOP_PLAYER.takeoff_yaw, HOP_PLAYER.high_jump_drift_yaw));
+            float drift = HOP_PLAYER.air_target_speed * func_00283198(FastDiffRots(HOP_PLAYER.takeoff_yaw, HOP_PLAYER.high_jump_drift_yaw));
 
             HOP_PLAYER.velocity.f[0] += func_00283180(HOP_PLAYER.takeoff_yaw) * drift;
             HOP_PLAYER.velocity.f[1] += func_00283198(HOP_PLAYER.takeoff_yaw) * drift;
@@ -281,8 +281,8 @@ void func_L00_002B6BC8(void) {
                 HOP_PLAYER.velocity.f[1] = func_00283198(HOP_PLAYER.move_yaw) * 0.08166667073965073f;
             } else {
                 func_L00_002D3BD8(HOP_PLAYER.velocity.f, HOP_PLAYER.velocity.f, 0.0f);
-                func_00282F20(probe_start, HOP_PLAYER.move_dir.f, 0.08166667073965073f);
-                func_00282CC0(HOP_PLAYER.velocity.f, HOP_PLAYER.velocity.f, probe_start);
+                vec_scale_to_length(probe_start, HOP_PLAYER.move_dir.f, 0.08166667073965073f);
+                FastVecAdd(HOP_PLAYER.velocity.f, HOP_PLAYER.velocity.f, probe_start);
             }
         }
         HOP_PLAYER.ground_speed = HOP_PLAYER.flat_speed;
@@ -295,7 +295,7 @@ void func_L00_002B6BC8(void) {
             HOP_PLAYER.yaw_error = func_002AA898(&yaw, HOP_PLAYER.move_yaw, &HOP_PLAYER.yaw_rate,
                                       0.018f, 0.2f, 0.12217307090759277f, 0);
             {
-                float delta = func_00283BE0(yaw, HOP_PLAYER.yaw);
+                float delta = fast_subtract_rotations(yaw, HOP_PLAYER.yaw);
 
                 func_L00_002AA0F0(0.0f, 0.0f, delta);
             }
@@ -324,7 +324,7 @@ void func_L00_002B6BC8(void) {
 
                 if (HOP_PLAYER.field1492) decel = 0.000047222223947152495f;
                 speed = func_L00_002D3A58(HOP_PLAYER.velocity.f);
-                func_002AA2E8(&speed, 0.0f, decel);
+                ApproachValue(&speed, 0.0f, decel);
                 func_L00_002D3BD8(HOP_PLAYER.velocity.f, HOP_PLAYER.velocity.f, speed);
                 return;
             }
@@ -339,12 +339,12 @@ void func_L00_002B6BC8(void) {
         if (HOP_PLAYER.field528 && HOP_PLAYER.field1492) {
             rate = 0.00013888889225199819f;
             if (HOP_PLAYER.stick_magnitude > 0.9f) {
-                func_L00_002B47A8(probe_start, probe_end, 0, 0.5f, -1.5f);
+                BuildOffsetVectorPair(probe_start, probe_end, 0, 0.5f, -1.5f);
                 probe_start[0] += func_00283180(HOP_PLAYER.move_yaw) * 0.7f;
                 probe_start[1] += func_00283198(HOP_PLAYER.move_yaw) * 0.7f;
                 probe_end[0] += func_00283180(HOP_PLAYER.move_yaw) * 0.7f;
                 probe_end[1] += func_00283198(HOP_PLAYER.move_yaw) * 0.7f;
-                if (func_002761F8(probe_start, probe_end, 2, 0, 0) && func_00278E78() != 7) {
+                if (CollLine(probe_start, probe_end, 2, 0, 0) && GetCollHitMaterial() != 7) {
                     HOP_PLAYER.target_speed = 0.0833333358168602f;
                     rate = 0.0027777778450399637f;
                 }
@@ -358,7 +358,7 @@ void func_L00_002B6BC8(void) {
                 rate = HOP_PLAYER.field320 * 0.003183098277077079f;
             }
         }
-        func_L00_002B6198(rate);
+        ApproachHeroVelocity(rate);
     }
 }
 #undef HOP_PLAYER
@@ -457,7 +457,7 @@ extern void func_002E64A0(void *mob);
 extern void func_L00_00326048(void *mob, void *p, s32 a2, s32 a3, f32 alpha);
 
 /* Walks the list of mobs: the ones of type 0xE29 get the 0x800 flag, the ones of type
-   0xD54 are handed to func_002E64A0, and the ones of type 0xFA0 with a 0x68 pointer
+   0xD54 are handed to UpdateEquipmentPieces, and the ones of type 0xFA0 with a 0x68 pointer
    get that pointer's block (from +0xC) to func_L00_00326048. */
 
 /* sched1 hoists the last statement of */

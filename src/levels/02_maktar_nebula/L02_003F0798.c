@@ -77,7 +77,7 @@ void func_L02_003F0798(char *object) {
         heading = func_00283248(((Hero *)D_00189E20)->f[0x80 / 4] - *(float *)(object + 0x10),
                                 ((Hero *)D_00189E20)->f[0x84 / 4] - *(float *)(object + 0x14));
     }
-    distance = func_00282E80(object + 0x10, target);
+    distance = vec_distance_xy(object + 0x10, target);
     switch (*(u8 *)(object + 0x95)) {
     case 2:
         if (func_002B3890((u8 *)object)) {
@@ -106,9 +106,9 @@ void func_L02_003F0798(char *object) {
         }
         angle = func_00283248(target[0] - *(float *)(object + 0x10),
                              target[1] - *(float *)(object + 0x14));
-        angle = func_00283C80(*(float *)(object + 0xF8), angle);
+        angle = FastDiffRots(*(float *)(object + 0xF8), angle);
         if (angle > 2.7925272f) func_L02_003F1B70(object);
-        if (*(u8 *)(object + 0xBC) == 0 && func_00282E80(object + 0x10, state + 0x4A0) < 0.5f)
+        if (*(u8 *)(object + 0xBC) == 0 && vec_distance_xy(object + 0x10, state + 0x4A0) < 0.5f)
             *(u8 *)(object + 0xBC) = 1;
         else
             func_L01_00321178(object, state + 0x4A0);
@@ -167,7 +167,7 @@ void func_L02_003F0798(char *object) {
                          0.0011635529808700085f, 0.10471977293491364f);
         }
         if (distance < 2.8f &&
-            func_00283C80(*(float *)(object + 0xF8),
+            FastDiffRots(*(float *)(object + 0xF8),
                           func_00283248(target[0] - *(float *)(object + 0x10),
                                         target[1] - *(float *)(object + 0x14))) < 0.38397247f) {
             func_002A7750((u8 *)object, 8, -1);
@@ -180,7 +180,7 @@ void func_L02_003F0798(char *object) {
             func_002B50E0(object, object + 0x10, heading);
         angle = func_00283248(target[0] - *(float *)(object + 0x10),
                              target[1] - *(float *)(object + 0x14));
-        angle = func_00283C80(*(float *)(object + 0xF8), angle);
+        angle = FastDiffRots(*(float *)(object + 0xF8), angle);
         if (angle > 2.7925272f) func_L02_003F1B70(object);
         break;
     case 8:

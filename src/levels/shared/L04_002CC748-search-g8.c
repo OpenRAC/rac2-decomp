@@ -52,7 +52,7 @@ int func_L04_003429F8(char *source, SearchOutput *out, int *areas, int count, vo
             next = (char *)out->next;
         } while (0);
         for (; i < limit; i++) {
-            if (func_002ACBC8((char *)&D_00189E20 + 0x80, areas[i])) {
+            if (IsPointInCuboid((char *)&D_00189E20 + 0x80, areas[i])) {
                 best = 0;
                 result = 2;
                 break;
@@ -63,7 +63,7 @@ int func_L04_003429F8(char *source, SearchOutput *out, int *areas, int count, vo
         previous = (char *)out->previous;
         next = (char *)out->next;
         if (region && regionCount > 0
-            && !func_002A8AF0((char *)&D_00189E20 + 0x80, region, regionCount)) {
+            && !point_in_path_xy((char *)&D_00189E20 + 0x80, region, regionCount)) {
             best = 0;
             result = 2;
         }
@@ -73,17 +73,17 @@ int func_L04_003429F8(char *source, SearchOutput *out, int *areas, int count, vo
         if (m && (WSHORT(m, 0xAA) == 0xCB || WSHORT(m, 0xAA) == 0x76C) && WBYTE(m, 0x20) != 0xFE
             && WBYTE(m, 0x20) != 0xFD && WBYTE(m, 0x20) == 3) {
             valid = 1;
-            d = func_00282E80(source + 0x10, m + 0x10);
+            d = vec_distance_xy(source + 0x10, m + 0x10);
             if (distance <= d) {
                 valid = 0;
             } else if (count > 0) {
                 for (i = 0; i < count - 1; i++) {
-                    if (func_002ACBC8(m + 0x10, areas[i])) {
+                    if (IsPointInCuboid(m + 0x10, areas[i])) {
                         valid = 0;
                         break;
                     }
                 }
-            } else if (region && regionCount > 0 && !func_002A8AF0(m + 0x10, region, regionCount)) {
+            } else if (region && regionCount > 0 && !point_in_path_xy(m + 0x10, region, regionCount)) {
                 valid = 0;
             }
             if (valid) {

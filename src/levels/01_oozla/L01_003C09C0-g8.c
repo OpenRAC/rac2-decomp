@@ -216,7 +216,7 @@ void func_L01_003C09C0(u8 *arg0) {
             func_L01_003BFDC8(arg0, 0, 0, 0xA);
         } else {
             temp_v0 = ((u8 *)((UView *)(temp_s4))->p[0x48]);
-            temp_f21 = func_00283C80(((UView *)(arg0))->f[0x3E], func_00283248(*(f32 *)(temp_v0 + 0x10) - ((UView *)(arg0))->f[0x4], *(f32 *)(temp_v0 + 0x14) - ((UView *)(arg0))->f[0x5]));
+            temp_f21 = FastDiffRots(((UView *)(arg0))->f[0x3E], func_00283248(*(f32 *)(temp_v0 + 0x10) - ((UView *)(arg0))->f[0x4], *(f32 *)(temp_v0 + 0x14) - ((UView *)(arg0))->f[0x5]));
             switch (((UView *)(arg0))->b[0xBC]) {                    /* switch 2 */
             case 0:                                 /* switch 2 */
                 if ((temp_f0 <= D_L01_001AFE5C) && (temp_f21 < (D_L01_001AFEAC * 0.017453294f)) && (((UView *)(temp_s4))->h[0x16E] == 0)) {
@@ -230,7 +230,7 @@ void func_L01_003C09C0(u8 *arg0) {
                     ((UView *)(temp_s4))->f[0xBB] = (f32) D_L01_001AFE5C;
                     ((UView *)(arg0))->b[0xBC] = 1U;
                 }
-                if (((UView *)(temp_s4))->f[0x8] < (2.0f * func_00283CE0((s32) ((UView *)(temp_s4))->h[0x12]) * 0.33333334f)) {
+                if (((UView *)(temp_s4))->f[0x8] < (2.0f * IntToFloat((s32) ((UView *)(temp_s4))->h[0x12]) * 0.33333334f)) {
                     ((UView *)(temp_s4))->c[0x2E0] = 1;
                     ((UView *)(temp_s4))->b[0x2E1] = 5U;
                     ((UView *)(temp_s4))->c[0x2E2] = 0xE;
@@ -299,7 +299,7 @@ block_43:
                     }
                     break;
                 }
-                if (((UView *)(temp_s4))->f[0x8] < (2.0f * func_00283CE0((s32) ((UView *)(temp_s4))->h[0x12]) * 0.33333334f)) {
+                if (((UView *)(temp_s4))->f[0x8] < (2.0f * IntToFloat((s32) ((UView *)(temp_s4))->h[0x12]) * 0.33333334f)) {
                     ((UView *)(temp_s4))->c[0x2E0] = 1;
                     ((UView *)(temp_s4))->b[0x2E1] = 5U;
                     ((UView *)(temp_s4))->c[0x2E2] = 0xE;
@@ -395,7 +395,7 @@ block_72:
                     ((UView *)(temp_s4))->b[0x2E1] = 4U;
                     ((UView *)(temp_s4))->c[0x2E2] = 0x16;
                 }
-                if (((UView *)(temp_s4))->f[0x8] < (func_00283CE0((s32) ((UView *)(temp_s4))->h[0x12]) * 0.33333334f)) {
+                if (((UView *)(temp_s4))->f[0x8] < (IntToFloat((s32) ((UView *)(temp_s4))->h[0x12]) * 0.33333334f)) {
                     ((UView *)(temp_s4))->c[0x2E0] = 1;
                     ((UView *)(temp_s4))->f[0xBB] = (f32) D_L01_001AFE54;
                     ((UView *)(temp_s4))->b[0x2E1] = 5U;
@@ -512,7 +512,7 @@ block_112:
                         sp[4] += func_002A7878(-0.3f, 0.3f);
                         sp[5] += func_002A7878(-0.3f, 0.3f);
                         sp[6] += func_002A7878(-0.3f, 0.3f);
-                        func_002761F8(sp, (sp + 4), 9, arg0, (sp + 8));
+                        CollLine(sp, (sp + 4), 9, arg0, (sp + 8));
                     }
                 }
             }
@@ -521,8 +521,8 @@ block_112:
             func_L01_00322288(arg0, func_00283248(((HeroV *)D_00189E20)->x - ((UView *)(arg0))->f[0x4], ((HeroV *)D_00189E20)->y - ((UView *)(arg0))->f[0x5]));
             if (func_002AEB60((u8 *) arg0, 16.0f) != 0) {
                 func_0029FCC0(arg0, 0xA, sp);
-                func_00282CF0((sp + 4), ((u8 *)((UView *)(temp_s4))->p[0x48]) + 0x10, sp);
-                func_00282F20((sp + 4), (sp + 4), D_L01_001AFEF4 * 0.016666668f);
+                FastVecSub((sp + 4), ((u8 *)((UView *)(temp_s4))->p[0x48]) + 0x10, sp);
+                vec_scale_to_length((sp + 4), (sp + 4), D_L01_001AFEF4 * 0.016666668f);
                 sp[6] = func_L00_0031CDD0(sp, ((u8 *)((UView *)(temp_s4))->p[0x48]) + 0x10, NULL, D_L01_001AFEF4 * 0.016666668f, -(D_L01_001AFEF8 * 0.00027777778f));
                 func_L01_003DA300(sp, (sp + 4), arg0, (f32) ((UView *)(temp_s4))->b[0x34]);
             }
@@ -540,7 +540,7 @@ block_112:
                     if (temp_f20 <= 17.0f) {
                         func_0029FCC0(arg0, 0xC, sp);
                         sp[2] -= 2.4f;
-                        if ((func_00282E48(sp, &((HeroV *)D_00189E20)->x) < D_L01_001AFE6C) && (*(s32 *)(D_00189E20 + 0x2294) != 0x6F)) {
+                        if ((fast_vec_dist(sp, &((HeroV *)D_00189E20)->x) < D_L01_001AFE6C) && (*(s32 *)(D_00189E20 + 0x2294) != 0x6F)) {
                             ((UView *)(temp_s4))->b[0x2F4] = 1U;
                         }
                     } else {
@@ -566,7 +566,7 @@ block_149:
                     func_L00_002B30E8();
                 } else {
                     func_002A8BD0(sp, (s32) arg0, 1, (f32) ((UView *)(temp_s4))->b[0x36]);
-                    func_002A8E20(((HeroV *)D_00189E20)->a2290, sp);
+                    QueueMobyImpact(((HeroV *)D_00189E20)->a2290, sp);
                 }
                 ((HeroV *)D_00189E20)->a22b5 = 1;
                 func_L01_003BFDC8(arg0, 0xB, 0, 0x14);
@@ -584,20 +584,20 @@ block_149:
         temp_f23 = func_0029F530(arg0);
         temp_v0_3 = (u8 *)((((UView *)(temp_s4))->i[0xB3] << 7) + (s32)D_L01_001B264C);
         temp_f0_2 = func_00283248(*(f32 *)(temp_v0_3 + 0x30) - ((UView *)(arg0))->f[0x4], *(f32 *)(temp_v0_3 + 0x34) - ((UView *)(arg0))->f[0x5]);
-        temp_f22 = func_00283B98(temp_f0_2, 1.5707965f);
-        temp_f21_2 = func_00283BE0(temp_f0_2, 1.5707965f);
-        temp_f20_2 = func_00283C80(((UView *)(arg0))->f[0x3E], temp_f22);
-        func_L01_00322288(arg0, temp_f20_2 < func_00283C80(((UView *)(arg0))->f[0x3E], temp_f21_2) ? temp_f22 : temp_f21_2);
+        temp_f22 = FastAddRotations(temp_f0_2, 1.5707965f);
+        temp_f21_2 = fast_subtract_rotations(temp_f0_2, 1.5707965f);
+        temp_f20_2 = FastDiffRots(((UView *)(arg0))->f[0x3E], temp_f22);
+        func_L01_00322288(arg0, temp_f20_2 < FastDiffRots(((UView *)(arg0))->f[0x3E], temp_f21_2) ? temp_f22 : temp_f21_2);
         if (((UView *)(arg0))->b[0x42] == 0xB) {
             var_s2 = 1;
             func_0029FCC0(arg0, 0xE, sp);
-            temp_f0_3 = func_00282E48(sp, &((Hero *)D_00189E20)->b[0x80]);
+            temp_f0_3 = fast_vec_dist(sp, &((Hero *)D_00189E20)->b[0x80]);
             if (!(temp_f0_3 > 13.0f)) {
                 var_s2 = 0;
             }
             if (((UView *)(temp_s4))->b[0x2F4] != 0) {
                 if (temp_f23 > 33.0f) {
-                    func_L01_002BEB90(0x16, 1);
+                    SetHeroMoveState(0x16, 1);
                     ((Hero *)D_00189E20)->i[0x2294 / 4] = 0x6F;
                     ((Hero *)D_00189E20)->i[0x24A0 / 4] = 0;
                     ((Hero *)D_00189E20)->i[0x229C / 4] = 9;
@@ -609,19 +609,19 @@ block_149:
                 }
             }
             if ((((UView *)(temp_s4))->b[0x2F4] == 0) && (var_s2 == 0)) {
-                func_00282F20((sp + 4), arg0 + 0xC0, D_L01_001AFEEC);
-                func_00282F20((sp + 8), (sp + 4), D_L01_001AFEF0 * 0.016666668f);
-                temp_f20_3 = func_00282E20((sp + 8));
+                vec_scale_to_length((sp + 4), arg0 + 0xC0, D_L01_001AFEEC);
+                vec_scale_to_length((sp + 8), (sp + 4), D_L01_001AFEF0 * 0.016666668f);
+                temp_f20_3 = vec_length_xy((sp + 8));
                 sp[10] = temp_f20_3 * (func_002A7790(1.0f - (temp_f0_3 * 0.006666667f)) * 0.7f);
                 qcopy(&((Hero *)D_00189E20)->b[0xF0], sp + 8);
                 qcopy(&((Hero *)D_00189E20)->b[0x110], sp + 8);
-                func_00282CC0(&((Hero *)D_00189E20)->b[0x80], &((Hero *)D_00189E20)->b[0x80], (sp + 8));
+                FastVecAdd(&((Hero *)D_00189E20)->b[0x80], &((Hero *)D_00189E20)->b[0x80], (sp + 8));
             }
             if (var_s2 != 0) {
                 ((UView *)(arg0))->i[0x27] = (s32) (((UView *)(arg0))->i[0x27] & ~0x30);
                 *(s32 *)(arg0 + 0x98) = (s32) *(s32 *)(((u8 *)((UView *)(arg0))->p[0x9]) + 0x10);
                 if (D_0018C0B4 == 0x6F) {
-                    func_L01_002BEB90(0x16, 1);
+                    SetHeroMoveState(0x16, 1);
                 }
             }
             if (((UView *)(arg0))->b[0x60] & 2) {
@@ -630,7 +630,7 @@ block_149:
                 func_L01_003BFDC8(arg0, 0xC, 0, 0x14);
                 func_002A7750(arg0, 0, 5);
                 if (D_0018C0B4 == 0x6F) {
-                    func_L01_002BEB90(0x16, 1);
+                    SetHeroMoveState(0x16, 1);
                 }
             }
         } else {
@@ -667,16 +667,16 @@ block_149:
             ((u8 *)((UView *)(temp_s4))->p[0xB9]) = NULL;
         }
         temp_s1 = arg0 + 0x10;
-        temp_v0_5 = func_L01_004171C8(temp_s1, 1, -1, -1);
+        temp_v0_5 = SpawnGoldBolt(temp_s1, 1, -1, -1);
         ((u8 *)((UView *)(temp_s4))->p[0xC0]) = temp_v0_5;
         if (temp_v0_5 != NULL) {
-            func_L01_002BEB90(0x6F, 1);
+            SetHeroMoveState(0x6F, 1);
             temp_s0_2 = temp_s4 + 0x2A0;
             temp_v0_6 = ((u8 *)((UView *)(temp_s4))->p[0xC0]);
             *(f32 *)(temp_v0_6 + 0x18) = (f32) (*(f32 *)(temp_v0_6 + 0x18) - 0.5f);
-            func_00282CF0(temp_s0_2, temp_s1, D_00189EA0);
+            FastVecSub(temp_s0_2, temp_s1, D_00189EA0);
             ((UView *)(temp_s4))->f[0xAA] = (f32) (((UView *)(temp_s4))->f[0xAA] + 1.0f);
-            func_00282D30(temp_s0_2, temp_s0_2, 0.85f);
+            FastVecScale(temp_s0_2, temp_s0_2, 0.85f);
             ((UView *)(temp_s4))->f[0xAB] = 1.0f;
             func_002A7750(arg0, 0, 8);
         }
@@ -701,34 +701,34 @@ block_149:
                 temp_v1_16 = (u8 *)((temp_v1_15 << 8) + (s32)D_L01_001B255C_sda);
                 if (*(u8 *)(temp_v1_16 + 0xBC) != 0) {
                     *(u8 *)(temp_v1_16 + 0xBC) = 0U;
-                    func_L01_00394240(D_L01_001B255C + (((UView *)(temp_s4))->i[0xBE] << 8));
+                    UpdateCameraPoseTrigger(D_L01_001B255C + (((UView *)(temp_s4))->i[0xBE] << 8));
                 }
             }
             temp_s1_2 = temp_s4 + 0x2A0;
             temp_s0_3 = ((u8 *)((UView *)(temp_s4))->p[0xC0]) + 0x10;
-            func_00282F20(temp_s0_3, temp_s1_2, temp_f21_3 * func_00282DF0(temp_s1_2));
+            vec_scale_to_length(temp_s0_3, temp_s1_2, temp_f21_3 * FastVecLength(temp_s1_2));
 
             *(f32 *)((((u8 *)((UView *)(temp_s4))->p[0xC0])) + 0x18) = (f32) (*(f32 *)((((u8 *)((UView *)(temp_s4))->p[0xC0])) + 0x18) + (func_00283198(temp_f21_3 * 3.1415927f) * 4.0f));
             temp_a0_4 = ((u8 *)((UView *)(temp_s4))->p[0xC0]) + 0x10;
-            func_00282CC0(temp_a0_4, temp_a0_4, D_00189EA0);
+            FastVecAdd(temp_a0_4, temp_a0_4, D_00189EA0);
             temp_s1_3 = *(u8 **)(((u8 *)((UView *)(temp_s4))->p[0xC0]) + 0x68);
             temp_s0_4 = temp_s1_3 + 0x10;
-            func_00282CF0(temp_s0_4, arg0 + 0x10, D_00189EA0);
-            func_00282F20(temp_s0_4, temp_s0_4, 2.5f);
-            *(f32 *)(temp_s1_3 + 0x1C) = func_00283B98(func_00283248(*(f32 *)(temp_s1_3 + 0x10), *(f32 *)(temp_s1_3 + 0x14)), 3.1415927f);
-            func_00282CC0(temp_s0_4, temp_s0_4, D_00189EA0);
+            FastVecSub(temp_s0_4, arg0 + 0x10, D_00189EA0);
+            vec_scale_to_length(temp_s0_4, temp_s0_4, 2.5f);
+            *(f32 *)(temp_s1_3 + 0x1C) = FastAddRotations(func_00283248(*(f32 *)(temp_s1_3 + 0x10), *(f32 *)(temp_s1_3 + 0x14)), 3.1415927f);
+            FastVecAdd(temp_s0_4, temp_s0_4, D_00189EA0);
             func_002A0F48(((u8 *)((UView *)(temp_s4))->p[0xC0]));
             ((UView *)(temp_s4))->f[0xAB] = temp_f21_3;
         }
         temp_a0_5 = ((u8 *)((UView *)(temp_s4))->p[0xC0]);
         if ((temp_a0_5 == NULL) || (*(s16 *)(temp_a0_5 + 0xAA) != 0x1250) || (temp_v1_17 = *(u8 *)(temp_a0_5 + 0x20), (temp_v1_17 == 0xFE)) || (temp_v1_17 == 0xFD)) {
-            func_002A6C58(arg0, 0, 3);
+            SetDeathBits(arg0, 0, 3);
 
             if ((((UView *)(arg0))->b[0xB0]) != 0xFF) {
                 func_002A0430((u32) (((UView *)(arg0))->b[0xB0]));
             }
             if (((UView *)(temp_s4))->i[0xC1] != -1) {
-                func_0027D330(0x10);
+                FadeToBlack(0x10);
                 func_L00_00303530(0, 0);
                 temp_a0_6 = D_L01_001B264C + (((UView *)(temp_s4))->i[0xC1] << 7);
                 func_L00_002B9D60(temp_a0_6 + 0x30, temp_a0_6 + 0x70, 0, 1);
@@ -745,7 +745,7 @@ block_149:
         break;
     }
         temp_f1 = func_L01_003BAFB0();
-        if ((((UView *)(arg0))->b[0x95] != 0) && (((HeroV *)D_00189E20)->z < (temp_f1 - 1.8f)) && (((HeroV *)D_00189E20)->z < (((UView *)(arg0))->f[0x6] - 1.0f)) && (func_00282E80(arg0 + 0x10, &((HeroV *)D_00189E20)->x) < 10.0f)) {
+        if ((((UView *)(arg0))->b[0x95] != 0) && (((HeroV *)D_00189E20)->z < (temp_f1 - 1.8f)) && (((HeroV *)D_00189E20)->z < (((UView *)(arg0))->f[0x6] - 1.0f)) && (vec_distance_xy(arg0 + 0x10, &((HeroV *)D_00189E20)->x) < 10.0f)) {
             func_L00_002B30E8();
         }
         func_L01_003C0140(arg0);

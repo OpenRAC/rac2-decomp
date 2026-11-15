@@ -78,7 +78,7 @@ void func_L01_002B7360(void)
         float speed;
         PlayerDriveView *hero = &D_00189E20;
         if (D_00189E20.frame > 54) {
-            func_002AA2E8((float *)(&D_00189E20.recoveryRate), 0.0069444445f, 0.0019444445f);
+            ApproachValue((float *)(&D_00189E20.recoveryRate), 0.0069444445f, 0.0019444445f);
         }
         if (D_00189E20.frame <= 54) speed = D_00189E20.recoverySpeed;
         else speed = 0.058333337f;
@@ -93,13 +93,13 @@ void func_L01_002B7360(void)
         }
         if (13.0f <= D_00189E20.plane && D_00189E20.plane <= 30.0f) {
             if (27.0f < D_00189E20.plane)
-                func_002AA2E8((float *)(&D_00189E20.lateralSpeed), 0.0f, 0.0022222223f);
-            else func_002AA2E8((float *)(&D_00189E20.lateralSpeed), 0.033333335f, 0.0022222223f);
+                ApproachValue((float *)(&D_00189E20.lateralSpeed), 0.0f, 0.0022222223f);
+            else ApproachValue((float *)(&D_00189E20.lateralSpeed), 0.033333335f, 0.0022222223f);
         }
         local.f[0] = D_00189E20.lateralSpeed;
         local.f[1] = 0.0f;
-        local.f[2] = func_00282DB0(&D_00189E20.velocity, &D_00189E20.basis);
-        func_00283098(&D_00189E20.velocity, &local, &D_00189E20);
+        local.f[2] = FastVecDot(&D_00189E20.velocity, &D_00189E20.basis);
+        matrix_mul_vec3(&D_00189E20.velocity, &local, &D_00189E20);
     } else if (state == 11) {
         D_00189E20.heading = D_00189E20.targetHeading;
         qcopy(&D_00189E20.direction, &D_00189E20.targetDirection);
@@ -109,12 +109,12 @@ void func_L01_002B7360(void)
         if (D_00189E20.useCurrentSpeed != 0) {
             float rate = D_00189E20.animationSpeed * 0.083333336f;
             if (rate < 0.033333335f) rate = 0.033333335f;
-            func_002AA2E8((float *)(&D_00189E20.strafeSpeed), rate, 0.010277778f);
+            ApproachValue((float *)(&D_00189E20.strafeSpeed), rate, 0.010277778f);
             D_00189E20.targetSpeed = D_00189E20.planarDistance;
         } else {
             if (D_00189E20.allowAction != 0 && D_00189E20.actionFrame <= 11)
-                func_002AA2E8((float *)(&D_00189E20.strafeSpeed), 0.0f, 0.0022222223f);
-            else func_002AA2E8((float *)(&D_00189E20.strafeSpeed), 0.07f, 0.0022222223f);
+                ApproachValue((float *)(&D_00189E20.strafeSpeed), 0.0f, 0.0022222223f);
+            else ApproachValue((float *)(&D_00189E20.strafeSpeed), 0.07f, 0.0022222223f);
         }
         if (D_00189E20.axisMode == 0) {
             ((float *)&D_00189E20.velocity)[0] = func_00283180(D_00189E20.inputHeading);
@@ -125,10 +125,10 @@ void func_L01_002B7360(void)
             func_L00_002D3BD8(&local, &D_00189E20.localDirection, D_00189E20.strafeSpeed);
             func_L00_002D3B58(&local.q, &local.q, 0.0f);
             func_L00_002D3BD8(&D_00189E20.velocity, &D_00189E20.velocity, 0.0f);
-            func_00282CC0(&D_00189E20.velocity, &D_00189E20.velocity, &local);
+            FastVecAdd(&D_00189E20.velocity, &D_00189E20.velocity, &local);
         }
         if (D_00189E20.axisMode == 0 && D_00189E20.useCurrentSpeed == 0) {
-            float angle = func_00283C80(D_00189E20.targetHeading, D_00189E20.inputHeading);
+            float angle = FastDiffRots(D_00189E20.targetHeading, D_00189E20.inputHeading);
             float cosine = func_00283198(angle);
             float amount = D_00189E20.inputSpeed * cosine;
             float component = func_00283180(D_00189E20.targetHeading);
@@ -150,8 +150,8 @@ void func_L01_002B7360(void)
                 ((float *)&D_00189E20.velocity)[1] *= 0.08166667f;
             } else {
                 func_L00_002D3BD8(&D_00189E20.velocity, &D_00189E20.velocity, 0.0f);
-                func_00282F20(&local, &D_00189E20.direction, 0.08166667f);
-                func_00282CC0(&D_00189E20.velocity, &D_00189E20.velocity, &local);
+                vec_scale_to_length(&local, &D_00189E20.direction, 0.08166667f);
+                FastVecAdd(&D_00189E20.velocity, &D_00189E20.velocity, &local);
             }
         }
         D_00189E20.targetSpeed = D_00189E20.planarDistance;
@@ -180,7 +180,7 @@ void func_L01_002B7360(void)
                 if (D_00189E20.mode == 2) {
                     float rate = D_00189E20.pendingDamping;
                     smoothed = func_L00_002D3A58((char *)&D_00189E20.velocity);
-                    func_002AA2E8(&smoothed, 0.0f, rate);
+                    ApproachValue(&smoothed, 0.0f, rate);
                     func_L00_002D3BD8(&D_00189E20.velocity, &D_00189E20.velocity, smoothed);
                     return;
                 }

@@ -139,9 +139,9 @@ void func_L06_003D0EE0(char *obj) {
     frame.normal.q = 0;
     frame.normal.f[2] = 1.0f;
     qcopy(&frame.old, position);
-    func_00282CC0(position, position, ctx);
+    FastVecAdd(position, position, ctx);
     func_002AFFD8(position, &frame.surface, 0);
-    func_00282D30(&frame.surface, &frame.surface, 0.0003055556f);
+    FastVecScale(&frame.surface, &frame.surface, 0.0003055556f);
     func_L00_0038F3D8(obj);
     frame.packet.moby = obj;
     frame.packet.flags = 0x830000;
@@ -157,7 +157,7 @@ void func_L06_003D0EE0(char *obj) {
     frame.packet.vector.f[2] = 1.0f;
     frame.packet.active = 1;
     (*(int *)(ctx + 0x14))++;
-    if (func_002761F8(&frame.old, position, 0x10, obj, &frame.packet)) {
+    if (CollLine(&frame.old, position, 0x10, obj, &frame.packet)) {
         collision = &D_L06_001BFC80;
         hit = collision->hit;
         if (hit) {
@@ -176,8 +176,8 @@ void func_L06_003D0EE0(char *obj) {
                 qcopy(dest, source);
             }
             func_00283028(&frame.velocity, ctx, &reread->normal);
-            func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-            func_00282F20(&frame.normal, &reread->normal, 1.0f);
+            vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+            vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
         } else {
             collision = &D_L06_001BFC80;
             if (collision->count <= 0)
@@ -185,12 +185,12 @@ void func_L06_003D0EE0(char *obj) {
             obj[0xBC] = 1;
             qcopy(position, &collision->point);
             func_00283028(&frame.velocity, ctx, &collision->normal);
-            func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-            func_00282F20(&frame.normal, &collision->normal, 1.0f);
+            vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+            vec_scale_to_length(&frame.normal, &collision->normal, 1.0f);
         }
     } else if (func_00282948(ctx + 0x18)) {
         obj[0xBC] = 1;
-        func_00282CC0((char *)&frame.velocity, (char *)&frame.velocity, ctx);
+        FastVecAdd((char *)&frame.velocity, (char *)&frame.velocity, ctx);
     }
 finish:
     if (*(unsigned char *)(obj + 0xBC)) {
@@ -254,7 +254,7 @@ Moby *func_L06_003F3448(Moby *parent, Quad *position)
     state = parent->state;
     result = 0;
     child = 0;
-    if (func_002A8600(&child, state->group, 1, 1) == 0) {
+    if (GetFirstMobyInGroup(&child, state->group, 1, 1) == 0) {
         state->count++;
         {
             Moby *spawned = child;
@@ -305,7 +305,7 @@ Moby *func_L06_003F3448(Moby *parent, Quad *position)
             record->value = (float)record->limit;
         }
     } else {
-        func_0026FEB8(D_L06_001AF990, parent->fB2, D_L06_001B2348[0]);
+        STUB_printf(D_L06_001AF990, parent->fB2, D_L06_001B2348[0]);
     }
     return result;
 }
@@ -333,7 +333,7 @@ void func_L06_003F3690(char *a0, char *a1)
             *(unsigned char *)(a1 + 0x57) = 0x5A;
             func_002AB800(a0, a1 + 0x50);
         } else {
-            func_002A6C58(a0, 0, 3);
+            SetDeathBits(a0, 0, 3);
             *(unsigned char *)(a0 + 0x20) = 2;
             *(unsigned char *)(a1 + 0x57) = 0x78;
             func_002AB800(a0, a1 + 0x50);
@@ -436,30 +436,30 @@ void func_L06_00401820(Moby *moby)
             if (state->level == 0) {
                 func_002A7750(moby, 3, -1);
                 if (!func_002E59B0(moby, state->sound))
-                    state->sound = func_002E5CF8(0, 4, moby);
+                    state->sound = PlayMobySound(0, 4, moby);
             } else {
                 func_002A7750(moby, 2, -1);
                 if (!func_002E59B0(moby, state->sound))
-                    state->sound = func_002E5CF8(1, 4, moby);
+                    state->sound = PlayMobySound(1, 4, moby);
             }
         }
         if (D_00189E20.position[2] < 55.0f && state->level == 0) {
             if (!func_002E59B0(moby, state->sound))
-                state->sound = func_002E5CF8(0, 4, moby);
+                state->sound = PlayMobySound(0, 4, moby);
             func_002A7750(moby, 3, -1);
         } else if (D_00189E20.position[2] > 57.0f && state->level == 1 &&
-                   func_002ACBC8(D_00189E20.position, state->zone)) {
+                   IsPointInCuboid(D_00189E20.position, state->zone)) {
             if (!func_002E59B0(moby, state->sound))
-                state->sound = func_002E5CF8(1, 4, moby);
+                state->sound = PlayMobySound(1, 4, moby);
             func_002A7750(moby, 2, -1);
         }
         break;
     case 2:
-        if (func_00282E48(moby->position, state->home) > 0.04f) {
+        if (fast_vec_dist(moby->position, state->home) > 0.04f) {
             movement[0] = func_00283180(moby->rotation[2] + 1.57079649f) * 0.05f;
             movement[1] = func_00283198(moby->rotation[2] + 1.57079649f) * 0.05f;
             movement[2] = 0.0f;
-            func_00282CC0(moby->position, moby->position, movement);
+            FastVecAdd(moby->position, moby->position, movement);
             if (state->step < 104)
                 moby->position[2] += 0.07f;
             state->step++;
@@ -482,13 +482,13 @@ void func_L06_00401820(Moby *moby)
     case 3:
         if (moby->position[2] >= 50.75f) {
             if (moby->position[2] < 53.0f &&
-                func_002ACBC8(D_00189E20.position, state->zone) &&
+                IsPointInCuboid(D_00189E20.position, state->zone) &&
                 D_00189E20.position[2] < moby->position[2])
                 break;
             movement[0] = func_00283180(moby->rotation[2] - 1.57079649f) * 0.05f;
             movement[1] = func_00283198(moby->rotation[2] - 1.57079649f) * 0.05f;
             movement[2] = 0.0f;
-            func_00282CC0(moby->position, moby->position, movement);
+            FastVecAdd(moby->position, moby->position, movement);
             if (state->step >= 61)
                 moby->position[2] -= 0.07f;
             state->step++;
@@ -518,7 +518,7 @@ stop:
     }
     state->sound = -1;
 done:
-    func_00282CF0(movement, moby->position, oldPosition);
+    FastVecSub(movement, moby->position, oldPosition);
     func_002AD6F0(state->tracker, movement, oldRotation, moby->rotation);
 }
 

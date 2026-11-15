@@ -137,17 +137,17 @@ void func_L00_003B69D8(NODE *a0)
     int i;
 
     slots = a0->f68;
-    func_L00_003B6B70();
+    UpdatePairedActorMovement();
     v = (char *)slots;
     func_L00_003B6F88(a0);
     q = v + 0x10;
     p = slots;
     for (i = 1; i >= 0; i--) {
-        func_00283098((char *)*p + 0x10, q, D_L00_001B8FF0);
+        matrix_mul_vec3((char *)*p + 0x10, q, D_L00_001B8FF0);
         q += 0x10;
-        func_00282CC0((char *)*p + 0x10, (char *)*p + 0x10, D_L00_001B8FF0 - 0x230);
+        FastVecAdd((char *)*p + 0x10, (char *)*p + 0x10, D_L00_001B8FF0 - 0x230);
         v = (char *)*p + 0xF0;
-        func_002833F0((char *)*p + 0xC0, v);
+        euler_rotation_basis((char *)*p + 0xC0, v);
         func_002A0F48(*p);
         p++;
     }
@@ -249,7 +249,7 @@ void func_L00_003B8158(NODE *a0)
 
 
 /* Picks a target: the hero's current one while it is live; else, of the class 0xEE1 mobies
-   func_002AF580 finds, the preferred one (while controller 1 holds a button of the hero's
+   SelectBestTargetInCone finds, the preferred one (while controller 1 holds a button of the hero's
    buttonMask) or the first one in range. */
 Moby *func_L00_003B8E58(void *origin, void *direction, Moby *preferred,
                         float angle0, float angle1, float range, float angle2, float angle3)
@@ -272,7 +272,7 @@ Moby *func_L00_003B8E58(void *origin, void *direction, Moby *preferred,
             return D_00189E20.target;
     }
 
-    func_002AF580(origin, direction, &count, candidates, 20, 0, 0, 0,
+    SelectBestTargetInCone(origin, direction, &count, candidates, 20, 0, 0, 0,
                   angle0, angle1, range, angle2, angle3);
 
     /* The preferred moby first. */
@@ -285,7 +285,7 @@ Moby *func_L00_003B8E58(void *origin, void *direction, Moby *preferred,
                 vars = candidate->vars;
                 if ((vars->flags3B1 & 0x80) && vars->f20 > 0.0f) {
                     if (vars->maxDistance == 0.0f
-                        || func_00282E80(origin, candidate->position) < vars->maxDistance)
+                        || vec_distance_xy(origin, candidate->position) < vars->maxDistance)
                         return candidate;
                 }
             }
@@ -300,7 +300,7 @@ Moby *func_L00_003B8E58(void *origin, void *direction, Moby *preferred,
             fallbackVars = fallback->vars;
             if ((fallbackVars->flags3B1 & 0x80) && fallbackVars->f20 > 0.0f) {
                 if (fallbackVars->maxDistance == 0.0f
-                    || func_00282E80(origin, fallback->position) < fallbackVars->maxDistance)
+                    || vec_distance_xy(origin, fallback->position) < fallbackVars->maxDistance)
                     return fallback;
             }
         }

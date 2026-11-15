@@ -20,8 +20,8 @@ void func_L16_00395C00(char *object)
         *(float *)(state+0x38)=0.2094395459f;
     } else if (*(float *)(state+0x38)<-0.2094395459f) *(float *)(state+0x38)=-0.2094395459f;
     if (func_00282C48(*(float *)(state+0x38)) <= 0.00174532947f) return;
-    func_00282F20(&local.quaternion,object+0xe0,func_00283198(*(float *)(state+0x38)*0.5f));
+    vec_scale_to_length(&local.quaternion,object+0xe0,func_00283198(*(float *)(state+0x38)*0.5f));
     ((float *)&local.quaternion)[3]=func_00283180(*(float *)(state+0x38)*0.5f);
-    func_00283958(&local.quaternion,local.matrix);
-    func_00283738(object+0xc0,local.matrix,object+0xc0);
+    quaternion_to_rotation_basis(&local.quaternion,local.matrix);
+    multiply_matrix3x3(object+0xc0,local.matrix,object+0xc0);
 }

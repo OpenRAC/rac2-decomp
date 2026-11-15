@@ -77,15 +77,15 @@ void func_L00_002ABBA0(void)
                 info = func_002AB1F0(obj);
                 if (!info)
                     continue;
-                distance = func_00282E80(D_00189E20.pos, obj + 0x10);
+                distance = vec_distance_xy(D_00189E20.pos, obj + 0x10);
                 if ((unsigned char)info[0x28] < distance)
                     continue;
                 angle = func_00283248(*(float *)(obj + 0x10) - D_00189E20.pos[0],
                                      *(float *)(obj + 0x14) - D_00189E20.pos[1]);
-                angle = func_00283C80(angle, D_00189E20.heading);
+                angle = FastDiffRots(angle, D_00189E20.heading);
                 if (angle > 1.9198623895645142f)
                     continue;
-                pitch = func_00282E80(obj + 0x10, D_00189E20.pos);
+                pitch = vec_distance_xy(obj + 0x10, D_00189E20.pos);
                 pitch = func_00283248(pitch, D_00189E20.pos[2] - *(float *)(obj + 0x18));
                 pitch = func_00282C48(pitch);
                 if (pitch > 1.047197699546814f)
@@ -110,7 +110,7 @@ void func_L00_002ABBA0(void)
             func_L00_002D36E0(0, 0, 1.2f, a, 1);
             qcopy(b, D_00189E20.target + 0x10);
             func_L00_002D3778(b, b, 0.5f);
-            if (func_002761F8(a, b, 2, 0, 0))
+            if (CollLine(a, b, 2, 0, 0))
                 D_00189E20.target = 0;
         }
     }
@@ -133,8 +133,8 @@ void func_L00_002ABBA0(void)
         else
             func_L00_002D36E0(0.3f, 0, 0.85f, b, 1);
         yaw = func_00283248(a[0] - b[0], a[1] - b[1]);
-        yaw = func_00283BE0(yaw, D_00189E20.heading);
-        pitch = func_00282E80(a, b);
+        yaw = fast_subtract_rotations(yaw, D_00189E20.heading);
+        pitch = vec_distance_xy(a, b);
         pitch = func_00283248(pitch, b[2] - a[2]);
         if (yaw > 1.0297443866729736f)
             yaw = 1.0297443866729736f;

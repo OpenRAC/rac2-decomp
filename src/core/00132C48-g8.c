@@ -26,14 +26,14 @@ int func_00132C48(int cmd, int size, void *arg) {
     for (i = 0; i < size; i++) D_001A70C0[i] = data[i];
     goto check;
     do {
-        func_00132028();
+        snd_Pump();
         func_0011AEA0(0);
 check:;
     } while (D_001A7480 != 0);
     func_001322B8(D_001A7080, 1);
     while (func_0011D810(D_001A7040) != 0) {
         if (D_001A74F8 == 0) func_00115D48(D_001A7578);
-        func_00132028();
+        snd_Pump();
         func_0011AEA0(0);
     }
     if (size != 0)

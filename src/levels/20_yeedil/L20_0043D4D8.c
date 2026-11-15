@@ -55,7 +55,7 @@ void func_L20_0043D4D8(unsigned char *object) {
     case 1:
         if ((unsigned)object[0xBC] != *(unsigned int *)(state + 0x7C)) {
             if (!*(unsigned char **)(state + 0x88)) {
-                if (!(*(unsigned char **)(state + 0x88) = func_0029EFD0(*(short *)(object + 0xAA))))
+                if (!(*(unsigned char **)(state + 0x88) = CreateMoby(*(short *)(object + 0xAA))))
                     goto clone_failed;
             }
             {
@@ -76,10 +76,10 @@ clone_failed:
     case 2:
         if (func_002B3868(object)) *(int *)(state + 0x78) = (int)(*(float *)(state + 0x70) / *(float *)(state + 0x74));
         if (!func_00282948((int *)(state + 0x78))) {
-            *(float *)(object + 0xF8) = func_00283B98(*(float *)(object + 0xF8), *(float *)(state + 0x74));
+            *(float *)(object + 0xF8) = FastAddRotations(*(float *)(object + 0xF8), *(float *)(state + 0x74));
             slot = *(int *)(state + 0x90) * 0x70 + D_00188660;
             if (*(unsigned char **)(slot + 0x88) != object || !slot[0x74])
-                *(int *)(state + 0x90) = func_002E5CF8(1, 4, (char *)object);
+                *(int *)(state + 0x90) = PlayMobySound(1, 4, (char *)object);
         } else {
             object[0xBC] = *(unsigned char *)(state + 0x7C);
             func_002A7750(object, 1, -1);
@@ -101,7 +101,7 @@ clone_failed:
         func_L00_002D7140(*(unsigned char **)(state + 0x84));
         *(int *)(state + 0x80) = 0;
     }
-    func_00282CF0(&delta, object + 0x10, &oldPosition);
+    FastVecSub(&delta, object + 0x10, &oldPosition);
     func_002AD6F0(state + 0x20, &delta, &oldRotation, object + 0xF0);
     child = *(unsigned char **)(state + 0x88);
     if (child) {
@@ -112,9 +112,9 @@ clone_failed:
             *(unsigned char **)(state + 0x88) = 0;
         } else {
             *(Quadword *)(child + 0xF0) = *(Quadword *)(object + 0xF0);
-            func_00282CF0(&offset, &D_L20_001B9FC0, object + 0x10);
-            func_00282D30(&offset, &offset, 0.01f);
-            func_00282CC0(*(unsigned char **)(state + 0x88) + 0x10, &offset, object + 0x10);
+            FastVecSub(&offset, &D_L20_001B9FC0, object + 0x10);
+            FastVecScale(&offset, &offset, 0.01f);
+            FastVecAdd(*(unsigned char **)(state + 0x88) + 0x10, &offset, object + 0x10);
             func_002A0F48(*(unsigned char **)(state + 0x88));
         }
     }

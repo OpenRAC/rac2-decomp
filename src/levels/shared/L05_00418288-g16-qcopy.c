@@ -1,7 +1,7 @@
 #include "common.h"
 
 /* D_L05_001B34E0 is read both ways: its first float through $gp (the _gp view, also the address passed to
-   func_002833F0), the other fields absolutely. */
+   euler_rotation_basis), the other fields absolutely. */
 typedef struct { float x, y, z; int flags; } Rotation;
 typedef struct { float x, y, z, w; } Vector;
 typedef struct { Vector rows[3]; } Matrix;
@@ -28,21 +28,21 @@ void func_L05_00418288(char *object)
     char *position = object + 0x10;
     char *output = entry + 0x10;
     D_L05_001B34E0.flags = 0;
-    D_L05_001B34E0_gp.x = func_00283B98(D_L05_001B34E0_gp.x, 0.1f);
-    D_L05_001B34E0.y = func_00283B98(D_L05_001B34E0.y, 0.09f);
-    D_L05_001B34E0.z = func_00283B98(D_L05_001B34E0.z, 0.11f);
+    D_L05_001B34E0_gp.x = FastAddRotations(D_L05_001B34E0_gp.x, 0.1f);
+    D_L05_001B34E0.y = FastAddRotations(D_L05_001B34E0.y, 0.09f);
+    D_L05_001B34E0.z = FastAddRotations(D_L05_001B34E0.z, 0.11f);
     func_00282C88(&value);
     value.x = 0.4f;
-    func_002833F0(&rotation, &D_L05_001B34E0_gp);
-    func_00283098(&value, &value, &rotation);
-    func_00282CC0(&value, &value, position);
+    euler_rotation_basis(&rotation, &D_L05_001B34E0_gp);
+    matrix_mul_vec3(&value, &value, &rotation);
+    FastVecAdd(&value, &value, position);
     qcopy(output, &value);
     *(float *)(entry + 0x1C) = 3.0f;
     if (D_L05_001B3500 > 0.0f) {
-        func_00282D90(&D_L05_001B34F0, &D_L05_001B34F0, D_L05_001B3500);
-        func_00282CF0(&D_L05_001B34F0, &D_L05_001B34F0, position);
-        func_00282F20(&D_L05_001B34F0, &D_L05_001B34F0, 5.0f);
-        func_00282CC0(&D_L05_001B34F0, &D_L05_001B34F0, position);
+        divide_vector_xyz(&D_L05_001B34F0, &D_L05_001B34F0, D_L05_001B3500);
+        FastVecSub(&D_L05_001B34F0, &D_L05_001B34F0, position);
+        vec_scale_to_length(&D_L05_001B34F0, &D_L05_001B34F0, 5.0f);
+        FastVecAdd(&D_L05_001B34F0, &D_L05_001B34F0, position);
         qcopy(output, &D_L05_001B34F0);
         *(float *)(entry + 0x1C) = 10.0f;
     } else {

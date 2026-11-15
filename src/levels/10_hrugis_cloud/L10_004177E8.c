@@ -39,16 +39,16 @@ void func_L10_004177E8(char *object, int joint, float radius) {
         speed = func_002A7878(radius * 2 * 0.01666666753590107f, radius * 0.0666666701436043f);
         tilt = func_002A78D8(0.6981317996978760f, 0.8726646900177002f);
     }
-    yaw = func_00283B98(heading, func_002A78D8(0, 1.5707964897155762f));
+    yaw = FastAddRotations(heading, func_002A78D8(0, 1.5707964897155762f));
     func_002AF000(velocity, speed, yaw, tilt);
-    particle = func_002BDCE8(0, 1.0f, 1.01f, radius * 210000.0f,
+    particle = SpawnSpinningSparkParticle(0, 1.0f, 1.01f, radius * 210000.0f,
                              point, -one, velocity, 0x101010, 0);
     if (particle != 0) {
         particle[3] = 0x44;
         *(short *)(particle + 0xA) = func_002A7820(40, 70);
-        particle[9] = func_00283CF0(4.0f) + 0x60;
+        particle[9] = FloatToInt(4.0f) + 0x60;
         data = particle + 0x20;
-        *(float *)(data + 0x1C) = func_00283CE0(func_002A7820(1, 10));
+        *(float *)(data + 0x1C) = IntToFloat(func_002A7820(1, 10));
         *(int *)(data + 4) = 3;
         data[0xA] = 0x7F;
         data[0xB] = particle[0xA];

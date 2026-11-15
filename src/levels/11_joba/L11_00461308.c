@@ -1,7 +1,7 @@
 /* func_L11_00461308: a Joba moby's state machine with a companion moby (class 0xCF6).
    State 0 spawns the companion; 1 sets or clears flag bits 0x41 on both from a level flag
-   and waits on its linked moby's state and func_002ACBC8; 2 makes three
-   func_L11_003DD068 calls with randomised directions; 3 waits for func_002ACBC8 to clear.
+   and waits on its linked moby's state and IsPointInCuboid; 2 makes three
+   func_L11_003DD068 calls with randomised directions; 3 waits for IsPointInCuboid to clear.
    In states 1-3 it oscillates its height, places the companion at its offset and emits
    three particles.
    Built -O2 -G0 in its own unit. The random bounds are a two-float block: the lower is
@@ -52,7 +52,7 @@ void func_L11_00461308(char *p)
     float t, sn, cs;
     switch ((unsigned char)p[0x20]) {
     case 0:
-        P(s,0x10)=func_0029EFD0(0xCF6);
+        P(s,0x10)=CreateMoby(0xCF6);
         F(s,0x14)=0; F(s,0x18)=0;
         if(P(s,0x10)) {
             func_002B37E8(P(s,0x10),0);
@@ -74,7 +74,7 @@ void func_L11_00461308(char *p)
         I(p,0x98)=I(P(p,0x24),0x10);
         ready=1;
         if(I(s,0xC)!=-1) { char *m=D_L11_001B359C[0]+(I(s,0xC)<<8); ready=0; if((unsigned char)m[0x20]!=3) ready=active; }
-        if (ready && func_002ACBC8(D_00189EA0,I(s,0)))
+        if (ready && IsPointInCuboid(D_00189EA0,I(s,0)))
             func_002A7750(p,2,-1);
         break;
     case 2:
@@ -88,7 +88,7 @@ void func_L11_00461308(char *p)
             tmp[1]=t+t-1.0f;
             t+=0.333f;
             *(TI128 *)dir=*(TI128 *)tmp;
-            func_002830C0(dir,dir,D_L11_001B368C[0]+(I(s,4)<<7));
+            transform_vector(dir,dir,D_L11_001B368C[0]+(I(s,4)<<7));
             {
                 float high = D_L11_001B2388_block[1];
                 float low = D_L11_001B2388;
@@ -99,11 +99,11 @@ void func_L11_00461308(char *p)
         break;
     case 3:
         active=1;
-        if(!func_002ACBC8(D_00189EA0,I(s,0))) func_002A7750(p,1,-1);
+        if(!IsPointInCuboid(D_00189EA0,I(s,0))) func_002A7750(p,1,-1);
         break;
     }
     if(active) {
-        F(s,0x14)=func_00283B98(F(s,0x14),0.034906592f);
+        F(s,0x14)=FastAddRotations(F(s,0x14),0.034906592f);
         sn=func_00283180(F(s,0x14));
         cs=func_00283198(F(s,0x14));
         F(p,0x18)-=F(s,0x18);
@@ -112,12 +112,12 @@ void func_L11_00461308(char *p)
         F(p,0xF4)+=cs*0.0015f;
         F(p,0xF0)+=sn*0.0015f;
         *(TI128 *)(P(s,0x10)+0xF0)=*(TI128 *)(p+0xF0);
-        func_00282D30(v,p+0xE0,1.46f);
-        func_00282CC0(P(s,0x10)+0x10,p+0x10,v);
+        FastVecScale(v,p+0xE0,1.46f);
+        FastVecAdd(P(s,0x10)+0x10,p+0x10,v);
         func_002A05A8(P(s,0x10));
         func_002A0F48(P(s,0x10));
-        func_00282D30(v,p+0xE0,0.59f);
-        func_00282CC0(pos,p+0x10,v);
+        FastVecScale(v,p+0xE0,0.59f);
+        FastVecAdd(pos,p+0x10,v);
         v[0]=v[1]=0.0f;
         v[2]=-(func_002A7878(2.25f,3.5f)*(1.0f/60.0f));
         func_L00_0033C0D0(p,pos,v,D_L11_001B2378,1);

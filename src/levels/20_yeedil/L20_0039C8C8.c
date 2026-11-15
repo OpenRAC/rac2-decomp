@@ -31,31 +31,31 @@ void func_L20_0039C8C8(float *p)
     char *r;
     char *q;
 
-    func_00282CF0((char *)v, D_L20_001B9FC0, (char *)p);
+    FastVecSub((char *)v, D_L20_001B9FC0, (char *)p);
     ang = func_00283248(v[0], v[1]);
 
     for (i = 19; i >= 0; i--) {
         f = func_002A7878(0.2f, 3.0f);
-        func_00282D30((char *)dir, D_0018A0E0, -(f * 0.01666666753590107f));
-        id = func_00283CF0(func_002A78D8(1.0f, 2.0f));
+        FastVecScale((char *)dir, D_0018A0E0, -(f * 0.01666666753590107f));
+        id = FloatToInt(func_002A78D8(1.0f, 2.0f));
         f = func_002A7878(0.3f, 0.75f) * 210000.0f;
         out[0] = p[0] + func_002A78D8(0.0f, 0.2f);
         out[1] = p[1] + func_002A78D8(0.0f, 0.2f);
         out[2] = p[2] + func_002A78D8(0.0f, 0.2f);
-        r = func_002BDCE8((char *)out, 0.0f, 1.0f, 1.01f, f, id, (char *)dir, 0x7F202020, 0);
+        r = SpawnSpinningSparkParticle((char *)out, 0.0f, 1.0f, 1.01f, f, id, (char *)dir, 0x7F202020, 0);
         if (r != 0) {
             q = r + 32;
             *(unsigned char *)(r + 3) = 0x44;
             *(short *)(r + 10) = 0x5A;
-            *(unsigned char *)(r + 9) = func_00283CF0(4.0f) + 0x40;
-            *(float *)(q + 0x1C) = func_00283CE0(5);
+            *(unsigned char *)(r + 9) = FloatToInt(4.0f) + 0x40;
+            *(float *)(q + 0x1C) = IntToFloat(5);
             *(int *)(q + 4) = 3;
             *(unsigned char *)(q + 0xA) = 0x30;
             *(unsigned char *)(q + 0xB) = *(unsigned char *)(r + 10);
         }
         scale = func_002A7878(1.0f, 2.0f);
         mag = func_002A7878(0.0f, 1.396263599395752f);
-        angle = func_00283B98(ang, func_002A78D8(0.0f, 1.396263599395752f));
+        angle = FastAddRotations(ang, func_002A78D8(0.0f, 1.396263599395752f));
         func_002AF000(dir, scale * 0.01666666753590107f, angle, mag);
         out[0] = p[0] + func_002A78D8(0.0f, 0.1f);
         out[1] = p[1] + func_002A78D8(0.0f, 0.1f);

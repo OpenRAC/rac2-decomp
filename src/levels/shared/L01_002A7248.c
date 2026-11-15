@@ -564,8 +564,8 @@ void func_L01_002B0318(void)
     int i;
 
     hero = (HeroState *)D_00189E20;
-    if (hero->f22B8 && hero->f22BA && !func_L00_002D4040(-1))
-        func_L00_002AF7D0();
+    if (hero->f22B8 && hero->f22BA && !get_ammo(-1))
+        cancel_hero_item_animation();
     for (i = 0; i < 2; i++) {
         HeroState *player = (HeroState *)D_00189E20;
         Moby **slot = &player->attached[i];
@@ -573,7 +573,7 @@ void func_L01_002B0318(void)
         if (*slot) {
             (*slot)->buffer0 = D_L01_001B7B00 + i * 0xC00;
             (*slot)->buffer1 = D_L01_001B7B00 + 0x600 + i * 0xC00;
-            weaponId = func_L00_002ADEA0(0);
+            weaponId = hero_slot_item_id(0);
             if (weaponId == player->weaponId) {
                 weapon = &((WeaponInfo *)D_L01_002637A0)[D_00139568[weaponId]];
                 animation = weapon->animation;
@@ -581,25 +581,25 @@ void func_L01_002B0318(void)
                     animation = weapon->altAnimation;
                 if (animation != -1 && (*slot)->animation != animation) {
                     player->animation = animation;
-                    func_L00_00311080(player->moby, *slot, animation, 0, 8, 1);
+                    initialize_moby_animation_blend(player->moby, *slot, animation, 0, 8, 1);
                 }
             }
             {
                 HeroState *owner = (HeroState *)D_00189E20;
 
-                func_L00_00310D30(owner->moby, *slot);
+                AdvanceAndDecodeAnimationFrames(owner->moby, *slot);
                 if (owner->attachedMode) {
                     if (owner->attachedMode == 2)
-                        func_002AA2E8(&(*slot)->fade, 0.0f, 0.25f);
+                        ApproachValue(&(*slot)->fade, 0.0f, 0.25f);
                     else
-                        func_002AA2E8(&(*slot)->fade, 0.0f, 0.07f);
+                        ApproachValue(&(*slot)->fade, 0.0f, 0.07f);
                     hero = (HeroState *)D_00189E20;
                     if ((*slot)->fade == 0.0f) {
-                        func_L00_00310C88(hero->moby, slot);
+                        release_moby_animation_slot(hero->moby, slot);
                         return;
                     }
                 } else {
-                    func_002AA2E8(&(*slot)->fade, 1.0f, 0.2f);
+                    ApproachValue(&(*slot)->fade, 1.0f, 0.2f);
                     if (((*slot)->flags & 2) && !owner->f22BA) {
                         owner->attachedMode = 1;
                         (*slot)->f28 = 0;
@@ -621,10 +621,10 @@ void func_L01_002B0318(void)
         func_00282C88(&state->f760);
     }
     state->f760 = 1.0f;
-    func_00283098(&state->f760, &state->f760, matrix);
+    matrix_mul_vec3(&state->f760, &state->f760, matrix);
     state->f770.quad = state->position;
     if (!state->f22C3)
-        state->f770.v[2] = func_00283B98(state->f770.v[2], 0.0f);
+        state->f770.v[2] = FastAddRotations(state->f770.v[2], 0.0f);
 }
 
 extern void func_L00_002AF7D0(void);
@@ -642,9 +642,9 @@ extern char D_00189E20[];
 void func_L01_002B3458(int a0, int a1, int a2) {
     char *s0 = D_00189E20;
 
-    func_L00_002AF7D0();
+    cancel_hero_item_animation();
     s0[0x22B6] = 1;
-    func_L00_002B1F90();
+    UpdateHeroSlotCallbacks();
     *(int *)(s0 + 0x2290) = *(int *)(s0 + 0xC18);
     func_L00_00322EC8(s0 + 0x18E0);
     func_L00_00322EC8(s0 + 0x1A30);
@@ -673,7 +673,7 @@ void func_L01_002B3458(int a0, int a1, int a2) {
         func_002A677C(*(int *)(s2 + 0x2290));
         *(unsigned short *)(s2 + 0x24F2) = a1;
     }
-    func_L01_002BEB90(a1, 2);
+    SetHeroMoveState(a1, 2);
 }
 
 
@@ -709,28 +709,28 @@ void func_L01_002B4DA0(int force)
     }
     func_L00_002D36E0(origin, 0, 0, height, 1);
     func_L00_002D36E0(lowOrigin, 0, 0, height * 0.3f, 1);
-    if (force || func_00282E20(velocity) < 0.01f) {
-        func_00282F20(endpoint, base, radius);
-        func_00282F20(farEndpoint, base, radius * 1.4f);
+    if (force || vec_length_xy(velocity) < 0.01f) {
+        vec_scale_to_length(endpoint, base, radius);
+        vec_scale_to_length(farEndpoint, base, radius * 1.4f);
     } else {
         func_L00_002D3B58(endpoint, velocity, 0);
-        func_00282F20(endpoint, endpoint, radius);
-        func_00282D30(farEndpoint, endpoint, 1.4f);
+        vec_scale_to_length(endpoint, endpoint, radius);
+        FastVecScale(farEndpoint, endpoint, 1.4f);
     }
-    func_00282CC0(endpoint, endpoint, origin);
+    FastVecAdd(endpoint, endpoint, origin);
     material = -1;
-    func_00282CC0(farEndpoint, farEndpoint, lowOrigin);
+    FastVecAdd(farEndpoint, farEndpoint, lowOrigin);
     {
         char *hero = D_L01_00189E20;
 
-        if (func_002761F8(lowOrigin, farEndpoint, 2, ((ProbeHero *)hero)->moby, 0) && D_L01_001BF91C > 0)
-            material = func_00278E78();
+        if (CollLine(lowOrigin, farEndpoint, 2, ((ProbeHero *)hero)->moby, 0) && D_L01_001BF91C > 0)
+            material = GetCollHitMaterial();
     }
     slope = 0;
     {
         char *hero = D_L01_00189E20;
 
-        if (func_002761F8(origin, endpoint, 2, ((ProbeHero *)hero)->moby, 0) && D_L01_001BF900.count > 0)
+        if (CollLine(origin, endpoint, 2, ((ProbeHero *)hero)->moby, 0) && D_L01_001BF900.count > 0)
             slope = func_L00_002D3EA8(D_L01_001BF900.normal);
     }
     if (slope >= 0.8726647f || material == 8 || material == 12) {
@@ -739,11 +739,11 @@ void func_L01_002B4DA0(int force)
 
         *(void **)(hero + 0x270) = D_L01_001BF900.moby;
         func_L00_002D3B58(D_L01_001BF900.normal, D_L01_001BF900.normal, 0);
-        func_00282F20(D_L01_001BF900.normal, D_L01_001BF900.normal, 1);
-        dot = func_00282DB0(D_L01_001BF900.normal, hero + 0xF0);
+        vec_scale_to_length(D_L01_001BF900.normal, D_L01_001BF900.normal, 1);
+        dot = FastVecDot(D_L01_001BF900.normal, hero + 0xF0);
         if (dot < 0) {
-            func_00282D30(D_L01_001BF900.normal, D_L01_001BF900.normal, -dot);
-            func_00282CC0(hero + 0xF0, hero + 0xF0, D_L01_001BF900.normal);
+            FastVecScale(D_L01_001BF900.normal, D_L01_001BF900.normal, -dot);
+            FastVecAdd(hero + 0xF0, hero + 0xF0, D_L01_001BF900.normal);
         }
     }
 }
@@ -793,13 +793,13 @@ void func_L01_002E1510(char *a0, int a1, char *a2, int a3, char *a4) {
         p = a0 + 0x20;
         n = a1;
         for (; n != 0; n--) {
-            func_00283098(p, p, a2);
+            matrix_mul_vec3(p, p, a2);
             p += 0x90;
-            func_00283098(q, q, a2);
+            matrix_mul_vec3(q, q, a2);
             q += 0x90;
         }
     }
-    func_00283738(buf, a2, a2);
+    multiply_matrix3x3(buf, a2, a2);
     for (i = 0; i < a3; i++) {
         int k = (i & 1) ? 2 : 0;
         if (a1 > 0) {
@@ -808,12 +808,12 @@ void func_L01_002E1510(char *a0, int a1, char *a2, int a3, char *a4) {
             r = a0;
             n = a1;
             while (n != 0) {
-                func_00283098(q, q, buf);
+                matrix_mul_vec3(q, q, buf);
                 n--;
                 q += 0x90;
-                func_00283098(p, p, buf);
+                matrix_mul_vec3(p, p, buf);
                 p += 0x90;
-                func_00280B90(r, a4, 1);
+                draw_world_quad(r, a4, 1);
                 r += 0x90;
             }
         }
@@ -862,7 +862,7 @@ void func_L01_002E2608(MotionVec *corners, int texture, int kind, int color, int
         qcopy(&packet.pos[i], &corners[i]);
         packet.pos[i].v[3] = 1;
     }
-    func_00280B90(&packet, 0, 0);
+    draw_world_quad(&packet, 0, 0);
 }
 
 /* func_L01_002EABA8 is defined in L01_002A7248-pre.c. */
@@ -965,7 +965,7 @@ void func_L01_0031AB20(char *m, MotionState *state, int path, float height, floa
     int phase = D_L01_001B2088[0];
 
     if ((phase & 15) == (((int)m >> 8) & 15)) {
-        float dist = func_00282E48(&motionHero.position, m + 0x10);
+        float dist = fast_vec_dist(&motionHero.position, m + 0x10);
 
         if (*(unsigned short *)(m + 0x34) & 0x1000) {
             if (state->distance < dist) {
@@ -979,60 +979,60 @@ void func_L01_0031AB20(char *m, MotionState *state, int path, float height, floa
     if (motionHero.held == m) {
         qcopy(&start, m + 0x10);
         start.v[2] += 0.5f;
-        if (func_002761F8(&start, &motionHero.probeEnd, 2, m, 0)) {
+        if (CollLine(&start, &motionHero.probeEnd, 2, m, 0)) {
             motionHero.held = 0;
         }
-        func_00282CF0(&delta, m + 0x10, &motionHero.position);
-        if (state->frame != -1 && func_002ACBC8(m + 0x10, state->frame)) {
-            func_00283098(&delta, &delta, D_L01_001B264C[0][state->frame].inverse);
+        FastVecSub(&delta, m + 0x10, &motionHero.position);
+        if (state->frame != -1 && IsPointInCuboid(m + 0x10, state->frame)) {
+            matrix_mul_vec3(&delta, &delta, D_L01_001B264C[0][state->frame].inverse);
             delta.v[1] = 0;
-            func_00283098(&delta, &delta, D_L01_001B264C[0][state->frame].forward);
+            matrix_mul_vec3(&delta, &delta, D_L01_001B264C[0][state->frame].forward);
         }
         gain = 4.0f;
         if (state->gain != 0) {
             gain = state->gain;
         }
         func_00282F70(&delta, &delta, gain);
-        func_00282CC0(&delta, &delta, &motionHero.position);
-        func_00282F20(&turn, &motionHero.motion, gain);
-        func_00282CC0(&turn, &turn, &motionHero.position);
+        FastVecAdd(&delta, &delta, &motionHero.position);
+        vec_scale_to_length(&turn, &motionHero.motion, gain);
+        FastVecAdd(&turn, &turn, &motionHero.position);
         turn.v[2] = delta.v[2];
-        func_00282D08(&delta, &delta, &turn, 0.5f);
-        func_00282CF0(&delta, &delta, &motionHero.position);
-        func_00282F20(&delta, &delta, gain);
-        func_00282CC0(&delta, &delta, &motionHero.position);
+        lerp_vector(&delta, &delta, &turn, 0.5f);
+        FastVecSub(&delta, &delta, &motionHero.position);
+        vec_scale_to_length(&delta, &delta, gain);
+        FastVecAdd(&delta, &delta, &motionHero.position);
         if (state->flags & 4) {
-            gain = func_00282E80(m + 0x10, &delta) * 0.5333333611f;
+            gain = vec_distance_xy(m + 0x10, &delta) * 0.5333333611f;
             accel = 0.01388888899f;
             limit = 0.2666666806f;
         } else {
-            gain = func_00282E80(m + 0x10, &delta) * 0.06666667014f;
+            gain = vec_distance_xy(m + 0x10, &delta) * 0.06666667014f;
             accel = 0.00555555569f;
             limit = 0.1333333403f;
         }
         if (limit < gain) {
             gain = limit;
         }
-        func_00282CF0(&target, &delta, m + 0x10);
+        FastVecSub(&target, &delta, m + 0x10);
         target.v[2] = 0;
-        func_00282F20(&target, &target, gain);
-        func_00282CF0(&change, &target, state);
+        vec_scale_to_length(&target, &target, gain);
+        FastVecSub(&change, &target, state);
         func_002AC9F8(&change, accel);
         state->velocity.v[0] += change.v[0];
         state->velocity.v[1] += change.v[1];
     } else {
-        speed = func_00282DF0(state);
-        func_002AA2E8(&speed, 0, 0.002777777845f);
-        func_00282F20(state, state, speed);
+        speed = FastVecLength(state);
+        ApproachValue(&speed, 0, 0.002777777845f);
+        vec_scale_to_length(state, state, speed);
     }
-    if (0.001f < func_00282DF0(state)) {
+    if (0.001f < FastVecLength(state)) {
         if (!(state->flags & 2)) {
             qcopy(&start, m + 0x10);
             qcopy(&delta, m + 0x10);
             start.v[2] += 0.25f;
             delta.v[2] -= 1;
             ground = 0;
-            if (func_002761F8(&start, &delta, 16, m, 0)) {
+            if (CollLine(&start, &delta, 16, m, 0)) {
                 ground = D_L01_001BF928;
             }
             if (*(float *)(m + 0x18) < ground) {
@@ -1042,33 +1042,33 @@ void func_L01_0031AB20(char *m, MotionState *state, int path, float height, floa
                 state->velocity.v[2] -= 0.00555555569f;
             }
         }
-        if (!(state->flags & 4) && func_00282E80(m + 0x10, &motionHero.position) < radius + 2.5f) {
+        if (!(state->flags & 4) && vec_distance_xy(m + 0x10, &motionHero.position) < radius + 2.5f) {
             float toward;
 
-            func_00282CF0(&start, &motionHero.position, m + 0x10);
+            FastVecSub(&start, &motionHero.position, m + 0x10);
             start.v[2] = 0;
-            func_00282F20(&start, &start, 1);
-            toward = func_00282DB0(&start, state);
+            vec_scale_to_length(&start, &start, 1);
+            toward = FastVecDot(&start, state);
             if (0 < toward) {
-                func_00282F20(&delta, &start, -toward);
-                func_00282CC0(state, state, &delta);
+                vec_scale_to_length(&delta, &start, -toward);
+                FastVecAdd(state, state, &delta);
             }
         }
         turn.q = 0;
         turn.v[2] = 0.7853982449f;
-        func_00282CC0(m + 0x10, m + 0x10, state);
+        FastVecAdd(m + 0x10, m + 0x10, state);
         qcopy(&delta, m + 0x10);
         delta.v[2] += 0.25f;
-        func_002833F0(matrix, &turn);
+        euler_rotation_basis(matrix, &turn);
         func_00282F70(&start, state, radius);
         for (i = 0; i < 8; i++) {
-            func_00283098(&start, &start, matrix);
-            func_00282CC0(&samples[i], m + 0x10, &start);
+            matrix_mul_vec3(&start, &start, matrix);
+            FastVecAdd(&samples[i], m + 0x10, &start);
             samples[i].v[2] += 0.25f;
             func_L01_0031B300(m, state, &delta, &samples[i]);
         }
-        func_00282D30(&target, state, 5);
-        func_00282CC0(&target, &target, m + 0x10);
+        FastVecScale(&target, state, 5);
+        FastVecAdd(&target, &target, m + 0x10);
         target.v[2] += radius;
         func_002A8C28(m, &target, 0x4000000, 0, 1, 0, radius + 0.2f, 1, 1);
         qcopy(&change, m + 0x10);
@@ -1080,17 +1080,17 @@ void func_L01_0031AB20(char *m, MotionState *state, int path, float height, floa
         if (path != -1) {
             func_002C9218(path, m + 0x10, m + 0x10, radius);
         }
-        func_00282CF0(&actual, m + 0x10, &old);
-        gain = func_00282E20(&actual);
-        if (gain < func_00282E20(state)) {
+        FastVecSub(&actual, m + 0x10, &old);
+        gain = vec_length_xy(&actual);
+        if (gain < vec_length_xy(state)) {
             state->velocity.v[0] = actual.v[0];
             state->velocity.v[1] = actual.v[1];
         }
-        if (func_00282E20(state) != 0) {
+        if (vec_length_xy(state) != 0) {
             char *sound = D_00188660 + state->sound * 0x70;
 
             if (*(char **)(sound + 0x88) != m || !((unsigned char *)sound)[0x74]) {
-                state->sound = func_002E5CF8(0, 4, m);
+                state->sound = PlayMobySound(0, 4, m);
             }
         } else {
             handle = state->sound;
@@ -1129,7 +1129,7 @@ int func_L01_0031B300(void *a0, void *a1, void *a2, void *a3) {
     char *p;
     int v1;
 
-    if (func_002761F8(a2, a3, 0x10, a0, 0) == 0)
+    if (CollLine(a2, a3, 0x10, a0, 0) == 0)
         goto fail;
     g = (char *)&D_L01_001BF900;
     p = *(char **)(g + 0x18);
@@ -1143,11 +1143,11 @@ int func_L01_0031B300(void *a0, void *a1, void *a2, void *a3) {
     }
     qcopy(&w, g + 0x40);
     h = g + 0x40;
-    func_00282F20(w.f, w.f, 1.0f);
-    func_00282CF0(&v, a3, g + 0x20);
-    f2 = func_00282C48(func_00282DB0(v.f, w.f));
-    func_00282F20(w.f, (float *)h, f2);
-    func_00282CC0(a0 + 0x10, a0 + 0x10, &w);
+    vec_scale_to_length(w.f, w.f, 1.0f);
+    FastVecSub(&v, a3, g + 0x20);
+    f2 = func_00282C48(FastVecDot(v.f, w.f));
+    vec_scale_to_length(w.f, (float *)h, f2);
+    FastVecAdd(a0 + 0x10, a0 + 0x10, &w);
     *(float *)(a0 + 0x18) = f20;
     return 1;
 fail:
@@ -1157,7 +1157,7 @@ fail:
 
 int func_L01_0031BC68(int a0, int a1, float phase) {
     float v = func_00283198(phase);
-    return func_00283D38(a0, a1, v * 0.5f + 0.5f);
+    return FastTweenColor(a0, a1, v * 0.5f + 0.5f);
 }
 
 
@@ -1171,12 +1171,12 @@ void func_L01_003208D0(void *a0, float *a1, int a2) {
     if (p[0x23] == 0 && a2 == 0)
         return;
 
-    r = func_00283B98(*a1, 0.14544412f);
+    r = FastAddRotations(*a1, 0.14544412f);
     *a1 = r;
     r = func_00283198(r);
-    i = func_00283D38(0x8000C020, 0x80008000, (r + 0.5f) * 0.5f);
+    i = FastTweenColor(0x8000C020, 0x80008000, (r + 0.5f) * 0.5f);
     if (func_002A7878(0.0f, 1.0f) < 0.05f)
-        i = func_00283D38(i, 0x8080FFFF, 0.3f);
+        i = FastTweenColor(i, 0x8080FFFF, 0.3f);
     func_002AEC18(a0, i);
 
     if (a2 != 0) {
@@ -1231,7 +1231,7 @@ void func_L01_003209F8(L01Thing *entry, s32 arg1, s32 id, f32 value)
             continue;
         if (D_L01_001B1E60[1] != 0)
             continue;
-        func_0029F978((u8 *)e, arg1, D_L01_001B1E60);
+        AttachManipulator((u8 *)e, arg1, D_L01_001B1E60);
         D_L01_001B1E80[0] = value;
         D_L01_001B1E80[1] = value;
         D_L01_001B1E80[2] = value;
@@ -1477,7 +1477,7 @@ void func_L01_00331CA0(Quad331CA0 *position, int kind, Quad331CA0 *velocity, flo
         }
         p->size = 0x37;
         p->color = (tint << 24) | 0xFFFFFF;
-        p->alpha = func_00283CF0(4.0f) + 0x20;
+        p->alpha = FloatToInt(4.0f) + 0x20;
         p->b1 = 0;
         p->b3 = 0x48;
         p->b2 = D_L01_001FF164[kind];
@@ -1560,11 +1560,11 @@ int func_L01_00337888(PathFollower *follower, Path *path, PathPoint *out, int se
             next = 1;
     } else
         next = segment + direction;
-    func_00282CF0(toNext, &path->points[next], &path->points[segment]);
-    length = func_00282DF0(toNext);
-    func_00282F20(toNext, toNext, 1.0f);
-    func_00282CF0(toFollower, &follower->position, &path->points[segment]);
-    distance = func_00282DB0(toFollower, toNext);
+    FastVecSub(toNext, &path->points[next], &path->points[segment]);
+    length = FastVecLength(toNext);
+    vec_scale_to_length(toNext, toNext, 1.0f);
+    FastVecSub(toFollower, &follower->position, &path->points[segment]);
+    distance = FastVecDot(toFollower, toNext);
     distance += step;
     if (length < distance) {
         last = path->count - 1;
@@ -1577,12 +1577,12 @@ int func_L01_00337888(PathFollower *follower, Path *path, PathPoint *out, int se
                 next = 1;
         } else
             next = segment + direction;
-        func_00282CF0(toNext, &path->points[next], &path->points[segment]);
+        FastVecSub(toNext, &path->points[next], &path->points[segment]);
         distance -= length;
-        func_00282F20(toNext, toNext, 1.0f);
+        vec_scale_to_length(toNext, toNext, 1.0f);
     }
-    func_00282F20(toNext, toNext, distance);
-    func_00282CC0(out, toNext, &path->points[segment]);
+    vec_scale_to_length(toNext, toNext, distance);
+    FastVecAdd(out, toNext, &path->points[segment]);
     return segment;
 }
 
@@ -1702,7 +1702,7 @@ void func_L01_00390A50(char *object)
         if (!flag) {
             if (settings->path != -1) {
                 path = D_L01_001FE180[settings->path];
-                flag = func_002A8AF0((float *)&point, (float *)(path + 0x10), *(int *)path) != 0;
+                flag = point_in_path_xy((float *)&point, (float *)(path + 0x10), *(int *)path) != 0;
             }
         }
         if (!flag) {
@@ -1711,7 +1711,7 @@ void func_L01_00390A50(char *object)
                     goto done;
                 if (settings->volumes[i] == -1)
                     continue;
-                if (func_002ACBC8(&point, settings->volumes[i]))
+                if (IsPointInCuboid(&point, settings->volumes[i]))
                     break;
             }
             goto set;
@@ -1742,7 +1742,7 @@ done:
         }
         for (k = 0; k < 11; k++) {
             if (mobys[k] != -1)
-                func_L01_003907B8(mobys[k], (TriggerSettings *)settings, flag);
+                ApplySpatialTriggerObjectSettings(mobys[k], (TriggerSettings *)settings, flag);
         }
     }
 }
@@ -1784,7 +1784,7 @@ void func_L01_00394148(void)
             continue;
         if (D_L01_001B1E60[1] != 0)
             continue;
-        func_0029F978((u8 *)e, 0, D_L01_001B1E60);
+        AttachManipulator((u8 *)e, 0, D_L01_001B1E60);
         D_L01_001B1E80[0] = 2.1f;
         D_L01_001B1E80[1] = 2.1f;
         D_L01_001B1E80[2] = 2.1f;

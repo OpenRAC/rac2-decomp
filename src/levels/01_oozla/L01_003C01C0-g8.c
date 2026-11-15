@@ -53,7 +53,7 @@ void func_L01_003C01C0(F003C01C0obj *obj)
 
                 /* The cleared local is consumed only by the following call. */
                 qzero_nc(&zero);
-                func_002B1350(obj, (char *)s + 0x60, &zero, 4);
+                ApplyObjectReaction(obj, (char *)s + 0x60, &zero, 4);
                 s->f2e = 3;
                 obj->f95 = 6;
                 obj->fbc = 99;
@@ -77,7 +77,7 @@ void func_L01_003C01C0(F003C01C0obj *obj)
     }
     func_002B3BA8(obj, s->f2f0, 0, 0, 0.0f, 0.0f);
     if (*(char **)((char *)s + 0x2e4)) {
-        func_00282CF0(*(char **)((char *)s + 0x2e4) + 0x20,
+        FastVecSub(*(char **)((char *)s + 0x2e4) + 0x20,
                      (char *)obj + 0x10, D_00189EA0);
         (*(char **)((char *)s + 0x2e4))[0x1f] = 1;
         *(float *)(*(char **)((char *)s + 0x2e4) + 0x10) =
@@ -92,6 +92,6 @@ void func_L01_003C01C0(F003C01C0obj *obj)
     }
     if (*(float *)(D_00189EA0 + 8) < obj->f18 + 20.0f &&
         (unsigned)(obj->f95 - 2) < 5) {
-        func_L01_002F14E8(2, 0, s->f20 / func_00283CE0(s->f24));
+        func_L01_002F14E8(2, 0, s->f20 / IntToFloat(s->f24));
     }
 }

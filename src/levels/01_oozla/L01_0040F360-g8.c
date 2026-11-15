@@ -38,7 +38,7 @@ void func_L01_0040F360(char *a0)
         *(u8 *)(s0 + 0xA8) = 0xFF;
         return;
     case 2:
-        func_00282D30((char *)buf, s0 + 0xD0, -0.06666667f);
+        FastVecScale((char *)buf, s0 + 0xD0, -0.06666667f);
         if (*(u8 *)(s0 + 0x31) != 0 && D_L01_001B2090 < 0.9f &&
             D_L01_001B208C < 0.9f && (current = D_L01_001B3468, current < D_L01_001B15E0)) {
             func_002B0A68(s0, 0x1F, buf, 1.0f, 3.0f, 2.0f, 5.0f, 0xFF);
@@ -46,7 +46,7 @@ void func_L01_0040F360(char *a0)
             func_002B0A68(s0, 5, buf, 1.0f, 3.0f, 2.0f, 5.0f, 0xFF);
         }
         func_L00_00326110(s0, 0.0f, 1);
-        func_002E5CF8(0, 0, s0);
+        PlayMobySound(0, 0, s0);
         func_002A7750(s0, 3, -1);
         return;
     case 3:

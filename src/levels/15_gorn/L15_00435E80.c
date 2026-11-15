@@ -77,7 +77,7 @@ void func_L15_00435E80(u8 *self) {
         owner = func_002ED688(&D_L15_001B261C[0][id]);
         D_L15_001B261C[0][id].x7C = 0x3F;
         GornCopyQuad((char *)&D_L15_001B261C[0][id] + 0x10, state + 0x430);
-        func_00283360(D_L15_001B261C[0][id].rotation);
+        set_identity_rotation_rows(D_L15_001B261C[0][id].rotation);
         *(int *)(state + 0x27C) = 0;
         func_00282C88(state + 0x400);
         self[0x23] = 0x7F;
@@ -90,8 +90,8 @@ void func_L15_00435E80(u8 *self) {
         func_002EE678(&D_L15_001B261C[0][id], 2);
         velocity = owner + 0x90;
         func_002EE920(&D_L15_001B261C[0][id], &path->points[(*(int *)(state + 0x44C))++]);
-        func_00282CF0(velocity, owner + 0x60, (char *)&D_L15_001B261C[0][id] + 0x10);
-        func_00282F20(velocity, velocity, 0.016666668f);
+        FastVecSub(velocity, owner + 0x60, (char *)&D_L15_001B261C[0][id] + 0x10);
+        vec_scale_to_length(velocity, velocity, 0.016666668f);
         *(int *)(owner + 0x130) = 2000000;
         *(int *)(state + 0x450) = 0;
         *(int *)(state + 0x454) = func_002A77E0(2);

@@ -165,8 +165,8 @@ enter_pause:
                 if (distance<best) { PTR(state, 0x750)=entity; best=distance; }
             }
             func_L18_003FB5E8(PTR(state, 0x750), position);
-            func_00282F20(temp, PTR(state, 0x750)+0xD0, -1.0f);
-            func_00282CC0(state+0x700, position, temp);
+            vec_scale_to_length(temp, PTR(state, 0x750)+0xD0, -1.0f);
+            FastVecAdd(state+0x700, position, temp);
         }
         HALF(state, 0x76A)=1;
         if (func_L02_002F21C0(object+0x10, state+0x700)<0.25f) {
@@ -192,8 +192,8 @@ enter_pause:
         hit=func_002B1C20(object, state+0x60);
         if ((object[0x42]==9 && func_002A77E0(30)==0) || (hit&1)) {
                 if (object[0x94]==6) func_L18_003FA908(WORD(object, 0xB8));
-                func_002A6C58(object, 0, 3);
-                func_002ABBB8(object, D_L18_001A8F20, object+0x10, 0.0f, 0.0f, 20, 0, 10,
+                SetDeathBits(object, 0, 3);
+                SpawnExplosionEffects(object, D_L18_001A8F20, object+0x10, 0.0f, 0.0f, 20, 0, 10,
                              0.0f, 0.0f, 9.0f, 1.0f, -1, 3.0f, 1, 5, -1, 0, 0x810001);
                 if (HALF(state, 0x76E)>=4) func_0029F338(object);
                 else { HALF(state, 0x76E)++; func_L18_003F8FA8(object); }

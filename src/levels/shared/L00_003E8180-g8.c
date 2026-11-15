@@ -87,7 +87,7 @@ void func_L00_003E8180(ChargeWeaponMoby *obj) {
     case 0: {
         int i;
         if (obj->animation != 0 || (obj->flags&2)) func_002A7470(obj,1,0,0);
-        func_0029F978(obj,0,&st->origin);
+        AttachManipulator(obj,0,&st->origin);
         st->timer=0.36666667f;
         st->unknown=-1;
         st->charge=0;
@@ -96,7 +96,7 @@ void func_L00_003E8180(ChargeWeaponMoby *obj) {
         D_L00_001B2B70.reticle=-1.0f;
         D_L00_001B06D0=0;
         D_L00_001B06B8=0;
-        st->handle=func_L00_00329E90(obj,0,&unused);
+        st->handle=AcquireEntitySlot(obj,0,&unused);
         st->anim=func_L00_0032A088(H(obj,0xAA),st->handle);
         for (i=0;i<4;i++) {
             D_L00_0024F7C0[i].values[0]=0; D_L00_0024F7C0[i].values[1]=0; D_L00_0024F7C0[i].values[2]=0;
@@ -129,7 +129,7 @@ void func_L00_003E8180(ChargeWeaponMoby *obj) {
             if (!func_00282948(&D_00189E20.timer)) enabled=0;
             {
                 unsigned int color;
-                if (st->timer!=0 && func_L00_002D4040(-1)) color=0x600000FF;
+                if (st->timer!=0 && get_ammo(-1)) color=0x600000FF;
                 else color=0x600FFF0F;
                 func_00273318(obj,color,1,0,0,38,-1,90,4);
             }
@@ -137,18 +137,18 @@ void func_L00_003E8180(ChargeWeaponMoby *obj) {
         func_0029FCC0(obj,0,&origin);
         if (D_00189E20.held) func_L00_0032A1A8(D_00189E20.held,&origin,&velocity,speed);
         else hit=func_L00_00324E48(&D_00189E20.camera,1,0.17453295f,0.17453295f,20,0.7853982448577881f,0.7853982448577881f);
-        if (st->timer==0 && hit && func_L00_002D4040(-1)) {
+        if (st->timer==0 && hit && get_ammo(-1)) {
             char *extra;
             /* The copy only writes target; no scalar local or source field aliases it. */
             qcopy_nc(&target,hit+0x10);
             extra=func_002AB1F0(hit);
             if (extra) {
                 func_002AFFD8(hit+0x10,&delta,1);
-                func_00282D30(&delta,&delta,F(extra,0x10));
-                func_00282CC0(&target,&delta,hit+0x10);
+                FastVecScale(&delta,&delta,F(extra,0x10));
+                FastVecAdd(&target,&delta,hit+0x10);
             }
             {
-                float scale=func_00282C48(0.9f-func_00282E48(D_L00_001B8DC0,&target)*0.006666667f*0.65f);
+                float scale=func_00282C48(0.9f-fast_vec_dist(D_L00_001B8DC0,&target)*0.006666667f*0.65f);
                 func_00273318(obj,0xFF0FFF0F,scale,&target,0,38,-1,90,4);
             }
         }
@@ -156,7 +156,7 @@ void func_L00_003E8180(ChargeWeaponMoby *obj) {
             if ((D_00138180.pressed&D_00189E20.mask) && enabled && !func_L00_003CBBD0() && D_00189E20.frame>=23) {
                 if (func_L00_002D3F30(-1,1)) {
                     D_L00_001B2B70.active=1;
-                    func_002E5CF8(2,0,obj);
+                    PlayMobySound(2,0,obj);
                     switch (D_L00_001B06D0) {
                     case 0:
                         D_L00_001B06D0=1; st->charge=D_L00_001B06C4; st->timer=0.5f;
@@ -166,7 +166,7 @@ void func_L00_003E8180(ChargeWeaponMoby *obj) {
                         break;
                     }
                 } else if ((D_00138180.released&D_00189E20.mask) || D_L00_001B2B70.active==1) {
-                    func_002E5CF8(7,0,obj); D_L00_001B2B70.active=0;
+                    PlayMobySound(7,0,obj); D_L00_001B2B70.active=0;
                 }
             }
         }
@@ -181,8 +181,8 @@ void func_L00_003E8180(ChargeWeaponMoby *obj) {
             st->charge+=D_L00_001B06BC;
             if (st->charge>D_L00_001B06CC) {
                 func_0029FCC0(obj,0,&target);
-                if (D_00189E20.direction==1) func_00282F20(&velocity,(char *)obj+0xD0,-speed);
-                else func_00282F20(&velocity,&D_00189E20.camera,speed);
+                if (D_00189E20.direction==1) vec_scale_to_length(&velocity,(char *)obj+0xD0,-speed);
+                else vec_scale_to_length(&velocity,&D_00189E20.camera,speed);
                 count=func_00277F48(&target,0,obj,0,1.0f);
                 for(i=0;i<count;i++) {
                     char *candidate=D_L00_001C3280[i];
@@ -191,11 +191,11 @@ void func_L00_003E8180(ChargeWeaponMoby *obj) {
                     qcopy(&point,candidate+0x10);
                     if (details) {
                         func_L00_003252A8(candidate,&delta,1);
-                        func_00282D30(&delta,&delta,F(details,0x10));
-                        func_00282CC0(&point,&delta,&point);
+                        FastVecScale(&delta,&delta,F(details,0x10));
+                        FastVecAdd(&point,&delta,&point);
                     }
-                    func_00282CF0(&velocity,&point,&target);
-                    func_00282F20(&velocity,&velocity,speed);
+                    FastVecSub(&velocity,&point,&target);
+                    vec_scale_to_length(&velocity,&velocity,speed);
                     break;
                 }
                 if (hit) {
@@ -204,13 +204,13 @@ void func_L00_003E8180(ChargeWeaponMoby *obj) {
                     extra=func_002AB1F0(hit);
                     if (extra) {
                         func_002AFFD8(hit+0x10,&point,1);
-                        func_00282D30(&point,&point,F(extra,0x10));
-                        func_00282CC0(&delta,&point,hit+0x10);
+                        FastVecScale(&point,&point,F(extra,0x10));
+                        FastVecAdd(&delta,&point,hit+0x10);
                     }
-                    func_00282CF0(&velocity,&delta,&target);
-                    func_00282F20(&velocity,&velocity,speed);
+                    FastVecSub(&velocity,&delta,&target);
+                    vec_scale_to_length(&velocity,&velocity,speed);
                 }
-                D_L00_001B06D4=func_L00_003CB980(obj,st->handle,&target,&velocity);
+                D_L00_001B06D4=SpawnParticlePoolMoby(obj,st->handle,&target,&velocity);
                 if (D_L00_001B06D4) *(ChargeWeaponMoby **)(D_L00_001B06D4+0xB8)=obj;
                 D_L00_001B06D8=50; D_L00_001B06D0=2;
             }
@@ -221,7 +221,7 @@ void func_L00_003E8180(ChargeWeaponMoby *obj) {
             break;
         }
         if (B(obj,0x31)) ref_L00_003E8180_00(func_L00_003E8A98,obj);
-        st->angle=func_00283BE0(st->angle,st->charge*0.3141593f);
+        st->angle=fast_subtract_rotations(st->angle,st->charge*0.3141593f);
         st->sine=func_00283198(st->angle*0.5f);
         st->cosine=func_00283180(st->angle*0.5f);
         break;

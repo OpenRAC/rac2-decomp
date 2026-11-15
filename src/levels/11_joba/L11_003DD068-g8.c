@@ -24,7 +24,7 @@ u8 *func_L11_003DD068(u8 *arg0, u8 *arg1, u8 *arg2, f32 arg3) {
     u8 *s2 = arg1;
     u8 *s3 = arg2;
     f32 f21 = arg3;
-    u8 *s1 = func_0029EFD0(0xA77);
+    u8 *s1 = CreateMoby(0xA77);
 
     if (s1 != 0) {
         u8 *v1;
@@ -40,10 +40,10 @@ u8 *func_L11_003DD068(u8 *arg0, u8 *arg1, u8 *arg2, f32 arg3) {
         *(f32 *)(s1 + 0x2C) = *(f32 *)(v1 + 0x24) * D_L11_001B016C;
         *(u16 *)(s1 + 0x34) |= 0x5000;
         *dst = *(TI128 *)s2;
-        func_00282CF0((f32 *)s0, (f32 *)s3, (f32 *)s2);
+        FastVecSub((f32 *)s0, (f32 *)s3, (f32 *)s2);
         *(s32 *)(s0 + 0x8) = 0;
-        f20 = func_00282DF0((f32 *)s0) / D_L11_001B0168;
-        func_00282F20((f32 *)s0, (f32 *)s0, f20);
+        f20 = FastVecLength((f32 *)s0) / D_L11_001B0168;
+        vec_scale_to_length((f32 *)s0, (f32 *)s0, f20);
         *(f32 *)(s0 + 0x8) = func_L00_0031CDD0((char *)s2, (char *)s3, 0, f20, -f21);
         *(f32 *)(s0 + 0xC) = f21;
     }

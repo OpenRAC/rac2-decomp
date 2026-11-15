@@ -58,19 +58,19 @@ void func_L15_00434610(char *object, int flag) {
         *(int *)(state + 0x444) = 300;
         for (i = *(int *)(state + 0x440) * 3; i < *(int *)(state + 0x440) * 3 + 3; i++) {
             qcopy_nc(point, D_L15_002B6CF0 + i * 16);
-            func_00283098(point, point, object + 0xC0);
-            func_00282CC0(point, point, object + 0x10);
-            spawn = func_L05_0037B440(0x957, 1);
+            matrix_mul_vec3(point, point, object + 0xC0);
+            FastVecAdd(point, point, object + 0x10);
+            spawn = SpawnFreeLevelObjectById(0x957, 1);
             if (spawn) {
                 data = (char *)func_002ED688((unsigned char *)spawn);
                 qcopy_nc(spawn + 0x10, point);
-                func_00282F20(spawn + 0xC0, object + 0xD0, *(int *)(state + 0x440) ? -1.0f : 1.0f);
+                vec_scale_to_length(spawn + 0xC0, object + 0xD0, *(int *)(state + 0x440) ? -1.0f : 1.0f);
                 qcopy_nc(data + 0x90, spawn + 0xC0);
-                func_00282DD8(spawn + 0xD0, spawn + 0xC0, z);
-                func_00282F20(spawn + 0xD0, spawn + 0xD0, 1.0f);
-                func_00282DD8(spawn + 0xE0, spawn + 0xD0, spawn + 0xC0);
-                func_00282D30(data + 0x60, spawn + 0xC0, 10.0f);
-                func_00282CC0(data + 0x60, spawn + 0x10, data + 0x60);
+                FastVecCross(spawn + 0xD0, spawn + 0xC0, z);
+                vec_scale_to_length(spawn + 0xD0, spawn + 0xD0, 1.0f);
+                FastVecCross(spawn + 0xE0, spawn + 0xD0, spawn + 0xC0);
+                FastVecScale(data + 0x60, spawn + 0xC0, 10.0f);
+                FastVecAdd(data + 0x60, spawn + 0x10, data + 0x60);
                 *(int *)(data + 0x130) = 500;
             }
         }
@@ -79,8 +79,8 @@ void func_L15_00434610(char *object, int flag) {
     if (*(int *)(state + 0x264)) {
         for (j = 0; j < 6; j++) {
             qcopy_nc(point, D_L15_002B6CF0 + j * 16);
-            func_00283098(point, point, object + 0xC0);
-            func_00282CC0(point, point, object + 0x10);
+            matrix_mul_vec3(point, point, object + 0xC0);
+            FastVecAdd(point, point, object + 0x10);
         }
     }
     func_L15_00435838(object);
@@ -97,14 +97,14 @@ void func_L15_00434610(char *object, int flag) {
     qcopy_nc(point, object + 0x10);
     point[3] = *(float *)(object + 0xC) * 0.0009765599970705807f;
     if (func_00283DB8(point, 100.0f) != -1 &&
-        func_002761F8(object + 0x10, owner->target + 0x10, 0, object, 0) &&
+        CollLine(object + 0x10, owner->target + 0x10, 0, object, 0) &&
         D_L15_001BFC18[0] && *(short *)(D_L15_001BFC18[0] + 0xAA) == *(short *)(owner->target + 0xAA))
         func_L15_00436298(object);
     if (func_00283DB8(point, 192.0f) != -1 && (unsigned char)object[0x20] != 2)
         func_L15_004363C8(object);
     if (!flag && func_L05_0037B538(object, 1, 1, 1)) {
         object[0x20] = 6;
-        func_002E5CF8(1, 0, object);
+        PlayMobySound(1, 0, object);
         sound = *(int *)(state + 0x458);
         if (sound != -1) {
             entry = (char *)(D_00188660 + sound * 0x70);
@@ -120,15 +120,15 @@ void func_L15_00434610(char *object, int flag) {
         if (*(float *)(state + 0x180) <= 400.0f) {
             *(int *)(state + 0x268) = 0;
             if (!*(int *)(state + 0x45C)) {
-                func_002E5CF8(4, 0, object);
+                PlayMobySound(4, 0, object);
                 *(int *)(state + 0x45C) = 1;
             }
-            n = func_00283CF0(*(float *)(state + 0x180) * 0.02f);
+            n = FloatToInt(*(float *)(state + 0x180) * 0.02f);
             if (n < 7 && n != *(int *)(state + 0x26C)) {
                 func_L05_00424990(object + 0x10, 0, 50, 2.5f, 30, 30, 30, 40, 1, 1, 0, 0);
                 func_0029FCC0(object, D_L15_001B17B0[7-n], matrix);
                 func_L05_00424990(matrix, 0, 50, 2.5f, 30, 30, 30, 40, 1, 1, 0, 0);
-                func_L15_004360D8(object, n-1);
+                SpawnLinkedPart(object, n-1);
             }
             func_L15_00434D28(object);
             *(int *)(state + 0x26C) = n;
@@ -140,15 +140,15 @@ void func_L15_00434610(char *object, int flag) {
         if (*(float *)(state + 0x180) <= 100.0f) {
             *(int *)(state + 0x268) = 0;
             if (!*(int *)(state + 0x45C)) {
-                func_002E5CF8(4, 0, object);
+                PlayMobySound(4, 0, object);
                 *(int *)(state + 0x45C) = 1;
             }
-            n = func_00283CF0(*(float *)(state + 0x180) * 0.08f);
+            n = FloatToInt(*(float *)(state + 0x180) * 0.08f);
             if (n < 7 && n != *(int *)(state + 0x26C)) {
                 func_L05_00424990(object + 0x10, 0, 50, 2.5f, 30, 30, 30, 40, 1, 1, 0, 0);
                 func_0029FCC0(object, D_L15_001B17B0[7-n], matrix);
                 func_L05_00424990(matrix, 0, 50, 2.5f, 30, 30, 30, 40, 1, 1, 0, 0);
-                func_L15_004360D8(object, n-1);
+                SpawnLinkedPart(object, n-1);
             }
             func_L15_00434D28(object);
             *(int *)(state + 0x26C) = n;

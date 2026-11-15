@@ -142,7 +142,7 @@ void func_0029F0C8(void *object, int classId)
         m->unknown63 = 0x18;
     if (m->pClass->sequences[0] == 0)
         return;
-    func_0029F390((u8 *)m);
+    update_moby_animation_state((u8 *)m);
     if (m->pClass->sequences[0]->frameCount >= 2)
         m->flags &= 0xFFFD;
     {

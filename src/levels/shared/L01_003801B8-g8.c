@@ -1,5 +1,5 @@
 /*
- * func_L01_003801B8: draw callback of the light-beam moby (RAC1's draw_vendor_effects,
+ * DrawVendorEffects: draw callback of the light-beam moby (RAC1's draw_vendor_effects,
  * func_L00_002A62D0). Draws four scrolling-UV quads of the beam from the corner tables, then
  * a glow quad that grows and fades with D_L01_001AEF24.
  *
@@ -53,7 +53,7 @@ void func_L01_003801B8(char *m)
     d0[2] = *(float *)(g + 0x158);
     d0[0] = 0.0f;
     d0[1] = 0.0f;
-    func_002833F0(mtx, d0);
+    euler_rotation_basis(mtx, d0);
 
     D_L01_001AEF20 = D_L01_001AEF20 + 0.01f;
     if (1.0f < D_L01_001AEF20) {
@@ -63,17 +63,17 @@ void func_L01_003801B8(char *m)
     pk[2] = 1;
     pk[3] = 0x4000000044L;
     pk[0] = 0;
-    pk[1] = func_0027C878(0x18);
+    pk[1] = GetEffectTextureDescriptor(0x18);
 
     q0 = q[0];
     q1 = q[1];
     q2 = q[2];
     q3 = q[3];
     for (k = 0; k < 4; k++) {
-        func_00283098(q0, D_L01_00290030[D_L01_001AEEE0[k][0]], mtx);
-        func_00283098(q1, D_L01_00290030[D_L01_001AEEE4[k][0]], mtx);
-        func_00283098(q2, D_L01_00290030[D_L01_001AEEE8[k][0]], mtx);
-        func_00283098(q3, D_L01_00290030[D_L01_001AEEEC[k][0]], mtx);
+        matrix_mul_vec3(q0, D_L01_00290030[D_L01_001AEEE0[k][0]], mtx);
+        matrix_mul_vec3(q1, D_L01_00290030[D_L01_001AEEE4[k][0]], mtx);
+        matrix_mul_vec3(q2, D_L01_00290030[D_L01_001AEEE8[k][0]], mtx);
+        matrix_mul_vec3(q3, D_L01_00290030[D_L01_001AEEEC[k][0]], mtx);
 
         qd.v[0][0] = *(float *)(m + 0x10) + q[0][0] * *(float *)(p + 0x90);
         qd.v[0][1] = *(float *)(m + 0x14) + q[0][1] * *(float *)(p + 0x90);
@@ -129,10 +129,10 @@ void func_L01_003801B8(char *m)
         qd.uv[2][1] = D_L01_002900C0[i2][1] + off;
         qd.uv[3][0] = D_L01_002900C0[i3][0];
         qd.uv[3][1] = D_L01_002900C0[i3][1] + off;
-        func_00280B90(&qd, 0, 1);
+        draw_world_quad(&qd, 0, 1);
     }
 
-    pk[1] = func_0027C878(0x1B);
+    pk[1] = GetEffectTextureDescriptor(0x1B);
 
     D_L01_001AEF24 = D_L01_001AEF24 + 0.01f;
     if (1.0f < D_L01_001AEF24) {
@@ -173,11 +173,11 @@ void func_L01_003801B8(char *m)
         d0[0] = 0.0f;
         d0[2] = rz;
         d0[1] = 0.0f;
-        func_002833F0(mtx, d0);
-        func_00283098(q0, &c[0], mtx);
-        func_00283098(q1, &c[1], mtx);
-        func_00283098(q2, &c[2], mtx);
-        func_00283098(q3, &c[3], mtx);
+        euler_rotation_basis(mtx, d0);
+        matrix_mul_vec3(q0, &c[0], mtx);
+        matrix_mul_vec3(q1, &c[1], mtx);
+        matrix_mul_vec3(q2, &c[2], mtx);
+        matrix_mul_vec3(q3, &c[3], mtx);
     }
 
     col = ((int)((1.0f - D_L01_001AEF24) * 128.0f) << 24) | 0x808080;
@@ -205,5 +205,5 @@ void func_L01_003801B8(char *m)
     qd.uv[2][1] = 1.0f;
     qd.uv[3][0] = 1.0f;
     qd.uv[3][1] = 1.0f;
-    func_00280B90(&qd, 0, 1);
+    draw_world_quad(&qd, 0, 1);
 }

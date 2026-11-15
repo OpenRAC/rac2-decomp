@@ -22,27 +22,27 @@ void func_L03_003E4148(u8 *m,u32 c0,u32 c1,void *a,void *b,float phase,int inner
  Packet p,q; Vec matrix[4],axis,step,quat,rotation[3];
  float distance,angle,dt,r; int count,i,j,segment;
  func_00281DE8(&p,D_L03_001B0C1C,0,128);
- func_00283658(matrix,m+0xc0);qcopy(matrix[3],m+0x10);
- func_00282DD8(axis,a,b);count=1;distance=func_00282DB0(a,b);
- angle=func_00282DF0(axis);distance=func_00283248(distance,angle);
- {int n=func_00283CF0(distance*11.45915412902832f);int z=0;if(n>z)count=n;}
+ copy_matrix_rotation(matrix,m+0xc0);qcopy(matrix[3],m+0x10);
+ FastVecCross(axis,a,b);count=1;distance=FastVecDot(a,b);
+ angle=FastVecLength(axis);distance=func_00283248(distance,angle);
+ {int n=FloatToInt(distance*11.45915412902832f);int z=0;if(n>z)count=n;}
  distance/=count;distance*=0.5f;
- func_00282F20(quat,axis,func_00283198(distance));quat[3]=func_00283180(distance);
- func_00283958(quat,rotation);func_00282F20(step,axis,D_L03_001B0C20);
+ vec_scale_to_length(quat,axis,func_00283198(distance));quat[3]=func_00283180(distance);
+ quaternion_to_rotation_basis(quat,rotation);vec_scale_to_length(step,axis,D_L03_001B0C20);
  for(i=0;i<4;i++){
   p.color[i]=c0;p.uv[i][0]=D_L03_001B0C28[i*2]+phase;p.uv[i][1]=D_L03_001B0C2C[i*2];
-  func_00282F20(p.v[i],a,D_L03_001B0C24);
-  if(i&1)func_00282CC0(p.v[i],p.v[i],step);else func_00282CF0(p.v[i],p.v[i],step);
+  vec_scale_to_length(p.v[i],a,D_L03_001B0C24);
+  if(i&1)FastVecAdd(p.v[i],p.v[i],step);else FastVecSub(p.v[i],p.v[i],step);
   p.v[i][3]=1.0f;
  }
- func_00283098(p.v[2],p.v[2],rotation);func_00283098(p.v[3],p.v[3],rotation);
+ matrix_mul_vec3(p.v[2],p.v[2],rotation);matrix_mul_vec3(p.v[3],p.v[3],rotation);
  phase=0;dt=1.0f/count;
  if(innerColor){q=p;{int k;for(k=3;k>=0;k--)q.color[k]=innerColor;}}
  for(segment=0;segment<count;segment++){
-  p.color[0]=p.color[1]=func_00283D38(c0,c1,phase);phase+=dt;
-  p.color[2]=p.color[3]=func_00283D38(c0,c1,phase);
-  func_00280B90(&p,matrix,0);
-  if(innerColor){r=func_002A7878(0.3f,0.9f);func_00282D08(q.v[2],p.v[2],p.v[3],r);func_00282D08(q.v[3],p.v[2],p.v[3],r-0.2f);func_00280B90(&q,matrix,0);{int k;for(k=0;k<2;k++)qcopy(q.v[k],q.v[k+2]);}}
-  {Vec *v=p.v;for(j=3;j>=0;j--){func_00283098(*v,*v,rotation);v++;}}
+  p.color[0]=p.color[1]=FastTweenColor(c0,c1,phase);phase+=dt;
+  p.color[2]=p.color[3]=FastTweenColor(c0,c1,phase);
+  draw_world_quad(&p,matrix,0);
+  if(innerColor){r=func_002A7878(0.3f,0.9f);lerp_vector(q.v[2],p.v[2],p.v[3],r);lerp_vector(q.v[3],p.v[2],p.v[3],r-0.2f);draw_world_quad(&q,matrix,0);{int k;for(k=0;k<2;k++)qcopy(q.v[k],q.v[k+2]);}}
+  {Vec *v=p.v;for(j=3;j>=0;j--){matrix_mul_vec3(*v,*v,rotation);v++;}}
  }
 }

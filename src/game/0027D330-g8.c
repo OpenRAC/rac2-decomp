@@ -32,11 +32,11 @@ void func_0027D330(int frames)
 
             func_00284EA8();
             func_00284F40(1);
-            func_00284FC0();
-            func_002FC560(0x42, 0x8000000044UL);
+            PutDrawBufferSmall();
+            VU1_addGSregister(0x42, 0x8000000044UL);
             q = (i << 7) / (i + 1);
             i--;
-            func_002FC560(1, (unsigned long)(128 - q) << 24);
+            VU1_addGSregister(1, (unsigned long)(128 - q) << 24);
             ref_0027D330_00.words[0] = 0x30000014;
             ref_0027D330_00.words[1] = (int)D_00138990;
             ref_0027D330_00.words[2] = 0;
@@ -45,7 +45,7 @@ void func_0027D330(int frames)
             func_002FC3C0(1);
             func_001261F0(0);
             D_001B1598_GP = D_001B1598 + 1;
-            func_002FC280();
+            SubmitBufferedDmaChain();
             func_002FC220();
         } while (i >= 0);
     }

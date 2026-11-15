@@ -187,9 +187,9 @@ void func_L11_00448DF8(u8 *self)
                 if (e[0x20] != 0xFD) {
                     if (e != self && e[0x20] >= 3 && *(s16 *)(e + 0xAA) == 0xD98 &&
                         *(s16 *)(*(u8 **)(e + 0x68) + 0x366) == 0) {
-                        if (func_00282E80(self + 0x10, e + 0x10) < best_d) {
+                        if (vec_distance_xy(self + 0x10, e + 0x10) < best_d) {
                             best = e;
-                            best_d = func_00282E80(self + 0x10, e + 0x10);
+                            best_d = vec_distance_xy(self + 0x10, e + 0x10);
                         }
                     }
                 }
@@ -230,10 +230,10 @@ void func_L11_00449098(char *object)
         func_0029FCC0(object, 1, end);
         func_L00_0031BDC0(closest, start, end,
                          *(char **)(state + 0x350) + 0x10);
-        func_00282CF0(remaining, closest, end);
-        func_00282CF0(span, start, end);
-        fraction = func_00282DF0(remaining);
-        fraction /= func_00282DF0(span);
+        FastVecSub(remaining, closest, end);
+        FastVecSub(span, start, end);
+        fraction = FastVecLength(remaining);
+        fraction /= FastVecLength(span);
         if (fraction < 0.0f)
             fraction = 0.0f;
         if (fraction > 1.0f)
@@ -242,7 +242,7 @@ void func_L11_00449098(char *object)
                          fraction * 0.35f + 0.15f,
                          (float)*(unsigned char *)(state + 0x34), 1.0f, 0, 1, 0)
             && *(short *)(state + 0x368) == 0) {
-            func_002E5CF8(5, 0, object);
+            PlayMobySound(5, 0, object);
             *(short *)(state + 0x368) = 1;
         }
         func_002A8C28(object, end, 0x10001, 0.5f,
@@ -305,15 +305,15 @@ void func_L11_004496A0(char *object, int mode, int active) {
     func_002B3380(object, state + 0x1F0, state + 0x20);
     if (*(short *)(state + 0x50) != 0) {
         *(short *)(state + 0x50) = 0;
-        func_002A0488(object, *(u8 *)(state + 0x54), *(u8 *)(state + 0x55),
+        set_moby_color(object, *(u8 *)(state + 0x54), *(u8 *)(state + 0x55),
                       *(u8 *)(state + 0x56));
         *(short *)(state + 0x52) = 1;
     }
     if (*(char **)(state + 0x354) != 0) {
-        func_002A04B8(object, &colors[0], &colors[1], &colors[2]);
+        get_moby_color(object, &colors[0], &colors[1], &colors[2]);
         green = colors[1];
         blue = colors[2];
-        func_002A0488(*(char **)(state + 0x354), colors[0], green, blue);
+        set_moby_color(*(char **)(state + 0x354), colors[0], green, blue);
     }
 }
 
@@ -378,7 +378,7 @@ void func_L11_00449970(char *a0, int a1, int a2)
     if (*(u8 *)(s1 + 0x2B1) == 0) {
         s0 = s1 + 0x2B0;
         func_00282A60(s0, 0, 0x40);
-        func_0029F978(a0, 3, s0);
+        AttachManipulator(a0, 3, s0);
         f0 = 1.0e-4f;
         *(u8 *)(s1 + 0x2B2) = 1;
         *(f32 *)(s1 + 0x2D8) = f0;
@@ -495,7 +495,7 @@ void func_L11_0044C328(char *object, int mode, int active) {
     func_002B3380(object, collision, health);
     if (*(short *)(state + 0x50) != 0) {
         *(short *)(state + 0x50) = 0;
-        func_002A0488(object, *(u8 *)(state + 0x54), *(u8 *)(state + 0x55),
+        set_moby_color(object, *(u8 *)(state + 0x54), *(u8 *)(state + 0x55),
                       *(u8 *)(state + 0x56));
         *(short *)(state + 0x52) = 1;
     }
@@ -520,11 +520,11 @@ void func_L11_0044C4F0(char *object) {
     *(short *)(state + 0x4CA) = 0;
     *(int *)(state + 0x490) = 0;
     if (*(u8 *)(object + 0x31) != 0) {
-        func_0032C700(object + 0x10, 0, 0x1E, 5, 5, 5, 0x2D, 1,
+        SpawnExplosion(object + 0x10, 0, 0x1E, 5, 5, 5, 0x2D, 1,
                      0.5f, 0.0f, 1, 0, 0, 0);
         func_002E5DA0(0, 0, object, 0xDF7);
         func_002A7A00(direction, 0.033333335071802139f, 0.083333335816860199f);
-        func_00282CC0(direction, direction, state + 0xD0);
+        FastVecAdd(direction, direction, state + 0xD0);
         func_002B0A68(object, 0x7F0, direction, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
     }
     slot = (char **)(state + 0x4A0);
@@ -559,7 +559,7 @@ void func_L11_0044C818(char *a0)
 
 char *func_L11_00450328(char *a0, TI128 *a1, TI128 *a2, float f12)
 {
-    char *obj = func_0029EFD0(0xDD9);
+    char *obj = CreateMoby(0xDD9);
 
     if (obj != 0) {
         char *st;
@@ -660,7 +660,7 @@ void func_L11_00452C58(char *object, int mode, int active) {
     func_002B3380(object, state + 0x1F0, state + 0x20);
     if (*(short *)(state + 0x50) != 0) {
         *(short *)(state + 0x50) = 0;
-        func_002A0488(object, *(u8 *)(state + 0x54), *(u8 *)(state + 0x55),
+        set_moby_color(object, *(u8 *)(state + 0x54), *(u8 *)(state + 0x55),
                       *(u8 *)(state + 0x56));
         *(short *)(state + 0x52) = 1;
     }
@@ -673,11 +673,11 @@ void func_L11_00452DF8(char *object) {
     *(short *)(state + 0x2D2) = 0;
     *(int *)(state + 0x2C4) = 0;
     if (*(u8 *)(object + 0x31) != 0) {
-        func_0032C700(object + 0x10, 0, 5, 5, 25, 20, 10, 1,
+        SpawnExplosion(object + 0x10, 0, 5, 5, 25, 20, 10, 1,
                      0.5f, 0.0f, 1, 0, 0, 0);
         func_002E5DA0(0, 0, object, 0xDF7);
         func_002A7A00(direction, 0.083333335816860199f, 0.11666667461395264f);
-        func_00282CC0(direction, direction, state + 0xD0);
+        FastVecAdd(direction, direction, state + 0xD0);
         func_002B0A68(object, 0xFF0, direction, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
     }
     func_002A7470(object, 0, 0, 3);

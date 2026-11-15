@@ -91,9 +91,9 @@ void func_L20_004404B8(char *arg0) {
     char *q = arg0 + 0x10;
     char *state = *(char **)(arg0 + 0x68);
 
-    func_00282CC0(q, q, state);
+    FastVecAdd(q, q, state);
     *(float *)(state + 8) = *(float *)(state + 8) - *(float *)(state + 0x14);
-    func_00282D30(state, state, *(float *)(state + 0x10));
+    FastVecScale(state, state, *(float *)(state + 0x10));
     func_002A8C28(*(char **)(arg0 + 0xB8), q, 0x10001, 0,
                   *(float *)(state + 0x18), 3.0f, 1.0f, 1, 0);
     if (func_00282948(state + 0x1C) != 0) {
@@ -133,7 +133,7 @@ void func_L20_004427C8(char *arg0, char *arg1, float f) {
 
     func_002A8C28(arg0, arg0 + 0x10, 0x04010000, 0,
                   *(float *)(state + 0x50) + 0.5f, 50.0f, 1.0f, 1, 0);
-    if (func_00282E80(arg0 + 0x10, arg1) <= *(float *)(state + 0x84)) {
+    if (vec_distance_xy(arg0 + 0x10, arg1) <= *(float *)(state + 0x84)) {
         func_002B50E0(arg0, arg1, f);
     } else {
         func_L01_00321178(arg0, arg1);
@@ -273,16 +273,16 @@ void func_L20_00443908(char *arg0) {
     char *state = *(char **)(arg0 + 0x68);
     Vec4 v[6];
 
-    func_00282CC0(arg0 + 0x10, arg0 + 0x10, state);
+    FastVecAdd(arg0 + 0x10, arg0 + 0x10, state);
     *(float *)(state + 8) = *(float *)(state + 8) - *(float *)(state + 0x20);
     v[2].q = 0;
     v[2].f[2] = 0.5f;
-    func_00283098(&v[0], &v[2], arg0 + 0xC0);
-    func_00283958(state + 0x10, &v[3]);
-    func_00283738(arg0 + 0xC0, &v[3], arg0 + 0xC0);
-    func_00283098(&v[1], &v[2], arg0 + 0xC0);
-    func_00282CF0(&v[2], &v[0], &v[1]);
-    func_00282CC0(arg0 + 0x10, arg0 + 0x10, (char *)&v[2]);
+    matrix_mul_vec3(&v[0], &v[2], arg0 + 0xC0);
+    quaternion_to_rotation_basis(state + 0x10, &v[3]);
+    multiply_matrix3x3(arg0 + 0xC0, &v[3], arg0 + 0xC0);
+    matrix_mul_vec3(&v[1], &v[2], arg0 + 0xC0);
+    FastVecSub(&v[2], &v[0], &v[1]);
+    FastVecAdd(arg0 + 0x10, arg0 + 0x10, (char *)&v[2]);
     if (func_00282948(state + 0x24) != 0) {
         func_0029F338(arg0);
     }
@@ -303,7 +303,7 @@ u8 *func_L20_00443CF0(char *arg0) {
 
     f = 1.0471977f;
     func_L20_00443B60(arg0, (char *)&v0, (char *)&v1, &f);
-    return func_L20_00440198(*(int *)(state + 0x21C), (float *)&v0, (float *)&v1, f);
+    return ActivateGroupMemberAt(*(int *)(state + 0x21C), (float *)&v0, (float *)&v1, f);
 }
 
 extern char *func_L20_00449FD0(char *, char *, char *, float, int, float);
@@ -349,7 +349,7 @@ void func_L20_00444AA8(char *arg0, float *arg1) {
 
     f = func_00283248(arg1[0] - *(float *)(arg0 + 0x10),
                       arg1[1] - *(float *)(arg0 + 0x14));
-    f = func_00283BE0(f, *(float *)(arg0 + 0xF8));
+    f = fast_subtract_rotations(f, *(float *)(arg0 + 0xF8));
     if (f > 1.0471977f) {
         f = 1.0471977f;
     } else if (f < -1.0471977f) {
@@ -413,7 +413,7 @@ c1:
 c2:
     if (func_002B3868(arg0) != 0) {
         *(int *)(state + 0x14) = 0;
-        func_002E5CF8(0, 0, arg0);
+        PlayMobySound(0, 0, arg0);
     }
     func_002AA548(arg0 + 0x10, state + 0x14,
                   *(float *)(state + 0x10) - *(float *)(state + 0x0),
@@ -428,7 +428,7 @@ c3:
     goto out;
 c4:
     if (func_002B3868(arg0) != 0) {
-        func_002E5CF8(0, 0, arg0);
+        PlayMobySound(0, 0, arg0);
         *(int *)(state + 0x14) = 0;
     }
     func_002AA548(arg0 + 0x10, state + 0x14, *(float *)(state + 0x10),
@@ -539,7 +539,7 @@ void func_L20_00446FA8(char *arg0) {
             if (func_L00_00324120(arg0) || (*(float *)(arg0+0x14)-*(float *)(state+0x70))*(D_00189EA4-*(float *)(state+0x70)) < 0.0f) {
                 if (*(int *)(state+0x74)==0) func_002A7750(arg0,2,-1);
                 else func_002A7750(arg0,3,-1);
-                if (!func_002E59B0(arg0,*(int *)(state+0x7C))) *(int *)(state+0x7C)=func_002E5CF8(0,4,arg0);
+                if (!func_002E59B0(arg0,*(int *)(state+0x7C))) *(int *)(state+0x7C)=PlayMobySound(0,4,arg0);
             }
         }
         break;
@@ -576,7 +576,7 @@ void func_L20_00446FA8(char *arg0) {
         } else func_002AA548(arg0+0x14,state+0x68,*(float *)(state+0x64),*(float *)(state+0x6C),*(float *)(state+0x6C),0.20000002f);
         break;
     }
-    func_00282CF0(&delta,arg0+0x10,&pos);
+    FastVecSub(&delta,arg0+0x10,&pos);
     func_002AD6F0(state+0x20,&delta,&rot,arg0+0xF0);
 }
 
@@ -655,7 +655,7 @@ void func_L20_004473B0(char *arg0) {
             *(float *)(state + 0x8C) = -1000.0f;
         }
     }
-    func_00282CF0(&delta, arg0 + 0x10, &pos);
+    FastVecSub(&delta, arg0 + 0x10, &pos);
     func_002AD6F0(state + 0x20, &delta, &rot, arg0 + 0xF0);
 }
 
@@ -668,7 +668,7 @@ extern char D_L20_002AB980[];
 extern void func_L04_003A21F8();
 
 void func_L20_00447908(void) {
-    func_L04_003A21F8(D_L20_002AB980, 6);
+    render_water_grids(D_L20_002AB980, 6);
 }
 
 /* func_L20_00447930 is defined in L20_00447930-g8.c (it reaches data through $gp). */
@@ -689,21 +689,21 @@ void func_L20_00448858(char *arg0) {
     d = *(float *)(state + 8);
     *(float *)(state + 8) = d - (d > 0.0f ? *(float *)(state + 0x20) * 4.0f : *(float *)(state + 0x20));
 
-    func_00282CC0(arg0 + 0x10, arg0 + 0x10, state);
-    *(float *)(arg0 + 0xF0) = func_00283B98(*(float *)(arg0 + 0xF0), *(float *)(state + 0x10));
-    *(float *)(arg0 + 0xF4) = func_00283B98(*(float *)(arg0 + 0xF4), *(float *)(state + 0x14));
-    *(float *)(arg0 + 0xF8) = func_00283B98(*(float *)(arg0 + 0xF8), *(float *)(state + 0x18));
+    FastVecAdd(arg0 + 0x10, arg0 + 0x10, state);
+    *(float *)(arg0 + 0xF0) = FastAddRotations(*(float *)(arg0 + 0xF0), *(float *)(state + 0x10));
+    *(float *)(arg0 + 0xF4) = FastAddRotations(*(float *)(arg0 + 0xF4), *(float *)(state + 0x14));
+    *(float *)(arg0 + 0xF8) = FastAddRotations(*(float *)(arg0 + 0xF8), *(float *)(state + 0x18));
 
     if (func_00277258(arg0 + 0x10, 0, arg0, 1.5f) != 0) {
         char *p = D_L20_001C0430;
 
         qcopy(arg0 + 0x10, p);
-        if (func_00282DB0(state, p + 0x10) < 0.0f) {
-            func_00282F20(p + 0x10, p + 0x10, 1.0f);
-            f = func_00282DF0(state);
-            func_00282D30(v, p + 0x10, -func_00282DB0(state, p + 0x10) * 1.25f);
-            func_00282CC0(state, state, v);
-            func_00282F20(state, state, f * 0.5f);
+        if (FastVecDot(state, p + 0x10) < 0.0f) {
+            vec_scale_to_length(p + 0x10, p + 0x10, 1.0f);
+            f = FastVecLength(state);
+            FastVecScale(v, p + 0x10, -FastVecDot(state, p + 0x10) * 1.25f);
+            FastVecAdd(state, state, v);
+            vec_scale_to_length(state, state, f * 0.5f);
         }
         *(int *)(state + 0x24) = 0;
         if ((unsigned char)arg0[0x23] > 0x60) {

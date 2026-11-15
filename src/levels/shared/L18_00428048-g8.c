@@ -1,5 +1,5 @@
 /* func_L18_00428048 (180 bytes; levels 18, 19, 20): the per-frame tick of an object's
-   controller block: rearms its timer, steps two countdowns (func_00282978 returns a value;
+   controller block: rearms its timer, steps two countdowns (FastDecTimer returns a value;
    declaring the callees void moves the counter into $v0), and hands it on. */
 #include "common.h"
 
@@ -23,8 +23,8 @@ void func_L18_00428048(char *self) {
             *(s16 *)(s0 + 0x390) = func_002A7820(D_L18_001B1258, D_L18_001B125C);
         }
     }
-    func_00282978(s0 + 0x392);
-    func_00282978(s0 + 0x396);
+    FastDecTimer(s0 + 0x392);
+    FastDecTimer(s0 + 0x396);
     *(u16 *)(s0 + 0x394) += 1;
     func_00282948(*(void **)(s0 + 0x3A8));
     if (*(u16 *)(self + 0x96) <= 0xFFFE) {

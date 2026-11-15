@@ -77,13 +77,13 @@ void func_L08_003CD708(SteeringObject *object,char *state,float inputScale)
             func_002AA3A8((float *)(state+0x60),(float *)(state+0x44),targetY,
                           D_L08_001B0030,D_L08_001B0034,limit);
             if (D_L08_001B0140)
-                F(state,0x14)=func_00283BE0(F(state,0x14),(F(state,0x60)*0.0002908882452175021f)*D_L08_001B005C);
+                F(state,0x14)=fast_subtract_rotations(F(state,0x14),(F(state,0x60)*0.0002908882452175021f)*D_L08_001B005C);
             bound=D_L08_001B0004;
         } else {
             func_002AA3A8((float *)(state+0x60),(float *)(state+0x44),targetY,
                           D_L08_001B0040,D_L08_001B0044,limit);
             if (D_L08_001B0140)
-                F(state,0x14)=func_00283BE0(F(state,0x14),(F(state,0x60)*0.0002908882452175021f)*D_L08_001B0060);
+                F(state,0x14)=fast_subtract_rotations(F(state,0x14),(F(state,0x60)*0.0002908882452175021f)*D_L08_001B0060);
             bound=D_L08_001B0008;
         }
         bound*=0.01745329424738884f;
@@ -93,17 +93,17 @@ void func_L08_003CD708(SteeringObject *object,char *state,float inputScale)
         hero=&D_00189E20;
         magnitude=func_00282C48(hero->bank);
         if (magnitude<func_00282C48(F(state,0x60)))
-            func_002AA2E8((float *)(state+0x60),-hero->bank,D_L08_001B0080);
+            ApproachValue((float *)(state+0x60),-hero->bank,D_L08_001B0080);
         else F(state,0x60)=-hero->bank;
         step=(F(state,0x60)*0.01745329424738884f)*D_L08_001B0074;
         if (func_00282C48(F(state,0x60))>0.2f) {
-            value=func_00283BE0(step,F(state,0x14));
+            value=fast_subtract_rotations(step,F(state,0x14));
             bound=D_L08_001B0070*0.0002908882452175021f;
             if (value>bound) value=bound;
             else if (value<-bound) value=-bound;
-            func_002AA2E8((float *)(state+0x44),value,
+            ApproachValue((float *)(state+0x44),value,
                          D_L08_001B0078*(D_00189E20.tickScale*4.848137450608192e-06f));
-            F(state,0x14)=func_00283B98(F(state,0x14),F(state,0x44));
+            F(state,0x14)=FastAddRotations(F(state,0x14),F(state,0x44));
         } else {
             func_002AA898((float *)(state+0x14),0.0f,(float *)(state+0x44),
                           0.010999999940395355f,0.3f,0.01454441249370575f,0);
@@ -116,5 +116,5 @@ update_pitch:
         func_002AA898((float *)(state+0x10),F(state,0x5C)*D_L08_001B004C,
                       (float *)(state+0x40),D_L08_001B0050,D_L08_001B0054,D_L08_001B0058,0);
     if (D_L08_001B0140)
-        F(state,0x18)=func_00283BE0(F(state,0x18),(F(state,0x5C)*0.0002908882452175021f)*D_L08_001B0064);
+        F(state,0x18)=fast_subtract_rotations(F(state,0x18),(F(state,0x5C)*0.0002908882452175021f)*D_L08_001B0064);
 }

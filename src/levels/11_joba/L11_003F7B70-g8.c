@@ -39,7 +39,7 @@ void func_L11_003F7B70(u8 *arg0) {
         /* fall through */
     case 1:
         if (*(s32 *)vars && *(u8 *)(target+0x20) == 2 &&
-            D_L11_001B0808 == func_00283CF0(*(f32 *)(vars+4)*15.0f)) {
+            D_L11_001B0808 == FloatToInt(*(f32 *)(vars+4)*15.0f)) {
             *(u8 *)(self+0x20) = 2;
             *(f32 *)(vars+0xC) = 3.1415927410125732f;
             *(s32 *)(vars+0x10) = 0;
@@ -48,11 +48,11 @@ void func_L11_003F7B70(u8 *arg0) {
     case 2: {
         s32 handle;
         *(f32 *)(vars+0x10) += 0.05235988646745682f;
-        *(f32 *)(vars+0xC) = func_00283B98(*(f32 *)(vars+0xC),0.05235988646745682f);
+        *(f32 *)(vars+0xC) = FastAddRotations(*(f32 *)(vars+0xC),0.05235988646745682f);
         handle = *(s32 *)(vars+0x30);
         entry = D_L11_00188660 + handle * 0x70;
         if (*(u8 **)(entry+0x88) != self || !*(u8 *)(entry+0x74))
-            *(s32 *)(vars+0x30) = func_002E5CF8(0,4,self);
+            *(s32 *)(vars+0x30) = PlayMobySound(0,4,self);
         if (*(f32 *)(vars+0x10) >= 6.2831854820251465f) {
             if (*(u8 *)(target+0x20) != 2) {
                 *(u8 *)(self+0x20) = 1;
@@ -67,8 +67,8 @@ void func_L11_003F7B70(u8 *arg0) {
             *(f32 *)(vars+0xC) = 3.1415927410125732f;
             qcopy(self+0x10,vars+0x20);
         } else {
-            func_00282F20(tmp,self+0xD0,-(func_00283180(*(f32 *)(vars+0xC))+1.0f)*2.2f);
-            func_00282CC0(self+0x10,tmp,vars+0x20);
+            vec_scale_to_length(tmp,self+0xD0,-(func_00283180(*(f32 *)(vars+0xC))+1.0f)*2.2f);
+            FastVecAdd(self+0x10,tmp,vars+0x20);
         }
         break;
     }

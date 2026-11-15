@@ -48,8 +48,8 @@ void func_L08_00429560(s32 unused,s32 slot) {
     if(!func_L02_002F1658()) return;
     first=index*2;
     second=first+1;
-    func_00282CF0(delta,D_L08_001B3A40[index],D_L08_002603E0[index][3]);
-    spacing=func_00282DF0(delta)*0.05f;
+    FastVecSub(delta,D_L08_001B3A40[index],D_L08_002603E0[index][3]);
+    spacing=FastVecLength(delta)*0.05f;
     if(D_L08_001B39A0[index]==2){
         D_L08_001B39A0[index]=3;
         for(j=0;j<20;j++){
@@ -61,14 +61,14 @@ void func_L08_00429560(s32 unused,s32 slot) {
             D_L08_002604A0[second][j][3]=1;
         }
     }
-    D_L08_001B39B0[index]=func_00283B98(D_L08_001B39B0[index],0.17453295f);
-    D_L08_001B39C0[index]=func_00283BE0(D_L08_001B39C0[index],0.80285156f);
-    D_L08_001B39D0[index]=func_00283B98(D_L08_001B39D0[index],0.05236f);
+    D_L08_001B39B0[index]=FastAddRotations(D_L08_001B39B0[index],0.17453295f);
+    D_L08_001B39C0[index]=fast_subtract_rotations(D_L08_001B39C0[index],0.80285156f);
+    D_L08_001B39D0[index]=FastAddRotations(D_L08_001B39D0[index],0.05236f);
     *(Quadword *)(point)=*(Quadword *)(D_L08_002603E0[index][3]);
-    func_00282F20(step,delta,spacing);
+    vec_scale_to_length(step,delta,spacing);
     previous=0;
     advance=0;
-    angleStep=(360.0f/(func_00283CE0(20)*0.5f))*0.017453294f;
+    angleStep=(360.0f/(IntToFloat(20)*0.5f))*0.017453294f;
     for(i=0;i<19;i++){
         half=(advance+spacing)*0.5f;
         height=0;
@@ -82,9 +82,9 @@ void func_L08_00429560(s32 unused,s32 slot) {
             advance=height-previous;
             previous=height;
         }
-        func_00282CC0(point,point,step);
+        FastVecAdd(point,point,step);
         t=(f32)i;
-        weight=(func_00283CE0(i)/func_00283CE0(20))*0.3f+0.1f;
+        weight=(IntToFloat(i)/IntToFloat(20))*0.3f+0.1f;
         wave=func_002ABB18(D_L08_001B39B0[index]+t*angleStep);
         weight=weight*func_00283198(wave);
         p=D_L08_002604A0[first];
@@ -94,12 +94,12 @@ void func_L08_00429560(s32 unused,s32 slot) {
         p[i][2]=weight-height;
     }
     qcopy_nc(basis[3],D_L08_002603E0[index][3]);
-    func_00282CF0(enddelta,D_L08_001B3A40[index],basis[3]);
-    func_00282F20(basis[0],enddelta,1.0f);
-    func_00282DD8(basis[1],basis[0],D_0018A0E0);
-    func_00282F20(basis[1],basis[1],-1.0f);
-    func_00282DD8(basis[2],basis[1],basis[0]);
-    func_002830C0(end,D_L08_002604A0[first][18],basis);
+    FastVecSub(enddelta,D_L08_001B3A40[index],basis[3]);
+    vec_scale_to_length(basis[0],enddelta,1.0f);
+    FastVecCross(basis[1],basis[0],D_0018A0E0);
+    vec_scale_to_length(basis[1],basis[1],-1.0f);
+    FastVecCross(basis[2],basis[1],basis[0]);
+    transform_vector(end,D_L08_002604A0[first][18],basis);
     *(Quadword *)(D_L08_001B3A70[index])=*(Quadword *)(end);
     q=D_L08_002604A0[second];
     for(k=0;k<19;k++){
@@ -123,18 +123,18 @@ void func_L08_00429560(s32 unused,s32 slot) {
     velocity[3]=1;
     velocity[1]=func_002A7878(-1,1);
     velocity[2]=func_002A7878(-1,1);
-    func_00282F20(velocity,velocity,r);
-    func_00283098(velocity,velocity,D_L08_002603E0[index]);
+    vec_scale_to_length(velocity,velocity,r);
+    matrix_mul_vec3(velocity,velocity,D_L08_002603E0[index]);
     func_L08_0034A078(D_L08_002603E0[index][3],velocity,127,D_L08_001B3A30[index]);
     if(!func_002A77E0(3)){
-        func_00282D30(temp,D_L08_002603E0[index],0.3f);
-        func_00282CC0(temp,temp,D_L08_002603E0[index][3]);
+        FastVecScale(temp,D_L08_002603E0[index],0.3f);
+        FastVecAdd(temp,temp,D_L08_002603E0[index][3]);
         effect=func_L08_0034A078(temp,D_L08_001A8F20,127,D_L08_001B3A30[index]);
         if(effect){
             *(s16 *)(effect+10)=4;
             *(f32 *)(effect+12)=120000.0f;
             data=effect+32;
-            *(f32 *)(data+16)=1.0f/func_00283CE0(4);
+            *(f32 *)(data+16)=1.0f/IntToFloat(4);
             *(s32 *)(data+24)=0x7F7F7F;
             if(D_L08_001B3A10[index]==1) *(s16 *)(data+22)=1;
         }
@@ -148,7 +148,7 @@ void func_L08_00429560(s32 unused,s32 slot) {
             *(s16 *)(effect+10)=4;
             *(f32 *)(effect+12)=120000.0f;
             data=effect+32;
-            *(f32 *)(data+16)=1.0f/func_00283CE0(4);
+            *(f32 *)(data+16)=1.0f/IntToFloat(4);
             *(s32 *)(data+24)=0x7F7F7F;
             if(D_L08_001B3A10[index]==1) *(s16 *)(data+22)=2;
         }

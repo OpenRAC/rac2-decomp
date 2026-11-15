@@ -36,17 +36,17 @@ void func_L30_003E1BA0(unsigned char *obj) {
         if(func_002A9640(obj,0x10000,0)) {
             float frameTime=0.016666668f;
             float angleScale;
-            func_00282CF0(f.v,obj+0x10,D_00189EA0);
+            FastVecSub(f.v,obj+0x10,D_00189EA0);
             angleScale=0.00029088825f;
             func_00282F70(f.v,f.v,D_L30_001B0B78*frameTime);
             f.v[2]=D_L30_001B0B7C*frameTime;
             func_00282C98(f.up);
-            func_00282DD8(f.axis,f.v,f.up);
-            func_00282F20(f.axis,f.axis,func_00283198(-D_L30_001B0B80*angleScale));
+            FastVecCross(f.axis,f.v,f.up);
+            vec_scale_to_length(f.axis,f.axis,func_00283198(-D_L30_001B0B80*angleScale));
             f.axis[3]=func_00283180(D_L30_001B0B80*angleScale);
-            func_00283098(f.pos,D_L30_001B0B90,obj+0xC0);
-            func_00282CC0(f.pos,f.pos,obj+0x10);
-            func_L00_003263D0(obj,f.pos,D_L30_001B0BB0,D_L30_001B0BB4,D_L30_001B0BB8,D_L30_001B0BA0,0x50404040,0,D_L30_001B0BBC,D_L30_001B0BC0,D_L30_001B0BC4);
+            matrix_mul_vec3(f.pos,D_L30_001B0B90,obj+0xC0);
+            FastVecAdd(f.pos,f.pos,obj+0x10);
+            SpawnTintedEffects(obj,f.pos,D_L30_001B0BB0,D_L30_001B0BB4,D_L30_001B0BB8,D_L30_001B0BA0,0x50404040,0,D_L30_001B0BBC,D_L30_001B0BC0,D_L30_001B0BC4);
             func_00273978(obj,0,-1,f.v,f.axis,255,15.0f);
             *(int *)(obj+0x98)=0; func_002A7750(obj,2,-1);
         }
@@ -54,7 +54,7 @@ void func_L30_003E1BA0(unsigned char *obj) {
     case 2: if(func_00273B70(obj)) func_002A7750(obj,3,-1); break;
     case 3:
         if(obj[0x23]<2) {
-            qcopy(obj+0x10,D_L30_001B3AE0); func_002833F0(obj+0xC0,D_L30_001B3AF0);
+            qcopy(obj+0x10,D_L30_001B3AE0); euler_rotation_basis(obj+0xC0,D_L30_001B3AF0);
             obj[0x23]=128; *(int *)(obj+0x98)=*(int *)(*(char **)(obj+0x24)+0x10); func_002A7750(obj,1,-1);
         } else obj[0x23]-=2;
         break;

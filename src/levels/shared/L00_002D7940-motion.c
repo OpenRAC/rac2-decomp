@@ -46,12 +46,12 @@ void func_L00_002DA1E0(char *pos, float step)
         *(short *)(obj + 0x8A) = 0;
         return;
     }
-    func_00282CF0(delta, pos, previous);
-    n = func_00283CF0(func_00282DF0(delta) / (step * 0.9f)) + 1;
-    func_00282D90(delta, delta, func_00283CE0(n));
+    FastVecSub(delta, pos, previous);
+    n = FloatToInt(FastVecLength(delta) / (step * 0.9f)) + 1;
+    divide_vector_xyz(delta, delta, IntToFloat(n));
     qcopy(pos, previous);
     for (j = 0; j < n; j++) {
-        func_00282CC0(pos, pos, delta);
+        FastVecAdd(pos, pos, delta);
         i = 0;
         while (i < 6 && func_00277258(pos, D_L00_001B1850, D_00189E20.collision, step) != 0) {
             qcopy(pos, D_L00_001BF230);

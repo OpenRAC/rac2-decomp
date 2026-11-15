@@ -42,18 +42,18 @@ void func_L00_00376600(void) {
     if (*(int *)(scroll + 0x6C) < 0) *(int *)(scroll + 0x6C) += 4;
     else if (*(int *)(scroll + 0x6C) > 0) *(int *)(scroll + 0x6C) -= 4;
     model = D_L00_0022F7C0;
-    pulse = func_00282C30(((*(int *)(model + 4) * 4) & 63) - 32) + 64;
+    pulse = subtract_integer_with_clamp(((*(int *)(model + 4) * 4) & 63) - 32) + 64;
     if (*(int *)(model + 0x144 + *(int *)(model + 0x80) * 12) > 0) {
         shade = pulse * 0x10202;
         outer_top = (int)(D_L00_001B25E0[0] * 123.0f + 0.5f);
         outer_bottom = (int)(D_L00_001B25E0[0] * 179.0f + 0.5f);
         outer_top += D_001A7B90[0] ? 4 : 0; outer_bottom += D_001A7B90[0] ? 4 : 0;
-        func_00285548(101, outer_top, 157, outer_bottom, D_001A7340[0], D_001A7344[0],
+        DrawFramebufferRect(101, outer_top, 157, outer_bottom, D_001A7340[0], D_001A7344[0],
                       shade | 0x80000000u);
         inner_top = (int)(D_L00_001B25E0[0] * 125.0f + 0.5f);
         inner_bottom = (int)(D_L00_001B25E0[0] * 177.0f + 0.5f);
         inner_top += D_001A7B90[0] ? 4 : 0; inner_bottom += D_001A7B90[0] ? 4 : 0;
-        func_00285548(103, inner_top, 155, inner_bottom, D_001A7340[0], D_001A7344[0], 0x80442D00);
+        DrawFramebufferRect(103, inner_top, 155, inner_bottom, D_001A7340[0], D_001A7344[0], 0x80442D00);
     }
     x = *(int *)(model + 0x6C) - 63;
     for (relative = -3; relative < 5; relative++, x += 56) {
@@ -62,7 +62,7 @@ void func_L00_00376600(void) {
         if (slot < 0) continue;
         if (slot >= *(int *)(loop_model + 0x740)) continue;
         tint = 0xF0F0B0;
-        handle = func_0028E588(*(int *)(D_L00_0022F7C0 + 0x140 + slot * 12), 0);
+        handle = GetIconFrame(*(int *)(D_L00_0022F7C0 + 0x140 + slot * 12), 0);
         distance = func_001234F0(150.0f - (float)(x + 2));
         if (func_00123028(distance, 0.0) < 0) distance = func_00122A98(0.0, distance);
         first_alpha = 128 - func_00123130(distance);

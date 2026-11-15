@@ -298,7 +298,7 @@ void func_003116E8(SupportMoby *moby) {
     vars->flags |= 4;
     if (group == 0xFF) {
         if (moby->oclass == 0x1F4 && func_002A77E0(2) != 0 && moby->rotation[0] == 0.0f && moby->rotation[1] == 0.0f) {
-            moby->rotation[2] = func_00283B98(moby->rotation[2], 1.5707964897155762f);
+            moby->rotation[2] = FastAddRotations(moby->rotation[2], 1.5707964897155762f);
         }
         if ((moby->oclass == 0x1F5 || moby->oclass == 0x200) && moby->mission != 0xFF && D_001A73E0[moby->mission] < vars->death_count) {
             func_0029F338(moby);
@@ -313,7 +313,7 @@ void func_003116E8(SupportMoby *moby) {
         qcopy_nc(&probe_bottom, src1);
         probe_top.z += 0.5f;
         probe_bottom.z = 0.1f;
-        if (func_002761F8(&probe_top, &probe_bottom, 2, 0, 0) == 0) {
+        if (CollLine(&probe_top, &probe_bottom, 2, 0, 0) == 0) {
             vars->support = 0;
             return;
         }
@@ -334,12 +334,12 @@ void func_003116E8(SupportMoby *moby) {
         return;
     }
 
-    func_002A8600(&moby, group, 0, 0);
+    GetFirstMobyInGroup(&moby, group, 0, 0);
     while (moby != 0) {
         vars = moby->vars;
         if (func_002ABB78(moby) != 0) {
             if (moby->oclass == 0x1F4 && func_002A77E0(2) != 0 && moby->rotation[0] == 0.0f && moby->rotation[1] == 0.0f) {
-                moby->rotation[2] = func_00283B98(moby->rotation[2], 1.5707964897155762f);
+                moby->rotation[2] = FastAddRotations(moby->rotation[2], 1.5707964897155762f);
             }
             if ((moby->oclass == 0x1F5 || moby->oclass == 0x200) && moby->mission != 0xFF && D_001A73E0[moby->mission] < vars->death_count) {
                 func_0029F338(moby);
@@ -353,7 +353,7 @@ void func_003116E8(SupportMoby *moby) {
                 qcopy_nc(&probe_bottom, src2);
                 probe_top.z += 0.5f;
                 probe_bottom.z = 0.1f;
-                if (func_002761F8(&probe_top, &probe_bottom, 2, 0, 0) == 0) {
+                if (CollLine(&probe_top, &probe_bottom, 2, 0, 0) == 0) {
                     vars->support = 0;
                 } else {
                     if (HIT.moby == 0) {
@@ -372,7 +372,7 @@ void func_003116E8(SupportMoby *moby) {
                         src3 = &moby->position;
                         below = HIT.moby;
                         qcopy_nc(src3, &below->position);
-                        func_00282CC0(src3, src3, &below->offset);
+                        FastVecAdd(src3, src3, &below->offset);
                         vars = HIT.moby->vars;
                         if (func_002ABB78(moby) != 0) {
                             vars->above = moby;
@@ -387,10 +387,10 @@ void func_003116E8(SupportMoby *moby) {
                 }
             }
         }
-        func_002A86E8(&moby, moby, 0, 0);
+        GetNextMobyInGroup(&moby, moby, 0, 0);
     }
 
-    func_002A8600(&member, group, 0, 0);
+    GetFirstMobyInGroup(&member, group, 0, 0);
     while (member != 0) {
         vars = member->vars;
         if (func_002ABB78(member) != 0 && vars->support == 0) {
@@ -399,7 +399,7 @@ void func_003116E8(SupportMoby *moby) {
             qcopy_nc(&probe_down, src4);
             probe_up.z += vars->height * 0.5f;
             probe_down.z = 0.1f;
-            if (func_002761F8(&probe_up, &probe_down, 2, moby, 0) != 0) {
+            if (CollLine(&probe_up, &probe_down, 2, moby, 0) != 0) {
                 if (HIT.moby != 0 && func_002AD0B0(HIT.moby) != 0) {
                     if (moby != 0) moby->occlusion = 0x7F80;
                     func_002AD5F8(member, HIT.moby, &member->position, &member->rotation[0], &vars->link_pos, &vars->link_rot);
@@ -448,21 +448,21 @@ void func_003116E8(SupportMoby *moby) {
                 }
             }
         }
-        func_002A86E8(&member, member, 0, 0);
+        GetNextMobyInGroup(&member, member, 0, 0);
     }
 
-    func_002A8600(&moby, group, 0, 0);
+    GetFirstMobyInGroup(&moby, group, 0, 0);
     while (moby != 0) {
         if (func_002ABB78(moby) != 0) {
-            func_002A86E8(&other, moby, 0, 0);
+            GetNextMobyInGroup(&other, moby, 0, 0);
             while (other != 0) {
                 if (func_002ABB78(other) != 0) {
-                    func_00282E48(&moby->position, &other->position);
+                    fast_vec_dist(&moby->position, &other->position);
                 }
-                func_002A86E8(&other, other, 0, 0);
+                GetNextMobyInGroup(&other, other, 0, 0);
             }
         }
-        func_002A86E8(&moby, moby, 0, 0);
+        GetNextMobyInGroup(&moby, moby, 0, 0);
     }
 }
 
@@ -505,8 +505,8 @@ void func_00313548(unsigned char *object, float *out, int index)
     func_002ACEC0(local, D_L00_0023A670[index], data + 0x20, *(float *)(data + 0x2C));
     entry = ((SolEmitterData *)data)->entries[index];
     if (entry && object[0x20] == 2)
-        func_00282F20(local, local, *(float *)(entry + 0x28));
-    func_00282CC0(out, data + 0x10, local);
+        vec_scale_to_length(local, local, *(float *)(entry + 0x28));
+    FastVecAdd(out, data + 0x10, local);
     out[2] += *(float *)data;
 }
 
@@ -577,8 +577,8 @@ void func_00316400(void *owner, char *object, int duration)
         info = func_002AB1F0(object);
         if (info != 0) {
             func_002B00B0(object, displacement, 1);
-            func_00282D30(displacement, displacement, *(float *)(info + 16));
-            func_00282CC0(effect->position, displacement, object + 16);
+            FastVecScale(displacement, displacement, *(float *)(info + 16));
+            FastVecAdd(effect->position, displacement, object + 16);
         } else {
             char *source = object + 16;
 
@@ -611,19 +611,19 @@ void func_003166C8(void *owner)
         p = slot;
         qcopy(p->origin, D_001B2520);
         if (p->timer) {
-            p->angle[0] = func_00283B98(p->angle[0], p->speed[0] * 100.0f);
-            p->angle[1] = func_00283B98(p->angle[1], p->speed[1] * 100.0f);
-            p->angle[2] = func_00283B98(p->angle[2], p->speed[2] * 100.0f);
-            p->angle2[0] = func_00283B98(p->angle2[0], p->speed2[0] * 100.0f);
-            p->angle2[1] = func_00283B98(p->angle2[1], p->speed2[1] * 100.0f);
-            p->angle2[2] = func_00283B98(p->angle2[2], p->speed2[2] * 100.0f);
+            p->angle[0] = FastAddRotations(p->angle[0], p->speed[0] * 100.0f);
+            p->angle[1] = FastAddRotations(p->angle[1], p->speed[1] * 100.0f);
+            p->angle[2] = FastAddRotations(p->angle[2], p->speed[2] * 100.0f);
+            p->angle2[0] = FastAddRotations(p->angle2[0], p->speed2[0] * 100.0f);
+            p->angle2[1] = FastAddRotations(p->angle2[1], p->speed2[1] * 100.0f);
+            p->angle2[2] = FastAddRotations(p->angle2[2], p->speed2[2] * 100.0f);
         } else {
-            p->angle[0] = func_00283B98(p->angle[0], p->speed[0] * 50.0f);
-            p->angle[1] = func_00283B98(p->angle[1], p->speed[1] * 50.0f);
-            p->angle[2] = func_00283B98(p->angle[2], p->speed[2] * 50.0f);
-            p->angle2[0] = func_00283B98(p->angle2[0], p->speed2[0] * 50.0f);
-            p->angle2[1] = func_00283B98(p->angle2[1], p->speed2[1] * 50.0f);
-            p->angle2[2] = func_00283B98(p->angle2[2], p->speed2[2] * 50.0f);
+            p->angle[0] = FastAddRotations(p->angle[0], p->speed[0] * 50.0f);
+            p->angle[1] = FastAddRotations(p->angle[1], p->speed[1] * 50.0f);
+            p->angle[2] = FastAddRotations(p->angle[2], p->speed[2] * 50.0f);
+            p->angle2[0] = FastAddRotations(p->angle2[0], p->speed2[0] * 50.0f);
+            p->angle2[1] = FastAddRotations(p->angle2[1], p->speed2[1] * 50.0f);
+            p->angle2[2] = FastAddRotations(p->angle2[2], p->speed2[2] * 50.0f);
         }
         p->offset[0] = func_00283180(p->angle[0]) * p->amplitude[0];
         p->offset[1] = func_00283198(p->angle[1]) * p->amplitude[1];
@@ -635,14 +635,14 @@ void func_003166C8(void *owner)
             info = func_002AB1F0(p->object);
             if (info) {
                 func_002B00B0(p->object, local, 1);
-                func_00282D30(local, local, *(float *)(info + 16));
-                func_00282CC0(p->position, local, p->object + 16);
+                FastVecScale(local, local, *(float *)(info + 16));
+                FastVecAdd(p->position, local, p->object + 16);
             } else {
                 qcopy(p->position, p->object + 16);
             }
-            ratio = func_00283CE0(p->timer);
-            ratio /= func_00283CE0(p->duration);
-            func_00282D08(p->position, p->origin, p->position, 1.0f - ratio);
+            ratio = IntToFloat(p->timer);
+            ratio /= IntToFloat(p->duration);
+            lerp_vector(p->position, p->origin, p->position, 1.0f - ratio);
         }
         if (func_00282948(&p->timer)) {
             if (!p->expired) p->expired = 1;

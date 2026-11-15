@@ -18,7 +18,7 @@ u8 *func_L04_00358AE8(u8 *position, u8 *velocity, int color, int time, float siz
         qcopy(particle+0x10, position);
         particle[8]=func_001163B0();
         *(int *)(particle+4)=color;
-        particle[9]=func_00283CF0(4.0f)+0x40;
+        particle[9]=FloatToInt(4.0f)+0x40;
         particle[3]=0x48;*(float *)(particle+0xc)=size;particle[1]=0;
         particle[2]=D_L04_001FF26C[0];
         *(int *)(state+0x18)=(s8)particle[7];

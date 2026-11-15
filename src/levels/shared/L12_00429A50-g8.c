@@ -42,17 +42,17 @@ void func_L12_00429A50(char *object)
         }
         switch (*(unsigned char *)(object + 0x20)) {
         case 0:
-            func_00282CC0(&local.next, object + 0x10, state);
-            func_002A8C00((char *)&local.move, (int)object, 3, *(float *)(state + 0x14), (Quad16 *)state);
+            FastVecAdd(&local.next, object + 0x10, state);
+            make_hit_descriptor((char *)&local.move, (int)object, 3, *(float *)(state + 0x14), (Quad16 *)state);
             local.move.id = *(unsigned short *)(object + 0xAA);
-            if (func_002761F8(object + 0x10, &local.next, 0, object, &local.move) != 0 || func_00277258(object + 0x10, 0, object, 0.3f) != 0) {
+            if (CollLine(object + 0x10, &local.next, 0, object, &local.move) != 0 || func_00277258(object + 0x10, 0, object, 0.3f) != 0) {
                 if (*(char **)D_L12_001C0258 != 0) {
                     if (*(char **)D_L12_001C0258 != *(char **)(state + 0x10)) {
                         qcopy(&local.direction, state);
-                        func_00282D30(&local.direction, &local.direction, 1.5f);
+                        FastVecScale(&local.direction, &local.direction, 1.5f);
                         ((float *)&local.direction)[2] = 1.0f;
                         ((float *)&local.direction)[3] = 5627.9248f;
-                        func_002A8C00((char *)&local.area, (int)object, 0x10003, *(float *)(state + 0x14), &local.direction);
+                        make_hit_descriptor((char *)&local.area, (int)object, 0x10003, *(float *)(state + 0x14), &local.direction);
                         local.area.kind = 1;
                         local.area.id = *(unsigned short *)(object + 0xAA);
                         local.area.enabled = 0;
@@ -63,10 +63,10 @@ void func_L12_00429A50(char *object)
                     }
                 } else {
                     qcopy(&local.direction, state);
-                    func_00282D30(&local.direction, &local.direction, 3.0f);
+                    FastVecScale(&local.direction, &local.direction, 3.0f);
                     ((float *)&local.direction)[2] = 1.0f;
                     ((float *)&local.direction)[3] = 5627.9248f;
-                    func_002A8C00((char *)&local.area, (int)object, 0x10003, *(float *)(state + 0x14), &local.direction);
+                    make_hit_descriptor((char *)&local.area, (int)object, 0x10003, *(float *)(state + 0x14), &local.direction);
                     local.area.kind = 1;
                     local.area.id = *(unsigned short *)(object + 0xAA);
                     local.area.enabled = 0;
@@ -78,11 +78,11 @@ void func_L12_00429A50(char *object)
             }
             if (!*(unsigned char *)(object + 0xBC))
                 qcopy(object + 0x10, &local.next);
-            func_00282D30(&local.direction, state, -0.5f);
+            FastVecScale(&local.direction, state, -0.5f);
             func_00282C88(&local.area);
             break;
         case 1:
-            func_0032C700(object + 0x10, 0, 25, 20, 20, 20, 0, 0, 1, 0, 0, 0, 0.25f, 20.0f);
+            SpawnExplosion(object + 0x10, 0, 25, 20, 20, 20, 0, 0, 1, 0, 0, 0, 0.25f, 20.0f);
             func_0029F338(object);
             return;
         }

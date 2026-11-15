@@ -35,11 +35,11 @@ void func_00306680(void *origin, int count)
     char *particle;
     float size, speed, angle, projectionLength;
     int random, spin, i;
-    func_00282CF0(&side,anchor,origin);
+    FastVecSub(&side,anchor,origin);
     func_002FE8D8(origin,&axis);
-    projectionLength=func_00282DB0(&axis,&side);
-    func_00282D30(&projection,&axis,projectionLength);
-    func_00282CF0(&side,&side,&projection);
+    projectionLength=FastVecDot(&axis,&side);
+    FastVecScale(&projection,&axis,projectionLength);
+    FastVecSub(&side,&side,&projection);
     for (i = 0; i < count; i++) {
         size=func_002A7878(ref_00306680_06,ref_00306680_07);
         spin=func_002A77E0(2);
@@ -47,25 +47,25 @@ void func_00306680(void *origin, int count)
         angle=func_002A7878(-1.0471977f,1.0471977f);
         func_002ACEC0(&velocity,&side,&axis,angle);
         speed=func_002A7878(ref_00306680_01,ref_00306680_02)*0.016666668f;
-        func_00282F20(&velocity,&velocity,speed);
+        vec_scale_to_length(&velocity,&velocity,speed);
         velocity.f[2]=func_002A7878(ref_00306680_03,ref_00306680_04)*0.016666668f;
         position.word=*(ParticleWord *)origin;
         position.f[0]+=func_002A78D8(0.0f,0.15f);
         position.f[1]+=func_002A78D8(0.0f,0.15f);
         position.f[2]+=func_002A78D8(0.0f,0.15f);
         if (!(func_001163B0()&1)) {
-            func_00282D30(&velocity,&velocity,1.5f);
+            FastVecScale(&velocity,&velocity,1.5f);
             particle=func_002C2210(&position,60,size*0.35f,size,0x7f000080,0,spin,&velocity,ref_00306680_05,1);
-            if (particle) particle[9]=(char)func_00283CF0(4.0f)+0x70;
+            if (particle) particle[9]=(char)FloatToInt(4.0f)+0x70;
             particle=func_002C2210(&position,60,size*0.245f,size*0.7f,0x7f7f7f7f,1,-spin,&velocity,ref_00306680_05,1);
         } else {
-            func_00282CF0(&pull,&ref_00306680_00,&position);
-            func_00282F20(&pull,&pull,speed);
-            func_00282CC0(&velocity,&velocity,&pull);
+            FastVecSub(&pull,&ref_00306680_00,&position);
+            vec_scale_to_length(&pull,&pull,speed);
+            FastVecAdd(&velocity,&velocity,&pull);
             particle=func_002C2210(&position,40,size*2.05f,size,0x7f000080,0,spin,&velocity,ref_00306680_05,1);
-            if (particle) particle[9]=(char)func_00283CF0(4.0f)+0x70;
+            if (particle) particle[9]=(char)FloatToInt(4.0f)+0x70;
             particle=func_002C2210(&position,40,size*1.4350001f,size*0.7f,0x7f7f7f7f,1,-spin,&velocity,ref_00306680_05,1);
         }
-        if (particle) particle[9]=(char)func_00283CF0(4.0f)+0x70;
+        if (particle) particle[9]=(char)FloatToInt(4.0f)+0x70;
     }
 }

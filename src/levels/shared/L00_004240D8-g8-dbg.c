@@ -50,8 +50,8 @@ int func_L00_004240D8(char *obj)
     total=0;
     qcopy(point,base+176);
     step=D_L00_001B14D0;
-    func_00282F20(direction,original,1.0f);
-    for(i=0;i<func_00283CF0(F(state,64)-1.0f);i++) {
+    vec_scale_to_length(direction,original,1.0f);
+    for(i=0;i<FloatToInt(F(state,64)-1.0f);i++) {
         if(i>0 && !func_L00_004204A0(point) &&
            func_00277258(point,D_L00_001B1850[0],D_00189E20.owner,step) &&
            !func_L00_00424070(obj,i,point,step)) {
@@ -60,27 +60,27 @@ int func_L00_004240D8(char *obj)
             if(func_L00_00423CA8(obj,point,i,total,step)) {
                 result=1;
                 if (D_00189E20.mode!=2 && func_00282C48(D_00138280)>0.05f) {
-                    func_00282CF0(difference,saved,previous);
-                    func_00282F20(difference,difference,1.0f);
-                    if(func_00282C48(func_00282DB0(D_L00_001B8E50,difference))<0.75f) {
+                    FastVecSub(difference,saved,previous);
+                    vec_scale_to_length(difference,difference,1.0f);
+                    if(func_00282C48(FastVecDot(D_L00_001B8E50,difference))<0.75f) {
                         F(state,48) += D_L00_001B14B4;
                         S(state,52)=2180;
                         if(F(movement,44)-F(state,48)<D_L00_001B14C8)
                             F(state,48)=F(movement,44)-D_L00_001B14C8;
                     }
                 }
-                func_00282CF0(difference,point,camera+80);
-                func_00282F20(movement,difference,F(movement,44)-F(state,48));
-                func_00282F20(direction,movement,1.0f);
+                FastVecSub(difference,point,camera+80);
+                vec_scale_to_length(movement,difference,F(movement,44)-F(state,48));
+                vec_scale_to_length(direction,movement,1.0f);
             }
         }
         {
             float ratio=(F(movement,44)-F(state,48))/F(movement,44);
             step += F(state,68)*F(state,60);
             total += step;
-            func_00282D30(saved,direction,step*ratio);
+            FastVecScale(saved,direction,step*ratio);
         }
-        func_00282CC0(point,point,saved);
+        FastVecAdd(point,point,saved);
     }
     return result;
 }

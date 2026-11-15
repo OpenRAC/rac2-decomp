@@ -30,8 +30,8 @@ void func_L00_002BA220(void)
 
     i = 9;
     do {
-        life = func_00283CF0(func_002A7878(4200.0f, 7350.0f) * 0.001f);
-        fade = func_00283CF0(func_002A7878(21000.0f, 31500.001953125f) * 0.001f);
+        life = FloatToInt(func_002A7878(4200.0f, 7350.0f) * 0.001f);
+        fade = FloatToInt(func_002A7878(21000.0f, 31500.001953125f) * 0.001f);
         speed = func_002A7878(0.002500000176951289f, 0.011666666716337204f);
         qcopy(pos, origin);
         if (D_001A79F0 != 6)

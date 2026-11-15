@@ -133,14 +133,14 @@ void func_L23_003BEA00(u8 *object)
         func_L23_003C1960((char *)object);
     if (object[0x20]!=13) {
         ((DispatchState *)state)->f270=func_002B0360((char *)object+0x10);
-        func_00282CF0(difference,D_00189E20.position,object+0x10);
+        FastVecSub(difference,D_00189E20.position,object+0x10);
         if (func_L02_00329C48((char *)object,(Quad *)difference,0)<=0.7853982f) facing=1;
-        distance=func_00282E48(D_00189E20.position,object+0x10);
+        distance=fast_vec_dist(D_00189E20.position,object+0x10);
         range=D_L23_001AFA6C;
         ((DispatchState *)state)->f27C=distance;
         ((DispatchState *)state)->f324=0;
         if (distance<range)
-            ((DispatchState *)state)->f324=func_L23_003C0A60(object,object+0x10,D_00189E20.position);
+            ((DispatchState *)state)->f324=IsPathClear(object,object+0x10,D_00189E20.position);
         qcopy((state+0x300), (object+0x10));
         func_L23_00418650(state+0x300,0.0f);
     }
@@ -149,19 +149,19 @@ void func_L23_003BEA00(u8 *object)
         if (((DispatchState *)state)->f3B4!=-1) {
             func_002E59F8(((DispatchState *)state)->f3B4); ((DispatchState *)state)->f3B4=-1;
         }
-        if (object[0x43]==8 && func_00282DF0(state+0x1C0)>0.0f) {
+        if (object[0x43]==8 && FastVecLength(state+0x1C0)>0.0f) {
             if (((DispatchState *)state)->f270<D_L23_001B36A4) func_L23_00418650((char *)object+0x10,0.0f);
             *(Quad *)local=0; local[2]=((DispatchState *)state)->f174;
             *(Quad *)point=*(Quad *)local;
-            func_00283098(point,point,object+0xC0);
-            func_00282CC0(point,point,object+0x10);
-            func_00282F20(difference,state+0x1C0,4.0f);
-            func_00282CC0(point,point,difference);
+            matrix_mul_vec3(point,point,object+0xC0);
+            FastVecAdd(point,point,object+0x10);
+            vec_scale_to_length(difference,state+0x1C0,4.0f);
+            FastVecAdd(point,point,difference);
             func_002A8C28(object,point,0x90000,0,1,0,5.0f,100.0f,0.0f);
         }
         if ((((DispatchState *)state)->f178&1) && ((DispatchState *)state)->f2A4==0) {
             func_002E5DA0(5,0,(char *)object,0x7E5);
-            func_0032C700(((DispatchState *)state)->f2A0+0x10,1,35,20,20,20,45,1,2.5f,20.0f,1,0,0,0);
+            SpawnExplosion(((DispatchState *)state)->f2A0+0x10,1,35,20,20,20,45,1,2.5f,20.0f,1,0,0,0);
             ((DispatchState *)state)->f2A4=1;
             if (((DispatchState *)state)->f38==(char *)D_00189E20.object) {
                 qcopy(difference, (object+0x10));
@@ -177,7 +177,7 @@ void func_L23_003BEA00(u8 *object)
             func_L00_0035F5A0(31,0,0);
             func_L23_003BFFC0((char *)object,8,0,4,2,1.0f);
             ((DispatchState *)state)->f26=25; ((DispatchState *)state)->f2A6=0;
-            func_0032C700(((DispatchState *)state)->f2A0+0x10,0,10,15,15,15,15,0,1.0f,20.0f,0,0,0,0);
+            SpawnExplosion(((DispatchState *)state)->f2A0+0x10,0,10,15,15,15,15,0,1.0f,20.0f,0,0,0,0);
         } else if ((flags & 2UL) == 2UL) func_002A7750(object,5,0);
     }
     switch (object[0x20]) {
@@ -220,11 +220,11 @@ void func_L23_003BEA00(u8 *object)
             func_002A7750(object,5,0);
             func_L23_003BFFC0((char *)object,3,0,10,3,1.0f);
         } else {
-            func_00282D30(point,object+0xE0,-3.0f);
-            func_00282CC0(point,point,object+0x10);
-            func_00282D30(difference,object+0xE0,0.2f);
-            func_00282CC0(difference,difference,object+0x10);
-            if (func_002761F8(difference,point,18,0,0) && func_00282E48(D_L23_001C0AA0,object+0x10)<4.0f)
+            FastVecScale(point,object+0xE0,-3.0f);
+            FastVecAdd(point,point,object+0x10);
+            FastVecScale(difference,object+0xE0,0.2f);
+            FastVecAdd(difference,difference,object+0x10);
+            if (CollLine(difference,point,18,0,0) && fast_vec_dist(D_L23_001C0AA0,object+0x10)<4.0f)
                 func_002A7750(object,4,0);
         }
         break;
@@ -249,7 +249,7 @@ void func_L23_003BEA00(u8 *object)
         if (((DispatchState *)state)->f250==0) func_002A7750(object,5,0);
         else if (((DispatchState *)state)->f324 && facing && ((DispatchState *)state)->f27C<D_L23_001AFA78)
             func_002A7750(object,8,2);
-        else func_L23_003C02C8(object);
+        else UpdatePathFollowing(object);
         break;
     case 8:
         if (func_002B3868(object)) ((DispatchState *)state)->f2A8=D_L23_001AFA58+func_002A7878(0.0f,D_L23_001AFA58*0.5f);
@@ -261,7 +261,7 @@ void func_L23_003BEA00(u8 *object)
             func_002A7750(object,5,0); ((DispatchState *)state)->f250=0;
         } else if (((DispatchState *)state)->f27C>D_L23_001AFA88 ||
                    ((unsigned int)(object[0x43]-5)<2 && ((DispatchState *)state)->f27C>D_L23_001AFA88-2.0f)) {
-            ((DispatchState *)state)->f320=(char *)D_00189E20.position; func_L23_003C02C8(object);
+            ((DispatchState *)state)->f320=(char *)D_00189E20.position; UpdatePathFollowing(object);
         } else {
             func_L23_003BFFC0((char *)object,3,0,10,1,1.0f); func_L11_003404E0((char *)object);
         }
@@ -286,7 +286,7 @@ void func_L23_003BEA00(u8 *object)
         if ((int)U(object,0x96)>D_L23_001AFA94) {
             ((DispatchState *)state)->f320=(char *)D_00189E20.position;
             if (((DispatchState *)state)->f27C<D_L23_001AFA8C) func_002A7750(object,10,2);
-            func_L23_003C02C8(object);
+            UpdatePathFollowing(object);
         }
         break;
     case 10:
@@ -300,15 +300,15 @@ void func_L23_003BEA00(u8 *object)
             break;
         }
         if ((int)U(object,0x96)<=D_L23_001AFA98) break;
-        func_00282CC0(difference,state+0x330,state+0x340);
-        func_00282D30(difference,difference,0.5f);
-        if (func_00282E48(difference,D_L23_001B36D0)<D_L23_001AFA4C) {
-            func_00282F20(point,((DispatchState *)state)->f2A0+0xE0,0.25f);
-            func_00282CC0(point,point,((DispatchState *)state)->f2A0+0xC0);
-            func_00282D30(point,point,15.0f); point[3]=5627.9248f;
+        FastVecAdd(difference,state+0x330,state+0x340);
+        FastVecScale(difference,difference,0.5f);
+        if (fast_vec_dist(difference,D_L23_001B36D0)<D_L23_001AFA4C) {
+            vec_scale_to_length(point,((DispatchState *)state)->f2A0+0xE0,0.25f);
+            FastVecAdd(point,point,((DispatchState *)state)->f2A0+0xC0);
+            FastVecScale(point,point,15.0f); point[3]=5627.9248f;
             func_002A8F70((int)D_0018C0B0,(int)object,0x10007,(int)(object+0x10),(int)point,D_L23_001B36F8);
             func_L00_002D6900(43);
-            func_0032C700(D_L23_001B36D0,1,10,10,10,10,45,0,1.2f,20.0f,0,1,0,0);
+            SpawnExplosion(D_L23_001B36D0,1,10,10,10,10,45,0,1.2f,20.0f,0,1,0,0);
             ((DispatchState *)state)->f3BE=1;
         }
         func_002A7750(object,11,2);

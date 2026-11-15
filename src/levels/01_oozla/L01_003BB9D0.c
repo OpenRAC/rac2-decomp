@@ -93,13 +93,13 @@ void func_L01_003BDF28(char *a0)
     *(float *)(s0 + 0x1E0) = func_00283180(func_002A7878(-3.1415927f, 3.1415927f)) * (float)*(unsigned char *)(s0 + 0x201);
     *(float *)(s0 + 0x1E4) = func_00283198(func_002A7878(-3.1415927f, 3.1415927f)) * (float)*(unsigned char *)(s0 + 0x201);
     *(int *)(s0 + 0x1E8) = 0;
-    func_00282CC0(s1, s1, s0 + 0x1D0);
+    FastVecAdd(s1, s1, s0 + 0x1D0);
     *(float *)(s0 + 0x1E8) = *(float *)(s0 + 0x1E8) + 1.7f;
     if (*(int *)(s0 + 0x23C) != 0) {
-        func_00282CF0(&buf, s1, D_00189EA0);
+        FastVecSub(&buf, s1, D_00189EA0);
         buf.z = 0;
-        func_00282F20(&buf, &buf, 8.0f);
-        func_00282CC0(s1, s1, &buf);
+        vec_scale_to_length(&buf, &buf, 8.0f);
+        FastVecAdd(s1, s1, &buf);
     }
     func_L01_003BDBE8(s2);
 }
@@ -134,7 +134,7 @@ void func_L01_003BD410(char *object)
         position[0] = func_00283180(angle) * radius;
         position[1] = func_00283198(angle) * radius;
         position[2] = 0.0f;
-        func_00282CC0(position, position, object + 0x10);
+        FastVecAdd(position, position, object + 0x10);
         position[2] = *(float *)(state + 0x224) + 0.025f;
         func_L01_0032EF38(position, 0x38002028, 0x2020, first, second, life);
     }
@@ -195,7 +195,7 @@ void func_L01_003BDBE8(void *object)
     *(int *)(s + 0xCC) = index;
     if (!func_L01_003165E8(s + 0x1E0, index, *(int *)(s + 0x218), *(int *)(s + 0x21C), -1)) {
         if ((func_001163B0() & 1) || *(int *)(s + 0x114) != 1 || *(int *)(s + 0x23C)) {
-            if (func_00282E80(s + 0x1E0, obj + 0x10) < 0.5f || !func_002A77E0(1)) {
+            if (vec_distance_xy(s + 0x1E0, obj + 0x10) < 0.5f || !func_002A77E0(1)) {
                 qcopy(s + 0x1E0, s + 0x1D0);
                 *(float *)(s + 0x1E8) += 1.7f;
             }
@@ -204,11 +204,11 @@ void func_L01_003BDBE8(void *object)
             *(float *)(s + 0x1E0) = func_00283180(func_002A7878(-3.1415927f, 3.1415927f)) * 1.2f;
             *(float *)(s + 0x1E4) = func_00283198(func_002A7878(-3.1415927f, 3.1415927f)) * 1.2f;
             *(int *)(s + 0x1E8) = 0;
-            func_00282CC0(s + 0x1E0, s + 0x1E0, D_00189EA0);
+            FastVecAdd(s + 0x1E0, s + 0x1E0, D_00189EA0);
             *(float *)(s + 0x1E8) += 1.7f;
             func_L01_00337A60(s + 0x1E0, s + 0x1E0, D_L01_001FE180[index] + 0x10, *(int *)D_L01_001FE180[index]);
         }
-        if ((*(int *)(s + 0x23C) && func_00282E80(s + 0x1E0, D_00189EA0) < 3.0f) || func_00282E80(s + 0x1E0, obj + 0x10) < 0.5f) {
+        if ((*(int *)(s + 0x23C) && vec_distance_xy(s + 0x1E0, D_00189EA0) < 3.0f) || vec_distance_xy(s + 0x1E0, obj + 0x10) < 0.5f) {
             offset = func_002A7878(3.0f, 5.0f);
             coordinate = *(float *)(s + 0x1E0);
             *(float *)(s + 0x1E0) = (func_001163B0() & 1) ? coordinate - offset : coordinate + offset;
@@ -217,10 +217,10 @@ void func_L01_003BDBE8(void *object)
             *(float *)(s + 0x1E4) = (func_001163B0() & 1) ? coordinate - offset : coordinate + offset;
         }
     }
-    if (func_002761F8(obj + 0x10, s + 0x1E0, 2, obj, 0)) {
-        func_00282CF0(s + 0x1E0, D_L01_001BF920, s + 0x1E0);
-        func_00282F20(s + 0x1E0, s + 0x1E0, 2.0f);
-        func_00282CC0(s + 0x1E0, s + 0x1E0, D_L01_001BF920);
+    if (CollLine(obj + 0x10, s + 0x1E0, 2, obj, 0)) {
+        FastVecSub(s + 0x1E0, D_L01_001BF920, s + 0x1E0);
+        vec_scale_to_length(s + 0x1E0, s + 0x1E0, 2.0f);
+        FastVecAdd(s + 0x1E0, s + 0x1E0, D_L01_001BF920);
     }
 }
 
@@ -288,7 +288,7 @@ void func_L01_003BE4D0(L01_003BE4D0_OBJ *obj)
     func_00282948(&s->timer230);
     func_00282948(&s->timer23C);
     /* Pack the current colour as 0x80BBGGRR, then blend it towards the target. */
-    func_002A04B8(obj, &red, &green, &blue);
+    get_moby_color(obj, &red, &green, &blue);
     {
         unsigned int alpha_green = (green << 8) | 0x80000000u;
         unsigned int alpha_blue_green = (blue << 16) | alpha_green;
@@ -304,7 +304,7 @@ void func_L01_003BE4D0(L01_003BE4D0_OBJ *obj)
     red = color & 0xFF;
     green = (color >> 8) & 0xFF;
     blue = (color >> 16) & 0xFF;
-    func_002A0488(obj, red, green, blue);
+    set_moby_color(obj, red, green, blue);
 }
 
 /* func_L01_003BE628 is in L01_003BE628.c. */

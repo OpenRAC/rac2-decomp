@@ -29,7 +29,7 @@ void func_L09_0041D650(char *obj) {
         func_L00_00324F18(obj, second,0.0f,10.0f,13.0f);
         first[3] = 0.2f; second[3] = 1.3f;
         func_L03_0042B6F8(first,second,0x28608020,obj,7,1);
-        func_00282D30(offset,offset,*(float *)(obj+0x2C));
+        FastVecScale(offset,offset,*(float *)(obj+0x2C));
         func_L00_0033E220(offset,obj,0x28608020,-1,0,-1,0,0x60,*(float *)(obj+0x2C)*1470000.0f,0.0f);
         func_002A7750(obj,1,-1);
         break;
@@ -41,12 +41,12 @@ void func_L09_0041D650(char *obj) {
         func_L00_0032A258(obj,D_L09_001B1B50,D_L09_001B1B48,D_L09_001B1B40,0xFFFF,0,D_L09_001B1B70,0,0x87F,0xFF,0);
         *(DobboQuad *)second = 0;
         func_L00_00324F18(obj,first,offset[0],offset[1],offset[2]);
-        func_0032C700(first,0,12,12,12,12,12,0,1,0,0,0,*(float *)(obj+0x2C),20.0f);
-        func_002ABBB8(obj,second,first,20,1,1,-1,0.0f,0.0f,0.0f,0.0f,0,0,-1,0,0x810001,9.0f,0.75f,0.0f);
+        SpawnExplosion(first,0,12,12,12,12,12,0,1,0,0,0,*(float *)(obj+0x2C),20.0f);
+        SpawnExplosionEffects(obj,second,first,20,1,1,-1,0.0f,0.0f,0.0f,0.0f,0,0,-1,0,0x810001,9.0f,0.75f,0.0f);
         *(DobboQuad *)velocity = 0;
         velocity[1] = 0.0666666701f;
-        func_00283098(velocity,velocity,obj+0xC0);
-        func_L00_003263D0(obj,first,10,1,velocity,0.25f,5.0f,0.75f,1.5f,0x7FAAAA40,0);
+        matrix_mul_vec3(velocity,velocity,obj+0xC0);
+        SpawnTintedEffects(obj,first,10,1,velocity,0.25f,5.0f,0.75f,1.5f,0x7FAAAA40,0);
         *(DobboQuad *)extra = 0;
         extra[1] = 0.200000018f; extra[2] = -0.0833333358f;
         func_L00_002EC248(obj,offset,extra,60,3,*(float *)(obj+0x2C)*2.0f,0.200000018f,1.0f,5.0f,1.0f);

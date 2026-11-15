@@ -17,7 +17,7 @@ void func_L06_0041F558(char *obj)
     float height, angle;
 
     func_002AB8C0(obj, st + 0x50);
-    func_00282978(st + 0x24A);
+    FastDecTimer(st + 0x24A);
     if (*(unsigned short *)(obj + 0x96) <= 0xFFFE)
         ++*(unsigned short *)(obj + 0x96);
     height = func_002A89A8(obj + 0x10, 0, 0.5f);
@@ -27,11 +27,11 @@ void func_L06_0041F558(char *obj)
         if (*(float *)(obj + 0x18) < height)
             *(float *)(obj + 0x18) = height;
     }
-    if (func_00283C80(*(float *)(obj + 0xF8),
+    if (FastDiffRots(*(float *)(obj + 0xF8),
                       func_00283248(*(float *)(st + 0x200) - *(float *)(obj + 0x10),
                                     *(float *)(st + 0x204) - *(float *)(obj + 0x14)))
             <= 2.6179940700531006f && (unsigned char)obj[0x95] == 2) {
-        angle = func_00283BE0(
+        angle = fast_subtract_rotations(
             func_00283248(*(float *)(st + 0x200) - *(float *)(obj + 0x10),
                           *(float *)(st + 0x204) - *(float *)(obj + 0x14)),
             *(float *)(obj + 0xF8));

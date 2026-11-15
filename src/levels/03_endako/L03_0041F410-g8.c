@@ -33,16 +33,16 @@ void func_L03_0041F410(u8 *entity, Vector *from, Vector *to, int enabled) {
     int i, count, color, rotation;
     float life, step;
     qcopy(&test, from);
-    test.f[3] = func_00282E48(from, to);
+    test.f[3] = fast_vec_dist(from, to);
     if (test.f[3] > 1.0f) return;
     if (func_00283DB8(&test, 32.0f) == -1) return;
     for (i=0; i<D_L03_001B1C40; i++) {
         color = func_002A7820(D_L03_001B1C58, D_L03_001B1C58_1[1]);
-        rotation = func_00283CF0(func_002A78D8(1.0f, 2.0f));
+        rotation = FloatToInt(func_002A78D8(1.0f, 2.0f));
         life = func_002A7878(D_L03_001B1C68, D_L03_001B1C68_1[1]) * 210000.0f;
         func_002A7A00(&velocity, 0.0f, 0.016666668f);
         velocity.f[2] += func_002A7878(D_L03_001B1C50, D_L03_001B1C50_1[1]) * 0.016666668f;
-        func_00282D08(&point, from, to, func_002A7878(0, 1));
+        lerp_vector(&point, from, to, func_002A7878(0, 1));
         func_002C16C0(&point, &velocity, color, D_L03_001B1C48 >> 24,
                      D_L03_001B1C48 & 0xFFFFFF, rotation, life, 500.0f, 1.0f, 0.0f, 1.0f);
     }
@@ -59,7 +59,7 @@ void func_L03_0041F410(u8 *entity, Vector *from, Vector *to, int enabled) {
             velocity.q = point.q;
             point.q = aux.q;
             life = func_002A7878(0, step);
-            func_00282D08(&aux, from, to, life + (float)j * step);
+            lerp_vector(&aux, from, to, life + (float)j * step);
             aux.f[2] += 0.02f;
             {
                 u8 *p = func_002BAA28(&aux, &velocity, &point, 0x40000000, 0x10000000, 5,

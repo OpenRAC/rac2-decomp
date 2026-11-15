@@ -54,7 +54,7 @@ int func_L00_002CA4E0(int *selected)
         float zero = 0.0f;
         int area;
         if (entry->inactive != 0 || entry->weight == zero) continue;
-        area = func_L00_002ADEA0(0);
+        area = hero_slot_item_id(0);
         if (entry->selector != -1 && entry->selector != area) continue;
         if (index == 2) {
             if (D_001A79F0 != 7 && D_001A79F0 != 0x13) continue;
@@ -62,7 +62,7 @@ int func_L00_002CA4E0(int *selected)
             qcopy(&origin, D_00189E20.origin);
             qcopy(&raised, &origin);
             raised.f[2] += 8.0f;
-            if (func_002761F8(&origin, &raised, 2, D_00189E20.object, 0)) continue;
+            if (CollLine(&origin, &raised, 2, D_00189E20.object, 0)) continue;
         }
         if (index == 3 && (D_00189E20.mode != 1 || D_00189E20.count > 50 || D_00189E20.state > 1)) continue;
         choices[count++] = index;

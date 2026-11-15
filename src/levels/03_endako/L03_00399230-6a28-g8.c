@@ -83,30 +83,30 @@ void func_L03_003C6A28(char *obj)
 
     case 1:
     case 2:
-        if (func_00282E80(obj + 0x10, D_00189EA0) < 6.0f && *(int *)(D_00189EA0 + 0x2C0)) {
-            func_00283698(mat, obj + 0xC0);
-            func_00282CF0(local, D_00189EA0, obj + 0x10);
-            func_00283098(local, local, mat);
+        if (vec_distance_xy(obj + 0x10, D_00189EA0) < 6.0f && *(int *)(D_00189EA0 + 0x2C0)) {
+            matrix_from_basis_rows(mat, obj + 0xC0);
+            FastVecSub(local, D_00189EA0, obj + 0x10);
+            matrix_mul_vec3(local, local, mat);
             if (*(u8 *)(obj + 0x20) == 1 && func_002B38B8(obj))
                 func_002A7750(obj, 2, -1);
             if (local[0] < 4.0f && local[0] > 0.0f && local[1] < 2.5f && local[1] > -2.5f) {
                 if (*(u8 *)(obj + 0x20) == 1) {
-                    func_002B0C28(8, 0x27BE, 1);
+                    TryClaimNotice(8, 0x27BE, 1);
                     break;
                 }
-                func_002B0C28(8, 0x27A8, 1);
+                TryClaimNotice(8, 0x27A8, 1);
                 if (func_L03_0032AB20(8) && (D_00138324 & 0x10)) {
                     func_002A7750(obj, 3, -1);
                     *(Quad *)pos = 0;
                     pos[0] = 2.0f;
-                    func_00283098(pos, pos, obj + 0xC0);
-                    func_00282CC0(pos, pos, obj + 0x10);
+                    matrix_mul_vec3(pos, pos, obj + 0xC0);
+                    FastVecAdd(pos, pos, obj + 0x10);
                     func_00282C88(rot);
-                    rot[2] = func_00283B98(*(float *)(obj + 0xF8), 3.14159f);
+                    rot[2] = FastAddRotations(*(float *)(obj + 0xF8), 3.14159f);
                     func_L00_002B9D60(pos, rot, 0x31, 1);
                     D_0018B650 = D_L03_001B2A1C + (*(int *)vars << 8);
                     func_L03_003C6E50(obj, cam1, cam2);
-                    func_00335438(cam1, cam2, 1, 0, 0);
+                    SetCamera5Pose(cam1, cam2, 1, 0, 0);
                     func_L03_003C7A40(D_L03_001B2A1C + (*(int *)vars << 8));
                 }
             }

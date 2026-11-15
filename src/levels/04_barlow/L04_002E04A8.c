@@ -574,7 +574,7 @@ void func_L04_002E04A8(void) {
             if (((Hero *)D_00189E20)->b[0x22B5] != 0) {
                 (*(TI128*)v0) = 0;
                 v0[0] = 1.0f;
-                func_00283098((s32) (((void*)D_00189E20) + 0x190), (s32)((TI128*)v0), (s32)&D_L04_001B9698[0x218]);
+                matrix_mul_vec3((s32) (((void*)D_00189E20) + 0x190), (s32)((TI128*)v0), (s32)&D_L04_001B9698[0x218]);
                 ((Hero *)D_00189E20)->f[0x1A0/4] = ((Hero *)D_L04_001B9698)->f[0];
                 func_L00_002B3EF8(0, 1.0f, 0.0f, 2.9088826f);
                 if ((((Hero *)D_00189E20)->b[0x22BB] != 0) && (((Hero *)D_00189E20)->i[0x1B8/4] == 0x78)) {
@@ -602,7 +602,7 @@ void func_L04_002E04A8(void) {
                     temp_a0_3 = ((Hero *)D_00189E20)->f[0x1A4/4] < 0.0f;
                     temp_a0_3 += 0xE;
                     if (M2C_FIELD(((Hero *)D_00189E20)->ptr[0x2290/4], u8* , 0x43) != temp_a0_3) {
-                        func_L00_002D2168(temp_a0_3, 0, 5.0f);
+                        set_hero_animation(temp_a0_3, 0, 5.0f);
                     }
                     temp_f0 = func_00282C48(((Hero *)D_00189E20)->f[0x1A4/4]) * 18.093401f;
                     ((Hero *)D_00189E20)->f[0xC20/4] = temp_f0;
@@ -614,7 +614,7 @@ void func_L04_002E04A8(void) {
                     }
                 } else if (((Hero *)D_00189E20)->f[0x1A4/4] == 0.0f) {
                     if (M2C_FIELD(((Hero *)D_00189E20)->ptr[0x2290/4], u8* , 0x43) != 0xD) {
-                        func_L00_002D2168(0xD, 0, 7.0f);
+                        set_hero_animation(0xD, 0, 7.0f);
                     }
                 }
             }
@@ -632,7 +632,7 @@ void func_L04_002E04A8(void) {
                 if (M2C_FIELD(temp_a0_4, u8* , 0x42) == M2C_FIELD(temp_a0_4, u8* , 0x43)) {
                     var_f1 = ((Hero *)D_00189E20)->f[0x174/4] / var_f20;
                     if ((var_f1 > 5.0f) && ((f32) M2C_FIELD(temp_a0_4, u8* , 0x41) < 5.5f)) {
-                        func_L00_002A9E30(13.0f, var_f1, 0.5f, -1.0f);
+                        AdjustHeroAnimationSpeedForTargetFrame(13.0f, var_f1, 0.5f, -1.0f);
                         if (((Hero *)D_00189E20)->f[0xC20/4] > 1.1f) {
                             ((Hero *)D_00189E20)->f[0xC20/4] = 1.1f;
                         }
@@ -664,7 +664,7 @@ void func_L04_002E04A8(void) {
                     }
                 }
             } else {
-                func_L01_002B4DA0(0);
+                ClipHeroVelocityAgainstWall(0);
                 if (((Hero *)D_00189E20)->h[0x34E/2] == 0) {
                     func_L00_002D34C0((s32) ((void*)D_00189E20) + 0xF0, (s32) ((void*)D_00189E20) + 0xF0, 0.015000001f);
                 } else {
@@ -676,7 +676,7 @@ void func_L04_002E04A8(void) {
     case 0x7C:
         hero7C = (void*)D_00189E20;
         if (((Hero *)hero7C)->i[0x7A4/4] == 0) {
-            temp_v0 = func_0029EFD0(0x52A);
+            temp_v0 = CreateMoby(0x52A);
             ((Hero *)hero7C)->i[0x7A4/4] = temp_v0;
             if (((Hero *)hero7C)->i[0x7A4/4] != 0) {
             qcopy((u8 *)temp_v0 + 0x10, &((Hero *)hero7C)->q[0x80/16]);
@@ -688,11 +688,11 @@ void func_L04_002E04A8(void) {
             temp_v1_4 = ((Hero *)hero7C)->i[0x7A4/4];
             M2C_FIELD(temp_v1_4, u16* , 0x34) = (u16) (M2C_FIELD(temp_v1_4, u16* , 0x34) | 0x800);
             func_002A0F48(((Hero *)hero7C)->i[0x7A4/4]);
-            func_002E5CF8(0, 0, ((Hero *)hero7C)->i[0x7A4/4]);
+            PlayMobySound(0, 0, ((Hero *)hero7C)->i[0x7A4/4]);
             }
         }
         if (((Hero *)hero7C)->i[0x7A4/4] != 0) {
-        M2C_FIELD(((Hero *)hero7C)->i[0x7A4/4], u8* , 0x23) += func_00283CF0(5.0f);
+        M2C_FIELD(((Hero *)hero7C)->i[0x7A4/4], u8* , 0x23) += FloatToInt(5.0f);
         temp_v1_6 = ((Hero *)hero7C)->i[0x7A4/4];
         if ((u8) M2C_FIELD(temp_v1_6, u8* , 0x23) >= 0x81U) {
             M2C_FIELD(temp_v1_6, u8* , 0x23) = 0x80U;
@@ -704,7 +704,7 @@ void func_L04_002E04A8(void) {
         func_002A0F48(temp_a0_5);
         }
         ((Hero *)D_00189E20)->f[0xF8/4] = 0.0f;
-        func_L00_002EE4D8((s32)(D_00189E20 + 0xF0), (s32)(D_00189E20 + 0xF0), func_00282E20((s32)(D_00189E20 + 0xF0)) * 0.92f);
+        func_L00_002EE4D8((s32)(D_00189E20 + 0xF0), (s32)(D_00189E20 + 0xF0), vec_length_xy((s32)(D_00189E20 + 0xF0)) * 0.92f);
         func_L00_002C9228();
         break;
     case 0x32:
@@ -729,15 +729,15 @@ void func_L04_002E04A8(void) {
             ((Hero *)D_00189E20)->i[0x2440/4] = -1;
         }
         if (((Hero *)D_00189E20)->h[0xA4A/2] != 0) {
-            func_00282978((s32) (((void*)D_00189E20) + 0xA4A));
+            FastDecTimer((s32) (((void*)D_00189E20) + 0xA4A));
             temp_a0_7 = (s32) ((u16) ((Hero *)D_00189E20)->h[0xA4A/2] << 0x10) >> 0x12;
-            func_L00_002AA938((temp_a0_7 >= 9) ? 8 : temp_a0_7, 0, 0);
+            EmitHeroRandomizedMotionEffects((temp_a0_7 >= 9) ? 8 : temp_a0_7, 0, 0);
         }
         if ((((Hero *)D_00189E20)->u[0x2294/4] == 0x32) && (((Hero *)D_00189E20)->i[0xC2C/4] == 0)) {
             temp_f1_2 = ((Hero *)D_00189E20)->f[0xC38/4];
             if (temp_f1_2 > 0.0f) {
                 if (temp_f1_2 < 10.0f) {
-                    func_L00_002AA938(4, 1, 0);
+                    EmitHeroRandomizedMotionEffects(4, 1, 0);
                 }
             }
         }
@@ -745,7 +745,7 @@ void func_L04_002E04A8(void) {
             if (((Hero *)D_00189E20)->i[0x22A0/4] == 0x34) {
                 temp_v1_7 = ((Hero *)D_00189E20)->i[0x1B8/4];
                 if (temp_v1_7 < 0xF) {
-                    func_L00_002AA938(((s32) (0x14 - temp_v1_7) / 3) + 1, 1, 0);
+                    EmitHeroRandomizedMotionEffects(((s32) (0x14 - temp_v1_7) / 3) + 1, 1, 0);
                 }
             }
         }
@@ -754,7 +754,7 @@ void func_L04_002E04A8(void) {
             if (((Hero *)D_00189E20)->i[0x1B8/4] == temp_v1_8) {
                 func_L00_002AABE0(3, 0x10, 0);
                 if (D_L04_001B2C70 != 0) {
-                    func_002FD1B8(D_L04_001B2C70, D_L04_001B2C78, 0, ((Hero *)D_00189E20)->f[0x80/4], ((Hero *)D_00189E20)->f[0x84/4], 0.4f, -0.3f);
+                    RippleDisturb(D_L04_001B2C70, D_L04_001B2C78, 0, ((Hero *)D_00189E20)->f[0x80/4], ((Hero *)D_00189E20)->f[0x84/4], 0.4f, -0.3f);
                 }
                 ((Hero *)D_00189E20)->h[0xA4A/2] = 0x46;
             }
@@ -855,7 +855,7 @@ void func_L04_002E04A8(void) {
         }
         temp_f20 = ((Hero *)D_00189E20)->f[0x94/4];
         func_002AA898((s32) (((void*)D_00189E20) + 0x94), var_f12_4, (s32) (((void*)D_00189E20) + 0xA28), 0.015f, 0.2f, stick_turn, 0);
-        temp_f22 = func_00283BE0(((Hero *)D_00189E20)->f[0x94/4], temp_f20);
+        temp_f22 = fast_subtract_rotations(((Hero *)D_00189E20)->f[0x94/4], temp_f20);
         func_L00_002B39F0(1.0f, 0);
         func_L00_002B3EF8(0, 0.007f, 0.08f, 0.087266475f);
         ((Hero *)D_00189E20)->f[0xA2C/4] = (f32) ((Hero *)D_00189E20)->f[0x1A4/4];
@@ -894,11 +894,11 @@ void func_L04_002E04A8(void) {
             func_0029FCC0((s32) ((Hero *)D_00189E20)->ptr[0x2290/4], 4, (s32)((TI128*)v0));
             (*(TI128*)v20) = 0;
             v20[0] = 0.4f;
-            func_00283098((s32) ((TI128*)v20), (s32) ((TI128*)v20), (s32) (((Hero *)D_00189E20)->ptr[0x2290/4] + 0xC0));
-            func_00282CC0((s32)((TI128*)v0), (s32)((TI128*)v0), (s32) ((TI128*)v20));
+            matrix_mul_vec3((s32) ((TI128*)v20), (s32) ((TI128*)v20), (s32) (((Hero *)D_00189E20)->ptr[0x2290/4] + 0xC0));
+            FastVecAdd((s32)((TI128*)v0), (s32)((TI128*)v0), (s32) ((TI128*)v20));
             qcopy(v10, &((Hero *)D_00189E20)->q[0x110/16]);
-            func_00282F20((s32) ((TI128*)v20), (s32) ((TI128*)v20), 0.025000002f);
-            func_00282CC0((s32) ((TI128*)v10), (s32) ((TI128*)v10), (s32) ((TI128*)v20));
+            vec_scale_to_length((s32) ((TI128*)v20), (s32) ((TI128*)v20), 0.025000002f);
+            FastVecAdd((s32) ((TI128*)v10), (s32) ((TI128*)v10), (s32) ((TI128*)v20));
             v10[2] += 0.033333335f;
             func_002BF728((s32)((TI128*)v0), (s32) ((TI128*)v10), 25200.0f, -1.0f);
             if ((f32) func_002A77E0(0x64) < 40.0f) {
@@ -911,7 +911,7 @@ void func_L04_002E04A8(void) {
             ((Hero *)heroA30)->i[0xA30/4] = func_002A7820(var_a0_4, var_a1_2);
         }
         if (((Hero *)D_00189E20)->u[0x2294/4] == 0x34) {
-            if (func_00282978((s32) (((void*)D_00189E20) + 0xA38)) != 0) {
+            if (FastDecTimer((s32) (((void*)D_00189E20) + 0xA38)) != 0) {
                 temp_s4 = ((Hero *)D_00189E20)->ptr[0x1310/4];
                 if (temp_s4 != 0) {
                     if (M2C_FIELD(temp_s4, s16* , 0xAA) == 0x261) {
@@ -919,14 +919,14 @@ void func_L04_002E04A8(void) {
                             func_0029FCC0((s32) temp_s4, var_s1 % 2, (s32)((TI128*)v0));
                             (*(TI128*)v20) = 0;
                             v20[0] = -0.15f;
-                            func_00283098((s32) ((TI128*)v20), (s32) ((TI128*)v20), (s32) (((Hero *)D_00189E20)->ptr[0x2290/4] + 0xC0));
-                            func_00282CC0((s32)((TI128*)v0), (s32)((TI128*)v0), (s32) ((TI128*)v20));
+                            matrix_mul_vec3((s32) ((TI128*)v20), (s32) ((TI128*)v20), (s32) (((Hero *)D_00189E20)->ptr[0x2290/4] + 0xC0));
+                            FastVecAdd((s32)((TI128*)v0), (s32)((TI128*)v0), (s32) ((TI128*)v20));
                             v0[0] += func_002A7878(0.0f, 0.03f);
                             v0[1] += func_002A7878(0.0f, 0.03f);
                             v0[2] += func_002A7878(0.0f, 0.03f);
                             qcopy(v10, &((Hero *)D_00189E20)->q[0x110/16]);
                             func_L00_00323F28((s32) ((TI128*)v10), (s32) ((TI128*)v10), -0.012500001f, ((Hero *)D_00189E20)->f[0x98/4], ((Hero *)D_00189E20)->f[0x94/4]);
-                            ((Hero *)D_00189E20)->h[0xA38/2] = func_00283CF0((0.116666675f - ((Hero *)D_00189E20)->f[0x1B4/4]) * 42.85714f);
+                            ((Hero *)D_00189E20)->h[0xA38/2] = FloatToInt((0.116666675f - ((Hero *)D_00189E20)->f[0x1B4/4]) * 42.85714f);
                             func_002BF728((s32)((TI128*)v0), (s32) ((TI128*)v10), func_002A7878(6300.0f, 9450.0f), -1.0f);
                         }
                     }
@@ -941,7 +941,7 @@ void func_L04_002E04A8(void) {
 block_198:
             func_L00_002B41B8(0.0019444445f, 0.0011111111f);
         }
-        temp_f21 = func_00283B98(-((Hero *)D_00189E20)->f[0x94/4], 0.0f);
+        temp_f21 = FastAddRotations(-((Hero *)D_00189E20)->f[0x94/4], 0.0f);
         temp_v1_13 = ((Hero *)D_00189E20)->u[0x2294/4];
         if (temp_v1_13 == 0x34) {
             func_002AF000((s32) (((void*)D_00189E20) + 0xF0), ((Hero *)D_00189E20)->f[0x1B4/4], ((Hero *)D_00189E20)->f[0x98/4], temp_f21);
@@ -952,16 +952,16 @@ block_198:
             }
             func_002AF000((s32)(D_00189E20 + 0xF0), var_f12_7, ((Hero *)D_00189E20)->f[0x98/4], temp_f21);
         } else if (temp_v1_13 == 0x33) {
-            spE0 = func_00282DF0((s32) (((void*)D_00189E20) + 0x160));
+            spE0 = FastVecLength((s32) (((void*)D_00189E20) + 0x160));
             if (((Hero *)D_00189E20)->i[0x22A0/4] == 0x34) {
-                func_002AA2E8((s32) &spE0, 0.0f, 0.0022222223f);
+                ApproachValue((s32) &spE0, 0.0f, 0.0022222223f);
             } else {
-                func_002AA2E8((s32) &spE0, 0.0f, 0.0011111111f);
+                ApproachValue((s32) &spE0, 0.0f, 0.0011111111f);
             }
-            func_00282F20((s32)(D_00189E20 + 0x160), (s32)(D_00189E20 + 0x160), spE0);
+            vec_scale_to_length((s32)(D_00189E20 + 0x160), (s32)(D_00189E20 + 0x160), spE0);
             qcopy(&((Hero *)D_00189E20)->q[0xF0/16], &((Hero *)D_00189E20)->q[0x160/16]);
         }
-        func_L01_002B4DA0(0);
+        ClipHeroVelocityAgainstWall(0);
         temp_f21_2 = ((Hero *)D_00189E20)->f[0xA2C/4] * func_00283180(temp_f21) * -7.0f;
         func_002AA898((s32) (((void*)D_00189E20) + 0x90), temp_f21_2, (s32) (((void*)D_00189E20) + 0xA24), 0.007f, 0.17f, 0.020362178f, 0);
         func_L00_002AB0C0(0.009f, 0.22f);
@@ -990,34 +990,34 @@ block_198:
     case 0x73:
         temp_a0_8 = 0xA - ((s32) ((Hero *)D_00189E20)->i[0x1B8/4] / 3);
         temp_s1 = ((void*)D_00189E20) + 0xF0;
-        func_L00_002AA938((temp_a0_8 >= 9) ? 8 : temp_a0_8, 0, 0);
+        EmitHeroRandomizedMotionEffects((temp_a0_8 >= 9) ? 8 : temp_a0_8, 0, 0);
         ((Hero *)D_00189E20)->f[0xF8/4] = 0.0f;
-        func_L00_002EE4D8((s32) temp_s1, (s32) temp_s1, func_00282E20((s32) temp_s1) * 0.92f);
-        func_L01_002B4DA0(0);
+        func_L00_002EE4D8((s32) temp_s1, (s32) temp_s1, vec_length_xy((s32) temp_s1) * 0.92f);
+        ClipHeroVelocityAgainstWall(0);
         break;
     case 0x72:
         func_L00_002AA478(0xF, 0x1E);
         ((Hero *)D_00189E20)->f[0xF8/4] = 0.0f;
-        func_L00_002EE4D8((s32)(D_00189E20 + 0xF0), (s32)(D_00189E20 + 0xF0), func_00282E20((s32)(D_00189E20 + 0xF0)) * 0.92f);
-        func_L01_002B4DA0(0);
+        func_L00_002EE4D8((s32)(D_00189E20 + 0xF0), (s32)(D_00189E20 + 0xF0), vec_length_xy((s32)(D_00189E20 + 0xF0)) * 0.92f);
+        ClipHeroVelocityAgainstWall(0);
         func_L00_002C9228();
         break;
     case 0x67:
     case 0x7F:
-        spE4 = func_00282DF0((s32)(D_00189E20 + 0x160));
-        func_002AA2E8((s32) &spE4, 0.0f, 0.0011111111f);
-        func_00282F20((s32)(D_00189E20 + 0x160), (s32)(D_00189E20 + 0x160), spE4);
+        spE4 = FastVecLength((s32)(D_00189E20 + 0x160));
+        ApproachValue((s32) &spE4, 0.0f, 0.0011111111f);
+        vec_scale_to_length((s32)(D_00189E20 + 0x160), (s32)(D_00189E20 + 0x160), spE4);
         qcopy(&((Hero *)D_00189E20)->q[0xF0/16], &((Hero *)D_00189E20)->q[0x160/16]);
         if (func_00282948((s32) (((void*)(D_00189E20 + 0x160)) + 0x8D0)) == 2) {
             temp_s2 = ((void*)(D_00189E20 + 0x160)) - 0x160;
             func_0029FCC0(M2C_FIELD(temp_s2, s32* , 0x2290), 4, (s32)((TI128*)v0));
             (*(TI128*)v20) = 0;
             v20[0] = 0.4f;
-            func_00283098((s32) ((TI128*)v20), (s32) ((TI128*)v20), M2C_FIELD(temp_s2, s32* , 0x2290) + 0xC0);
-            func_00282CC0((s32)((TI128*)v0), (s32)((TI128*)v0), (s32) ((TI128*)v20));
+            matrix_mul_vec3((s32) ((TI128*)v20), (s32) ((TI128*)v20), M2C_FIELD(temp_s2, s32* , 0x2290) + 0xC0);
+            FastVecAdd((s32)((TI128*)v0), (s32)((TI128*)v0), (s32) ((TI128*)v20));
             qcopy(v10, &((Hero *)D_00189E20)->q[0x110/16]);
-            func_00282F20((s32) ((TI128*)v20), (s32) ((TI128*)v20), 0.025000002f);
-            func_00282CC0((s32) ((TI128*)v10), (s32) ((TI128*)v10), (s32) ((TI128*)v20));
+            vec_scale_to_length((s32) ((TI128*)v20), (s32) ((TI128*)v20), 0.025000002f);
+            FastVecAdd((s32) ((TI128*)v10), (s32) ((TI128*)v10), (s32) ((TI128*)v20));
             v10[2] += 0.033333335f;
             func_002BF728((s32)((TI128*)v0), (s32) ((TI128*)v10), 25200.0f, -1.0f);
             temp_v1_14 = M2C_FIELD(temp_s2, s32* , 0x1B8);
@@ -1035,7 +1035,7 @@ block_224:
         if (((Hero *)D_00189E20)->f[0xA3C/4] > 0.0f) {
             ((Hero *)D_00189E20)->f[0xA3C/4] = 0.0f;
         }
-        func_002AA2E8((s32) (((void*)D_00189E20) + 0xA3C), -0.025000002f, 0.00041666668f);
+        ApproachValue((s32) (((void*)D_00189E20) + 0xA3C), -0.025000002f, 0.00041666668f);
         ((Hero *)D_00189E20)->f[0xF8/4] = (f32) ((Hero *)D_00189E20)->f[0xA3C/4];
         break;
     case 0x35:
@@ -1052,7 +1052,7 @@ block_224:
         if (((Hero *)D_00189E20)->h[0xA4A/2] != 0) {
             ((Hero *)D_00189E20)->h[0xA4A/2] -= 1;
             temp_a0_9 = ((Hero *)D_00189E20)->h[0xA4A/2] >> 3;
-            func_L00_002AA938((temp_a0_9 >= 7) ? 6 : temp_a0_9, 0, 0);
+            EmitHeroRandomizedMotionEffects((temp_a0_9 >= 7) ? 6 : temp_a0_9, 0, 0);
         }
         ((Hero *)D_00189E20)->f[0xC20/4] = 0.6f;
         func_L00_002B39F0(0.050000004f, 0);
@@ -1081,11 +1081,11 @@ block_224:
         if ((((Hero *)D_00189E20)->u[0x2294/4] == 0x35) && (((Hero *)D_00189E20)->i[0xC2C/4] == 0)) {
             temp_f1_4 = ((Hero *)D_00189E20)->f[0xC38/4];
             if ((temp_f1_4 > 0.0f) && (temp_f1_4 < 10.0f)) {
-                func_L00_002AA938(4, 1, 0);
+                EmitHeroRandomizedMotionEffects(4, 1, 0);
             }
         }
         func_L00_002B94D8(0.0011666666f);
-        func_L01_002B4DA0(0);
+        ClipHeroVelocityAgainstWall(0);
         func_L00_002C9228();
         break;
     case 0x85:
@@ -1113,11 +1113,11 @@ block_224:
             func_L00_002D34C0((s32)(D_00189E20 + 0xF0), (s32)(D_00189E20 + 0xF0), 0.015000001f);
         }
         if ((anim2F != -1) && (M2C_FIELD(((Hero *)D_00189E20)->ptr[0x2290/4], u8* , 0x42) != 0x36)) {
-            func_L00_002D2168(anim2F, 0, (f32) blend2F);
+            set_hero_animation(anim2F, 0, (f32) blend2F);
         } else {
             temp_v1_15 = ((Hero *)D_00189E20)->ptr[0x2290/4];
             if ((M2C_FIELD(temp_v1_15, u8* , 0x60) & 2) && (M2C_FIELD(temp_v1_15, u8* , 0x42) == 0x36)) {
-                func_L00_002D2168(func_L04_002CC748(0), 0, 5.0f);
+                set_hero_animation(func_L04_002CC748(0), 0, 5.0f);
             }
         }
         break;
@@ -1160,7 +1160,7 @@ block_224:
         break;
     case 0x24:
         qcopy(v0, (u8 *)((Hero *)D_00189E20)->ptr[0xAA4/4] + 0x10);
-        temp_f0_4 = func_00282E48((s32) (((void*)D_00189E20) + 0x80), (s32)((TI128*)v0));
+        temp_f0_4 = fast_vec_dist((s32) (((void*)D_00189E20) + 0x80), (s32)((TI128*)v0));
         ((Hero *)D_00189E20)->f[0xAB0/4] = temp_f0_4;
         ((Hero *)D_00189E20)->f[0xAAC/4] = 60.0f;
         if (((Hero *)D_00189E20)->f[0xAA0/4] > 0.0f) {
@@ -1168,18 +1168,18 @@ block_224:
         }
         temp_v1_16 = ((Hero *)D_00189E20)->i[0x2298/4];
         if (temp_v1_16 == 0) {
-            func_002AA2E8((s32) (((void*)D_00189E20) + 0xAA0), 0.45000002f, 0.022222223f);
+            ApproachValue((s32) (((void*)D_00189E20) + 0xAA0), 0.45000002f, 0.022222223f);
             temp_v0_5 = ((Hero *)D_00189E20)->ptr[0xAA4/4];
             var_f20_2 = func_00283248(M2C_FIELD(temp_v0_5, f32* , 0x10) - M2C_FIELD(temp_fp, f32* , 0x10), M2C_FIELD(temp_v0_5, f32* , 0x14) - M2C_FIELD(temp_fp, f32* , 0x14));
             if (((Hero *)D_00189E20)->i[0x3A0/4] != 0) {
-                if (func_00283C80(((Hero *)D_00189E20)->f[0x98/4], var_f20_2) > 1.5707964f) {
-                    var_f20_2 = func_00283B98(var_f20_2, 3.1415927f);
+                if (FastDiffRots(((Hero *)D_00189E20)->f[0x98/4], var_f20_2) > 1.5707964f) {
+                    var_f20_2 = FastAddRotations(var_f20_2, 3.1415927f);
                 }
             }
             ((Hero *)D_00189E20)->f[0x1A0/4] = var_f20_2;
             func_L00_002B3EF8(0, 0.03f, 0.15f, 0.12217307f);
         } else if (temp_v1_16 == 1) {
-            func_002AA2E8((s32) (((void*)D_00189E20) + 0xAA0), 0.0f, 0.011666667f);
+            ApproachValue((s32) (((void*)D_00189E20) + 0xAA0), 0.0f, 0.011666667f);
         }
         if ((func_002A88A0((s32) &spE8, (s32) &spEC, -0.0058333334f, ((Hero *)D_00189E20)->f[0xAA0/4], 1.9f - ((Hero *)D_00189E20)->f[0xAB0/4]) > 0) && (spE8 > 0.0f)) {
             ((Hero *)D_00189E20)->f[0xAAC/4] = spE8;
@@ -1190,39 +1190,39 @@ block_224:
             ((Hero *)D_00189E20)->i[0xAB4/4] = 1;
         }
         if (((Hero *)D_00189E20)->i[0xAB4/4] != 0) {
-            func_002AA800((s32) (((void*)D_00189E20) + 0x94), 0, 0.0f, 0.06399541f);
+            StepAngleTowardTarget((s32) (((void*)D_00189E20) + 0x94), 0, 0.0f, 0.06399541f);
         } else {
-            turn24 = func_00283B98(-func_00283248(func_00282E80((s32) (((void*)D_00189E20) + 0x80), (s32)((TI128*)v0)), v0[2] - ((Hero *)D_00189E20)->f[0x88/4]), 1.5707965f);
-            func_002AA800((s32) (((void*)D_00189E20) + 0x94), 0, turn24, 0.10762865f);
+            turn24 = FastAddRotations(-func_00283248(vec_distance_xy((s32) (((void*)D_00189E20) + 0x80), (s32)((TI128*)v0)), v0[2] - ((Hero *)D_00189E20)->f[0x88/4]), 1.5707965f);
+            StepAngleTowardTarget((s32) (((void*)D_00189E20) + 0x94), 0, turn24, 0.10762865f);
         }
-        v20[0] = func_00283180(func_00283B98(((Hero *)D_00189E20)->f[0x98/4], -1.5707965f)) * -0.57f;
-        temp_f0_5 = func_00283198(func_00283B98(((Hero *)D_00189E20)->f[0x98/4], -1.5707965f)) * -0.57f;
+        v20[0] = func_00283180(FastAddRotations(((Hero *)D_00189E20)->f[0x98/4], -1.5707965f)) * -0.57f;
+        temp_f0_5 = func_00283198(FastAddRotations(((Hero *)D_00189E20)->f[0x98/4], -1.5707965f)) * -0.57f;
         v20[2] = 0;
         v20[1] = temp_f0_5;
-        func_00282CC0((s32) ((TI128*)v20), (s32) ((TI128*)v20), (s32) (((void*)D_00189E20) + 0x80));
-        func_00282CF0((s32) ((TI128*)v10), (s32) (((Hero *)D_00189E20)->ptr[0xAA4/4] + 0x10), (s32) ((TI128*)v20));
-        func_00282F20((s32) (((void*)D_00189E20) + 0xF0), (s32) ((TI128*)v10), ((Hero *)D_00189E20)->f[0xAA0/4]);
+        FastVecAdd((s32) ((TI128*)v20), (s32) ((TI128*)v20), (s32) (((void*)D_00189E20) + 0x80));
+        FastVecSub((s32) ((TI128*)v10), (s32) (((Hero *)D_00189E20)->ptr[0xAA4/4] + 0x10), (s32) ((TI128*)v20));
+        vec_scale_to_length((s32) (((void*)D_00189E20) + 0xF0), (s32) ((TI128*)v10), ((Hero *)D_00189E20)->f[0xAA0/4]);
         temp_f0_6 = ((Hero *)D_00189E20)->f[0xAAC/4];
         if (temp_f0_6 < 30.0f) {
             ((Hero *)D_00189E20)->f[0xF8/4] = (f32) (((Hero *)D_00189E20)->f[0xF8/4] - ((30.0f - temp_f0_6) * 0.008055556f));
         }
         break;
     case 0x25:
-        func_002AA2E8((s32)(D_00189E20 + 0xABC), ((Hero *)D_00189E20)->f[0xAC0/4], 0.16666667f);
+        ApproachValue((s32)(D_00189E20 + 0xABC), ((Hero *)D_00189E20)->f[0xAC0/4], 0.16666667f);
         qcopy(&((Hero *)D_00189E20)->q[0xF0/16], &((Hero *)D_00189E20)->q[0x110/16]);
-        func_00282D30((s32)(D_00189E20 + 0xF0), (s32)(D_00189E20 + 0xF0), 0.9f);
+        FastVecScale((s32)(D_00189E20 + 0xF0), (s32)(D_00189E20 + 0xF0), 0.9f);
         ((Hero *)D_00189E20)->f[0xF8/4] = (f32) (((Hero *)D_00189E20)->f[0xF8/4] - 0.004166667f);
         qcopy(v0, (u8 *)((Hero *)D_00189E20)->ptr[0xAA4/4] + 0x10);
-        ((Hero *)D_00189E20)->f[0xAB0/4] = func_00282E48((s32)(D_00189E20 + 0x80), (s32)((TI128*)v0));
-        func_00282CC0((s32) ((TI128*)v10), (s32)(D_00189E20 + 0x80), (s32)(D_00189E20 + 0xF0));
-        func_00282CF0((s32) ((TI128*)v30), (s32) ((TI128*)v10), (s32)((TI128*)v0));
-        func_00282F20((s32) ((TI128*)v30), (s32) ((TI128*)v30), ((Hero *)D_00189E20)->f[0xABC/4]);
-        func_00282CC0((s32) ((TI128*)v20), (s32)((TI128*)v0), (s32) ((TI128*)v30));
-        func_00282CF0((s32)(D_00189E20 + 0xF0), (s32) ((TI128*)v20), (s32)(D_00189E20 + 0x80));
+        ((Hero *)D_00189E20)->f[0xAB0/4] = fast_vec_dist((s32)(D_00189E20 + 0x80), (s32)((TI128*)v0));
+        FastVecAdd((s32) ((TI128*)v10), (s32)(D_00189E20 + 0x80), (s32)(D_00189E20 + 0xF0));
+        FastVecSub((s32) ((TI128*)v30), (s32) ((TI128*)v10), (s32)((TI128*)v0));
+        vec_scale_to_length((s32) ((TI128*)v30), (s32) ((TI128*)v30), ((Hero *)D_00189E20)->f[0xABC/4]);
+        FastVecAdd((s32) ((TI128*)v20), (s32)((TI128*)v0), (s32) ((TI128*)v30));
+        FastVecSub((s32)(D_00189E20 + 0xF0), (s32) ((TI128*)v20), (s32)(D_00189E20 + 0x80));
         break;
     case 0x2B:
         if ((((Hero *)D_00189E20)->i[0xC28/4] & 2) && (M2C_FIELD(temp_fp, u8* , 0x43) == 0x34)) {
-            func_L00_002D2168(0x35, 0xA, 12.0f);
+            set_hero_animation(0x35, 0xA, 12.0f);
             ((Hero *)D_00189E20)->f[0xC20/4] = 0.3f;
         }
         temp_v1_17 = ((Hero *)D_00189E20)->ptr[0xAD4/4];
@@ -1231,25 +1231,25 @@ block_224:
             temp_v0_6 = M2C_FIELD(temp_v1_17, void** , 0x68);
             if ((temp_v0_6 != 0) && (M2C_FIELD(temp_v0_6, s32* , 0x34) != 0)) {
                 var_f20_3 = M2C_FIELD(temp_v1_17, f32* , 0xF8);
-                if (func_00283C80(var_f20_3, ((Hero *)D_00189E20)->f[0x98/4]) > 90.0f) {
-                    var_f20_3 = func_00283B98(var_f20_3, 3.1415927f);
+                if (FastDiffRots(var_f20_3, ((Hero *)D_00189E20)->f[0x98/4]) > 90.0f) {
+                    var_f20_3 = FastAddRotations(var_f20_3, 3.1415927f);
                 }
                 func_002AA898((s32) (((void*)D_00189E20) + 0xAEC), var_f20_3, (s32) (((void*)D_00189E20) + 0xAF8), 0.02f, 0.3f, 0.0f, 0);
             }
         }
         ((Hero *)D_00189E20)->f[0x1A0/4] = (f32) ((Hero *)D_00189E20)->f[0xAEC/4];
         func_L00_002B3EF8(0, 0.02f, 0.3f, 0.078539826f);
-        func_00282CF0((s32)((TI128*)v0), (s32) (((Hero *)D_00189E20)->ptr[0xAD4/4] + 0x10), (s32) (((void*)D_00189E20) + 0x80));
-        func_00282F20((s32)((TI128*)v0), (s32)((TI128*)v0), 1.0f);
+        FastVecSub((s32)((TI128*)v0), (s32) (((Hero *)D_00189E20)->ptr[0xAD4/4] + 0x10), (s32) (((void*)D_00189E20) + 0x80));
+        vec_scale_to_length((s32)((TI128*)v0), (s32)((TI128*)v0), 1.0f);
         if (v0[2] < 0.23f) {
             v0[2] = 0.23f;
         }
         func_00282C88((s32) ((TI128*)v20));
         v20[2] = ((Hero *)D_00189E20)->f[0x98/4];
-        func_00283410((s32) ((TI128*)v40), (s32) ((TI128*)v20));
-        func_00283698((s32) ((TI128*)m80), (s32) ((TI128*)v40));
-        func_002830C0((s32)((TI128*)v0), (s32)((TI128*)v0), (s32) ((TI128*)m80));
-        v10[0] = -func_00283248(func_00282C10((v0[0] * v0[0]) + (v0[2] * v0[2])), v0[1]);
+        euler_to_matrix((s32) ((TI128*)v40), (s32) ((TI128*)v20));
+        matrix_from_basis_rows((s32) ((TI128*)m80), (s32) ((TI128*)v40));
+        transform_vector((s32)((TI128*)v0), (s32)((TI128*)v0), (s32) ((TI128*)m80));
+        v10[0] = -func_00283248(square_root((v0[0] * v0[0]) + (v0[2] * v0[2])), v0[1]);
         temp_f0_7 = func_00283248(v0[2], v0[0]);
         v10[1] = temp_f0_7;
         func_002AA898((s32) (((void*)D_00189E20) + 0x94), temp_f0_7, (s32) (((void*)D_00189E20) + 0xA4), 0.04f, 0.2f, 0.15998854f, 0);
@@ -1267,22 +1267,22 @@ block_224:
                 temp_a0_10 = ((void*)D_00189E20) + 0xF0;
                 (*(s32*)&v30[2]) = 0;
                 v30[1] = temp_f0_8;
-                func_00282CC0((s32) temp_a0_10, (s32) temp_a0_10, (s32) ((TI128*)v30));
+                FastVecAdd((s32) temp_a0_10, (s32) temp_a0_10, (s32) ((TI128*)v30));
             }
             if (((Hero *)D_00189E20)->h[0xADC/2] != 0) {
                 temp_s2_2 = ((void*)D_00189E20) + 0x80;
-                if ((func_00282E80((s32) temp_s2_2, (s32) (((Hero *)D_00189E20)->ptr[0xAD4/4] + 0x10)) < (((Hero *)D_00189E20)->f[0xAE0/4] * 1.57f)) || (((Hero *)D_00189E20)->f[0x31C/4] > 1.5f)) {
+                if ((vec_distance_xy((s32) temp_s2_2, (s32) (((Hero *)D_00189E20)->ptr[0xAD4/4] + 0x10)) < (((Hero *)D_00189E20)->f[0xAE0/4] * 1.57f)) || (((Hero *)D_00189E20)->f[0x31C/4] > 1.5f)) {
                     temp_s1_2 = ((void*)D_00189E20) + 0xF0;
                     func_L00_002D34C0((s32) temp_s1_2, (s32) (((void*)D_00189E20) + 0x110), 0.011111111f);
                     if ((((Hero *)D_00189E20)->h[0xAFE/2] != 0) && (func_L00_002D3B00((s32) temp_s1_2) > 0.0f)) {
-                        func_00282CF0((s32) ((TI128*)v30), (s32) temp_s2_2, (s32) (((Hero *)D_00189E20)->ptr[0xAD4/4] + 0x10));
+                        FastVecSub((s32) ((TI128*)v30), (s32) temp_s2_2, (s32) (((Hero *)D_00189E20)->ptr[0xAD4/4] + 0x10));
                         func_L00_002D34C0((s32) temp_s1_2, (s32) temp_s1_2, 0.015833333f);
                     }
                 }
-                temp_f20_3 = func_00282DF0((s32)(D_00189E20 + 0xF0)) * 0.00025f;
-                func_00282D30((s32) ((TI128*)v30), (s32)(D_00189E20 + 0xF0), -1.0f);
-                func_00282F20((s32) ((TI128*)v30), (s32) ((TI128*)v30), temp_f20_3);
-                func_00282CC0((s32)(D_00189E20 + 0xF0), (s32)(D_00189E20 + 0xF0), (s32) ((TI128*)v30));
+                temp_f20_3 = FastVecLength((s32)(D_00189E20 + 0xF0)) * 0.00025f;
+                FastVecScale((s32) ((TI128*)v30), (s32)(D_00189E20 + 0xF0), -1.0f);
+                vec_scale_to_length((s32) ((TI128*)v30), (s32) ((TI128*)v30), temp_f20_3);
+                FastVecAdd((s32)(D_00189E20 + 0xF0), (s32)(D_00189E20 + 0xF0), (s32) ((TI128*)v30));
             }
         }
         temp_v0_7 = ((Hero *)D_00189E20)->ptr[0xAD4/4];
@@ -1290,38 +1290,38 @@ block_224:
             temp_s0 = M2C_FIELD(temp_v0_7, void** , 0x68);
             temp_s1_3 = ((void*)D_00189E20) + 0xF0;
             if (temp_s0 != 0) {
-                temp_f0_9 = func_00282DF0((s32) temp_s1_3);
+                temp_f0_9 = FastVecLength((s32) temp_s1_3);
                 temp_f12 = M2C_FIELD(temp_s0, f32* , 0xC);
                 spF0 = temp_f0_9;
                 if (temp_f12 < temp_f0_9) {
-                    func_002AA2E8((s32) &spF0, temp_f12, 0.004166667f);
-                    func_00282F20((s32) temp_s1_3, (s32) temp_s1_3, spF0);
+                    ApproachValue((s32) &spF0, temp_f12, 0.004166667f);
+                    vec_scale_to_length((s32) temp_s1_3, (s32) temp_s1_3, spF0);
                 }
             }
         }
-        temp_f0_10 = func_00283B98(((Hero *)D_00189E20)->f[0x98/4], -1.5707965f);
+        temp_f0_10 = FastAddRotations(((Hero *)D_00189E20)->f[0x98/4], -1.5707965f);
         temp_s5 = ((void*)D_00189E20) + 0x80;
         temp_s4_2 = ((void*)D_00189E20) + 0xF0;
         vD0[0] = func_00283180(temp_f0_10) * 0.15f;
         temp_f0_11 = func_00283198(temp_f0_10) * 0.15f;
         (*(s32*)&vD0[2]) = 0;
         vD0[1] = temp_f0_11;
-        func_00282CC0((s32) &vD0[0], (s32) &vD0[0], (s32) temp_s5);
-        func_00282CC0((s32) ((TI128*)v30), (s32) &vD0[0], (s32) temp_s4_2);
-        func_00282CF0((s32) ((TI128*)vC0), (s32) ((TI128*)v30), (s32) (((Hero *)D_00189E20)->ptr[0xAD4/4] + 0x10));
-        func_00282F20((s32) ((TI128*)vC0), (s32) ((TI128*)vC0), ((Hero *)D_00189E20)->f[0xAE4/4]);
-        func_00282CC0((s32) ((TI128*)v30), (s32) (((Hero *)D_00189E20)->ptr[0xAD4/4] + 0x10), (s32) ((TI128*)vC0));
-        func_00282CF0((s32) temp_s4_2, (s32) ((TI128*)v30), (s32) &vD0[0]);
+        FastVecAdd((s32) &vD0[0], (s32) &vD0[0], (s32) temp_s5);
+        FastVecAdd((s32) ((TI128*)v30), (s32) &vD0[0], (s32) temp_s4_2);
+        FastVecSub((s32) ((TI128*)vC0), (s32) ((TI128*)v30), (s32) (((Hero *)D_00189E20)->ptr[0xAD4/4] + 0x10));
+        vec_scale_to_length((s32) ((TI128*)vC0), (s32) ((TI128*)vC0), ((Hero *)D_00189E20)->f[0xAE4/4]);
+        FastVecAdd((s32) ((TI128*)v30), (s32) (((Hero *)D_00189E20)->ptr[0xAD4/4] + 0x10), (s32) ((TI128*)vC0));
+        FastVecSub((s32) temp_s4_2, (s32) ((TI128*)v30), (s32) &vD0[0]);
         temp_f20_4 = ((Hero *)D_00189E20)->f[0xAE4/4];
         func_002AA3A8((s32) (((void*)D_00189E20) + 0xAE4), (s32) (((void*)D_00189E20) + 0xAE8), ((Hero *)D_00189E20)->f[0xAE0/4], ((Hero *)D_00189E20)->f[0xB04/4], ((Hero *)D_00189E20)->f[0xB08/4], ((Hero *)D_00189E20)->f[0xB0C/4]);
         temp_f20_5 = ((Hero *)D_00189E20)->f[0xAE4/4] - temp_f20_4;
-        if (((Hero *)D_00189E20)->f[0xAE4/4] < func_00282DF0((s32) ((TI128*)vC0))) {
-            func_00282F20((s32) ((TI128*)vC0), (s32) ((TI128*)vC0), temp_f20_5);
-            func_00282CC0((s32) temp_s5, (s32) temp_s5, (s32) ((TI128*)vC0));
+        if (((Hero *)D_00189E20)->f[0xAE4/4] < FastVecLength((s32) ((TI128*)vC0))) {
+            vec_scale_to_length((s32) ((TI128*)vC0), (s32) ((TI128*)vC0), temp_f20_5);
+            FastVecAdd((s32) temp_s5, (s32) temp_s5, (s32) ((TI128*)vC0));
         }
         if ((((Hero *)D_00189E20)->h[0xAFE/2] != 0) && (var_s7 != 0)) {
             min2B = 0.23333335f;
-            temp_f0_12 = func_00282E20((s32) temp_s4_2);
+            temp_f0_12 = vec_length_xy((s32) temp_s4_2);
             spF4 = temp_f0_12;
             if (temp_f0_12 < min2B) {
                 func_002AA3A8((s32) &spF4, (s32) (((void*)D_00189E20) + 0xAF4), min2B, 0.047f, 0.3f, 0.0f);
@@ -1329,12 +1329,12 @@ block_224:
                 temp_f0_13 = func_00283198(((Hero *)D_00189E20)->f[0xAEC/4]);
                 v30[2] = 0.0f;
                 v30[1] = temp_f0_13 * ((Hero *)D_00189E20)->f[0xAF4/4];
-                func_00282CC0((s32) temp_s4_2, (s32) temp_s4_2, (s32) ((TI128*)v30));
+                FastVecAdd((s32) temp_s4_2, (s32) temp_s4_2, (s32) ((TI128*)v30));
             }
         }
         if ((((Hero *)D_00189E20)->h[0xADC/2] != 0) && (((Hero *)D_00189E20)->h[0x34E/2] != 0) && (((temp_f24 < 0.0f) && (((Hero *)D_00189E20)->f[0xF8/4] > 0.0f)) || (((Hero *)D_00189E20)->h[0xAFC/2] != 0))) {
             ((Hero *)D_00189E20)->h[0xAFE/2] = 0;
-            temp_f20_6 = func_00282C10(((Hero *)D_00189E20)->f[0xAE0/4] / ((Hero *)D_00189E20)->f[0xAF0/4]) * 3.1415927f;
+            temp_f20_6 = square_root(((Hero *)D_00189E20)->f[0xAE0/4] / ((Hero *)D_00189E20)->f[0xAF0/4]) * 3.1415927f;
             temp_v0_8 = ((Hero *)D_00189E20)->h[0xAFC/2];
             if (temp_v0_8 != 0) {
                 var_v0_4 = temp_v0_8 == 1;
@@ -1344,22 +1344,22 @@ block_224:
             }
             if (var_v0_4 != 0) {
                 if (M2C_FIELD(temp_fp, u8* , 0x43) != 0x35) {
-                    func_L00_002D2168(0x35, 6, 17.0f);
+                    set_hero_animation(0x35, 6, 17.0f);
                     ((Hero *)D_00189E20)->h[0xAFC/2] = 1;
                 } else {
                     temp_v0_9 = ((Hero *)D_00189E20)->ptr[0x2290/4];
                     if (M2C_FIELD(temp_v0_9, u8* , 0x42) == M2C_FIELD(temp_v0_9, u8* , 0x43)) {
-                        func_L00_002A9E30(42.0f, temp_f20_6, 0.5f, -1.0f);
+                        AdjustHeroAnimationSpeedForTargetFrame(42.0f, temp_f20_6, 0.5f, -1.0f);
                         ((Hero *)D_00189E20)->h[0xAFC/2] = 0;
                     }
                 }
             } else if (M2C_FIELD(temp_fp, u8* , 0x43) != 0x35) {
-                func_L00_002D2168(0x35, 0x15, 9.0f);
+                set_hero_animation(0x35, 0x15, 9.0f);
                 ((Hero *)D_00189E20)->h[0xAFC/2] = 2;
             } else {
                 temp_v0_10 = ((Hero *)D_00189E20)->ptr[0x2290/4];
                 if (M2C_FIELD(temp_v0_10, u8* , 0x42) == M2C_FIELD(temp_v0_10, u8* , 0x43)) {
-                    func_L00_002A9E30(12.0f, temp_f20_6, 0.5f, -1.0f);
+                    AdjustHeroAnimationSpeedForTargetFrame(12.0f, temp_f20_6, 0.5f, -1.0f);
                     ((Hero *)D_00189E20)->h[0xAFC/2] = 0;
                 }
             }
@@ -1373,7 +1373,7 @@ block_224:
         if (((Hero *)D_00189E20)->b[0x1492] != 0) {
             temp_a1_3 = ((Hero *)D_00189E20)->i[0xBE4/4];
             if (temp_a1_3 != 0) {
-                temp_f1_5 = func_00282E80((s32) (((void*)D_00189E20) + 0x80), temp_a1_3 + 0x10);
+                temp_f1_5 = vec_distance_xy((s32) (((void*)D_00189E20) + 0x80), temp_a1_3 + 0x10);
                 var_v1_2 = 0;
                 if ((((Hero *)D_00189E20)->b[0x1496] != 0) || (((Hero *)D_00189E20)->b[0x149B] != 0) || (((Hero *)D_00189E20)->b[0x1495] != 0)) {
                     var_v1_2 = 1;
@@ -1396,15 +1396,15 @@ block_224:
             }
             temp_a1_4 = ((Hero *)D_00189E20)->i[0xBE4/4];
             if (temp_a1_4 != 0) {
-                func_00282CF0((s32)((TI128*)v0), temp_a1_4 + 0x10, (s32) (((void*)D_00189E20) + 0x80));
+                FastVecSub((s32)((TI128*)v0), temp_a1_4 + 0x10, (s32) (((void*)D_00189E20) + 0x80));
                 temp_f0_14 = func_L00_002D3A58((s32)((TI128*)v0));
                 if (((temp_f0_14 > 2.0f) && (temp_f0_14 < 5.0f)) || (var_s1_2 != 0)) {
                     ((Hero *)D_00189E20)->f[0x1B0/4] = 0.075f;
                 }
                 func_L00_002B41B8(0.0069444445f, 0.0069444445f);
-                func_00282F20((s32) ((TI128*)v10), (s32)D_00189E20, ((Hero *)D_00189E20)->f[0x1B4/4]);
+                vec_scale_to_length((s32) ((TI128*)v10), (s32)D_00189E20, ((Hero *)D_00189E20)->f[0x1B4/4]);
                 func_L00_002D3BD8((s32)(D_00189E20 + 0xF0), (s32)(D_00189E20 + 0xF0), 0.0f);
-                func_00282CC0((s32)(D_00189E20 + 0xF0), (s32)(D_00189E20 + 0xF0), (s32) ((TI128*)v10));
+                FastVecAdd((s32)(D_00189E20 + 0xF0), (s32)(D_00189E20 + 0xF0), (s32) ((TI128*)v10));
             } else {
                 if ((var_s1_2 != 0) && (((Hero *)D_00189E20)->i[0x1B8/4] < 0x46)) {
                     ((Hero *)D_00189E20)->f[0x1B0/4] = 0.075f;
@@ -1430,8 +1430,8 @@ block_224:
         if ((((Hero *)D_00189E20)->i[0xC2C/4] == 0) && (((Hero *)D_00189E20)->f[0xC38/4] > 23.5f) && (((Hero *)D_00189E20)->f[0x118/4] < 0.0f) && (((Hero *)D_00189E20)->h[0x34E/2] != 0)) {
             qcopy(v0, &((Hero *)D_00189E20)->q[0x80/16]);
             func_L00_002D3778((s32)((TI128*)v0), (s32)((TI128*)v0), -0.5f);
-            func_00282F20((s32) &v40[0], (s32)D_00189E20, 2.0f);
-            func_002A8C00((s32) ((TI128*)v10), (s32) ((Hero *)D_00189E20)->ptr[0x2290/4], 0x10000, 2.0f, (s32) &v40[0]);
+            vec_scale_to_length((s32) &v40[0], (s32)D_00189E20, 2.0f);
+            make_hit_descriptor((s32) ((TI128*)v10), (s32) ((Hero *)D_00189E20)->ptr[0x2290/4], 0x10000, 2.0f, (s32) &v40[0]);
             v10[3] = 5627.925f;
             (*(u8*)((u8*)v20+9)) = 1;
             (*(u16*)((u8*)v20+10)) = 0x47;
@@ -1453,7 +1453,7 @@ block_224:
         if (temp_v1_18 < 9) {
             temp_s0_2 = ((void*)D_00189E20) + 0xF0;
             spF8 = func_L00_002D3B00((s32) temp_s0_2);
-            func_002AA2E8((s32) &spF8, var_f21, 0.041666668f);
+            ApproachValue((s32) &spF8, var_f21, 0.041666668f);
             func_L00_002D3B58((s32) temp_s0_2, (s32) temp_s0_2, spF8);
         } else if (temp_v1_18 > lim3) {
             temp_s1_4 = ((void*)D_00189E20) + 0xF0;
@@ -1485,7 +1485,7 @@ block_224:
                     var_f20_6 = func_L00_002B9B38((s32) temp_s0_3, 0);
                     var_f0_3 = func_L00_002B9B38((s32) temp_s0_3, 1);
                 } else {
-                    var_f20_6 = func_00283BE0(((Hero *)D_00189E20)->f[0xBEC/4], ((Hero *)D_00189E20)->f[0x98/4]);
+                    var_f20_6 = fast_subtract_rotations(((Hero *)D_00189E20)->f[0xBEC/4], ((Hero *)D_00189E20)->f[0x98/4]);
                     var_f0_3 = func_002AA738(1, ((Hero *)D_00189E20)->f[0xBEC/4], ((Hero *)D_00189E20)->f[0x98/4]);
                 }
                 if (var_f0_3 < 4.3633237f) {
@@ -1512,7 +1512,7 @@ block_224:
                         if (((Hero *)D_00189E20)->u[0x2294/4] == 0x15) {
                             func_L00_002B75A0(14.0f, 0.52359885f, 0.78539824f);
                         } else {
-                            func_L00_0041E958(64.0f, 0.17453295f, 0.3490659f);
+                            UpdateHeroAimTarget(64.0f, 0.17453295f, 0.3490659f);
                         }
                     }
                 }
@@ -1532,7 +1532,7 @@ block_224:
         if (((Hero *)D_00189E20)->b[0x1492] != 0) {
             if (func_L00_002B3998(84.0f) != 0) {
                 var_f21_2 = 0.041666668f;
-                temp_f20_7 = func_00283B98(((Hero *)D_00189E20)->f[0x98/4], 3.1415927f);
+                temp_f20_7 = FastAddRotations(((Hero *)D_00189E20)->f[0x98/4], 3.1415927f);
                 if ((*(s32*)&D_00138320) & 8) {
                     var_f21_2 = 0.050000004f;
                 }
@@ -1565,9 +1565,9 @@ block_224:
         temp_s2_3 = (((Hero *)D_00189E20)->h[0xBFC/2] * 0x2C) + (s32)D_L04_00276890;
         if ((temp_a1_5 != 0) && (((Hero *)D_00189E20)->i[0x1B8/4] < 4)) {
             temp_s1_5 = ((void*)D_00189E20) + 0x80;
-            var_f12_13 = func_00282E80(temp_a1_5 + 0x10, (s32) temp_s1_5);
+            var_f12_13 = vec_distance_xy(temp_a1_5 + 0x10, (s32) temp_s1_5);
             if ((*(s32*)&D_L04_001A8FF0) != 0) {
-                var_f12_13 = func_00282E48(((Hero *)D_00189E20)->i[0xBE4/4] + 0x10, (s32) temp_s1_5);
+                var_f12_13 = fast_vec_dist(((Hero *)D_00189E20)->i[0xBE4/4] + 0x10, (s32) temp_s1_5);
             }
             var_f12_13 = var_f12_13 - 0.5f;
             if (var_f12_13 < 0.0f) {
@@ -1623,12 +1623,12 @@ block_224:
             }
             break;
         }
-        func_002AA2E8((s32)(D_00189E20 + 0xC20), 1.0f, 0.2f);
+        ApproachValue((s32)(D_00189E20 + 0xC20), 1.0f, 0.2f);
         if ((((Hero *)D_00189E20)->i[0xBE8/4] != 0) || (((Hero *)D_00189E20)->i[0xBE4/4] != 0)) {
         if (((Hero *)D_00189E20)->b[0x22C3] != 0) {
             var_f0_5 = func_L00_002B9B38((s32)(D_00189E20 + 0xBC0), 0);
         } else {
-            var_f0_5 = func_00283BE0(((Hero *)D_00189E20)->f[0xBEC/4], ((Hero *)D_00189E20)->f[0x98/4]);
+            var_f0_5 = fast_subtract_rotations(((Hero *)D_00189E20)->f[0xBEC/4], ((Hero *)D_00189E20)->f[0x98/4]);
         }
         temp_f1_8 = func_00282C48(var_f0_5);
         if ((M2C_FIELD(temp_s2_3, s32* , 4) == 1) && (var_f0_5 > 0.0f)) {
@@ -1665,15 +1665,15 @@ block_224:
         func_L00_002B9F00(3.7f, 0.0f, 0.35f);
             break;
     case 0x77:
-        func_002AA2E8((s32)(D_00189E20 + 0x1B4), 0.0f, 0.006666667f);
+        ApproachValue((s32)(D_00189E20 + 0x1B4), 0.0f, 0.006666667f);
         if ((*(s32*)&D_L04_001A8FF0) != 0) {
-            func_00282F20((s32)(D_00189E20 + 0xF0), (s32)(D_00189E20 + 0xBD0), ((Hero *)D_00189E20)->f[0x1B4/4]);
+            vec_scale_to_length((s32)(D_00189E20 + 0xF0), (s32)(D_00189E20 + 0xBD0), ((Hero *)D_00189E20)->f[0x1B4/4]);
             if (((Hero *)D_00189E20)->f[0x31C/4] > 0.0f) {
                 func_L00_002D34C0((s32)(D_00189E20 + 0xF0), (s32)(D_00189E20 + 0x130), 0.0069444445f);
             } else {
                 func_L00_002D3B58((s32)(D_00189E20 + 0xF0), (s32)(D_00189E20 + 0xF0), 0.0f);
             }
-            func_00282D30((s32)(D_00189E20 + 0x190), (s32)(D_00189E20 + 0xBD0), -1.0f);
+            FastVecScale((s32)(D_00189E20 + 0x190), (s32)(D_00189E20 + 0xBD0), -1.0f);
         } else {
             ((Hero *)D_00189E20)->f[0xF0/4] = (f32) (func_00283180(((Hero *)D_00189E20)->f[0xBF0/4]) * ((Hero *)D_00189E20)->f[0x1B4/4]);
             ((Hero *)D_00189E20)->f[0xF4/4] = (f32) (func_00283198(((Hero *)D_00189E20)->f[0xBF0/4]) * ((Hero *)D_00189E20)->f[0x1B4/4]);
@@ -1682,7 +1682,7 @@ block_224:
             } else {
                 ((Hero *)D_00189E20)->f[0xF8/4] = 0.0f;
             }
-            ((Hero *)D_00189E20)->f[0x1A0/4] = func_00283B98(((Hero *)D_00189E20)->f[0xBF0/4], 3.1415927f);
+            ((Hero *)D_00189E20)->f[0x1A0/4] = FastAddRotations(((Hero *)D_00189E20)->f[0xBF0/4], 3.1415927f);
         }
         func_L00_002B3EF8(0, 0.05f, 0.2f, 0.2821616f);
         break;
@@ -1738,7 +1738,7 @@ block_224:
                     v30[0] = 2.0f * func_00283180(((Hero *)D_00189E20)->f[0x98/4]);
                     v30[1] = 2.0f * func_00283198(((Hero *)D_00189E20)->f[0x98/4]);
                     v30[2] = 1.3f;
-                    func_002A8C00((s32)((TI128*)v0), (s32) ((Hero *)D_00189E20)->ptr[0x2290/4], 0x30000, 3.0f, (s32) ((TI128*)v30));
+                    make_hit_descriptor((s32)((TI128*)v0), (s32) ((Hero *)D_00189E20)->ptr[0x2290/4], 0x30000, 3.0f, (s32) ((TI128*)v30));
                     (*(u8*)((u8*)v10+9)) = 3;
                     v0[3] = 5627.925f;
                     (*(u8*)((u8*)v10+8)) = 0;
@@ -1748,21 +1748,21 @@ block_224:
                     temp_f0_15 = func_00283198(temp_f22_2) * 0.8f;
                     v40[2] = 0.55f;
                     v40[1] = temp_f0_15;
-                    func_00282CC0((s32) &v40[0], (s32) &v40[0], (s32) temp_s1_6);
+                    FastVecAdd((s32) &v40[0], (s32) &v40[0], (s32) temp_s1_6);
                     func_L00_002BA138((s32) temp_s2_4, func_00277F48(0.8f, (s32) &v40[0], 0, (s32) temp_s2_4, (s32)((TI128*)v0)));
-                    temp_f22_2 = func_00283B98(((Hero *)D_00189E20)->f[0x98/4], -0.8726647f);
+                    temp_f22_2 = FastAddRotations(((Hero *)D_00189E20)->f[0x98/4], -0.8726647f);
                     v40[0] = func_00283180(temp_f22_2) * 0.8f;
                     temp_f0_17 = func_00283198(temp_f22_2) * 0.8f;
                     v40[2] = 0.55f;
                     v40[1] = temp_f0_17;
-                    func_00282CC0((s32) &v40[0], (s32) &v40[0], (s32) temp_s1_6);
+                    FastVecAdd((s32) &v40[0], (s32) &v40[0], (s32) temp_s1_6);
                     func_L00_002BA138((s32) temp_s2_4, func_00277F48(0.8f, (s32) &v40[0], 0, (s32) ((Hero *)D_00189E20)->ptr[0x2290/4], (s32)((TI128*)v0)));
-                    temp_f22_2 = func_00283B98(((Hero *)D_00189E20)->f[0x98/4], 0.8726647f);
+                    temp_f22_2 = FastAddRotations(((Hero *)D_00189E20)->f[0x98/4], 0.8726647f);
                     v40[0] = func_00283180(temp_f22_2) * 0.8f;
                     temp_f0_19 = func_00283198(temp_f22_2) * 0.8f;
                     v40[2] = 0.55f;
                     v40[1] = temp_f0_19;
-                    func_00282CC0((s32) &v40[0], (s32) &v40[0], (s32) temp_s1_6);
+                    FastVecAdd((s32) &v40[0], (s32) &v40[0], (s32) temp_s1_6);
                     func_L00_002BA138((s32) temp_s2_4, func_00277F48(0.8f, (s32) &v40[0], 0, (s32) temp_s2_4, (s32)((TI128*)v0)));
                 }
             }
@@ -1770,7 +1770,7 @@ block_224:
         if (((Hero *)D_00189E20)->i[0x1B8/4] >= 0xB) {
             func_L00_002B9F00(3.7f, 0.0f, 0.35f);
         }
-        func_L01_002B4DA0(1);
+        ClipHeroVelocityAgainstWall(1);
         if (((Hero *)D_00189E20)->h[0x34E/2] != 0) {
             func_L00_002D34C0((s32) ((void*)D_00189E20) + 0xF0, (s32) ((void*)D_00189E20) + 0x120, 0.0061111115f);
             func_L00_002B4308();
@@ -1809,7 +1809,7 @@ block_224:
             if (((Hero *)D_00189E20)->f[0x174/4] > 0.008333334f) {
                 func_L00_002AA750(2, 4);
             }
-            func_L00_002AA938(5, 2, 0);
+            EmitHeroRandomizedMotionEffects(5, 2, 0);
         }
         if (((Hero *)D_00189E20)->h[0x1454/2] == 0) {
             if (((Hero *)D_00189E20)->f[0x174/4] < 0.028333336f) {
@@ -1818,8 +1818,8 @@ block_224:
                     ((Hero *)D_00189E20)->b[0x40F] = 1U;
                 }
             }
-            temp_f20_9 = func_L00_0032F038(1);
-            if ((func_00283C80(temp_f20_9, func_L00_0032F038(7)) > 1.9198624f) && (func_00282C48(((Hero *)D_00189E20)->f[0x1A8/4]) > 1.2217306f) && (((Hero *)D_00189E20)->f[0x24B8/4] == 1.0f)) {
+            temp_f20_9 = ReadPadFloatHistory(1);
+            if ((FastDiffRots(temp_f20_9, ReadPadFloatHistory(7)) > 1.9198624f) && (func_00282C48(((Hero *)D_00189E20)->f[0x1A8/4]) > 1.2217306f) && (((Hero *)D_00189E20)->f[0x24B8/4] == 1.0f)) {
                 ((Hero *)D_00189E20)->b[0x40F] = 1U;
                 ((Hero *)D_00189E20)->b[0x40C] = 1U;
             }
@@ -1839,7 +1839,7 @@ block_224:
             ((Hero *)D_00189E20)->f[0x1A0/4] = (f32) ((Hero *)D_00189E20)->f[0x408/4];
         } else {
             func_L00_002B3D10();
-            if ((func_L00_002ADEA0(0) == 0xA) && ((((Hero *)D_00189E20)->f[0x24BC/4] == 1.0f) || (((Hero *)D_00189E20)->i[0x410/4] != 0)) && (((Hero *)D_00189E20)->b[0x22BA] == 0)) {
+            if ((hero_slot_item_id(0) == 0xA) && ((((Hero *)D_00189E20)->f[0x24BC/4] == 1.0f) || (((Hero *)D_00189E20)->i[0x410/4] != 0)) && (((Hero *)D_00189E20)->b[0x22BA] == 0)) {
                 qcopy(&((Hero *)D_00189E20)->q[0x3F0/16], &((Hero *)D_00189E20)->q[0x190/16]);
                 ((Hero *)D_00189E20)->i[0x410/4] = 1;
                 ((Hero *)D_00189E20)->f[0x408/4] = ((Hero *)D_00189E20)->f[0x1A0/4];
@@ -1876,7 +1876,7 @@ block_224:
             }
         }
         func_L00_002B7B80();
-        func_L00_002B8CB8();
+        UpdateHeroLeanAndSwayParameters();
         if (((Hero *)D_00189E20)->b[0x40F] != 0) {
             var_f2_2 = 0.09916667f - (func_00282C48(((Hero *)D_00189E20)->f[0x1A8/4]) * 0.029178405f);
             if (var_f2_2 < 0.0f) {
@@ -1923,7 +1923,7 @@ block_224:
         } else {
             func_L00_002B4208(99999.0f);
         }
-        func_L01_002B4DA0(1);
+        ClipHeroVelocityAgainstWall(1);
         if (((Hero *)D_00189E20)->h[0x214/2] != 0) {
             func_L00_002B9F00(5.0f, 0.2f, 0.35f);
         }
@@ -1958,11 +1958,11 @@ block_224:
         } else {
             func_002AA3A8((s32) (((void*)D_00189E20) + 0x88), (s32) (((void*)D_00189E20) + 0xA00), ((Hero *)D_00189E20)->f[0x318/4] + 0.17f, 0.04f, 0.3f, 0.125f);
         }
-        func_00282D30((s32) ((TI128*)v10), (s32)(D_00189E20 + 0x110), 3.0f);
-        func_00282CC0((s32) ((TI128*)v10), (s32) ((TI128*)v10), (s32)(D_00189E20 + 0xE0));
+        FastVecScale((s32) ((TI128*)v10), (s32)(D_00189E20 + 0x110), 3.0f);
+        FastVecAdd((s32) ((TI128*)v10), (s32) ((TI128*)v10), (s32)(D_00189E20 + 0xE0));
         temp_v0_12 = func_00277F48(0.57f, (s32) ((TI128*)v10), 0, (s32) ((Hero *)D_00189E20)->ptr[0x2290/4], 0);
         if (temp_v0_12 != 0) {
-            func_00282D30((s32) ((TI128*)v20), (s32)(D_00189E20 + 0x110), 7.0f);
+            FastVecScale((s32) ((TI128*)v20), (s32)(D_00189E20 + 0x110), 7.0f);
             for (var_s0 = 0; var_s0 < temp_v0_12; var_s0++) {
                 if (func_002ABB78(((s32 *)D_L04_001C3B40)[var_s0]) != 0) {
                     func_002A8F70(((s32 *)D_L04_001C3B40)[var_s0], (s32) ((Hero *)D_00189E20)->ptr[0x2290/4], 0x10000, (s32) (((void*)D_00189E20) + 0x80), (s32) ((TI128*)v20), 1.0f);
@@ -2003,7 +2003,7 @@ block_224:
             ((Hero *)D_L04_00274D10)->f[0x274/4] = (f32) (func_00282C48(var_f20_9) * -0.09f);
             ((Hero *)D_L04_00274D10)->f[0x270/4] = (f32) (func_00282C48(var_f20_9) * 0.08f);
         } else if (temp_v1_25 == 0x66) {
-            temp_f22_3 = func_00283B98(func_00283BE0(func_00283248(((Hero *)D_00189E20)->f[0x110/4], ((Hero *)D_00189E20)->f[0x114/4]), ((Hero *)D_00189E20)->f[0x98/4]), 3.1415927f);
+            temp_f22_3 = FastAddRotations(fast_subtract_rotations(func_00283248(((Hero *)D_00189E20)->f[0x110/4], ((Hero *)D_00189E20)->f[0x114/4]), ((Hero *)D_00189E20)->f[0x98/4]), 3.1415927f);
             var_f21_5 = ((Hero *)D_00189E20)->f[0x174/4] * 6.9813175f;
             if (var_f21_5 > 0.43633235f) {
                 var_f21_5 = 0.43633235f;
@@ -2024,41 +2024,41 @@ block_224:
         break;
     case 0x17:
     case 0x18:
-        func_00282CF0((s32)(D_00189E20 + 0x190), (s32)(D_00189E20 + 0x560), (s32)(D_00189E20 + 0x550));
+        FastVecSub((s32)(D_00189E20 + 0x190), (s32)(D_00189E20 + 0x560), (s32)(D_00189E20 + 0x550));
         ((Hero *)D_00189E20)->f[0x1A0/4] = func_00283248(((Hero *)D_00189E20)->f[0x190/4], ((Hero *)D_00189E20)->f[0x194/4]);
         func_L00_002B3EF8(0, 0.04f, 0.2f, 0.10471977f);
         if (((Hero *)D_00189E20)->b[0x22C3] != 2) {
-            func_002AA800((s32)(D_00189E20 + 0x94), 0, 0.0f, 0.078539826f);
+            StepAngleTowardTarget((s32)(D_00189E20 + 0x94), 0, 0.0f, 0.078539826f);
         }
-        func_00282CF0((s32)(D_00189E20 + 0xF0), (s32)(D_00189E20 + 0x550), (s32)(D_00189E20 + 0x80));
+        FastVecSub((s32)(D_00189E20 + 0xF0), (s32)(D_00189E20 + 0x550), (s32)(D_00189E20 + 0x80));
         func_002AC9F8((s32)(D_00189E20 + 0xF0), 0.06666667f);
-        func_002AA2E8((s32)(D_00189E20 + 0x580), ((Hero *)D_00189E20)->f[0x88/4], 0.050000004f);
+        ApproachValue((s32)(D_00189E20 + 0x580), ((Hero *)D_00189E20)->f[0x88/4], 0.050000004f);
         break;
     case 0x19:
     case 0x1A:
-        func_00282CF0((s32)(D_00189E20 + 0x190), (s32)(D_00189E20 + 0x560), (s32)(D_00189E20 + 0x550));
+        FastVecSub((s32)(D_00189E20 + 0x190), (s32)(D_00189E20 + 0x560), (s32)(D_00189E20 + 0x550));
         ((Hero *)D_00189E20)->f[0x1A0/4] = func_00283248(((Hero *)D_00189E20)->f[0x190/4], ((Hero *)D_00189E20)->f[0x194/4]);
         func_L00_002B3EF8(0, 0.02f, 0.2f, 0.078539826f);
-        func_00282CF0((s32) ((TI128*)v60), (s32)(D_00189E20 + 0x560), (s32)(D_00189E20 + 0x550));
+        FastVecSub((s32) ((TI128*)v60), (s32)(D_00189E20 + 0x560), (s32)(D_00189E20 + 0x550));
         func_00282C88((s32)(D_00189E20 + 0xF0));
         if (((Hero *)D_00189E20)->u[0x2294/4] == 0x19) {
-            func_00282DD8((s32) &v40[0], (s32)(D_00189E20 + 0x2C0), (s32) ((TI128*)v60));
+            FastVecCross((s32) &v40[0], (s32)(D_00189E20 + 0x2C0), (s32) ((TI128*)v60));
         } else {
-            func_00282DD8((s32) &v40[0], (s32) ((TI128*)v60), (s32)(D_00189E20 + 0x2C0));
+            FastVecCross((s32) &v40[0], (s32) ((TI128*)v60), (s32)(D_00189E20 + 0x2C0));
         }
-        func_00282F20((s32) &v40[0], (s32) &v40[0], 0.2f);
-        func_00282CC0((s32) &v50[0], (s32)(D_00189E20 + 0x80), (s32) &v40[0]);
+        vec_scale_to_length((s32) &v40[0], (s32) &v40[0], 0.2f);
+        FastVecAdd((s32) &v50[0], (s32)(D_00189E20 + 0x80), (s32) &v40[0]);
         if ((func_L00_002ACF88((s32)(D_00189E20 + 0x80), (s32)(D_00189E20 + 0x90), 0) != 0) && (func_L00_002ACF88((s32) &v50[0], (s32)(D_00189E20 + 0x90), (s32)((TI128*)v0)) != 0)) {
-            func_00282CF0((s32)(D_00189E20 + 0xF0), (s32)((TI128*)v0), (s32)(D_00189E20 + 0x80));
-            var_v0_8 = func_00283CF0(((Hero *)D_00189E20)->f[0xC38/4]) * 4;
+            FastVecSub((s32)(D_00189E20 + 0xF0), (s32)((TI128*)v0), (s32)(D_00189E20 + 0x80));
+            var_v0_8 = FloatToInt(((Hero *)D_00189E20)->f[0xC38/4]) * 4;
             var_v1_4 = (s32)D_L04_001ACE68;
-            func_00282F20((s32)(D_00189E20 + 0xF0), (s32)(D_00189E20 + 0xF0), *(f32*)(var_v0_8 + var_v1_4) * 0.5f);
+            vec_scale_to_length((s32)(D_00189E20 + 0xF0), (s32)(D_00189E20 + 0xF0), *(f32*)(var_v0_8 + var_v1_4) * 0.5f);
         }
         break;
     case 0x76:
         ((Hero *)D_00189E20)->f[0x1A0/4] = ((Hero *)D_00189E20)->f[0x32C/4];
         ((Hero *)D_00189E20)->f[0x1B0/4] = 0.09166667f;
-        func_L00_002B6198(0.0069444445f);
+        ApproachHeroVelocity(0.0069444445f);
         func_L00_002D34C0((s32) (((void*)D_00189E20) + 0xF0), (s32) ((void*)D_00189E20) + 0x130, 0.005f);
         break;
     case 0x6:
@@ -2091,10 +2091,10 @@ block_224:
     case 0x74:
         ((Hero *)D_00189E20)->c[0x22BC] = 1;
         var_s1_5_u2 = ((void*)D_00189E20) + 0xF0;
-        func_002AA2E8((s32) (((void*)D_00189E20) + 0xA88), ((Hero *)D_00189E20)->f[0xA90/4], 0.0024240687f);
-        func_002AA2E8((s32) (((void*)D_00189E20) + 0xA8C), ((Hero *)D_00189E20)->f[0xA94/4], 0.0024240687f);
+        ApproachValue((s32) (((void*)D_00189E20) + 0xA88), ((Hero *)D_00189E20)->f[0xA90/4], 0.0024240687f);
+        ApproachValue((s32) (((void*)D_00189E20) + 0xA8C), ((Hero *)D_00189E20)->f[0xA94/4], 0.0024240687f);
         func_L00_002AA0F0(((Hero *)D_00189E20)->f[0xA88/4], ((Hero *)D_00189E20)->f[0xA8C/4], 0.0f);
-        func_L00_002EE4D8((s32) var_s1_5_u2, (s32) var_s1_5_u2, func_00282E20((s32) var_s1_5_u2) * 0.9f);
+        func_L00_002EE4D8((s32) var_s1_5_u2, (s32) var_s1_5_u2, vec_length_xy((s32) var_s1_5_u2) * 0.9f);
         func_L00_002D34C0((s32) var_s1_5_u2, (s32) var_s1_5_u2, ((Hero *)D_00189E20)->f[0xA80/4]);
         if (func_L00_002D3B00((s32) var_s1_5_u2) < -0.8333334f) {
             func_L00_002D3B58((s32) var_s1_5_u2, (s32) var_s1_5_u2, -0.8333334f);
@@ -2109,14 +2109,14 @@ block_224:
             var_a0_12 = 0;
         }
         if (var_a0_12 != 0) {
-            func_002AA2E8((s32) (((void*)D_00189E20) + 0x5B0), 0.0f, 0.1f);
+            ApproachValue((s32) (((void*)D_00189E20) + 0x5B0), 0.0f, 0.1f);
             temp_a0_15 = ((void*)D_00189E20) + 0xF0;
             func_L00_002D38A0((s32) temp_a0_15, (s32) temp_a0_15, 0.025f);
         } else {
-            func_002AA2E8((s32) (((void*)D_00189E20) + 0x5B0), 0.0f, 0.02f);
+            ApproachValue((s32) (((void*)D_00189E20) + 0x5B0), 0.0f, 0.02f);
         }
         if (((Hero *)D_00138180)->i[0x1A4/4] & 0x40) {
-            func_002AA2E8((s32)(D_00189E20 + 0x5B0), 0.0f, 0.5f);
+            ApproachValue((s32)(D_00189E20 + 0x5B0), 0.0f, 0.5f);
         }
         func_L00_002D34C0((s32)(D_00189E20 + 0xF0), (s32)(D_00189E20 + 0xF0), 0.0075000003f);
         if (func_L00_002D3B00((s32)(D_00189E20 + 0xF0)) > 0.10000001f) {
@@ -2150,10 +2150,10 @@ block_224:
         if (((Hero *)D_00189E20)->f[0x24B8/4] < 0.2f) {
             var_f12_19 = 0.00055555557f;
         }
-        func_L00_002B6198(var_f12_19);
+        ApproachHeroVelocity(var_f12_19);
         break;
     case 0x8:
-        if (func_L00_002ADEA0(3) == 2) {
+        if (hero_slot_item_id(3) == 2) {
             temp_a2_3 = ((Hero *)D_00189E20)->i[0x243C/4];
             if (temp_a2_3 != -1) {
                 temp_a0_16 = (temp_a2_3 * 0x70) + (s32)D_00188660;
@@ -2199,9 +2199,9 @@ block_224:
         func_L00_002D34C0((s32) temp_s0_7, (s32) temp_s0_7, -sp110);
         temp_f12_5 = ((Hero *)D_00189E20)->f[0x88/4];
         if (temp_f12_5 < ((Hero *)D_00189E20)->f[0x490/4]) {
-            func_002AA2E8((s32) (((void*)D_00189E20) + 0x490), temp_f12_5, 0.06666667f);
+            ApproachValue((s32) (((void*)D_00189E20) + 0x490), temp_f12_5, 0.06666667f);
         }
-        func_L00_002AC578();
+        ProbeHeroAirborneWallContact();
         break;
     case 0x7:
     case 0x9:
@@ -2241,12 +2241,12 @@ block_224:
             if (((Hero *)D_00189E20)->i[0x1B8/4] == 0x14) {
                 func_L00_002AABE0(3, 0x10, 1);
                 if (D_L04_001B2C70 != 0) {
-                    func_002FD1B8(D_L04_001B2C70, D_L04_001B2C78, 0, ((Hero *)D_00189E20)->f[0x80/4], ((Hero *)D_00189E20)->f[0x84/4], 0.4f, 0.35f);
+                    RippleDisturb(D_L04_001B2C70, D_L04_001B2C78, 0, ((Hero *)D_00189E20)->f[0x80/4], ((Hero *)D_00189E20)->f[0x84/4], 0.4f, 0.35f);
                 }
             }
             temp_f1_13 = ((Hero *)D_00189E20)->f[0xC38/4];
             if ((temp_f1_13 >= 4.0f) && (temp_f1_13 <= 7.0f)) {
-                func_L00_002AA938(7, 0, 0);
+                EmitHeroRandomizedMotionEffects(7, 0, 0);
             }
         }
         temp_a2_5 = ((Hero *)D_00189E20)->h[0x4AC/2];
@@ -2304,7 +2304,7 @@ block_224:
                     qcopy(v0, &((Hero *)D_00189E20)->q[0x80/16]);
                     func_L00_002D38A0((s32)((TI128*)v0), (s32)((TI128*)v0), 0.5f);
                     func_L00_002D3798((s32) ((TI128*)v10), (s32)((TI128*)v0), 0.95f);
-                    if (func_002761F8((s32)((TI128*)v0), (s32) ((TI128*)v10), 4, (s32) ((Hero *)D_00189E20)->ptr[0x2290/4], 0) != 0) {
+                    if (CollLine((s32)((TI128*)v0), (s32) ((TI128*)v10), 4, (s32) ((Hero *)D_00189E20)->ptr[0x2290/4], 0) != 0) {
                         ((Hero *)D_00189E20)->h[0x524/2] = 1;
                     }
                 }
@@ -2313,7 +2313,7 @@ block_224:
             func_L00_002B6BC8();
             if (((Hero *)D_00189E20)->u[0x2294/4] == 0x12) {
                 temp_s0_8 = ((void*)D_00189E20) + 0xF0;
-                var_f0_11 = func_00282E20((s32) temp_s0_8);
+                var_f0_11 = vec_length_xy((s32) temp_s0_8);
                 if (var_f0_11 > 0.06166667f) {
                     var_f0_11 = 0.06166667f;
                 }
@@ -2356,7 +2356,7 @@ block_224:
                     func_L00_002D36E0((s32)((TI128*)v0), 1, 0.8f, 0.0f, 0.3f);
                     temp_v0_17 = func_00277F48(0.9f, (s32)((TI128*)v0), 0, (s32) ((Hero *)D_00189E20)->ptr[0x2290/4], 0);
                     if (temp_v0_17 != 0) {
-                        func_00282D30((s32) ((TI128*)v10), (s32) (((void*)D_00189E20) + 0x110), 7.0f);
+                        FastVecScale((s32) ((TI128*)v10), (s32) (((void*)D_00189E20) + 0x110), 7.0f);
                         for (var_s0_2 = 0; var_s0_2 < temp_v0_17; var_s0_2++) {
                             if (func_002ABB78(((s32 *)D_L04_001C3B40)[var_s0_2]) != 0) {
                                 func_002A8F70(((s32 *)D_L04_001C3B40)[var_s0_2], (s32) ((Hero *)D_00189E20)->ptr[0x2290/4], 0x10000, (s32) (((void*)D_00189E20) + 0x80), (s32) ((TI128*)v10), 1.0f);
@@ -2366,8 +2366,8 @@ block_224:
                 }
             }
         }
-        func_L00_002B6560();
-        func_L00_002AC578();
+        ApplyHeroGravityAndJumpMotion();
+        ProbeHeroAirborneWallContact();
         break;
     case 0x16:
         var_f20_13 = func_L00_002D3A58((s32)(D_00189E20 + 0xF0));
@@ -2391,9 +2391,9 @@ block_224:
         ((Hero *)D_00189E20)->f[0xF8/4] = -0.38333336f;
         break;
     case 0x62:
-        func_00282CF0((s32)((TI128*)v0), (s32)(D_00189E20 + 0x18A0), (s32)(D_00189E20 + 0x80));
+        FastVecSub((s32)((TI128*)v0), (s32)(D_00189E20 + 0x18A0), (s32)(D_00189E20 + 0x80));
         ((Hero *)D_00189E20)->f[0x1A0/4] = func_00283248(v0[0], v0[1]);
-        temp_f0_30 = func_00282E20((s32)((TI128*)v0));
+        temp_f0_30 = vec_length_xy((s32)((TI128*)v0));
         if (temp_f0_30 > 0.2f) {
             hp32 = (Hero *)D_00189E20;
             hp32->f[0x24B8/4] = 1.0f;
@@ -2426,7 +2426,7 @@ block_224:
         func_L00_002B41B8(speed62 * 0.005f, 0.0055555557f);
         func_L00_002B4208(99999.0f);
         if (((Hero *)D_00189E20)->b[0x22B4] == 0) {
-            func_L01_002B4DA0(1);
+            ClipHeroVelocityAgainstWall(1);
         }
         if (((Hero *)D_00189E20)->h[0x34E/2] != 0) {
             func_L00_002D34C0((s32) ((void*)D_00189E20) + 0xF0, (s32) ((void*)D_00189E20) + 0x110, 0.0069444445f);
@@ -2436,13 +2436,13 @@ block_224:
         func_L00_002D34C0((s32) ((void*)D_00189E20) + 0xF0, (s32) ((void*)D_00189E20) + 0xF0, 0.015000001f);
         break;
     case 0x63:
-        func_00282CF0((s32)((TI128*)v0), (s32)(D_00189E20 + 0x18A0), (s32)(D_00189E20 + 0x80));
-        if (func_00282DB0((s32)((TI128*)v0), (s32)(D_00189E20 + 0x160)) < 0.0f) {
+        FastVecSub((s32)((TI128*)v0), (s32)(D_00189E20 + 0x18A0), (s32)(D_00189E20 + 0x80));
+        if (FastVecDot((s32)((TI128*)v0), (s32)(D_00189E20 + 0x160)) < 0.0f) {
             func_00282C88((s32)(D_00189E20 + 0x160));
         }
         func_00282C88((s32)(D_00189E20 + 0xF0));
         func_L00_002B94D8(0.0075000003f);
-        func_L01_002B4DA0(0);
+        ClipHeroVelocityAgainstWall(0);
         if (((Hero *)D_00189E20)->h[0x34E/2] != 0) {
             func_L00_002D34C0((s32) ((void*)(D_00189E20 + 0xF0)), (s32) ((void*)(D_00189E20 + 0x18A0)) - 0x1790, 0.0069444445f);
             func_L00_002B4308();

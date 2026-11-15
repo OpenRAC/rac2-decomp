@@ -126,8 +126,8 @@ void func_L12_003E04B8(TodanoInitObject *o) {
         d->f588 |= 1;
         func_002B60B0(o, 0.00333333341f, 0.100000009f, 0.00349065894f, 0.209439546f);
         qcopy((u8 *)d + 0x760, (u8 *)o + 0x10);
-        func_00282CF0((u8 *)d + 0x770, (u8 *)o + 0x10, D_L12_001B2F8C[0] + (d->f518 << 7) + 0x30);
-        func_00283098((u8 *)d + 0x770, (u8 *)d + 0x770, D_L12_001B2F8C[0] + (d->f518 << 7) + 0x40);
+        FastVecSub((u8 *)d + 0x770, (u8 *)o + 0x10, D_L12_001B2F8C[0] + (d->f518 << 7) + 0x30);
+        matrix_mul_vec3((u8 *)d + 0x770, (u8 *)d + 0x770, D_L12_001B2F8C[0] + (d->f518 << 7) + 0x40);
         d->f598 = (u8 *)d + 0x6C0;
         d->f59C = (u8 *)d + 0x640;
         d->f790 = func_L02_0032E508(o, d->f510, (u8 *)d + 0x110, 32);
@@ -137,7 +137,7 @@ void func_L12_003E04B8(TodanoInitObject *o) {
         if (o->f43)func_002A7470(o, 0, 0, 0);
         D_L12_001B09F4 = 0;
     }
-    if (o->f31 && func_00282E48((u8 *)o + 0x10, D_L12_001B9E00) < 24) {
+    if (o->f31 && fast_vec_dist((u8 *)o + 0x10, D_L12_001B9E00) < 24) {
         func_002A93B0(o);
         o->f6F = 22;
     }

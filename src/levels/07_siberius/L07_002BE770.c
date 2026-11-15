@@ -19,7 +19,7 @@ char *func_L07_00336860(void *a, void *b, int c, int d)
  q=p+0x20;
  *(int *)(q+0x10)=func_002A7820(32,80);
  *(int *)(p+4)=0x808080;
- p[9]=func_00283CF0(2.0f)-16; p[1]=0; p[3]=0x48;
+ p[9]=FloatToInt(2.0f)-16; p[1]=0; p[3]=0x48;
  if(func_002A77E0(2)) p[2]=D_L07_001FEEA4[0]; else p[2]=D_L07_001FEF00[0];
  *(float *)(p+12)=func_002A7878(0.1f,0.24f)*210000.0f;
  p[8]=func_002A77E0(255);

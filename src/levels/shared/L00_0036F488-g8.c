@@ -104,7 +104,7 @@ void func_L00_0036F488(void)
     blocked |= func_L00_002D6880() != 0;
     func_L00_002FC058();
 
-    if (func_L00_0032EF10(16, D_L00_001A8FB8, 0) && D_L00_001B19C4 >= 8) {
+    if (PadPressedWithin(16, D_L00_001A8FB8, 0) && D_L00_001B19C4 >= 8) {
         if (((Hero *)D_00189E20)->state != 0x6F && ((Hero *)D_00189E20)->mode != 2 && ((Hero *)D_00189E20)->state != 0x31 && blocked
             && ((Hero *)D_00189E20)->state != 0x1C && !D_L00_001A8F00 && D_L00_001B18E0 < 0.2f
             && ((Hero *)D_00189E20)->f22B4 < 2 && !D_L00_001A8FB4 && D_001A7BB0[3]) {
@@ -188,8 +188,8 @@ normal:
         func_002B9390();
         func_L00_002ED808();
         func_00272368();
-        func_002E4AC8();
-        func_002914B8();
+        UpdateSoundVoices();
+        UpdateLightingEnvironment();
         func_0029FFB8();
         func_0028E138(1);
         func_0029BCD8();

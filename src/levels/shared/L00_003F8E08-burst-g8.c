@@ -34,13 +34,13 @@ void func_L00_003FD178(float *point)
     int j;
     char *effect;
 
-    func_00282CF0((char *)delta, D_L00_001B8DC0, (char *)point);
+    FastVecSub((char *)delta, D_L00_001B8DC0, (char *)point);
     base_angle = func_00283248(delta[0], delta[1]);
     for (i = 0; i < 15; i++) {
         scale = func_002A7878(0.5f, 1.25f);
-        kind = func_00283CF0(func_002A78D8(1.0f, 2.0f));
+        kind = FloatToInt(func_002A78D8(1.0f, 2.0f));
         elevation = func_002A7878(0.0f, 1.3962636f);
-        angle = func_00283B98(base_angle, func_002A78D8(0.0f, 1.3962636f));
+        angle = FastAddRotations(base_angle, func_002A78D8(0.0f, 1.3962636f));
         func_002AF000(direction, scale * 0.016666668f, angle, elevation);
         position[0] = point[0] + func_002A78D8(0.0f, 0.2f);
         position[1] = point[1] + func_002A78D8(0.0f, 0.2f);
@@ -62,10 +62,10 @@ void func_L00_003FD178(float *point)
         effect = func_002C2210(trail_scale * 0.1f, position, 60, trail_scale,
                                0x7FFF1010, 0, sign, direction, 0, 0.003f);
         if (effect != 0)
-            effect[9] = func_00283CF0(4.0f) + 112;
+            effect[9] = FloatToInt(4.0f) + 112;
         effect = func_002C2210(trail_scale * 0.05f, position, 60, trail_scale * 0.5f,
                                0x7F7F7F7F, 1, -sign, direction, 0, 0.003f);
         if (effect != 0)
-            effect[9] = func_00283CF0(4.0f) + 112;
+            effect[9] = FloatToInt(4.0f) + 112;
     }
 }

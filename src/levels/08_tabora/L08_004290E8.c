@@ -35,7 +35,7 @@ void func_L08_004290E8(char *a0) {
             } else if (v == 4) {
                 func_L08_00429408(i);
             } else if (v != 0) {
-                func_L08_00429560(D_L08_001B3A30[i], i);
+                update_slot_panes_and_effects(D_L08_001B3A30[i], i);
                 count++;
                 D_L08_001B39A0[i] = 4;
             }

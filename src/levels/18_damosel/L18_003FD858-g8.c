@@ -17,13 +17,13 @@ void func_L18_003FD858(u8 *a) {
  case 0:
   qcopy(s+0x40,a+0x10);
   W(s,0x6c)=(int)(F(s,0x60)/(F(s,0x64)*0.0166666675f));
-  func_00282F20(s+0x50,s+0x30,F(s,0x60)/(float)W(s,0x6c));
+  vec_scale_to_length(s+0x50,s+0x30,F(s,0x60)/(float)W(s,0x6c));
   func_002A7750(a,1,-1);
   W(s,0x68)=0; W(s,0x74)=0;
   break;
  case 1:
   if(W(s,0x68)>=2) {
-   func_00282CF0(a+0x10,a+0x10,s+0x50);
+   FastVecSub(a+0x10,a+0x10,s+0x50);
    W(s,0x68)--;
   } else if(W(s,0x68)>0) {
    qcopy_nc(a+0x10,s+0x40); W(s,0x68)--;
@@ -36,7 +36,7 @@ void func_L18_003FD858(u8 *a) {
   break;
  case 2:
   if(W(s,0x68)<W(s,0x6c)) {
-   func_00282CC0(a+0x10,a+0x10,s+0x50); W(s,0x68)++;
+   FastVecAdd(a+0x10,a+0x10,s+0x50); W(s,0x68)++;
   }
   if(!(D_L18_001B2348[0]&15)) {
    if(func_L18_003FDD68(a,W(s,0x70)!=-1?D_L18_001B281C+(W(s,0x70)<<8)+0x10:D_00189EA0))

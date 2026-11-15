@@ -42,7 +42,7 @@ void func_L00_003C8828(char *owner)
     func_0029FCC0(owner, 0, &origin);
     targetVector = &target;
     radius = D_00189E20.state == 29 ? 11.0f : 4.5f;
-    func_002FDF40(targetVector, &origin, 0, 0, 1.5f, radius, 0.25f, 0.0030555557f);
+    CalculateAimedLaunchVelocity(targetVector, &origin, 0, 0, 1.5f, radius, 0.25f, 0.0030555557f);
     allowed = 1;
     FIELD(context, int, 0x24) = func_002FE5A0(&origin, targetVector, context,
         context + 0x10, owner, 0, 0, 0.0030555557f);
@@ -62,19 +62,19 @@ void func_L00_003C8828(char *owner)
     case 1:
         if ((D_00138324 & D_00189E20.input) && !D_00189E20.flag && allowed) {
             if (func_L00_002D3F30(-1, 1)) {
-                func_L00_002AF568();
+                start_equipped_item_animation();
                 FIELD(owner, unsigned char, 0x20) = 2;
                 FIELD(context, int, 0x20) = 20;
             } else {
-                func_002E5CF8(2, 0, owner);
+                PlayMobySound(2, 0, owner);
             }
         }
         break;
     case 2:
         if (func_00282948(context + 0x20)) {
-            func_002E5CF8(0, 0, owner);
+            PlayMobySound(0, 0, owner);
             func_L00_0038A748(owner, &origin, targetVector);
-            func_L00_002AF7D0();
+            cancel_hero_item_animation();
             FIELD(owner, unsigned char, 0x20) = 3;
             FIELD(context, int, 0x20) = 10;
         }

@@ -225,12 +225,12 @@ void func_L23_003BF9B0(Moby_003BF9B0 *moby)
         vars->f88 |= 0x81;
         moby->f32 = 0xFF;
         moby->f30 = 0xFF;
-        vars->child = func_0029EFD0(0x7E6);
-        func_00283360(vars->child->fC0);
+        vars->child = CreateMoby(0x7E6);
+        set_identity_rotation_rows(vars->child->fC0);
         vars->f258 = 0;
         func_L23_003C0028(moby);
-        vars->f48 = func_00283CF0(12.0f);
-        vars->f4A = func_00283CF0(14.4f);
+        vars->f48 = FloatToInt(12.0f);
+        vars->f4A = FloatToInt(14.4f);
     } else if (ref_L23_003BF9B0_00 != 0 && D_L23_001B1424 == 0) {
         if (D_L23_001B36AC < 10)
             func_L23_003C1B58(moby);
@@ -251,12 +251,12 @@ void func_L23_003BF9B0(Moby_003BF9B0 *moby)
         vars->child->f78 = moby->f78;
         vars->child->f31 = 1;
         vars->child->scale = vars->child->pClass->scale * k;
-        if (vars->child->f31 != 0 && func_00282E48(vars->child->pos, D_L23_001BA640) < 24.0f) {
+        if (vars->child->f31 != 0 && fast_vec_dist(vars->child->pos, D_L23_001BA640) < 24.0f) {
             func_002A93B0(vars->child);
             vars->child->f6F = 22;
         }
     }
-    if (moby->f31 != 0 && func_00282E48(moby->pos, D_L23_001BA640) < 24.0f) {
+    if (moby->f31 != 0 && fast_vec_dist(moby->pos, D_L23_001BA640) < 24.0f) {
         func_002A93B0(moby);
         moby->f6F = 22;
     }

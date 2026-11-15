@@ -41,26 +41,26 @@ void func_L22_002B8E10(int force) {
         func_L00_002D36E0(start, zero, zero, reach, 1);
         func_L00_002D36E0(extended_start, zero, zero, reach * 0.3f, 1);
     }
-    if (force != 0 || func_00282E20(D_00189E20 + 0xF0) < 0.01f) {
-        func_00282F20(end, D_00189E20, scale);
-        func_00282F20(extended_end, D_00189E20, scale * 1.4f);
+    if (force != 0 || vec_length_xy(D_00189E20 + 0xF0) < 0.01f) {
+        vec_scale_to_length(end, D_00189E20, scale);
+        vec_scale_to_length(extended_end, D_00189E20, scale * 1.4f);
     } else {
         func_L00_002D3B58(end, D_00189E20 + 0xF0, 0);
-        func_00282F20(end, end, scale);
-        func_00282D30(extended_end, end, 1.4f);
+        vec_scale_to_length(end, end, scale);
+        FastVecScale(extended_end, end, 1.4f);
     }
-    func_00282CC0(end, end, start);
+    FastVecAdd(end, end, start);
     hit = -1;
-    func_00282CC0(extended_end, extended_end, extended_start);
+    FastVecAdd(extended_end, extended_end, extended_start);
     {
         char *g = D_00189E20;
-        if (func_002761F8(extended_start, extended_end, 2, *(void **)(g + 0x2290), 0) && D_L22_001C00C0.count > 0)
-            hit = func_00278E78();
+        if (CollLine(extended_start, extended_end, 2, *(void **)(g + 0x2290), 0) && D_L22_001C00C0.count > 0)
+            hit = GetCollHitMaterial();
     }
     angle = 0;
     {
         char *g = D_00189E20;
-        if (func_002761F8(start, end, 2, *(void **)(g + 0x2290), 0) && D_L22_001C00C0.count > 0)
+        if (CollLine(start, end, 2, *(void **)(g + 0x2290), 0) && D_L22_001C00C0.count > 0)
             angle = func_L00_002D3EA8(D_L22_001C00C0.normal);
     }
     if (angle >= 0.8726647f || hit == 8 || hit == 12) {
@@ -70,11 +70,11 @@ void func_L22_002B8E10(int force) {
         float dot;
         *(void **)(g + 0x270) = contact->object;
         func_L00_002D3B58(normal, normal, 0);
-        func_00282F20(normal, normal, 1);
-        dot = func_00282DB0(normal, g + 0xF0);
+        vec_scale_to_length(normal, normal, 1);
+        dot = FastVecDot(normal, g + 0xF0);
         if (dot < 0) {
-            func_00282D30(normal, normal, -dot);
-            func_00282CC0(g + 0xF0, g + 0xF0, normal);
+            FastVecScale(normal, normal, -dot);
+            FastVecAdd(g + 0xF0, g + 0xF0, normal);
         }
     }
 }

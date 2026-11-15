@@ -98,14 +98,14 @@ void func_L11_00411D40(TurretMoby *moby) {
     func_0029FCC0(moby, 3, &seat);
     seat.f[2] += 0.4f;
     if (moby->state >= 4) {
-        if (func_00282978(&vars->mount_delay) != 0 && moby->command == 1 &&
+        if (FastDecTimer(&vars->mount_delay) != 0 && moby->command == 1 &&
             D_00189E20.mode != 0x14 && D_00189E20.mode != 7 && D_00189E20.state != 0x39 && D_L11_001A8FB4 == 0) {
             qcopy_nc(&D_00189E20.pos, &seat);
             qcopy_nc(&D_00189E20.rot, moby->rot);
             offset.f[0] = func_00283180(D_00189E20.rot.f[2]) * -0.4f;
             offset.f[1] = func_00283198(D_00189E20.rot.f[2]) * -0.4f;
             offset.f[2] = 0.0f;
-            func_00282CC0(&D_00189E20.pos, &D_00189E20.pos, &offset);
+            FastVecAdd(&D_00189E20.pos, &D_00189E20.pos, &offset);
             func_00282A88(&D_00189E20.velocity, 0xA0);
             if (D_00138180.pressed & 0x10) {
                 func_003355A8(0);
@@ -117,7 +117,7 @@ void func_L11_00411D40(TurretMoby *moby) {
             } else {
                 if (moby->state != 5) {
                     vars->dismount_delay = 2;
-                    func_00335438(D_00189E20.moby + 0x10, D_00189E20.moby + 0xf0, 0, 0, 0);
+                    SetCamera5Pose(D_00189E20.moby + 0x10, D_00189E20.moby + 0xf0, 0, 0, 0);
                     if (moby->prev_seq != 4) {
                         func_002A7470(moby, 4, 0, 5);
                     }
@@ -126,13 +126,13 @@ void func_L11_00411D40(TurretMoby *moby) {
                 moby->speed = 2.0f;
             }
         } else if (moby->command == 2) {
-            if (func_00282E48(&seat, D_00189E20.moby + 0x10) > 1.2f || D_00189E20.ground != moby) {
+            if (fast_vec_dist(&seat, D_00189E20.moby + 0x10) > 1.2f || D_00189E20.ground != moby) {
                 moby->command = 0;
                 vars->mount_delay = 60;
             }
         } else if (D_00189E20.mode != 0x14 && D_00189E20.mode != 7 &&
                    D_00189E20.state != 0x39 && D_00189E20.ground == moby &&
-                   func_00282E48(&seat, D_00189E20.moby + 0x10) < 1.2f && vars->mount_delay == 0 && D_L11_001A8FB4_block[0] == 0) {
+                   fast_vec_dist(&seat, D_00189E20.moby + 0x10) < 1.2f && vars->mount_delay == 0 && D_L11_001A8FB4_block[0] == 0) {
             moby->command = 1;
             func_L11_002D8EF8(0x31, 1);
         }
@@ -151,22 +151,22 @@ void func_L11_00411D40(TurretMoby *moby) {
         D_00188660.owner = moby;
         return;
     case 4:
-        if (func_00282E80(moby->pos, &D_00189E20.pos) < 4.0f) {
+        if (vec_distance_xy(moby->pos, &D_00189E20.pos) < 4.0f) {
             moby->pos[2] += ((vars->rest_z - 1.0f) - moby->pos[2]) * 0.11f;
             if (D_00189E20.ground != moby) {
-                yaw = func_00283B98(vars->yaw_speed,
-                func_00283B98(func_00283BE0(
+                yaw = FastAddRotations(vars->yaw_speed,
+                FastAddRotations(fast_subtract_rotations(
                     func_00283248(D_00189E20.pos.f[0] - moby->pos[0], D_00189E20.pos.f[1] - moby->pos[1]),
                     moby->rot[2]), 3.14159298f) * 0.01f) * 0.9f;
                 vars->yaw_speed = yaw;
-                moby->rot[2] = func_00283B98(moby->rot[2], yaw);
+                moby->rot[2] = FastAddRotations(moby->rot[2], yaw);
             } else vars->yaw_speed = 0.0f;
-            func_00283098(&tmp, &D_L11_001B0CA0, moby->matrix);
-            func_00282CC0(&tmp, &tmp, &seat);
+            matrix_mul_vec3(&tmp, &D_L11_001B0CA0, moby->matrix);
+            FastVecAdd(&tmp, &tmp, &seat);
             if (vars->beam == -1) {
                 vars->beam_frames = 0;
                 vars->beam = func_L00_002FCF18(&tmp, 0.4f, 0.0f, 4.0f, 4.0f, 4.0f);
-                func_002E5CF8(2, 0, moby);
+                PlayMobySound(2, 0, moby);
             } else {
                 beam = &D_L11_001C8A40[vars->beam];
                 beam->pos[0] = tmp.f[0];
@@ -190,7 +190,7 @@ void func_L11_00411D40(TurretMoby *moby) {
                 moby->pos[2] = vars->rest_z;
             }
             if (D_00189E20.ground != moby && vars->beam != -1) {
-                func_002E5CF8(0, 0, moby);
+                PlayMobySound(0, 0, moby);
                 func_00291450(vars->beam);
                 vars->beam = -1;
             }
@@ -208,16 +208,16 @@ void func_L11_00411D40(TurretMoby *moby) {
         if (D_L11_001A7BA4[0]) invert = 1;
         stick_y = -D_00189E20.stick_y * invert;
         tmp.f[1] = stick_y;
-        len = func_00282E20(&tmp);
+        len = vec_length_xy(&tmp);
         if (len > 1.0f) {
-            func_00282D90(&tmp, &tmp, len);
+            divide_vector_xyz(&tmp, &tmp, len);
         }
         vars->yaw_speed += -tmp.f[0] * 0.0008726647356525064f;
         if (tmp.f[0] == 0.0f) vars->yaw_speed = 0.0f;
         if (vars->yaw_speed != 0.0f) {
             u8 *slot = (u8 *)&D_00188660 + vars->sound * 0x70;
             if (*(u8 **)(slot + 0x88) != moby || !slot[0x74])
-                vars->sound = func_002E5CF8(3, 4, moby);
+                vars->sound = PlayMobySound(3, 4, moby);
         } else {
             if (vars->sound != -1) {
                 u8 *slot = (u8 *)&D_00188660 + vars->sound * 0x70;
@@ -228,8 +228,8 @@ void func_L11_00411D40(TurretMoby *moby) {
         }
         vars->pitch_speed += -tmp.f[1] * 0.00031512894f;
         if (tmp.f[1] == 0.0f) vars->pitch_speed = 0.0f;
-        moby->rot[2] = func_00283B98(moby->rot[2], vars->yaw_speed);
-        vars->pitch = func_00283B98(vars->pitch, vars->pitch_speed);
+        moby->rot[2] = FastAddRotations(moby->rot[2], vars->yaw_speed);
+        vars->pitch = FastAddRotations(vars->pitch, vars->pitch_speed);
         if (vars->pitch < -0.52359885f) {
             vars->pitch = -0.52359885f;
             vars->pitch_speed = 0.0f;
@@ -249,7 +249,7 @@ void func_L11_00411D40(TurretMoby *moby) {
                     func_002AF000(&shot, 1.0f, moby->rot[2], vars->pitch);
                     func_0029FCC0(moby, 0, &muzzle);
                     func_L11_00450328(moby, &shot, &muzzle, 0, 6.0f);
-                    func_002E5CF8(1, 0, moby);
+                    PlayMobySound(1, 0, moby);
                     D_L11_001BA780.unk160 = 0.03f;
                     D_L11_001BA780.unk168 = 10;
                     D_L11_001BA780.unk170 = 0.03f;
@@ -262,12 +262,12 @@ void func_L11_00411D40(TurretMoby *moby) {
                         rnd.f[1] = func_002A7878(-1.0f, 1.0f);
                         rnd.f[2] = func_002A7878(-1.0f, 1.0f);
                         dir.q = rnd.q;
-                        func_00282F20(&dir, &dir, func_00282DF0(&shot) * 0.65f);
-                        func_00282CC0(&dir, &shot, &dir);
-                        func_00282F20(&dir, &dir, func_002A7878(0.050000004f, 0.10000001f));
+                        vec_scale_to_length(&dir, &dir, FastVecLength(&shot) * 0.65f);
+                        FastVecAdd(&dir, &shot, &dir);
+                        vec_scale_to_length(&dir, &dir, func_002A7878(0.050000004f, 0.10000001f));
                         func_L04_00358AE8(&muzzle, &dir, 0x5F2F4F6F, func_002A7820(5, 10), 50000.0f);
                     }
-                    func_00282F20(&shot, &shot, 0.008333334f);
+                    vec_scale_to_length(&shot, &shot, 0.008333334f);
                     func_L04_00358AE8(&muzzle, &shot, 0x2F4F7F7F, func_002A7820(4, 7), 500000.0f);
                 } else if (moby->anim_flags & 2) {
                     func_002A7470(moby, 3, 0, 1);
@@ -277,7 +277,7 @@ void func_L11_00411D40(TurretMoby *moby) {
                     func_002AF000(&shot, 1.0f, moby->rot[2], vars->pitch);
                     func_0029FCC0(moby, 1, &muzzle);
                     func_L11_00450328(moby, &shot, &muzzle, 0, 6.0f);
-                    func_002E5CF8(1, 0, moby);
+                    PlayMobySound(1, 0, moby);
                     D_L11_001BA780.unk160 = 0.03f;
                     D_L11_001BA780.unk168 = 10;
                     D_L11_001BA780.unk170 = 0.03f;
@@ -290,12 +290,12 @@ void func_L11_00411D40(TurretMoby *moby) {
                         rnd.f[1] = func_002A7878(-1.0f, 1.0f);
                         rnd.f[2] = func_002A7878(-1.0f, 1.0f);
                         dir.q = rnd.q;
-                        func_00282F20(&dir, &dir, func_00282DF0(&shot) * 0.65f);
-                        func_00282CC0(&dir, &shot, &dir);
-                        func_00282F20(&dir, &dir, func_002A7878(0.050000004f, 0.10000001f));
+                        vec_scale_to_length(&dir, &dir, FastVecLength(&shot) * 0.65f);
+                        FastVecAdd(&dir, &shot, &dir);
+                        vec_scale_to_length(&dir, &dir, func_002A7878(0.050000004f, 0.10000001f));
                         func_L04_00358AE8(&muzzle, &dir, 0x5F2F4F6F, func_002A7820(5, 10), 50000.0f);
                     }
-                    func_00282F20(&shot, &shot, 0.008333334f);
+                    vec_scale_to_length(&shot, &shot, 0.008333334f);
                     func_L04_00358AE8(&muzzle, &shot, 0x2F4F7F7F, func_002A7820(4, 7), 500000.0f);
                 } else if (moby->anim_flags & 2) {
                     func_002A7470(moby, 2, 0, 1);
@@ -304,14 +304,14 @@ void func_L11_00411D40(TurretMoby *moby) {
         } else if (moby->prev_seq != 4 && (moby->anim_flags & 2)) {
             func_002A7470(moby, 4, 0, 1);
         }
-        if (func_00282978(&vars->dismount_delay) != 0) {
+        if (FastDecTimer(&vars->dismount_delay) != 0) {
             func_002A0F48(moby);
             moby->flags |= 4;
             func_L11_004885A0();
             func_0029FCC0(moby, 2, &tmp);
             func_002AF000(&shot, D_L11_001B0C90, moby->rot[2], vars->pitch);
             shot.f[2] += D_L11_001B0C94;
-            func_00282CC0(&muzzle, &tmp, &shot);
+            FastVecAdd(&muzzle, &tmp, &shot);
             func_00335370(&muzzle);
             dir.f[0] = 0.0f;
             dir.f[1] = -vars->pitch;

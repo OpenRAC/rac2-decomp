@@ -55,8 +55,8 @@ char *func_L00_003E6778(char *rec, int mode, float amount, char *pos)
             *(float *)(p + 36) = zero;
             *(int *)(p + 88) = *(int *)(p + 84) = func_002A7820(100, 120);
             qcopy(p, *(char **)(p + 124) + 32);
-            func_00282F20(v, p + 16, func_002A7878(0.15f, 0.75f));
-            func_00282CC0(p, v, p);
+            vec_scale_to_length(v, p + 16, func_002A7878(0.15f, 0.75f));
+            FastVecAdd(p, v, p);
             *(int *)(p + 112) = 2;
             goto zero_angle;
         } else if (mode == 1) {
@@ -87,10 +87,10 @@ zero_angle:
             *(float *)(p + 76) = func_002A7878(0.5f, 0.8f) * 1.15f;
             *(float *)(p + 36) = 0.058333337f;
             *(int *)(p + 88) = *(int *)(p + 84) = 90;
-            func_00282F20(v, *(char **)(p + 124), 0.2f);
-            func_00282CC0(p, *(char **)(p + 124) + 32, v);
-            func_00282F20(w, p + 16, 0.75f);
-            func_00282CC0(p, w, p);
+            vec_scale_to_length(v, *(char **)(p + 124), 0.2f);
+            FastVecAdd(p, *(char **)(p + 124) + 32, v);
+            vec_scale_to_length(w, p + 16, 0.75f);
+            FastVecAdd(p, w, p);
             *(float *)(p + 48) = func_002A78D8(0.052359886f, 0.10471977f);
             *(int *)(p + 112) = mode;
         }

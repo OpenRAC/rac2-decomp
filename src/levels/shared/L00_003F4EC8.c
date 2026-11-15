@@ -35,17 +35,17 @@ void func_L00_003F4EC8(unsigned char *object) {
     else
         qcopy(&previous,object + 0x10);
     position = (float *)(object + 0x10);
-    func_00282CC0(position, position, state);
+    FastVecAdd(position, position, state);
     if (*(int *)(state + 0x28) == 1)
-        func_00282CC0(state + 0x40, state + 0x40, state + 0x30);
+        FastVecAdd(state + 0x40, state + 0x40, state + 0x30);
     if ((unsigned char)object[0x20] == 0)
         object[0x20] = 1;
     for (i = 0; i < 4; i++) {
-        func_00282D08(&point, &previous, position, func_00283CE0(i) * 0.25f);
+        lerp_vector(&point, &previous, position, IntToFloat(i) * 0.25f);
         func_L00_003F5750(object, &point);
     }
     func_L00_003F6900(object, position);
-    func_00282D08(&point, &previous, position, 0.5f);
+    lerp_vector(&point, &previous, position, 0.5f);
     func_L00_003F6900(object, &point);
     if (*(float *)(object + 0x10) < 2.0f || *(float *)(object + 0x10) > 1021.0f ||
         *(float *)(object + 0x14) < 2.0f || *(float *)(object + 0x14) > 1021.0f ||

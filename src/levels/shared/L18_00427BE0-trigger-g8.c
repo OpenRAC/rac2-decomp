@@ -23,11 +23,11 @@ void func_L18_0042B008(u8 *object)
     unsigned short id;
     u8 *counter; u8 *hero0;
     if (!state) return;
-    *(float *)(state + 4) = func_00283B98(*(float *)(state + 4), 0.10471977293491364f);
+    *(float *)(state + 4) = FastAddRotations(*(float *)(state + 4), 0.10471977293491364f);
     if (object[0x20] == 0) {
         func_0029FCC0(object, 0, &point);
         touched = 0;
-        distance = func_00282E80(D_00189E20 + 0x80, &point);
+        distance = vec_distance_xy(D_00189E20 + 0x80, &point);
         state[8] = 0;
         hero0 = D_00189E20;
         if (*(u8 **)(hero0 + 0x33C) == object && *(int *)(hero0 + 0x340) &&
@@ -75,7 +75,7 @@ activate:
                 } else func_002DF3F8(D_00189E20 + 0x80, D_00189E20 + 0x90);
             }
         }
-        value = func_00283CF0((func_00283198(*(float *)(state + 4)) * 4.0f - 3.0f) * 128.0f);
+        value = FloatToInt((func_00283198(*(float *)(state + 4)) * 4.0f - 3.0f) * 128.0f);
         if (value > 128) value = 128;
         else if (value < 32) value = 32;
         { u32 color = ((u32)value << 8) | 0x80000000U;

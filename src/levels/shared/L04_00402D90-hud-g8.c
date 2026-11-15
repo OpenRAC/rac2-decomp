@@ -50,9 +50,9 @@ void func_L04_0040C880(unsigned char *m)
         if(i==4) { a=120;b=149;do{c=156;}while(0);d=171; }
         else { j=i*30; a=j;b=a+30;d=a+45;c=b; }
         colors[i]=0;
-        if(frame>=a && frame<b) colors[i]=func_00283D38(0,start.v[i],(float)(frame-a)*0.033333335f);
+        if(frame>=a && frame<b) colors[i]=FastTweenColor(0,start.v[i],(float)(frame-a)*0.033333335f);
         else if(frame>=b && frame<c && b!=c) colors[i]=start.v[i];
-        else if(frame>=c && frame<d) colors[i]=func_00283D38(start.v[i],end.v[i],(float)(frame-c)*0.06666667f);
+        else if(frame>=c && frame<d) colors[i]=FastTweenColor(start.v[i],end.v[i],(float)(frame-c)*0.06666667f);
         else if(frame>=d) colors[i]=end.v[i];
     }
     i=0;
@@ -61,7 +61,7 @@ void func_L04_0040C880(unsigned char *m)
     sine=func_00283198(angle);
     sine=sine/func_00283180(angle);
     D_L04_001BDB80.tan_half=sine;
-    func_0027AB40();
+    UpdateViewContext();
 
     one=1;
     for(;i<2;i++) {
@@ -79,7 +79,7 @@ void func_L04_0040C880(unsigned char *m)
         for(j=0;j<5;j++) {
             func_00300A00(func_00336D50((char *)D_L04_001A904C+0x8710,61),fy,colors[j],(float)(D_001A7B90?y.v[j]:x.v[j]),0.8f,0.8f,0.0f);
         }
-        func_002FC560(71,0x5360b);
+        VU1_addGSregister(71,0x5360b);
     }
     if(m[0x20]!=3) {
         float turn, ratio;
@@ -88,6 +88,6 @@ void func_L04_0040C880(unsigned char *m)
         ratio=func_00283198(turn);
         ratio=ratio/func_00283180(turn);
         D_L04_001BDB80.tan_half=ratio;
-        func_0027AB40();
+        UpdateViewContext();
     }
 }

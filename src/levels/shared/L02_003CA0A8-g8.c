@@ -45,14 +45,14 @@ void func_L02_003CA0A8(char *obj)
     for (i = 0; i < 32; i++) {
         alpha = func_002A7820(D_L02_001AFFC8, D_L02_001AFFB8[0].alpha[1]);
         r = func_002A7878(zero, 1.0f);
-        color = func_00283D38(D_L02_001AFFD0, D_L02_001AFFB8[0].colors[1], r);
+        color = FastTweenColor(D_L02_001AFFD0, D_L02_001AFFB8[0].colors[1], r);
         r = func_002A7878(speed.a, speed.b);
         vel[0] = func_00283180(angle) * r;
         vel[1] = func_00283198(angle) * r;
         vel[2] = zero;
-        angle = func_00283B98(angle, func_002A7878(range.a, range.b));
+        angle = FastAddRotations(angle, func_002A7878(range.a, range.b));
         func_002C3150(pos, vel, color, alpha & 255, func_002A77E0(255) & 255, 0, D_L02_001AFFD8);
-        func_00282D30(vel, vel, 0.8f);
+        FastVecScale(vel, vel, 0.8f);
         func_002C3150(pos, vel, color, alpha & 255, func_002A77E0(255) & 255, 0, D_L02_001AFFB8[0].sizes[1]);
     }
 }

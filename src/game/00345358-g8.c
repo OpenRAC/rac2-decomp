@@ -49,7 +49,7 @@ void func_003464D0(char *o)
     f[6] = (int)&D_001AE4B0;
     f[5] = (int)&D_001AE4A8;
     f[22] = 1;
-    func_00337210(f);
+    DrawItemGrid(f);
 }
 
 extern char D_001AA7D8[];
@@ -96,7 +96,7 @@ void func_003463C8(char *o)
     f[6] = (int)&D_001AE480;
     f[5] = (int)&D_001AE478;
     f[22] = 1;
-    func_00337210(f);
+    DrawItemGrid(f);
 }
 
 /* Pad input on the 3 x 2 selection grid: up/down/left/right move the cursor (sound 3) and

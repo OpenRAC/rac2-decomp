@@ -55,13 +55,13 @@ void func_002F8918(int *cancel, int *confirm)
         *cancel = 0;
         *confirm = 0;
         if (ROW.kind == 1 && D_00139688[ROW.item] >= ITEM.capacity) {
-            func_002E5CF8(2, 17, D_0021F240.moby);
+            PlayMobySound(2, 17, D_0021F240.moby);
         } else if (ROW.kind == 1) {
             PurchaseItem *record = &ITEM;
-            if (D_001A79F8 < record->price) func_002E5CF8(2, 17, D_0021F240.moby);
+            if (D_001A79F8 < record->price) PlayMobySound(2, 17, D_0021F240.moby);
             else *confirm = 1;
-        } else if (D_001A79F8 < func_002F6510()) {
-            func_002E5CF8(2, 0, D_0021F240.moby);
+        } else if (D_001A79F8 < GetSelectedShopItemPrice()) {
+            PlayMobySound(2, 0, D_0021F240.moby);
         }
         D_0021F240.state = 2;
     } else if (D_0021F240.state == 2) {
@@ -70,7 +70,7 @@ void func_002F8918(int *cancel, int *confirm)
                 if (D_001B2248 >= 2) {
                     --D_001B2248;
                     if (!(D_001B223C & 3) || D_001B223C < 16)
-                        func_002E5CF8(1, 17, D_0021F240.moby);
+                        PlayMobySound(1, 17, D_0021F240.moby);
                 }
             }
             if ((BUTTONS & 0x2000) || (D_001B2240 >= 16 && !(D_001B2240 & 7)) || D_001B2240 >= 48) {
@@ -82,7 +82,7 @@ void func_002F8918(int *cancel, int *confirm)
                     if (D_001B2248 < max) {
                         ++D_001B2248;
                         if (!(D_001B2240 & 3) || D_001B2240 < 16)
-                            func_002E5CF8(1, 17, D_0021F240.moby);
+                            PlayMobySound(1, 17, D_0021F240.moby);
                     }
                 }
             }
@@ -101,9 +101,9 @@ void func_002F8918(int *cancel, int *confirm)
             if (ROW.kind == 1) {
                 PurchaseItem *record = &ITEM;
                 cost = record->price * D_001B2248;
-            } else cost = func_002F6510();
+            } else cost = GetSelectedShopItemPrice();
             if (D_001A79F8 < cost && D_00139688[ROW.item] >= (gate = &ITEM)->capacity) {
-                func_002E5CF8(0, 17, D_0021F240.moby);
+                PlayMobySound(0, 17, D_0021F240.moby);
             } else if (ROW.kind == 1) {
                 int *ammo = &D_00139688[ROW.item];
                 PurchaseItem *record = &ITEM;
@@ -120,15 +120,15 @@ void func_002F8918(int *cancel, int *confirm)
                             D_001A79F8 -= total;
                         }
                         func_002F6608(0);
-                        func_002F88D8(func_00288FB8(0x2DCB));
-                        func_002E5CF8(7, 17, D_0021F240.moby);
+                        func_002F88D8(GetLocalizedString(0x2DCB));
+                        PlayMobySound(7, 17, D_0021F240.moby);
                     } else {
-                        func_002F88D8(func_00288FB8(0x2DCC));
-                        func_002E5CF8(0, 17, D_0021F240.moby);
+                        func_002F88D8(GetLocalizedString(0x2DCC));
+                        PlayMobySound(0, 17, D_0021F240.moby);
                     }
-                } else func_002E5CF8(0, 17, D_0021F240.moby);
+                } else PlayMobySound(0, 17, D_0021F240.moby);
             } else {
-                int price = func_002F6510();
+                int price = GetSelectedShopItemPrice();
                 if (D_001A79F8 >= price) {
                     item = ROW.item;
                     func_00288308(item);
@@ -155,19 +155,19 @@ void func_002F8918(int *cancel, int *confirm)
                     func_0028A130(D_0021F240.last);
                     D_001A79F8 -= price;
                     func_002F6608(0);
-                    if (D_0021F240.handle != -1) func_0028B6C8(D_0021F240.handle, 0);
+                    if (D_0021F240.handle != -1) set_animation_parameter(D_0021F240.handle, 0);
                     D_0021F240.handle = -1;
                     if (ROW.kind == 1) func_0029B6D0(ROW.item, 0x112A880);
                     else if (D_0021F240.index > D_0021F240.count - 1) D_0021F240.index = D_0021F240.count - 1;
-                    func_002F88D8(func_00288FB8(0x2DCB));
-                    func_002E5CF8(7, 17, D_0021F240.moby);
+                    func_002F88D8(GetLocalizedString(0x2DCB));
+                    PlayMobySound(7, 17, D_0021F240.moby);
                 } else {
-                    func_002F88D8(func_00288FB8(0x2DCC));
-                    func_002E5CF8(0, 17, D_0021F240.moby);
+                    func_002F88D8(GetLocalizedString(0x2DCC));
+                    PlayMobySound(0, 17, D_0021F240.moby);
                 }
             }
-        } else func_002E5CF8(0, 17, D_0021F240.moby);
+        } else PlayMobySound(0, 17, D_0021F240.moby);
         D_0021F240.state = 0;
-        func_002FB1A0();
+        PrepareVendorSelectionPreview();
     }
 }

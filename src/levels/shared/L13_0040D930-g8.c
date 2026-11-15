@@ -27,16 +27,16 @@ void func_L13_0040D930(char *obj)
     }
     switch ((unsigned char)obj[0x20]) {
     case 0:
-        func_00282CC0(&v.end, obj + 0x10, s);
-        func_002A8C00(v.collision, obj, 1, s, *(float *)(s + 0x14));
+        FastVecAdd(&v.end, obj + 0x10, s);
+        make_hit_descriptor(v.collision, obj, 1, s, *(float *)(s + 0x14));
         *(unsigned short *)(v.collision + 0x1A) = *(unsigned short *)(obj + 0xAA);
-        if (func_002761F8(obj + 0x10, &v.end, 0, obj, v.collision)) {
+        if (CollLine(obj + 0x10, &v.end, 0, obj, v.collision)) {
             if (D_L13_001BFD00.hit) {
                 if (D_L13_001BFD00.hit != *(char **)(s + 0x10)) {
                     qcopy(&v.scaled, s);
-                    func_00282D30(&v.scaled, &v.scaled, 2.0f);
+                    FastVecScale(&v.scaled, &v.scaled, 2.0f);
                     ((float *)&v.scaled)[3] = 5627.9248046875f;
-                    func_002A8C00(v.damage, obj, 0x10001, &v.scaled, *(float *)(s + 0x14));
+                    make_hit_descriptor(v.damage, obj, 0x10001, &v.scaled, *(float *)(s + 0x14));
                     v.damage[0x19] = 1;
                     *(unsigned short *)(v.damage + 0x1A) = *(unsigned short *)(obj + 0xAA);
                     v.damage[0x18] = 0;
@@ -46,9 +46,9 @@ void func_L13_0040D930(char *obj)
                 }
             } else {
                 qcopy(&v.scaled, s);
-                func_00282D30(&v.scaled, &v.scaled, 3.0f);
+                FastVecScale(&v.scaled, &v.scaled, 3.0f);
                 ((float *)&v.scaled)[3] = 5627.9248046875f;
-                func_002A8C00(v.damage, obj, 0x10001, &v.scaled, *(float *)(s + 0x14));
+                make_hit_descriptor(v.damage, obj, 0x10001, &v.scaled, *(float *)(s + 0x14));
                 v.damage[0x19] = 1;
                 *(unsigned short *)(v.damage + 0x1A) = *(unsigned short *)(obj + 0xAA);
                 v.damage[0x18] = 0;
@@ -58,7 +58,7 @@ void func_L13_0040D930(char *obj)
             }
         }
         qcopy(obj + 0x10, &v.end);
-        func_00282D30(&v.scaled, s, -0.5f);
+        FastVecScale(&v.scaled, s, -0.5f);
         func_00282C88(v.damage);
         break;
     case 1:

@@ -68,12 +68,12 @@ void func_L20_0039D7B0(char *arg0) {
 
     s1 = *(char **)(s0 + 0x68);
     func_L20_0039DF18(s0, 0);
-    func_L20_0039D880(s0);
+    SpawnHealthThresholdEffects(s0);
     if ((D_L20_001B2AC8 & 7) == (((s32)s0 >> 8) & 7)) {
         func_L20_0039D680(s0);
     }
     c = 0.009696274995803833f;
-    r = func_00283BE0(*(f32 *)(s1 + 0x284), *(f32 *)(s0 + 0xF8));
+    r = fast_subtract_rotations(*(f32 *)(s1 + 0x284), *(f32 *)(s0 + 0xF8));
     {
         f32 c2 = c;
         func_002AAA00(s1 + 0x288, s1 + 0x28C, r, c, c2, 0.58177649974823f, 0);
@@ -239,19 +239,19 @@ void func_L20_0039E1E8(char *arg0) {
     hero = D_00189E20;
     if (*(char **)(state + 0x200) == *(char **)(hero + 0x2290)) {
         angle = func_002A7878(-45.0f, 45.0f);
-        angle = func_00283B98(angle * 0.017453294f, D_L20_001B9FD8);
+        angle = FastAddRotations(angle * 0.017453294f, D_L20_001B9FD8);
         *(f32 *)(state + 0x260) = func_00283180(angle) * dist;
         *(f32 *)(state + 0x264) = func_00283198(angle) * dist;
         *(int *)(state + 0x268) = 0;
-        func_00282CC0(state + 0x260, state + 0x260, hero + 0x80);
+        FastVecAdd(state + 0x260, state + 0x260, hero + 0x80);
     } else {
-        func_00282CF0(state + 0x260, arg0 + 0x10, *(char **)(state + 0x200) + 0x10);
-        if (dist < func_00282DF0(state + 0x260)) {
+        FastVecSub(state + 0x260, arg0 + 0x10, *(char **)(state + 0x200) + 0x10);
+        if (dist < FastVecLength(state + 0x260)) {
             func_00282F70(state + 0x260, state + 0x260, dist);
         }
-        func_00282CC0(state + 0x260, state + 0x260, *(char **)(state + 0x200) + 0x10);
+        FastVecAdd(state + 0x260, state + 0x260, *(char **)(state + 0x200) + 0x10);
     }
-    *(f32 *)(state + 0x11C) = func_00282E80(arg0 + 0x10, state + 0x260);
+    *(f32 *)(state + 0x11C) = vec_distance_xy(arg0 + 0x10, state + 0x260);
 }
 
 
@@ -330,8 +330,8 @@ void func_L20_003C0350(char *arg0) {
         return;
     }
     {
-        f32 v = func_00283CE0(*(s32 *)(s1 + 4)) * *(f32 *)(s1 + 8);
-        scale = func_002A7AA8(-1.0f, 0.0f, 1.0f, 0.0f, 1.0f - v);
+        f32 v = IntToFloat(*(s32 *)(s1 + 4)) * *(f32 *)(s1 + 8);
+        scale = cubic_hermite_scalar(-1.0f, 0.0f, 1.0f, 0.0f, 1.0f - v);
     }
     out = D_L20_0023E670;
     base = D_L20_001B2F9C;
@@ -372,7 +372,7 @@ s32 func_L20_00435178(char *arg0, s32 arg1) {
     s2 = func_L09_00329028(s1, s0);
     if (s2 == 0) {
         if (s0 != -1) {
-            f0 = func_00282E80(s1 + 0x10,
+            f0 = vec_distance_xy(s1 + 0x10,
                                D_L20_001FEC80[s0] + ((*(s16 *)(s3 + 0x1CA) << 4) + 0x10));
             if (!(*(f32 *)(s3 + 0x134) > f0)) {
             } else {

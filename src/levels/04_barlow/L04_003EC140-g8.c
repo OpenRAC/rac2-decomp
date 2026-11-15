@@ -35,7 +35,7 @@ void func_L04_003EC140(char *o)
     char *p = *(char **)(o + 0x68);
 
     qcopy(o + 0x10, p + 0x1b0);
-    func_00115484(input, 0, 12);
+    memset(input, 0, 12);
     scale = 1.0f;
     active = 0;
     if (D_00189E20.ptr[0x33c / 4] == o && D_00189E20.i[0x340 / 4]) {
@@ -46,9 +46,9 @@ void func_L04_003EC140(char *o)
             *(int *)(p + 0x1d4) = 0;
             *(int *)(p + 0x1d8) = 0;
         }
-        func_00283698(matrix, o + 0xc0);
-        func_00282CF0(delta, D_00189E20.b + 0x80, o + 0x10);
-        func_00283098(delta, delta, matrix);
+        matrix_from_basis_rows(matrix, o + 0xc0);
+        FastVecSub(delta, D_00189E20.b + 0x80, o + 0x10);
+        matrix_mul_vec3(delta, delta, matrix);
         input[0] += -delta[1] * 0.333f;
         input[1] += delta[0] * 1.5f;
     }
@@ -65,13 +65,13 @@ void func_L04_003EC140(char *o)
     *(float *)(o + 0xf0) = *(float *)(p + 0x1c4);
     *(float *)(o + 0xf4) = *(float *)(p + 0x1c8);
     *(float *)(o + 0x18) += *(float *)(p + 0x1cc);
-    angle = func_00283B98(*(float *)(p + 0x1a8), D_L04_001B00E8 * 0.0002908882452175021f);
+    angle = FastAddRotations(*(float *)(p + 0x1a8), D_L04_001B00E8 * 0.0002908882452175021f);
     *(float *)(p + 0x1a8) = angle;
     *(float *)(o + 0xf0) += D_L04_001B00F8 * (func_00283198(angle) * 0.017453294f);
-    angle = func_00283B98(*(float *)(p + 0x1ac), D_L04_001B00EC[0] * 0.0002908882452175021f);
+    angle = FastAddRotations(*(float *)(p + 0x1ac), D_L04_001B00EC[0] * 0.0002908882452175021f);
     *(float *)(p + 0x1ac) = angle;
     *(float *)(o + 0xf4) += D_L04_001B00FC[0] * (func_00283198(angle) * 0.017453294f);
-    angle = func_00283B98(*(float *)(p + 0x1c0), D_L04_001B00F0[0] * 0.0002908882452175021f);
+    angle = FastAddRotations(*(float *)(p + 0x1c0), D_L04_001B00F0[0] * 0.0002908882452175021f);
     *(float *)(p + 0x1c0) = angle;
     *(float *)(o + 0x18) += D_L04_001B0100[0] * func_00283198(angle);
 }

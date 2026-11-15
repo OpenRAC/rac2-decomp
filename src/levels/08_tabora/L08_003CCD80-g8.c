@@ -89,7 +89,7 @@ void func_L08_003CCD80(char * object) {
         if (FIELD(object, s16, 0xAA) == 0x8F9) {
             FIELD(state, s16, 4) = D_L08_001AFF24;
             FIELD(state, u8, 0x1E) = D_L08_001AFF2C;
-            FIELD(state, float, 8) = func_00283CE0(FIELD(state, u8, 0x1C));
+            FIELD(state, float, 8) = IntToFloat(FIELD(state, u8, 0x1C));
             FIELD(state, void *, 0x10) = func_L08_003CCC30(object, 0x8F8, D_L08_001AFF26, FIELD(state, u8, 0x1C), FIELD(state, int, 0), D_L08_001AFF2E, FIELD(state, u8, 0x1D));
             FIELD(state, void *, 0x14) = func_L08_003CCC30(object, 0x8F7, D_L08_001AFF28, FIELD(state, u8, 0x1C), FIELD(state, int, 0), D_L08_001AFF30, FIELD(state, u8, 0x1D));
             FIELD(state, void *, 0x18) = func_L08_003CCC30(object, 0x8F6, D_L08_001AFF2A, FIELD(state, u8, 0x1C), FIELD(state, int, 0), D_L08_001AFF32, FIELD(state, u8, 0x1D));
@@ -116,10 +116,10 @@ void func_L08_003CCD80(char * object) {
             FIELD(state, u8, 0x1C) = 0;
         }
     }
-    FIELD(object, u8, 0x23) = FIELD(state, u8, 0x1E) + func_00283CF0(func_00283CE0(255 - FIELD(state, u8, 0x1E)) * FIELD(state, float, 8));
+    FIELD(object, u8, 0x23) = FIELD(state, u8, 0x1E) + FloatToInt(IntToFloat(255 - FIELD(state, u8, 0x1E)) * FIELD(state, float, 8));
     if (FIELD(state, float, 8) < 1) {
         if (FIELD(state, u8, 0x1D)) {
-            rotationDelta = -func_00283CF0(func_00283CE0(FIELD(state, s16, 4)) * (1.0f - FIELD(state, float, 8)));
+            rotationDelta = -FloatToInt(IntToFloat(FIELD(state, s16, 4)) * (1.0f - FIELD(state, float, 8)));
             FIELD(state, s16, 6) += rotationDelta;
             if (FIELD(state, s16, 6) > 4096) {
                 FIELD(state, s16, 6) -= 4096;
@@ -128,13 +128,13 @@ void func_L08_003CCD80(char * object) {
                 FIELD(state, s16, 6) += 4096;
                 rotationDelta += 4096;
             }
-            func_L00_00310838(FIELD(object, void *, 0x24), 0, rotationDelta);
+            offset_moby_class_point_pairs(FIELD(object, void *, 0x24), 0, rotationDelta);
         }
-        if (!func_002A77E0(D_L08_001AFF5C + func_00283CF0(D_L08_001AFF60 * FIELD(state, float, 8)) - 1)) {
-            func_00282F20(acceleration, object + 0xC0, func_002A7878(-D_L08_001AFF38, D_L08_001AFF38));
-            func_00282CC0(velocity, object + 0x10, acceleration);
-            func_00282F20(acceleration, object + 0xD0, func_002A7878(-D_L08_001AFF3C, D_L08_001AFF3C));
-            func_00282CC0(velocity, velocity, acceleration);
+        if (!func_002A77E0(D_L08_001AFF5C + FloatToInt(D_L08_001AFF60 * FIELD(state, float, 8)) - 1)) {
+            vec_scale_to_length(acceleration, object + 0xC0, func_002A7878(-D_L08_001AFF38, D_L08_001AFF38));
+            FastVecAdd(velocity, object + 0x10, acceleration);
+            vec_scale_to_length(acceleration, object + 0xD0, func_002A7878(-D_L08_001AFF3C, D_L08_001AFF3C));
+            FastVecAdd(velocity, velocity, acceleration);
             velocity[2] = FIELD(state, float, 0xC) + D_L08_001AFFCC;
             first = func_002A7878(D_L08_001AFF40, D_L08_001AFF44);
             second = func_002A7878(D_L08_001AFF48, D_L08_001AFF4C);
@@ -147,7 +147,7 @@ void func_L08_003CCD80(char * object) {
             slot = FIELD(state, s8, 0x1F);
             sound = D_00188660 + slot * 0x70;
             if (FIELD(sound, void *, 0x88) != object || !FIELD(sound, u8, 0x74))
-                slot = func_002E5CF8(0, 4, object);
+                slot = PlayMobySound(0, 4, object);
             FIELD(state, s8, 0x1F) = slot;
             if (!func_002A77E0(D_L08_001AFFC0 - 1)) {
                 velocity[3] = func_002A7878(D_L08_001AFF90, D_L08_001AFF94);
@@ -155,21 +155,21 @@ void func_L08_003CCD80(char * object) {
                 if (!func_002A77E0(2)) {
                     qcopy(position, object + 0x10);
                     position[2] += D_L08_001AFFC4;
-                    func_00282F20(offset, object + 0xC0, func_002A7878(D_L08_001AFFA0, D_L08_001AFFA4));
-                    func_00282CC0(position, position, offset);
-                    func_00282F20(offset, object + 0xD0, func_002A7878(D_L08_001AFFA8, D_L08_001AFFAC));
-                    func_00282CC0(position, position, offset);
+                    vec_scale_to_length(offset, object + 0xC0, func_002A7878(D_L08_001AFFA0, D_L08_001AFFA4));
+                    FastVecAdd(position, position, offset);
+                    vec_scale_to_length(offset, object + 0xD0, func_002A7878(D_L08_001AFFA8, D_L08_001AFFAC));
+                    FastVecAdd(position, position, offset);
                 } else {
-                    func_00282CF0(position, D_L08_001B9B00, object + 0x10);
-                    func_00282F20(position, position, 1);
+                    FastVecSub(position, D_L08_001B9B00, object + 0x10);
+                    vec_scale_to_length(position, position, 1);
                     position[2] = 0;
                     func_002836E8(inverseBasis, object + 0xC0);
-                    func_00283098(position, position, inverseBasis);
+                    matrix_mul_vec3(position, position, inverseBasis);
                     position[0] *= func_002A7878(D_L08_001AFFB0, D_L08_001AFFB4);
                     position[1] *= func_002A7878(0, D_L08_001AFFBC);
                     position[2] = func_002A7878(0, D_L08_001AFFC4);
-                    func_00283098(position, position, object + 0xC0);
-                    func_00282CD8(delta, position, object + 0x10);
+                    matrix_mul_vec3(position, position, object + 0xC0);
+                    add_vectors(delta, position, object + 0x10);
                 }
                 velocityX = func_00283180(func_002A7940());
                 velocityX *= func_002A7878(0, D_L08_001AFF64 * 0.016666668f);

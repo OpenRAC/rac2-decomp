@@ -79,7 +79,7 @@ void func_L01_003D98E0(u8 *m)
     case 0:
         if(0.0f<height) {
             if(*(int *)(s+0xC0)==-1) {
-                func_0026FEB8(D_L01_001B0800,*(s16 *)(m+0xAA),*(s16 *)(m+0xB2));
+                STUB_printf(D_L01_001B0800,*(s16 *)(m+0xAA),*(s16 *)(m+0xB2));
                 *(int *)(s+0xC8)=0;
                 func_0029F338(m);
                 return;
@@ -104,13 +104,13 @@ void func_L01_003D98E0(u8 *m)
         }
         qcopy(anchor,D_L01_001B264C[*(int *)(otherState+0x2CC)].position);
         anchor[2]=*(float *)(m+0x18);
-        func_00282F20(target,*(u8 **)(s+0xC8)+0xC0,5.0f);
-        func_00282CC0(target,target,*(u8 **)(s+0xC8)+0x10);
+        vec_scale_to_length(target,*(u8 **)(s+0xC8)+0xC0,5.0f);
+        FastVecAdd(target,target,*(u8 **)(s+0xC8)+0x10);
         if(((HeroView *)D_00189E20)->mode==0 && ((HeroView *)D_00189E20)->platform==m) {
             float dotX,dotY,y,x,scale;
-            func_00282CF0(delta,((HeroView *)D_00189E20)->position,m+0x10);
-            dotX=func_00282DB0(delta,m+0xC0);
-            dotY=func_00282DB0(delta,m+0xD0);
+            FastVecSub(delta,((HeroView *)D_00189E20)->position,m+0x10);
+            dotX=FastVecDot(delta,m+0xC0);
+            dotY=FastVecDot(delta,m+0xD0);
             scale=D_L01_001B07A8;
             y=-scale*dotY;
             x=scale*dotX;
@@ -125,88 +125,88 @@ void func_L01_003D98E0(u8 *m)
             other=*(u8 **)(s+0xC8);
             if(other!=0 && other[0x20]!=0xFE && other[0x20]!=0xFD && other[0x95]>=2) {
                 float dist,dist2;
-                func_00282CF0(delta,m+0x10,other+0x10);
-                dist=func_00282DF0(delta);
-                dist2=func_00282E80(m+0x10,target);
-                if(dist2<dist) { func_00282CF0(delta,m+0x10,target); dist=dist2; }
+                FastVecSub(delta,m+0x10,other+0x10);
+                dist=FastVecLength(delta);
+                dist2=vec_distance_xy(m+0x10,target);
+                if(dist2<dist) { FastVecSub(delta,m+0x10,target); dist=dist2; }
                 if(dist<D_L01_001B07C4) {
                     float falloff,anchorDistance,d;
                     dist=D_L01_001B07C4-dist;
                     falloff=dist/(D_L01_001B07C4-D_L01_001B07C8);
                     if(falloff>1.0f) falloff=1.0f;
                     else if(falloff<0.0f) falloff=0.0f;
-                    func_00282F20(delta,delta,dist*falloff);
+                    vec_scale_to_length(delta,delta,dist*falloff);
                     func_00282FB8(delta,delta,D_L01_001B07D4*(1.0f/60.0f));
-                    anchorDistance=func_00282E80(*(u8 **)(s+0xC8)+0x10,anchor);
-                    func_00282CF0(prevRot,m+0x10,anchor);
-                    d=func_00282DF0(prevRot)-anchorDistance;
+                    anchorDistance=vec_distance_xy(*(u8 **)(s+0xC8)+0x10,anchor);
+                    FastVecSub(prevRot,m+0x10,anchor);
+                    d=FastVecLength(prevRot)-anchorDistance;
                     d=d/func_00282C48(d);
                     d*=1.0f/60.0f;
-                    func_00282F20(prevRot,prevRot,(D_L01_001B07D8*d)*falloff);
-                    func_00282CC0(m+0x10,m+0x10,prevRot);
-                    func_00282CC0(m+0x10,m+0x10,delta);
+                    vec_scale_to_length(prevRot,prevRot,(D_L01_001B07D8*d)*falloff);
+                    FastVecAdd(m+0x10,m+0x10,prevRot);
+                    FastVecAdd(m+0x10,m+0x10,delta);
                 }
             }
         }
-        func_00282CF0(delta,s+0xB0,m+0x10);
+        FastVecSub(delta,s+0xB0,m+0x10);
         fieldD8=(float *)(s+0xD8);
-        func_00282D30(delta,delta,D_L01_001B07CC);
+        FastVecScale(delta,delta,D_L01_001B07CC);
         fieldDC=(float *)(s+0xDC); fieldD0=(float *)(s+0xD0);
         func_00282FB8(delta,delta,D_L01_001B07D0*(1.0f/60.0f));
         fieldD4=(float *)(s+0xD4);
-        func_00282CC0(m+0x10,m+0x10,delta);
-        limit=func_00282E80(m+0x10,*(u8 **)(s+0xC8)+0x10);
-        secondary=func_00282E80(m+0x10,target);
+        FastVecAdd(m+0x10,m+0x10,delta);
+        limit=vec_distance_xy(m+0x10,*(u8 **)(s+0xC8)+0x10);
+        secondary=vec_distance_xy(m+0x10,target);
         limit=limit<secondary?limit:secondary;
         cursor=0;
-        func_002A8600(&cursor,m[0x21],0,0);
+        GetFirstMobyInGroup(&cursor,m[0x21],0,0);
         while(cursor!=0) {
             float dist,dist2,falloff;
-            func_00282CF0(delta,m+0x10,cursor+0x10);
-            dist=func_00282DF0(delta);
+            FastVecSub(delta,m+0x10,cursor+0x10);
+            dist=FastVecLength(delta);
             if(dist<D_L01_001B07DC) {
-                dist2=func_00282E80(cursor+0x10,*(u8 **)(s+0xC8)+0x10);
-                secondary=func_00282E80(m+0x10,target);
+                dist2=vec_distance_xy(cursor+0x10,*(u8 **)(s+0xC8)+0x10);
+                secondary=vec_distance_xy(m+0x10,target);
                 dist2=dist2<secondary?dist2:secondary;
                 dist=D_L01_001B07DC-dist;
                 falloff=dist/(D_L01_001B07DC-D_L01_001B07E0);
                 if(falloff>1.0f) falloff=1.0f;
                 else if(falloff<0.0f) falloff=0.0f;
-                func_00282F20(delta,delta,dist*falloff);
+                vec_scale_to_length(delta,delta,dist*falloff);
                 func_00282FB8(delta,delta,D_L01_001B07E4*(1.0f/60.0f));
                 if(limit<dist2) {
                     float radius;
-                    func_00282CF0(cursor+0x10,cursor+0x10,delta);
-                    func_00282CF0(prevRot,cursor+0x10,anchor);
-                    radius=func_00282DF0(prevRot);
+                    FastVecSub(cursor+0x10,cursor+0x10,delta);
+                    FastVecSub(prevRot,cursor+0x10,anchor);
+                    radius=FastVecLength(prevRot);
                     if(radius<D_L01_001B07E8) {
-                        func_00282F20(prevRot,prevRot,D_L01_001B07E8);
-                        func_00282CC0(cursor+0x10,anchor,prevRot);
+                        vec_scale_to_length(prevRot,prevRot,D_L01_001B07E8);
+                        FastVecAdd(cursor+0x10,anchor,prevRot);
                     } else if(D_L01_001B07EC<radius) {
-                        func_00282F20(prevRot,prevRot,D_L01_001B07EC);
-                        func_00282CC0(cursor+0x10,anchor,prevRot);
+                        vec_scale_to_length(prevRot,prevRot,D_L01_001B07EC);
+                        FastVecAdd(cursor+0x10,anchor,prevRot);
                     }
-                } else func_00282CC0(m+0x10,m+0x10,delta);
+                } else FastVecAdd(m+0x10,m+0x10,delta);
             }
-            func_002A86E8(&cursor,cursor,0,0);
+            GetNextMobyInGroup(&cursor,cursor,0,0);
         }
         {
             float dist;
-            func_00282CF0(delta,m+0x10,anchor);
-            dist=func_00282DF0(delta);
+            FastVecSub(delta,m+0x10,anchor);
+            dist=FastVecLength(delta);
             if(dist<D_L01_001B07E8) {
-                func_00282F20(delta,delta,D_L01_001B07E8);
-                func_00282CC0(m+0x10,anchor,delta);
+                vec_scale_to_length(delta,delta,D_L01_001B07E8);
+                FastVecAdd(m+0x10,anchor,delta);
             } else if(D_L01_001B07EC<dist) {
-                func_00282F20(delta,delta,D_L01_001B07EC);
-                func_00282CC0(m+0x10,anchor,delta);
+                vec_scale_to_length(delta,delta,D_L01_001B07EC);
+                FastVecAdd(m+0x10,anchor,delta);
             }
         }
         *(float *)(m+0x18)=height;
         func_002AEE70(m,fieldD8,fieldDC,0.08f,0.008726648055016994f,-1.0f);
         func_002AEF28(m,fieldD0,fieldD4,0.04363323748111725f,0.007272206246852875f,0.00901753549f);
-        *(float *)(m+0xF0)=func_00283B98(*(float *)(s+0x90),*(float *)(m+0xF0));
-        *(float *)(m+0xF4)=func_00283B98(*(float *)(s+0x94),*(float *)(m+0xF4));
+        *(float *)(m+0xF0)=FastAddRotations(*(float *)(s+0x90),*(float *)(m+0xF0));
+        *(float *)(m+0xF4)=FastAddRotations(*(float *)(s+0x94),*(float *)(m+0xF4));
         func_L01_003D9830(m);
         break;
     }
@@ -234,7 +234,7 @@ void func_L01_003D98E0(u8 *m)
     if(*(float *)(m+0x18)<10.0f) *(float *)(m+0x18)=10.0f;
     if(*(float *)(m+0x18)>1013.0f) *(float *)(m+0x18)=1013.0f;
     if(m[0x20]!=2) {
-        func_00282CF0(anchor,m+0x10,oldPos);
+        FastVecSub(anchor,m+0x10,oldPos);
         func_002AD6F0(s+0x50,anchor,oldRot,m+0xF0);
     }
 }

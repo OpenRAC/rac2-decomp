@@ -181,12 +181,12 @@ void func_L00_00413128(char *object)
     char *child;
     int code, index;
     float *value;
-    if (func_00282978(state + 0x1E) != 0) {
+    if (FastDecTimer(state + 0x1E) != 0) {
         func_0029F338(object);
         return;
     }
-    func_00282D30(local, ((EffectHero *)D_00189E20)->ptr[2212] + 0xE0, 0.75f);
-    func_00282CC0(object + 0x10, &((EffectHero *)D_00189E20)->f[32], local);
+    FastVecScale(local, ((EffectHero *)D_00189E20)->ptr[2212] + 0xE0, 0.75f);
+    FastVecAdd(object + 0x10, &((EffectHero *)D_00189E20)->f[32], local);
     if (*(char **)(state + 0x20) != 0) {
         code = *(unsigned char *)(*(char **)(state + 0x20) + 0x20);
         if (code == 254)
@@ -198,14 +198,14 @@ void func_L00_00413128(char *object)
             qcopy(state + 0x30, child + 0x10);
             value = func_002AB1F0(child);
             if (value != 0) {
-                func_00282D30(local + 16, *(char **)(state + 0x20) + 0xE0, value[4]);
-                func_00282CC0(state + 0x30, state + 0x30, local + 16);
+                FastVecScale(local + 16, *(char **)(state + 0x20) + 0xE0, value[4]);
+                FastVecAdd(state + 0x30, state + 0x30, local + 16);
             }
         }
     }
     if (*(unsigned char *)(object + 0x20) == 1) {
         func_L00_00414018_1(object);
-        func_L00_00413358(object);
+        UpdateWaveLineEffect(object);
     } else {
         index = *(int *)(state + 0x18);
         if (index >= 0) {
@@ -256,7 +256,7 @@ char *func_L00_00414020(float size, char *position, int trigger, int kind, int r
                         char *parent)
 {
     Vector128 direction[1], up[1], attachment[1], sphere[1], difference[1];
-    char *object = func_0029EFD0(0x139c);
+    char *object = CreateMoby(0x139c);
     ParentedSpawnState *state;
     SpawnObject *m;
     if (object != 0) {
@@ -267,13 +267,13 @@ char *func_L00_00414020(float size, char *position, int trigger, int kind, int r
         state = (ParentedSpawnState *)m->state;
         qcopy(object + 0x10, position);
         *(float *)(object + 0x1c) = 1.0f;
-        func_00282CF0(direction, D_L00_001B8C80 + 0x140, object + 0x10);
-        func_00282F20(direction, direction, 1.0f);
+        FastVecSub(direction, D_L00_001B8C80 + 0x140, object + 0x10);
+        vec_scale_to_length(direction, direction, 1.0f);
         func_002AFFD8(object + 0x10, (char *)up, 1);
         qcopy(object + 0xc0, direction);
-        func_00282DD8(object + 0xd0, object + 0xc0, up);
-        func_00282F20(object + 0xd0, object + 0xd0, 1.0f);
-        func_00282DD8(object + 0xe0, object + 0xd0, object + 0xc0);
+        FastVecCross(object + 0xd0, object + 0xc0, up);
+        vec_scale_to_length(object + 0xd0, object + 0xd0, 1.0f);
+        FastVecCross(object + 0xe0, object + 0xd0, object + 0xc0);
         m->forward[3] = m->right[3] = m->up[3] = 0.0f;
         state->size = size;
         state->kind = kind;
@@ -298,16 +298,16 @@ char *func_L00_00414020(float size, char *position, int trigger, int kind, int r
         if (func_00283DB8(sphere, 128.0f) == 1) {
             state->delay = 10;
             state->fade = 0.1f;
-            if (func_00282E48(position, D_L00_001B8C80 + 0x140) < 48.0f && trigger != 0) {
+            if (fast_vec_dist(position, D_L00_001B8C80 + 0x140) < 48.0f && trigger != 0) {
                 char *manager = D_L00_001B8C80;
                 *(int *)(manager + 0x16c) = 0;
                 *(int *)(manager + 0x168) = 20;
                 *(float *)(manager + 0x160) = 0.075f;
             }
             if (state->flags != 0) {
-                func_00282CF0(difference, object + 0x10, D_L00_001B8C80 + 0x140);
-                func_00282F20(difference, difference, 1.0f);
-                if (1.5707964f - func_002831B0(func_00282DB0(difference, D_L00_001B8C80 + 0x370)) < 0.45378566f)
+                FastVecSub(difference, object + 0x10, D_L00_001B8C80 + 0x140);
+                vec_scale_to_length(difference, difference, 1.0f);
+                if (1.5707964f - func_002831B0(FastVecDot(difference, D_L00_001B8C80 + 0x370)) < 0.45378566f)
                     state->flags = 1;
                 else
                     state->flags = 0;
@@ -371,34 +371,34 @@ void func_L00_00415210(Vector *position, float size, float offset, float roll,
     packet.uv[3][0] = 1.0f;
     packet.uv[3][1] = 1.0f;
     qcopy(&frame.position, position);
-    func_00282CF0((char *)&frame.row[0], (char *)(D_L00_001B8C80 + 0x140), (char *)&frame.position);
-    func_00282F20((char *)&frame.row[0], (char *)&frame.row[0], 1.0f);
-    func_00282DD8((char *)&frame.row[1], (char *)&frame.row[0], (char *)&D_0018A0E0);
-    func_00282F20((char *)&frame.row[1], (char *)&frame.row[1], 1.0f);
-    func_00282DD8((char *)&frame.row[2], (char *)&frame.row[1], (char *)&frame.row[0]);
+    FastVecSub((char *)&frame.row[0], (char *)(D_L00_001B8C80 + 0x140), (char *)&frame.position);
+    vec_scale_to_length((char *)&frame.row[0], (char *)&frame.row[0], 1.0f);
+    FastVecCross((char *)&frame.row[1], (char *)&frame.row[0], (char *)&D_0018A0E0);
+    vec_scale_to_length((char *)&frame.row[1], (char *)&frame.row[1], 1.0f);
+    FastVecCross((char *)&frame.row[2], (char *)&frame.row[1], (char *)&frame.row[0]);
     if (roll != 0.0f) {
         scratch.angles.word = 0;
         scratch.angles.v[0] = roll;
-        func_002833F0(scratch.u.rotation, &scratch.angles);
-        func_00283738(frame.row, frame.row, scratch.u.rotation);
+        euler_rotation_basis(scratch.u.rotation, &scratch.angles);
+        multiply_matrix3x3(frame.row, frame.row, scratch.u.rotation);
     }
-    func_00282D30(&scratch.angles, &frame.row[0], offset);
-    func_00282CC0(&frame.position, &frame.position, &scratch.angles);
+    FastVecScale(&scratch.angles, &frame.row[0], offset);
+    FastVecAdd(&frame.position, &frame.position, &scratch.angles);
     {
         Vector *vertex = packet.vertex;
         int count;
         corner = D_L00_001AA310;
         count = 3;
         do {
-            func_00282D30(vertex, corner, size);
+            FastVecScale(vertex, corner, size);
             ++corner;
             --count;
-            func_002830C0(vertex, vertex, &frame);
+            transform_vector(vertex, vertex, &frame);
             ++vertex;
         } while (count >= 0);
     }
-    func_002FC560(0x47, 0x31001ULL);
-    func_00280B90((char *)&packet, 0, 0);
+    VU1_addGSregister(0x47, 0x31001ULL);
+    draw_world_quad((char *)&packet, 0, 0);
     if (mode != 0) {
         int i;
 
@@ -408,18 +408,18 @@ void func_L00_00415210(Vector *position, float size, float offset, float roll,
             int count;
             count = 2;
             do {
-                func_00282CC0(&scratch.u.projection.center, &scratch.u.projection.center,
+                FastVecAdd(&scratch.u.projection.center, &scratch.u.projection.center,
                               vertex);
                 ++vertex;
                 --count;
             } while (count >= 0);
         }
-        func_00282D30(&scratch.u.projection.center, &scratch.u.projection.center, 0.25f);
+        FastVecScale(&scratch.u.projection.center, &scratch.u.projection.center, 0.25f);
         for (i = 0; i < 4; ++i) {
-            func_00282CF0((char *)&scratch.u.projection.point, (char *)&packet.vertex[i],
+            FastVecSub((char *)&scratch.u.projection.point, (char *)&packet.vertex[i],
                           (char *)&scratch.u.projection.center);
-            func_00282D30(&scratch.u.projection.point, &scratch.u.projection.point, 0.8f);
-            func_00282CC0(&scratch.u.projection.point, &scratch.u.projection.center,
+            FastVecScale(&scratch.u.projection.point, &scratch.u.projection.point, 0.8f);
+            FastVecAdd(&scratch.u.projection.point, &scratch.u.projection.center,
                           &scratch.u.projection.point);
             func_0027C768((int)&scratch.u.projection.point, &packet.uv[i][0], &packet.uv[i][1]);
             if (func_002A77E0(1) == 0) {
@@ -448,16 +448,16 @@ void func_L00_00415210(Vector *position, float size, float offset, float roll,
     }
     func_00281DE8(&packet, -1, 1, 0x80);
     packet.flags = 0x8000000054ULL;
-    func_002FC560(0x47, 0x33001ULL);
-    func_00280B90((char *)&packet, 0, 0);
-    func_002FC560(0x47, 0x5360bULL);
+    VU1_addGSregister(0x47, 0x33001ULL);
+    draw_world_quad((char *)&packet, 0, 0);
+    VU1_addGSregister(0x47, 0x5360bULL);
 }
 
 
 char *func_L00_00415740(float size, char *position, int trigger, int kind, int red, int green, int blue, int enabled, int flags, int extra, int control)
 {
     Vector128 direction[1], up[1], sphere[1], difference[1];
-    char *object = func_0029EFD0(0x139d);
+    char *object = CreateMoby(0x139d);
     SpawnState *state;
     SpawnObject *m;
     char *camera;
@@ -471,13 +471,13 @@ char *func_L00_00415740(float size, char *position, int trigger, int kind, int r
         qcopy(object + 0x10, position);
         *(float *)(object + 0x1c) = 1.0f;
         camera = D_L00_001B8C80 + 0x140;
-        func_00282CF0(direction, camera, object + 0x10);
-        func_00282F20(direction, direction, 1.0f);
+        FastVecSub(direction, camera, object + 0x10);
+        vec_scale_to_length(direction, direction, 1.0f);
         func_002AFFD8(object + 0x10, (char *)up, 1);
         qcopy(object + 0xc0, direction);
-        func_00282DD8(object + 0xd0, object + 0xc0, up);
-        func_00282F20(object + 0xd0, object + 0xd0, 1.0f);
-        func_00282DD8(object + 0xe0, object + 0xd0, object + 0xc0);
+        FastVecCross(object + 0xd0, object + 0xc0, up);
+        vec_scale_to_length(object + 0xd0, object + 0xd0, 1.0f);
+        FastVecCross(object + 0xe0, object + 0xd0, object + 0xc0);
         m->forward[3] = m->right[3] = m->up[3] = 0.0f;
         /* Both countdowns start together. */
         state->timer = state->life = 60;
@@ -497,16 +497,16 @@ char *func_L00_00415740(float size, char *position, int trigger, int kind, int r
         if (func_00283DB8(sphere, 128.0f) == 1) {
             state->delay = 10;
             state->fade = 0.1f;
-            if (func_00282E48(position, camera) < 48.0f && trigger != 0) {
+            if (fast_vec_dist(position, camera) < 48.0f && trigger != 0) {
                 char *manager = camera - 0x140;
                 *(int *)(manager + 0x16c) = 0;
                 *(volatile float *)(manager + 0x160) = 0.075f;
                 *(volatile int *)(manager + 0x168) = 40;
             }
             if (state->flags != 0) {
-                func_00282CF0(difference, object + 0x10, D_L00_001B8C80 + 0x140);
-                func_00282F20(difference, difference, 1.0f);
-                angle = func_002831B0(func_00282DB0(difference, (char *)&D_L00_001B8C80 + 0x370));
+                FastVecSub(difference, object + 0x10, D_L00_001B8C80 + 0x140);
+                vec_scale_to_length(difference, difference, 1.0f);
+                angle = func_002831B0(FastVecDot(difference, (char *)&D_L00_001B8C80 + 0x370));
                 if (1.5707963705f - angle < 0.4537856579f)
                     state->flags = 1;
                 else
@@ -568,34 +568,34 @@ void func_L00_00416A38(Vector *position, float size, float offset, float roll,
     packet.uv[3][0] = 1.0f;
     packet.uv[3][1] = 1.0f;
     qcopy(&frame.position, position);
-    func_00282CF0((char *)&frame.row[0], (char *)(D_L00_001B8C80 + 0x140), (char *)&frame.position);
-    func_00282F20((char *)&frame.row[0], (char *)&frame.row[0], 1.0f);
-    func_00282DD8((char *)&frame.row[1], (char *)&frame.row[0], (char *)&D_0018A0E0);
-    func_00282F20((char *)&frame.row[1], (char *)&frame.row[1], 1.0f);
-    func_00282DD8((char *)&frame.row[2], (char *)&frame.row[1], (char *)&frame.row[0]);
+    FastVecSub((char *)&frame.row[0], (char *)(D_L00_001B8C80 + 0x140), (char *)&frame.position);
+    vec_scale_to_length((char *)&frame.row[0], (char *)&frame.row[0], 1.0f);
+    FastVecCross((char *)&frame.row[1], (char *)&frame.row[0], (char *)&D_0018A0E0);
+    vec_scale_to_length((char *)&frame.row[1], (char *)&frame.row[1], 1.0f);
+    FastVecCross((char *)&frame.row[2], (char *)&frame.row[1], (char *)&frame.row[0]);
     if (roll != 0.0f) {
         scratch.angles.word = 0;
         scratch.angles.v[0] = roll;
-        func_002833F0(scratch.u.rotation, &scratch.angles);
-        func_00283738(frame.row, frame.row, scratch.u.rotation);
+        euler_rotation_basis(scratch.u.rotation, &scratch.angles);
+        multiply_matrix3x3(frame.row, frame.row, scratch.u.rotation);
     }
-    func_00282D30(&scratch.angles, &frame.row[0], offset);
-    func_00282CC0(&frame.position, &frame.position, &scratch.angles);
+    FastVecScale(&scratch.angles, &frame.row[0], offset);
+    FastVecAdd(&frame.position, &frame.position, &scratch.angles);
     {
         Vector *vertex = packet.vertex;
         int count;
         corner = D_L00_001AA310;
         count = 3;
         do {
-            func_00282D30(vertex, corner, size);
+            FastVecScale(vertex, corner, size);
             ++corner;
             --count;
-            func_002830C0(vertex, vertex, &frame);
+            transform_vector(vertex, vertex, &frame);
             ++vertex;
         } while (count >= 0);
     }
-    func_002FC560(0x47, 0x31001ULL);
-    func_00280B90((char *)&packet, 0, 0);
+    VU1_addGSregister(0x47, 0x31001ULL);
+    draw_world_quad((char *)&packet, 0, 0);
     if (mode != 0) {
         int i;
 
@@ -605,18 +605,18 @@ void func_L00_00416A38(Vector *position, float size, float offset, float roll,
             int count;
             count = 2;
             do {
-                func_00282CC0(&scratch.u.projection.center, &scratch.u.projection.center,
+                FastVecAdd(&scratch.u.projection.center, &scratch.u.projection.center,
                               vertex);
                 ++vertex;
                 --count;
             } while (count >= 0);
         }
-        func_00282D30(&scratch.u.projection.center, &scratch.u.projection.center, 0.25f);
+        FastVecScale(&scratch.u.projection.center, &scratch.u.projection.center, 0.25f);
         for (i = 0; i < 4; ++i) {
-            func_00282CF0((char *)&scratch.u.projection.point, (char *)&packet.vertex[i],
+            FastVecSub((char *)&scratch.u.projection.point, (char *)&packet.vertex[i],
                           (char *)&scratch.u.projection.center);
-            func_00282D30(&scratch.u.projection.point, &scratch.u.projection.point, 0.8f);
-            func_00282CC0(&scratch.u.projection.point, &scratch.u.projection.center,
+            FastVecScale(&scratch.u.projection.point, &scratch.u.projection.point, 0.8f);
+            FastVecAdd(&scratch.u.projection.point, &scratch.u.projection.center,
                           &scratch.u.projection.point);
             func_0027C768((int)&scratch.u.projection.point, &packet.uv[i][0], &packet.uv[i][1]);
             if (func_002A77E0(1) == 0) {
@@ -645,16 +645,16 @@ void func_L00_00416A38(Vector *position, float size, float offset, float roll,
     }
     func_00281DE8(&packet, -1, 1, 0x80);
     packet.flags = 0x8000000054ULL;
-    func_002FC560(0x47, 0x33001ULL);
-    func_00280B90((char *)&packet, 0, 0);
-    func_002FC560(0x47, 0x5360bULL);
+    VU1_addGSregister(0x47, 0x33001ULL);
+    draw_world_quad((char *)&packet, 0, 0);
+    VU1_addGSregister(0x47, 0x5360bULL);
 }
 
 
 char *func_L00_00416F68(Vector128 *position, int kind, char *parent)
 {
     Vector128 direction[1], up[1];
-    char *object = func_0029EFD0(0x139E);
+    char *object = CreateMoby(0x139E);
     if (object != 0) {
         SpawnObject *m = (SpawnObject *)object;
         AttachedSpawnState *state = (AttachedSpawnState *)m->state;
@@ -667,14 +667,14 @@ char *func_L00_00416F68(Vector128 *position, int kind, char *parent)
         qcopy(first, position);
         *(float *)(object + 0x1c) = 1.0f;
         second = object + 0xc0;
-        func_00282CF0(direction, D_L00_001B8C80 + 0x140, first);
-        func_00282F20(direction, direction, 1.0f);
+        FastVecSub(direction, D_L00_001B8C80 + 0x140, first);
+        vec_scale_to_length(direction, direction, 1.0f);
         func_002AFFD8(first, (char *)up, 1);
         qcopy(second, direction);
         third = object + 0xd0;
-        func_00282DD8(third, second, up);
-        func_00282F20(third, third, 1.0f);
-        func_00282DD8(object + 0xe0, third, second);
+        FastVecCross(third, second, up);
+        vec_scale_to_length(third, third, 1.0f);
+        FastVecCross(object + 0xe0, third, second);
         m->forward[3] = m->right[3] = m->up[3] = 0.0f;
         state->life = 60;
         state->kind = kind;
@@ -696,12 +696,12 @@ void func_L00_00417218(char *object)
         heading = func_00283248(((CameraHead *)D_L00_001B8C80)->x - *(float *)(object + 0x10),
                                 ((CameraHead *)D_L00_001B8C80)->y - *(float *)(object + 0x14));
         speed = func_002A78D8(1.0f, 2.0f);
-        func_00283CF0(speed);
+        FloatToInt(speed);
         spawn[0] = *(float *)(object + 0x10) + func_002A78D8(-0.25f, 0.25f);
         spawn[1] = *(float *)(object + 0x14) + func_002A78D8(-0.25f, 0.25f);
         spawn[2] = *(float *)(object + 0x18) + func_002A78D8(-0.25f, 0.25f);
         spread = 0.0f;
-        angle = func_00283B98(heading, func_002A78D8(spread, -1.5707965f));
+        angle = FastAddRotations(heading, func_002A78D8(spread, -1.5707965f));
         speed = 4.0f;
         spawn[4] = func_00283180(angle) * 0.016666668f * speed;
         spawn[5] = func_00283198(angle) * 0.016666668f * speed;
@@ -733,7 +733,7 @@ void func_L00_00417D70(char *object)
         p->start.v[0] += func_002A7878(-0.1f, 0.1f);
         p->start.v[1] += func_002A7878(-0.1f, 0.1f);
         p->start.v[2] += func_002A7878(-0.1f, 0.1f);
-        func_00282CF0(&delta, &p->end, &p->start);
+        FastVecSub(&delta, &p->end, &p->start);
         if (*(int *)(state + 4) == 0) {
             qcopy(&p->start, object + 0x10);
         } else {
@@ -741,25 +741,25 @@ void func_L00_00417D70(char *object)
             offset.v[0] = -0.15f;
             offset.v[1] = -0.8f;
             offset.v[3] = 1.0f;
-            func_00283098(&transformed, &offset, *(char **)(state + 8) + 0xC0);
-            func_00282CC0(&transformed, &transformed, *(char **)(state + 8) + 0x10);
+            matrix_mul_vec3(&transformed, &offset, *(char **)(state + 8) + 0xC0);
+            FastVecAdd(&transformed, &transformed, *(char **)(state + 8) + 0x10);
             qcopy(&p->start, &transformed);
         }
-        func_00282CC0(&p->end, &p->start, &delta);
+        FastVecAdd(&p->end, &p->start, &delta);
         if (p->time != 0) {
-            p->ang0[0] = func_00283B98(p->ang0[0], p->rate0[0] * 100.0f);
-            p->ang0[1] = func_00283B98(p->ang0[1], p->rate0[1] * 100.0f);
-            p->ang0[2] = func_00283B98(p->ang0[2], p->rate0[2] * 100.0f);
-            p->ang1[0] = func_00283B98(p->ang1[0], p->rate1[0] * 100.0f);
-            p->ang1[1] = func_00283B98(p->ang1[1], p->rate1[1] * 100.0f);
-            p->ang1[2] = func_00283B98(p->ang1[2], p->rate1[2] * 100.0f);
+            p->ang0[0] = FastAddRotations(p->ang0[0], p->rate0[0] * 100.0f);
+            p->ang0[1] = FastAddRotations(p->ang0[1], p->rate0[1] * 100.0f);
+            p->ang0[2] = FastAddRotations(p->ang0[2], p->rate0[2] * 100.0f);
+            p->ang1[0] = FastAddRotations(p->ang1[0], p->rate1[0] * 100.0f);
+            p->ang1[1] = FastAddRotations(p->ang1[1], p->rate1[1] * 100.0f);
+            p->ang1[2] = FastAddRotations(p->ang1[2], p->rate1[2] * 100.0f);
         } else {
-            p->ang0[0] = func_00283B98(p->ang0[0], p->rate0[0] * 50.0f);
-            p->ang0[1] = func_00283B98(p->ang0[1], p->rate0[1] * 50.0f);
-            p->ang0[2] = func_00283B98(p->ang0[2], p->rate0[2] * 50.0f);
-            p->ang1[0] = func_00283B98(p->ang1[0], p->rate1[0] * 50.0f);
-            p->ang1[1] = func_00283B98(p->ang1[1], p->rate1[1] * 50.0f);
-            p->ang1[2] = func_00283B98(p->ang1[2], p->rate1[2] * 50.0f);
+            p->ang0[0] = FastAddRotations(p->ang0[0], p->rate0[0] * 50.0f);
+            p->ang0[1] = FastAddRotations(p->ang0[1], p->rate0[1] * 50.0f);
+            p->ang0[2] = FastAddRotations(p->ang0[2], p->rate0[2] * 50.0f);
+            p->ang1[0] = FastAddRotations(p->ang1[0], p->rate1[0] * 50.0f);
+            p->ang1[1] = FastAddRotations(p->ang1[1], p->rate1[1] * 50.0f);
+            p->ang1[2] = FastAddRotations(p->ang1[2], p->rate1[2] * 50.0f);
         }
         p->out0.v[0] = func_00283180(p->ang0[0]) * p->amp0[0];
         p->out0.v[1] = func_00283198(p->ang0[1]) * p->amp0[1];
@@ -767,13 +767,13 @@ void func_L00_00417D70(char *object)
         p->out1.v[0] = func_00283180(p->ang1[0]) * p->amp1[0];
         p->out1.v[1] = func_00283198(p->ang1[1]) * p->amp1[1];
         p->out1.v[2] = -func_00283198(p->ang1[2]) * p->amp1[2];
-        ratio = func_00283CE0(p->time);
-        ratio /= func_00283CE0(p->duration);
+        ratio = IntToFloat(p->time);
+        ratio /= IntToFloat(p->duration);
         blend = 1.0f - ratio;
         if (*(int *)(state + 4) == 0)
-            func_00282D08(&p->point, &p->start, &p->end, blend);
+            lerp_vector(&p->point, &p->start, &p->end, blend);
         else
-            func_00282D08(&p->point, &p->start, &p->end, 0.75f);
+            lerp_vector(&p->point, &p->start, &p->end, 0.75f);
         if (func_00282948(&p->time)) {
             if (p->started == 0)
                 p->started = 1;
@@ -827,7 +827,7 @@ void func_L00_004181A8(char *p)
 char *func_L00_00418730(float size, char *position, int trigger, int kind, int red, int green, int blue, int enabled, int flags, int extra, int control)
 {
     Vector128 direction[1], up[1], sphere[1], difference[1];
-    char *object = func_0029EFD0(0x139f);
+    char *object = CreateMoby(0x139f);
     SpawnState *state;
     SpawnObject *m;
     char *camera;
@@ -841,13 +841,13 @@ char *func_L00_00418730(float size, char *position, int trigger, int kind, int r
         qcopy(object + 0x10, position);
         *(float *)(object + 0x1c) = 1.0f;
         camera = D_L00_001B8C80 + 0x140;
-        func_00282CF0(direction, camera, object + 0x10);
-        func_00282F20(direction, direction, 1.0f);
+        FastVecSub(direction, camera, object + 0x10);
+        vec_scale_to_length(direction, direction, 1.0f);
         func_002AFFD8(object + 0x10, (char *)up, 1);
         qcopy(object + 0xc0, direction);
-        func_00282DD8(object + 0xd0, object + 0xc0, up);
-        func_00282F20(object + 0xd0, object + 0xd0, 1.0f);
-        func_00282DD8(object + 0xe0, object + 0xd0, object + 0xc0);
+        FastVecCross(object + 0xd0, object + 0xc0, up);
+        vec_scale_to_length(object + 0xd0, object + 0xd0, 1.0f);
+        FastVecCross(object + 0xe0, object + 0xd0, object + 0xc0);
         m->forward[3] = m->right[3] = m->up[3] = 0.0f;
         /* Both countdowns start together. */
         state->timer = state->life = 60;
@@ -867,16 +867,16 @@ char *func_L00_00418730(float size, char *position, int trigger, int kind, int r
         if (func_00283DB8(sphere, 128.0f) == 1) {
             state->delay = 10;
             state->fade = 0.1f;
-            if (func_00282E48(position, camera) < 48.0f && trigger != 0) {
+            if (fast_vec_dist(position, camera) < 48.0f && trigger != 0) {
                 char *manager = camera - 0x140;
                 *(int *)(manager + 0x16c) = 0;
                 *(volatile float *)(manager + 0x160) = 0.075f;
                 *(volatile int *)(manager + 0x168) = 40;
             }
             if (state->flags != 0) {
-                func_00282CF0(difference, object + 0x10, D_L00_001B8C80 + 0x140);
-                func_00282F20(difference, difference, 1.0f);
-                angle = func_002831B0(func_00282DB0(difference, (char *)&D_L00_001B8C80 + 0x370));
+                FastVecSub(difference, object + 0x10, D_L00_001B8C80 + 0x140);
+                vec_scale_to_length(difference, difference, 1.0f);
+                angle = func_002831B0(FastVecDot(difference, (char *)&D_L00_001B8C80 + 0x370));
                 if (1.5707963705f - angle < 0.4537856579f)
                     state->flags = 1;
                 else
@@ -886,7 +886,7 @@ char *func_L00_00418730(float size, char *position, int trigger, int kind, int r
             state->delay = 0;
             state->flags = 0;
         }
-        func_L00_00418A80(object, (char *)up);
+        SpawnBurstParticles(object, (char *)up);
     }
     return object;
 }

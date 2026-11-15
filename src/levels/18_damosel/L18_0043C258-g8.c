@@ -71,9 +71,9 @@ void func_L18_0043C258(LauncherObject *obj) {
     if (damage > 0.0f) {
         func_002AB800(obj, s->transform);
         if (s->health <= 0.0f) {
-            func_0032C700(obj->position, 1, 25, 20, 20, 20, 45, 1, 1.0f, 20.0f, 1, 1, 0, 0);
+            SpawnExplosion(obj->position, 1, 25, 20, 20, 20, 45, 1, 1.0f, 20.0f, 1, 1, 0, 0);
             func_002B0A68(obj, 0x3a, D_L18_001A8F20, 3, 6, 3, 6, 255);
-            func_002E5CF8(1, 0, obj);
+            PlayMobySound(1, 0, obj);
             func_0029F338(obj);
             return;
         }
@@ -92,7 +92,7 @@ void func_L18_0043C258(LauncherObject *obj) {
         func_002A7750(obj, 1, -1);
         break;
     case 1:
-        if (s->startRegion != -1 && func_002ACBC8(D_00189EA0, s->startRegion))
+        if (s->startRegion != -1 && IsPointInCuboid(D_00189EA0, s->startRegion))
             func_002A7750(obj, 2, -1);
         break;
     case 2:
@@ -105,17 +105,17 @@ void func_L18_0043C258(LauncherObject *obj) {
             s->turnX = func_002A7878(z, D_L18_001B1AB4 * 0.0002908882452175021f);
             s->turnY = func_002A7878(z, D_L18_001B1AB8 * 0.0002908882452175021f);
             obj->position[2] = s->baseZ;
-            func_002E5CF8(0, 0, obj);
+            PlayMobySound(0, 0, obj);
         }
         if (obj->position[2] >= s->baseZ) {
             obj->position[2] += s->velocityZ;
             s->velocityZ -= D_L18_001B1ACC * 0.00027777778450399637f;
             if (s->velocityZ > 0) {
-                obj->rotation[0] = func_00283B98(s->turnX, obj->rotation[0]);
-                obj->rotation[1] = func_00283B98(s->turnY, obj->rotation[1]);
+                obj->rotation[0] = FastAddRotations(s->turnX, obj->rotation[0]);
+                obj->rotation[1] = FastAddRotations(s->turnY, obj->rotation[1]);
             } else {
-                obj->rotation[0] = func_00283B98(-s->turnX, obj->rotation[0]);
-                obj->rotation[1] = func_00283B98(-s->turnY, obj->rotation[1]);
+                obj->rotation[0] = FastAddRotations(-s->turnX, obj->rotation[0]);
+                obj->rotation[1] = FastAddRotations(-s->turnY, obj->rotation[1]);
             }
         } else {
             func_002A7750(obj, 2, -1);
@@ -124,24 +124,24 @@ void func_L18_0043C258(LauncherObject *obj) {
             zero = 0;
             child = func_L18_003F75E8(s->childId, &zero);
             if (child) {
-                func_00282F20(v, D_L18_001B1AF0, D_L18_001B1AC0 * (1.0f / 60.0f));
-                func_00283098(v, v, obj->matrix);
+                vec_scale_to_length(v, D_L18_001B1AF0, D_L18_001B1AC0 * (1.0f / 60.0f));
+                matrix_mul_vec3(v, v, obj->matrix);
                 func_002ACB48(v, D_L18_001B1ABC * (1.0f / 60.0f));
-                func_00283098(p, D_L18_001B1AE0, obj->matrix);
-                func_00282CC0(p, p, obj->position);
+                matrix_mul_vec3(p, D_L18_001B1AE0, obj->matrix);
+                FastVecAdd(p, p, obj->position);
                 func_L18_003F76F0(child, p, v);
                 *(s32 *)(child + 0xB8) = (s32)obj;
                 s->fireTimer = func_002A7820(D_L18_001B1AD0, D_L18_001B1AD4);
             }
         } else if (s->fireTimer == -1) {
-            if (s->fireRegion != -1 && func_002ACBC8(D_00189EA0, s->fireRegion)) {
+            if (s->fireRegion != -1 && IsPointInCuboid(D_00189EA0, s->fireRegion)) {
                 s->fireTimer++;
-                func_0032C700(obj->position, 1, 25, 20, 20, 20, 45, 1, 1.0f, 20.0f, 1, 1, 0, 0);
-                func_002E5CF8(1, 0, obj);
-                func_00282F20(v, D_L18_001B1AF0, D_L18_001B1AC4 * (1.0f / 60.0f));
-                func_00283098(v, v, obj->matrix);
+                SpawnExplosion(obj->position, 1, 25, 20, 20, 20, 45, 1, 1.0f, 20.0f, 1, 1, 0, 0);
+                PlayMobySound(1, 0, obj);
+                vec_scale_to_length(v, D_L18_001B1AF0, D_L18_001B1AC4 * (1.0f / 60.0f));
+                matrix_mul_vec3(v, v, obj->matrix);
                 func_002ACB48(p, D_L18_001B1ABC * (1.0f / 60.0f));
-                func_00282CC0(v, v, p);
+                FastVecAdd(v, v, p);
                 func_002B0A68(obj, 5, v, 3, 6, 3, 6, 255);
             }
         } else {

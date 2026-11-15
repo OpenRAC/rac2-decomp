@@ -71,19 +71,19 @@ abc:
             if (func_00282C48(r1) < t23) {
                 s2 = func_00282C48(r1);
                 if (t23 < s2 + func_00282C48(*q)) {
-                    func_002AA2E8(q, 0.0f, fc);
+                    ApproachValue(q, 0.0f, fc);
                 } else {
-                    func_002AA2E8(q, 0.0f, fc * 1.1f);
+                    ApproachValue(q, 0.0f, fc * 1.1f);
                 }
             } else {
-                r = func_00282C10((fc + fc) * r1);
+                r = square_root((fc + fc) * r1);
                 if (fd < r) {
                     r = fd;
                 }
                 if (r1 < 0.0f) {
-                    func_002AA800(q, 0, -r, fb);
+                    StepAngleTowardTarget(q, 0, -r, fb);
                 } else {
-                    func_002AA800(q, 0, r, fb);
+                    StepAngleTowardTarget(q, 0, r, fb);
                 }
             }
             s4 = func_00282C48(r1);
@@ -101,7 +101,7 @@ abc:
             }
             *q = qn;
         }
-        *p = func_00283B98(qn, *p);
+        *p = FastAddRotations(qn, *p);
         return *q;
     }
 }

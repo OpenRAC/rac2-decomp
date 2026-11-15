@@ -56,10 +56,10 @@ void func_L00_0038E880(char *object, BurstVector *velocity, BurstVector *normal)
     int kind, z1, z2;
 
     tmpl = D_L00_002A26A0;
-    scale = 1.0f + func_00283CE0(((BurstWeapon *)(D_00139568[12] * 224 + (int)D_L00_00262570))->enabled != 0);
-    func_00282D30(velocity, velocity, scale);
-    func_00282CF0(&delta, D_L00_001B8DC0, object + 0x10);
-    distance = func_00282DF0(&delta);
+    scale = 1.0f + IntToFloat(((BurstWeapon *)(D_00139568[12] * 224 + (int)D_L00_00262570))->enabled != 0);
+    FastVecScale(velocity, velocity, scale);
+    FastVecSub(&delta, D_L00_001B8DC0, object + 0x10);
+    distance = FastVecLength(&delta);
     pa = object;
     pb = object;
     pc = object;
@@ -75,12 +75,12 @@ void func_L00_0038E880(char *object, BurstVector *velocity, BurstVector *normal)
             random.f[0] = func_002A7878(-1.0f, 1.0f);
             random.f[1] = func_002A7878(-1.0f, 1.0f);
             shard.q = random.q;
-            func_00282F20(&projected, n1, func_00282DB0(&shard, n2));
-            func_00282CF0(&shard, &shard, &projected);
-            func_00282F20(&projected, n3, func_002A7878(0.0f, 1.0f));
-            func_00282CC0(&shard, &shard, &projected);
-            func_00282F20(&shard, &shard, s1 * func_002A7878(3.5f, 6.5f) * (1.0f / 60.0f));
-            func_00282CC0(&shard, &shard, v1);
+            vec_scale_to_length(&projected, n1, FastVecDot(&shard, n2));
+            FastVecSub(&shard, &shard, &projected);
+            vec_scale_to_length(&projected, n3, func_002A7878(0.0f, 1.0f));
+            FastVecAdd(&shard, &shard, &projected);
+            vec_scale_to_length(&shard, &shard, s1 * func_002A7878(3.5f, 6.5f) * (1.0f / 60.0f));
+            FastVecAdd(&shard, &shard, v1);
             lifetime = func_002A7820(lo, hi);
             w = &D_L00_00262570[D_00139568[12]];
             func_00308600(o1 + 0x10, &shard, lifetime, none,
@@ -107,7 +107,7 @@ void func_L00_0038E880(char *object, BurstVector *velocity, BurstVector *normal)
             drift.f[1] = func_002A7878(-1.0f, 1.0f);
             drift.f[2] = func_002A7878(-0.5f, 2.0f);
             random.q = drift.q;
-            func_00282F20(&random, &random, s2 * func_002A7878(4.0f / 60.0f, 8.0f / 60.0f));
+            vec_scale_to_length(&random, &random, s2 * func_002A7878(4.0f / 60.0f, 8.0f / 60.0f));
             func_002BF728(o2 + 0x10, (char *)&random, func_002A7878(0.05f, 0.1f) * 210000.0f, h2);
         }
     }
@@ -145,13 +145,13 @@ void func_L00_0038E880(char *object, BurstVector *velocity, BurstVector *normal)
                 point.f[0] = func_00283180(angle) * radius;
                 point.f[1] = func_00283198(angle) * radius;
                 point.f[2] = 0.0f;
-                func_00282CC0(&point, &point, o3 + 0x10);
+                FastVecAdd(&point, &point, o3 + 0x10);
                 radius *= 8.0f / 60.0f;
                 point.f[2] = h3 + half;
                 drift.f[2] -= radius;
                 c1 = (alpha << 24) | (b1 << 16) | (g1 << 8);
                 c2 = (b2 << 16) | (g2 << 8);
-                func_L00_0033AA40(&point, &drift, delay, func_002A7878(0.25f, 1.0f), h4,
+                SpawnDistanceFadedParticle(&point, &drift, delay, func_002A7878(0.25f, 1.0f), h4,
                 c1 | r1, 1.0f / 180.0f, c2 | r2, on);
             }
         }
@@ -171,7 +171,7 @@ void func_L00_0038E880(char *object, BurstVector *velocity, BurstVector *normal)
                 point.f[0] = func_002A7878(-3.0f, 3.0f);
                 point.f[1] = func_002A7878(-3.0f, 3.0f);
                 point.f[2] = func_002A7878(4.0f / 60.0f, 14.0f * (1.0f / 60.0f));
-                func_00282F20(&point, &point, func_002A7878(1.5f, 3.0f) * (1.0f / 60.0f));
+                vec_scale_to_length(&point, &point, func_002A7878(1.5f, 3.0f) * (1.0f / 60.0f));
                 point.f[2] = func_002A7878(3.0f, 6.0f) * (1.0f / 60.0f);
                 drift.q = *(BurstQuad *)(o4 + 0x10);
                 drift.f[2] = h5;

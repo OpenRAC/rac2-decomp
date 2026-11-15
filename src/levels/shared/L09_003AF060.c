@@ -32,7 +32,7 @@ void func_L09_003AF060(char *object)
     BeamVector beamWidth, glowWidth, coreWidth;
     char *state = *(char **)(object + 0x68);
 
-    beam.texture = func_0027C878(16);
+    beam.texture = GetEffectTextureDescriptor(16);
     beam.control = 0x0000FF9000000260ULL;
     beam.tag = 0;
     beam.blend = 0x8000000040ULL | ((unsigned long long)(func_001163B0() % 2 + 1) << 2);
@@ -41,7 +41,7 @@ void func_L09_003AF060(char *object)
     beam.colors[3] = 0x7F081840;
     beam.colors[2] = 0x7F081840;
 
-    glow.texture = func_0027C878(16);
+    glow.texture = GetEffectTextureDescriptor(16);
     glow.control = 0x0000FF9000000260ULL;
     glow.blend = 0x8000000048ULL;
     glow.colors[1] = 0x1F030B1F;
@@ -50,7 +50,7 @@ void func_L09_003AF060(char *object)
     glow.colors[2] = 0x1F030B1F;
     glow.tag = 0;
 
-    core.texture = func_0027C878(16);
+    core.texture = GetEffectTextureDescriptor(16);
     core.control = 0x0000FF9000000260ULL;
     core.blend = 0x8000000048ULL;
     core.tag = 0;
@@ -100,42 +100,42 @@ void func_L09_003AF060(char *object)
     core.uv[6] = 1;
     core.uv[7] = 1;
 
-    func_00282CF0(&matrix[0], state + 0x20, state + 0x10);
-    func_00282F20((char *)&matrix[0], (char *)&matrix[0], 1.0f);
-    func_00282CF0(&matrix[1], D_L09_001B9A00, state + 0x10);
-    func_00282DD8((char *)&matrix[2], (char *)&matrix[1], (char *)&matrix[0]);
-    func_00282F20((char *)&matrix[2], (char *)&matrix[2], 1.0f);
-    func_00282DD8((char *)&matrix[1], (char *)&matrix[0], (char *)&matrix[2]);
+    FastVecSub(&matrix[0], state + 0x20, state + 0x10);
+    vec_scale_to_length((char *)&matrix[0], (char *)&matrix[0], 1.0f);
+    FastVecSub(&matrix[1], D_L09_001B9A00, state + 0x10);
+    FastVecCross((char *)&matrix[2], (char *)&matrix[1], (char *)&matrix[0]);
+    vec_scale_to_length((char *)&matrix[2], (char *)&matrix[2], 1.0f);
+    FastVecCross((char *)&matrix[1], (char *)&matrix[0], (char *)&matrix[2]);
 
     qcopy(&matrix[3], state + 0x10);
     qcopy(&beam.vertices[0], &beamWidth);
     qcopy(&glow.vertices[0], &glowWidth);
     qcopy(&core.vertices[0], &coreWidth);
-    func_00282D30((char *)&beam.vertices[1], (char *)&beam.vertices[0], -1.0f);
-    func_00282D30((char *)&glow.vertices[1], (char *)&glow.vertices[0], -1.0f);
-    func_00282D30((char *)&core.vertices[1], (char *)&core.vertices[0], -1.0f);
-    func_002830C0(&beam.vertices[0], &beam.vertices[0], matrix);
-    func_002830C0(&beam.vertices[1], &beam.vertices[1], matrix);
-    func_002830C0(&glow.vertices[0], &glow.vertices[0], matrix);
-    func_002830C0(&glow.vertices[1], &glow.vertices[1], matrix);
-    func_002830C0(&core.vertices[0], &core.vertices[0], matrix);
-    func_002830C0(&core.vertices[1], &core.vertices[1], matrix);
+    FastVecScale((char *)&beam.vertices[1], (char *)&beam.vertices[0], -1.0f);
+    FastVecScale((char *)&glow.vertices[1], (char *)&glow.vertices[0], -1.0f);
+    FastVecScale((char *)&core.vertices[1], (char *)&core.vertices[0], -1.0f);
+    transform_vector(&beam.vertices[0], &beam.vertices[0], matrix);
+    transform_vector(&beam.vertices[1], &beam.vertices[1], matrix);
+    transform_vector(&glow.vertices[0], &glow.vertices[0], matrix);
+    transform_vector(&glow.vertices[1], &glow.vertices[1], matrix);
+    transform_vector(&core.vertices[0], &core.vertices[0], matrix);
+    transform_vector(&core.vertices[1], &core.vertices[1], matrix);
 
     qcopy(&matrix[3], state + 0x20);
     qcopy(&beam.vertices[2], &beamWidth);
     qcopy(&glow.vertices[2], &glowWidth);
     qcopy(&core.vertices[2], &coreWidth);
-    func_00282D30((char *)&beam.vertices[3], (char *)&beam.vertices[2], -1.0f);
-    func_00282D30((char *)&glow.vertices[3], (char *)&glow.vertices[2], -1.0f);
-    func_00282D30((char *)&core.vertices[3], (char *)&core.vertices[2], -1.0f);
-    func_002830C0(&beam.vertices[2], &beam.vertices[2], matrix);
-    func_002830C0(&beam.vertices[3], &beam.vertices[3], matrix);
-    func_002830C0(&glow.vertices[2], &glow.vertices[2], matrix);
-    func_002830C0(&glow.vertices[3], &glow.vertices[3], matrix);
-    func_002830C0(&core.vertices[2], &core.vertices[2], matrix);
-    func_002830C0(&core.vertices[3], &core.vertices[3], matrix);
+    FastVecScale((char *)&beam.vertices[3], (char *)&beam.vertices[2], -1.0f);
+    FastVecScale((char *)&glow.vertices[3], (char *)&glow.vertices[2], -1.0f);
+    FastVecScale((char *)&core.vertices[3], (char *)&core.vertices[2], -1.0f);
+    transform_vector(&beam.vertices[2], &beam.vertices[2], matrix);
+    transform_vector(&beam.vertices[3], &beam.vertices[3], matrix);
+    transform_vector(&glow.vertices[2], &glow.vertices[2], matrix);
+    transform_vector(&glow.vertices[3], &glow.vertices[3], matrix);
+    transform_vector(&core.vertices[2], &core.vertices[2], matrix);
+    transform_vector(&core.vertices[3], &core.vertices[3], matrix);
 
-    func_00280B90((char *)&beam, 0, 0);
-    func_00280B90((char *)&glow, 0, 0);
-    func_00280B90((char *)&core, 0, 0);
+    draw_world_quad((char *)&beam, 0, 0);
+    draw_world_quad((char *)&glow, 0, 0);
+    draw_world_quad((char *)&core, 0, 0);
 }

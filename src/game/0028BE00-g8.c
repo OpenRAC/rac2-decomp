@@ -70,10 +70,10 @@ void func_0028BE00(Selector *p)
     }
     p->timeout = 180;
     p->timer = 24;
-    if (func_00282978(D_0018C316) && !D_001A7BB3) D_00138180.inhibit = 2;
+    if (FastDecTimer(D_0018C316) && !D_001A7BB3) D_00138180.inhibit = 2;
     x = D_00138180.x;
     y = D_00138180.y;
-    mag = func_00282C10(x * x + y * y);
+    mag = square_root(x * x + y * y);
     if (mag != 0.0f) {
         x /= mag;
         y /= mag;
@@ -91,11 +91,11 @@ void func_0028BE00(Selector *p)
         if (mag > 0.9f) {
             a = ang + 3.1415927f + 3.1415927f + 1.5707964f + 3.1415927f / (float)D_001B18D0;
             f = a * 0.15915494f * (float)D_001B18D0;
-            r = (float)old * 6.2831855f / func_00283CE0(D_001B18D0) - 3.1415927f;
-            if (old == -1 || func_00283C80(r, func_00283BE0(ang, 1.5707964f)) > 0.5890487f) {
+            r = (float)old * 6.2831855f / IntToFloat(D_001B18D0) - 3.1415927f;
+            if (old == -1 || FastDiffRots(r, fast_subtract_rotations(ang, 1.5707964f)) > 0.5890487f) {
                 s = (int)f % D_001B18D0;
                 if ((s ^ 1) & 1) {
-                    float fr = f - (float)func_00283CF0(f);
+                    float fr = f - (float)FloatToInt(f);
                     if (fr > 0.8f) s++;
                     else if (fr < 0.2f) s--;
                     s = (s + D_001B18D0) % D_001B18D0;
@@ -145,13 +145,13 @@ void func_0028BE00(Selector *p)
     }
     c = p->fade;
     if (p->selected != old) {
-        func_0026FEB8(D_001A8E18);
+        STUB_printf(D_001A8E18);
         func_002B7AD0();
         c[1] = 0;
         func_002E5E58(3, 0, 0);
     } else if (c[1] < 8) c[1]++;
     if (p->selected >= 0 && !func_00294630(InfoOf(D_001B18D4[D_001A8D48][p->selected].f18)->name)) {
-        func_00294420(InfoOf(D_001B18D4[D_001A8D48][p->selected].f18)->name);
+        LoadClassIntoFreeCacheSlot(InfoOf(D_001B18D4[D_001A8D48][p->selected].f18)->name);
     } else {
         if (!(D_00138180.held & 0x10) && !D_001A63AC) {
             if (c[0]) c[0]--;

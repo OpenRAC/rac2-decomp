@@ -40,13 +40,13 @@ void func_002EE000(unsigned char *owner)
         return;
     if (func_002EE6A8(owner) != 8 && func_002EE6A8(owner) != 9) {
         qcopy(old, obj->rot);
-        a = func_00282E20(obj->unk90);
+        a = vec_length_xy(obj->unk90);
         sign = 1.0f;
         obj->rot[1] = -func_00283248(a, obj->unk90[2]);
         obj->rot[2] = func_00283248(obj->unk90[0], obj->unk90[1]);
-        if (func_00283BE0(obj->rot[2], old[2]) < 0.0f)
+        if (fast_subtract_rotations(obj->rot[2], old[2]) < 0.0f)
             sign = -1.0f;
-        b = func_00283C80(old[2], obj->rot[2]);
+        b = FastDiffRots(old[2], obj->rot[2]);
         if (func_002EE6A8(owner) != 2 && func_002EE6A8(owner) != 12) {
             obj->rot[0] *= 0.98f;
             obj->rot[0] += (b * -sign) * (D_001AC244 * 1.4137166738510132f) * 8.0f;
@@ -55,18 +55,18 @@ void func_002EE000(unsigned char *owner)
             else if (obj->rot[0] < -1.4137166738510132f)
                 obj->rot[0] = -1.4137166738510132f;
             func_002A91F0(temp, obj->rot);
-            func_00283958(temp, owner + 0xC0);
+            quaternion_to_rotation_basis(temp, owner + 0xC0);
         } else {
             func_002A91F0(temp, obj->rot);
             func_00283810(obj->unk40, obj->unk40, temp, 0.0125f);
-            func_00283958(obj->unk40, owner + 0xC0);
+            quaternion_to_rotation_basis(obj->unk40, owner + 0xC0);
         }
     } else {
         char *p = D_001B5390;
 
-        func_00282F20(owner + 0xC0, p + 0x10, obj->unk140);
-        func_00282F20(owner + 0xE0, p, -1.0f);
-        func_00282F20(owner + 0xD0, p + 0x20, -1.0f);
+        vec_scale_to_length(owner + 0xC0, p + 0x10, obj->unk140);
+        vec_scale_to_length(owner + 0xE0, p, -1.0f);
+        vec_scale_to_length(owner + 0xD0, p + 0x20, -1.0f);
     }
 }
 
@@ -75,11 +75,11 @@ void func_002EE610(unsigned char *owner)
     char *data = (char *)func_002ED688(owner);
     if (data) {
         char *vector = data + 0x90;
-        float length = func_00282DF0(vector);
+        float length = FastVecLength(vector);
         float limit = D_L00_001AC588;
         *(float *)(data + 0x124) = length;
         if (limit < length) {
-            func_00282F20(vector, vector, limit);
+            vec_scale_to_length(vector, vector, limit);
             *(float *)(data + 0x124) = D_L00_001AC588;
         }
     }

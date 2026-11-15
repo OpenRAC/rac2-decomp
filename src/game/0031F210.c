@@ -83,8 +83,8 @@ int func_003216E8(char *object)
         U(object,0x7e) |= 1;
         *(char **)(data+0x18)=data+0x110;
         F(data,0x284) *= 0.017453294f;
-        U(data,0x48)=func_00283CF0(20.0f);
-        U(data,0x4a)=func_00283CF0(16.0f);
+        U(data,0x48)=FloatToInt(20.0f);
+        U(data,0x4a)=FloatToInt(16.0f);
         if(func_002A77E0(2)==1) H(object,0x34)|=0x8000;
         F(data,0x90)=0.5f;
         F(data,0x94)=0.5f;
@@ -123,7 +123,7 @@ int func_003216E8(char *object)
         func_0029FCC0(object,0,data+0x380);
         F(data,0x388)+=20.0f;
         func_0029FCC0(object,0,data+0x390);
-        if(func_002761F8(data+0x390,data+0x380,0,object,0)) qcopy(data+0x380,D_001BAFA0);
+        if(CollLine(data+0x390,data+0x380,0,object,0)) qcopy(data+0x380,D_001BAFA0);
         if(!I(data,0x27c) && I(data,0x288)==-1) {
             F(object,0x18)=func_002A89A8(object+0x10,0,0.5f);
             func_002A7750((unsigned char *)object,1,0);
@@ -132,7 +132,7 @@ int func_003216E8(char *object)
             func_002A7750((unsigned char *)object,3,2);
             if(U(object,0x43)!=11) func_002A7470(object,11,0,0);
             I(object,0x98)=0;F(data,0x30)=2.5f;
-            child=func_0029EFD0(0xab7);
+            child=CreateMoby(0xab7);
             *(char **)(data+0x2ac)=child;
             if(!child) return 1;
             U(child,0x30)=U(object,0x30);
@@ -149,7 +149,7 @@ int func_003216E8(char *object)
             U(object,0x30)=0x80;
         }
     }
-    if(U(object,0x31) && func_00282E48(object+0x10,D_001B5340)<24.0f) {
+    if(U(object,0x31) && fast_vec_dist(object+0x10,D_001B5340)<24.0f) {
         func_002A93B0(object);U(object,0x6f)=22;
     }
     func_0029FCC0(object,0,data+0x390);
@@ -158,8 +158,8 @@ int func_003216E8(char *object)
     func_0029FC20(object,3,matrix);
     func_00282C88(data+0x3c0);
     I(data,0x3c8)=0;F(data,0x3c0)=0.25f;
-    func_002830C0(data+0x3c0,data+0x3c0,matrix);
-    func_00282CC0((float *)(data+0x3c0),(float *)(data+0x3c0),matrix+12);
+    transform_vector(data+0x3c0,data+0x3c0,matrix);
+    FastVecAdd((float *)(data+0x3c0),(float *)(data+0x3c0),matrix+12);
     special=0;
     if(U(data,0x2e)==2) special=1;
     status=func_002B0ED8(object,data+0x60,0);
@@ -189,7 +189,7 @@ int func_003216E8(char *object)
         I(data,0x25c)=func_002B3BA8(object,I(data,0x254),F(data,0x26c),10.0f,0,0);
         if(F(object,0x18)<90.0f) {
             func_002AC728(object,object+0x10,-1,0.5f,13.0f);
-            func_002A6C58(object,0,3);return 1;
+            SetDeathBits(object,0,3);return 1;
         }
     if(special) {func_00321E28(object);return 1;}
     return 0;
@@ -221,8 +221,8 @@ void func_00321E80(char *object)
     char *first;
     func_002AB8C0(object, data + 0x50);
     first = data + 0x3D0;
-    func_00282978(data + 0x270);
-    func_00282978(data + 0x272);
+    FastDecTimer(data + 0x270);
+    FastDecTimer(data + 0x272);
     func_002AEC48(object, first, 5, 0.03f, 0.3f);
     func_002AEC48(object, data + 0x450, 6, 0.03f, 0.3f);
     if (*(unsigned short *)(object + 0x96) < 65535)
@@ -282,7 +282,7 @@ void func_00322340(int unused, char *pos, int color, int first, int second, floa
     *(int *)(pkt + 84) = 0;
     *(int *)(pkt + 88) = 0;
     *(int *)(pkt + 100) = 0;
-    r = func_0027C878(11);
+    r = GetEffectTextureDescriptor(11);
     *(long long *)(pkt + 112) = 0;
     *(long long *)(pkt + 120) = r;
     *(long long *)(pkt + 128) = 0xFF9000000260LL;
@@ -295,30 +295,30 @@ void func_00322340(int unused, char *pos, int color, int first, int second, floa
     *(int *)(pkt + 64) = color + first;
     quat[3] = 0;
     quat[2] = func_00283248(dx, dy);
-    quat[1] = -func_00283248(func_00282E80(pos, &((BootAimVector *)D_001B5200)->x_140),
+    quat[1] = -func_00283248(vec_distance_xy(pos, &((BootAimVector *)D_001B5200)->x_140),
                               ((BootAimVector *)D_001B5200)->z_148 - *(float *)(pos + 8));
     quat[0] = func_002A7940();
-    func_00283410(m, quat);
-    func_00282CF0(off, &((BootAimVector *)D_001B5200)->x_140, pos);
-    func_00282F20(off, off, 0.5f);
+    euler_to_matrix(m, quat);
+    FastVecSub(off, &((BootAimVector *)D_001B5200)->x_140, pos);
+    vec_scale_to_length(off, off, 0.5f);
     m[12] = *(float *)(pos) + off[0];
     m[13] = *(float *)(pos + 4) + off[1];
     m[14] = *(float *)(pos + 8) + off[2];
     m[15] = 1.0f;
-    func_00282D30(pkt, pkt, scale);
-    func_00282D30(pkt + 16, pkt + 16, scale);
-    func_00282D30(pkt + 32, pkt + 32, scale);
-    func_00282D30(pkt + 48, pkt + 48, scale);
-    func_00280B90(pkt, m, 0);
+    FastVecScale(pkt, pkt, scale);
+    FastVecScale(pkt + 16, pkt + 16, scale);
+    FastVecScale(pkt + 32, pkt + 32, scale);
+    FastVecScale(pkt + 48, pkt + 48, scale);
+    draw_world_quad(pkt, m, 0);
     *(int *)(pkt + 76) = color + second;
     *(int *)(pkt + 72) = color + second;
     *(int *)(pkt + 68) = color + second;
     *(int *)(pkt + 64) = color + second;
-    func_00282D30(pkt, pkt, 0.5f);
-    func_00282D30(pkt + 16, pkt + 16, 0.5f);
-    func_00282D30(pkt + 32, pkt + 32, 0.5f);
-    func_00282D30(pkt + 48, pkt + 48, 0.5f);
-    func_00280B90(pkt, m, 0);
+    FastVecScale(pkt, pkt, 0.5f);
+    FastVecScale(pkt + 16, pkt + 16, 0.5f);
+    FastVecScale(pkt + 32, pkt + 32, 0.5f);
+    FastVecScale(pkt + 48, pkt + 48, 0.5f);
+    draw_world_quad(pkt, m, 0);
 }
 
 
@@ -355,15 +355,15 @@ void func_00322690(char *object, float *position, int joint, float intensity)
 
     func_0029FC20(object, joint, matrix);
     qcopy(axis, matrix + 4);
-    func_00282CF0(base, matrix + 12, (char *)position);
-    func_00282F20(near, axis, 0.85f);
-    func_00282F20(far, axis, 1.6f);
-    func_00282CC0(near, near, base);
-    func_00282CC0(far, far, base);
+    FastVecSub(base, matrix + 12, (char *)position);
+    vec_scale_to_length(near, axis, 0.85f);
+    vec_scale_to_length(far, axis, 1.6f);
+    FastVecAdd(near, near, base);
+    FastVecAdd(far, far, base);
     near[2] -= 0.1f;
     far[2] -= 0.1f;
-    func_00282F20(velocity, matrix + 4, 0.25f);
-    func_00282CC0(velocity, velocity, position);
+    vec_scale_to_length(velocity, matrix + 4, 0.25f);
+    FastVecAdd(velocity, velocity, position);
     func_002A8C28(object, base, 0.3f, 1, intensity, 1.0f, 0, 1, 0);
     func_002A8C28(object, near, 0.3f, 1, intensity, 1.0f, 0, 1, 0);
     func_002A8C28(object, far, 0.3f, 1, intensity, 1.0f, 0, 1, 0);
@@ -377,7 +377,7 @@ void func_00322690(char *object, float *position, int joint, float intensity)
     *(JointEffectQuad *)drift = 0;
     drift[2] = 0.1f;
     drift[3] = 1.0f;
-    func_00282CC0(drift, drift, position);
+    FastVecAdd(drift, drift, position);
     for (j = 0; j < 1; j++) {
         particle = func_002C16C0(near, drift, 15, 60, 0x606060, 3,
                                  105000.0f, 21000.0f, 1.0f, -0.0002f, 0.0f);
@@ -496,7 +496,7 @@ void func_00325638(int unused, char *pos, int color, int first, int second, floa
     *(int *)(pkt + 84) = 0;
     *(int *)(pkt + 88) = 0;
     *(int *)(pkt + 100) = 0;
-    r = func_0027C878(11);
+    r = GetEffectTextureDescriptor(11);
     *(long long *)(pkt + 112) = 0;
     *(long long *)(pkt + 120) = r;
     *(long long *)(pkt + 128) = 0xFF9000000260LL;
@@ -509,30 +509,30 @@ void func_00325638(int unused, char *pos, int color, int first, int second, floa
     *(int *)(pkt + 64) = color + first;
     quat[3] = 0;
     quat[2] = func_00283248(dx, dy);
-    quat[1] = -func_00283248(func_00282E80(pos, &((BootAimVector *)D_001B5200)->x_140),
+    quat[1] = -func_00283248(vec_distance_xy(pos, &((BootAimVector *)D_001B5200)->x_140),
                               ((BootAimVector *)D_001B5200)->z_148 - *(float *)(pos + 8));
     quat[0] = func_002A7940();
-    func_00283410(m, quat);
-    func_00282CF0(off, &((BootAimVector *)D_001B5200)->x_140, pos);
-    func_00282F20(off, off, 0.5f);
+    euler_to_matrix(m, quat);
+    FastVecSub(off, &((BootAimVector *)D_001B5200)->x_140, pos);
+    vec_scale_to_length(off, off, 0.5f);
     m[12] = *(float *)(pos) + off[0];
     m[13] = *(float *)(pos + 4) + off[1];
     m[14] = *(float *)(pos + 8) + off[2];
     m[15] = 1.0f;
-    func_00282D30(pkt, pkt, scale);
-    func_00282D30(pkt + 16, pkt + 16, scale);
-    func_00282D30(pkt + 32, pkt + 32, scale);
-    func_00282D30(pkt + 48, pkt + 48, scale);
-    func_00280B90(pkt, m, 0);
+    FastVecScale(pkt, pkt, scale);
+    FastVecScale(pkt + 16, pkt + 16, scale);
+    FastVecScale(pkt + 32, pkt + 32, scale);
+    FastVecScale(pkt + 48, pkt + 48, scale);
+    draw_world_quad(pkt, m, 0);
     *(int *)(pkt + 76) = color + second;
     *(int *)(pkt + 72) = color + second;
     *(int *)(pkt + 68) = color + second;
     *(int *)(pkt + 64) = color + second;
-    func_00282D30(pkt, pkt, 0.5f);
-    func_00282D30(pkt + 16, pkt + 16, 0.5f);
-    func_00282D30(pkt + 32, pkt + 32, 0.5f);
-    func_00282D30(pkt + 48, pkt + 48, 0.5f);
-    func_00280B90(pkt, m, 0);
+    FastVecScale(pkt, pkt, 0.5f);
+    FastVecScale(pkt + 16, pkt + 16, 0.5f);
+    FastVecScale(pkt + 32, pkt + 32, 0.5f);
+    FastVecScale(pkt + 48, pkt + 48, 0.5f);
+    draw_world_quad(pkt, m, 0);
 }
 
 
@@ -563,7 +563,7 @@ void func_00325B70(char *self, char **children, int first, int second)
 {
     int i;
     for (i = 0; i < 2; i++, children++) {
-        *children = func_0029EFD0(0xAA2);
+        *children = CreateMoby(0xAA2);
         if (*children != 0) {
             func_002B37E8(*children, self);
             *(float *)(*children + 0x2C) *= 0.75f;
@@ -620,7 +620,7 @@ void func_00326CB8(char *obj)
     func_00282C88_1(buf);
     buf[0] = *(float *)(e + 16);
     buf[1] = *(float *)(e + 20);
-    *(float *)(e + 48) = func_00282DF0(buf);
+    *(float *)(e + 48) = FastVecLength(buf);
 }
 
 

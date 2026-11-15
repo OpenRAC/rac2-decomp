@@ -41,7 +41,7 @@ int func_L10_0037F510(void)
 void *func_L10_0039D5E0(void *position, void *direction, s32 duration, s32 kind,
                        s32 first, s32 second, float jitter, s32 third, s32 texture,
                        float width, float height, float fade) {
-    u8 *object = func_0029EFD0(0x133E);
+    u8 *object = CreateMoby(0x133E);
     char *state;
     int i;
     if (object) {
@@ -73,7 +73,7 @@ extern u8 D_L10_0039D9C0[];
 
 /* Refreshes and then hands the constructor at 0x0039D9C0 to the callback list. */
 void func_L10_0039D728(void *a0) {
-    func_L10_0039D760(a0);
+    RebuildTimedLightningStripPoints(a0);
     func_L00_002E6EF8(D_L10_0039D9C0, a0);
 }
 
@@ -87,16 +87,16 @@ void func_L10_0039D760(void *object) {
     f32 t;
     int strip, i, j;
     for (strip = 0; strip < 4; strip++) {
-        if (func_00282978(&D_L10_001B2DB8[strip])) {
+        if (FastDecTimer(&D_L10_001B2DB8[strip])) {
             D_L10_001B2DB8[strip] = 2;
             D_L10_001B2DC0[strip] = 0;
             qcopy(point, state);
             point[0] += func_002A7878(0.0f, 0.0f);
             point[1] += func_002A7878(0.0f, 0.0f);
             point[2] += func_002A7878(0.0f, 0.0f);
-            func_00282CF0(direction, point, self + 0x10);
-            func_00282F20(direction, direction, 0.5f);
-            func_00282CC0(direction, point, direction);
+            FastVecSub(direction, point, self + 0x10);
+            vec_scale_to_length(direction, direction, 0.5f);
+            FastVecAdd(direction, point, direction);
             for (i = 0; i < 8; i++) {
                 t = (f32)i * 0.1f;
                 if (i == 7) t = 1.0f;
@@ -130,7 +130,7 @@ void func_L10_0039D9C0(void *a0) {
     char *s0 = *(char **)((char *)a0 + 0x68);
 
     if (func_00282948(s0 + 0x10) == 0) {
-        func_L10_0039DA48(D_L10_00234600, *(int *)(s0 + 0x1C), *(int *)(s0 + 0x30), 8,
+        DrawHrugisRibbon(D_L10_00234600, *(int *)(s0 + 0x1C), *(int *)(s0 + 0x30), 8,
                           *(float *)(s0 + 0x24), *(float *)(s0 + 0x28),
                           *(float *)(s0 + 0x20), *(int *)(s0 + 0x14), *(int *)(s0 + 0x18));
     } else {
@@ -172,15 +172,15 @@ void func_L10_004191E8(void *a0)
     if (*(int *)((char *)s1 + 0x268) != 0)
         return;
     if (*(unsigned char *)((char *)s0 + 0x20) == 2) {
-        func_L05_00379FA0(0.9f, 13.0f, 4.5f, s0, 0x60000080, 0, 1, 1.0f, 0, -1, 0);
+        SpawnSpaceProjectile(0.9f, 13.0f, 4.5f, s0, 0x60000080, 0, 1, 1.0f, 0, -1, 0);
     } else if (*(unsigned char *)((char *)s0 + 0x20) == 1) {
         if (func_002A77E0(2) != 0)
-            func_L05_00379FA0(0.6f, 5.0f, 1.0f, s0, 0x60800000, 1, 0, 1.0f, 0, -1, 0);
+            SpawnSpaceProjectile(0.6f, 5.0f, 1.0f, s0, 0x60800000, 1, 0, 1.0f, 0, -1, 0);
         else
-            func_L05_00379FA0(0.6f, 5.0f, 1.0f, s0, 0x60800080, 1, 0, 1.0f, 0, -1, 0);
+            SpawnSpaceProjectile(0.6f, 5.0f, 1.0f, s0, 0x60800080, 1, 0, 1.0f, 0, -1, 0);
     }
     if (func_002A77E0(3) == 0)
-        func_002E5CF8(0, 0, s0);
+        PlayMobySound(0, 0, s0);
     *(int *)((char *)s1 + 0x268) = 0x19;
 }
 

@@ -36,7 +36,7 @@ void *func_L00_004239A8(char *a0)
     int i = 0;
     char *cam = D_L00_001B8E10 + 0x10;
 
-    func_00282CC0(&v, base + 0xB0, end);
+    FastVecAdd(&v, base + 0xB0, end);
     *(short *)(st + 0x38) = 2;
     q = *(void **)(*(char **)D_L00_001B8E10 + 0x70);
     tgt = *(void **)(st + 0x48);
@@ -50,9 +50,9 @@ void *func_L00_004239A8(char *a0)
         else
             gotB = 1;
         if (*(short *)(st + 0x38) != 0) {
-            func_00282CF0(&w, D_L00_001BF220_1, &v);
-            func_00282F20(&w, &w, 1.0f);
-            d = func_00282DB0(cam + 0x30, &w);
+            FastVecSub(&w, D_L00_001BF220_1, &v);
+            vec_scale_to_length(&w, &w, 1.0f);
+            d = FastVecDot(cam + 0x30, &w);
             if (d > 0.75f)
                 *(short *)(st + 0x38) = 1;
             else if (d < -0.75f)
@@ -64,7 +64,7 @@ void *func_L00_004239A8(char *a0)
         i++;
     }
     ret = func_L00_004237C8(a0, &v, gotA, gotB);
-    func_00282CC0(st + 0x20, (char *)mid + 0x50, end);
+    FastVecAdd(st + 0x20, (char *)mid + 0x50, end);
     if (*(short *)(st + 0x38) == 2)
         *(short *)(st + 0x38) = 0;
     return ret;

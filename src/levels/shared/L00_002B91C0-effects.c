@@ -26,7 +26,7 @@ void func_L00_002BA138(void *object, int count)
     if (count != 0) {
         base = D_00189E20;
         if (*(short *)(base + 0xbfe) == 0) {
-            func_002E5CF8(1, 0, object);
+            PlayMobySound(1, 0, object);
             *(short *)(base + 0xbfe) = 1;
         }
         if (count > 0) {

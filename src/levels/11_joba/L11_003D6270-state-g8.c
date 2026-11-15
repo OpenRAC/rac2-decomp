@@ -114,11 +114,11 @@ void func_L11_003F1F48(u8 *self) {
                 else func_002A7750(self,4,2);
             }
         }
-        func_00282CC0(self+0x10,self+0x10,state+0x1E0);
+        FastVecAdd(self+0x10,self+0x10,state+0x1E0);
         func_L11_00332EE0(vector,self+0xE0,F(state,0x270));
-        func_00283678(matrix,vector);
-        func_00283738(self+0xC0,matrix,self+0xC0);
-        amplitude=D_L11_001B0558*(1-(H(state,0x298)*2.0f)/func_00283CE0(D_L11_001B057C))*(1-(H(state,0x298)*2.0f)/func_00283CE0(D_L11_001B057C));
+        copy_matrix3x4(matrix,vector);
+        multiply_matrix3x3(self+0xC0,matrix,self+0xC0);
+        amplitude=D_L11_001B0558*(1-(H(state,0x298)*2.0f)/IntToFloat(D_L11_001B057C))*(1-(H(state,0x298)*2.0f)/IntToFloat(D_L11_001B057C));
         F(self,0x10)=amplitude*func_00283180(F(state,0x250))+func_L11_004417E8(W(self,0xB8))[0];
         F(self,0x14)=amplitude*func_00283198(F(state,0x250))+func_L11_004417E8(W(self,0xB8))[1];
         U(state,0x298)++;
@@ -147,11 +147,11 @@ void func_L11_003F1F48(u8 *self) {
                 u8 *v=vector;
                 u8 *position=self+0x10;
                 pos=func_L11_004417E8(W(self,0xB8));
-                func_00282CF0(v,position,pos);
+                FastVecSub(v,position,pos);
                 W(vector,8)=0;
-                func_00282F20(v,v,D_L11_001B0564);
+                vec_scale_to_length(v,v,D_L11_001B0564);
                 pos=func_L11_004417E8(W(self,0xB8));
-                func_00282CC0(v,v,pos);
+                FastVecAdd(v,v,pos);
                 if (self[0x95]==2) F(vector,8)=F(self,0x18)+D_L11_001B0568;
                 else if (self[0x95]==1) F(vector,8)=F(self,0x18)-D_L11_001B0568;
                 func_L11_00440B28(W(self,0xB8),vector);
@@ -185,20 +185,20 @@ void func_L11_003F1F48(u8 *self) {
     case 9:
         if (func_002B3868(self)) {
             pos=func_L11_004417E8(W(self,0xB8));
-            func_00282CF0(state+0x1E0,pos,self+0x10);
+            FastVecSub(state+0x1E0,pos,self+0x10);
             W(state,0x1E8)=0;
-            func_00282F20(state+0x1E0,state+0x1E0,0.1666666716337204f);
+            vec_scale_to_length(state+0x1E0,state+0x1E0,0.1666666716337204f);
             F(self,0x48)=D_L11_001B0574;
             func_L11_003F31C0(self);
             U(self,0x34)&=0xEFFF;
         }
         F(state,0x1E8)-=0.0027777778450399637f;
-        func_00282CC0(self+0x10,self+0x10,state+0x1E0);
+        FastVecAdd(self+0x10,self+0x10,state+0x1E0);
         pos=func_L11_004417E8(W(self,0xB8));
         if (F(self,0x18)<pos[2]+5 || !func_002A77E0(0x1C2) || U(self,0x96)>=301) {
             func_L02_003FC248(self,0,-1);
             func_L11_003F3098(self);
-            func_0032C700(self+0x10,0,25,15,30,20,30,0,3,0,1,1,0,0);
+            SpawnExplosion(self+0x10,0,25,15,30,20,30,0,3,0,1,1,0,0);
             func_002E5DA0(0,0,self,0xDF7);
         }
         break;

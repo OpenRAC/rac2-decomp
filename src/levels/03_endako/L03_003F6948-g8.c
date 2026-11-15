@@ -45,11 +45,11 @@ void func_L03_003F6948(u8 *self) {
         u8 *data = *(u8 **)(obj + 0x68);
         qcopy(&frame.pos, obj + 0x10);
         frame.pos.f[3] = 1.0f;
-        func_00282CF0(&frame.a, D_L03_001B9980, &frame.pos);
-        func_00282F20(&frame.b, data, (float)*(s16 *)(data + 0x12) * scale);
-        func_00282DD8(&frame.c, &frame.b, &frame.a);
-        func_00282F20(&frame.c, &frame.c, 1.0f);
-        func_00282DD8(&frame.a, &frame.b, &frame.c);
-        func_00280B90(&packet, &frame.a, 0);
+        FastVecSub(&frame.a, D_L03_001B9980, &frame.pos);
+        vec_scale_to_length(&frame.b, data, (float)*(s16 *)(data + 0x12) * scale);
+        FastVecCross(&frame.c, &frame.b, &frame.a);
+        vec_scale_to_length(&frame.c, &frame.c, 1.0f);
+        FastVecCross(&frame.a, &frame.b, &frame.c);
+        draw_world_quad(&packet, &frame.a, 0);
     }
 }

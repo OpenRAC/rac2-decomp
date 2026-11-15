@@ -129,7 +129,7 @@ extern void func_002A93B0();
 
 void func_L02_003DBE60(char *arg0) {
     if (*(unsigned char *)(arg0 + 0x31) != 0) {
-        if (func_00282E48(arg0 + 0x10, &D_L02_001BA500) < 64.0f) {
+        if (fast_vec_dist(arg0 + 0x10, &D_L02_001BA500) < 64.0f) {
             func_002A93B0(arg0);
             *(unsigned char *)(arg0 + 0x6F) = 60;
         }
@@ -199,8 +199,8 @@ void func_L02_003E75A8(char *arg0) {
             st->pos[i] = st->pos[i] - st->speed[i];
             if (st->pos[i] < 0.0f)
                 st->pos[i] += 9.0f;
-            if (D_L02_002A53B0[i][func_00283CF0(st->pos[i] + 9.0f) % 9] == st->want[i]) {
-                if (st->pos[i] - (float)func_00283CF0(st->pos[i]) < 0.2f)
+            if (D_L02_002A53B0[i][FloatToInt(st->pos[i] + 9.0f) % 9] == st->want[i]) {
+                if (st->pos[i] - (float)FloatToInt(st->pos[i]) < 0.2f)
                     st->mode[i] = 0;
             }
             break;
@@ -245,10 +245,10 @@ extern Global001A7A00 D_001A7A00 __attribute__((sda));
    func_L01_0031A278, plus the offset b from func_L02_0031E9E8) and acts on the mode at +0x5C of
    its state (the one func_L02_003E79F8 rolls), through the level's own jump table. Mode 1 starts
    an effect (func_L00_00321878). Mode 2 sets the word at +0xA4, decrements D_L02_001AEC78 and
-   changes the actor's state to 5. Mode 3 scales by 0.35 the state of the object func_003202E8
+   changes the actor's state to 5. Mode 3 scales by 0.35 the state of the object SpawnWeaponAmmoPickup
    makes at the point. Mode 4 calls func_L02_003A8770 and prints D_L02_001B09C8. Mode 5 runs a
    one-shot (the flag at D_001A7A00 + 0x79, func_002E5E58, func_002B0A18 and D_L02_001A903C) and
-   adds 300 to D_001A79F8. Modes 1, 3, 4 and 5 call func_002E5CF8 with 2 first, any other mode
+   adds 300 to D_001A79F8. Modes 1, 3, 4 and 5 call PlayMobySound with 2 first, any other mode
    with 3. */
 void func_L02_003E77E0(char *arg0) {
     static void *tab[] = { &&c1, &&c2, &&c3, &&c4, &&c5 };
@@ -262,13 +262,13 @@ void func_L02_003E77E0(char *arg0) {
     func_002A7750(arg0, 1, -1);
     func_L02_0031E9E8(b, 1.0f);
     func_L01_0031A278(arg0, a, 3.0f, 0.0f, 2.0f);
-    func_00282CC0(a, b, a);
+    FastVecAdd(a, b, a);
     sel = *(int *)(state + 0x5C) - 1;
     if (sel < 5)
         goto *D_L02_002A52D0[sel];
     goto other;
 c1:
-    func_002E5CF8(2, 0x20, arg0);
+    PlayMobySound(2, 0x20, arg0);
     func_L00_00321878(arg0, 0xF, 0x41, 3, -1, 4, 0.0f);
     goto done;
 c2:
@@ -277,18 +277,18 @@ c2:
     func_002A7750(arg0, 5, -1);
     goto done;
 c3:
-    func_002E5CF8(2, 0x20, arg0);
-    func_002A68A8(arg0, &out);
-    p = *(char **)(func_003202E8(a, out, -1, 0) + 0x68);
-    func_00282D30(p, p, 0.35f);
+    PlayMobySound(2, 0x20, arg0);
+    PickAmmoDropItem(arg0, &out);
+    p = *(char **)(SpawnWeaponAmmoPickup(a, out, -1, 0) + 0x68);
+    FastVecScale(p, p, 0.35f);
     goto done;
 c4:
-    func_002E5CF8(2, 0x20, arg0);
+    PlayMobySound(2, 0x20, arg0);
     func_L02_003A8770(a, 0);
-    func_0026FEB8(D_L02_001B09C8);
+    STUB_printf(D_L02_001B09C8);
     goto done;
 c5:
-    func_002E5CF8(2, 0x20, arg0);
+    PlayMobySound(2, 0x20, arg0);
     if (D_001A7A00.once == 0) {
         D_001A7A00.once = 1;
         func_002E5E58(1, 0, 0);
@@ -298,7 +298,7 @@ c5:
     D_001A79F8 += 300;
     goto done;
 other:
-    func_002E5CF8(3, 0x20, arg0);
+    PlayMobySound(3, 0x20, arg0);
 done:
     return;
 }
@@ -381,11 +381,11 @@ extern float func_00282E80(char *, char *);
 float func_L02_003EEC58(char *arg0) {
     State *state = *(State **)(arg0 + 0x68);
     Entry *entry = (Entry *)D_L02_001FF1C0[state->id];
-    float cur = func_00282E80(D_00189EA0, (char *)&entry->pts[state->idx]);
+    float cur = vec_distance_xy(D_00189EA0, (char *)&entry->pts[state->idx]);
     float d;
 
     if (state->idx < entry->count - 1) {
-        d = func_00282E80(D_00189EA0, (char *)&entry->pts[state->idx + 1]);
+        d = vec_distance_xy(D_00189EA0, (char *)&entry->pts[state->idx + 1]);
         if (d < cur) {
             state->t += entry->pts[state->idx].w;
             if (state->t > 14.0f)
@@ -395,7 +395,7 @@ float func_L02_003EEC58(char *arg0) {
         }
     }
     if (state->idx > 0) {
-        d = func_00282E80(D_00189EA0, (char *)&entry->pts[state->idx - 1]);
+        d = vec_distance_xy(D_00189EA0, (char *)&entry->pts[state->idx - 1]);
         if (d < cur) {
             state->t -= entry->pts[state->idx].w;
             if (state->t < 0.0f)
@@ -422,7 +422,7 @@ extern char *D_L02_001FF1C0[];
    point i (the index at +0x30, one back when it is the last point) to point j (i plus the
    lookahead at +0x3C, at most the last point). The segment's angle (func_00283248) minus the
    angle of the hero's direction vector (floats at +0x160 of its state, the pointer at +0x70 of the
-   object at D_L02_001BA500 + 0x50) turned by pi, wrapped by func_00283B98 and func_00283BE0, clears
+   object at D_L02_001BA500 + 0x50) turned by pi, wrapped by FastAddRotations and fast_subtract_rotations, clears
    the heading when it is under about a tenth of a degree; otherwise func_002AAC80 eases the
    heading towards it, weighted by the progress (+0x34, minus 6, over 8, at least 0). The heading
    is then copied into the hero's state at +0x1D4, +0x1DC gets 1.0 and, from a progress of 0.9, the
@@ -467,8 +467,8 @@ void func_L02_003EEDD0(char *arg0) {
                            *(float *)(p1 + 0x14) - *(float *)(p0 + 0x14));
     }
     a2 = func_00283248(dir[0], dir[1]);
-    a2 = func_00283B98(a2, 3.1415927f);
-    a1 = func_00283BE0(a1, a2);
+    a2 = FastAddRotations(a2, 3.1415927f);
+    a1 = fast_subtract_rotations(a1, a2);
     if (func_00282C48(a1) < 0.0017453294713050127f) {
         *(float *)(state + 0x38) = 0.0f;
     } else {
@@ -479,7 +479,7 @@ void func_L02_003EEDD0(char *arg0) {
     *(float *)(cam + 0x1C) = 1.0f;
     *(float *)(cam + 0x14) = *(float *)(state + 0x38);
     if (scale >= 0.9f) {
-        func_L00_00424B48(0);
+        set_follow_camera_orbit_clamp_mode(0);
         func_L00_00424C28();
     }
 }
@@ -498,10 +498,10 @@ int func_L02_003EEFB8(char *arg0) {
     TI128 buf;
     int i;
 
-    if (*(float *)(state + 0x2C) < func_00282E48(D_00189EA0, state + 0x20))
+    if (*(float *)(state + 0x2C) < fast_vec_dist(D_00189EA0, state + 0x20))
         return 0;
     for (i = 0; i < *(int *)entry; i += *(int *)(state + 0x40)) {
-        if (func_00282E48(D_00189EA0, entry + (i * 16 + 0x10)) < *(float *)(state + 0x2C)) {
+        if (fast_vec_dist(D_00189EA0, entry + (i * 16 + 0x10)) < *(float *)(state + 0x2C)) {
             buf = *(TI128 *)D_00189EA0;
             *(int *)(state + 0x30) = func_L02_00348420(&buf, entry);
             return 1;
@@ -583,8 +583,8 @@ void func_L02_003F1298(char *arg0) {
         s->p18 = (char *)&s->f110;
         f = func_002A7878(15.0f, 40.0f) * 0.017453294f;
         s->f4B4 = (func_002A77E0(2) != 0) ? -f : f;
-        s->b48 = func_00283CF0(15.0f);
-        s->b4A = func_00283CF0(12.0f);
+        s->b48 = FloatToInt(15.0f);
+        s->b4A = FloatToInt(12.0f);
         if (func_002A77E0(2) == 1)
             *(u16 *)(arg0 + 0x34) |= 0x8000;
         s->f4CC = 8.0f;
@@ -608,12 +608,12 @@ void func_L02_003F1298(char *arg0) {
         func_L02_003F18E8(arg0);
     }
     if (*(u8 *)(arg0 + 0x31) != 0) {
-        if (func_00282E48(arg0 + 0x10, &D_L02_001BA500) < 24.0f) {
+        if (fast_vec_dist(arg0 + 0x10, &D_L02_001BA500) < 24.0f) {
             func_002A93B0(arg0);
             *(u8 *)(arg0 + 0x6F) = 0x16;
         }
     }
-    s->f4BC = func_00283B98(s->f4BC, s->f4CC * 0.017453294f);
+    s->f4BC = FastAddRotations(s->f4BC, s->f4CC * 0.017453294f);
     func_00325C50(s->f4BC, arg0, s->x4C0, 1, D_L02_001A8F20);
     func_00325DA0(arg0, s->x4DC);
     if (*(u8 *)(arg0 + 0x31) != 0 && *(u8 *)(arg0 + 0x20) >= 3) {
@@ -720,7 +720,7 @@ void func_L02_003F17B0(char *arg0, int arg1) {
         *(u16 *)(state + 0x4EA) = 0;
         if (flag != 0) {
             *(short *)(state + 0x60) = 0;
-            func_002A0488(arg0, *(u8 *)(state + 0x64), *(u8 *)(state + 0x65),
+            set_moby_color(arg0, *(u8 *)(state + 0x64), *(u8 *)(state + 0x65),
                           *(u8 *)(state + 0x66));
             *(short *)(state + 0x62) = 1;
         }

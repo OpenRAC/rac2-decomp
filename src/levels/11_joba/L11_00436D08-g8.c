@@ -86,23 +86,23 @@ s32 func_L11_00436D08(AimObject *obj)
             return 0;
         if (!func_L02_003D7300(entity))
             continue;
-        if (!(func_00282E80(obj->position, entity->position) < D_L11_001B1230))
+        if (!(vec_distance_xy(obj->position, entity->position) < D_L11_001B1230))
             continue;
 
         angle = func_00283248(entity->position[0] - obj->position[0],
                               entity->position[1] - obj->position[1]);
-        if (!(func_00283C80(obj->heading, angle) < D_L11_001B1234 * 0.017453294f))
+        if (!(FastDiffRots(obj->heading, angle) < D_L11_001B1234 * 0.017453294f))
             continue;
         if (ids == 0)
             return 0;
 
-        func_00282CF0(vec, obj->position, entity->position);
+        FastVecSub(vec, obj->position, entity->position);
         turn = D_L11_001B1238 * 0.017453294f;
         angle = func_00283248(entity->position[0] - obj->position[0],
                               entity->position[1] - obj->position[1]);
         func_002ACEC0(vec, vec, obj->axis,
-                      func_00283BE0(obj->heading, angle) >= 0.0f ? -turn : turn);
-        func_00282CC0(vec, vec, entity->position);
+                      fast_subtract_rotations(obj->heading, angle) >= 0.0f ? -turn : turn);
+        FastVecAdd(vec, vec, entity->position);
 
         savedTurnRate = state->turnRate;
         state->turnRate = 0.0001f;

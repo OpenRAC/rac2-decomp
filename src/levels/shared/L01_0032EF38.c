@@ -43,7 +43,7 @@ L01_EF38Particle *func_L01_0032EF38(L01_EF38Quad *position, int color, int kind,
         p->color = color;
         p->b3 = 0x44;
         p->position.f[2] = p->position.f[2] + 0.05f;
-        p->alpha = func_00283CF0(2.0f) + 32;
+        p->alpha = FloatToInt(2.0f) + 32;
         p->b1 = 1;
         p->b2 = *D_L01_001FF110;
         p->size = life;
@@ -53,7 +53,7 @@ L01_EF38Particle *func_L01_0032EF38(L01_EF38Quad *position, int color, int kind,
         out->kind = kind;
         p->payload.scale = scale;
         out->second = second;
-        out->rate = 1.0f / func_00283CE0(life);
+        out->rate = 1.0f / IntToFloat(life);
     }
     return p;
 }

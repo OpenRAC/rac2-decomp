@@ -117,20 +117,20 @@ void func_L00_003B9310(unsigned char *object,AimState *state)
         if (!state->special) state->target=0;
         state->special=1;
     } else {
-        func_00282D30(&origin,D_00189E20.f2290+0xe0,0.75f);
-        func_00282CC0(&origin,(char *)&D_00189E20+0x80,&origin);
+        FastVecScale(&origin,D_00189E20.f2290+0xe0,0.75f);
+        FastVecAdd(&origin,(char *)&D_00189E20+0x80,&origin);
         if (D_00189E20.f22b4!=4) func_0029FCC0(object,1,&state->origin);
         else func_0029FCC0(D_00189E20.f2290,5,&state->origin);
         angle=0.2617994248867035f; D_L00_001B28E0=angle; state->special=0;
     }
-    func_00282978(&state->delay); old=state->target;
+    FastDecTimer(&state->delay); old=state->target;
     if (old) {
         unsigned char *descriptor;
         entry=old;
         descriptor=func_002AB1F0(entry);
         if (descriptor) {
-            func_00282D30(&direction,entry+0xe0,F(descriptor,0x10));
-            func_00282CC0(&target,entry+0x10,&direction);
+            FastVecScale(&direction,entry+0xe0,F(descriptor,0x10));
+            FastVecAdd(&target,entry+0x10,&direction);
         } else qcopy(&target,entry+0x10);
         if (!old || B(old,0x20)==254 || B(old,0x20)==253 ||
             (descriptor && F(descriptor,0)<=0.0f) || !B(old,0x31) || D_00189E20.f24ec) {
@@ -140,16 +140,16 @@ void func_L00_003B9310(unsigned char *object,AimState *state)
     if (state->mode==1 && !D_00189E20.f24ec && !state->delay && !D_L00_001AFCE0 && !D_00189E20.f1e0) {
         qcopy(&direction,&D_L00_001B8FF0);
         if (D_00189E20.f2294==29) direction.v[2]=0;
-        func_00282D30(&state->direction,&direction,1.0f);
-        candidate=func_L00_003B8E58(&origin,&direction,angle,cone,range,0.7853982448577881f,0.6108653f,state->target);
+        FastVecScale(&state->direction,&direction,1.0f);
+        candidate=SelectCurrentOrPreferredTarget(&origin,&direction,angle,cone,range,0.7853982448577881f,0.6108653f,state->target);
         if (!candidate) {
-            func_00282F20(&temp,&direction,D_L00_001B28E4);
-            func_00282CC0(&temp,&temp,&origin);
-            if (func_002761F8(&origin,&temp,0,D_00189E20.f2290,0)) {
+            vec_scale_to_length(&temp,&direction,D_L00_001B28E4);
+            FastVecAdd(&temp,&temp,&origin);
+            if (CollLine(&origin,&temp,0,D_00189E20.f2290,0)) {
                 unsigned char *hit=D_L00_001BF200.hit;
                 if (hit && B(hit,0x20)!=254 && B(hit,0x20)!=253 && S(hit,0xaa)==0xee1) {
                     entry=P(hit,0x68);
-                    if ((B(entry,0x3b1)&0x80) && (F(entry,0x3e4)==0.0f || func_00282E80(&origin,object+0x10)<F(entry,0x3e4)))
+                    if ((B(entry,0x3b1)&0x80) && (F(entry,0x3e4)==0.0f || vec_distance_xy(&origin,object+0x10)<F(entry,0x3e4)))
                         candidate=D_L00_001BF200.hit;
                 }
             }
@@ -168,8 +168,8 @@ void func_L00_003B9310(unsigned char *object,AimState *state)
                     newDescriptor=func_002AB1F0(candidate);
                     if (newDescriptor) {
                         state->height.value=F(newDescriptor,0x10);
-                        func_00282D30(&temp,state->target+0xe0,F(newDescriptor,0x10));
-                        func_00282CC0(&target,state->target+0x10,&temp);
+                        FastVecScale(&temp,state->target+0xe0,F(newDescriptor,0x10));
+                        FastVecAdd(&target,state->target+0x10,&temp);
                     } else qcopy(&target,state->target+0x10);
                 }
             } else state->timer=D_L00_001AFCE8;
@@ -180,20 +180,20 @@ void func_L00_003B9310(unsigned char *object,AimState *state)
     }
     if (D_00189E20.f2294==29) func_00273318(object,1.0f,0x600fff0f,0,38,0.0f,-1,90.0f,4);
     if (state->target) {
-        float opacity=func_00282C48(0.9f-func_00282E48(&D_L00_001B8DC0,&target)*0.006666667f*0.65f);
+        float opacity=func_00282C48(0.9f-fast_vec_dist(&D_L00_001B8DC0,&target)*0.006666667f*0.65f);
         func_00273318(object,opacity,0xff0fff0f,&target,38,0.0f,-1,90.0f,4);
-        func_00282CF0(&state->direction,&target,&state->origin);
-        func_00282F20(&state->direction,&state->direction,1.0f);
+        FastVecSub(&state->direction,&target,&state->origin);
+        vec_scale_to_length(&state->direction,&state->direction,1.0f);
     }
     {
-        func_00283698(matrix,object+0xc0);
-        func_002830C0(&direction,&state->direction,matrix);
+        matrix_from_basis_rows(matrix,object+0xc0);
+        transform_vector(&direction,&state->direction,matrix);
         if (D_00189E20.f22b4!=4) {
-            D_L00_0023DB20.yaw=func_00283B98(1.5707964f,func_00283248(direction.v[0],direction.v[1]));
-            D_L00_0023DB20.pitch=-func_00283248(func_00282E20(&direction),direction.v[2]);
+            D_L00_0023DB20.yaw=FastAddRotations(1.5707964f,func_00283248(direction.v[0],direction.v[1]));
+            D_L00_0023DB20.pitch=-func_00283248(vec_length_xy(&direction),direction.v[2]);
         } else {
             D_L00_0025BE10.yaw=func_00283248(direction.v[0],direction.v[1]);
-            D_L00_0025BE10.pitch=func_00283248(func_00282E20(&direction),direction.v[2]);
+            D_L00_0025BE10.pitch=func_00283248(vec_length_xy(&direction),direction.v[2]);
         }
     }
     if (state->mode==1 && D_00189E20.f2294!=28 && D_00189E20.f2294!=49) {
@@ -203,8 +203,8 @@ void func_L00_003B9310(unsigned char *object,AimState *state)
             if (!state->held) {
                 if (D_00189E20.f22b4!=4) {
                     unsigned char *sound;
-                    func_L00_002AF568(); sound=D_00188660+state->handle*0x70;
-                    if (P(sound,0x88)!=object || !B(sound,0x74)) state->handle=func_002E5CF8(0,4,object);
+                    start_equipped_item_animation(); sound=D_00188660+state->handle*0x70;
+                    if (P(sound,0x88)!=object || !B(sound,0x74)) state->handle=PlayMobySound(0,4,object);
                 }
                 state->held=1;
             }
@@ -212,7 +212,7 @@ void func_L00_003B9310(unsigned char *object,AimState *state)
                 unsigned char *sound;
                 state->charge.bits=0; state->charge2=0;
                 sound=D_00188660+state->handle*0x70;
-                if (P(sound,0x88)!=object || !B(sound,0x74)) state->handle=func_002E5CF8(0,4,object);
+                if (P(sound,0x88)!=object || !B(sound,0x74)) state->handle=PlayMobySound(0,4,object);
             }
         }
         if (state->charge.value>0.0f || (D_00138180.held&D_00189E20.f1230) || !D_00189E20.f340 || D_00189E20.f34e)
@@ -224,7 +224,7 @@ void func_L00_003B9310(unsigned char *object,AimState *state)
                 if (P(sound,0x88)==object && B(sound,0x74)) func_002E59F8(handle);
             }
             state->handle=-1;
-            if (D_00189E20.f22b4!=4) func_L00_002AF7D0();
+            if (D_00189E20.f22b4!=4) cancel_hero_item_animation();
             state->held=0;
         }
     }

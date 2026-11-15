@@ -89,7 +89,7 @@ void func_L23_00415988(Thing *m)
             break;
         if (D_L23_001A8F00 != 0)
             break;
-        if (p->msg != -1 && func_002ACBC8(D_00189E20.body, p->msg) == 0)
+        if (p->msg != -1 && IsPointInCuboid(D_00189E20.body, p->msg) == 0)
             break;
         fail = 1;
         missing = 1;
@@ -104,7 +104,7 @@ void func_L23_00415988(Thing *m)
                         continue;
                 }
                 if (func_00288AA0(D_L23_001C0840, e) == 0 && i == 0) {
-                    func_0026FEB8(D_L23_002AB450, m->id, m->oclass, D_001A79F0, p->idx, e);
+                    STUB_printf(D_L23_002AB450, m->id, m->oclass, D_001A79F0, p->idx, e);
                     return;
                 }
                 fail = 0;
@@ -116,7 +116,7 @@ void func_L23_00415988(Thing *m)
            on an 8-byte boundary. */
         do {
             if (missing != 0)
-                func_0026FEB8(D_L23_001B1390, D_001A79F0, p->idx);
+                STUB_printf(D_L23_001B1390, D_001A79F0, p->idx);
         } while (0);
         if (fail != 0) {
             p->tail.b.had = 0;
@@ -164,7 +164,7 @@ void func_L23_00415988(Thing *m)
         if (p->tail.low != -1)
             func_00288CB0(p->tail.low, 1);
         else if (notify != 0 || p->tail.b.had != 0)
-            func_0029B3E0(0, -1);
+            MemcardSave(0, -1);
         break;
     case 4:
         played = 0;
@@ -188,7 +188,7 @@ void func_L23_00415988(Thing *m)
         if (p->tail.low != -1)
             func_00288CB0(p->tail.low, 1);
         else if ((played != 0 || p->tail.b.had != 0) && p->count != p->tail.low)
-            func_0029B3E0(0, -1);
+            MemcardSave(0, -1);
         func_0029F338(m);
         break;
     }

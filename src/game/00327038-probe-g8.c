@@ -44,41 +44,41 @@ void func_00327038(char *self)
         return;
     negative = *(float *)(state + 0x18) <= 0.0f;
     func_00282C88(total);
-    func_00282F20(origin, D_001B27B0, -D_001B0108);
+    vec_scale_to_length(origin, D_001B27B0, -D_001B0108);
     count = 0;
-    func_00282CC0(origin, origin, self + 0x10);
+    FastVecAdd(origin, origin, self + 0x10);
     if (!D_001B27C8 && func_00278870(origin, D_001B010C)) {
-        func_00282CF0(offset, D_001BAFB0, origin);
-        func_00282CC0(self + 0x10, offset, self + 0x10);
+        FastVecSub(offset, D_001BAFB0, origin);
+        FastVecAdd(self + 0x10, offset, self + 0x10);
     }
     end_ptr = end;
     rowD = self + 0xD0;
     rowE = self + 0xE0;
     inverse_ptr = inverse;
     for (i = 0; i < 32; i++) {
-        angle = func_00283CE0(i);
-        angle /= func_00283CE0(31);
-        func_00282F20(offset, rowD, D_001B010C);
+        angle = IntToFloat(i);
+        angle /= IntToFloat(31);
+        vec_scale_to_length(offset, rowD, D_001B010C);
         angle *= 1.57079637f;
         sine = func_00283198(angle);
         if (!negative)
             sine = -sine;
-        func_00282D30(quat, rowE, sine);
+        FastVecScale(quat, rowE, sine);
         quat[3] = func_00283180(angle);
         inverse[0] = -quat[0];
         inverse[1] = -quat[1];
         inverse[2] = -quat[2];
         inverse[3] = quat[3];
-        func_002837D0(temp, quat, offset);
-        func_002837D0(rotated, temp, inverse_ptr);
-        func_00282CC0(end, rotated, origin);
-        if (func_002761F8(origin, end, 0, self, 0)) {
+        multiply_quaternions(temp, quat, offset);
+        multiply_quaternions(rotated, temp, inverse_ptr);
+        FastVecAdd(end, rotated, origin);
+        if (CollLine(origin, end, 0, self, 0)) {
             count++;
-            func_00282D30(opposite, D_001B27B0, -1.0f);
-            func_00282D30(normal, D_001BAFA0 + 8, 0.0009765625f);
-            func_00282F20(normal, normal, 1.0f);
-            func_00282CF0(hit, D_001BAFA0, end_ptr);
-            func_00282CC0(total, total, hit);
+            FastVecScale(opposite, D_001B27B0, -1.0f);
+            FastVecScale(normal, D_001BAFA0 + 8, 0.0009765625f);
+            vec_scale_to_length(normal, normal, 1.0f);
+            FastVecSub(hit, D_001BAFA0, end_ptr);
+            FastVecAdd(total, total, hit);
             result = D_001BAF80;
             if (*(char **)(result + 0x18) != 0
                 && *(short *)(*(char **)(*(char **)(result + 0x18) + 0x24) + 0x46) == 5) {
@@ -88,7 +88,7 @@ void func_00327038(char *self)
         }
     }
     if (count) {
-        func_00282D90(total, total, (float)count);
-        func_00282CC0(self + 0x10, self + 0x10, total);
+        divide_vector_xyz(total, total, (float)count);
+        FastVecAdd(self + 0x10, self + 0x10, total);
     }
 }

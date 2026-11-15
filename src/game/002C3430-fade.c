@@ -19,7 +19,7 @@ void func_002C3430(char *p)
     if (!p)
         return;
     q = p + 32;
-    if (func_00282978((short *)(p + 10)) || !*(char **)q ||
+    if (FastDecTimer((short *)(p + 10)) || !*(char **)q ||
         *(signed char *)(*(char **)q + 32) < 0) {
         func_002B9180(p);
         return;
@@ -35,7 +35,7 @@ void func_002C3430(char *p)
             *(float *)(p + 12) = 159600.0f;
     }
     *(float *)(q + 8) += 0.001f;
-    p[8] = func_00283CF0(*(float *)(q + 8) * 255.0f);
+    p[8] = FloatToInt(*(float *)(q + 8) * 255.0f);
     p[2] = D_001F2634[*(short *)(q + 12)];
     if (*(float *)(p + 12) <= 159600.0f || *(float *)(q + 16) > 0.0f)
         *(float *)(q + 4) += *(float *)(q + 16);
@@ -59,10 +59,10 @@ void func_002C3430(char *p)
         }
     }
     *(int *)(p + 4) = (*(int *)(p + 4) & 0xffffff) +
-        (func_00283CF0(*(float *)(q + 4) * 256.0f) << 24);
+        (FloatToInt(*(float *)(q + 4) * 256.0f) << 24);
     *(float *)(q + 20) += (1.0f - *(float *)(q + 20)) * 0.175f;
     func_0029FCC0(*(void **)q, *(short *)(q + 14), a);
-    func_00282CF0(b, D_001B5340, a);
-    func_00282F20(b, b, *(float *)(q + 20));
-    func_00282CC0(p + 16, (char *)a, (char *)b);
+    FastVecSub(b, D_001B5340, a);
+    vec_scale_to_length(b, b, *(float *)(q + 20));
+    FastVecAdd(p + 16, (char *)a, (char *)b);
 }

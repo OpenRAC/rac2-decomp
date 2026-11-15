@@ -64,21 +64,21 @@ void func_003054E8(char *object)
             continue;
         }
         qcopy(&previous, hit);
-        func_00282CC0(&trail->position,&trail->position,&trail->velocity);
-        if (!func_002761F8(&previous,&trail->position,0,object,0)) continue;
+        FastVecAdd(&trail->position,&trail->position,&trail->velocity);
+        if (!CollLine(&previous,&trail->position,0,object,0)) continue;
         collision = &ref_003054E8_00;
         hit=collision->hit;
         if (hit) {
             if (((*(unsigned short *)(hit+0x34)&0x1000) || *(short *)(*(char **)(hit+0x24)+0x46)==5) &&
                 hit!=D_00189E20.moby && *(short *)(hit+0xaa)!=0x1366) {
                 ParticleDamageDescriptor *descriptor;
-                func_00282F20(&normal,&trail->velocity,1.0f);
+                vec_scale_to_length(&normal,&trail->velocity,1.0f);
                 descriptor = &ref_003054E8_02[D_00139568[0x29]];
-                func_002A8C00((char *)&contact,(int)object,0x210000,
+                make_hit_descriptor((char *)&contact,(int)object,0x210000,
                     descriptor->damage,(Quad16 *)&normal);
                 contact.objectClass=*(unsigned short *)(object+0xaa);
                 contact.source=3; contact.kind=5;
-                func_002A8E20(hit,&contact);
+                QueueMobyImpact(hit,&contact);
                 func_00334160(hit,0x29,*(int *)(object+0xb8));
                 trail->owner=0;
                 --*(int *)(state+0x64);

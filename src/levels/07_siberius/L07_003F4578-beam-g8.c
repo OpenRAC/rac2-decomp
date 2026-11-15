@@ -53,16 +53,16 @@ void func_L07_003F4CC0(u8 *a)
     f32 uvOffset;
 
     func_L07_003F4C18(a, start, end);
-    func_00282CF0(delta, end, start);
-    func_00282CF0(side, D_L07_001B9200, a + 0x10);
-    func_00282DD8(normal, side, delta);
-    func_00282F20(normal, normal, 1);
+    FastVecSub(delta, end, start);
+    FastVecSub(side, D_L07_001B9200, a + 0x10);
+    FastVecCross(normal, side, delta);
+    vec_scale_to_length(normal, normal, 1);
     qzero_nc(side);
     qcopy_nc(base, start);
     base[3] = 1;
     func_00281DE8(&draw, D_L07_001B0EB0, 1, 128);
     uvOffset = 0.0f;
-    color = func_00283D38(D_L07_001B0EA8 & 0xffffff, D_L07_001B0EA8, F(p, 0x24));
+    color = FastTweenColor(D_L07_001B0EA8 & 0xffffff, D_L07_001B0EA8, F(p, 0x24));
     {
         s32 i;
 
@@ -84,8 +84,8 @@ void func_L07_003F4CC0(u8 *a)
             draw.colors[i] = color;
         }
     }
-    func_00280B90(&draw, delta, 0);
-    color = func_00283D38(D_L07_001B0EAC[0] & 0xffffff, D_L07_001B0EAC[0], F(p, 0x24));
+    draw_world_quad(&draw, delta, 0);
+    color = FastTweenColor(D_L07_001B0EAC[0] & 0xffffff, D_L07_001B0EAC[0], F(p, 0x24));
     {
         s32 i;
 
@@ -98,8 +98,8 @@ void func_L07_003F4CC0(u8 *a)
             draw.colors[i] = color;
         }
     }
-    func_00280B90(&draw, delta, 0);
-    length = func_00282DF0(delta) / D_L07_001B0EC0;
+    draw_world_quad(&draw, delta, 0);
+    length = FastVecLength(delta) / D_L07_001B0EC0;
     rotation = F(p, 0x28);
     if (a[0x20] == 0) {
         alpha = 1;
@@ -111,7 +111,7 @@ void func_L07_003F4CC0(u8 *a)
         count = length + 1;
     }
     qcopy(current, base);
-    func_00282F20(step, delta, D_L07_001B0EC0);
+    vec_scale_to_length(step, delta, D_L07_001B0EC0);
     for (i = 0; (f32)i < count; i++) {
         f32 *pos;
 
@@ -122,14 +122,14 @@ void func_L07_003F4CC0(u8 *a)
             width = D_L07_001B0EC8[0];
         else
             width = D_L07_001B0EC8[1];
-        color = func_00283D38(D_L07_001B0ED0 & 0xffffff, D_L07_001B0ED0, alpha);
+        color = FastTweenColor(D_L07_001B0ED0 & 0xffffff, D_L07_001B0ED0, alpha);
         pos = current;
         func_00281EB8(pos, 49, color, 1, width, 0, rotation);
-        color = func_00283D38(D_L07_001B0ED4[0] & 0xffffff, D_L07_001B0ED4[0], alpha);
-        func_00281EB8(pos, 49, color, 1, width, 0, func_00283B98(rotation, D_L07_001B0ED8));
-        rotation = -func_00283B98(rotation, D_L07_001B0EDC * 0.017453294f);
+        color = FastTweenColor(D_L07_001B0ED4[0] & 0xffffff, D_L07_001B0ED4[0], alpha);
+        func_00281EB8(pos, 49, color, 1, width, 0, FastAddRotations(rotation, D_L07_001B0ED8));
+        rotation = -FastAddRotations(rotation, D_L07_001B0EDC * 0.017453294f);
         if ((f32)i < length - 1)
-            func_00282CC0(current, current, step);
+            FastVecAdd(current, current, step);
         else
             qcopy(current, end);
     }

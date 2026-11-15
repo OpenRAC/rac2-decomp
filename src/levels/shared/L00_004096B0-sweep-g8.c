@@ -97,7 +97,7 @@ void func_L00_004096B0(char *object)
         float sweep_radius, min_facing;
 
         qcopy(&previous, position);
-        func_00282CC0(position, position, state);
+        FastVecAdd(position, position, state);
         func_002FEE70(*(int *)(state + 0x28), state, 0);
         func_002FE880(position, (float *)state, 0.0040555559f);
         /* Set here rather than at its use: sched1 issues this constant right after the call, which
@@ -119,7 +119,7 @@ void func_L00_004096B0(char *object)
         query.pad48 = 0;
         query.collisionFlags = 0;
         query.useOffset = 0;
-        contacts = func_002FE9D0(&query);
+        contacts = CollideSweptSphere(&query);
         contact_kind = func_00300540(query.surface);
         qcopy(position, &query.position);
         qcopy(state, &query.velocity);
@@ -141,7 +141,7 @@ void func_L00_004096B0(char *object)
                     if (description != 0 && !(*(float *)description <= 0.0f) && target != 0 &&
                         *(char **)(target + 0x24) != 0 &&
                         *(short *)(*(char **)(target + 0x24) + 0x46) == 5) {
-                        float distance = func_00282E48(target + 0x10, object + 0x10);
+                        float distance = fast_vec_dist(target + 0x10, object + 0x10);
                         if (distance < closest) {
                             closest = distance;
                             best = i;
@@ -154,31 +154,31 @@ void func_L00_004096B0(char *object)
                     float length, projection;
                     qcopy(&workspace.math.point, target + 0x10);
                     if (D_L00_001A8FF0 != 0) {
-                        func_00282D30(&workspace.math.work, target + 0xE0,
+                        FastVecScale(&workspace.math.work, target + 0xE0,
                                       *(float *)(description + 0x10));
-                        func_00282CC0(&workspace.math.point, &workspace.math.point, &workspace.math.work);
+                        FastVecAdd(&workspace.math.point, &workspace.math.point, &workspace.math.work);
                     } else
                         workspace.math.point.f[2] += *(float *)(description + 0x10);
-                    projection = func_00282DB0(&direction, state);
-                    func_00282D30(&workspace.math.work, &direction, projection);
-                    func_00282CF0(&workspace.math.delta, state, &workspace.math.work);
-                    length = func_00282DF0(&workspace.math.delta);
+                    projection = FastVecDot(&direction, state);
+                    FastVecScale(&workspace.math.work, &direction, projection);
+                    FastVecSub(&workspace.math.delta, state, &workspace.math.work);
+                    length = FastVecLength(&workspace.math.delta);
                     if (length != 0.0f) {
-                        func_00282CF0(&workspace.math.difference, &workspace.math.point, object + 0x10);
-                        projection = func_00282DB0(&workspace.math.difference, &direction);
-                        func_00282D30(&workspace.math.projection, &direction, projection);
-                        func_00282CF0(&workspace.math.perpendicular, &workspace.math.difference, &workspace.math.projection);
+                        FastVecSub(&workspace.math.difference, &workspace.math.point, object + 0x10);
+                        projection = FastVecDot(&workspace.math.difference, &direction);
+                        FastVecScale(&workspace.math.projection, &direction, projection);
+                        FastVecSub(&workspace.math.perpendicular, &workspace.math.difference, &workspace.math.projection);
                         if (length < 0.06666667f)
                             length = 0.06666667f;
-                        func_00282F20(&workspace.math.perpendicular, &workspace.math.perpendicular, length);
-                        func_00282CC0(state, &workspace.math.perpendicular, &workspace.math.work);
+                        vec_scale_to_length(&workspace.math.perpendicular, &workspace.math.perpendicular, length);
+                        FastVecAdd(state, &workspace.math.perpendicular, &workspace.math.work);
                     }
                 }
             }
             qcopy(&workspace.math.point, state);
             workspace.math.point.f[2] = 0.0f;
-            func_00282DD8(&workspace.math.point, &workspace.math.point, &direction);
-            func_00282F20(&workspace.math.point, &workspace.math.point, 1.0f);
+            FastVecCross(&workspace.math.point, &workspace.math.point, &direction);
+            vec_scale_to_length(&workspace.math.point, &workspace.math.point, 1.0f);
             range = func_002A78D8(0.0f, 0.52359885f);
             if (func_00282C48(range) < 0.00001f) {
                 func_002AB668(&workspace.math.work, &direction, range);
@@ -186,7 +186,7 @@ void func_L00_004096B0(char *object)
             }
             range = func_002A7878(0.05235988646745682f, 0.10471977293491364f);
             func_002AB668(state + 0x10, &workspace.math.point, range);
-            func_002E5CF8(0, 0, object);
+            PlayMobySound(0, 0, object);
         }
         workspace.impact.owner = object;
         workspace.impact.flags = 0x830000;
@@ -194,13 +194,13 @@ void func_L00_004096B0(char *object)
         workspace.impact.count = 1;
         qcopy(&workspace.impact.force, state);
         triggered = 0;
-        func_00282F20(&workspace.impact.force, &workspace.impact.force, 1.0f);
+        vec_scale_to_length(&workspace.impact.force, &workspace.impact.force, 1.0f);
         workspace.impact.kind = 3;
         workspace.impact.force.f[3] = 5627.9248046875f;
         workspace.impact.enabled = 1;
         workspace.impact.object_class = *(short *)(object + 0xAA);
         range = *(int *)(state + 0x24) != 0 ? 8.0f : 2.0f;
-        if (func_00282978(state + 0x20) != 0 ||
+        if (FastDecTimer(state + 0x20) != 0 ||
             (contacts > 0 && (unsigned int)(contact_kind - 1) <= 1)) {
             triggered = 1;
         } else {
@@ -213,13 +213,13 @@ void func_L00_004096B0(char *object)
                     int special = func_002ABB78(target);
                     if (special != 0 || (description != 0 && *(float *)description > 0.0f &&
                                          *(short *)(description + 6) == 0)) {
-                        func_002A8E20(target, &workspace.impact);
+                        QueueMobyImpact(target, &workspace.impact);
                         triggered = 1;
                         if (special == 0) {
                             if (*(int *)(state + 0x24) != 0)
-                                func_0032D758(target, 0x4C, *(void **)(object + 0xB8));
+                                StartAttachedEffect(target, 0x4C, *(void **)(object + 0xB8));
                             else
-                                func_0032D758(target, 0x25, *(void **)(object + 0xB8));
+                                StartAttachedEffect(target, 0x25, *(void **)(object + 0xB8));
                         }
                         break;
                     }
@@ -232,11 +232,11 @@ void func_L00_004096B0(char *object)
         }
         if (triggered) {
             float blast_range;
-            func_002E5CF8(1, 0, object);
+            PlayMobySound(1, 0, object);
             blast_range = 0.6f;
             if (*(int *)(state + 0x24) != 0)
                 blast_range = 2.4f;
-            func_0032C700(object + 0x10, 0, 6, 5, 6, 8, 10, 0, 0, 0, 0, D_L00_001ADB2C,
+            SpawnExplosion(object + 0x10, 0, 6, 5, 6, 8, 10, 0, 0, 0, 0, D_L00_001ADB2C,
                           blast_range, 20.0f);
             func_002FEE50(*(int *)(state + 0x28));
             func_0029F338(object);

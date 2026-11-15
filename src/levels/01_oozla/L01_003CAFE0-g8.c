@@ -216,7 +216,7 @@ void func_L01_003D8E80(u8 *a0)
                 a0[0x40] = p[0x40];
                 a0[0x41] = p[0x41];
                 *(float *)(a0 + 0x44) = *(float *)(p + 0x44);
-                func_0029F390(a0);
+                update_moby_animation_state(a0);
             }
         }
         func_002A7750(a0, 1, -1);
@@ -225,7 +225,7 @@ void func_L01_003D8E80(u8 *a0)
         switch (state->mode) {
         case 1:
             if (state->soundIndex == -1 && !func_002A77E0(79))
-                state->soundIndex = func_002E5CF8(0, 0, a0);
+                state->soundIndex = PlayMobySound(0, 0, a0);
             if (a0[0x60] & 2) {
                 if (!func_002A77E0(3)) {
                     if (a0[0x43] != 2)
@@ -244,10 +244,10 @@ void func_L01_003D8E80(u8 *a0)
             hit = 0;
             if (func_002A9640(a0, 0x10001, 0))
                 hit = 1;
-            if (func_002ACBC8(D_00189EA0, state->hitIndex))
+            if (IsPointInCuboid(D_00189EA0, state->hitIndex))
                 hit = 1;
             if (hit) {
-                state->soundIndex = func_002E5CF8(0, 0, a0);
+                state->soundIndex = PlayMobySound(0, 0, a0);
                 func_L01_003D8C00(a0, 3, 10, 1);
                 if (a0[0x43] != 3)
                     func_002A7470(a0, 3, 0, 10);
@@ -258,7 +258,7 @@ void func_L01_003D8E80(u8 *a0)
             switch (a0[0xBC]) {
             case 0:
                 if (state->soundIndex == -1 && !func_002A77E0(89))
-                    state->soundIndex = func_002E5CF8(0, 0, a0);
+                    state->soundIndex = PlayMobySound(0, 0, a0);
                 {
                     int detected = func_002A9640(a0, 0x10001, 0);
                     flag = 0;
@@ -272,7 +272,7 @@ void func_L01_003D8E80(u8 *a0)
                         flag = 1;
                 }
                 if (flag) {
-                    state->soundIndex = func_002E5CF8(0, 0, a0);
+                    state->soundIndex = PlayMobySound(0, 0, a0);
                     func_L01_003D8830(a0);
                     func_L01_003D8830(a0);
                     func_L01_003D8830(a0);
@@ -303,7 +303,7 @@ void func_L01_003D8E80(u8 *a0)
                     qcopy(a0 + 0xF0, p + 0xF0);
                 }
             }
-            if (func_002ACBC8(D_00189EA0, state->hitIndex)) {
+            if (IsPointInCuboid(D_00189EA0, state->hitIndex)) {
                 /* Retail shares state 2's counter and delete tails. */
                 if (state->persistent) {
                     if (a0[0xB0] != 255) {
@@ -319,7 +319,7 @@ void func_L01_003D8E80(u8 *a0)
             /* Falls through to the sound trigger used by mode zero. */
         case 0:
             if (state->soundIndex == -1 && !func_002A77E0(89))
-                state->soundIndex = func_002E5CF8(0, 0, a0);
+                state->soundIndex = PlayMobySound(0, 0, a0);
             break;
         }
         break;

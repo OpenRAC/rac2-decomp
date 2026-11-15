@@ -26,37 +26,37 @@ int func_L23_003C0A60(char *obj, TI128 *p1, TI128 *p2) {
     int found;
     char *hit;
 
-    if (D_L23_001AFA70 < func_00282E48(p1, p2))
+    if (D_L23_001AFA70 < fast_vec_dist(p1, p2))
         return 0;
     qcopy(&loc[0], p2);
     func_L23_00418650(&loc[0], *(float *)(state + 0x54) + *(float *)(state + 0x50));
-    func_00282CF0(&loc[1], &loc[0], p1);
-    func_00282F20(&loc[1], &loc[1], D_L23_001AFAB0);
+    FastVecSub(&loc[1], &loc[0], p1);
+    vec_scale_to_length(&loc[1], &loc[1], D_L23_001AFAB0);
     qcopy(&loc[4], p1);
     qcopy(&loc[2], p1);
     func_L23_00418650(&loc[2], *(float *)(state + 0x54) + *(float *)(state + 0x50));
     found = 0;
     do {
-        float d = func_00282E48(&loc[4], &loc[0]);
+        float d = fast_vec_dist(&loc[4], &loc[0]);
 
         if (d < D_L23_001AFAB0) {
             if (d < 0.0f)
                 return 1;
-            func_00282F20(&loc[5], &loc[1], d);
+            vec_scale_to_length(&loc[5], &loc[1], d);
             found = 1;
-            func_00282CC0(&loc[3], &loc[4], &loc[5]);
+            FastVecAdd(&loc[3], &loc[4], &loc[5]);
             func_L23_00418650(&loc[3], *(float *)(state + 0x54) + *(float *)(state + 0x50));
         } else {
-            func_00282CC0(&loc[3], &loc[4], &loc[1]);
+            FastVecAdd(&loc[3], &loc[4], &loc[1]);
             func_L23_00418650(&loc[3], *(float *)(state + 0x54) + *(float *)(state + 0x50));
         }
-        if (func_002761F8(&loc[2], &loc[3], 0x10, 0, 0)) {
+        if (CollLine(&loc[2], &loc[3], 0x10, 0, 0)) {
             hit = D_L23_001C0A80.hit;
             if (hit != obj && hit != D_00189E20.hero)
                 return 0;
         }
         qcopy(&loc[2], &loc[3]);
-        func_00282CC0(&loc[4], &loc[4], &loc[1]);
+        FastVecAdd(&loc[4], &loc[4], &loc[1]);
     } while (found == 0);
     return 1;
 }

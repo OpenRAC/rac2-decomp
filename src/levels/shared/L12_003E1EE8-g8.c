@@ -29,22 +29,22 @@ int func_L12_003E1EE8(u8 *a0, u8 *a1) {
         src = e + 0x10;
     qcopy(entry, src);
     if (*(s32 *)(st + 0x168) > 0) {
-        func_00282CF0(rot, a1 + ((*(s32 *)(st + 0x168) << 4) + 0x10),
+        FastVecSub(rot, a1 + ((*(s32 *)(st + 0x168) << 4) + 0x10),
                       a1 + (*(s32 *)(st + 0x168) << 4));
         *(qword *)dir = *(qword *)rot;
-        len = func_00282DF0(dir);
+        len = FastVecLength(dir);
         if (D_L12_001B0B10 * 0.016666668f < len)
-            func_00282F20(dir, dir, D_L12_001B0B10 * 0.016666668f);
-        func_00282CC0(a0 + 0x10, a0 + 0x10, dir);
+            vec_scale_to_length(dir, dir, D_L12_001B0B10 * 0.016666668f);
+        FastVecAdd(a0 + 0x10, a0 + 0x10, dir);
     } else {
-        func_00282CF0(rot, e + 0x10, a1 + (*(s32 *)a1 << 4));
+        FastVecSub(rot, e + 0x10, a1 + (*(s32 *)a1 << 4));
         *(qword *)dir = *(qword *)rot;
-        len = func_00282DF0(dir);
+        len = FastVecLength(dir);
         if (D_L12_001B0B10 * 0.016666668f < len)
-            func_00282F20(dir, dir, D_L12_001B0B10 * 0.016666668f);
-        func_00282CC0(a0 + 0x10, a0 + 0x10, dir);
+            vec_scale_to_length(dir, dir, D_L12_001B0B10 * 0.016666668f);
+        FastVecAdd(a0 + 0x10, a0 + 0x10, dir);
     }
-    if (func_00282E48(a0 + 0x10, entry) <= 0.5f) {
+    if (fast_vec_dist(a0 + 0x10, entry) <= 0.5f) {
         s32 c = *(s32 *)(st + 0x168);
 
         if (c == -1)

@@ -50,10 +50,10 @@ void func_002C43C8(Effect2C43C8 *e) {
     keep = e->dir[3];
     func_0029FCC0(e->at.moby, at->joint, e->pos);
     func_0029FC20(e->at.moby, at->joint, mtx);
-    k = func_00283CE0(at->spread);
+    k = IntToFloat(at->spread);
     r = func_002A7878(-k, k);
-    func_00282F20(off, mtx, (r * 0.01f - 1.0f) * at->dist);
-    func_00282CC0(e->dir, e->pos, off);
+    vec_scale_to_length(off, mtx, (r * 0.01f - 1.0f) * at->dist);
+    FastVecAdd(e->dir, e->pos, off);
     e->pos[3] = size;
     e->dir[3] = keep;
 }

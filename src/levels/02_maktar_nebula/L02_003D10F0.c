@@ -38,8 +38,8 @@ void func_L02_003D10F0(char *self) {
 
     if (*(unsigned char *)(self + 0x20) == 0) {
         *(char **)(s + 0x18) = s + 0x100;
-        *(unsigned char *)(s + 0x48) = func_00283CF0(15.0f);
-        *(unsigned char *)(s + 0x4A) = func_00283CF0(16.0f);
+        *(unsigned char *)(s + 0x48) = FloatToInt(15.0f);
+        *(unsigned char *)(s + 0x4A) = FloatToInt(16.0f);
         ang = func_002A7878(10.0f, 30.0f) * 0.017453294f;
         if (func_002A77E0(2) != 0)
             dir = -ang;
@@ -74,7 +74,7 @@ void func_L02_003D10F0(char *self) {
         func_L02_003D2390(self);
     }
     if (*(unsigned char *)(self + 0x31) != 0) {
-        if (func_00282E48(self + 0x10, &D_L02_001BA500) < 24.0f) {
+        if (fast_vec_dist(self + 0x10, &D_L02_001BA500) < 24.0f) {
             func_002A93B0(self);
             *(unsigned char *)(self + 0x6F) = 0x16;
         }

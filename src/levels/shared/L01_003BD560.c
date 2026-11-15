@@ -16,7 +16,7 @@ float func_L01_003BD560(void *position, float first, float second, float floor, 
         endpoints[1][2] = first < limit ? first : limit;
     else
         endpoints[1][2] = first;
-    if (func_002761F8(endpoints[1], endpoints[0], 2, 0, 0)) {
+    if (CollLine(endpoints[1], endpoints[0], 2, 0, 0)) {
         return D_L01_001BF928 > floor ? D_L01_001BF928 : floor;
     }
     return floor;

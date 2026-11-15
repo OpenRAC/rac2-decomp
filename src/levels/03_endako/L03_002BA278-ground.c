@@ -145,19 +145,19 @@ void func_L03_002BA278(void)
         reach = D_00189E20.capsuleRadius * 2.9f;
     if (func_L00_002ADF80())
         reach = 0.0f;
-    func_L00_002B47A8(start, end, 1, reach, -48.0f);
-    if (func_002761F8(start, end, 2, D_00189E20.moby, 0)) {
+    BuildOffsetVectorPair(start, end, 1, reach, -48.0f);
+    if (CollLine(start, end, 2, D_00189E20.moby, 0)) {
         D_00189E20.groundSoundClass = func_L00_002E2048();
         if (D_L03_001BFDC0.object)
             D_00189E20.groundSoundClass = 0;
         if (D_001A79F0 == 7 && D_L03_001BFDC0.object)
             D_00189E20.groundSoundClass = 1;
-        D_00189E20.groundType = func_00278E78();
+        D_00189E20.groundType = GetCollHitMaterial();
         if (!D_00189E20.groundType) {
             D_00189E20.waterSurfaceZ = func_002A90F8(D_L03_001BFDC0.position, &D_00189E20.waterSurfaceNormal);
             if (D_00189E20.position.z < D_00189E20.waterSurfaceZ && D_00189E20.inWaterFrames < 1)
                 D_00189E20.inWaterFrames = 1;
-            if (!func_002761F8(start, end, 0x24, D_00189E20.moby, 0))
+            if (!CollLine(start, end, 0x24, D_00189E20.moby, 0))
                 goto contacts_done;
             D_00189E20.groundSoundClass = func_L00_002E2048();
         }
@@ -178,13 +178,13 @@ void func_L03_002BA278(void)
                 D_00189E20.groundZ = D_L03_001BFDC0.position[2];
                 if (D_L03_001A8FF0)
                     D_00189E20.groundZ = func_002B0360((char *)D_L03_001BFDC0.position);
-                D_00189E20.groundDistance = func_00282E48(&D_00189E20.position, &D_00189E20.groundPoint);
+                D_00189E20.groundDistance = fast_vec_dist(&D_00189E20.position, &D_00189E20.groundPoint);
                 D_00189E20.groundMoby = (int)D_L03_001BFDC0.object;
                 func_001290E0(&D_00189E20.groundNormal, D_L03_001BFDC0.normal);
                 D_00189E20.groundSlope = func_L00_002D3EA8(D_L03_001BFDC0.normal);
                 D_00189E20.downhillYaw = func_00283248(D_L03_001BFDC0.normal[0], D_L03_001BFDC0.normal[1]);
-                func_00282CF0(difference, &D_00189E20.groundPoint, &D_00189E20.position);
-                if (func_00282DB0(difference, &D_00189E20.groundNormal) > 0.0f)
+                FastVecSub(difference, &D_00189E20.groundPoint, &D_00189E20.position);
+                if (FastVecDot(difference, &D_00189E20.groundNormal) > 0.0f)
                     D_00189E20.groundDistance = -D_00189E20.groundDistance;
                 if (D_00189E20.groundDistance < 0.02f) {
                     D_00189E20.framesOffGround = 0;
@@ -215,11 +215,11 @@ contacts_done:
             func_002AFF60((char *)&D_00189E20.position, (char *)&D_00189E20.gravityDir, 0);
         } else {
             if (D_00189E20.f2f0.w != 0.0f) {
-                func_002AA2E8(&D_00189E20.f2f0.w, 0.0f, 1.0f);
+                ApproachValue(&D_00189E20.f2f0.w, 0.0f, 1.0f);
                 qcopy(&D_00189E20.gravityDir, &D_00189E20.f2f0);
             } else {
                 qcopy(&D_00189E20.gravityDir, &D_00189E20.groundNormal);
-                func_00282D30(&D_00189E20.gravityDir, &D_00189E20.gravityDir, -1.0f);
+                FastVecScale(&D_00189E20.gravityDir, &D_00189E20.gravityDir, -1.0f);
             }
         }
         break;
@@ -228,8 +228,8 @@ contacts_done:
             float sign = -1.0f;
             if (D_00189E20.referencePoint.w > 0.0f)
                 sign = 1.0f;
-            func_00282CF0(&D_00189E20.gravityDir, &D_00189E20.referencePoint, &D_00189E20.position);
-            func_00282F20(&D_00189E20.gravityDir, &D_00189E20.gravityDir, sign);
+            FastVecSub(&D_00189E20.gravityDir, &D_00189E20.referencePoint, &D_00189E20.position);
+            vec_scale_to_length(&D_00189E20.gravityDir, &D_00189E20.gravityDir, sign);
         }
         break;
     }
@@ -255,7 +255,7 @@ contacts_done:
                 angle = -angle;
             func_L00_002D3638(left, 0.2f, angle, 1, 0.44999998807907104f);
             func_L00_002D3638(right, 0.2f, angle, 1, -0.44999998807907104f);
-            if (func_002761F8(left, right, 0x22, D_00189E20.moby, 0)) {
+            if (CollLine(left, right, 0x22, D_00189E20.moby, 0)) {
                 if (D_L03_001A8FF0) {
                     float firstHeight = func_002B0360((char *)D_L03_001BFDC0.position);
                     D_00189E20.sideHeight[side] = firstHeight - func_002B0360((char *)&D_00189E20.groundPoint);

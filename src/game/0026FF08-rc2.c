@@ -47,7 +47,7 @@ void func_0026FF08(s32 arg0, s32 arg1, f32 fparg0, f32 fparg1, f32 fparg2, f32 f
         } else {
             s8 *r = D_001B5200;
             (*(s16 *)((char *)(r) + (0x3EA))) = arg0;
-            temp_f1 = 1.0f / func_00283CE0(arg0);
+            temp_f1 = 1.0f / IntToFloat(arg0);
             (*(s8 *)((char *)(r) + (0x3E8))) = arg1;
             (*(f32 *)((char *)(r) + (0x3F0))) = (*(f32 *)((char *)(r) + (0x3D8)));
             (*(f32 *)((char *)(r) + (0x3EC))) = temp_f1;

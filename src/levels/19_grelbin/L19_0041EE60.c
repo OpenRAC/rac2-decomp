@@ -89,7 +89,7 @@ void func_L19_0041EE60(u8 *object)
             vec[2] = 0.15f;
             *(s16 *)(object + 0x7C) = 0;
             func_002B0A68(object, 0x1F, vec, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
-            func_002E5CF8(0, 0, object);
+            PlayMobySound(0, 0, object);
             func_002A7750(object, 3, -1);
         }
         break;

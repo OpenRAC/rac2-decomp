@@ -13,7 +13,7 @@ void func_L16_00413700(u8 *moby, float *velocity, float gravity)
     *(float *)(state + 0x34) = gravity;
     *(BossQuadword *)up = 0;
     up[2] = 1.0f;
-    func_00282DD8(state + 0x20, up, velocity);
+    FastVecCross(state + 0x20, up, velocity);
     func_002ACE78((float *)(state + 0x20), (float *)(state + 0x20), 0.05817765f);
     func_002A7750(moby, 2, -1);
 }

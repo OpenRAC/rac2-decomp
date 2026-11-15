@@ -38,8 +38,8 @@ void func_L01_003CB668(void)
         for (i = 0; i < 8; i++) {
             firstPhase[i] = (int)((func_00283180(firstAngle) + 1.0f) * D_L01_001B0370);
             secondPhase[i] = (int)((func_00283180(secondAngle) + 1.0f) * D_L01_001B0378);
-            firstAngle = func_00283B98(firstAngle, 0.785398006f);
-            secondAngle = func_00283B98(secondAngle, 0.785398006f);
+            firstAngle = FastAddRotations(firstAngle, 0.785398006f);
+            secondAngle = FastAddRotations(secondAngle, 0.785398006f);
         }
         { int row, col;
         for (row = 0; row < 8; row++)
@@ -70,16 +70,16 @@ void func_L01_003CB668(void)
                 vertical[0] = 0.0f;
                 vertical[1] = D_L01_001B0380;
                 vertical[2] = (float)(D_L01_00297580[k + 38] - D_L01_00297580[k + 2]) * 0.0009765625f;
-                func_00282DD8(normal, vertical, horizontal);
-                func_00282F20(normal, normal, 1.0f);
-                c = (int)(func_00282DB0(normal, direction) * 128.0f);
+                FastVecCross(normal, vertical, horizontal);
+                vec_scale_to_length(normal, normal, 1.0f);
+                c = (int)(FastVecDot(normal, direction) * 128.0f);
                 {
                     unsigned int green = (c << 8) | 0x80000000;
                     unsigned int red = c << 16;
                     target = red | green;
                     target |= c;
                 }
-                D_L01_00297960[(i) * 9 + (j)] = func_00283D38(
+                D_L01_00297960[(i) * 9 + (j)] = FastTweenColor(
                     *(unsigned int *)(palette + (unsigned int)D_L01_001B036C), target, D_L01_001B038C);
                 palette += 4;
             }

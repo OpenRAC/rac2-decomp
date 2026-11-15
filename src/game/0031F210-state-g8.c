@@ -62,25 +62,25 @@ void func_00326198(char *object)
         char *p = object + 0x10;
         func_002FE8D8(p, D_001B27B0);
     }
-    func_00282D30(D_001B27B0, D_001B27B0, -1.0f);
-    func_00282D30(ahead, object + 0xE0, D_001B0108);
-    func_00282CC0(ahead, object + 0x10, ahead);
-    func_00282D30(behind, object + 0xE0, -1.0f);
-    func_00282CC0(behind, object + 0x10, behind);
-    if (func_002761F8(ahead, behind, 2, object, 0)) {
-        if (func_00278E78() == 2) {
-            func_00282D30(D_001B27B0, D_001BAFC0, 0.0009765625f);
-            func_00282F20(D_001B27B0, D_001B27B0, -1.0f);
+    FastVecScale(D_001B27B0, D_001B27B0, -1.0f);
+    FastVecScale(ahead, object + 0xE0, D_001B0108);
+    FastVecAdd(ahead, object + 0x10, ahead);
+    FastVecScale(behind, object + 0xE0, -1.0f);
+    FastVecAdd(behind, object + 0x10, behind);
+    if (CollLine(ahead, behind, 2, object, 0)) {
+        if (GetCollHitMaterial() == 2) {
+            FastVecScale(D_001B27B0, D_001BAFC0, 0.0009765625f);
+            vec_scale_to_length(D_001B27B0, D_001B27B0, -1.0f);
             *(int *)(D_001B27B0 + 0x14) = 1;
         } else D_001B27C4 = 0;
-        if (func_00278E78() == 6)
+        if (GetCollHitMaterial() == 6)
             D_001B27C8 = 1;
         else D_001B27C8 = 0;
     } else {
         D_001B27C4 = 0;
         *(int *)(D_001B27B0 + 0x18) = 0;
     }
-    func_002B0CE0(6, 0, 1);
+    ForceClaimNotice(6, 0, 1);
     /* Each case is its own block: the address-taken locals leave their stack slots when the
      * switch ends, and the attachment block below reuses that space. */
     switch ((unsigned char)object[0x20]) {
@@ -115,18 +115,18 @@ void func_00326198(char *object)
         if (*(float *)(object + 0x2C) > 0.0181099995970726f)
             *(float *)(object + 0x2C) = 0.0181099995970726f;
         qcopy(oldpos, object + 0x10);
-        func_00282CC0(object + 0x10, object + 0x10, data);
+        FastVecAdd(object + 0x10, object + 0x10, data);
         func_002FEE70(D_001B27CC[0], data, 0);
         func_00300190(object + 0x10, object + 0x10);
         func_00300248(data, data);
         func_002FE880(object + 0x10, data, 0.003055555745959282f);
-        if (func_002761F8(oldpos, object + 0x10, 2, object, 0)) {
+        if (CollLine(oldpos, object + 0x10, 2, object, 0)) {
             char *hitinfo = D_001BAF80;
             char *hit = *(char **)(hitinfo + 0x18);
             if (hit && (hit == player->target || *(short *)(hit + 0xAA) == 0x907)) break;
             qcopy(object + 0x10, hitinfo + 0x20);
             func_00282C88(data);
-            func_002B0CE0(6, 0, 1);
+            ForceClaimNotice(6, 0, 1);
             func_0026F748(28, 1);
             func_00335798(object + 0x10, object + 0xF0, object);
             object[0x20] = 2;
@@ -138,7 +138,7 @@ void func_00326198(char *object)
     }
     case 2: {
         object[0x20] = 3;
-        func_002E5CF8(2, 0, object);
+        PlayMobySound(2, 0, object);
         if (D_0018C0B4[0] != 28 || D_001A8BB0 == 2) {
             func_00335840();
             object[0x20] = 9;
@@ -176,7 +176,7 @@ void func_00326198(char *object)
             int field48, field4c, enabled, surface, field58;
         } collision;
         qcopy(oldpos, object + 0x10);
-        func_00282CC0(object + 0x10, object + 0x10, data);
+        FastVecAdd(object + 0x10, object + 0x10, data);
         func_002FE880(object + 0x10, data, 0.006111111491918564f);
         func_00300190(object + 0x10, object + 0x10);
         func_00300248(data, data);
@@ -193,7 +193,7 @@ void func_00326198(char *object)
         collision.field48 = 0;
         collision.field4c = 0;
         collision.field58 = 0;
-        result = func_002FE9D0((char *)&collision);
+        result = CollideSweptSphere((char *)&collision);
         qcopy(object + 0x10, collision.end);
         qcopy(data, collision.velocity);
         if (result == 2) {
@@ -204,7 +204,7 @@ void func_00326198(char *object)
                 object[0x20] = result;
                 func_00282C88(data);
             }
-        } else if (func_00282DF0(data) > 0.4f) {
+        } else if (FastVecLength(data) > 0.4f) {
             object[0x20] = 9;
             *(int *)(data + 0x20) = 10;
         }
@@ -218,9 +218,9 @@ void func_00326198(char *object)
     case 5: {
         char direction[16];
         if (func_00282948(data + 0x20)) {
-            func_00282F20(direction, object + 0xC0, 1.0f);
+            vec_scale_to_length(direction, object + 0xC0, 1.0f);
             func_0032DA58(object, object + 0x10, direction, *(float *)(object + 0x18));
-            func_002E5CF8(1, 0, object);
+            PlayMobySound(1, 0, object);
             object[0x20] = 6;
             *(unsigned short *)(object + 0x34) |= 0x41;
             if (D_0018C0B4[0] != 28 || D_001A8BB0 == 2) {
@@ -232,7 +232,7 @@ void func_00326198(char *object)
         break;
     }
     case 6: {
-        func_00327B40(object);
+        DamageNearbyMobys(object);
         *(float *)(data + 0x24) += D_001B00F8 * (1.0f / 60.0f);
         if (func_00282948(data + 0x20) && !*(int *)(data + 0x28)) object[0x20] = 8;
         break;
@@ -254,10 +254,10 @@ void func_00326198(char *object)
     func_0027D098(func_00327D08, object);
     if ((unsigned char)object[0x20] >= 2 && D_001AD7EC[0]) {
         char angles[16], adjusted[16], matrix[64];
-        func_00283658(matrix, object + 0xC0);
+        copy_matrix_rotation(matrix, object + 0xC0);
         func_002AB6D8(matrix, angles);
         func_002AD0E0(object, D_001AD7EC[0], object + 0x10, angles, object + 0x10, adjusted);
-        func_002833F0(object + 0xC0, adjusted);
+        euler_rotation_basis(object + 0xC0, adjusted);
     }
     func_002A9288(object, D_001B010C);
 }

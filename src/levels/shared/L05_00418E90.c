@@ -16,16 +16,16 @@ void func_L05_00418E90(char *arg0)
     int c1;
     int c2;
 
-    *(float *)(st + 0x60) = func_00283B98(*(float *)(st + 0x60), 0.01f);
-    *(float *)(st + 0x64) = func_00283B98(*(float *)(st + 0x64), -0.007f);
-    *(float *)(st + 0x68) = func_00283B98(*(float *)(st + 0x68), 0.007f);
-    *(float *)(st + 0x6C) = func_00283B98(*(float *)(st + 0x6C), *(float *)(st + 0x38) * 0.02f);
+    *(float *)(st + 0x60) = FastAddRotations(*(float *)(st + 0x60), 0.01f);
+    *(float *)(st + 0x64) = FastAddRotations(*(float *)(st + 0x64), -0.007f);
+    *(float *)(st + 0x68) = FastAddRotations(*(float *)(st + 0x68), 0.007f);
+    *(float *)(st + 0x6C) = FastAddRotations(*(float *)(st + 0x6C), *(float *)(st + 0x38) * 0.02f);
     q = arg0 + 0xE0;
     qcopy(&v, q);
     c1 = 0;
-    func_00282F20((char *)&v, (char *)&v, 0.05f);
+    vec_scale_to_length((char *)&v, (char *)&v, 0.05f);
     c2 = 0;
-    func_00282CC0((char *)&v, arg0 + 0x10, (char *)&v);
+    FastVecAdd((char *)&v, arg0 + 0x10, (char *)&v);
     if (D_L05_00221D50 != 0) {
         *(int *)(st + 0xA0) = 7;
     } else {

@@ -113,10 +113,10 @@ void func_L06_00403F60(char *a0)
                     }
                     *(int *)(s0 + 0xC) = -1;
                 }
-                func_002E5CF8(1, 0, s1);
+                PlayMobySound(1, 0, s1);
             } else {
                 if (func_002E59B0(s1, *(int *)(s0 + 0xC)) == 0)
-                    *(int *)(s0 + 0xC) = func_002E5CF8(0, 4, s1);
+                    *(int *)(s0 + 0xC) = PlayMobySound(0, 4, s1);
             }
         } else {
             if (func_002E59B0(s1, *(int *)(s0 + 0xC)) != 0) {
@@ -188,7 +188,7 @@ void func_L06_003FDA08(char *a0)
     goto done;
 c0:
     *(unsigned char *)(s1 + 0x30) = 0xFE;
-    func_L06_003FDEB8(*(unsigned char *)(s1 + 0x21));
+    InitializePathMobyGroup(*(unsigned char *)(s1 + 0x21));
     goto done;
 c1:
     if (*(int *)(s2 + 0x64) != -1 && func_L00_00329520(D_L06_001B9840, *(int *)(s2 + 0x64)) != 0) {
@@ -201,10 +201,10 @@ c1:
         }
         func_002A7750(s1, 4, -1);
     }
-    func_L06_003FE178(s1);
+    UpdatePathMobySpacing(s1);
     t = D_00188660 + *(int *)(s2 + 0x54) * 0x70;
     if (*(int *)(t + 0x88) != (int)s1 || *(unsigned char *)(t + 0x74) == 0)
-        *(int *)(s2 + 0x54) = func_002E5CF8(0, 4, s1);
+        *(int *)(s2 + 0x54) = PlayMobySound(0, 4, s1);
     if (*(unsigned char *)(s1 + 0x31) == 0)
         goto done;
     if (func_00282948(s2 + 0x44)) {
@@ -221,7 +221,7 @@ c1:
         func_L00_0032A258(s1, &D_L06_001AFC80, &D_L06_001AFC70, &D_L06_001AFC68, 0xFFFF, 1, cls, 0, 0xFFFF,
                           0xFF, 0);
         *(short *)(s1 + 0x7C) = (1 << cls) - 0x8000;
-        func_0032C700(s1 + 0x10, 0, 0x19, 0x14, 0x14, 0x14, 0x14, 1, 1.0f, 20.0f, 1, 0, 0, 0);
+        SpawnExplosion(s1 + 0x10, 0, 0x19, 0x14, 0x14, 0x14, 0x14, 1, 1.0f, 20.0f, 1, 0, 0, 0);
         func_002A7750(s1, 2, -1);
         *(int *)(s2 + 0x38) = 0;
         *(int *)(s2 + 0x14) = 0;
@@ -229,8 +229,8 @@ c1:
         *(int *)(s1 + 0x98) = 0;
     }
     *(unsigned char *)(s1 + 0xA8) = 0xFF;
-    *(float *)(s1 + 0xF8) = func_00283B98(*(float *)(s1 + 0xF8), 3.141593f);
-    func_002833F0(s1 + 0xC0, s1 + 0xF0);
+    *(float *)(s1 + 0xF8) = FastAddRotations(*(float *)(s1 + 0xF8), 3.141593f);
+    euler_rotation_basis(s1 + 0xC0, s1 + 0xF0);
     goto done;
 c4:
     if (func_L00_00329520(D_L06_001B9840, *(int *)(s2 + 0x64)) == 0) {
@@ -246,7 +246,7 @@ c4:
     goto done;
 c2:
     *(float *)(s1 + 0xF4) = (*(float *)(s1 + 0xF4) - 0.7853982f) * 0.95f + 0.7853982f;
-    func_002833F0(s1 + 0xC0, s1 + 0xF0);
+    euler_rotation_basis(s1 + 0xC0, s1 + 0xF0);
     *(float *)(s1 + 0x18) = *(float *)(s1 + 0x18) - 0.0200000014f;
     if (func_002A77E0(4) == 0 && *(short *)(s1 + 0xAA) == 0x86B) {
         *(TI128 *)vec = 0;

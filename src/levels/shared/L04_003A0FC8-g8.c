@@ -48,11 +48,11 @@ void func_L04_003A0FC8(void)
     u8 *packet_write_cursor;
     WaterCamera *camera;
 
-    func_002833B8(scaled_translation_matrix, 1024.0f);
-    func_00282D30(scaled_translation_matrix[3], D_L04_001B9680, -1024.0f);
+    set_scale_matrix(scaled_translation_matrix, 1024.0f);
+    FastVecScale(scaled_translation_matrix[3], D_L04_001B9680, -1024.0f);
     scaled_translation_matrix[3][3] = 1.0f;
     if (D_L04_001B201C != 8) {
-        func_002FC410(D_0010ED30, D_0010ED20);
+        VU1_addDataRef(D_0010ED30, D_0010ED20);
         D_L04_001B201C = 8;
     }
     D_L04_001B2C48.tag->tag = 0x10000000;
@@ -64,8 +64,8 @@ void func_L04_003A0FC8(void)
     base[1].addr = 0;
     base[1].vif0 = 0;
     base[1].vif1 = 0x6C0C43A4;
-    func_00283788(base + 2, D_L04_001B9680 - 0x100, scaled_translation_matrix);
-    func_00283788(base + 6, D_L04_001B9680 - 0x80, scaled_translation_matrix);
+    multiply_matrix(base + 2, D_L04_001B9680 - 0x100, scaled_translation_matrix);
+    multiply_matrix(base + 6, D_L04_001B9680 - 0x80, scaled_translation_matrix);
     base[10].tag = 0x8000;
     base[10].addr = 0x303EC000;
     base[10].vif0 = 0x412;

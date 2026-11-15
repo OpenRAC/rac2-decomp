@@ -14,7 +14,7 @@ unsigned char *func_L08_0034A078(void *position, void *velocity, int kind, void 
         int lifetime;
         qcopy(particle + 0x10, position);
         {
-            int display = func_00283CF0(4.0f);
+            int display = FloatToInt(4.0f);
             data = particle + 0x20;
             particle[9] = display + 0x70;
         }
@@ -26,7 +26,7 @@ unsigned char *func_L08_0034A078(void *position, void *velocity, int kind, void 
         lifetime = func_002A7820(10, 30);
         *(short *)(particle + 0xa) = lifetime;
         {
-            float age = func_00283CE0((short)lifetime);
+            float age = IntToFloat((short)lifetime);
             *(void **)(data + 0x1c) = owner;
             *(float *)(data + 0x10) = 1.0f / age;
         }

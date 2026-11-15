@@ -39,7 +39,7 @@ void func_L00_00410D20(char *m) {
         if (!ref_L00_00410D20_01[i].target)
             continue;
         s = (char *)&ref_L00_00410D20_01[i];
-        *(float *)(s + 0xC) = func_00283B98(*(float *)(s + 0xC), 0.20943954586982727f);
+        *(float *)(s + 0xC) = FastAddRotations(*(float *)(s + 0xC), 0.20943954586982727f);
         dead = 0;
         if (*(signed char *)(*(char **)(s + 0x18) + 0x20) < 0)
             dead = 1;
@@ -98,10 +98,10 @@ void func_L00_00410D20(char *m) {
         goto random_particles;
     timer:
         if (*(int *)(s + 0x24) == 0) {
-            int c = func_00283D38(*(int *)(s + 4), *(int *)(s + 8),
+            int c = FastTweenColor(*(int *)(s + 4), *(int *)(s + 8),
                                   (func_00283180(*(float *)(s + 0xC)) + 1.0f) * 0.5f);
 
-            func_002A0488(*(char **)(s + 0x18), c & 255, (c >> 8) & 255, (c >> 16) & 255);
+            set_moby_color(*(char **)(s + 0x18), c & 255, (c >> 8) & 255, (c >> 16) & 255);
         } else
             --*(int *)(s + 0x24);
     }

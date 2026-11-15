@@ -76,37 +76,37 @@ void func_L02_00411D18(u8 *object)
     right.vertex[1].quad = D_L02_001B1BC0.vertex[1].quad;
     right.vertex[2].quad = D_L02_001B1BC0.vertex[2].quad;
     right.vertex[3].quad = D_L02_001B1BC0.vertex[3].quad;
-    func_00283658(context, object + 0xC0);
+    copy_matrix_rotation(context, object + 0xC0);
     qcopy(&context[3], position);
     context[3].f[3] = 1.0f;
-    func_00282F20(context, context, 4.0f);
-    func_00282F20(&context[1], &context[1], 10.0f);
-    func_00282CF0(&direction, &D_L02_001BA500, position);
+    vec_scale_to_length(context, context, 4.0f);
+    vec_scale_to_length(&context[1], &context[1], 10.0f);
+    FastVecSub(&direction, &D_L02_001BA500, position);
     func_002AFDD8((char *)object, (char *)&direction, (char *)&direction, 0);
     if (direction.f[0] < 0.0f)
-        func_00282D30(context, context, -1.0f);
+        FastVecScale(context, context, -1.0f);
     phase = func_00283198(*(float *)(state + 0x2C)) * 0.5f + 0.5f;
-    primary_color = func_00283D38(palette.word[0], palette.word[1], phase);
-    secondary_color = func_00283D38(palette.word[2], palette.word[3], phase);
+    primary_color = FastTweenColor(palette.word[0], palette.word[1], phase);
+    secondary_color = FastTweenColor(palette.word[2], palette.word[3], phase);
     fade = *(float *)(state + 0x20);
     fade = fade >= 0.2f ? fade : 1.0f - fade * 5.0f;
-    wave_color[0] = func_00283D38(palette.word[3], palette.word[3] & 0xFFFFFF, fade);
+    wave_color[0] = FastTweenColor(palette.word[3], palette.word[3] & 0xFFFFFF, fade);
     fade = *(float *)(state + 0x24);
     fade = fade >= 0.2f ? fade : 1.0f - fade * 5.0f;
-    wave_color[1] = func_00283D38(palette.word[3], palette.word[3] & 0xFFFFFF, fade);
+    wave_color[1] = FastTweenColor(palette.word[3], palette.word[3] & 0xFFFFFF, fade);
     if (*(float *)(state + 0x1C) < 1.0f) {
-        primary_color = func_00283D38(primary_color & 0xFFFFFF, primary_color, *(float *)(state + 0x1C));
-        secondary_color = func_00283D38(secondary_color & 0xFFFFFF, secondary_color, *(float *)(state + 0x1C));
-        wave_color[0] = func_00283D38(wave_color[0] & 0xFFFFFF, wave_color[0], *(float *)(state + 0x1C));
-        wave_color[1] = func_00283D38(wave_color[1] & 0xFFFFFF, wave_color[1], *(float *)(state + 0x1C));
+        primary_color = FastTweenColor(primary_color & 0xFFFFFF, primary_color, *(float *)(state + 0x1C));
+        secondary_color = FastTweenColor(secondary_color & 0xFFFFFF, secondary_color, *(float *)(state + 0x1C));
+        wave_color[0] = FastTweenColor(wave_color[0] & 0xFFFFFF, wave_color[0], *(float *)(state + 0x1C));
+        wave_color[1] = FastTweenColor(wave_color[1] & 0xFFFFFF, wave_color[1], *(float *)(state + 0x1C));
     }
-    func_L02_002EF968(packets, D_L02_001B1C00, primary_color, primary_uv.uv, primary.vertex, 1);
-    func_L02_002EF968(packets + 1, D_L02_001B1C04, secondary_color, secondary_uv.uv, left.vertex, 1);
-    func_L02_002EF968(packets + 2, D_L02_001B1C04, secondary_color, secondary_uv.uv, right.vertex, 1);
-    func_L02_002EF968(packets + 3, D_L02_001B1C04, wave_color[0], secondary_uv.uv, left.vertex, 1);
-    func_L02_002EF968(packets + 4, D_L02_001B1C04, wave_color[0], secondary_uv.uv, right.vertex, 1);
-    func_L02_002EF968(packets + 5, D_L02_001B1C04, wave_color[1], secondary_uv.uv, left.vertex, 1);
-    func_L02_002EF968(packets + 6, D_L02_001B1C04, wave_color[1], secondary_uv.uv, right.vertex, 1);
+    FillQuadPacket(packets, D_L02_001B1C00, primary_color, primary_uv.uv, primary.vertex, 1);
+    FillQuadPacket(packets + 1, D_L02_001B1C04, secondary_color, secondary_uv.uv, left.vertex, 1);
+    FillQuadPacket(packets + 2, D_L02_001B1C04, secondary_color, secondary_uv.uv, right.vertex, 1);
+    FillQuadPacket(packets + 3, D_L02_001B1C04, wave_color[0], secondary_uv.uv, left.vertex, 1);
+    FillQuadPacket(packets + 4, D_L02_001B1C04, wave_color[0], secondary_uv.uv, right.vertex, 1);
+    FillQuadPacket(packets + 5, D_L02_001B1C04, wave_color[1], secondary_uv.uv, left.vertex, 1);
+    FillQuadPacket(packets + 6, D_L02_001B1C04, wave_color[1], secondary_uv.uv, right.vertex, 1);
     for (i = 0; i < 4; i++) {
         packets[1].uv[i][0] += *(float *)(state + 0x28);
         packets[2].uv[i][0] += *(float *)(state + 0x28);
@@ -123,26 +123,26 @@ void func_L02_00411D18(u8 *object)
     transform_parameters[1].quad = 0;
     transform_parameters[0].f[2] = -0.19634955f;
     transform_parameters[1].f[2] = 6.0f;
-    func_00115484(zero_expansion, 0, sizeof(zero_expansion));
+    memset(zero_expansion, 0, sizeof(zero_expansion));
     zero_expansion[0].f[2] = *(float *)(state + 0x20) + *(float *)(state + 0x20);
     zero_expansion[1].f[2] = *(float *)(state + 0x24) + *(float *)(state + 0x24);
     expansion[0].quad = zero_expansion[0].quad;
     expansion[1].quad = zero_expansion[1].quad;
-    func_002833F0(matrix, transform_parameters);
+    euler_rotation_basis(matrix, transform_parameters);
     func_L01_002E1510(packets, 7, matrix, 16, context);
     for (j = 0; j < 4; j++) {
-        func_00282CC0(&packets[0].vertex[j], &primary.vertex[j], &transform_parameters[1]);
-        func_00282CC0(&packets[1].vertex[j], &left.vertex[j], &transform_parameters[1]);
-        func_00282CC0(&packets[2].vertex[j], &right.vertex[j], &transform_parameters[1]);
-        func_00282CC0(&packets[3].vertex[j], &left.vertex[j], &transform_parameters[1]);
-        func_00282CC0(&packets[4].vertex[j], &right.vertex[j], &transform_parameters[1]);
-        func_00282CC0(&packets[5].vertex[j], &left.vertex[j], &transform_parameters[1]);
-        func_00282CC0(&packets[6].vertex[j], &right.vertex[j], &transform_parameters[1]);
-        func_00282CF0(&packets[3].vertex[j], &packets[3].vertex[j], &expansion[0]);
-        func_00282CC0(&packets[4].vertex[j], &packets[4].vertex[j], &expansion[0]);
-        func_00282CF0(&packets[5].vertex[j], &packets[5].vertex[j], &expansion[1]);
-        func_00282CC0(&packets[6].vertex[j], &packets[6].vertex[j], &expansion[1]);
+        FastVecAdd(&packets[0].vertex[j], &primary.vertex[j], &transform_parameters[1]);
+        FastVecAdd(&packets[1].vertex[j], &left.vertex[j], &transform_parameters[1]);
+        FastVecAdd(&packets[2].vertex[j], &right.vertex[j], &transform_parameters[1]);
+        FastVecAdd(&packets[3].vertex[j], &left.vertex[j], &transform_parameters[1]);
+        FastVecAdd(&packets[4].vertex[j], &right.vertex[j], &transform_parameters[1]);
+        FastVecAdd(&packets[5].vertex[j], &left.vertex[j], &transform_parameters[1]);
+        FastVecAdd(&packets[6].vertex[j], &right.vertex[j], &transform_parameters[1]);
+        FastVecSub(&packets[3].vertex[j], &packets[3].vertex[j], &expansion[0]);
+        FastVecAdd(&packets[4].vertex[j], &packets[4].vertex[j], &expansion[0]);
+        FastVecSub(&packets[5].vertex[j], &packets[5].vertex[j], &expansion[1]);
+        FastVecAdd(&packets[6].vertex[j], &packets[6].vertex[j], &expansion[1]);
     }
-    func_002833F0(matrix, transform_parameters);
+    euler_rotation_basis(matrix, transform_parameters);
     func_L01_002E1510(packets, 7, matrix, 16, context);
 }

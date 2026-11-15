@@ -69,8 +69,8 @@ void func_L05_004432E0(char *camera)
                 *(float *)(state + 0x38), goal, D_L05_001B1BF4, 0.2f, 0.0f);
         }
     }
-    func_00282D30(&motion, moby + 0xC0, *(float *)(state + 0x38));
-    func_00282CC0(camera + 0x30, camera + 0x30, &motion);
+    FastVecScale(&motion, moby + 0xC0, *(float *)(state + 0x38));
+    FastVecAdd(camera + 0x30, camera + 0x30, &motion);
     qzero_nc(record + 0x30);
 
     if (D_001A79F0 == 20) {
@@ -83,9 +83,9 @@ void func_L05_004432E0(char *camera)
         *(float *)(record + 0x38) = rise;
         t = *(float *)(input + 0x68) / (*(float *)(input + 0x78) * DEG_TO_RAD);
         side = (sideLow + (sideHigh - sideLow) * t) * FRAME_TIME;
-        func_00282D30(&delta, camera + 0x10, side);
-        func_00282CC0(camera + 0x30, camera + 0x30, &delta);
-        func_00282CC0(record + 0x30, record + 0x30, &delta);
+        FastVecScale(&delta, camera + 0x10, side);
+        FastVecAdd(camera + 0x30, camera + 0x30, &delta);
+        FastVecAdd(record + 0x30, record + 0x30, &delta);
     }
 
     if (D_001A79F0 == 15) {
@@ -107,13 +107,13 @@ void func_L05_004432E0(char *camera)
     {
         char *roll = *(char **)(camera + 0x70) + 0xD4;
         if (*(short *)(roll + 4)) {
-            float amount = func_00283CE0(*(short *)(roll + 6));
+            float amount = IntToFloat(*(short *)(roll + 6));
             amount = D_L05_001B1BE0 * func_00283198(amount * *(float *)(roll + 8) * 3.1415927f);
             if (*(short *)(roll + 4) == 1)
                 amount = -amount;
-            func_00282D30(&delta, camera + 0x10, amount);
-            func_00282CC0(camera + 0x30, camera + 0x30, &delta);
-            func_00282CC0(record + 0x30, record + 0x30, &delta);
+            FastVecScale(&delta, camera + 0x10, amount);
+            FastVecAdd(camera + 0x30, camera + 0x30, &delta);
+            FastVecAdd(record + 0x30, record + 0x30, &delta);
         }
     }
 
@@ -128,13 +128,13 @@ void func_L05_004432E0(char *camera)
         int index = **(int **)(D_L05_00221D88 + 0x68);
         if (index >= 0) {
             char *sphere = D_L05_001B2614 + index * 128;
-            float radius = func_00282DF0(sphere) - D_L05_001B1A7C;
+            float radius = FastVecLength(sphere) - D_L05_001B1A7C;
             float distance;
-            func_00282CF0(&delta, sphere + 0x30, camera + 0x30);
-            distance = func_00282DF0(&delta);
+            FastVecSub(&delta, sphere + 0x30, camera + 0x30);
+            distance = FastVecLength(&delta);
             if (radius < distance) {
-                func_00282F20(&delta, &delta, distance - radius);
-                func_00282CC0(camera + 0x30, camera + 0x30, &delta);
+                vec_scale_to_length(&delta, &delta, distance - radius);
+                FastVecAdd(camera + 0x30, camera + 0x30, &delta);
             }
         }
     }

@@ -31,7 +31,7 @@ void func_L11_00445990(char *a0) {
 
     if (D_0018C0B4 != 0x6F)
         func_L11_002D8EF8(0x6F, 1);
-    if (func_L00_0032EF10(0x40, 0x3C, 0) != 0) {
+    if (PadPressedWithin(0x40, 0x3C, 0) != 0) {
         func_002A7750(a0, 7, -1);
         *(s16 *)(state + 0x1E8) = *(u16 *)(state + 0x1F0);
         D_001395B8[0x49] = *(u8 *)(state + 0x1E8);
@@ -49,7 +49,7 @@ void func_L11_00445990(char *a0) {
             D_001395B8[0x49] = *(u8 *)(state + 0x1E8);
             return;
         }
-    } else if (func_L00_0032EF10(0x10, 0x3C, 0) != 0) {
+    } else if (PadPressedWithin(0x10, 0x3C, 0) != 0) {
         func_L11_004425C8(a0);
     } else {
         func_L00_002E6CF0(func_L11_004456A0, a0);

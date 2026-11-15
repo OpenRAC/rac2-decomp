@@ -70,7 +70,7 @@ void func_0031D588(char *self)
     case 1:
         qcopy(old, self + 0x10);
         func_002FEE70(*(int *)(state + 0x44), state, 0);
-        func_00282CC0(self + 0x10, self + 0x10, state);
+        FastVecAdd(self + 0x10, self + 0x10, state);
         func_002E5F40(*(int *)(state + 0x20), *(int *)(state + 0x24) + func_002A7820(-200, 200));
         n = func_00277F48(self + 0x10, 0, self, 0, 0.45f);
         for (i = 0; i < n; i++) {
@@ -82,36 +82,36 @@ void func_0031D588(char *self)
             if (data) {
                 qcopy(self + 0x10, obj + 0x10);
                 func_002B00B0(obj, temp.v, 1);
-                func_00282D30(temp.v, temp.v, *(float *)(data + 0x10));
-                func_00282CC0(self + 0x10, self + 0x10, temp.v);
+                FastVecScale(temp.v, temp.v, *(float *)(data + 0x10));
+                FastVecAdd(self + 0x10, self + 0x10, temp.v);
             }
             *(char **)(state + 0x38) = obj;
             *(int *)(state + 0x10) = 15;
             *(unsigned char *)(self + 0x20) = 2;
             qcopy(temp.v, state);
             func_00282C88(state);
-            func_00282F20(temp.v, temp.v, 0.033333335f);
-            func_002A8C00(event.raw, self, 0x210000, temp.v,
+            vec_scale_to_length(temp.v, temp.v, 0.033333335f);
+            make_hit_descriptor(event.raw, self, 0x210000, temp.v,
                           ((DamageClass *)D_00239BA0)[((DamageClasses *)D_00139568)->entry].value);
             *(unsigned char *)(event.raw + 24) = 1;
             *(unsigned char *)(event.raw + 25) = 3;
             *(short *)(event.raw + 26) = *(short *)(self + 0xAA);
-            func_002A8E20(obj, event.raw);
+            QueueMobyImpact(obj, event.raw);
             func_0031F6E8(self + 0x10, 10, 1);
-            func_0032D758(obj, 28, *(int *)(self + 0xB8));
+            StartAttachedEffect(obj, 28, *(int *)(self + 0xB8));
             break;
         }
         if (!*(char **)(state + 0x38)) {
             int hit;
-            if (func_002761F8(old, self + 0x10, 2, self, 0))
+            if (CollLine(old, self + 0x10, 2, self, 0))
                 hit = 1;
             else
                 hit = func_00277258(self + 0x10, 2, self, 0.1f) != 0;
             if (hit == 1) {
                 qcopy(self + 0x10, D_001BAFA0);
-                func_00282D30(temp.v, D_001BAFA0 + 0x20, 0.0009765625f);
-                func_00282F20(temp.v, temp.v, 0.1f);
-                func_00282CC0(self + 0x10, temp.v, self + 0x10);
+                FastVecScale(temp.v, D_001BAFA0 + 0x20, 0.0009765625f);
+                vec_scale_to_length(temp.v, temp.v, 0.1f);
+                FastVecAdd(self + 0x10, temp.v, self + 0x10);
                 *(int *)(state + 0x10) = 15;
                 *(unsigned char *)(self + 0x20) = 2;
                 func_0031F6E8(self + 0x10, 15, 0);
@@ -128,21 +128,21 @@ void func_0031D588(char *self)
             info = func_002AB1F0(*(char **)(state + 0x38));
             if (info) {
                 func_002B00B0(*(char **)(state + 0x38), temp.v, 1);
-                func_00282D30(temp.v, temp.v, *(float *)(info + 0x10));
-                func_00282CC0(self + 0x10, temp.v, *(char **)(state + 0x38) + 0x10);
+                FastVecScale(temp.v, temp.v, *(float *)(info + 0x10));
+                FastVecAdd(self + 0x10, temp.v, *(char **)(state + 0x38) + 0x10);
             }
         }
         if (func_00282948(state + 0x10)) {
             *(unsigned char *)(self + 0x20) = 4;
             temp.params = D_001AFE00;
             event.query.exclude = (QueryExclude){*(char **)(state + 0x38), 0};
-            func_002AF580(self + 0x10, self + 0xC0, 6.2831855f, 6.2831855f, &count,
+            SelectBestTargetInCone(self + 0x10, self + 0xC0, 6.2831855f, 6.2831855f, &count,
                           event.query.targets, 3, &event.query.exclude,
                           10.0f, 0.0f, 0.0f, 0, &temp.params);
             for (i = 0; i < count; i++) {
                 for (j = 4; j >= 0; j--)
                     func_0031DC18(self, event.query.targets[i], 10);
-                func_002E5CF8(1, 0, self);
+                PlayMobySound(1, 0, self);
             }
         }
         break;
@@ -154,27 +154,27 @@ void func_0031D588(char *self)
         if (*(char **)(state + 0x38)) {
             if (!D_001AFDF4) {
                 D_001AFDF4 = 1;
-                func_002E5CF8(3, 0, self);
+                PlayMobySound(3, 0, self);
             }
             info = func_002AB1F0(*(char **)(state + 0x38));
             if (info) {
                 func_002B00B0(*(char **)(state + 0x38), temp.v, 1);
-                func_00282D30(temp.v, temp.v, *(float *)(info + 0x10));
-                func_00282CC0(self + 0x10, temp.v, *(char **)(state + 0x38) + 0x10);
+                FastVecScale(temp.v, temp.v, *(float *)(info + 0x10));
+                FastVecAdd(self + 0x10, temp.v, *(char **)(state + 0x38) + 0x10);
             }
         }
         if (!*(int *)(state + 0x1C)) {
             func_0031E6E8(self);
             if (!*(char **)(state + 0x38)) {
                 func_0031F6E8(self + 0x10, 10, 1);
-                func_002E5CF8(2, 0, self);
+                PlayMobySound(2, 0, self);
             }
         }
     }
     }
     if (*(unsigned char *)(self + 0x20) != 4) {
         if (!func_002E59B0(self, *(int *)(state + 0x20)))
-            *(int *)(state + 0x20) = func_002E5CF8(0, 4, self);
+            *(int *)(state + 0x20) = PlayMobySound(0, 4, self);
         if (*(int *)(state + 0x24) == -1) {
             char *rec = D_00188660 + *(int *)(state + 0x20) * 112;
             *(int *)(state + 0x24) = ((SoundRecord *)rec)->value;

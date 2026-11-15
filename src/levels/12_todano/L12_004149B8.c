@@ -224,7 +224,7 @@ void func_L12_0041BED8(u8 *self)
                     * 0.16666667f;
             f32 t;
 
-            func_00282F20((f32 *)(*s0 + 0xD0), *s0 + 0xD0, v);
+            vec_scale_to_length((f32 *)(*s0 + 0xD0), *s0 + 0xD0, v);
             func_002A0F48(*s0);
             t = *(f32 *)(*(u8 **)(*s0 + 0x24) + 0x3C);
             *(f32 *)(*s0 + 0xC) = t + t;

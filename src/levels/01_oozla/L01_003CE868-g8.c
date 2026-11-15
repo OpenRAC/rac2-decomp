@@ -26,7 +26,7 @@ void func_L01_003CE868(u8 *a0)
     float h, dist, delta;
 
     if (!p) {
-        func_0026FEB8(D_L01_002A4D50, *(s16 *)(a0 + 0xAA), *(s16 *)(a0 + 0xB2));
+        STUB_printf(D_L01_002A4D50, *(s16 *)(a0 + 0xAA), *(s16 *)(a0 + 0xB2));
         return;
     }
     switch (a0[0x20]) {
@@ -51,13 +51,13 @@ void func_L01_003CE868(u8 *a0)
                           D_L01_001B042C * 0.00027777778f, D_L01_001B0430, 3.0f);
         func_L01_003CE7D8((float *)(a0 + 0x14), (float *)(p + 0x14), *(float *)(p + 4),
                           D_L01_001B042C * 0.00027777778f, D_L01_001B0430, 3.0f);
-        dist = func_00282E80(a0 + 0x10, D_00189EA0);
+        dist = vec_distance_xy(a0 + 0x10, D_00189EA0);
         if (dist < D_L01_001B0434 &&
             *(float *)(D_00189EA0 + 8) < *(float *)(a0 + 0x18) + 0.8f) {
-            func_00282CF0(d, a0 + 0x10, D_00189EA0);
+            FastVecSub(d, a0 + 0x10, D_00189EA0);
             d[2] = 0;
-            func_00282F20(d, d, (D_L01_001B0434 - dist) * 0.08f);
-            func_00282CC0(a0 + 0x10, a0 + 0x10, d);
+            vec_scale_to_length(d, d, (D_L01_001B0434 - dist) * 0.08f);
+            FastVecAdd(a0 + 0x10, a0 + 0x10, d);
         }
         delta = h + *(float *)(p + 0x28) - *(float *)(a0 + 0x18);
         if (delta > 0.050000004f)

@@ -52,9 +52,9 @@ void func_L02_003EB258(char *actor) {
         for (layer = 0; layer < 2; layer++) func_00281DE8(packet + layer, D_L02_001B0D60[layer], 0, 0x80);
     }
     calculated.weights[0] = func_00283198(*(float *)(state + 0x14)) * 0.5f + 0.5f;
-    calculated.weights[1] = func_00283198(func_00283B98(*(float *)(state + 0x14), 3.1415927f)) * 0.5f + 0.5f;
+    calculated.weights[1] = func_00283198(FastAddRotations(*(float *)(state + 0x14), 3.1415927f)) * 0.5f + 0.5f;
     blend = calculated;
-    count = func_00283CF0(func_00282DF0(D_L02_001B368C + *(int *)(state + 8) * 0x80 + 0x10));
+    count = FloatToInt(FastVecLength(D_L02_001B368C + *(int *)(state + 8) * 0x80 + 0x10));
     *(Quad *)normal = 0;
     normal[3] = 1.0f;
     step = 2.0f / (float)count;
@@ -65,11 +65,11 @@ void func_L02_003EB258(char *actor) {
         packet[1].uv[i][0] = D_L02_001B0D68[i+4][0] + *(float *)(state + 0x18);
         packet[1].uv[i][1] = D_L02_001B0D6C[i+4][0];
         tint = D_L02_001B0DAC;
-        packet[0].color[i] = func_00283D38(D_L02_001B0DA8, tint[0], blend.weights[0]);
-        packet[1].color[i] = func_00283D38(tint[1], tint[2], blend.weights[1]);
+        packet[0].color[i] = FastTweenColor(D_L02_001B0DA8, tint[0], blend.weights[0]);
+        packet[1].color[i] = FastTweenColor(tint[1], tint[2], blend.weights[1]);
         if (*(float *)(state + 0x1C) < 1.0f) {
-            packet[0].color[i] = func_00283D38(packet[0].color[i] & mask, packet[0].color[i], *(float *)(state + 0x1C));
-            packet[1].color[i] = func_00283D38(packet[1].color[i] & mask, packet[1].color[i], *(float *)(state + 0x1C));
+            packet[0].color[i] = FastTweenColor(packet[0].color[i] & mask, packet[0].color[i], *(float *)(state + 0x1C));
+            packet[1].color[i] = FastTweenColor(packet[1].color[i] & mask, packet[1].color[i], *(float *)(state + 0x1C));
         }
         qcopy(vertex, normal);
         if (i >= 2) *(float *)vertex = -1.0f; else *(float *)vertex = 1.0f;
@@ -78,11 +78,11 @@ void func_L02_003EB258(char *actor) {
         if (i >= 2) *(float *)(vertex + 0x90) = -1.0f; else *(float *)(vertex + 0x90) = 1.0f;
         *(float *)(vertex + 0x94) = (i & 1) ? -1.0f : step + -1.0f;
     }
-    func_00283658(matrix, D_L02_001B368C + *(int *)(state + 8) * 0x80);
+    copy_matrix_rotation(matrix, D_L02_001B368C + *(int *)(state + 8) * 0x80);
     qcopy(matrix + 12, D_L02_001B368C + *(int *)(state + 8) * 0x80 + 0x30);
     for (slice = 0; slice < count; slice++) {
-        func_00280B90(packet, matrix, 0);
-        func_00280B90(packet + 1, matrix, 0);
+        draw_world_quad(packet, matrix, 0);
+        draw_world_quad(packet + 1, matrix, 0);
         {
         int j;
         char *sliceVertex = (char *)&packet;

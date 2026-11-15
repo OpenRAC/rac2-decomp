@@ -19,13 +19,13 @@ void func_L12_00414028(u8 *obj) {
         && target[0x20] != 0xFE && target[0x20] != 0xFD) {
         qcopy(tmp0, obj + 0x10);
         tmp0[2] += func_002A7878(0.0f, 1.0f);
-        func_00282F20(tmp1, *(u8 **)(st + 0x2F8) + 0xC0, 4.0f);
-        func_00282CC0(st + 0x1F0, tmp0, tmp1);
+        vec_scale_to_length(tmp1, *(u8 **)(st + 0x2F8) + 0xC0, 4.0f);
+        FastVecAdd(st + 0x1F0, tmp0, tmp1);
         return;
     }
     g = D_00189E20;
     if (*(int *)(st + 0x200) == *(int *)(g + 0x2290)) {
-        if (D_L12_001B1844 < func_00282E80(obj + 0x10, g + 0x80)) {
+        if (D_L12_001B1844 < vec_distance_xy(obj + 0x10, g + 0x80)) {
             qcopy(st + 0x1F0, g + 0xD0);
         } else {
             qcopy(st + 0x1F0, g + 0xE0);

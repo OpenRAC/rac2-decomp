@@ -132,9 +132,9 @@ void func_L01_003C0140(L01_003C0140_OBJ *a0)
     if (p->f96 <= 0xFFFE) {
         p->f96 = p->f96 + 1;
     }
-    func_00282978((char *)q + 0x2DE);
-    func_00282978((char *)q + 0x2DA);
-    func_00282978((char *)q + 0x2DC);
+    FastDecTimer((char *)q + 0x2DE);
+    FastDecTimer((char *)q + 0x2DA);
+    FastDecTimer((char *)q + 0x2DC);
     func_002B0990(p, (char *)q + 0x220, 10, 1, D_L01_001AFEFC);
 }
 
@@ -165,7 +165,7 @@ void func_L01_003BCEC8(char *obj)
     case 1:
         if (func_00282948(s + 0x30)) {
             *(unsigned char *)(obj + 0x20) = 2;
-            *(int *)(s + 0x30) = func_00283CF0(10.0f);
+            *(int *)(s + 0x30) = FloatToInt(10.0f);
             *(unsigned short *)(obj + 0x34) |= 0x2000;
             return;
         }
@@ -176,11 +176,11 @@ void func_L01_003BCEC8(char *obj)
             return;
         }
         /* Fade while the removal timer runs. */
-        *(unsigned char *)(obj + 0x23) = func_00283CF0((float)*(int *)(s + 0x30) * 12.8f);
+        *(unsigned char *)(obj + 0x23) = FloatToInt((float)*(int *)(s + 0x30) * 12.8f);
         break;
     }
-    *(float *)(s + 0x40) = func_00283B98(*(float *)(s + 0x40), 0.034906592f);
-    *(float *)(obj + 0xF8) = func_00283B98(*(float *)(obj + 0xF8),
+    *(float *)(s + 0x40) = FastAddRotations(*(float *)(s + 0x40), 0.034906592f);
+    *(float *)(obj + 0xF8) = FastAddRotations(*(float *)(obj + 0xF8),
                                            *(float *)(s + 0x18) * func_00283198(*(float *)(s + 0x40)));
     *(float *)(obj + 0xF0) += (*(float *)(s + 0x44) - *(float *)(obj + 0xF0)) * 0.02f;
     if (*(unsigned char *)(obj + 0x20) != 2) {
@@ -189,9 +189,9 @@ void func_L01_003BCEC8(char *obj)
         *(float *)(obj + 0xF4) = tilt;
         saved = *(float *)(s + 8);
         *(float *)(s + 8) = 0.0f;
-        func_00282D30(s, s, scale);
+        FastVecScale(s, s, scale);
         *(float *)(s + 8) = saved;
-        func_00282CC0(obj + 0x10, obj + 0x10, s);
+        FastVecAdd(obj + 0x10, obj + 0x10, s);
         *(float *)(s + 8) -= *(float *)(s + 0x38);
         if (*(float *)(s + 8) < *(float *)(s + 0x3C))
             *(float *)(s + 8) = *(float *)(s + 0x3C);
@@ -199,7 +199,7 @@ void func_L01_003BCEC8(char *obj)
         *(float *)(obj + 0xF4) += (0.17453295f - *(float *)(obj + 0xF4)) * 0.1f;
     }
     pos[2] += 1.0f;
-    if (func_002761F8(pos, obj + 0x10, 2, obj, 0)) {
+    if (CollLine(pos, obj + 0x10, 2, obj, 0)) {
         qcopy(obj + 0x10, D_L01_001BF920);
         /* qzero(state + 8): retail passes a misaligned pointer here (original bug; sq ignores the low four address bits). Allowed by owner ruling (2026-11-09). */
         qzero(s + 8);
@@ -207,7 +207,7 @@ void func_L01_003BCEC8(char *obj)
         qzero(s + 0x10);
         if (*(unsigned char *)(obj + 0x20) != 2) {
             *(unsigned char *)(obj + 0x20) = 2;
-            *(int *)(s + 0x30) = func_00283CF0(10.0f);
+            *(int *)(s + 0x30) = FloatToInt(10.0f);
             *(unsigned short *)(obj + 0x34) |= 0x2000;
         }
     }

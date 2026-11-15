@@ -54,13 +54,13 @@ void func_0032ACF0(s32 arg0) {
     do {
         if ((*(s32 *)((s8 *)(var_s0) + (0x1C))) == arg0) {
             func_002FE8D8((*(s32 *)((s8 *)(p5) + (0x2290))) + 0x10, sp);
-            temp_f20 = func_00283CE0((*(s32 *)((s8 *)(var_s0) + (0x18))));
-            temp_f20_2 = temp_f20 / func_00283CE0(0x25);
+            temp_f20 = IntToFloat((*(s32 *)((s8 *)(var_s0) + (0x18))));
+            temp_f20_2 = temp_f20 / IntToFloat(0x25);
             func_002ACEC0(sp10, var_s0, sp, (*(f32 *)((s8 *)(var_s0) + (0x10))));
-            func_0032AE30(arg0, sp10, func_00283CF0(temp_f20_2 * 128.0f));
-            (*(f32 *)((s8 *)(var_s0) + (0x10))) = func_00283B98((*(f32 *)((s8 *)(var_s0) + (0x10))), (*(f32 *)((s8 *)(var_s0) + (0x14))));
-            func_00282F20(sp, sp, 0.04f);
-            func_00282CC0(var_s0, var_s0, sp);
+            func_0032AE30(arg0, sp10, FloatToInt(temp_f20_2 * 128.0f));
+            (*(f32 *)((s8 *)(var_s0) + (0x10))) = FastAddRotations((*(f32 *)((s8 *)(var_s0) + (0x10))), (*(f32 *)((s8 *)(var_s0) + (0x14))));
+            vec_scale_to_length(sp, sp, 0.04f);
+            FastVecAdd(var_s0, var_s0, sp);
             if (func_00282948(var_s3) != 0) {
                 (*(s32 *)((s8 *)(var_s0) + (0x1C))) = 0;
             }

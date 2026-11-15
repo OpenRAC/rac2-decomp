@@ -68,7 +68,7 @@ void func_L11_003F3CB8(u8 *object)
             f32 scale = small ? func_002A7878(D_L11_001B062C, D_L11_001B0630) : func_002A7878(D_L11_001B0604, D_L11_001B0608);
             u8 *path = data + 0xA0 + i * 0xA0;
             func_L11_003F4198(points, count, path, amplitude);
-            func_L11_003F4490(points, count, duration, D_L11_001B05B4, D_L11_001B05B8, width, scale);
+            DrawDualQuadStrip(points, count, duration, D_L11_001B05B4, D_L11_001B05B8, width, scale);
             if ((u16)(*(u16 *)state - 3) < 2) {
                 f32 extra[D_L11_001B0634][4];
                 s32 pick = func_002A7820(count - 6, count - 3);
@@ -81,7 +81,7 @@ void func_L11_003F3CB8(u8 *object)
                 width = func_002A7878(D_L11_001B0644, D_L11_001B0648);
                 scale = func_002A7878(D_L11_001B064C, D_L11_001B0650);
                 func_L11_003F4198(extra, D_L11_001B0634, frame, D_L11_001B0638);
-                func_L11_003F4490(extra, D_L11_001B0634, duration, D_L11_001B05BC, D_L11_001B05C0, width, scale);
+                DrawDualQuadStrip(extra, D_L11_001B0634, duration, D_L11_001B05BC, D_L11_001B05C0, width, scale);
             }
             if (group) {
                 f32 jitter = func_002A7878(-D_L11_001B05D8, D_L11_001B05D8);

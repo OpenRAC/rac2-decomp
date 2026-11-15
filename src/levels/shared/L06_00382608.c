@@ -19,7 +19,7 @@ void func_L06_00382608(void *data, int path, int owner, int flags, int stride, f
     int one;
 
     if (path == -1) {
-        func_0026FEB8(D_L06_001AA660);
+        STUB_printf(D_L06_001AA660);
         return;
     }
     polygon = D_L06_001FE500[path];
@@ -34,7 +34,7 @@ void func_L06_00382608(void *data, int path, int owner, int flags, int stride, f
         while (index < (polygon ? *(int *)polygon : 0)) {
             /* cse reuses this 1 for the case-1 compare, kept in $s1 across the call. */
             one = 1;
-            func_00282F20(advance, D_L06_001B9A90, scale * 1.2f);
+            vec_scale_to_length(advance, D_L06_001B9A90, scale * 1.2f);
             qcopy(point, polygon + (index * 16 + 0x10));
             switch (flags & 7) {
             case 1:
@@ -49,7 +49,7 @@ void func_L06_00382608(void *data, int path, int owner, int flags, int stride, f
                     int n = index;
                     do {
                         func_L03_00339128(point, data, n % 10 + 2, owner, scale, 0x7F, timer, 0xFF);
-                        func_00282CC0(point, point, advance);
+                        FastVecAdd(point, point, advance);
                         n /= 10;
                     } while (n != 0);
                 }

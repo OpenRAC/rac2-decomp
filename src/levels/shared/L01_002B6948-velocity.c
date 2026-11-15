@@ -59,7 +59,7 @@ void func_L01_002B6948(float rate) {
         v[1]=func_00283198(angle)*speed;
         v[2]=D_00189E20.xf8;
         dot=-(D_00189E20.xf0*v[0]+D_00189E20.xf4*v[1]);
-        l1=func_00282E20(v);l2=func_00282E20((char *)&D_00189E20+0xf0);
+        l1=vec_length_xy(v);l2=vec_length_xy((char *)&D_00189E20+0xf0);
         if(l1==0.0f || l2==0.0f) dot=0.0f;
         else {
             dot/=l1;
@@ -70,9 +70,9 @@ void func_L01_002B6948(float rate) {
         if(dot>3.0f) dot=3.0f;
         if(dot<1.0f) dot=1.0f;
         rate*=dot;
-        func_00282CF0(v,v,(char *)&D_00189E20+0xf0);
-        if(func_00282E20(v)>rate) func_00282F70(v,v,rate);
-        func_00282CC0((char *)&D_00189E20+0xf0,(char *)&D_00189E20+0xf0,v);
+        FastVecSub(v,v,(char *)&D_00189E20+0xf0);
+        if(vec_length_xy(v)>rate) func_00282F70(v,v,rate);
+        FastVecAdd((char *)&D_00189E20+0xf0,(char *)&D_00189E20+0xf0,v);
         *(VelocityQuad *)t=*(VelocityQuad *)((char *)&D_00189E20+0xa60);
         D_00189E20.x1b4=D_00189E20.x178-func_L00_002B5590(t);
         if(D_00189E20.x1454) D_00189E20.x1b4=D_00189E20.x174;
@@ -80,9 +80,9 @@ void func_L01_002B6948(float rate) {
     case 1:case 2:
         *(VelocityQuad *)t=*(VelocityQuad *)((char *)&D_00189E20+0x190);speed=D_00189E20.x1b0;
         func_L00_002D3B58(v,t,0.0f);
-        func_00282F20(v,v,speed);
+        vec_scale_to_length(v,v,speed);
         func_L00_002D3B58(u,(char *)&D_00189E20+0xf0,0.0f);
-        dot=-func_00282DB0(u,v);
+        dot=-FastVecDot(u,v);
         l1=func_L00_002D3A58(v);l2=func_L00_002D3A58((char *)&D_00189E20+0xf0);
         if(l1==0.0f || l2==0.0f) dot=0.0f;
         else {
@@ -94,10 +94,10 @@ void func_L01_002B6948(float rate) {
         if(dot>3.0f) dot=3.0f;
         if(dot<1.0f) dot=1.0f;
         rate*=dot;
-        func_00282CF0(v,v,(char *)&D_00189E20+0xf0);
+        FastVecSub(v,v,(char *)&D_00189E20+0xf0);
         func_L00_002D3B58(v,v,0.0f);
         if(func_L00_002D3A58(v)>rate) func_L00_002D3BD8(v,v,rate);
-        func_00282CC0((char *)&D_00189E20+0xf0,(char *)&D_00189E20+0xf0,v);
+        FastVecAdd((char *)&D_00189E20+0xf0,(char *)&D_00189E20+0xf0,v);
         D_00189E20.x1b4=D_00189E20.x178;
         if(D_00189E20.x1454) D_00189E20.x1b4=D_00189E20.x174;
         break;

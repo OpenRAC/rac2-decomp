@@ -38,12 +38,12 @@ void func_L09_003F8960(char *obj)
         && *(u8 *)(other + 0x20) != 0xFE && *(u8 *)(other + 0x20) != 0xFD) {
         qcopy(pos, obj + 0x10);
         pos[2] += func_002A7878(0.0f, 1.0f);
-        func_00282F20(ofs, *(char **)(fr + 0x2F8) + 0xC0, 4.0f);
-        func_00282CC0(fr + 0x1F0, pos, ofs);
+        vec_scale_to_length(ofs, *(char **)(fr + 0x2F8) + 0xC0, 4.0f);
+        FastVecAdd(fr + 0x1F0, pos, ofs);
         return;
     }
     if (*(char **)(fr + 0x200) == D_00189E20.p2290) {
-        if (func_00282E80(obj + 0x10, &D_00189E20.q080) > ref_L09_003F8960_00)
+        if (vec_distance_xy(obj + 0x10, &D_00189E20.q080) > ref_L09_003F8960_00)
             qcopy(fr + 0x1F0, &D_00189E20.q0D0);
         else
             qcopy(fr + 0x1F0, &D_00189E20.q0E0);

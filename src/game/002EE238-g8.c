@@ -34,9 +34,9 @@ void func_002EE238(char *owner)
     pull = o + 0x80;
     pos = o + 0x90;
     func_00282C88(vel);
-    func_00282CF0(pull, o + 0x60, owner + 0x10);
-    func_00282F20(t, pull, D_001AC240);
-    func_00282CC0(vel, t, vel);
+    FastVecSub(pull, o + 0x60, owner + 0x10);
+    vec_scale_to_length(t, pull, D_001AC240);
+    FastVecAdd(vel, t, vel);
     qcopy(t, pos);
     h = (*(float *)(o + 0x124) - D_001AC248 * 0.5f) / D_001AC248;
     k = func_00282C48(h);
@@ -46,12 +46,12 @@ void func_002EE238(char *owner)
         k = D_001AC244;
     if (0.0f < h)
         k = -k;
-    func_00282F20(t, t, k);
-    func_00282CC0(vel, t, vel);
-    len = func_00282DF0(vel);
+    vec_scale_to_length(t, t, k);
+    FastVecAdd(vel, t, vel);
+    len = FastVecLength(vel);
     k = D_001AC240 * D_001AC248;
     if (k < len)
-        func_00282F20(vel, vel, k);
+        vec_scale_to_length(vel, vel, k);
     qcopy(o + 0xA0, pos);
-    func_00282CC0(pos, vel, pos);
+    FastVecAdd(pos, vel, pos);
 }

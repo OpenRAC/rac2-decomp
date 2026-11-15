@@ -43,7 +43,7 @@ void func_002BDBC0(void *pos, void *dir, u32 color, s32 flags, s32 frames, f32 s
     if (e != 0) {
         p = &e->p;
         e->color = color;
-        e->f9 = func_00283CF0(4.0f) + 0x70;
+        e->f9 = FloatToInt(4.0f) + 0x70;
         e->f1 = 0;
         e->f3 = 0x44;
         e->size = size * 0.2f;
@@ -51,7 +51,7 @@ void func_002BDBC0(void *pos, void *dir, u32 color, s32 flags, s32 frames, f32 s
         e->f2 = *D_001F2598[0];
         e->frames = frames;
         p->frames = frames;
-        len = func_00283CE0(frames);
+        len = IntToFloat(frames);
         d = size - e->size;
         p->color = color;
         p->flags = flags;

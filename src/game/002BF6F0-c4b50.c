@@ -22,8 +22,8 @@ void func_002C4B50(FallingParticle_C4B50 *self) {
     motion.lane[3] = 0.0f;
     old_x = (int)self->position.lane[0];
     old_y = (int)self->position.lane[1];
-    func_00282CC0(self->position.lane, self->position.lane, motion.lane);
-    func_00282CC0(self->position.lane, self->position.lane, D_001B1DC0);
+    FastVecAdd(self->position.lane, self->position.lane, motion.lane);
+    FastVecAdd(self->position.lane, self->position.lane, D_001B1DC0);
     if (old_x != (int)self->position.lane[0] || old_y != (int)self->position.lane[1]) {
         sample.quad = self->position.quad;
         if (func_002B0520(sample.lane) >= D_001B1DD0) {
@@ -41,7 +41,7 @@ update:
     motion.lane[1] = 0.0f;
     motion.lane[2] = -0.00013888889f;
     motion.lane[3] = 0.0f;
-    func_00282CC0(velocity, motion.lane, velocity);
+    FastVecAdd(velocity, motion.lane, velocity);
     velocity[3] = floor + D_001B1DC8;
     return;
 }
@@ -74,12 +74,12 @@ void func_002C4D18(char *self)
     char *owner;
 
     *(float *)(self + 0xC) =
-        func_00283CE0(*(short *)((char *)rec + 8) * (rec[3] - *(short *)(self + 0xA)) / rec[3]
+        IntToFloat(*(short *)((char *)rec + 8) * (rec[3] - *(short *)(self + 0xA)) / rec[3]
                       + *(short *)((char *)rec + 0xA)) * 1000.0f;
     v[0] = p->vx;
     v[1] = p->vy;
     v[2] = p->vz;
-    func_00282D30(v, v, 0.98f);
+    FastVecScale(v, v, 0.98f);
     p->vx = v[0];
     p->vy = v[1];
     p->vz = v[2];
@@ -89,21 +89,21 @@ void func_002C4D18(char *self)
             w[0] = p->ox;
             w[1] = p->oy;
             w[2] = p->oz;
-            func_00282CC0(w, w, v);
+            FastVecAdd(w, w, v);
             p->ox = w[0];
             p->oy = w[1];
             p->oz = w[2];
-            func_00283098(m, w, p->owner + 0xC0);
-            func_00282CC0(self + 0x10, p->owner + 0x10, m);
+            matrix_mul_vec3(m, w, p->owner + 0xC0);
+            FastVecAdd(self + 0x10, p->owner + 0x10, m);
         } else {
             func_002B9180(self);
             return;
         }
     } else {
-        func_00282CC0(self + 0x10, self + 0x10, v);
+        FastVecAdd(self + 0x10, self + 0x10, v);
     }
     *(unsigned char *)(self + 8) = *(unsigned char *)(self + 8) + 1;
-    *(int *)(self + 4) = func_002A9568(rec[1], rec[0], (float)*(short *)(self + 0xA) / func_00283CE0(rec[3]));
-    if (func_00282978((short *)(self + 0xA)) != 0)
+    *(int *)(self + 4) = func_002A9568(rec[1], rec[0], (float)*(short *)(self + 0xA) / IntToFloat(rec[3]));
+    if (FastDecTimer((short *)(self + 0xA)) != 0)
         func_002B9180(self);
 }

@@ -89,7 +89,7 @@ have:
                 *(f32 *)(vars + 4) = 0.8000001f;
                 if (self[0x43] != 3)
                     func_002A7470(self, 3, 0, 10);
-                func_002E5CF8(0, 0, (char *)self);
+                PlayMobySound(0, 0, (char *)self);
                 self[0x20] = 2;
             }
         } else if (((Hero *)D_00189E20)->i[0x2294 / 4] == 0x8A) {
@@ -100,12 +100,12 @@ have:
                 *(f32 *)(vars + 4) = 0.8000001f;
                 if (self[0x43] != 3)
                     func_002A7470(self, 3, 0, 10);
-                func_002E5CF8(0, 0, (char *)self);
+                PlayMobySound(0, 0, (char *)self);
                 self[0x20] = 0xF;
             }
         } else if (((Hero *)D_00189E20)->i[0x2294 / 4] == 0x2B) {
             if (vars != 0) {
-                f32 d = func_00282E48(((Hero *)D_00189E20)->ptr[0xAD4 / 4] + 0x10, data->target + 0x10);
+                f32 d = fast_vec_dist(((Hero *)D_00189E20)->ptr[0xAD4 / 4] + 0x10, data->target + 0x10);
                 int n = 7;
                 if (((Hero *)D_00189E20)->i[0x1240 / 4] <= 0x1D)
                     n = 5;
@@ -115,7 +115,7 @@ have:
                 data->f18 = 0.0f;
                 if (self[0x43] != 3)
                     func_002A7470(self, 3, 0, 10);
-                func_002E5CF8(0, 0, (char *)self);
+                PlayMobySound(0, 0, (char *)self);
                 self[0x20] = 9;
             }
         }
@@ -124,9 +124,9 @@ have:
         func_0027CDC8(func_0030F408, (char *)self);
         if ((self[0x60] & 2) && self[0x43] != 4)
             func_002A7470(self, 4, 0, 10);
-        func_00282CF0(v1, ((Hero *)D_00189E20)->ptr[0xAA4 / 4] + 0x10, data->target + 0x10);
+        FastVecSub(v1, ((Hero *)D_00189E20)->ptr[0xAA4 / 4] + 0x10, data->target + 0x10);
         dist = *(f32 *)(vars + 4);
-        dist += func_00282DF0(&((Hero *)D_00189E20)->b[0x150]);
+        dist += FastVecLength(&((Hero *)D_00189E20)->b[0x150]);
         if (((Hero *)D_00189E20)->i[0x229C / 4] == 0xF) {
             dist += ((Hero *)D_00189E20)->f[0x644 / 4];
         } else if ((((Hero *)D_00189E20)->i[0x22A4 / 4] == 4 || ((Hero *)D_00189E20)->i[0x22A4 / 4] == 2) && ((Hero *)D_00189E20)->f[0x31C / 4] > 2.0f) {
@@ -134,7 +134,7 @@ have:
         }
         qcopy(v2, &((Hero *)D_00189E20)->q[0x80 / 16]);
         v2[2] += 0.5f;
-        if (func_002761F8(v2, ((Hero *)D_00189E20)->ptr[0xAA4 / 4] + 0x10, 2, 0, 0) != 0) {
+        if (CollLine(v2, ((Hero *)D_00189E20)->ptr[0xAA4 / 4] + 0x10, 2, 0, 0) != 0) {
             if (((Hero *)D_00189E20)->f[0x31C / 4] > 0.5f) {
                 func_0026F748(6, 1);
             } else {
@@ -142,16 +142,16 @@ have:
                 func_0026F768(func_0026F710(0), 0, 14.0f);
             }
             self[0x20] = 6;
-        } else if (dist < func_00282E48(data->target + 0x10, ((Hero *)D_00189E20)->ptr[0xAA4 / 4] + 0x10)) {
-            func_00282F20(v1, v1, dist);
-            func_00282CC0(data->target + 0x10, data->target + 0x10, v1);
+        } else if (dist < fast_vec_dist(data->target + 0x10, ((Hero *)D_00189E20)->ptr[0xAA4 / 4] + 0x10)) {
+            vec_scale_to_length(v1, v1, dist);
+            FastVecAdd(data->target + 0x10, data->target + 0x10, v1);
         } else {
             qcopy(data->target + 0x10, ((Hero *)D_00189E20)->ptr[0xAA4 / 4] + 0x10);
             self[0x20] = 3;
         }
         break;
     case 3:
-        func_002E5CF8(1, 0, (char *)self);
+        PlayMobySound(1, 0, (char *)self);
         func_0027CDC8(func_0030F408, (char *)self);
         qcopy(data->target + 0x10, ((Hero *)D_00189E20)->ptr[0xAA4 / 4] + 0x10);
         self[0x20] = 4;
@@ -160,7 +160,7 @@ have:
         func_0029FCC0(self, 0, v1);
         qcopy(v1, &((Hero *)D_00189E20)->q[0x80 / 16]);
         v1[2] += 0.5f;
-        if (func_002761F8(v1, ((Hero *)D_00189E20)->ptr[0xAA4 / 4] + 0x10, 2, 0, 0) != 0) {
+        if (CollLine(v1, ((Hero *)D_00189E20)->ptr[0xAA4 / 4] + 0x10, 2, 0, 0) != 0) {
             if (((Hero *)D_00189E20)->h[0x34E / 2] != 0) {
                 func_0026F748(6, 1);
             } else {
@@ -175,14 +175,14 @@ have:
             data->f18 = data->f18 + 0.6981318f;
             if (data->f20 < 0.16800001f) {
                 ((Hero *)D_00189E20)->i[0x684 / 4] = 0;
-                if (data->target != 0 && func_00282E48(data->target + 0x10, &((Hero *)D_00189E20)->q[0x80 / 16]) > 3.5f) {
+                if (data->target != 0 && fast_vec_dist(data->target + 0x10, &((Hero *)D_00189E20)->q[0x80 / 16]) > 3.5f) {
                     if ((D_00138320 & ((Hero *)D_00189E20)->u[0x1230 / 4]) == 0) {
                         ((Hero *)D_00189E20)->i[0xAC8 / 4] = 1;
                         func_0026F748(0, 0);
                         func_0026F768(func_0026F710(0), 0, 14.0f);
                         self[0x20] = 6;
                     } else {
-                        func_002E5CF8(2, 0, (char *)self);
+                        PlayMobySound(2, 0, (char *)self);
                         if (((Hero *)D_00189E20)->i[0xAB8 / 4] != 0) {
                             func_0026F748(0x25, 1);
                         } else {
@@ -214,12 +214,12 @@ have:
         break;
     case 7:
         func_0029FCC0(self, 0, v2);
-        func_00282CF0(v1, v2, data->target + 0x10);
+        FastVecSub(v1, v2, data->target + 0x10);
         dist = *(f32 *)(vars + 4);
-        dist += func_00282DF0(&((Hero *)D_00189E20)->b[0x150]);
-        if (dist < func_00282E48(data->target + 0x10, v2)) {
-            func_00282F20(v1, v1, dist);
-            func_00282CC0(data->target + 0x10, data->target + 0x10, v1);
+        dist += FastVecLength(&((Hero *)D_00189E20)->b[0x150]);
+        if (dist < fast_vec_dist(data->target + 0x10, v2)) {
+            vec_scale_to_length(v1, v1, dist);
+            FastVecAdd(data->target + 0x10, data->target + 0x10, v1);
             func_0027CDC8(func_0030F408, (char *)self);
         } else {
             qcopy(data->target + 0x10, v2);
@@ -232,14 +232,14 @@ have:
         func_0027CDC8(func_0030F408, (char *)self);
         if ((self[0x60] & 2) && self[0x43] != 4)
             func_002A7470(self, 4, 0, 10);
-        func_00282CF0(v1, ((Hero *)D_00189E20)->ptr[0xAD4 / 4] + 0x10, data->target + 0x10);
-        if (*(f32 *)(vars + 4) < func_00282DF0(v1)) {
-            func_00282F20(v1, v1, *(f32 *)(vars + 4));
-            func_00282CC0(data->target + 0x10, data->target + 0x10, v1);
+        FastVecSub(v1, ((Hero *)D_00189E20)->ptr[0xAD4 / 4] + 0x10, data->target + 0x10);
+        if (*(f32 *)(vars + 4) < FastVecLength(v1)) {
+            vec_scale_to_length(v1, v1, *(f32 *)(vars + 4));
+            FastVecAdd(data->target + 0x10, data->target + 0x10, v1);
         } else {
             qcopy(data->target + 0x10, ((Hero *)D_00189E20)->ptr[0xAD4 / 4] + 0x10);
             self[0x20] = 0xB;
-            func_002E5CF8(1, 0, (char *)self);
+            PlayMobySound(1, 0, (char *)self);
         }
         break;
     case 10:
@@ -279,10 +279,10 @@ have:
         if ((self[0x60] & 2) && self[0x43] != 4)
             func_002A7470(self, 4, 0, 10);
         func_0029FCC0(self, 0, v2);
-        func_00282CF0(v1, v2, data->target + 0x10);
-        if (*(f32 *)(vars + 4) < func_00282E48(data->target + 0x10, v2)) {
-            func_00282F20(v1, v1, *(f32 *)(vars + 4));
-            func_00282CC0(data->target + 0x10, data->target + 0x10, v1);
+        FastVecSub(v1, v2, data->target + 0x10);
+        if (*(f32 *)(vars + 4) < fast_vec_dist(data->target + 0x10, v2)) {
+            vec_scale_to_length(v1, v1, *(f32 *)(vars + 4));
+            FastVecAdd(data->target + 0x10, data->target + 0x10, v1);
             func_0027CDC8(func_0030F408, (char *)self);
         } else {
             qcopy(data->target + 0x10, v2);
@@ -291,7 +291,7 @@ have:
             self[0x20] = 1;
         }
         if (((Hero *)D_00189E20)->i[0x2294 / 4] == 0x2B && vars != 0) {
-            *(f32 *)(vars + 4) = func_00282E48(((Hero *)D_00189E20)->ptr[0xAD4 / 4] + 0x10, data->target + 0x10) * 0.1f;
+            *(f32 *)(vars + 4) = fast_vec_dist(((Hero *)D_00189E20)->ptr[0xAD4 / 4] + 0x10, data->target + 0x10) * 0.1f;
             data->f1C = 1.0f;
             data->f20 = 0.0f;
             data->f18 = 0.0f;
@@ -306,7 +306,7 @@ have:
             func_002A7470(self, 4, 0, 10);
         qcopy(v1, &((Hero *)D_00189E20)->q[0x80 / 16]);
         v1[2] += 0.5f;
-        if (func_002761F8(v1, ((Hero *)D_00189E20)->ptr[0xB10 / 4] + 0x10, 2, 0, 0) != 0) {
+        if (CollLine(v1, ((Hero *)D_00189E20)->ptr[0xB10 / 4] + 0x10, 2, 0, 0) != 0) {
             if (((Hero *)D_00189E20)->f[0x31C / 4] > 0.5f) {
                 func_0026F748(6, 1);
             } else {
@@ -315,14 +315,14 @@ have:
             }
             self[0x20] = 0x13;
         } else {
-            func_00282CF0(v2, ((Hero *)D_00189E20)->ptr[0xB10 / 4] + 0x10, data->target + 0x10);
-            if (*(f32 *)(vars + 4) < func_00282DF0(v2)) {
-                func_00282F20(v2, v2, *(f32 *)(vars + 4));
-                func_00282CC0(data->target + 0x10, data->target + 0x10, v2);
+            FastVecSub(v2, ((Hero *)D_00189E20)->ptr[0xB10 / 4] + 0x10, data->target + 0x10);
+            if (*(f32 *)(vars + 4) < FastVecLength(v2)) {
+                vec_scale_to_length(v2, v2, *(f32 *)(vars + 4));
+                FastVecAdd(data->target + 0x10, data->target + 0x10, v2);
             } else {
                 qcopy(data->target + 0x10, ((Hero *)D_00189E20)->ptr[0xB10 / 4] + 0x10);
                 self[0x20] = 0x11;
-                func_002E5CF8(1, 0, (char *)self);
+                PlayMobySound(1, 0, (char *)self);
             }
         }
         break;
@@ -363,10 +363,10 @@ have:
         if ((self[0x60] & 2) && self[0x43] != 4)
             func_002A7470(self, 4, 0, 10);
         func_0029FCC0(self, 0, v2);
-        func_00282CF0(v1, v2, data->target + 0x10);
-        if (*(f32 *)(vars + 4) < func_00282E48(data->target + 0x10, v2)) {
-            func_00282F20(v1, v1, *(f32 *)(vars + 4));
-            func_00282CC0(data->target + 0x10, data->target + 0x10, v1);
+        FastVecSub(v1, v2, data->target + 0x10);
+        if (*(f32 *)(vars + 4) < fast_vec_dist(data->target + 0x10, v2)) {
+            vec_scale_to_length(v1, v1, *(f32 *)(vars + 4));
+            FastVecAdd(data->target + 0x10, data->target + 0x10, v1);
             func_0027CDC8(func_0030F408, (char *)self);
         } else {
             qcopy(data->target + 0x10, v2);
@@ -375,7 +375,7 @@ have:
             self[0x20] = 1;
         }
         if (((Hero *)D_00189E20)->i[0x229C / 4] == 0x21 && vars != 0) {
-            *(f32 *)(vars + 4) = func_00282E48(((Hero *)D_00189E20)->ptr[0xB10 / 4] + 0x10, data->target + 0x10) * 0.1f;
+            *(f32 *)(vars + 4) = fast_vec_dist(((Hero *)D_00189E20)->ptr[0xB10 / 4] + 0x10, data->target + 0x10) * 0.1f;
             data->f1C = 1.0f;
             data->f20 = 0.0f;
             data->f18 = 0.0f;

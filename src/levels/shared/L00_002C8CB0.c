@@ -39,7 +39,7 @@ int func_L00_002C8CB0(void)
     start.v[2] = *(float *)(base + 0x330) + 0.01f;
     qcopy(&end, &start);
     end.v[2] += 0.3f;
-    if (func_002761F8(&start, &end, 2, object, 0) == 0)
+    if (CollLine(&start, &end, 2, object, 0) == 0)
         goto fail;
     if (*(short *)(base + 0x24fc) == 0 && (D_00138320 & 10) != 0)
         func_L00_002C42E0(0x34, 1);

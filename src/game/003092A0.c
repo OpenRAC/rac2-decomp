@@ -108,7 +108,7 @@ void func_003092A0(void *p) {
         v->f28 += v->f38;
         v->f2C += v->f3C;
         v->i8 = (&D_00189E20)->i1310;
-        func_0027CFD0(func_00308768, o);
+        func_0027CFD0(draw_joint_aligned_beam_effect, o);
         if (func_00282948(v) != 0) {
             o->state = 3;
             v->f20 = 0.0125f;
@@ -120,7 +120,7 @@ void func_003092A0(void *p) {
         break;
     case 3:
         v->i8 = (&D_00189E20)->i1310;
-        func_0027CFD0(func_00308768, o);
+        func_0027CFD0(draw_joint_aligned_beam_effect, o);
         if (flag == 0) {
             o->state = 4;
             v->i0 = 8;
@@ -142,7 +142,7 @@ void func_003092A0(void *p) {
             v->f28 -= v->f38;
             v->f2C -= v->f3C;
             v->i8 = (&D_00189E20)->i1310;
-            func_0027CFD0(func_00308768, o);
+            func_0027CFD0(draw_joint_aligned_beam_effect, o);
         }
         break;
     }

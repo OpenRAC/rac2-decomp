@@ -130,8 +130,8 @@ void func_L00_0040F6A0(Moby *moby)
     }
     if (HERO->i[0x2294 / 4] == 1)
         func_L00_002C42E0(0x1D, 1);
-    func_00283098(&nozzle, &D_L00_001B1270, &moby->right);
-    func_00282CC0(&nozzle, &nozzle, &moby->position);
+    matrix_mul_vec3(&nozzle, &D_L00_001B1270, &moby->right);
+    FastVecAdd(&nozzle, &nozzle, &moby->position);
     if (HERO->i[0x1450 / 4] != 0)
         HERO->i[0xBF8 / 4] = HERO->i[0x1450 / 4];
 
@@ -143,24 +143,24 @@ void func_L00_0040F6A0(Moby *moby)
         }
         vars->aiming = 1;
         spread = 0.06981317699f;
-        if (vars->cooldown > 0.0f && func_L00_002D4040(-1))
+        if (vars->cooldown > 0.0f && get_ammo(-1))
             color = 0x600000FF;
         else
             color = 0x600FFF0F;
         func_00273318(moby, 1.25f, color, 0, 0x27, 0.0f, -1, 90.0f, 4);
         qcopy(&direction, &HERO->q[0x760 / 16]);
-        func_00282D30(&origin, HERO->ptr[0x2290 / 4] + 0xE0, 0.75f);
-        func_00282CC0(&origin, &HERO->q[0x80 / 16], &origin);
+        FastVecScale(&origin, HERO->ptr[0x2290 / 4] + 0xE0, 0.75f);
+        FastVecAdd(&origin, &HERO->q[0x80 / 16], &origin);
     } else {
         vars->aiming = 0;
         spread = 0.349065899848938f;
         if (HERO->h[0x24EC / 2] != 0) {
-            func_00282D30(&direction, &moby->forward, -1.0f);
+            FastVecScale(&direction, &moby->forward, -1.0f);
             } else {
             qcopy(&direction, &HERO->q[0x760 / 16]);
             }
-        func_00282D30(&origin, HERO->ptr[0x2290 / 4] + 0xE0, 0.75f);
-        func_00282CC0(&origin, &HERO->q[0x80 / 16], &origin);
+        FastVecScale(&origin, HERO->ptr[0x2290 / 4] + 0xE0, 0.75f);
+        FastVecAdd(&origin, &HERO->q[0x80 / 16], &origin);
     }
     func_002829D8(&vars->cooldown);
     if (moby->animation == moby->nextAnimation && (moby->flags & 2))
@@ -181,9 +181,9 @@ void func_L00_0040F6A0(Moby *moby)
         } else {
             float distance;
             vars->lockTimer = 5;
-            distance = func_00282E48(D_L00_001B8DC0, &candidate->position) * 0.006666667f;
-            func_00282D30(&aim, &candidate->up, vars->lockHeight);
-            func_00282CC0(&aim, &candidate->position, &aim);
+            distance = fast_vec_dist(D_L00_001B8DC0, &candidate->position) * 0.006666667f;
+            FastVecScale(&aim, &candidate->up, vars->lockHeight);
+            FastVecAdd(&aim, &candidate->position, &aim);
             func_00273318(moby, func_00282C48(0.9f - distance * 0.65f), 0xFF0FFF0F, &aim, 0x26, 0.0f, -1, 90.0f, 4);
             HERO->ptr[0xBF8 / 4] = (char *)candidate;
         }
@@ -214,12 +214,12 @@ void func_L00_0040F6A0(Moby *moby)
 
     released = 0;
     charged = 0;
-    if ((D_00138180[0x1A0 / 4] & HERO->u[0x1230 / 4]) && func_L00_002D4040(-1)) {
+    if ((D_00138180[0x1A0 / 4] & HERO->u[0x1230 / 4]) && get_ammo(-1)) {
         SoundSlot *slot = &D_00188660[vars->chargeSound];
         int level;
         vars->charge++;
         if (slot[1].owner != moby || !slot[1].active)
-            vars->chargeSound = func_002E5CF8(6, 4, moby);
+            vars->chargeSound = PlayMobySound(6, 4, moby);
         ref_L00_0040F6A0_00(func_L00_00410690, moby);
         level = D_00139688[HERO->i[0x1248 / 4]];
         if (level >= 5)
@@ -228,8 +228,8 @@ void func_L00_0040F6A0(Moby *moby)
             float size;
             int life;
             func_002ACEC0(&work, &moby->up, &moby->forward, func_002A7940());
-            func_00282D30(&work, &work, func_002A7878(1.5f, 2.0f) * 0.016666668f);
-            life = func_00283CF0(func_002A78D8(1.0f, 3.0f));
+            FastVecScale(&work, &work, func_002A7878(1.5f, 2.0f) * 0.016666668f);
+            life = FloatToInt(func_002A78D8(1.0f, 3.0f));
             size = func_002A7878(0.45f, 0.75f) * 210000.0f;
             spark.f[0] = nozzle.f[0] + func_002A78D8(0.0f, 0.1f);
             spark.f[1] = nozzle.f[1] + func_002A78D8(0.0f, 0.1f);
@@ -243,8 +243,8 @@ void func_L00_0040F6A0(Moby *moby)
                 func_002E59F8(vars->chargeSound);
         }
         vars->chargeSound = -1;
-        if ((D_00138180[0x1A4 / 4] & HERO->u[0x1230 / 4]) && !func_L00_002D4040(-1))
-            func_002E5CF8(1, 0, moby);
+        if ((D_00138180[0x1A4 / 4] & HERO->u[0x1230 / 4]) && !get_ammo(-1))
+            PlayMobySound(1, 0, moby);
         if (vars->charge != 0) {
             released = 1;
             charged = func_L00_00410840(moby);
@@ -255,13 +255,13 @@ void func_L00_0040F6A0(Moby *moby)
 
     if (D_L00_001A8F00 == 0 && vars->cooldown == 0.0f && HERO->b[0x22BC] == 0 && ready && released &&
         HERO->i[0x1240 / 4] >= 23) {
-        if (func_L00_002D4040(-1)) {
+        if (get_ammo(-1)) {
             if (candidate == 0) {
                 int count, i;
-                func_00282D30(&work, &moby->forward, -1.0f);
-                func_00282CC0(&work, &work, &moby->position);
-                func_00282D30(&spark, &moby->right, 0.275f);
-                func_00282CC0(&work, &work, &spark);
+                FastVecScale(&work, &moby->forward, -1.0f);
+                FastVecAdd(&work, &work, &moby->position);
+                FastVecScale(&spark, &moby->right, 0.275f);
+                FastVecAdd(&work, &work, &spark);
                 count = func_00277F48(1.0f, &work, 1, HERO->ptr[0x2290 / 4], 0);
                 if (count != 0) {
                     for (i = 0; i < count; i++) {
@@ -294,17 +294,17 @@ void func_L00_0040F6A0(Moby *moby)
                 }
             }
             vars->flash = 15;
-            func_L00_00410888(moby, charged);
+            SpawnOrientedParticleBursts(moby, charged);
             func_L00_00410430(moby, &nozzle, charged);
             func_002A75E0(moby, 2, 0, 2, 0);
-            func_L00_002AF568();
+            start_equipped_item_animation();
             vars->sound = func_L00_002D6998(D_0029FCC8);
             if (charged)
                 D_0018C958[0x3A8 / 2] = 0xFFFF;
             else if (D_0018C958[0x3A8 / 2] < 40 && ++D_0018C958[0x3A8 / 2] == 40)
                 func_00288E18(0x9F7, 0x4E);
         }
-        if (!((D_00138180[0x1A0 / 4] & HERO->u[0x1230 / 4]) && func_L00_002D4040(-1) && HERO->b[0x22B8]) &&
+        if (!((D_00138180[0x1A0 / 4] & HERO->u[0x1230 / 4]) && get_ammo(-1) && HERO->b[0x22B8]) &&
             vars->sound >= 0) {
             func_L00_002D6B70(vars->sound);
             vars->sound = -1;

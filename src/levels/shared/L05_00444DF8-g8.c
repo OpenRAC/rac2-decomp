@@ -14,14 +14,14 @@ void func_L05_00444DF8(u8 a, u8 b, u8 c, u8 d, float x, float y, float scale, fl
     float size;
 
     if (D_001A79F0 == 0x14)
-        sprite = func_0027C878(0x41);
+        sprite = GetEffectTextureDescriptor(0x41);
     else
-        sprite = func_0027C878(0x3F);
+        sprite = GetEffectTextureDescriptor(0x3F);
     size = D_L05_001B1B1C * scale;
     func_L05_00444FD0(x, y, size, size, angle, 0x3F, 0x3F, sprite, 0xFFFFF3, a, b, c, d);
-    angle = func_00283B98(angle, 1.5707964f);
+    angle = FastAddRotations(angle, 1.5707964f);
     func_L05_00444FD0(x, y, size, size, angle, 0x3F, 0x3F, sprite, 0xFFFFF3, a, b, c, d);
-    angle = func_00283B98(angle, 1.5707964f);
+    angle = FastAddRotations(angle, 1.5707964f);
     func_L05_00444FD0(x, y, size, size, angle, 0x3F, 0x3F, sprite, 0xFFFFF3, a, b, c, d);
-    func_L05_00444FD0(x, y, size, size, func_00283B98(angle, 1.5707964f), 0x3F, 0x3F, sprite, 0xFFFFF3, a, b, c, d);
+    func_L05_00444FD0(x, y, size, size, FastAddRotations(angle, 1.5707964f), 0x3F, 0x3F, sprite, 0xFFFFF3, a, b, c, d);
 }

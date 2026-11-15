@@ -74,7 +74,7 @@ void func_L20_00449338(char *arg0) {
     }
     }
     if (*(u8 *)(arg0 + 0x20) < 3) {
-        func_00282CF0(&v2, arg0 + 0x10, &v0);
+        FastVecSub(&v2, arg0 + 0x10, &v0);
         func_002AD6F0(state + 0x20, &v2, &v1, arg0 + 0xF0);
     }
 }

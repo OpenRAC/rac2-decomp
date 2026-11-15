@@ -62,15 +62,15 @@ void func_L22_003F8658(u8 *a0) {
     v[0] = x;
     v[1] = y;
     v[2] = z;
-    func_00283098(v, v, D_L22_001B9C80 + 0x230);
+    matrix_mul_vec3(v, v, D_L22_001B9C80 + 0x230);
     buf = (u8 *)(v + 4);
-    func_00282CC0(buf, (u8 *)v, D_L22_001B9C80);
+    FastVecAdd(buf, (u8 *)v, D_L22_001B9C80);
     qcopy(dst, buf);
     *(f32 *)(obj + 0xF8) = func_00283248(*(f32 *)(ctl + 0x0) - *(f32 *)(obj + 0x10),
                                          *(f32 *)(ctl + 0x4) - *(f32 *)(obj + 0x14));
-    t = func_00282E80(dst, ctl);
+    t = vec_distance_xy(dst, ctl);
     angle = -func_00283248(t, *(f32 *)(ctl + 0x8) - *(f32 *)(obj + 0x18));
     scale = D_L22_001B0BB0;
     *(f32 *)(obj + 0xF4) = angle;
-    *(f32 *)(obj + 0xF0) = func_00283B98(*(f32 *)(obj + 0xF0), scale * 0.00029088825f);
+    *(f32 *)(obj + 0xF0) = FastAddRotations(*(f32 *)(obj + 0xF0), scale * 0.00029088825f);
 }

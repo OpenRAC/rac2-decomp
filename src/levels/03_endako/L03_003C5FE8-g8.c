@@ -34,16 +34,16 @@ void func_L03_003C5FE8(char *a0)
         f32 *p = s2->wobble;
         s32 i;
 
-        s2->spin = func_00283B98(s2->spin, D_L03_001B0050 * k);
-        s2->roll = func_00283B98(s2->roll, D_L03_001B0054 * k);
+        s2->spin = FastAddRotations(s2->spin, D_L03_001B0050 * k);
+        s2->roll = FastAddRotations(s2->roll, D_L03_001B0054 * k);
         for (i = 1; i >= 0; i--) {
-            *p = func_00283B98(*p, *c * 0.000290888245f);
+            *p = FastAddRotations(*p, *c * 0.000290888245f);
             p++;
             c++;
         }
         func_L00_002E6CF0(func_L03_003C6208, s1);
         if (func_002B38B8(s1) != 0) {
-            func_002AA2E8(&s2->fade, 0.0f, 0.0333333351f);
+            ApproachValue(&s2->fade, 0.0f, 0.0333333351f);
             if (s2->fade <= 0.0f) {
                 func_002A7750(s1, 2, -1);
                 *(s32 *)(s1 + 0x98) = 0;
@@ -56,7 +56,7 @@ void func_L03_003C5FE8(char *a0)
         char *p = D_L03_00188660 + s2->slot * 0x70;
 
         if (*(char **)(p + 0x88) != s1 || *(u8 *)(p + 0x74) == 0)
-            s2->slot = func_002E5CF8(0, 4, s1);
+            s2->slot = PlayMobySound(0, 4, s1);
     } else {
         s32 v = s2->slot;
 

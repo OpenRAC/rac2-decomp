@@ -48,8 +48,8 @@ void func_L04_0040C368(unsigned char *self)
             for (i = 0; i < 3; i++) {
                 if (i == 1) parameters = D_L04_002BDB20;
                 else parameters = D_L04_002BDAC0;
-                func_00283098(point, &offsets[i], m + 0xc0);
-                func_00282CC0(point, point, m + 0x10);
+                matrix_mul_vec3(point, &offsets[i], m + 0xc0);
+                FastVecAdd(point, point, m + 0x10);
                 point[3] = 0.0f;
                 qcopy(first, point);
                 qcopy(second, point);

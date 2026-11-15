@@ -129,7 +129,7 @@ void func_L00_0037A610(void)
     int c;
     func_00284F40(0);
     D_L00_001BD370[0] = 0.62f;
-    func_0027AB40();
+    UpdateViewContext();
 
     switch (menu->state) {
     case 0:
@@ -138,7 +138,7 @@ void func_L00_0037A610(void)
         D_L00_001B18D4 = 0x100ff;
         if (menu->initialize)
             D_L00_001B18D4 = 127;
-        func_0027BD70();
+        RenderFrame();
         *(unsigned short *)(menu->moby + 0x34) &= 0xfffe;
         if (!menu->initialize)
             break;
@@ -148,7 +148,7 @@ void func_L00_0037A610(void)
             func_002FC3C0(1);
             func_001261F0(0);
             D_L00_001B18D8 = D_L00_001B18D8 + 1;
-            func_002FC280();
+            SubmitBufferedDmaChain();
             func_002FC220();
             D_L00_001B2610 = 0x60000;
             func_L00_002E73E0(menu->capture);
@@ -182,20 +182,20 @@ void func_L00_0037A610(void)
             menu->field94 = 0;
             menu->field90 = 0;
             menu->end = menu->text + 0x400;
-            func_002FB1A0();
+            PrepareVendorSelectionPreview();
         }
         /* Initialization falls through into the first rendered frame. */
     case 1:
         func_002FC990(menu->capture, D_001A72DC[0], D_001A7344[0] << 11);
-        func_0027C540(0);
+        SetupGifPaging(0);
         func_00279D18();
         func_0027B858();
         if (D_L00_001AD570 >= 1.0f && menu->draw) {
-            func_002A0250();
+            DrawMobysSetup();
             func_002A01C8();
             func_002A01F0();
         }
-        func_002FC560(0x42, 0x8000000044ULL);
+        VU1_addGSregister(0x42, 0x8000000044ULL);
         {
             float dr = (float)(D_L00_001B25F0[0] - D_L00_001B25E4[0]);
             float dg = (float)(D_L00_001B25F4[0] - D_L00_001B25E8[0]);
@@ -244,10 +244,10 @@ void func_L00_0037A610(void)
         if (D_L00_001AD570 >= 1.0f) {
             ref_L00_0037A610_00();
             if (menu->mode == 0) {
-                func_002FA880();
-                func_L00_00377C50();
-                func_L00_00378818();
-                func_002F9C80();
+                DrawVendorPurchasePrompt();
+                DrawPurchaseActionPrompts();
+                DrawVendorPurchasePanel();
+                DrawVendorItemSelectList();
                 func_L00_00375718();
                 if (menu->auxiliary)
                     func_002FAE68();
@@ -259,8 +259,8 @@ void func_L00_0037A610(void)
                 }
             } else if (menu->mode == 3) {
                 func_L00_00377330();
-                func_L00_003781B0();
-                func_L00_00378C18();
+                DrawItemPurchaseButtonLabels();
+                DrawPurchaseAffordabilityPrompt();
                 func_L00_00376600();
                 func_L00_00375718();
                 if (menu->draw) {
@@ -274,8 +274,8 @@ void func_L00_0037A610(void)
                         qcopy(models + 0x310, matrices + 0x70);
                         func_002A0F48(models + 0x200);
                     }
-                    func_00283678(menu->models + 0x2c0, matrices);
-                    func_00283678(menu->models + 0x3c0, matrices + 0x40);
+                    copy_matrix3x4(menu->models + 0x2c0, matrices);
+                    copy_matrix3x4(menu->models + 0x3c0, matrices + 0x40);
                     func_002A10E8(menu->models + 0x200);
                     func_002A10E8(menu->models + 0x300);
                     func_002A0300(menu->models, menu->count + 2);
@@ -283,7 +283,7 @@ void func_L00_0037A610(void)
                     func_002A0380();
                 }
             } else if (menu->mode == 2) {
-                func_L00_00378578();
+                DrawSelectedItemPurchasePanel();
                 func_L00_00378E90();
                 func_L00_003769C0();
                 func_L00_00375718();
@@ -298,13 +298,13 @@ void func_L00_0037A610(void)
                     func_002A0220();
                     func_002A0380();
                     func_002FC620(0, D_001A7340[0] - 1, 0, D_001A7344[0] - 1);
-                    func_L00_003778F0();
+                    DrawSelectedItemInfoPanel();
                 }
             } else if (menu->mode == 1) {
                 func_L00_00377580();
                 func_L00_00378388();
-                func_L00_00378DE0();
-                func_002FA270();
+                DrawSelectedItemLimitStatus();
+                DrawAmmoSelectList();
                 func_L00_00375718();
                 if (menu->draw) {
                     func_002FC620(158, 360, 115, 206);
@@ -315,9 +315,9 @@ void func_L00_0037A610(void)
             }
             func_002FC620(0, D_001A7340[0] - 1, 0, D_001A7344[0] - 1);
         }
-        func_0027C660();
+        DoGifPaging();
         func_002FC3C0(16);
-        func_0029FEE0();
+        PatchMobyGifs();
         break;
     }
 }

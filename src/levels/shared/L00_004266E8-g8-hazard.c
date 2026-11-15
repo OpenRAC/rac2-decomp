@@ -38,12 +38,12 @@ void func_L00_004266E8(u8 *o) {
     char *params = *(char **)(D_L00_001B1844 + *(short *)(o + 0x84) * 0x20 + 0x1C);
     st = *(S_9f38 **)(o + 0x70);
     func_L00_00426480(o);
-    func_00282F20(&up, D_00189E20.p2290 + 0xE0, 1.0f);
+    vec_scale_to_length(&up, D_00189E20.p2290 + 0xE0, 1.0f);
     if (D_L00_001B8C80_1.phase == 0 && D_00189E20.b22B5 == 0) D_00189E20.b22B5 = 1;
     t = -D_00138180.f108;
     if (t == 0.0f) t = -D_00138180.f100;
-    if (t == 0.0f) t = func_00283CE0((D_00138180.i1A0 >> 15) & 1);
-    if (t == 0.0f) t = -func_00283CE0((D_00138180.i1A0 >> 13) & 1);
+    if (t == 0.0f) t = IntToFloat((D_00138180.i1A0 >> 15) & 1);
+    if (t == 0.0f) t = -IntToFloat((D_00138180.i1A0 >> 13) & 1);
     if (*(short *)(params + 0x26)) t = 0.0f;
     r = func_00282C48(st->a);
     k = D_L00_001B15C8 + (D_L00_001B15CC - D_L00_001B15C8) * r;
@@ -53,8 +53,8 @@ void func_L00_004266E8(u8 *o) {
         func_002ACEC0(o, o, &up, D_00189E20.f15C);
     t = -D_00138180.f10C;
     if (t == 0.0f) t = -D_00138180.f104;
-    if (t == 0.0f) t = func_00283CE0((D_00138180.i1A0 >> 12) & 1);
-    if (t == 0.0f) t = -func_00283CE0((D_00138180.i1A0 >> 14) & 1);
+    if (t == 0.0f) t = IntToFloat((D_00138180.i1A0 >> 12) & 1);
+    if (t == 0.0f) t = -IntToFloat((D_00138180.i1A0 >> 14) & 1);
     if (D_L00_001B8C80_1.phase != 0 && D_00189E20.i22A0 == 2) t = 0.0f;
     if (*(short *)(params + 0x26)) t = 0.0f;
     if (D_001A7BA0[1] == 0) t = -t;
@@ -63,11 +63,11 @@ void func_L00_004266E8(u8 *o) {
     st->b = func_002702C8(st->b, t, D_L00_001B15D0, D_L00_001B15D4, D_L00_001B15D8, &st->vb);
     if (st->b != 0.0f) {
         float a, n, z;
-        func_00282DD8(&side, o, &up);
+        FastVecCross(&side, o, &up);
         a = k * st->b;
-        n = func_00282C48(func_00283B98(st->ang, a));
+        n = func_00282C48(FastAddRotations(st->ang, a));
         if (1.1170108318328857f < n && func_00282C48(st->ang) < n)
-            a += -a * (func_00283BE0(n, 1.1170108318328857f) * 2.86478853225708f);
+            a += -a * (fast_subtract_rotations(n, 1.1170108318328857f) * 2.86478853225708f);
         if (n >= 1.1152654886245728f && st->ang > 0.0f)
             st->z = func_002702C8(st->z, 0.5f, 0.005f, 0.2f, 0.0f, &st->vz);
         else
@@ -77,19 +77,19 @@ void func_L00_004266E8(u8 *o) {
         d.f[1] = *(float *)(o + 4);
         d.f[3] = z;
         d.f[2] = z;
-        func_00282F20(&d, &d, st->z);
-        func_00282CC0(o + 0x30, o + 0x30, &d);
+        vec_scale_to_length(&d, &d, st->z);
+        FastVecAdd(o + 0x30, o + 0x30, &d);
         if (func_00277258(o + 0x30, 0x12, D_00189E20.p2290, 0.3f))
             st->z = func_002702C8(st->z, z, 0.005f, 0.2f, z, &st->vz);
-        n = func_00283B98(st->ang, a);
+        n = FastAddRotations(st->ang, a);
         if (func_00282C48(n) > 1.4660767316818237f)
-            { float m = 1.4660767316818237f; if (!(z < n)) m = -1.4660767316818237f; a = func_00283BE0(m, st->ang); }
+            { float m = 1.4660767316818237f; if (!(z < n)) m = -1.4660767316818237f; a = fast_subtract_rotations(m, st->ang); }
         func_002ACEC0(o, o, &side, a);
-        st->ang = func_00283B98(st->ang, a);
+        st->ang = FastAddRotations(st->ang, a);
     }
-    func_00282F20(o, o, 1.0f);
-    func_00282DD8(o + 0x10, o, &up);
-    func_00282F20(o + 0x10, o + 0x10, 1.0f);
-    func_00282DD8(o + 0x20, o + 0x10, o);
+    vec_scale_to_length(o, o, 1.0f);
+    FastVecCross(o + 0x10, o, &up);
+    vec_scale_to_length(o + 0x10, o + 0x10, 1.0f);
+    FastVecCross(o + 0x20, o + 0x10, o);
     *(short *)(params + 0x26) = 0;
 }

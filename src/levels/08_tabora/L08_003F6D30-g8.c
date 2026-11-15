@@ -11,7 +11,7 @@ void func_L08_003F6D30(char *object)
     float scale, numerator, denominator, ratio;
     if (*(int *)(state + 0x2c) != -1) {
         source = D_L08_001B29DC + *(int *)(state + 0x2c) * 256;
-        replacement = func_0029EFD0(0x131d);
+        replacement = CreateMoby(0x131d);
         scale = *(float *)(replacement + 0x2c);
         *(unsigned short *)(replacement + 0x32) = *(unsigned short *)(source + 0x32);
         replacement[0x30] = source[0x30];

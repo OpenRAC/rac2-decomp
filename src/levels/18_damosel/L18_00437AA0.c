@@ -9,7 +9,7 @@ extern float D_L18_001B191C __attribute__((sda));
 
 char *func_L18_00437AA0(int owner, char *position, char *velocity, int value, float scale, float extra)
 {
-    char *object = func_0029EFD0(0xf9e);
+    char *object = CreateMoby(0xf9e);
     char *state;
     float angle;
     float k;
@@ -111,29 +111,29 @@ void func_L18_00439960(u8 *obj)
     effects:
         if (!B(state,0x91) && func_002A9640(obj,0x40000,0)) {
             if (I(state,0x94)!=-1) B(D_L18_001B281C+I(state,0x94)*256,0xBC)=1;
-            func_00282CC0(delta,obj+0xD0,obj+0xE0);
-            func_00282F20(delta,delta,1.0f/12.0f);
-            func_00282CC0(offset,obj+0x10,obj+0xE0);
-            func_002ABBB8(obj,delta,offset,0,0,4,2,9,10,3,16,-1,1,1,-1,0,0x810001,1,15);
+            FastVecAdd(delta,obj+0xD0,obj+0xE0);
+            vec_scale_to_length(delta,delta,1.0f/12.0f);
+            FastVecAdd(offset,obj+0x10,obj+0xE0);
+            SpawnExplosionEffects(obj,delta,offset,0,0,4,2,9,10,3,16,-1,1,1,-1,0,0x810001,1,15);
             func_002B0A68(obj,31,3,6,3,6,delta,255);
             H(obj,0x34)|=1;
             B(obj,0x31)=0;
             I(obj,0x98)=0;
-            if (*(s16 *)(obj+0xAA)==0x10ED) func_002E5CF8(0,0,obj);
+            if (*(s16 *)(obj+0xAA)==0x10ED) PlayMobySound(0,0,obj);
             if (B(state,0x93)) func_002A0430(B(obj,0xB0));
             func_002A7750(obj,2,-1);
         }
         B(obj,0xA8)=255;
         break;
     case 2:
-        if (func_002B3868(obj) && (*(s16 *)(obj+0xAA)==0xEDB || *(s16 *)(obj+0xAA)==0x1146)) func_002E5CF8(0,0,obj);
+        if (func_002B3868(obj) && (*(s16 *)(obj+0xAA)==0xEDB || *(s16 *)(obj+0xAA)==0x1146)) PlayMobySound(0,0,obj);
         F(state,0x88)+=1.0f/F(state,0x84);
         if (F(state,0x88)>1) F(state,0x88)=1;
         t=1.0f-func_00283180(F(state,0x88)*3.1415927f);
         t*=0.5f;
-        func_00282CF0(delta,D_L18_001B290C[I(state,0x80)].position,state+0x60);
-        func_00282D30(delta,delta,t);
-        func_00282CC0(obj+0x10,state+0x60,delta);
+        FastVecSub(delta,D_L18_001B290C[I(state,0x80)].position,state+0x60);
+        FastVecScale(delta,delta,t);
+        FastVecAdd(obj+0x10,state+0x60,delta);
         R(obj,0xF8)=func_002AA150(F(state,0x78),D_L18_001B290C[I(state,0x80)].rotation[2],t);
         R(obj,0xF4)=func_002AA150(F(state,0x74),D_L18_001B290C[I(state,0x80)].rotation[1],t);
         R(obj,0xF0)=func_002AA150(F(state,0x70),D_L18_001B290C[I(state,0x80)].rotation[0],t);
@@ -146,7 +146,7 @@ void func_L18_00439960(u8 *obj)
         break;
     }
     if (B(obj,0x20)<3) {
-        func_00282CF0(delta,obj+0x10,oldpos);
+        FastVecSub(delta,obj+0x10,oldpos);
         func_002AD6F0(state+0x20,delta,oldrot,obj+0xF0);
     }
 }

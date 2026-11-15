@@ -20,17 +20,17 @@ void func_L00_0038F178(char *actor) {
     count = 0;
     do {
         count--;
-        func_00282D30(offset, state, 0.5f);
+        FastVecScale(offset, state, 0.5f);
         func_002A7A00(jitterPoint, 0.0f, 0.016666668f);
-        func_00282CC0(offset, jitterPoint, offset);
+        FastVecAdd(offset, jitterPoint, offset);
         func_00282C88((Quad *)velocityPoint);
         offset[3] = func_002A7878(0.25f, 0.15f);
         velocity[3] = func_002A7878(0.15f, 0.05f);
-        firstColor = func_00283D38(0x804080FF, 0x8040FFFF, func_002A7878(0.0f, 1.0f));
-        lastColor = func_00283D38(0x80104040, 0x80002080, func_002A7878(0.0f, 1.0f));
-        kind = func_00283CF0(func_002A7878(0.0f, 1.0f) + 1.0f);
-        duration = func_00283CF0((func_002A7878(-0.5f, 0.5f) + 1.0f) * 30.0f);
-        size = func_00283CF0((func_002A7878(-0.5f, 0.5f) + 1.0f) * 10.0f);
+        firstColor = FastTweenColor(0x804080FF, 0x8040FFFF, func_002A7878(0.0f, 1.0f));
+        lastColor = FastTweenColor(0x80104040, 0x80002080, func_002A7878(0.0f, 1.0f));
+        kind = FloatToInt(func_002A7878(0.0f, 1.0f) + 1.0f);
+        duration = FloatToInt((func_002A7878(-0.5f, 0.5f) + 1.0f) * 30.0f);
+        size = FloatToInt((func_002A7878(-0.5f, 0.5f) + 1.0f) * 10.0f);
         func_002B00D8(actor + 0x10, velocityPoint, velocityPoint, (float)duration * 0.0011111111f);
         func_002BAA28(actor + 0x10, offset, velocityPoint, firstColor, lastColor, kind, duration, size, 0x10019);
     } while (count >= 0);

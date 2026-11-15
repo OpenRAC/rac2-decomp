@@ -39,7 +39,7 @@ void func_L13_0038C578(u8 *a0) {
             f32 second = D_L13_001AEBF4;
             func_L01_0031A278(a0, buf, x, second, first);
         }
-        func_0032C700(buf, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 1, 1, 0, 0, 0.3f, 20.0f);
+        SpawnExplosion(buf, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 1, 1, 0, 0, 0.3f, 20.0f);
         func_0029F338(a0);
         break;
     }

@@ -57,19 +57,19 @@ void func_L10_003F5EF8(u8 *a0) {
         obj = D_001B251C[0] + (*(int *)(s5 + 0x260) << 8);
         *(f32 *)(s5 + 0x27C) = ang;
         func_0029FC20(obj, *(int *)(s5 + 0x26C), a);
-        func_00282F20(d, a[1], 50.0f);
-        func_00282CC0(d, a[3], d);
-        func_00282F20(s3, a[1], -1.0f);
-        func_00282DD8(s1, s3, v0);
-        func_00282F20(s1, s1, 1.0f);
-        func_00282DD8(a0 + 0xE0, s1, s3);
-        func_00282D30(e, s3, func_00283198(*(f32 *)(s5 + 0x27C) * 0.5f));
+        vec_scale_to_length(d, a[1], 50.0f);
+        FastVecAdd(d, a[3], d);
+        vec_scale_to_length(s3, a[1], -1.0f);
+        FastVecCross(s1, s3, v0);
+        vec_scale_to_length(s1, s1, 1.0f);
+        FastVecCross(a0 + 0xE0, s1, s3);
+        FastVecScale(e, s3, func_00283198(*(f32 *)(s5 + 0x27C) * 0.5f));
         e[3] = func_00283180(*(f32 *)(s5 + 0x27C) * 0.5f);
-        func_00283958(e, q);
-        func_00283738(s3, q, s3);
+        quaternion_to_rotation_basis(e, q);
+        multiply_matrix3x3(s3, q, s3);
         qcopy(a0 + 0x10, d);
         func_L05_0037B538(a0, 0, 0, 0);
         break;
     }
-    func_L00_002E6EF8(func_L10_003F61C8, a0);
+    func_L00_002E6EF8(DrawHrugisBeamEffect, a0);
 }

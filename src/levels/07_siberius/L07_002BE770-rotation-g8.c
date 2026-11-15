@@ -45,7 +45,7 @@ void func_L07_00378898(unsigned char *a0)
             }
             /* The transfer helper also preserves the original address recomputation. */
             qzero_nc(v);
-            ang = func_00283B98(state->angles[i], D_L07_001AEBF8[i] * 0.00029088824f);
+            ang = FastAddRotations(state->angles[i], D_L07_001AEBF8[i] * 0.00029088824f);
             state->angles[i] = ang;
             v[2] = ang;
             for (p = D_L07_001A9014[state->groups[i]];
@@ -57,10 +57,10 @@ void func_L07_00378898(unsigned char *a0)
                 q = loc;
                 for (k = 0; k < 3; k++)
                     q[k] = *(float *)(e + 0xC + k * 16);
-                t = func_00282DF0(e);
-                func_002833F0(e, v);
-                func_00282F20(e, e, t);
-                func_00282F20(e + 0x10, e + 0x10, t);
+                t = FastVecLength(e);
+                euler_rotation_basis(e, v);
+                vec_scale_to_length(e, e, t);
+                vec_scale_to_length(e + 0x10, e + 0x10, t);
                 for (m = 0; m < 3; m++)
                     *(float *)(e + 0xC + m * 16) = q[m];
                 func_L00_0036AE00(*p & 0x7FFF, 1);

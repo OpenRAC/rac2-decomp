@@ -14,7 +14,7 @@ char *func_L04_0035F3E0(void *position, void *velocity, int mode, float size)
     if (particle) {
         qcopy(particle + 0x10, position);
         *(int *)(particle + 4) = 0x7FFFFFFF;
-        particle[9] = func_00283CF0(4.0f) + 0x40;
+        particle[9] = FloatToInt(4.0f) + 0x40;
         particle[3] = 0x48;
         particle[1] = 0;
         if (mode >= 0)

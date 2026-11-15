@@ -39,8 +39,8 @@ void func_L01_003B4C58(u8 *object)
         *P(state,0x370) = -1;
     }
     qcopy((state+0x2D0), (object+0x10));
-    state[0x48] = func_00283CF0(10.0f);
-    state[0x4A] = func_00283CF0(8.0f);
+    state[0x48] = FloatToInt(10.0f);
+    state[0x4A] = FloatToInt(8.0f);
     I(state,0xA8) = 5;
     F(state,0x9C) = 0.4f;
     state[0x79] = 1;

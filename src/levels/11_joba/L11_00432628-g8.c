@@ -65,9 +65,9 @@ void func_L11_0043A9D8(char *obj)
     *(short *)(state + 0x2EE) = 0;
     *(float *)(state + 0x2DC) = f0;
     func_00282A60((unsigned int *)(state + 0x220), 0, 0x40);
-    func_0029F978((unsigned char *)obj, 2, (unsigned char *)(state + 0x220));
+    AttachManipulator((unsigned char *)obj, 2, (unsigned char *)(state + 0x220));
     func_00282A60((unsigned int *)(state + 0x260), 0, 0x40);
-    func_0029F978((unsigned char *)obj, 3, (unsigned char *)(state + 0x260));
+    AttachManipulator((unsigned char *)obj, 3, (unsigned char *)(state + 0x260));
 }
 
 extern float D_L11_001B12C4 __attribute__((sda));
@@ -109,9 +109,9 @@ void func_L11_004393D8(char *obj, int index, int flag)
     entry = func_L11_004417E8(*(char **)(obj + 0xB8));
 
     base1 = D_L11_001B359C;
-    func_00282CF0(v, entry, ((char *)(base1 + (*(int *)(*(char **)(obj + 0x68) + offset + 0x330) << 8))) + 0x10);
+    FastVecSub(v, entry, ((char *)(base1 + (*(int *)(*(char **)(obj + 0x68) + offset + 0x330) << 8))) + 0x10);
     r = func_002A77E0(10) + 15;
-    func_00282F20(v, v, (float)r * (1.0f / 60.0f));
+    vec_scale_to_length(v, v, (float)r * (1.0f / 60.0f));
     func_002ACB48(v, 1.0f / 60.0f);
     r = func_002A77E0(5) + 5;
     v[2] = (float)r * (1.0f / 60.0f);
@@ -123,7 +123,7 @@ void func_L11_004393D8(char *obj, int index, int flag)
         t = 0.0f;
 
     base2 = D_L11_001B359C;
-    func_L11_0043A680(((char *)(base2 + (*(int *)(*(char **)(obj + 0x68) + offset + 0x330) << 8))), v, D_L11_001B12C4 * (1.0f / 3600.0f), t);
+    InitializeRandomizedObjectMotion(((char *)(base2 + (*(int *)(*(char **)(obj + 0x68) + offset + 0x330) << 8))), v, D_L11_001B12C4 * (1.0f / 3600.0f), t);
 
     base3 = D_L11_001B359C;
     /* The record's field at 0xB8 takes the object's own handle. */
@@ -181,14 +181,14 @@ void func_L11_00434AF8(char *obj, void *q)
 
     f.saved = *(TI128 *)q;
     st = *(char **)(obj + 0x68);
-    func_00282CF0(f.c, st, st + 0x10);
-    func_00282CF0(f.a, st, D_L11_001BA8C0);
-    func_00282CF0(f.b, st + 0x10, D_L11_001BA8C0);
-    func_00282DD8(f.a, f.a, f.c);
-    func_00282F20(f.a, f.a, 0.1f);
-    func_00282DD8(f.b, f.b, f.c);
-    func_00282F20(f.b, f.b, 0.1f);
-    f.quad.texture = func_0027C878(7);
+    FastVecSub(f.c, st, st + 0x10);
+    FastVecSub(f.a, st, D_L11_001BA8C0);
+    FastVecSub(f.b, st + 0x10, D_L11_001BA8C0);
+    FastVecCross(f.a, f.a, f.c);
+    vec_scale_to_length(f.a, f.a, 0.1f);
+    FastVecCross(f.b, f.b, f.c);
+    vec_scale_to_length(f.b, f.b, 0.1f);
+    f.quad.texture = GetEffectTextureDescriptor(7);
     f.quad.mode = 0x0000ff9000000260UL;
     f.quad.registers = ((unsigned long)D_L11_001B11FC << 32) | 0x48;
     f.quad.primitive = 0;
@@ -197,15 +197,15 @@ void func_L11_00434AF8(char *obj, void *q)
         f.quad.uv[i][0] = D_L11_001B1210[i * 2];
         f.quad.uv[i][1] = D_L11_001B1214[i * 2];
     }
-    func_00282CF0(&f.corner, st, f.a);
+    FastVecSub(&f.corner, st, f.a);
     f.quad.position[0] = f.corner;
-    func_00282CC0(&f.corner, st, f.a);
+    FastVecAdd(&f.corner, st, f.a);
     f.quad.position[1] = f.corner;
-    func_00282CF0(&f.corner, st + 0x10, f.b);
+    FastVecSub(&f.corner, st + 0x10, f.b);
     f.quad.position[2] = f.corner;
-    func_00282CC0(&f.corner, st + 0x10, f.b);
+    FastVecAdd(&f.corner, st + 0x10, f.b);
     f.quad.position[3] = f.corner;
-    func_00280B90(&f.quad, 0, 0);
+    draw_world_quad(&f.quad, 0, 0);
 }
 
 extern int D_L11_001B1200 __attribute__((sda));
@@ -221,14 +221,14 @@ void func_L11_00434D00(char *obj, void *q)
 
     f.saved = *(TI128 *)q;
     st = *(char **)(obj + 0x68);
-    func_00282CF0(f.c, st, st + 0x10);
-    func_00282CF0(f.a, st, D_L11_001BA8C0);
-    func_00282CF0(f.b, st + 0x10, D_L11_001BA8C0);
-    func_00282DD8(f.a, f.a, f.c);
-    func_00282F20(f.a, f.a, 0.05f);
-    func_00282DD8(f.b, f.b, f.c);
-    func_00282F20(f.b, f.b, 0.05f);
-    f.quad.texture = func_0027C878(0x13);
+    FastVecSub(f.c, st, st + 0x10);
+    FastVecSub(f.a, st, D_L11_001BA8C0);
+    FastVecSub(f.b, st + 0x10, D_L11_001BA8C0);
+    FastVecCross(f.a, f.a, f.c);
+    vec_scale_to_length(f.a, f.a, 0.05f);
+    FastVecCross(f.b, f.b, f.c);
+    vec_scale_to_length(f.b, f.b, 0.05f);
+    f.quad.texture = GetEffectTextureDescriptor(0x13);
     f.quad.mode = 0x0000ff9000000260UL;
     f.quad.registers = ((unsigned long)D_L11_001B1200 << 32) | 0x48;
     f.quad.primitive = 0;
@@ -237,18 +237,18 @@ void func_L11_00434D00(char *obj, void *q)
         f.quad.uv[i][0] = D_L11_001B1210[i * 2];
         f.quad.uv[i][1] = D_L11_001B1214[i * 2];
     }
-    func_00282CF0(&f.corner, st, f.a);
+    FastVecSub(&f.corner, st, f.a);
     f.quad.position[0] = f.corner;
-    func_00282CC0(&f.corner, st, f.a);
+    FastVecAdd(&f.corner, st, f.a);
     f.quad.position[1] = f.corner;
-    func_00282CF0(&f.corner, st + 0x10, f.b);
+    FastVecSub(&f.corner, st + 0x10, f.b);
     f.quad.position[2] = f.corner;
-    func_00282CC0(&f.corner, st + 0x10, f.b);
+    FastVecAdd(&f.corner, st + 0x10, f.b);
     f.quad.position[3] = f.corner;
-    func_00280B90(&f.quad, 0, 0);
-    f.quad.texture = func_0027C878(0x10);
+    draw_world_quad(&f.quad, 0, 0);
+    f.quad.texture = GetEffectTextureDescriptor(0x10);
     f.quad.mode = 0x0000ff9000000260UL;
     f.quad.registers = 0x8000000048UL;
     f.quad.primitive = 0;
-    func_00280B90(&f.quad, 0, 0);
+    draw_world_quad(&f.quad, 0, 0);
 }

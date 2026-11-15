@@ -105,9 +105,9 @@ void func_L02_003D9E68(TurretObject *self)
         char *targetObject = state->target;
         if (targetObject) qcopy(target, targetObject + 0x10);
     }
-    distance = func_00282E80(self->position, target);
+    distance = vec_distance_xy(self->position, target);
     yaw = func_00283248(target[0] - self->position[0], target[1] - self->position[1]);
-    difference = func_00283C80(*(float *)(PROXY + 0xF8), yaw);
+    difference = FastDiffRots(*(float *)(PROXY + 0xF8), yaw);
     func_0029FC20((char *)self, 0, (char *)ownerMatrix);
     qcopy_nc(PROXY + 0x10, ownerMatrix + 12);
     func_002A05A8((char *)PROXY);
@@ -135,22 +135,22 @@ void func_L02_003D9E68(TurretObject *self)
         *(Quadword *)work.rotation.original = 0;
         work.rotation.original[2] = state->yaw;
         *(Quadword *)work.rotation.angles = *(Quadword *)work.rotation.original;
-        func_002833F0(PROXY + 0xC0, &work);
+        euler_rotation_basis(PROXY + 0xC0, &work);
         object = (TurretObject *)PROXY;
         func_002AB6D8(object->matrix, object->rotation);
     }
     mode = self->state;
     if (mode == 5 || (mode == 6 && state->elapsed < (float)state->duration * 0.2f)) {
         func_0029FCC0((char *)PROXY, 2, (char *)work.aim.origin);
-        func_00282CF0(work.aim.difference, state->target + 0x10, work.aim.origin);
-        limit = func_00282E80(state->target + 0x10, work.aim.origin);
+        FastVecSub(work.aim.difference, state->target + 0x10, work.aim.origin);
+        limit = vec_distance_xy(state->target + 0x10, work.aim.origin);
         *(Quadword *)angles = 0;
         angles[1] = func_00283248(work.aim.difference[2], limit) + -1.5707964f;
         if (angles[1] > 1.5707965f) angles[1] = 1.5707965f;
         else if (angles[1] < -1.5707965f) angles[1] = -1.5707965f;
         if (difference < 0.17453295f) {
             angles[2] = func_00283248(work.aim.difference[0], work.aim.difference[1]);
-            angles[2] = func_00283BE0(angles[2], *(float *)(PROXY + 0xF8));
+            angles[2] = fast_subtract_rotations(angles[2], *(float *)(PROXY + 0xF8));
             angles[2] = func_00283C28(angles[2]);
         }
         if (!(angles[2] > 0.9599312f)) {
@@ -159,14 +159,14 @@ void func_L02_003D9E68(TurretObject *self)
         func_002A91F0(orientation, angles);
         func_L02_00321C30(state->leftJoint, orientation, 0.01f);
         func_0029FCC0((char *)PROXY, 3, (char *)work.aim.origin);
-        func_00282CF0(work.aim.difference, state->target + 0x10, work.aim.origin);
-        limit = func_00282E80(state->target + 0x10, work.aim.origin);
+        FastVecSub(work.aim.difference, state->target + 0x10, work.aim.origin);
+        limit = vec_distance_xy(state->target + 0x10, work.aim.origin);
         angles[1] = func_00283248(work.aim.difference[2], limit) + -1.5707964f;
         if (angles[1] > 1.5707965f) angles[1] = 1.5707965f;
         else if (angles[1] < -1.5707965f) angles[1] = -1.5707965f;
         if (difference < 0.17453295f) {
             angles[2] = func_00283248(work.aim.difference[0], work.aim.difference[1]);
-            angles[2] = func_00283BE0(angles[2], *(float *)(PROXY + 0xF8));
+            angles[2] = fast_subtract_rotations(angles[2], *(float *)(PROXY + 0xF8));
             angles[2] = func_00283C28(angles[2]);
         }
         if (!(angles[2] > 0.13962635f)) {
@@ -174,12 +174,12 @@ void func_L02_003D9E68(TurretObject *self)
         } else angles[2] = 0.13962635f;
         func_002A91F0(orientation, angles);
         func_L02_00321C30(state->rightJoint, orientation, 0.01f);
-        if (func_00282978(&state->fireTimer) && distance < 45.0f
+        if (FastDecTimer(&state->fireTimer) && distance < 45.0f
                 && distance > 0.0f && difference < 3.141593f) {
             if (OBJ.nextAnimation != 5) func_002A7470((char *)&OBJ, 5, 0, 3);
             PROXY[0xBC] = 0;
             if (self->state == 5)
-                state->fireTimer = func_00283CF0((state->elapsed / (float)state->duration) * 40.0f + 20.0f);
+                state->fireTimer = FloatToInt((state->elapsed / (float)state->duration) * 40.0f + 20.0f);
             else state->fireTimer = 60;
         }
     } else {
@@ -202,18 +202,18 @@ void func_L02_003D9E68(TurretObject *self)
         if (!OBJ.emitted && phase > 3.0f && phase < 6.0f) {
             func_0029FCC0((char *)&OBJ, 0, (char *)work.aim.origin);
             func_0029FC20((char *)PROXY, 0, (char *)firstMuzzle);
-            func_00282CF0(angles, state->target + 0x10, work.aim.origin);
-            func_00282F20(angles, angles, 1.0f);
+            FastVecSub(angles, state->target + 0x10, work.aim.origin);
+            vec_scale_to_length(angles, angles, 1.0f);
             firstMuzzle[2] = angles[2];
-            func_00282F20(firstMuzzle, firstMuzzle, 1.0f);
+            vec_scale_to_length(firstMuzzle, firstMuzzle, 1.0f);
             func_L02_004216F0((unsigned char *)work.aim.origin, (int)self, (unsigned char *)firstMuzzle,
                     (float)state->damage);
             func_0029FCC0((char *)PROXY, 1, (char *)work.aim.difference);
             func_0029FC20((char *)PROXY, 1, (char *)secondMuzzle);
-            func_00282CF0(angles, state->target + 0x10, work.aim.difference);
-            func_00282F20(angles, angles, 1.0f);
+            FastVecSub(angles, state->target + 0x10, work.aim.difference);
+            vec_scale_to_length(angles, angles, 1.0f);
             secondMuzzle[2] = angles[2];
-            func_00282F20(secondMuzzle, secondMuzzle, 1.0f);
+            vec_scale_to_length(secondMuzzle, secondMuzzle, 1.0f);
             func_L02_004216F0((unsigned char *)work.aim.difference, (int)self, (unsigned char *)secondMuzzle,
                     (float)state->damage);
             PROXY[0xBC] = 1;
@@ -233,7 +233,7 @@ void func_L02_003D9E68(TurretObject *self)
             *(Quadword *)work.rotation.original = 0;
             work.rotation.original[2] = state->yaw;
             *(Quadword *)work.rotation.angles = *(Quadword *)work.rotation.original;
-            func_002833F0(PROXY + 0xC0, &work);
+            euler_rotation_basis(PROXY + 0xC0, &work);
             object = (TurretObject *)PROXY;
             func_002AB6D8(object->matrix, object->rotation);
             return;
@@ -248,7 +248,7 @@ void func_L02_003D9E68(TurretObject *self)
         *(Quadword *)work.rotation.original = 0;
         work.rotation.original[2] = state->yaw;
         *(Quadword *)work.rotation.angles = *(Quadword *)work.rotation.original;
-        func_002833F0(PROXY + 0xC0, &work);
+        euler_rotation_basis(PROXY + 0xC0, &work);
         object = (TurretObject *)PROXY;
         func_002AB6D8(object->matrix, object->rotation);
         return;

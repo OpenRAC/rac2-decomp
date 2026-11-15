@@ -37,28 +37,28 @@ void func_L08_00424FF8(char *m, void *position, int count,
             y *= func_002A7878(minRadius, maxRadius);
             offset[1] = y;
             offset[2] = 0;
-            func_00283098(offset, offset, m + 0xC0);
+            matrix_mul_vec3(offset, offset, m + 0xC0);
             {
-                float range = speed * ((maxRadius - func_00282DF0(offset)) * 0.01666666753590107f) / maxRadius;
-                func_00282F20(velocity, offset, func_002A7878(range * 0.25f, range));
+                float range = speed * ((maxRadius - FastVecLength(offset)) * 0.01666666753590107f) / maxRadius;
+                vec_scale_to_length(velocity, offset, func_002A7878(range * 0.25f, range));
             }
             velocity[2] += func_002A7878(rise * 0.25f, rise) * 0.01666666753590107f;
             if (*(u8 *)(m + 0x20) == 5) {
                 qcopy(motion, vars + 0xD0);
                 motion[2] = 0;
-                func_00282D30(motion, vars + 0xD0, 0.8f);
-                func_00282CC0(velocity, velocity, motion);
-                func_00282D30(accel, motion, 0.4f);
+                FastVecScale(motion, vars + 0xD0, 0.8f);
+                FastVecAdd(velocity, velocity, motion);
+                FastVecScale(accel, motion, 0.4f);
             } else {
                 vzero(accel);
             }
-            func_00282CC0(offset, offset, position);
+            FastVecAdd(offset, offset, position);
             offset[2] += -0.75f;
             velocity[3] = size;
             accel[3] = endSize;
-            a = func_00283CF0(func_002A7878(15.0f, 25.0f));
-            b = func_00283CF0(func_002A7878(20.0f, 40.0f));
-            c = func_00283CF0(func_002A7878(50.0f, 70.0f));
+            a = FloatToInt(func_002A7878(15.0f, 25.0f));
+            b = FloatToInt(func_002A7878(20.0f, 40.0f));
+            c = FloatToInt(func_002A7878(50.0f, 70.0f));
             particle = func_002BAA28(offset, velocity, accel, 0x70204050, 0x7F7F7F, a, b, c, -1);
             if (particle && (func_001163B0() & 1))
                 particle[3] = 0x48;

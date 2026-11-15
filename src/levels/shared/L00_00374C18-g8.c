@@ -127,9 +127,9 @@ void func_L00_00374C18(void)
             if (D_L00_0022F7C0[0].fa0 >= 0) {
                 v = D_0014B540[0].entries[D_L00_0022F7C0[0].fa0].value;
                 func_002B7CE0(1);
-                func_00294420(v);
+                LoadClassIntoFreeCacheSlot(v);
                 func_002B7CE0(1);
-                func_00294988(v);
+                SwitchCachedDiscAsset(v);
             } else {
                 D_00152CE4 = -1;
             }
@@ -148,7 +148,7 @@ void func_L00_00374C18(void)
             func_00335370(MENU + 0xD0);
             func_003353C8(MENU + 0xE0);
         }
-        func_002914B8();
+        UpdateLightingEnvironment();
         func_002F52B8();
         break;
     case 1:
@@ -178,28 +178,28 @@ void func_L00_00374C18(void)
             for (i = 0; i < D_L00_0022F7C0[0].f34; i++) {
                 float stickScale = 0.0033333334f;
                 m = (char *)D_L00_0022F7C0[0].f2c + i * 256;
-                func_00283098(m + 16, MENU + 0xC0, (char *)D_L00_0022F7C0[0].f28 + 0xC0);
-                func_00282CC0(m + 16, m + 16, (char *)D_L00_0022F7C0[0].f28 + 16);
+                matrix_mul_vec3(m + 16, MENU + 0xC0, (char *)D_L00_0022F7C0[0].f28 + 0xC0);
+                FastVecAdd(m + 16, m + 16, (char *)D_L00_0022F7C0[0].f28 + 16);
                 MF(0x2C) = *(float *)(*(char **)(m + 0x24) + 0x24) * D_L00_0022F7C0[0].f98;
                 if (*(short *)(m + 0xAA) == 0x10E3)
                     m[0x23] = D_L00_0022F7C0[0].f94 / 2;
                 else
                     m[0x23] = D_L00_0022F7C0[0].f94;
                 if (D_L00_0022F7C0[0].f50 != 2) {
-                    MF(0xF8) = func_00283B98(MF(0xF8), func_L00_002EDCF0(0.01f));
+                    MF(0xF8) = FastAddRotations(MF(0xF8), func_L00_002EDCF0(0.01f));
                 } else {
                     x = D_00138180[0].x * stickScale;
                     y = D_00138180[0].y * stickScale;
                     if (D_L00_0022F7C0[0].fa4 <= 0) {
-                        D_L00_0022F7C0[0].fb4 = func_00283B98(D_L00_0022F7C0[0].fb4,
+                        D_L00_0022F7C0[0].fb4 = FastAddRotations(D_L00_0022F7C0[0].fb4,
                             (D_L00_0022F7C0[0].fa8 - D_L00_0022F7C0[0].fb4) * 0.006666667f);
-                        D_L00_0022F7C0[0].fb8 = func_00283B98(D_L00_0022F7C0[0].fb8,
+                        D_L00_0022F7C0[0].fb8 = FastAddRotations(D_L00_0022F7C0[0].fb8,
                             (D_L00_0022F7C0[0].fac - D_L00_0022F7C0[0].fb8) * 0.006666667f);
-                        D_L00_0022F7C0[0].fbc = func_00283B98(D_L00_0022F7C0[0].fbc,
+                        D_L00_0022F7C0[0].fbc = FastAddRotations(D_L00_0022F7C0[0].fbc,
                             (D_L00_0022F7C0[0].fb0 - D_L00_0022F7C0[0].fbc) * 0.006666667f);
                     } else {
-                        D_L00_0022F7C0[0].fbc = func_00283B98(D_L00_0022F7C0[0].fbc, x);
-                        D_L00_0022F7C0[0].fb8 = func_00283B98(D_L00_0022F7C0[0].fb8, y);
+                        D_L00_0022F7C0[0].fbc = FastAddRotations(D_L00_0022F7C0[0].fbc, x);
+                        D_L00_0022F7C0[0].fb8 = FastAddRotations(D_L00_0022F7C0[0].fb8, y);
                     }
                     MF(0xF0) = D_L00_0022F7C0[0].fb4;
                     MF(0xF4) = D_L00_0022F7C0[0].fb8;
@@ -219,7 +219,7 @@ void func_L00_00374C18(void)
                 }
                 func_002A0F48(m);
                 if (D_L00_0022F7C0[0].f50 != 2) {
-                    func_00282D30(vec, m, 0.0009765625f);
+                    FastVecScale(vec, m, 0.0009765625f);
                     MF(0x10) += MF(0x10) - vec[0];
                     MF(0x14) += MF(0x14) - vec[1];
                     func_002A0F48(m);
@@ -229,10 +229,10 @@ void func_L00_00374C18(void)
                 D_L00_0022F7C0[0].fa4--;
         }
         if (D_L00_0022F7C0[0].f8c)
-            func_L00_0037A2E8();
+            BindVendorPreviewModel();
         else if (D_L00_0022F7C0[0].f90 == 3 && D_L00_0022F7C0[0].f84 == 0 &&
                  D_L00_0022F7C0[0].f6c == 0)
-            func_002FB1A0();
+            PrepareVendorSelectionPreview();
         D_L00_0022F7C0[0].f04++;
         func_L00_00374B98();
         func_L00_00374708();
@@ -254,5 +254,5 @@ void func_L00_00374C18(void)
         func_0029BCD8();
         break;
     }
-    func_002E4AC8();
+    UpdateSoundVoices();
 }

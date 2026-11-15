@@ -22,8 +22,8 @@ int func_002B1CC8(char *obj, float *out, void *in, float radius, float tolerance
     qcopy(out, in);
     qcopy(v, in);
     v[2] = 0;
-    func_00282F20(v, v, radius);
-    func_00282CC0(pos, obj + 0x10, v);
+    vec_scale_to_length(v, v, radius);
+    FastVecAdd(pos, obj + 0x10, v);
     heading = func_00283248(v[0], v[1]);
     count = func_00277F48(pos, 0, obj, 0, radius);
     if (count) {
@@ -35,7 +35,7 @@ int func_002B1CC8(char *obj, float *out, void *in, float radius, float tolerance
                 radius = func_00283248(
                     *(float *)(D_001BF000[i] + 0x10) - *(float *)(obj + 0x10),
                     *(float *)(D_001BF000[i] + 0x14) - *(float *)(obj + 0x14));
-                if (func_00283C80(heading, radius) < tolerance)
+                if (FastDiffRots(heading, radius) < tolerance)
                     angles[n++] = radius;
             }
         }
@@ -53,7 +53,7 @@ int func_002B1CC8(char *obj, float *out, void *in, float radius, float tolerance
                 }
             }
             angle = angles[n >> 1];
-            length = func_00282E20(out);
+            length = vec_length_xy(out);
             out[0] = func_00283180(angle) * length;
             out[1] = func_00283198(angle) * length;
         }

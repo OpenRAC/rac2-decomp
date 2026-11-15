@@ -44,7 +44,7 @@ void func_L11_00415E70(u8 *object) {
             {
                 u8 *record = (u8 *)D_00188660 + *(s32 *)(state + 0x70) * 0x70;
                 if (*(u8 **)(record + 0x88) != object || record[0x74] == 0)
-                    *(s32 *)(state + 0x70) = func_002E5CF8(0, 4, object);
+                    *(s32 *)(state + 0x70) = PlayMobySound(0, 4, object);
             }
             *(u8 **)(state + 0x68) = func_L00_002D70A0(5);
             *(f32 *)(*(u8 **)(state + 0x68)) = 10.0f;
@@ -54,7 +54,7 @@ void func_L11_00415E70(u8 *object) {
             {
                 u8 *record = *(u8 **)(state + 0x68) + 0x20;
                 *(TI128 *)(record) = *(TI128 *)(object + 0xC0);
-                func_00282F20(record, record, -1.0f);
+                vec_scale_to_length(record, record, -1.0f);
             }
             (*(u8 **)(state + 0x68))[0x1E] = 1;
             object[0x20] = 1;
@@ -91,12 +91,12 @@ void func_L11_00415E70(u8 *object) {
             *(s32 *)(state + 0x70) = -1;
         } else {
             *(TI128 *)(point) = *(TI128 *)(path + 0x10 + *(s32 *)(state + 0x64) * 16);
-            func_00282CF0(step, point, (object + 0x10));
-            func_00282F20(step, step, 0.033333335f);
-            func_00282CC0((object + 0x10), (object + 0x10), step);
-            if (func_00282E80((object + 0x10), point) < 0.05f) ++*(s32 *)(state + 0x64);
+            FastVecSub(step, point, (object + 0x10));
+            vec_scale_to_length(step, step, 0.033333335f);
+            FastVecAdd((object + 0x10), (object + 0x10), step);
+            if (vec_distance_xy((object + 0x10), point) < 0.05f) ++*(s32 *)(state + 0x64);
         }
-        if (func_002ACBC8(D_00189EA0, *(s32 *)(state + 0x6C))) {
+        if (IsPointInCuboid(D_00189EA0, *(s32 *)(state + 0x6C))) {
             func_002A8598(object[0x21], 0);
             *(TI128 *)((object + 0x10)) = *(TI128 *)(path + 0x10);
             object[0x20] = 0;
@@ -113,7 +113,7 @@ void func_L11_00415E70(u8 *object) {
     position = object + 0x10;
     if (object[0x20] == 2) {
         u8 *path;
-        if (func_002ACBC8(D_00189EA0, *(s32 *)(state + 0x6C))) {
+        if (IsPointInCuboid(D_00189EA0, *(s32 *)(state + 0x6C))) {
             path = D_L11_001FF580[*(s32 *)(state + 0x60)];
             func_002A8598(object[0x21], 0);
             *(TI128 *)(position) = *(TI128 *)(path + 0x10);
@@ -136,10 +136,10 @@ void func_L11_00415E70(u8 *object) {
             *(s32 *)(state + 0x64) = 0;
         } else {
             *(TI128 *)(point) = *(TI128 *)(path + 0x10 + *(s32 *)(state + 0x64) * 16);
-            func_00282CF0(step, point, position);
-            func_00282F20(step, step, 0.06666667f);
-            func_00282CC0(position, position, step);
-            if (func_00282E80(position, point) < 0.05f) --*(s32 *)(state + 0x64);
+            FastVecSub(step, point, position);
+            vec_scale_to_length(step, step, 0.06666667f);
+            FastVecAdd(position, position, step);
+            if (vec_distance_xy(position, point) < 0.05f) --*(s32 *)(state + 0x64);
         }
     }
     if (object[0x20] == 5) {
@@ -156,10 +156,10 @@ void func_L11_00415E70(u8 *object) {
             *(s32 *)(state + 0x70) = -1;
         } else {
             *(TI128 *)(point) = *(TI128 *)(path + 0x10 + *(s32 *)(state + 0x64) * 16);
-            func_00282CF0(step, point, position);
-            func_00282F20(step, step, 0.06666667f);
-            func_00282CC0(position, position, step);
-            if (func_00282E48(position, point) < 0.05f) --*(s32 *)(state + 0x64);
+            FastVecSub(step, point, position);
+            vec_scale_to_length(step, step, 0.06666667f);
+            FastVecAdd(position, position, step);
+            if (fast_vec_dist(position, point) < 0.05f) --*(s32 *)(state + 0x64);
         }
     }
     if (object[0x20] == 6) {
@@ -179,13 +179,13 @@ void func_L11_00415E70(u8 *object) {
             }
         } else {
             *(TI128 *)(point) = *(TI128 *)(path + 0x10 + *(s32 *)(state + 0x64) * 16);
-            func_00282CF0(step, point, position);
-            func_00282F20(step, step, 0.06666667f);
-            func_00282CC0(position, position, step);
-            if (func_00282E48(position, point) < 0.05f) ++*(s32 *)(state + 0x64);
+            FastVecSub(step, point, position);
+            vec_scale_to_length(step, step, 0.06666667f);
+            FastVecAdd(position, position, step);
+            if (fast_vec_dist(position, point) < 0.05f) ++*(s32 *)(state + 0x64);
         }
     }
-    func_00282CF0(delta, position, previous);
+    FastVecSub(delta, position, previous);
     func_002AD6F0(state + 0x20, delta, rotation, rotation);
     func_L01_003208D0(object, state + 0x74, object[0xBC]);
 }

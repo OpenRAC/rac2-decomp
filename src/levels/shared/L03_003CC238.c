@@ -45,7 +45,7 @@ void func_L03_003CC238(u8 *object)
             scale = *(f32 *)(object + 0x2C) / *(f32 *)(*(u8 **)(object + 0x24) + 0x24);
             position.q = 0;
             position.f[2] = scale * 3.5f;
-            func_00282CC0(&position, &position, object + 0x10);
+            FastVecAdd(&position, &position, object + 0x10);
             velocity.q = 0;
             scale *= 0.05833333730697632f;
             velocity.f[2] = scale;
@@ -62,7 +62,7 @@ void func_L03_003CC238(u8 *object)
         break;
     case 5:
         vars = *(u8 **)(object + 0x68);
-        func_00282CC0(object + 0x10, object + 0x10, vars);
+        FastVecAdd(object + 0x10, object + 0x10, vars);
         if (func_00282948(vars + 0x10) != 0)
             func_0029F338(object);
         break;

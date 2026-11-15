@@ -45,7 +45,7 @@ void func_L15_00430590(char *self, int stage)
     }
     if (D_L15_001A904C && !D_L15_001B15CC) {
         int count, value;
-        func_0027D330(30);
+        FadeToBlack(30);
         func_0029B758(0, func_L15_00430168);
         count = D_L15_001B1520[stage];
         value = D_L15_001B15D8[stage][count < 3 ? count : 2];
@@ -57,14 +57,14 @@ void func_L15_00430590(char *self, int stage)
         D_L15_001B1520[stage] = count + 1;
         D_001A79F8 = D_001A79F8 + value;
         func_L15_00432008();
-        func_0029B3E0(0, -1);
+        MemcardSave(0, -1);
     }
     func_L05_00379F48(1);
     if (!func_00282948(state + 0x50)) {
         if (D_00138324 & 0x40) {
             D_L15_001B15CC = 0;
             *(int *)(state + 0x50) = 5400;
-            func_0027D330(30);
+            FadeToBlack(30);
             func_L05_00379F48(0);
             *(int *)(state + 0x6C) = 120;
             if (D_L15_001B1520[0]) {
@@ -79,7 +79,7 @@ void func_L15_00430590(char *self, int stage)
                 }
             }
             D_L15_001B15BC = 0;
-            func_L15_0042FD40(self);
+            ResetGornStageCounters(self);
         } else if (D_00138324 & 0x10) {
             func_002B49E0(3, 1, 4, 0, 0);
         }

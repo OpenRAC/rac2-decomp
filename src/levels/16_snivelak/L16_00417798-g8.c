@@ -39,7 +39,7 @@ void func_L16_00417798(char *self) {
         func_L00_0032A258(self, D_L16_001B1B70, D_L16_001B1B68, D_L16_001B1B60, 65535, 0, D_L16_001B1B90, 0, 65535, 255, 0);
         for (i = 0; i < 3; i++) {
             func_L00_00324F18(self, pos, D_L16_001B1BB0[i].x, D_L16_001B1BB0[i].y, D_L16_001B1BB0[i].z);
-            func_0032C700(pos, 0, 12, 12, 12, 12, 12, 0, 1, 0, 0, 0, *(f32 *)(self + 0x2C), 20.0f);
+            SpawnExplosion(pos, 0, 12, 12, 12, 12, 12, 0, 1, 0, 0, 0, *(f32 *)(self + 0x2C), 20.0f);
         }
         if (D_L16_001B1B90 >= 0) {
             *(u16 *)(self + 0x7C) = (1 << D_L16_001B1B90) | 0x8000;

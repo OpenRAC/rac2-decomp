@@ -63,7 +63,7 @@ void func_L01_00394240(CamMoby *m)
         if (v->requireEnabled && (D_0019B2E8[m->index + (ref_L01_00394240_00 << 4)] & 0x80)) {
             func_0029F338(m);
         } else if (v->camera == -1) {
-            func_0026FEB8(D_L01_002A4370, m->id, m->group);
+            STUB_printf(D_L01_002A4370, m->id, m->group);
             func_0029F338(m);
         } else {
             m->field30 = m->field32 = 255;
@@ -82,15 +82,15 @@ void func_L01_00394240(CamMoby *m)
                 break;
             }
         }
-        if ((func_002ACBC8(D_00189EA0, v->trigger) || m->active == 1) &&
+        if ((IsPointInCuboid(D_00189EA0, v->trigger) || m->active == 1) &&
             (!v->requireHero || *(int *)(D_00189EA0 + 0x2C0))) {
             qcopy(&position, D_L01_001B94C0);
             qcopy(&rotation, D_L01_001B94C0 + 16);
             if (v->source == -1) func_L00_002B9D60(D_00189EA0, D_00189EA0 + 0x10, 0x6F, 1);
             else func_L00_002B9D60(&D_L01_001B264C[0][v->source].forward[3],
                                   &D_L01_001B264C[0][v->source].inverse[3], 0x6F, 1);
-            if (v->mode) func_00335438(&position, &rotation, 2, v->parameter, 0);
-            else func_00335438(&D_L01_001B264C[0][v->camera].forward[3],
+            if (v->mode) SetCamera5Pose(&position, &rotation, 2, v->parameter, 0);
+            else SetCamera5Pose(&D_L01_001B264C[0][v->camera].forward[3],
                               &D_L01_001B264C[0][v->camera].inverse[3], 0, 0, 0);
             D_L01_001B1FA8[0] = 1;
             m->state = 2;
@@ -101,17 +101,17 @@ void func_L01_00394240(CamMoby *m)
             qcopy(&v->rotation, &base[camera].inverse[3]); }
         }
         if (D_001A79F0[0] == 19 &&
-            (func_002ACBC8(D_00189EA0, v->trigger) || m->active == 1 || func_002B38B8(m)) &&
+            (IsPointInCuboid(D_00189EA0, v->trigger) || m->active == 1 || func_002B38B8(m)) &&
             (!v->requireHero || D_0018A160)) {
             qcopy(&position, D_L01_001B94C0);
             qcopy(&rotation, D_L01_001B94C0 + 16);
             if (v->source == -1) func_L00_002B9D60(D_00189EA0, D_00189EA0 + 0x10, 0x6F, 1);
             else func_L00_002B9D60(&D_L01_001B264C[0][v->source].forward[3],
                                   &D_L01_001B264C[0][v->source].inverse[3], 0x6F, 1);
-            if (v->mode) func_00335438(&position, &rotation, 2, v->parameter, 0);
-            else if (D_001A79F0[0] == 19) func_00335438(&D_L01_001B264C[0][v->camera].forward[3],
+            if (v->mode) SetCamera5Pose(&position, &rotation, 2, v->parameter, 0);
+            else if (D_001A79F0[0] == 19) SetCamera5Pose(&D_L01_001B264C[0][v->camera].forward[3],
                                                  &D_L01_001B264C[0][v->camera].inverse[3], 1, 0, 0);
-            else func_00335438(&D_L01_001B264C[0][v->camera].forward[3],
+            else SetCamera5Pose(&D_L01_001B264C[0][v->camera].forward[3],
                               &D_L01_001B264C[0][v->camera].inverse[3], 0, 0, 0);
             { unsigned int saveIndex = m->saveIndex;
             u8 *p;

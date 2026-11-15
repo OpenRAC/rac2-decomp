@@ -161,7 +161,7 @@ void func_L00_003EC140(Object *object)
                 func_002E59F8(state->slot);
         }
         state->slot = -1;
-        func_002E5CF8(2, 0, object);
+        PlayMobySound(2, 0, object);
         object->mode = 2;
         return;
     }
@@ -188,7 +188,7 @@ void func_L00_003EC140(Object *object)
             state->slot = -1;
             if (((Slot *)(D_00188660 - 0x70))->owner != object ||
                 !((Slot *)(D_00188660 - 0x70))->active)
-                state->slot = func_002E5CF8(1, 4, object);
+                state->slot = PlayMobySound(1, 4, object);
         }
         qzero(&state->velocity);
         state->random0 = func_002A7940();
@@ -208,14 +208,14 @@ void func_L00_003EC140(Object *object)
             state->slot = -1;
             if (((Slot *)(D_00188660 - 0x70))->owner != object ||
                 !((Slot *)(D_00188660 - 0x70))->active)
-                state->slot = func_002E5CF8(1, 4, object);
+                state->slot = PlayMobySound(1, 4, object);
         }
         if (D_00189E20.mode != 129 &&
             func_00282EB0(&state->last_position, &D_00189E20.player) > 400.0f) {
             if (D_001A79F0 == 7 && D_00189E20.object &&
                 D_00189E20.object->class_id == 0x11D9) {
-                func_00282CF0(&vector, &D_00189E20.player, &state->last_position);
-                func_00282CC0(&object->position, &object->position, &vector);
+                FastVecSub(&vector, &D_00189E20.player, &state->last_position);
+                FastVecAdd(&object->position, &object->position, &vector);
             } else {
                 if (state->slot != -1) {
                     Slot *entry = (Slot *)(D_00188660 + state->slot * 112);
@@ -252,10 +252,10 @@ void func_L00_003EC140(Object *object)
                     func_002E59F8(state->slot);
             }
             state->slot = -1;
-            func_002E5CF8(2, 0, object);
+            PlayMobySound(2, 0, object);
             object->mode = 2;
         }
-        func_L00_003EB8E8(object, state);
+        UpdateAutoTargetFire(object, state);
         break;
     }
     case 2:
@@ -305,17 +305,17 @@ void func_L00_003EC140(Object *object)
         }
         object->flags |= 0x200;
         object->alpha -= 128 / D_L00_001B0768;
-        object->angle_z = func_00283B98(object->angle_z, 0.41887909f);
+        object->angle_z = FastAddRotations(object->angle_z, 0.41887909f);
         break;
     }
     if (object->mode) {
         if (!D_L00_001ADB2C) {
             if (D_00189E20.mode == 39) {
-                func_00282CC0(&object->position, &object->position, &D_00189E20.movement);
+                FastVecAdd(&object->position, &object->position, &D_00189E20.movement);
             } else {
-                func_00282CC0(&vector, &object->position, &D_00189E20.drift);
+                FastVecAdd(&vector, &object->position, &D_00189E20.drift);
                 func_L00_0031AC60(&object->position, &object->position, &vector, 0.4f);
-                func_00282D08(&object->position, &object->position, &vector, 0.625f);
+                lerp_vector(&object->position, &object->position, &vector, 0.625f);
             }
         }
         func_00300190(&object->position, &object->position);
@@ -329,7 +329,7 @@ void func_L00_003EC140(Object *object)
     qcopy(&object->axis_z, &camera->axis_z);
     if (D_00189E20.phase == 15) {
         qcopy(&object->axis_x, &camera->axis_y);
-        func_00282D30(&object->axis_y, &camera->axis_x, -1.0f);
+        FastVecScale(&object->axis_y, &camera->axis_x, -1.0f);
     }
     angle = object->angle_z;
     if (func_00282C48(angle) > 0.00001f) {

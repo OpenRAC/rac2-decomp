@@ -36,7 +36,7 @@ void func_L06_004649F0(char *o) {
  *(Quad *)v=0; v[0]=0.06666667f; v[2]=func_002A7878(6,9)*0.0166666675f;
  *(Quad *)pos=*(Quad *)v;
  func_002A0F48(o);
- func_00283098(s+0x70,pos,o+0xC0);
+ matrix_mul_vec3(s+0x70,pos,o+0xC0);
  func_002A7750(o,1,-1); break;
  case 1:
  damage=func_002A96A0(o,func_0035CBA0(o,0x230000,0));
@@ -49,12 +49,12 @@ void func_L06_004649F0(char *o) {
  func_002AB8C0(o,s+0x50); ((unsigned char *)o)[0xA8]=255; break;
  case 2:
  if(func_002B3868(o)) {
- func_0032C700(o+0x10,1,25,20,20,20,45,1,1,20,1,1,0,0);
+ SpawnExplosion(o+0x10,1,25,20,20,20,45,1,1,20,1,1,0,0);
  func_003A0948(1,0,o);
  }
  func_002AB8C0(o,s+0x50);
  *(float *)(s+0x68)+=0.000290888245f;
- *(float *)(o+0xF4)=func_00283B98(*(float *)(o+0xF4),*(float *)(s+0x68));
+ *(float *)(o+0xF4)=FastAddRotations(*(float *)(o+0xF4),*(float *)(s+0x68));
  if(*(float *)(o+0xF4)>0.628318548f && D_0018C0B4!=140) {
  *(int *)(o+0x98)=0;
  for(i=0;i<6;i++) {
@@ -79,11 +79,11 @@ void func_L06_004649F0(char *o) {
  D_L06_001B9700.n168=60;
  D_L06_001B9700.n16c=0;
  *(unsigned short *)(o+0x7C)=0x8100;
- func_00283098(v,&D_L06_001B1D70,o+0xC0);
- func_00282CC0(o+0x10,o+0x10,v);
+ matrix_mul_vec3(v,&D_L06_001B1D70,o+0xC0);
+ FastVecAdd(o+0x10,o+0x10,v);
  }
  func_002A8C28(o,o+0x10,2.5f,4,1,0x4030000,0,1,0);
- func_00282CC0(o+0x10,o+0x10,s+0x70);
+ FastVecAdd(o+0x10,o+0x10,s+0x70);
  *(float *)(s+0x78)-=0.003f;
  if (!*(int *)(s+0x80) && *(float *)(o+0x18) < *(float *)(s+0x6C)) {
      func_L06_00464F40(o);

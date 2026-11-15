@@ -24,15 +24,15 @@ int func_002D0568(void)
     int i, y = 274;
     float z;
 
-    func_0027C540(0);
+    SetupGifPaging(0);
     z = 0.0f;
     func_00300A00(func_00336D50(D_001A8CFC + 0x8710, 0xD7), 0x60442D00, (float)(D_001A7340 / 2), (float)D_001ABA1C, 1.0f, D_001B23A8, z);
     func_00300A00(func_00336D50(D_001A8CFC + 0x8710, 0xD8), 0x60241700, (float)(D_001A7340 / 2), (float)D_001ABA1C, 1.0f, D_001B23A8, z);
     func_00300A00(func_00336D50(D_001A8CFC + 0x8710, 0xD9), 0x55F0C070, (float)(D_001A7340 / 2), (float)D_001ABA1C, 1.0f, D_001B23A8, z);
     func_00300A00(func_00336D50(D_001A8CFC + 0x8710, 0xDD), 0x55F0C070, (float)(D_001A7340 / 2), (float)D_001ABA1C, 1.0f, D_001B23A8, z);
-    func_0027FAA8(179, 27, 0x80F0F0F0UL, func_00288FB8(0x31FF), -1);
-    func_0027FAA8(353, 375, 0x80F0F0F0UL, func_00288FB8(0x2D4F), -1);
-    func_0027FAA8(181, 375, 0x80F0F0F0UL, func_00288FB8(0x2D75), -1);
+    func_0027FAA8(179, 27, 0x80F0F0F0UL, GetLocalizedString(0x31FF), -1);
+    func_0027FAA8(353, 375, 0x80F0F0F0UL, GetLocalizedString(0x2D4F), -1);
+    func_0027FAA8(181, 375, 0x80F0F0F0UL, GetLocalizedString(0x2D75), -1);
     func_002CEBD0();
     for (i = 0; i < 5; i++, y += 20) {
         int index = i + D_001ABA04 - 2, key;
@@ -44,7 +44,7 @@ int func_002D0568(void)
         if (index >= 5)
             index -= 5;
         key = D_001ABA08[index] ? D_001ABD00[index * 2] : 0x2DC0;
-        text = func_00288FB8(key);
+        text = GetLocalizedString(key);
         if (i == 0 || i == 4)
             color = 0x10F0F0F0;
         else if (i == 1 || i == 3)
@@ -55,6 +55,6 @@ int func_002D0568(void)
         }
         func_0027FB40(D_001A7340 / 2, y, color, text, -1);
     }
-    func_0027C660();
+    DoGifPaging();
     return 0;
 }

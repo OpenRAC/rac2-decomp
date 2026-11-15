@@ -22,7 +22,7 @@ void func_L10_00424448(void *object)
     if (!D_L10_001B13A4) {
         D_L10_00221CFC = 0;
         D_L10_001B13A4 = 1;
-        func_002B7320();
+        music_Unpause();
         func_L05_0037B210();
         func_L05_00379F18(0);
         entries = func_L05_00379EB8();

@@ -65,7 +65,7 @@ void func_L15_00430DF0(char *self)
         init = 1;
         D_L15_001B1598 = 0; index = 0; misses = 0;
         D_L15_001B3698 = 0; D_L15_00221E10.reset = 0;
-        func_002B7320();
+        music_Unpause();
         if (effect) func_0029F338(effect);
         func_L05_0037B210(); effect = 0;
         func_L05_00379F28(1);
@@ -76,7 +76,7 @@ void func_L15_00430DF0(char *self)
         path = D_L15_001FE480[*(int *)(state + 0x30)];
         while ((!first || !next) && index != path->pointCount) {
             if (path->point[index].f[3] != -1) {
-            object = func_0029EFD0(0x114A);
+            object = CreateMoby(0x114A);
             ((unsigned char *)object)[0x30] = 0xFF;
             objectFlags = *(unsigned short *)(object + 0x34);
             oldFirst = first;
@@ -84,17 +84,17 @@ void func_L15_00430DF0(char *self)
             *(unsigned short *)(object + 0x34) = objectFlags | 0x100;
             if (!oldFirst) first = object; else next = object;
             if (index == path->pointCount - 1) {
-                func_00282CF0(object + 0xC0, &path->point[index - 1], &path->point[index]);
+                FastVecSub(object + 0xC0, &path->point[index - 1], &path->point[index]);
                 *(int *)(object + 0xCC) = 0;
-                func_00282F20(object + 0xC0, object + 0xC0, -1);
+                vec_scale_to_length(object + 0xC0, object + 0xC0, -1);
             } else {
-                func_00282CF0(object + 0xC0, &path->point[index + 1], &path->point[index]);
+                FastVecSub(object + 0xC0, &path->point[index + 1], &path->point[index]);
                 *(int *)(object + 0xCC) = 0;
-                func_00282F20(object + 0xC0, object + 0xC0, 1);
+                vec_scale_to_length(object + 0xC0, object + 0xC0, 1);
             }
-            func_00282DD8(object + 0xD0, object + 0xC0, &up);
-            func_00282F20(object + 0xD0, object + 0xD0, 1);
-            func_00282DD8(object + 0xE0, object + 0xD0, object + 0xC0);
+            FastVecCross(object + 0xD0, object + 0xC0, &up);
+            vec_scale_to_length(object + 0xD0, object + 0xD0, 1);
+            FastVecCross(object + 0xE0, object + 0xD0, object + 0xC0);
             qcopy(object + 0x10, &path->point[index]);
             *(int *)(object + 0x1C) = 0;
             }
@@ -104,47 +104,47 @@ void func_L15_00430DF0(char *self)
     if (!first && !next && !waiting) { func_L15_00430590(self, 3); return; }
     if (func_L00_0042B730(func_L05_00379ED0(0xF82))) {
         waiting = 1;
-        if (func_00282948((int *)(state + 0x64))) { waiting = 0; *(int *)(state + 0x64) = 240; func_L15_0042FD40(self); func_L05_0037B210(); }
-        else func_L00_0030DD70(func_00288FB8(0x31DE), -1);
+        if (func_00282948((int *)(state + 0x64))) { waiting = 0; *(int *)(state + 0x64) = 240; ResetGornStageCounters(self); func_L05_0037B210(); }
+        else func_L00_0030DD70(GetLocalizedString(0x31DE), -1);
     } else if (misses >= 12) {
         waiting = 1;
-        if (!func_00282948((int *)(state + 0x64))) func_L00_0030DD70(func_00288FB8(0x31DE), -1);
-        else { waiting = 0; *(int *)(state + 0x64) = 240; func_L15_0042FD40(self); func_L05_0037B210(); }
+        if (!func_00282948((int *)(state + 0x64))) func_L00_0030DD70(GetLocalizedString(0x31DE), -1);
+        else { waiting = 0; *(int *)(state + 0x64) = 240; ResetGornStageCounters(self); func_L05_0037B210(); }
     }
     if (waiting) return;
     count = D_L15_001B3698 + 1;
     if (count < 2) return;
     hero = D_L15_001B261C + (*(int *)(state + 0x20) << 8);
     qcopy(&camera, &D_L15_001B97C0);
-    func_00282CF0(&fromCamera, &camera, first + 0x10);
-    func_00282F20(&fromCamera, &fromCamera, 1);
-    func_00282CF0(&fromHero, hero + 0x10, first + 0x10);
-    func_00282F20(&fromHero, &fromHero, 1);
-    heroDot = func_00282DB0(first + 0xC0, &fromHero);
-    cameraDot = func_00282DB0(first + 0xC0, &fromCamera);
+    FastVecSub(&fromCamera, &camera, first + 0x10);
+    vec_scale_to_length(&fromCamera, &fromCamera, 1);
+    FastVecSub(&fromHero, hero + 0x10, first + 0x10);
+    vec_scale_to_length(&fromHero, &fromHero, 1);
+    heroDot = FastVecDot(first + 0xC0, &fromHero);
+    cameraDot = FastVecDot(first + 0xC0, &fromCamera);
     if ((heroDot != oldHero && heroDot > 0) || (cameraDot != oldCamera && cameraDot > 0)) {
         path = D_L15_001FE480[*(int *)(state + 0x30)];
-        if (func_00282E48(&camera, first + 0x10) <= 1.25f || func_00282E48(hero + 0x10, first + 0x10) <= 1.25f) {
+        if (fast_vec_dist(&camera, first + 0x10) <= 1.25f || fast_vec_dist(hero + 0x10, first + 0x10) <= 1.25f) {
             func_002E5DA0(15, 0, self, 0xFBF); func_L05_0037ADD8(0.5f);
         } else { func_L05_0037ADD8(-0.75f); misses++; }
         func_0029F338(first); first = next; next = 0;
         while (!next && index != path->pointCount) {
             if (path->point[index].f[3] != -1) {
-            object = func_0029EFD0(0x114A);
+            object = CreateMoby(0x114A);
             ((PathObject *)object)->alpha = 0xFF; ((PathObject *)object)->colour = 0x1FF; ((PathObject *)object)->flags |= 0x100;
             next = object;
             if (index == path->pointCount - 1) {
-                func_00282CF0(object + 0xC0, &path->point[index - 1], &path->point[index]);
+                FastVecSub(object + 0xC0, &path->point[index - 1], &path->point[index]);
                 *(int *)(object + 0xCC) = 0;
-                func_00282F20(object + 0xC0, object + 0xC0, -1);
+                vec_scale_to_length(object + 0xC0, object + 0xC0, -1);
             } else {
-                func_00282CF0(object + 0xC0, &path->point[index + 1], &path->point[index]);
+                FastVecSub(object + 0xC0, &path->point[index + 1], &path->point[index]);
                 *(int *)(object + 0xCC) = 0;
-                func_00282F20(object + 0xC0, object + 0xC0, 1);
+                vec_scale_to_length(object + 0xC0, object + 0xC0, 1);
             }
-            func_00282DD8(object + 0xD0, object + 0xC0, &up);
-            func_00282F20(object + 0xD0, object + 0xD0, 1);
-            func_00282DD8(object + 0xE0, object + 0xD0, object + 0xC0);
+            FastVecCross(object + 0xD0, object + 0xC0, &up);
+            vec_scale_to_length(object + 0xD0, object + 0xD0, 1);
+            FastVecCross(object + 0xE0, object + 0xD0, object + 0xC0);
             qcopy(object + 0x10, &path->point[index]);
             *(int *)(object + 0x1C) = 0;
             }

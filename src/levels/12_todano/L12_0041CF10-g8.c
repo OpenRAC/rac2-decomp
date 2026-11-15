@@ -91,14 +91,14 @@ Destroy0:
         if (func_00282948(state + 0x14)) {
             *(int *)(self + 0x98) = 0;
             *(u16 *)(self + 0x34) = (*(u16 *)(self + 0x34) | 0x41) & 0xEFFF;
-            func_00282F20(vec, self + 0xC0, -0.10000000894f);
+            vec_scale_to_length(vec, self + 0xC0, -0.10000000894f);
             func_002B0A68(self, 63, vec, 3.0f, 6.0f, 3.0f, 6.0f, 255);
             p = (int *)state;
             for (i = 0; i < 3; i++, p++) {
                 if (*p != -1) {
                     child = D_L12_001B2E9C_gp + (*p << 8);
                     func_L12_0041E8F8(child);
-                    func_0032C700(child + 0x10, 1, 14, 10, 15, 10, 20, 1,
+                    SpawnExplosion(child + 0x10, 1, 14, 10, 15, 10, 20, 1,
                                   1, 1, 0, 0, 2.0f, 20.0f);
                     func_0029F338(D_L12_001B2E9C + (*p << 8));
                 }

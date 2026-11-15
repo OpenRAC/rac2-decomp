@@ -45,8 +45,8 @@ void func_L12_003E3A88(char *obj) {
         H(P(obj, 0x24), 0x46) = 5;
         U(obj, 0x34) |= 0x1000;
         F(s, 0x30) = 2.25f;
-        B(s, 0x48) = func_00283CF0(20.0f);
-        B(s, 0x4A) = func_00283CF0(24.0f);
+        B(s, 0x48) = FloatToInt(20.0f);
+        B(s, 0x4A) = FloatToInt(24.0f);
         B(s, 0x70) = 17;
         W(s, 0xA8) = 3;
         B(s, 0x71) = 4;
@@ -90,7 +90,7 @@ void func_L12_003E3A88(char *obj) {
         if (P(s, 0x294))
             W(P(s, 0x294), 0) = -1;
     }
-    if (B(obj, 0x31) && func_00282E48(obj + 0x10, D_L12_001B9E00) < 24.0f) {
+    if (B(obj, 0x31) && fast_vec_dist(obj + 0x10, D_L12_001B9E00) < 24.0f) {
         func_002A93B0(obj);
         B(obj, 0x6F) = 22;
     }
@@ -101,7 +101,7 @@ void func_L12_003E3A88(char *obj) {
     result = func_002B0ED8(obj, s + 0x60, 0);
     if (result) {
         if (result == 4) {
-            func_0026FEB8(D_L12_001B0B70);
+            STUB_printf(D_L12_001B0B70);
             W(s, 0x278) = 5;
         } else
             W(s, 0x278) = 1;
@@ -112,7 +112,7 @@ void func_L12_003E3A88(char *obj) {
         H(s, 0x26) = D_L12_001B0B00;
         H(s, 0x274) = 150;
     }
-    if (func_00282978(s + 0x274)) {
+    if (FastDecTimer(s + 0x274)) {
         if (W(s, 0x278) != 1)
             W(s, 0x278) = 0;
         else
@@ -120,18 +120,18 @@ void func_L12_003E3A88(char *obj) {
     }
     H(s, 0x276) = func_002B3BA8(obj, W(s, 0x150), 0, 0, 6.0f, 0.0f);
     W(s, 0x270) = W(s, 0x140);
-    if (P(s, 0x140) && func_00282E80(P(s, 0x140) + 0x10, obj + 0x10) < 16.0f) {
+    if (P(s, 0x140) && vec_distance_xy(P(s, 0x140) + 0x10, obj + 0x10) < 16.0f) {
         qcopy(pos, obj + 0x10);
         pos[2] += D_L12_001B0B68;
-        if (!func_002761F8(pos, s + 0x130, 16, 0, 0) || D_L12_001C0258 == D_0018C0B0) {
+        if (!CollLine(pos, s + 0x130, 16, 0, 0) || D_L12_001C0258 == D_0018C0B0) {
             if (H(s, 0x276) != 1)
                 H(s, 0x276) = 1;
         }
     }
     if (B(obj, 0x31)) {
-        angle = func_00283CE0(D_L12_001B29C8 % 60);
-        angle = angle * 6.2831854820251465f / func_00283CE0(60) - 3.1415927410125732f;
-        W(obj, 0x78) = func_L01_0031BC68(0x80808080, 0x80303030, angle);
+        angle = IntToFloat(D_L12_001B29C8 % 60);
+        angle = angle * 6.2831854820251465f / IntToFloat(60) - 3.1415927410125732f;
+        W(obj, 0x78) = PulseColor(0x80808080, 0x80303030, angle);
     }
     func_002B0990(obj, s + 0x2B0, 1, 1, D_L12_001B0B64);
 }

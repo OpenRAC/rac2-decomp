@@ -196,16 +196,16 @@ void func_L11_004471A8(JobObject *object)
     int chance;
     u16 timer;
 
-    if (func_00282978(&state->spawnTimer)) {
+    if (FastDecTimer(&state->spawnTimer)) {
         timer = D_L11_001B19A8;
         chance = D_L11_001B19AC;
         state->spawnTimer = timer;
         if (!func_002A77E0(chance)) {
             qcopy(position, &D_00189EA0);
-            func_00282CF0(velocity, position, func_L11_004417E8(object));
+            FastVecSub(velocity, position, func_L11_004417E8(object));
             velocity[2] = 0;
-            func_00282F20(velocity, velocity, D_L11_001B19B4);
-            func_00282CC0(position, velocity, func_L11_004417E8(object));
+            vec_scale_to_length(velocity, velocity, D_L11_001B19B4);
+            FastVecAdd(position, velocity, func_L11_004417E8(object));
             position[2] += 5.0f;
         } else {
             angle = func_002A7878(-3.1415927410125732f, 3.1415927410125732f);
@@ -254,8 +254,8 @@ void func_L11_004484A8(JobObject *object)
 
     if (object->stage == 0) {
         state->params = state->paramBlock;
-        state->f48 = func_00283CF0(15.0f);
-        state->f4A = func_00283CF0(16.0f);
+        state->f48 = FloatToInt(15.0f);
+        state->f4A = FloatToInt(16.0f);
         speed = func_002A7878(10.0f, 30.0f) * 0.01745329424738884f;
         state->turnRate = func_002A77E0(2) ? -speed : speed;
         state->f80 = 1.3f;
@@ -287,7 +287,7 @@ void func_L11_004484A8(JobObject *object)
     }
     if (state->f36E == 0 && object->stage != 18 && !D_001A8FF4) {
         object->flags |= 0x400;
-        if (object->f31 && func_00282E48(object->position, D_L11_001BA8C0) < 24.0f) {
+        if (object->f31 && fast_vec_dist(object->position, D_L11_001BA8C0) < 24.0f) {
             func_002A93B0(object);
             object->f6F = 22;
         }
@@ -316,7 +316,7 @@ void func_L11_004484A8(JobObject *object)
         if (state->health <= 0.0f && object->f95 != 7 && object->f95 != 8)
             func_L11_00449970(object, 1, 0);
         if (state->f36E) {
-            func_00283698(state->basis, object->rotation);
+            matrix_from_basis_rows(state->basis, object->rotation);
             func_002AFFD8(object->position, state->anchor, 0);
             if (!func_L11_004461C0(object->fB8, object->position) && object->f95 != 8) {
                 state->health = 0;
@@ -359,8 +359,8 @@ void func_L11_00452450(char *object)
         *(f32 *)(state + 0x2C8) = turnRate;
         if (func_002A77E0(2) == 1)
             *(u16 *)(object + 0x34) |= 0x8000;
-        *(u8 *)(state + 0x48) = func_00283CF0(15.0f);
-        *(u8 *)(state + 0x4A) = func_00283CF0(12.0f);
+        *(u8 *)(state + 0x48) = FloatToInt(15.0f);
+        *(u8 *)(state + 0x4A) = FloatToInt(12.0f);
         *(u8 *)(state + 0x60) = 0xB;
         *(s32 *)(state + 0x98) = 4;
         *(f32 *)(state + 0x100) = 0.8f;
@@ -377,7 +377,7 @@ void func_L11_00452450(char *object)
     }
     if (*(s16 *)(state + 0x2D8) == 0 && *(u8 *)(object + 0x20) != 0xC && D_001A8FF4 == 0) {
         *(u16 *)(object + 0x34) |= 0x400;
-        if (*(u8 *)(object + 0x31) != 0 && func_00282E48(object + 0x10, D_L11_001BA8C0) < 24.0f) {
+        if (*(u8 *)(object + 0x31) != 0 && fast_vec_dist(object + 0x10, D_L11_001BA8C0) < 24.0f) {
             func_002A93B0(object);
             *(u8 *)(object + 0x6F) = 0x16;
         }
@@ -391,8 +391,8 @@ void func_L11_00452450(char *object)
     func_00282C88(aim);
     *(s32 *)(state + 0x298) = 0;
     *(f32 *)(state + 0x290) = 0.25f;
-    func_002830C0(aim, aim, matrix);
-    func_00282CC0(aim, aim, matrix + 12);
+    transform_vector(aim, aim, matrix);
+    FastVecAdd(aim, aim, matrix + 12);
     if (*(u8 *)(object + 0x20) >= 3) {
         hit = (char *)func_002A9640(object, 0x10000, 1);
         if (hit != 0) {
@@ -409,7 +409,7 @@ void func_L11_00452450(char *object)
         }
         if (*(s16 *)(state + 0x2D8) != 0) {
             char *pos;
-            func_00283698(state + 0x230, object + 0xC0);
+            matrix_from_basis_rows(state + 0x230, object + 0xC0);
             pos = object + 0x10;
             func_002AFFD8(pos, state + 0x260, 0);
             if (func_L11_004461C0(*(s32 *)(object + 0xB8), pos) == 0) {

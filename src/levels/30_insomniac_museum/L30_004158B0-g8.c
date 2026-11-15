@@ -69,14 +69,14 @@ void func_L30_004158B0(char *obj) {
         int n, life;
         char *particle;
         a = func_00283248(D_L30_001B9C80.position[0] - *(float *)(obj+0x10), D_L30_001B9C80.position[1] - *(float *)(obj+0x14));
-        n = func_00283CF0(func_002A78D8(2.0f, 5.0f));
+        n = FloatToInt(func_002A78D8(2.0f, 5.0f));
         life = func_002A7820(30, 50);
         p[0] = *(float *)(obj+0x10) + func_002A78D8(0.0f, 0.1f)*st->scale;
         p[1] = *(float *)(obj+0x14) + func_002A78D8(0.0f, 0.1f)*st->scale;
         p[2] = *(float *)(obj+0x18) + func_002A78D8(0.0f, 0.1f)*st->scale;
         size = func_002A7878(0.6f, 1.0f)*st->scale;
         speed = func_002A7878(9.0f, 12.0f)*st->scale;
-        direction = func_00283B98(a, func_002A78D8(0.0f, 1.396263599395752f));
+        direction = FastAddRotations(a, func_002A78D8(0.0f, 1.396263599395752f));
         v[0] = func_00283180(direction)*(1.0f/60.0f)*speed;
         v[1] = func_00283198(direction)*(1.0f/60.0f)*speed;
         v[2] = 0.0f;
@@ -92,14 +92,14 @@ void func_L30_004158B0(char *obj) {
         int n, life;
         char *particle;
         a = func_00283248(D_L30_001B9C80.position[0] - *(float *)(obj+0x10), D_L30_001B9C80.position[1] - *(float *)(obj+0x14));
-        n = func_00283CF0(func_002A78D8(2.0f, 5.0f));
+        n = FloatToInt(func_002A78D8(2.0f, 5.0f));
         life = func_002A7820(30, 50);
         p[0] = *(float *)(obj+0x10) + func_002A78D8(0.0f, 0.1f)*st->scale;
         p[1] = *(float *)(obj+0x14) + func_002A78D8(0.0f, 0.1f)*st->scale;
         p[2] = *(float *)(obj+0x18) + func_002A78D8(0.0f, 0.1f)*st->scale;
         size = func_002A7878(0.75f, 1.5f)*st->scale;
         speed = func_002A7878(9.0f, 12.0f)*st->scale;
-        direction = func_00283B98(a, func_002A78D8(0.0f, 1.396263599395752f));
+        direction = FastAddRotations(a, func_002A78D8(0.0f, 1.396263599395752f));
         v[0] = func_00283180(direction)*(1.0f/60.0f)*speed;
         v[1] = func_00283198(direction)*(1.0f/60.0f)*speed;
         v[2] = 0.0f;
@@ -112,14 +112,14 @@ void func_L30_004158B0(char *obj) {
         int n, life;
         char *particle;
         a = func_00283248(D_L30_001B9C80.position[0] - *(float *)(obj+0x10), D_L30_001B9C80.position[1] - *(float *)(obj+0x14));
-        n = func_00283CF0(func_002A78D8(2.0f, 5.0f));
+        n = FloatToInt(func_002A78D8(2.0f, 5.0f));
         life = func_002A7820(30, 50);
         p[0] = *(float *)(obj+0x10) + func_002A78D8(0.0f, 0.1f)*st->scale;
         p[1] = *(float *)(obj+0x14) + func_002A78D8(0.0f, 0.1f)*st->scale;
         p[2] = *(float *)(obj+0x18) + func_002A78D8(0.0f, 0.1f)*st->scale;
         size = func_002A7878(0.6f, 1.0f)*st->scale;
         speed = func_002A7878(9.0f, 12.0f)*st->scale;
-        direction = func_00283B98(a, func_002A78D8(0.0f, 1.396263599395752f));
+        direction = FastAddRotations(a, func_002A78D8(0.0f, 1.396263599395752f));
         v[0] = func_00283180(direction)*(1.0f/60.0f)*speed;
         v[1] = func_00283198(direction)*(1.0f/60.0f)*speed;
         v[2] = 0.0f;
@@ -130,7 +130,7 @@ void func_L30_004158B0(char *obj) {
     for (i = 0; i < st->count4; i++) {
         float x, y;
         char *particle;
-        func_00282D30(p,obj+0xC0,func_002A7878(15.0f,20.0f)*st->scale*(1.0f/60.0f));
+        FastVecScale(p,obj+0xC0,func_002A7878(15.0f,20.0f)*st->scale*(1.0f/60.0f));
         x = func_002A78D8(0.2617994248867035f,1.396263599395752f);
         y = func_002A78D8(0.2617994248867035f,1.396263599395752f);
         func_002AB668(t,obj+0xD0,x);
@@ -146,7 +146,7 @@ void func_L30_004158B0(char *obj) {
         *(Quadword *)p = *(Quadword *)v;
         func_00308408(obj,obj+0x10,p,16,st->scale*3.5f,(unsigned char)st->color,(unsigned char)(st->color>>8),(unsigned char)(st->color>>16),45);
     }
-    func_002ABBB8(obj,D_L30_001A8F20,obj+0x10,0.0f,0.0f,0,0,0,0.0f,0.0f,9.0f,0.0f,-1,st->scale*20.0f,0,0,-1,0,0x810001);
+    SpawnExplosionEffects(obj,D_L30_001A8F20,obj+0x10,0.0f,0.0f,0,0,0,0.0f,0.0f,9.0f,0.0f,-1,st->scale*20.0f,0,0,-1,0,0x810001);
     sign = 1;
     a = func_00283248(D_L30_001B9C80.position[0] - *(float *)(obj+0x10), D_L30_001B9C80.position[1] - *(float *)(obj+0x14));
     for (i = 0; i < st->count3; i++) {
@@ -159,14 +159,14 @@ void func_L30_004158B0(char *obj) {
         size = func_002A7878(1.0f/60.0f,1.0f/30.0f)*st->scale;
         x = func_002A78D8(0.0f,1.396263599395752f);
         y = func_002A78D8(0.0f,1.5707964897155762f);
-        func_002AF000(v,size,func_00283B98(a,y),x);
-        particle = func_002BDCE8(p,0.0f,1.0f,1.01f,sign,v,st->scale*315000.0f,st->color|0x7F0000,0);
+        func_002AF000(v,size,FastAddRotations(a,y),x);
+        particle = SpawnSpinningSparkParticle(p,0.0f,1.0f,1.01f,sign,v,st->scale*315000.0f,st->color|0x7F0000,0);
         if (particle) {
             char *sub = particle + 0x20;
             *(short *)(particle+10) = func_002A7820(40,70);
-            particle[9] = func_00283CF0(4.0f)+64;
+            particle[9] = FloatToInt(4.0f)+64;
             *(int *)(sub+4) = 3;
-            *(float *)(sub+0x1C) = func_00283CE0(func_002A7820(1,10));
+            *(float *)(sub+0x1C) = IntToFloat(func_002A7820(1,10));
             sub[0xA] = 64;
             sub[0xB] = particle[10];
         }

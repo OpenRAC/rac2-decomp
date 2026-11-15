@@ -29,7 +29,7 @@ extern float D_L08_001B1F94 __attribute__((sda));
 /* Installs the same aligned input vector in the owner and its attached state. */
 SpawnObject *func_L08_00435600(u8 *owner, SpawnVector *position)
 {
-    SpawnObject *object = func_0029EFD0(0x998);
+    SpawnObject *object = CreateMoby(0x998);
     if (object != 0) {
         AttachedState *state;
         object->enabled = 1;

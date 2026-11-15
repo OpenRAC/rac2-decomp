@@ -32,7 +32,7 @@ void func_L16_00417990(char *object)
         func_002A7750((unsigned char *)object,1,-1);
         break;
     case 1:
-        func_00282D30(position,position,*(float *)(object+0x2c));
+        FastVecScale(position,position,*(float *)(object+0x2c));
         state[1]=(int)func_L00_0033E220(position,object,0x28202080u,-1,1,2,0,0x60,*(float *)(object+0x2c)*3780000.0f,0.75f);
         if(func_002A9640(object,0x4010000u,0)!=0 && state[0]==0) func_002A7750((unsigned char *)object,2,-1);
         *(unsigned char *)(object+0xa8)=0xff;
@@ -42,7 +42,7 @@ void func_L16_00417990(char *object)
         func_L00_002EC248(object,position,0.2f,velocity,0.1166666746f,40,1,1.0f,5.0f,1.0f);
         *(Vector128 *)zero=0;
         func_L00_00324F18(object,(char *)position,13.0f,0.0f,14.0f);
-        func_002ABBB8(object,zero,position,0.0f,0.0f,10,3,5,0.0f,-1,1.0f,9.0f,0.75f,0.0f,0,0,-1,0,0x810001);
+        SpawnExplosionEffects(object,zero,position,0.0f,0.0f,10,3,5,0.0f,-1,1.0f,9.0f,0.75f,0.0f,0,0,-1,0,0x810001);
         if(state[1]!=0) func_002B9180((void *)state[1]);
         func_L00_00326620(object,0x10f2,0);
         *(int *)(object+0x98)=0;
@@ -53,11 +53,11 @@ void func_L16_00417990(char *object)
         break;
     case 3:
         if(state[2]>80) {
-            func_00282D30(velocity,velocity,0.5f);
+            FastVecScale(velocity,velocity,0.5f);
             func_L00_002EC248(object,position,0.0f,velocity,0.05000000447f,4,1,1.0f,5.0f,1.0f);
         }
         if(func_00282948(state+2)!=0) {
-            func_00282D30(velocity,velocity,0.3333333433f);
+            FastVecScale(velocity,velocity,0.3333333433f);
             ((float *)velocity)[2]*=0.3333333433f;
             func_L00_002EC248(object,position,0.0f,velocity,0.05000000447f,func_002A7820(3,6),1,0.5f,15.0f,1.0f);
             func_L00_002EC248(object,position,0.0f,velocity,0.05000000447f,func_002A7820(3,6),0,0.5f,15.0f,1.0f);

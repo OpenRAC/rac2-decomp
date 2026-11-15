@@ -39,8 +39,8 @@ void func_L02_003D91A0(char *self) {
     float amount;
     if (*(unsigned char *)(self + 0x20) == 0) {
         struct InitPrefix *initial = (struct InitPrefix *)state;
-        initial->flag = func_00283CF0(15.0f);
-        initial->limit = func_00283CF0(24.0f);
+        initial->flag = FloatToInt(15.0f);
+        initial->limit = FloatToInt(24.0f);
         initial->active = 1;
         initial->mode = 3;
         initial->blend = 0.5f;
@@ -58,7 +58,7 @@ void func_L02_003D91A0(char *self) {
         entry = (char *)((*(int *)(*(char **)(self + 0x68) + 0x244) << 8) + D_L02_001B359C_1[0]);
         *(unsigned short *)(entry + 0x34) |= 6;
         *(short *)(state + 0x286) = 60;
-        func_002A04B8(self, state + 0x270, state + 0x274, state + 0x278);
+        get_moby_color(self, state + 0x270, state + 0x274, state + 0x278);
         func_00282A60(state + 0x170, 0, 0x40);
         func_00282A60(state + 0x1B0, 0, 0x40);
         func_L02_003DB6D8(self);

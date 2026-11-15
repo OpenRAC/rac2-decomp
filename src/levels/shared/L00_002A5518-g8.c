@@ -86,7 +86,7 @@ void func_L00_002A5518(void)
         int i;
         for (i = 0; i < 7; i++) {
             if (!D_00189E20.effects[i].active) {
-                func_0029F978(D_00189E20.moby, D_L00_001A7E40[i],
+                AttachManipulator(D_00189E20.moby, D_L00_001A7E40[i],
                              (unsigned char *)&D_00189E20.effects[i]);
                 D_00189E20.effects[i].enabled = 1;
                 qcopy(&D_00189E20.effects[i].a, D_L00_0025DD90 + i);

@@ -36,7 +36,7 @@ void func_L16_00410618(u8 *moby)
     float quantum, amount, divisor;
     if (!moby[0x20]) {
         if (D_001395B8[0x83] == 2) {
-            func_L16_00411F80(moby, 0);
+            SetMobyAndGroupsEnabled(moby, 0);
             func_0029F338(D_L16_001B2B1C[0] + *(int *)(state + 0x174) * 256);
             func_0029F338(moby);
             return;
@@ -47,14 +47,14 @@ void func_L16_00410618(u8 *moby)
         }
         speech = state + 0x310;
         state[0x2e] = 1;
-        divisor = func_00283CE0(D_L16_001B16C4);
+        divisor = IntToFloat(D_L16_001B16C4);
         quantum = (float)*(short *)(state + 0x24);
         quantum /= divisor;
-        threshold = func_00283CF0((*(float *)(state + 0x20) - 1.0f) / quantum);
+        threshold = FloatToInt((*(float *)(state + 0x20) - 1.0f) / quantum);
         *(float *)(state + 0x248) = (float)threshold * quantum;
         arms = (u8 **)(state + 0x238);
         for (i = 1; i >= 0; i--, arms++) {
-            child = func_0029EFD0(0x7e8);
+            child = CreateMoby(0x7e8);
             if (child) {
                 func_002B37E8(child, moby);
                 *(unsigned short *)(child + 0x34) |= 0x4100;
@@ -82,8 +82,8 @@ void func_L16_00410618(u8 *moby)
         func_L16_004116C8(moby, 0, 0, 0.0f);
         if (D_001395B8[0x83] == 1) {
             func_L16_004117A8(moby);
-            func_L16_00411F80(moby, 1);
-        } else func_L16_00411F80(moby, 0);
+            SetMobyAndGroupsEnabled(moby, 1);
+        } else SetMobyAndGroupsEnabled(moby, 0);
     }
     if (!moby[0x95] || moby[0x95] == 5) return;
     damage = func_002A9640(moby, 0x10000, 0);
@@ -100,12 +100,12 @@ void func_L16_00410618(u8 *moby)
         }
         else func_002AB800((int)moby, (char *)(state + 0x50));
         amount = func_002A96A0(moby, damage);
-        func_002AA2E8((float *)(state + 0x20), 0.0f, amount);
+        ApproachValue((float *)(state + 0x20), 0.0f, amount);
         if (D_L16_001B16C0 && moby[0x95] != 3 && *(float *)(state + 0x20) < *(float *)(state + 0x248)) {
-            divisor = func_00283CE0(D_L16_001B16C4);
+            divisor = IntToFloat(D_L16_001B16C4);
             quantum = (float)*(short *)(state + 0x24);
             quantum /= divisor;
-            threshold = func_00283CF0((*(float *)(state + 0x20) - 1.0f) / quantum);
+            threshold = FloatToInt((*(float *)(state + 0x20) - 1.0f) / quantum);
             (*(int *)(state + 0x260))++;
             *(float *)(state + 0x248) = (float)threshold * quantum;
             func_002A7750(moby, 9, 3);

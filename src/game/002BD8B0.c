@@ -21,7 +21,7 @@ void *func_002BD8B0(void *a0, void *a1, int a2, int a3, int a4, int a5, float f)
     if (p != 0) {
         qcopy((char *)p + 0x10, a0);
         *(int *)((char *)p + 4) = a2;
-        v = func_00283CF0(4.0f);
+        v = FloatToInt(4.0f);
         *(unsigned char *)((char *)p + 1) = 0;
         *(float *)((char *)p + 0xC) = f;
         *(unsigned char *)((char *)p + 3) = 0x48;

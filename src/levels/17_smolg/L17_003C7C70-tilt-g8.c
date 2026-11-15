@@ -70,21 +70,21 @@ void func_L17_003C7C70(UpdateObject *o)
     case 1:
         if(func_L00_00324120(o)) {
             func_002A7750(o,2,-1);
-            s->b0=func_00283CF0(D_L17_001B03C8*60.0f);
+            s->b0=FloatToInt(D_L17_001B03C8*60.0f);
         }
         break;
     case 2: {
         float t;
-        if(func_002B3868(o))func_002E5CF8(0,0,o);
-        if(s->b0==60)func_002E5CF8(0,0,o);
+        if(func_002B3868(o))PlayMobySound(0,0,o);
+        if(s->b0==60)PlayMobySound(0,0,o);
         if(func_00282948(&s->b0)) {
-            s->b4=func_00283CF0(D_L17_001B03CC*60.0f);
+            s->b4=FloatToInt(D_L17_001B03CC*60.0f);
             o->mode=3;
         } else {
-            rot[0]=func_00283198(func_002ABB18(func_00283CE0(s->b0)*0.75f))*0.017453294f;
-            rot[1]=func_00283180(func_002ABB18(func_00283CE0(s->b0)*0.89f))*0.017453294f;
+            rot[0]=func_00283198(func_002ABB18(IntToFloat(s->b0)*0.75f))*0.017453294f;
+            rot[1]=func_00283180(func_002ABB18(IntToFloat(s->b0)*0.89f))*0.017453294f;
             if((float)s->b4>D_L17_001B03C8*60.0f-30.0f) {
-                t=func_00283CE0(s->b0)/(D_L17_001B03C8*60.0f-30.0f);
+                t=IntToFloat(s->b0)/(D_L17_001B03C8*60.0f-30.0f);
                 o->rotation.f[0]=o->rotation.f[0]*t+rot[0]*(1.0f-t);
                 o->rotation.f[1]=o->rotation.f[1]*t+rot[1]*(1.0f-t);
             } else {
@@ -96,15 +96,15 @@ void func_L17_003C7C70(UpdateObject *o)
     }
     case 3: {
         float t,f,b,ax,ay;
-        t=func_00283CE0(s->b4)/(D_L17_001B03CC*60.0f);
+        t=IntToFloat(s->b4)/(D_L17_001B03CC*60.0f);
         f=(1.0f-t)*D_L17_001B03D4;
         o->rotation.f[1]=0;
         o->rotation.f[0]=(1.0f-t)*1.57079649f;
-        ax=func_00283180(func_00283B98(1.57079649f,o->rotation.f[2]));
+        ax=func_00283180(FastAddRotations(1.57079649f,o->rotation.f[2]));
         b=func_00283198(o->rotation.f[0]);
         ax*=f*b;
         o->position.f[0]=ax;
-        ay=func_00283198(func_00283B98(1.57079649f,o->rotation.f[2]));
+        ay=func_00283198(FastAddRotations(1.57079649f,o->rotation.f[2]));
         b=func_00283198(o->rotation.f[0]);
         ay*=f*b;
         o->position.f[1]=ay;
@@ -120,23 +120,23 @@ void func_L17_003C7C70(UpdateObject *o)
         o->flags34&=~0x20;
         if(func_00282948(&s->b4)) {
             o->mode=4;
-            s->b8=func_00283CF0(D_L17_001B03D0*60.0f);
+            s->b8=FloatToInt(D_L17_001B03D0*60.0f);
         }
         break;
     }
     case 4: {
         float t,f,b,c,ax,ay;
-        t=func_00283CE0(s->b8)/(D_L17_001B03D0*60.0f);
+        t=IntToFloat(s->b8)/(D_L17_001B03D0*60.0f);
         *(Quad *)rot=o->rotation.q;
         c=1.0f-t;
         f=(1.0f-c)*D_L17_001B03D4;
         o->rotation.f[0]=func_00283C28((rot[0]*c+c*4.71238947f)+1.57079649f);
         o->rotation.f[1]=rot[1]*c;
-        ax=func_00283180(func_00283B98(1.57079649f,o->rotation.f[2]));
+        ax=func_00283180(FastAddRotations(1.57079649f,o->rotation.f[2]));
         b=func_00283198(o->rotation.f[0]);
         ax*=f*b;
         o->position.f[0]=ax;
-        ay=func_00283198(func_00283B98(1.57079649f,o->rotation.f[2]));
+        ay=func_00283198(FastAddRotations(1.57079649f,o->rotation.f[2]));
         b=func_00283198(o->rotation.f[0]);
         ay*=f*b;
         o->position.f[1]=ay;
@@ -162,7 +162,7 @@ void func_L17_003C7C70(UpdateObject *o)
     }
     }
     if(o->mode<3) {
-        func_00282CF0(pos,&o->position,oldpos);
+        FastVecSub(pos,&o->position,oldpos);
         func_002AD6F0((u8 *)s+0x50,pos,oldrot,&o->rotation);
     }
 }

@@ -24,7 +24,7 @@ void func_L19_00422238(char *obj)
         else
             vel[2] = *(float *)(state + 0xC) * 0.5f;
         pos[2] += 6.0f;
-        color = func_00283D38(*(int *)(state + 0x38), *(int *)(state + 0x34),
+        color = FastTweenColor(*(int *)(state + 0x38), *(int *)(state + 0x34),
                               func_002A7878(0.0f, 1.0f));
         alpha = color >> 24;
         life = func_002A7820(*(int *)(state + 0x40) / 2, *(int *)(state + 0x40));

@@ -1,7 +1,7 @@
 /* The 15-state per-frame update of one Endako entity. -G8 for its small data;
  * -g (config/cflags.txt) gives the two nops retail has before state 12's div.s.
  *
- * func_002AA800 returns the angle still left, the result of its last call to
+ * StepAngleTowardTarget returns the angle still left, the result of its last call to
  * func_002AA738, as RAC1's ApproachValue returns the distance left. No caller
  * here reads it, but the call still defines $f0: that is why state 14's copy
  * right after it takes $f1.
@@ -87,7 +87,7 @@ void func_L03_003F4638(u8 *e) {
     func_L03_003F5590(e);
     switch(e[0x20]) {
     case 1:
-        if (func_002ACBC8(D_L03_00189EA0,((AttackState *)s)->activation[I(s,0x2D4)])) {
+        if (IsPointInCuboid(D_L03_00189EA0,((AttackState *)s)->activation[I(s,0x2D4)])) {
             u8 *p;
             func_002A7750(e,2,-1);
             H(e,0x34)=(H(e,0x34)&0xFFBE)|0x1000;
@@ -100,10 +100,10 @@ void func_L03_003F4638(u8 *e) {
             F(s,0x2A8)=func_00283248(D_L03_00189E20.position[0]-F(e,0x10),D_L03_00189E20.position[1]-F(e,0x14));
             F(s,0x2D0)=0.16666667f;
         }
-        if(func_002ACBC8(D_L03_00189EA0,I(s,0x94))) func_002A7750(e,4,-1);
+        if(IsPointInCuboid(D_L03_00189EA0,I(s,0x94))) func_002A7750(e,4,-1);
         break;
     case 2:
-        if(func_002ACBC8(D_L03_00189EA0,((AttackState *)s)->ready[I(s,0x2D4)])) {
+        if(IsPointInCuboid(D_L03_00189EA0,((AttackState *)s)->ready[I(s,0x2D4)])) {
             D_001395C2[0]=1; func_002A7750(e,3,-1);
             I(s,0x2DC)=I(*(u8 **)(s+0x2CC),0)-1;
         }
@@ -120,7 +120,7 @@ void func_L03_003F4638(u8 *e) {
         }
         break;
     case 4:
-        if(D_L03_001B104C && func_002ACBC8(D_L03_00189EA0,I(s,0x94))) {
+        if(D_L03_001B104C && IsPointInCuboid(D_L03_00189EA0,I(s,0x94))) {
             if(D_L03_001B106C) func_002A7750(e,5,-1);
             else if(func_00288AA0(D_L03_001BFB80,0x36)) {
                 D_L03_001B106C=1;func_00288BE8(D_L03_001BFB80);func_002A7750(e,5,-1);
@@ -170,14 +170,14 @@ void func_L03_003F4638(u8 *e) {
         int done=1,n;
         for(i=0;i<2;i++) {
             if(((AttackState *)s)->target[i]!=0) {
-                func_002AA2E8(&((AttackState *)s)->blend[i],-((AttackState *)s)->target[i],D_L03_001B1054*0.0002908882452175021f);
+                ApproachValue(&((AttackState *)s)->blend[i],-((AttackState *)s)->target[i],D_L03_001B1054*0.0002908882452175021f);
                 F(s,0x178+i*0x80)=((AttackState *)s)->blend[i];
                 if(func_00282C48(((AttackState *)s)->blend[i]+((AttackState *)s)->target[i])>0.01f) done=0;
                 if(((D_L03_001B2548+i*4)&7)==0) {
                     Q(b,0)=0; b[1]=func_002A78D8(0,0.1f);b[2]=func_002A78D8(0,0.1f);b[3]=1;
-                    Q(a,0)=Q(b,0);func_0029FC20(e,i+2,c);func_002830C0(a,a,c);
-                    func_00282F20(b,c,D_L03_001B103C*0.016666668f);
-                    func_002E5CF8(3,0,e);n=func_L03_003D9820(e,a,b,s[0x34]);func_L03_003F68E8(e,n);
+                    Q(a,0)=Q(b,0);func_0029FC20(e,i+2,c);transform_vector(a,a,c);
+                    vec_scale_to_length(b,c,D_L03_001B103C*0.016666668f);
+                    PlayMobySound(3,0,e);n=func_L03_003D9820(e,a,b,s[0x34]);func_L03_003F68E8(e,n);
                 }
             }
         }
@@ -201,8 +201,8 @@ void func_L03_003F4638(u8 *e) {
         if(func_002B3868(e) && e[0x43]!=6) func_002A7470(e,6,0,5);
         if(func_002AEB60(e,2.0f)) {
             func_0029FCC0(e,4,a);qcopy(b,e+0xC0);b[2]=0;
-            func_00282F20(b,b,D_L03_001B1068*0.016666668f);
-            n=s[0x36];func_002E5CF8(4,0,e);
+            vec_scale_to_length(b,b,D_L03_001B1068*0.016666668f);
+            n=s[0x36];PlayMobySound(4,0,e);
             func_L03_003E18D8(e,a,b,b,30,(float)n,(float)n,80,1,1.0f);
         }
         if((e[0x60]&2) && func_00282948(s+0x33C)) func_002A7750(e,6,2);
@@ -220,9 +220,9 @@ void func_L03_003F4638(u8 *e) {
             side=(float)I(s,0x330)*0.016666668f;
             lateral=D_L03_001B1030[S(s,0x3C2)-1]*side;
             c[2]=2*height/(float)n; c[1]=lateral;}
-            Q(b,0)=Q(c,0);func_00283098(b,b,e+0xC0);
-            func_00282D30(c,b,(float)(n>>1));func_00282CC0(c,c,a);func_00282CF0(c,s+0x50,c);c[2]=0;
-            func_00282F20(c,c,D_L03_001B1030[S(s,0x3C2)-1]*0.016666668f);
+            Q(b,0)=Q(c,0);matrix_mul_vec3(b,b,e+0xC0);
+            FastVecScale(c,b,(float)(n>>1));FastVecAdd(c,c,a);FastVecSub(c,s+0x50,c);c[2]=0;
+            vec_scale_to_length(c,c,D_L03_001B1030[S(s,0x3C2)-1]*0.016666668f);
             func_L03_003D09D0(e,0,a,b,c,n,300,s[0x35]);
         }
         break;
@@ -236,27 +236,27 @@ void func_L03_003F4638(u8 *e) {
         else if(e[0x43]!=0)func_002A7470(e,0,0,5);
         if(H(e,0x96)%45==0) {
             Q(b,0)=0;b[0]=func_002A7878(-2,2);b[1]=func_002A7878(-4,4);b[2]=func_002A7878(-1,3);
-            Q(a,0)=Q(b,0);func_00283098(a,a,e+0xC0);func_00282CC0(a,a,e+0x10);func_002E5CF8(2,0,e);
-            func_0032C700(a,0,25,20,20,20,45,1,0,0,0,0,1,20);
+            Q(a,0)=Q(b,0);matrix_mul_vec3(a,a,e+0xC0);FastVecAdd(a,a,e+0x10);PlayMobySound(2,0,e);
+            SpawnExplosion(a,0,25,20,20,20,45,1,0,0,0,0,1,20);
         }
-        func_002AA800(s+0x2A0,0,0.26179942f,0.0014544413425028324f);
+        StepAngleTowardTarget(s+0x2A0,0,0.26179942f,0.0014544413425028324f);
         ((AttackState *)s)->angles[1]=((AttackState *)s)->angles[0];I(s,0x2DC)=I(s,0x2D8);
         if(H(e,0x96)>=180) {
-            func_00282CF0(a,D_L03_001B9980,e+0x10);func_00282F20(a,a,1);func_0032DA58(e,e+0x10,a,0);
+            FastVecSub(a,D_L03_001B9980,e+0x10);vec_scale_to_length(a,a,1);func_0032DA58(e,e+0x10,a,0);
             func_002A7750(e,15,-1);I(s,0x2CC)=0;F(s,0x2D0)=-0.083333336f;
-        } else F(s,0x2C0)=func_00283B98(F(s,0x2C0),(float)H(e,0x96)*0.0024240687489509583f);
+        } else F(s,0x2C0)=FastAddRotations(F(s,0x2C0),(float)H(e,0x96)*0.0024240687489509583f);
         break;
     case 15: {
         int n;
         float x;
         if(H(e,0x96)%15==0) {
             Q(b,0)=0;b[0]=func_002A7878(-2,2);b[1]=func_002A7878(-2,2);b[2]=func_002A7878(0,3);
-            Q(a,0)=Q(b,0);func_00283098(a,a,e+0xC0);func_00282CC0(a,a,e+0x10);func_002E5CF8(2,0,e);
-            func_0032C700(a,0,25,20,20,20,45,0,0,0,0,0,1,20);
+            Q(a,0)=Q(b,0);matrix_mul_vec3(a,a,e+0xC0);FastVecAdd(a,a,e+0x10);PlayMobySound(2,0,e);
+            SpawnExplosion(a,0,25,20,20,20,45,0,0,0,0,0,1,20);
         }
-        func_002AA800(s+0x2A0,0,0.78539824f,0.02617994323372841f);func_002AA800(s+0x2A4,0,1.5707965f,0.02617994323372841f);
-        x=func_00283CE0(H(e,0x96));F(s,0x2D0)-=x*9.259259968530387e-05f;F(s,0x298)+=F(s,0x2D0);
-        if(!S(s,0x3C0) && F(s,0x298)<F(s,0x2B8)-1) {S(s,0x3C0)=1;func_002A6C58(e,0,3);}
+        StepAngleTowardTarget(s+0x2A0,0,0.78539824f,0.02617994323372841f);StepAngleTowardTarget(s+0x2A4,0,1.5707965f,0.02617994323372841f);
+        x=IntToFloat(H(e,0x96));F(s,0x2D0)-=x*9.259259968530387e-05f;F(s,0x298)+=F(s,0x2D0);
+        if(!S(s,0x3C0) && F(s,0x298)<F(s,0x2B8)-1) {S(s,0x3C0)=1;SetDeathBits(e,0,3);}
         if(F(s,0x298)<F(s,0x2B8)-12) {
             func_L00_002D7140(I(s,0x2C8));func_L00_003294F0(D_L03_001B2A1C+(I(s,0xA4)<<8),0);func_L01_00323310(I(s,0xB4),I(s,0xB8));
             if(I(s,0x2C4))func_0029F338(*(void **)(s+0x2C4));

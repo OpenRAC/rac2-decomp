@@ -22,10 +22,10 @@ void func_L04_00456860(unsigned char *m, int count, float low, float high, float
             position.f[0] = radius * func_00283180(angle);
             position.f[1] = radius * func_00283198(angle);
             position.f[2] = func_002A7878(0.0f, 1.0f);
-            func_00282F20(&velocity, &position, func_002A7878(speed * 0.75f, speed * 1.25f));
+            vec_scale_to_length(&velocity, &position, func_002A7878(speed * 0.75f, speed * 1.25f));
             position.f[2] = func_002A7878(low, high);
-            func_00282CC0(&position, m + 0x10, &position);
-            func_L00_003263D0(m, &position, 0.0f, 1, 1, &velocity, 0.0f, 1.0f, 0x80402000, 3.5f, 0);
+            FastVecAdd(&position, m + 0x10, &position);
+            SpawnTintedEffects(m, &position, 0.0f, 1, 1, &velocity, 0.0f, 1.0f, 0x80402000, 3.5f, 0);
         } while (--remaining);
     }
 }

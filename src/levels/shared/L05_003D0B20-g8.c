@@ -39,16 +39,16 @@ void func_L05_003D0B20(char *obj)
     float length;
     qcopy(&old, obj + 0x10);
     if (*(char **)(data+0x10) && *(int *)(func_002ED688(*(char **)(data+0x10))+0x110)==1) {
-        if (*(int *)(data+0x18)<func_00283CF0(1.0f / *(float *)(data+0x1c))-4) {
-            length=func_00282DF0(data);
-            func_00282CF0(data,*(char **)(data+0x10)+0x10,obj+0x10);
-            func_00282F20(data,data,length);
+        if (*(int *)(data+0x18)<FloatToInt(1.0f / *(float *)(data+0x1c))-4) {
+            length=FastVecLength(data);
+            FastVecSub(data,*(char **)(data+0x10)+0x10,obj+0x10);
+            vec_scale_to_length(data,data,length);
         } else {
             float turn = D_L05_001AFC28;
             if (*(int *)(data+0x24)) {
-                func_00282CF0(&temp, *(char **)(data + 0x10) + 0x10, obj + 0x10);
-                length = func_00282DF0(data);
-                func_00282F20(data, &temp, length);
+                FastVecSub(&temp, *(char **)(data + 0x10) + 0x10, obj + 0x10);
+                length = FastVecLength(data);
+                vec_scale_to_length(data, &temp, length);
             } else {
                 func_L05_003D1058(obj + 0x10, data, *(char **)(data + 0x10),
                                    data + 0x14, turn, D_L05_001AFC30, 0.0f);
@@ -56,12 +56,12 @@ void func_L05_003D0B20(char *obj)
         }
         temp.q = 0;
         temp.f[2] = 1.0f;
-        func_00282F20(obj + 0xC0, data, 1.0f);
-        func_00282DD8(obj + 0xD0, obj + 0xC0, &temp);
-        func_00282F20(obj + 0xD0, obj + 0xD0, 1.0f);
-        func_00282DD8(obj + 0xE0, obj + 0xD0, obj + 0xC0);
+        vec_scale_to_length(obj + 0xC0, data, 1.0f);
+        FastVecCross(obj + 0xD0, obj + 0xC0, &temp);
+        vec_scale_to_length(obj + 0xD0, obj + 0xD0, 1.0f);
+        FastVecCross(obj + 0xE0, obj + 0xD0, obj + 0xC0);
     }
-    func_00282CC0(obj+0x10,obj+0x10,data);
+    FastVecAdd(obj+0x10,obj+0x10,data);
     if (*(int *)(data+0x24)) {
         *(float *)(obj+0x2c)+=0.025f;
         if (*(float *)(obj+0x2c)>*(float *)(*(char **)(obj+0x24)+0x24)*0.75f)
@@ -76,13 +76,13 @@ void func_L05_003D0B20(char *obj)
         if (*(float *)(obj+0x10)<2.0f || *(float *)(obj+0x10)>1021.0f ||
             *(float *)(obj+0x14)<2.0f || *(float *)(obj+0x14)>1021.0f ||
             *(float *)(obj+0x18)<2.0f || *(float *)(obj+0x18)>1021.0f) goto destroy;
-        if (func_00278E78()!=6) {
+        if (GetCollHitMaterial()!=6) {
             collision = 0;
             if (func_00277258(obj+0x10,16,*(void **)(data+0x20),*(int *)(data+0x24)?D_L05_001AFC50:D_L05_001AFC4C)) {
                 collision = 1;
                 qcopy(obj + 0x10, D_L05_001BFB30);
             }
-            if (collision || func_002761F8(&old,obj+0x10,16,*(void **)(data+0x20),0)) goto impact;
+            if (collision || CollLine(&old,obj+0x10,16,*(void **)(data+0x20),0)) goto impact;
         }
     }
     goto emit;
@@ -97,12 +97,12 @@ destroy:
     }
 emit:
     qcopy(&temp,&old);
-    func_00282CF0(&delta,obj+0x10,&old);
-    func_00282D30(&delta,&delta,0.3330000042915344f);
+    FastVecSub(&delta,obj+0x10,&old);
+    FastVecScale(&delta,&delta,0.3330000042915344f);
     for (i=3;i>=0;i--) {
         float a, b;
         char *effect;
-        func_00282CC0(&temp,&temp,&delta);
+        FastVecAdd(&temp,&temp,&delta);
         a = func_002A7940();
         b = func_002A7940();
         func_002AF000(&velocity,0.01250000111758709f,a,b);

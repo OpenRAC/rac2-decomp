@@ -67,7 +67,7 @@ void func_L20_0043F570(char *obj) {
         hit = func_002B1C20(obj, st + 0x140);
         if (hit & 1) {
             *(int *)(st + 0x280) = 0;
-            func_002A6C58(obj, 0, 3);
+            SetDeathBits(obj, 0, 3);
             func_L01_003E9CF8(obj, 0, func_L20_00440460);
         } else if (hit & 2) func_002A7750(obj, 3, 1);
         break;
@@ -80,7 +80,7 @@ void func_L20_0043F570(char *obj) {
             *(float *)(st + 0x78) = D_L20_001B1FE0 * 0.0166666675f;
             *(float *)(st + 0x288) = 1.0471977f;
         }
-        distance = func_00282E80(obj + 0x10, D_00189EA0);
+        distance = vec_distance_xy(obj + 0x10, D_00189EA0);
         if (distance < D_L20_001B1FF0) *(float *)(st + 0x288) = 2.0943954f;
         else if (D_L20_001B1FF4 < distance) *(float *)(st + 0x288) = 1.0471977f;
         if (*(int *)(st + 0xD0) == 60) {
@@ -128,11 +128,11 @@ void func_L20_0043F570(char *obj) {
             *(float *)(st + 0x70) = accel;
         }
         if (*(u8 *)(obj + 0x42) == *(u8 *)(obj + 0x43) && func_002AEB60(obj, 14.0f)) {
-            func_00283098(&v, &D_L20_001B2010, obj + 0xC0);
-            func_00282CC0(&v, &v, obj + 0x10);
+            matrix_mul_vec3(&v, &D_L20_001B2010, obj + 0xC0);
+            FastVecAdd(&v, &v, obj + 0x10);
             func_002A8C28(obj, &v, 0x04000001, 0, 0.333f, 2.0f, 1.0f, 1, 0);
         }
-        if ((*(u8 *)(obj + 0x60) & 2) && func_00282E80(obj + 0x10, D_00189EA0) > D_L20_001B1FF8) func_002A7750(obj, 3, -1);
+        if ((*(u8 *)(obj + 0x60) & 2) && vec_distance_xy(obj + 0x10, D_00189EA0) > D_L20_001B1FF8) func_002A7750(obj, 3, -1);
         break;
     }
     case 7:
@@ -142,11 +142,11 @@ void func_L20_0043F570(char *obj) {
         func_002A8C28(obj, obj + 0x10, 0x04000000, 0, 0.5f, 5.0f, 1.0f, 1, 0);
         qzero_nc(&v);
         v.f[2] = *(float *)(st + 0x288) * 0.0166666675f;
-        func_002833F0(matrix, &v);
-        func_00283098(st + 0x210, st + 0x210, matrix);
-        length = func_00282E20(st + 0x210);
+        euler_rotation_basis(matrix, &v);
+        matrix_mul_vec3(st + 0x210, st + 0x210, matrix);
+        length = vec_length_xy(st + 0x210);
         if (length < 0.0500000045f) {
-            func_002AA2E8(&length, 0.0f, 0.0027777778f);
+            ApproachValue(&length, 0.0f, 0.0027777778f);
             if (length <= 0.0f) func_002A7750(obj, 1, 1);
             else func_00282F70(st + 0x210, st + 0x210, length);
         }
@@ -163,8 +163,8 @@ void func_L20_0043F570(char *obj) {
             *(int *)(obj + 0x9C) = 2;
             *(int *)(obj + 0x98) = flags;
             *(u16 *)(obj + 0x34) = *(u16 *)(data + 0x44) | 0x1000;
-            func_00283098(&v, st + 0x230, obj + 0xC0);
-            func_00282CC0(obj + 0x10, &v, obj + 0x10);
+            matrix_mul_vec3(&v, st + 0x230, obj + 0xC0);
+            FastVecAdd(obj + 0x10, &v, obj + 0x10);
             *(float *)(obj + 0x18) = func_002A89A8(obj + 0x10, 0, 0.5f);
             qzero(obj + 0xF0);
             *(float *)(obj + 0xF8) = func_00283248(
@@ -221,8 +221,8 @@ void func_L20_0043FC70(char *arg0) {
             *(float *)(st + 0x74) = accel;
         }
         *(int *)(st + 0x88) |= 0x200;
-        *(unsigned char *)(st + 0x48) = func_00283CF0(8.0f);
-        *(unsigned char *)(st + 0x4A) = func_00283CF0(12.0f);
+        *(unsigned char *)(st + 0x48) = FloatToInt(8.0f);
+        *(unsigned char *)(st + 0x4A) = FloatToInt(12.0f);
         *(unsigned char *)(st + 0x29) = 1;
         if (*(short *)(st + 0x24) == 0) {
             *(short *)(st + 0x24) = 3;
@@ -251,16 +251,16 @@ void func_L20_0043FC70(char *arg0) {
         char *hit = func_002A9640(arg0, 0x10000, 0);
         float damage = func_002A96A0(arg0, hit);
 
-        func_002AA2E8(st + 0x20, 0.0f, damage);
+        ApproachValue(st + 0x20, 0.0f, damage);
         *(unsigned char *)(arg0 + 0xA8) = 0xFF;
         if (*(float *)(st + 0x20) <= 0.0f) {
             *(float *)(arg0 + 0xF4) = 0.0f;
             *(float *)(arg0 + 0xF0) = 0.0f;
-            func_00283098(&a, st + 0x230, arg0 + 0xC0);
-            func_002833F0(arg0 + 0xC0, arg0 + 0xF0);
-            func_00283098(&b, st + 0x230, arg0 + 0xC0);
-            func_00282CF0(&b, &b, &a);
-            func_00282CF0(arg0 + 0x10, arg0 + 0x10, &b);
+            matrix_mul_vec3(&a, st + 0x230, arg0 + 0xC0);
+            euler_rotation_basis(arg0 + 0xC0, arg0 + 0xF0);
+            matrix_mul_vec3(&b, st + 0x230, arg0 + 0xC0);
+            FastVecSub(&b, &b, &a);
+            FastVecSub(arg0 + 0x10, arg0 + 0x10, &b);
         }
     } else {
         func_002B0ED8(arg0, st + 0x140, 0);
@@ -292,7 +292,7 @@ int func_L20_0043FFF0(char *obj) {
     unsigned short *p;
     char *e;
 
-    dist = func_00282E80(obj + 0x10, D_00189EA0);
+    dist = vec_distance_xy(obj + 0x10, D_00189EA0);
     for (p = D_L20_001FBB20[*(u8 *)(obj + 0x21)];
          *(u8 *)(obj + 0x21) != 0xFF && *(u8 *)(obj + 0x21) <= D_L20_001B2FB8 && p != 0 &&
          ((p != 0 && (short)p[-1] >= 0) || p == D_L20_001FBB20[*(u8 *)(obj + 0x21)]);
@@ -305,7 +305,7 @@ int func_L20_0043FFF0(char *obj) {
                 busy++;
             if (busy >= D_L20_001B2020)
                 return 0;
-            if (dist > func_00282E80(e + 0x10, D_00189EA0))
+            if (dist > vec_distance_xy(e + 0x10, D_00189EA0))
                 closer++;
             if (closer >= D_L20_001B2020)
                 return 0;

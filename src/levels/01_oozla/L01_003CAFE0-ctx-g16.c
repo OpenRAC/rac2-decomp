@@ -60,7 +60,7 @@ void func_L01_003CAFE0(void)
         CONTEXT_FLOAT(0x228) = D_L01_001B0338;
         CONTEXT_FLOAT(0x22c) = D_L01_001B033C;
     }
-    func_0027AB40();
+    UpdateViewContext();
     func_00279D18();
     {
         u8 *header = D_L01_001B2CC8[0];
@@ -140,7 +140,7 @@ void func_L01_003CAFE0(void)
     func_00282B50(D_L01_001B2CC8[0], D_L01_001B0300, 0x30);
     D_L01_001B2CC8[0] += 0x30;
     if (D_L01_001B209C != 6) {
-        func_002FC410((unsigned int)D_0010FFC0, D_0010FFB0[0]);
+        VU1_addDataRef((unsigned int)D_0010FFC0, D_0010FFB0[0]);
         D_L01_001B209C = 6;
     }
     packet = D_L01_001B2CC8[0];
@@ -155,10 +155,10 @@ void func_L01_003CAFE0(void)
     *(unsigned char **)(packet + 0x44) = D_L01_001B2CC8[0] + 0x60;
     func_00282B50(D_L01_001B2CC8[0], context, 0x60);
     D_L01_001B2CC8[0] += 0x60;
-    func_00283388(matrix);
-    func_00282D30(matrix + 12, D_L01_001B93C0[0].pos, -1024.0f);
+    set_identity_matrix(matrix);
+    FastVecScale(matrix + 12, D_L01_001B93C0[0].pos, -1024.0f);
     matrix[15] = 1.0f;
-    func_00283788(matrix, D_L01_001B93C0[0].matrix, matrix);
+    multiply_matrix(matrix, D_L01_001B93C0[0].matrix, matrix);
     func_00282B50(D_L01_001B2CC8[0], D_L01_001A8EF0, 0x20);
     *(unsigned char **)(D_L01_001B2CC8[0] + 4) = D_L01_001B2CC8[0] + 0x20;
     func_00282B50(D_L01_001B2CC8[0] + 0x20, matrix, 0x40);

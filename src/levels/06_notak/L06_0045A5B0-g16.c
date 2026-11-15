@@ -88,7 +88,7 @@ void func_L06_0045A5B0(u8 *self) {
         func_L06_003660F0(self, 0, s6 + 0x140, 2.20000005f);
         if (B(self, 0x20) == 0) {
             if (func_L06_00459D08(self, s6) != 0) {
-                func_0026FEB8(D_L06_001B1A68, H(self, 0xB2));
+                STUB_printf(D_L06_001B1A68, H(self, 0xB2));
                 func_0029F338(self);
                 return;
             }
@@ -100,11 +100,11 @@ void func_L06_0045A5B0(u8 *self) {
         s3 = func_00282948(s6 + 0x124) != 0;
         if (W(s6, 0x100) != 0 && B(self, 0x20) >= 7) {
             hp = *(u8 **)(s6 + 0x138);
-            s2 = func_002A8AF0(&hit, hp + 0x10, *(int *)hp) != 0;
+            s2 = point_in_path_xy(&hit, hp + 0x10, *(int *)hp) != 0;
         } else {
             hp = *(u8 **)(s6 + 0x138);
-            s2 = func_002A8AF0(D_00189EA0, hp + 0x10, *(int *)hp) != 0;
-            if (func_00282E80(self + 0x10, D_00189EA0) < 30.0f) {
+            s2 = point_in_path_xy(D_00189EA0, hp + 0x10, *(int *)hp) != 0;
+            if (vec_distance_xy(self + 0x10, D_00189EA0) < 30.0f) {
                 hit.obj = *(void **)(D_00189EA0 + 0x2210);
                 qcopy(&hit.pos, D_00189EA0);
                 qcopy(&hit.v30, D_00189EA0 + 0x10);
@@ -122,7 +122,7 @@ void func_L06_0045A5B0(u8 *self) {
         }
         if (W(s6, 0x100) != 0) {
             hp = *(u8 **)(s6 + 0x118);
-            func_002A8AF0(self + 0x10, hp + 0x10, *(int *)hp);
+            point_in_path_xy(self + 0x10, hp + 0x10, *(int *)hp);
         }
         old = B(self, 0xBC);
         s7 = 0xFF;
@@ -135,7 +135,7 @@ void func_L06_0045A5B0(u8 *self) {
             s4 = D_L06_001B1980[st];
         }
         func_0029FCC0(self, 0, v70.f);
-        if (func_00277258(v70.f, 1, self, 0.800000012f) != 0 && func_00278E78() == 0) {
+        if (func_00277258(v70.f, 1, self, 0.800000012f) != 0 && GetCollHitMaterial() == 0) {
             f20 = **(float **)(s6 + 0x11C);
             f20 -= F(s6, 0x120);
             f20 *= 0.5f;
@@ -151,13 +151,13 @@ void func_L06_0045A5B0(u8 *self) {
                 f20 *= 2.0f;
             }
             p1 = self + 0x10;
-            if (func_00282E80(p1, D_L06_001BFCA0) > 0.5f) {
-                f21 = func_00282E80(p1, D_L06_001BFCA0) * 2.0f;
+            if (vec_distance_xy(p1, D_L06_001BFCA0) > 0.5f) {
+                f21 = vec_distance_xy(p1, D_L06_001BFCA0) * 2.0f;
             } else {
                 f21 = 1.0f;
             }
             if (D_L06_001B2348[0] % 45 == H(self, 0xB2) && func_002A77E0(2) == 0) {
-                func_002FD1B8(D_L06_001B2FB0, D_L06_001B2FB8[0], 1, F(self, 0x10), F(self, 0x14), f21, f20);
+                RippleDisturb(D_L06_001B2FB0, D_L06_001B2FB8[0], 1, F(self, 0x10), F(self, 0x14), f21, f20);
             }
             if (D_L06_001B2348[0] % ((func_001163B0() & 7) + 0x14) == 0) {
                 f22 = func_002A7878(1.5f, 2.4000001f);
@@ -179,7 +179,7 @@ void func_L06_0045A5B0(u8 *self) {
         }
         switch (B(self, 0x20)) {
         case 0:
-            func_0026FEB8(D_L06_001B1AA0);
+            STUB_printf(D_L06_001B1AA0);
             break;
         case 20:
             cur = W(s6, 0x108);
@@ -213,7 +213,7 @@ void func_L06_0045A5B0(u8 *self) {
                 if (B(self, 0x43) != 2) {
                     func_002A7470(self, 2, 0, 2);
                 }
-                func_002E5CF8(1, 0, self);
+                PlayMobySound(1, 0, self);
                 B(self, 0x20) = 5;
             } else if (s3 != 0) {
                 if (B(self, 0x43) != 1) {
@@ -223,7 +223,7 @@ void func_L06_0045A5B0(u8 *self) {
                 F(s6, 0x12C) = func_002A7940();
                 B(self, 0x20) = 2;
             }
-            func_00282D30(s6 + 0xC0, s6 + 0xC0, 0.949999988f);
+            FastVecScale(s6 + 0xC0, s6 + 0xC0, 0.949999988f);
             func_L06_0045A0D0(self, s6, 0.00416666688f, 0.013888889f, 0.13333334f);
             if (s7 != 0xFF) {
                 if (B(self, 0x43) != s4) {
@@ -244,9 +244,9 @@ void func_L06_0045A5B0(u8 *self) {
                     B(self, 0x20) = 4;
                 }
             } else {
-                func_002A7CA0(self, F(s6, 0x12C), s6 + 0x110, 0.000484813732f, 0.00126051577f, 0.029088825f);
+                MobySpringTurn(self, F(s6, 0x12C), s6 + 0x110, 0.000484813732f, 0.00126051577f, 0.029088825f);
                 F(self, 0xF4) = func_L01_00310BC0(s6 + 0x114, F(self, 0xF4), 0.0f, 0.000484813732f, 0.00126051577f, 0.029088825f);
-                if (s3 != 0 && func_002ACBC8(self + 0x10, W(s6, 0x104)) != 0) {
+                if (s3 != 0 && IsPointInCuboid(self + 0x10, W(s6, 0x104)) != 0) {
                     if (B(self, 0x43) != 0) {
                         func_002A7470(self, 0, 0, 0xA);
                     }
@@ -266,7 +266,7 @@ void func_L06_0045A5B0(u8 *self) {
                 if (B(self, 0x43) != 2) {
                     func_002A7470(self, 2, 0, 2);
                 }
-                func_002E5CF8(1, 0, self);
+                PlayMobySound(1, 0, self);
                 B(self, 0x20) = 5;
             }
             func_L06_0045A0D0(self, s6, 0.00416666688f, 0.013888889f, 0.13333334f);
@@ -281,21 +281,21 @@ void func_L06_0045A5B0(u8 *self) {
             p4 = self + 0x10;
             s1 = 1;
             f22 = func_00283248(hit.pos.f[0] - F(self, 0x10), hit.pos.f[1] - F(self, 0x14));
-            func_002A7CA0(self, f22, s6 + 0x110, 0.00349065894f, 0.0f, 0.209439546f);
-            { float t = -func_00283248(func_00282E80(p4, &hit), hit.pos.f[2] - F(self, 0x18));
+            MobySpringTurn(self, f22, s6 + 0x110, 0.00349065894f, 0.0f, 0.209439546f);
+            { float t = -func_00283248(vec_distance_xy(p4, &hit), hit.pos.f[2] - F(self, 0x18));
             F(self, 0xF4) = func_L01_00310BC0(s6 + 0x114, F(self, 0xF4), t, 0.00349065894f, 0.0f, 0.209439546f); }
-            if (func_00282E80(p4, D_00189EA0) < 3.0f) {
+            if (vec_distance_xy(p4, D_00189EA0) < 3.0f) {
             } else {
                 s1 = 0;
             }
             if (s1 != 0) {
-                func_00282D30(s6 + 0xC0, s6 + 0xC0, 0.899999976f);
+                FastVecScale(s6 + 0xC0, s6 + 0xC0, 0.899999976f);
             }
             if (func_L06_0045A1B0(self, s6, f22, 0.209439531f, 0.00555555569f, 0.52359885f, 0.000833333354f, 0.333333343f, 0.0833333358f) != 0 && s1 != 0 && (u32)(W(D_00189EA0, 0x221C) - 0x11) < 2) {
                 if (B(self, 0x43) != 2) {
                     func_002A7470(self, 2, 0, 2);
                 }
-                func_002E5CF8(1, 0, self);
+                PlayMobySound(1, 0, self);
                 W(self, 0x98) = 0;
                 B(self, 0x20) = 5;
                 F(s6, 0x13C) = 0.0f;
@@ -319,18 +319,18 @@ void func_L06_0045A5B0(u8 *self) {
         case 5:
             p5 = self + 0x10;
             func_0029FCC0(self, 0, v70.f);
-            func_00282CF0(&v80, v70.f, p5);
+            FastVecSub(&v80, v70.f, p5);
             f21 = func_00283248(hit.pos.f[0] - v70.f[0], hit.pos.f[1] - v70.f[1]);
-            func_002A7CA0(self, f21, s6 + 0x110, 0.00349065894f, 0.0f, 0.209439546f);
+            MobySpringTurn(self, f21, s6 + 0x110, 0.00349065894f, 0.0f, 0.209439546f);
             F(self, 0xF4) = F(self, 0xF4) * 0.699999988f;
             F(s6, 0x13C) = F(s6, 0x13C) + 0.0280000009f;
             qcopy(&vB0, p5);
-            func_00282CF0(&v90, &hit, &v80);
-            func_00282CF0(&vA0, &v90, s6 + 0xF0);
-            func_00282D30(&vA0, &vA0, F(s6, 0x13C) < 1.0f ? F(s6, 0x13C) : 1.0f);
-            func_00282CC0(&vC0, &vA0, s6 + 0xF0);
+            FastVecSub(&v90, &hit, &v80);
+            FastVecSub(&vA0, &v90, s6 + 0xF0);
+            FastVecScale(&vA0, &vA0, F(s6, 0x13C) < 1.0f ? F(s6, 0x13C) : 1.0f);
+            FastVecAdd(&vC0, &vA0, s6 + 0xF0);
             func_002A7EA0(self, p5, &vC0, 0.75f, 0.75f, 40.0f, 6.28318596f, 3);
-            func_00282CF0(s6 + 0xC0, p5, &vB0);
+            FastVecSub(s6 + 0xC0, p5, &vB0);
             if (F(s6, 0x13C) >= 1.0f) {
                 ((Hero *)D_00189E20)->i[0x24CC / 4] = 0;
                 func_L00_002C42E0(0x39, 1);
@@ -345,7 +345,7 @@ void func_L06_0045A5B0(u8 *self) {
             func_L06_00459EC0(self, s6);
             func_L06_0045A1B0(self, s6, F(s6, 0x12C), 0.209439531f, 0.00166666671f, 0.52359885f, 0.00111111114f, 0.116666675f, 0.0500000045f);
             func_L06_0045A0D0(self, s6, 0.00333333341f, 0.013888889f, 0.116666675f);
-            func_002A7CA0(self, F(s6, 0x12C), s6 + 0x110, 0.000436332368f, 0.000872664736f, 0.0523598865f);
+            MobySpringTurn(self, F(s6, 0x12C), s6 + 0x110, 0.000436332368f, 0.000872664736f, 0.0523598865f);
             F(self, 0xF4) = func_L01_00310BC0(s6 + 0x114, F(self, 0xF4), 0.0f, 0.000436332368f, 0.000872664736f, 0.0523598865f);
             if ((B(self, 0x60) & 2) && B(self, 0x43) != 1) {
                 func_002A7470(self, 1, 0, 0xA);
@@ -372,10 +372,10 @@ void func_L06_0045A5B0(u8 *self) {
                 B(self, 0x20) = 8;
             }
             p7 = s6 + 0xC0;
-            func_00282D30(p7, p7, 0.949999988f);
+            FastVecScale(p7, p7, 0.949999988f);
             F(s6, 0xC8) = F(s6, 0xC8) - 0.163333341f;
             if (func_L04_0033CB08(self, p7, 0x400, 0x10, 1.0f, 0.0f) != 0) {
-                func_00282D30(p7, p7, 0.5f);
+                FastVecScale(p7, p7, 0.5f);
             }
             if (s7 != 0xFF) {
                 if (B(self, 0x43) != s4) {
@@ -391,9 +391,9 @@ void func_L06_0045A5B0(u8 *self) {
                 }
                 B(self, 0x20) = 9;
             } else {
-                func_002A7CA0(self, F(s6, 0x12C), s6 + 0x110, 0.000218166184f, 0.000436332368f, 0.0130899716f);
+                MobySpringTurn(self, F(s6, 0x12C), s6 + 0x110, 0.000218166184f, 0.000436332368f, 0.0130899716f);
                 F(self, 0xF4) = func_L01_00310BC0(s6 + 0x114, F(self, 0xF4), 0.0f, 0.000218166184f, 0.000436332368f, 0.0130899716f);
-                if (s3 != 0 && func_002ACBC8(self + 0x10, W(s6, 0x104)) != 0) {
+                if (s3 != 0 && IsPointInCuboid(self + 0x10, W(s6, 0x104)) != 0) {
                     if (B(self, 0x43) != 3) {
                         func_002A7470(self, 3, 0, 0xA);
                     }
@@ -412,7 +412,7 @@ void func_L06_0045A5B0(u8 *self) {
             p8 = s6 + 0xC0;
             F(s6, 0xC8) = F(s6, 0xC8) - 0.163333341f;
             if (func_L04_0033CB08(self, p8, 0x400, 0x10, 1.0f, 0.0f) != 0) {
-                func_00282D30(p8, p8, 0.5f);
+                FastVecScale(p8, p8, 0.5f);
             }
             if (s7 != 0xFF) {
                 if (B(self, 0x43) != s4) {
@@ -424,8 +424,8 @@ void func_L06_0045A5B0(u8 *self) {
         case 9:
         case 10:
             f20 = func_00283248(hit.pos.f[0] - F(self, 0x10), hit.pos.f[1] - F(self, 0x14));
-            func_002A7CA0(self, f20, s6 + 0x110, 0.000218166184f, 0.000436332368f, 0.0130899716f);
-            if (func_L06_0045A1B0(self, s6, f20, 0.52359885f, 0.00111111114f, 1.57079649f, 0.00249999994f, 0.0250000022f, 0.0166666675f) != 0 && func_00282E80(self + 0x10, &hit) < 1.89999998f && B(self, 0x20) != 0xA) {
+            MobySpringTurn(self, f20, s6 + 0x110, 0.000218166184f, 0.000436332368f, 0.0130899716f);
+            if (func_L06_0045A1B0(self, s6, f20, 0.52359885f, 0.00111111114f, 1.57079649f, 0.00249999994f, 0.0250000022f, 0.0166666675f) != 0 && vec_distance_xy(self + 0x10, &hit) < 1.89999998f && B(self, 0x20) != 0xA) {
                 if (B(self, 0x43) != 5) {
                     func_002A7470(self, 5, 0, 2);
                 }
@@ -434,10 +434,10 @@ void func_L06_0045A5B0(u8 *self) {
             p9 = s6 + 0xC0;
             F(s6, 0xC8) = F(s6, 0xC8) - 0.163333341f;
             if (func_L04_0033CB08(self, p9, 0x400, 0x10, 1.0f, 0.0f) != 0) {
-                func_00282D30(p9, p9, 0.5f);
+                FastVecScale(p9, p9, 0.5f);
             }
-            B(s6, 0x48) = func_00283CF0(8.0f);
-            B(s6, 0x4A) = func_00283CF0(9.60000038f);
+            B(s6, 0x48) = FloatToInt(8.0f);
+            B(s6, 0x4A) = FloatToInt(9.60000038f);
             if (s2 == 0) {
                 if (B(self, 0x43) != 4) {
                     func_002A7470(self, 4, 0, 0xA);
@@ -465,7 +465,7 @@ void func_L06_0045A5B0(u8 *self) {
             }
             break;
         case 12:
-            if (func_L06_0035EA68(self, s6 + 0x60) & 1) {
+            if (mine_fall(self, s6 + 0x60) & 1) {
                 func_L06_00459C38(self, s6);
             }
             break;
@@ -475,15 +475,15 @@ void func_L06_0045A5B0(u8 *self) {
             }
             break;
         case 14:
-            if (func_L06_0035EA68(self, s6 + 0x60) & (B(self, 0x60) & 2)) {
-                func_002ABBB8(self, s6 + 0xC0, NULL, 0.0f, 0.0f, 3, 3, 5, 2.0f, 1.0f, 4.0f, 1.0f, -1, 7.0f, 0, 1, -1, 0, 0x810001);
+            if (mine_fall(self, s6 + 0x60) & (B(self, 0x60) & 2)) {
+                SpawnExplosionEffects(self, s6 + 0xC0, NULL, 0.0f, 0.0f, 3, 3, 5, 2.0f, 1.0f, 4.0f, 1.0f, -1, 7.0f, 0, 1, -1, 0, 0x810001);
                 func_0029F338(self);
                 return;
             }
             break;
         case 16:
             p16 = s6 + 0xC0;
-            func_00282D30(p16, p16, 0.949999988f);
+            FastVecScale(p16, p16, 0.949999988f);
             F(s6, 0xC8) = F(s6, 0xC8) - 0.163333341f;
             func_L04_0033CB08(self, p16, 0x400, 0x10, 1.0f, 0.0f);
             if (B(self, 0x60) & 2) {
@@ -492,7 +492,7 @@ void func_L06_0045A5B0(u8 *self) {
             break;
         case 15:
             p15 = s6 + 0xC0;
-            func_00282D30(p15, p15, 0.949999988f);
+            FastVecScale(p15, p15, 0.949999988f);
             F(s6, 0xC8) = F(s6, 0xC8) - 0.163333341f;
             func_L04_0033CB08(self, p15, 0x400, 0x10, 1.0f, 0.0f);
             if (s7 != 0xFF) {
@@ -503,7 +503,7 @@ void func_L06_0045A5B0(u8 *self) {
             }
             break;
         case 17:
-            func_00282D30(s6 + 0xC0, s6 + 0xC0, 0.949999988f);
+            FastVecScale(s6 + 0xC0, s6 + 0xC0, 0.949999988f);
             if (B(self, 0x60) & 2) {
                 func_L06_00459C38(self, s6);
             }

@@ -33,8 +33,8 @@ void func_L13_0041A550(char *moby) {
     length=func_002A7878(4.0f,8.0f);
 
     for (i = 0; i < 32; i++) {
-        float y_offset = func_00283CE0(i);
-        float last = func_00283CE0(0x1F);
+        float y_offset = IntToFloat(i);
+        float last = IntToFloat(0x1F);
         float y;
         y_offset = y_offset / last;
         y_offset = (0.5f - y_offset) * length;
@@ -58,12 +58,12 @@ void func_L13_0041A550(char *moby) {
             qcopy(&beam->pts[j], &path[j]);
             qcopy(&beam->off[j], &path_steps[j]);
         } else {
-            func_00282CC0(&work, &path[j - 1], &path[j]);
-            func_00282CC0(&work, &work, &path[j + 1]);
-            func_00282D30(&beam->pts[j], &work, 0.333f);
-            func_00282CC0(&work, &path_steps[j - 1], &path_steps[j]);
-            func_00282CC0(&work, &work, &path_steps[j + 1]);
-            func_00282D30(&beam->off[j], &work, 0.333f);
+            FastVecAdd(&work, &path[j - 1], &path[j]);
+            FastVecAdd(&work, &work, &path[j + 1]);
+            FastVecScale(&beam->pts[j], &work, 0.333f);
+            FastVecAdd(&work, &path_steps[j - 1], &path_steps[j]);
+            FastVecAdd(&work, &work, &path_steps[j + 1]);
+            FastVecScale(&beam->off[j], &work, 0.333f);
         }
     }
 
@@ -71,7 +71,7 @@ void func_L13_0041A550(char *moby) {
         int start;
         float spread = (D_L13_001B16A0);
         func_002A7A00(&work, spread, spread);
-        start = func_00283CF0(func_002A7878((float)branch * 6.0f, (float)(branch + 1) * 6.0f)) + 4;
+        start = FloatToInt(func_002A7878((float)branch * 6.0f, (float)(branch + 1) * 6.0f)) + 4;
         beam->cnt[branch] = (unsigned char)start;
         qcopy(&beam->a[0][branch], &beam->pts[start]);
         qcopy(&beam->b[0][branch], &beam->off[start]);
@@ -89,14 +89,14 @@ void func_L13_0041A550(char *moby) {
             for (k = 1; k < 4; k++) {
                 func_002A7A00(&delta, 0.1f, 0.1f);
                 func_002A7A00(b_col + k * 64, 0.0f, (D_L13_001B16A4) * (1.0f/60.0f));
-                func_00282CC0(cur_col + k * 64, prev_col + (k - 1) * 64, &work);
-                func_00282CC0(cur_col + k * 64, cur_col + k * 64, &delta);
+                FastVecAdd(cur_col + k * 64, prev_col + (k - 1) * 64, &work);
+                FastVecAdd(cur_col + k * 64, cur_col + k * 64, &delta);
             }
         }
     }
 
 
-    if (func_00282E80(moby+0x10, D_L13_001B98C0) >= 4.0f) {
+    if (vec_distance_xy(moby+0x10, D_L13_001B98C0) >= 4.0f) {
         int color;
         int l;
         char *frame=(char *)((beam->idx<<7)+(int)D_L13_001B2A0C);
@@ -104,10 +104,10 @@ void func_L13_0041A550(char *moby) {
         beam->rotation[1]=*(float *)(frame+0x74);
         beam->rotation[1]+=func_002A78D8(0.0f,30.0f)*0.0174532942f;
         beam->rotation[0]=func_002A7940();
-        func_00283410(matrix,beam->rotation);
+        euler_to_matrix(matrix,beam->rotation);
         qcopy(&matrix[3], moby+0x10);
         for (l = 0; l < 32; l += 8) {
-            func_002830C0(&work, &beam->pts[l], matrix);
+            transform_vector(&work, &beam->pts[l], matrix);
             qcopy(&delta, &beam->off[l]);
             delta.f[3] = (D_L13_001B16B8);
             {
@@ -123,7 +123,7 @@ void func_L13_0041A550(char *moby) {
         }
         for (k = 0; k < 2; k++) {
             int n;
-            func_002830C0(&work, &beam->a[3][k], matrix);
+            transform_vector(&work, &beam->a[3][k], matrix);
             qcopy(&delta, &beam->b[3][k]);
             delta.f[3] = (D_L13_001B16B8);
             {

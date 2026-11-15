@@ -72,7 +72,7 @@ void func_L13_0041B670(Ring_L13 *object)
         if (!(D_00138324[0] & 0x10))
             return;
         if (D_L13_001A8FB4 == 11) {
-            func_002E5CF8(0, 0, object);
+            PlayMobySound(0, 0, object);
             object->mode = 2;
             state->i28 = 0;
             state->i2C = 0;
@@ -106,7 +106,7 @@ void func_L13_0041B670(Ring_L13 *object)
                 target_state->i2C = 0;
                 target_state->f20 = 1.0f;
                 target_state->f24 = 1.0f;
-                func_002E5CF8(1, 0, destination);
+                PlayMobySound(1, 0, destination);
                 object->mode = 1;
                 state->timer = 1.95f;
                 state->f24 = 0;
@@ -121,13 +121,13 @@ void func_L13_0041B670(Ring_L13 *object)
             }
             return;
         }
-        func_L00_002E6CF0(func_L13_0041BAE0, object);
-        func_002AA2E8(&state->timer, 0.0f, 0.06666667f);
+        func_L00_002E6CF0(DrawMobyRadiusRing, object);
+        ApproachValue(&state->timer, 0.0f, 0.06666667f);
         return;
     case 4:
         if (state->timer < 1.95f) {
-            func_L00_002E6CF0(func_L13_0041BAE0, object);
-            func_002AA2E8(&state->timer, 1.95f, 0.06666667f);
+            func_L00_002E6CF0(DrawMobyRadiusRing, object);
+            ApproachValue(&state->timer, 1.95f, 0.06666667f);
             return;
         }
         if (state->f24 > 0.0f) {

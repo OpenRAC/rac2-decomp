@@ -136,7 +136,7 @@ void func_L04_003E2438(u8 *arg0) {
                 func_L04_003E22B0(arg0, 4, 3, 0, 0xC);
             }
         } else if (*(s32 *)(data + 0x2DC) != -1 &&
-                   func_002A8AF0(data + 0x230, (u8 *)D_L04_001FE340[*(s32 *)(data + 0x2DC)] + 0x10,
+                   point_in_path_xy(data + 0x230, (u8 *)D_L04_001FE340[*(s32 *)(data + 0x2DC)] + 0x10,
                                  *D_L04_001FE340[*(s32 *)(data + 0x2DC)]) != 0) {
             func_L04_003E22B0(arg0, 6, 5, 0, 0xA);
             func_002B60B0(arg0, 0.016666668f, 0.5f, 0.001163553f, 0.10471977f);
@@ -164,7 +164,7 @@ void func_L04_003E2438(u8 *arg0) {
         if (func_002B3890(arg0) != 0)
             func_002B60B0(arg0, 0.0033333334f, 0.10000001f, 0.001163553f, 0.10471977f);
         if ((*(s32 *)(data + 0x2DC) == -1 ||
-             func_002A8AF0(data + 0x230, (u8 *)D_L04_001FE340[*(s32 *)(data + 0x2DC)] + 0x10,
+             point_in_path_xy(data + 0x230, (u8 *)D_L04_001FE340[*(s32 *)(data + 0x2DC)] + 0x10,
                            *D_L04_001FE340[*(s32 *)(data + 0x2DC)]) == 0) &&
             *(s32 *)(data + 0x258) != 1 && *(s32 *)(data + 0x25C) != 1) {
             if (arg0[0x20] == 0xD || arg0[0x20] == 0x10 || arg0[0x20] == 0xC) {
@@ -193,7 +193,7 @@ void func_L04_003E2438(u8 *arg0) {
 
         r = func_002B1C20(arg0, data + 0x60);
         if (r & 1) {
-            func_002A6C58(arg0, 0, 3);
+            SetDeathBits(arg0, 0, 3);
             func_L01_003E9CF8(arg0, 0, 0);
             return;
         }
@@ -227,7 +227,7 @@ void func_L04_003E2438(u8 *arg0) {
             if (*(s32 *)(data + 0x2BC) >= 0x15)
                 *(f32 *)(data + 0x124) = 0.06666667f;
             else
-                func_002AA2E8((f32 *)(data + 0x124), 0.0f, 0.0011111111f);
+                ApproachValue((f32 *)(data + 0x124), 0.0f, 0.0011111111f);
             if (arg0[0x43] == 5) {
                 if (*(s32 *)(data + 0x2BC) == 0) {
                     func_L04_003E22B0(arg0, 1, 1, 0, 0xC);
@@ -266,9 +266,9 @@ void func_L04_003E2438(u8 *arg0) {
         }
         break;
     case 5:
-        if (func_00282978(data + 0x300) != 0) {
+        if (FastDecTimer(data + 0x300) != 0) {
             func_L04_003E22B0(arg0, 5, 4, 0, 0xA);
-            func_L04_003E2338(arg0);
+            SelectRandomOtherLiveSlot(arg0);
             func_002A7750(arg0, 6, 0);
         }
         break;
@@ -279,7 +279,7 @@ void func_L04_003E2438(u8 *arg0) {
         *(TI128 *)v = *(TI128 *)(data + 0x280);
         func_002B60B0(arg0, 0.00044444445f, 0.02666667f, 0.001163553f, 0.10471977f);
         func_L01_00321178(arg0, v);
-        if (func_00282E80(arg0 + 0x10, v) < 1.0f) {
+        if (vec_distance_xy(arg0 + 0x10, v) < 1.0f) {
             func_L04_003E22B0(arg0, 1, 1, 0, 0xA);
             *(s16 *)(data + 0x300) = func_002A7820(0x4B0, 0xBB8);
             func_002A7750(arg0, 5, -1);
@@ -298,7 +298,7 @@ void func_L04_003E2438(u8 *arg0) {
         m = *(f32 *)(data + 0x16C) * 30.0f;
         if (m < *(f32 *)(data + 0x1E8))
             *(f32 *)(data + 0x1E8) = m;
-        if (func_00282E80(arg0 + 0x10, v) < 1.0f || *(s32 *)(data + 0x1C0) >= 0x3D) {
+        if (vec_distance_xy(arg0 + 0x10, v) < 1.0f || *(s32 *)(data + 0x1C0) >= 0x3D) {
             func_L04_003E22B0(arg0, 1, 1, 0, 0xA);
             *(s16 *)(data + 0x300) = func_002A7820(0x4B0, 0xBB8);
             func_002A7750(arg0, 5, -1);
@@ -309,9 +309,9 @@ void func_L04_003E2438(u8 *arg0) {
     case 8:
         func_00282948(data + 0x2BC);
         if (*(s32 *)(data + 0x2BC) >= 0x15)
-            func_002AA2E8((f32 *)(data + 0x124), 0.06666667f, 0.0019444445f);
+            ApproachValue((f32 *)(data + 0x124), 0.06666667f, 0.0019444445f);
         else
-            func_002AA2E8((f32 *)(data + 0x124), 0.0f, 0.0019444445f);
+            ApproachValue((f32 *)(data + 0x124), 0.0f, 0.0019444445f);
         if (arg0[0x43] == 6) {
             if (*(s32 *)(data + 0x2BC) == 0) {
                 func_L04_003E22B0(arg0, 3, 2, 0, 0xC);
@@ -347,20 +347,20 @@ void func_L04_003E2438(u8 *arg0) {
         func_L04_003E5B10(arg0, data + 0x230);
         *(s32 *)(data + 0x2B0) = *(s32 *)(data + 0x2B0) + 1;
         if (*(u8 **)(data + 0x2AC) != 0) {
-            if (func_00282E80(arg0 + 0x10, *(u8 **)(data + 0x240) + 0x10) < 20.0f &&
-                func_00283C80(*(f32 *)(arg0 + 0xF8), func_00283248(*(f32 *)(data + 0x230) - *(f32 *)(arg0 + 0x10),
+            if (vec_distance_xy(arg0 + 0x10, *(u8 **)(data + 0x240) + 0x10) < 20.0f &&
+                FastDiffRots(*(f32 *)(arg0 + 0xF8), func_00283248(*(f32 *)(data + 0x230) - *(f32 *)(arg0 + 0x10),
                                                                  *(f32 *)(data + 0x234) - *(f32 *)(arg0 + 0x14))) < 0.17453295f) {
                 func_L04_003E22B0(arg0, 9, 6, 0, 0xA);
                 func_002A7750(arg0, 0xE, -1);
             }
         } else {
-            if (func_00282E80(arg0 + 0x10, *(u8 **)(data + 0x240) + 0x10) < 2.7f &&
-                func_00283C80(*(f32 *)(arg0 + 0xF8), func_00283248(*(f32 *)(data + 0x230) - *(f32 *)(arg0 + 0x10),
+            if (vec_distance_xy(arg0 + 0x10, *(u8 **)(data + 0x240) + 0x10) < 2.7f &&
+                FastDiffRots(*(f32 *)(arg0 + 0xF8), func_00283248(*(f32 *)(data + 0x230) - *(f32 *)(arg0 + 0x10),
                                                                  *(f32 *)(data + 0x234) - *(f32 *)(arg0 + 0x14))) < 0.3490659f) {
                 func_L04_003E22B0(arg0, 0xC, 0, 0, 5);
                 func_002A7750(arg0, 0x11, -1);
             }
-            if (func_00282E80(arg0 + 0x10, *(u8 **)(data + 0x240) + 0x10) > 2.7f && (arg0[0x42] == 5 || arg0[0x42] == 0x10)) {
+            if (vec_distance_xy(arg0 + 0x10, *(u8 **)(data + 0x240) + 0x10) > 2.7f && (arg0[0x42] == 5 || arg0[0x42] == 0x10)) {
                 func_L04_003E22B0(arg0, 6, 5, 0, 4);
                 func_002B60B0(arg0, 0.0033333334f, 0.10000001f, 0.001163553f, 0.10471977f);
             }
@@ -372,7 +372,7 @@ void func_L04_003E2438(u8 *arg0) {
         func_L01_00321178(arg0, data + 0x230);
         func_002A7E08(arg0, *(void **)(data + 0x240), data + 0x2B4, 0.001f, 0.01f, 0.1f);
         *(s32 *)(data + 0x2B0) = *(s32 *)(data + 0x2B0) + 1;
-        if (func_00282E80(arg0 + 0x10, *(u8 **)(data + 0x240) + 0x10) < 3.5f) {
+        if (vec_distance_xy(arg0 + 0x10, *(u8 **)(data + 0x240) + 0x10) < 3.5f) {
             func_L04_003E22B0(arg0, 8, 0, 1, 3);
             *(f32 *)(arg0 + 0x48) = 1.0f;
             func_002A7750(arg0, 0x10, -1);
@@ -391,9 +391,9 @@ void func_L04_003E2438(u8 *arg0) {
         z = dir[2];
         dir[2] = 2.0f;
         qcopy(scaled, dir);
-        func_00282D30(scaled, scaled, 2.5f);
+        FastVecScale(scaled, scaled, 2.5f);
         scaled[3] = 5627.925f;
-        func_002A8C00(req, arg0, 1, *(f32 *)(data + 0x2E8), scaled);
+        make_hit_descriptor(req, arg0, 1, *(f32 *)(data + 0x2E8), scaled);
         req[0x19] = 1;
         *(u16 *)(req + 0x1A) = *(u16 *)(arg0 + 0xAA);
         req[0x18] = 0;
@@ -412,13 +412,13 @@ void func_L04_003E2438(u8 *arg0) {
         off[0] = func_00283180(*(f32 *)(arg0 + 0xF8)) * 4.0f;
         off[1] = func_00283198(*(f32 *)(arg0 + 0xF8)) * 4.0f;
         off[2] = 0.0f;
-        func_00282CC0(off, p, off);
+        FastVecAdd(off, p, off);
         func_L01_00321178(arg0, data + 0x230);
         *(s32 *)(data + 0x2B0) = *(s32 *)(data + 0x2B0) + 1;
         if (arg0[0x60] & 2) {
             func_L04_003E22B0(arg0, 2, 2, 0, 0xA);
             func_002A7750(arg0, 0xC, -1);
-            if (func_00282E80(p, &((Hero *)D_00189E20)->f[0x80 / 4]) < 3.0f) {
+            if (vec_distance_xy(p, &((Hero *)D_00189E20)->f[0x80 / 4]) < 3.0f) {
                 func_002B60B0(arg0, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
                 if (arg0[0x43] != 0x11)
                     func_002A7470(arg0, 0x11, 0, 0xA);
@@ -437,9 +437,9 @@ void func_L04_003E2438(u8 *arg0) {
         dir[1] = func_00283198(*(f32 *)(arg0 + 0xF8));
         dir[2] = 2.0f;
         qcopy(scaled, dir);
-        func_00282D30(scaled, scaled, 2.5f);
+        FastVecScale(scaled, scaled, 2.5f);
         scaled[3] = 5627.925f;
-        func_002A8C00(req, arg0, 0x04000001, *(f32 *)(data + 0x2E8), scaled);
+        make_hit_descriptor(req, arg0, 0x04000001, *(f32 *)(data + 0x2E8), scaled);
         req[0x19] = 1;
         *(u16 *)(req + 0x1A) = *(u16 *)(arg0 + 0xAA);
         req[0x18] = 0;
@@ -452,8 +452,8 @@ void func_L04_003E2438(u8 *arg0) {
         {
         f32 v[4] __attribute__((aligned(16)));
 
-        func_00282F20(v, arg0 + 0xC0, -5.5f);
-        func_00282CC0(v, v, arg0 + 0x10);
+        vec_scale_to_length(v, arg0 + 0xC0, -5.5f);
+        FastVecAdd(v, v, arg0 + 0x10);
         func_L02_00331440(arg0, v, func_00283248(v[0] - *(f32 *)(arg0 + 0x10), v[1] - *(f32 *)(arg0 + 0x14)), 0x10, -1.0f, -1.0f);
         }
         if (*(u16 *)(arg0 + 0x96) >= 0x79) {
@@ -506,7 +506,7 @@ void func_L04_003E2438(u8 *arg0) {
             v10[0] = func_00283180(*(f32 *)(arg0 + 0xF8)) * 0.1f;
             v10[1] = func_00283198(*(f32 *)(arg0 + 0xF8)) * 0.1f;
             v10[2] = 0.0f;
-            func_00282CC0(v0, v0, v10);
+            FastVecAdd(v0, v0, v10);
             v0[2] -= 0.05f;
             g = func_0029F530(arg0);
             f = func_002A7878(0.2f, 0.9f) * 0.2f * g;
@@ -530,8 +530,8 @@ void func_L04_003E2438(u8 *arg0) {
         if (arg0[0x42] == 0xC && f >= 10.0f && f <= 15.0f)
             func_002A8D70(arg0, 1.0f, *(f32 *)(data + 0x2E4), 1, 0x04000001, 1.0f, 0, 1, 0);
         if (arg0[0x60] & 2) {
-            if (func_00282E80(arg0 + 0x10, *(u8 **)(data + 0x240) + 0x10) < 2.7f &&
-                func_00283C80(*(f32 *)(arg0 + 0xF8), func_00283248(*(f32 *)(data + 0x230) - *(f32 *)(arg0 + 0x10),
+            if (vec_distance_xy(arg0 + 0x10, *(u8 **)(data + 0x240) + 0x10) < 2.7f &&
+                FastDiffRots(*(f32 *)(arg0 + 0xF8), func_00283248(*(f32 *)(data + 0x230) - *(f32 *)(arg0 + 0x10),
                                                                  *(f32 *)(data + 0x234) - *(f32 *)(arg0 + 0x14))) < 0.3490659f) {
                 func_L04_003E22B0(arg0, 0xC, 0, 0, 0xA);
                 func_002A7750(arg0, 0x11, -1);
@@ -548,9 +548,9 @@ void func_L04_003E2438(u8 *arg0) {
         f32 hp;
 
         if (arg0[0x60] & 2) {
-            if (func_00282E80(arg0 + 0x10, *(u8 **)(data + 0x240) + 0x10) < 25.0f && *(u8 **)(data + 0x2AC) != 0 &&
+            if (vec_distance_xy(arg0 + 0x10, *(u8 **)(data + 0x240) + 0x10) < 25.0f && *(u8 **)(data + 0x2AC) != 0 &&
                 *(s32 *)(data + 0x2D0) < 3) {
-                if (func_00283C80(*(f32 *)(arg0 + 0xF8), func_00283248(*(f32 *)(data + 0x230) - *(f32 *)(arg0 + 0x10),
+                if (FastDiffRots(*(f32 *)(arg0 + 0xF8), func_00283248(*(f32 *)(data + 0x230) - *(f32 *)(arg0 + 0x10),
                                                                      *(f32 *)(data + 0x234) - *(f32 *)(arg0 + 0x14))) > 0.087266475f) {
                     func_002A7750(arg0, 0x14, -1);
                     func_L04_003E22B0(arg0, 0x10, 4, 0, 0xA);
@@ -558,7 +558,7 @@ void func_L04_003E2438(u8 *arg0) {
                     func_L04_003E22B0(arg0, 9, 6, 0, 0xA);
                     func_002A7750(arg0, 0xE, -1);
                 }
-            } else if (func_00282E80(arg0 + 0x10, *(u8 **)(data + 0x240) + 0x10) > 10.0f && *(u8 **)(data + 0x2AC) != 0 &&
+            } else if (vec_distance_xy(arg0 + 0x10, *(u8 **)(data + 0x240) + 0x10) > 10.0f && *(u8 **)(data + 0x2AC) != 0 &&
                        *(s32 *)(data + 0x2D0) >= 3) {
                 func_L04_003E22B0(arg0, 3, 2, 0, 0xA);
                 func_002A7750(arg0, 0x13, -1);
@@ -578,7 +578,7 @@ void func_L04_003E2438(u8 *arg0) {
             f32 v0[4] __attribute__((aligned(16)));
             f32 v10[4] __attribute__((aligned(16)));
 
-            if (func_00283C80(*(f32 *)(arg0 + 0xF8), func_00283248(*(f32 *)(data + 0x230) - *(f32 *)(arg0 + 0x10),
+            if (FastDiffRots(*(f32 *)(arg0 + 0xF8), func_00283248(*(f32 *)(data + 0x230) - *(f32 *)(arg0 + 0x10),
                                                                  *(f32 *)(data + 0x234) - *(f32 *)(arg0 + 0x14))) < 0.78539824f) {
                 s32 k;
                 u8 *l;
@@ -587,10 +587,10 @@ void func_L04_003E2438(u8 *arg0) {
                 v10[0] = func_00283180(*(f32 *)(arg0 + 0xF8)) * 0.1f;
                 v10[1] = func_00283198(*(f32 *)(arg0 + 0xF8)) * 0.1f;
                 v10[2] = 0.0f;
-                func_00282CC0(v0, v0, v10);
+                FastVecAdd(v0, v0, v10);
                 v0[2] -= 0.05f;
                 *(TI128 *)(data + 0x260) = *(TI128 *)v0;
-                func_00282CF0(data + 0x280, data + 0x230, v0);
+                FastVecSub(data + 0x280, data + 0x230, v0);
                 *(f32 *)(data + 0x2C8) = 0.0f;
                 func_L00_003294F0(arg0, 0);
                 k = func_L00_002FCF18(arg0 + 0x10, 5.0f, 0.0f, 1.0f, 0.0f, 0.0f);
@@ -613,14 +613,14 @@ void func_L04_003E2438(u8 *arg0) {
                 v10[0] = func_00283180(*(f32 *)(arg0 + 0xF8)) * 0.1f;
                 v10[1] = func_00283198(*(f32 *)(arg0 + 0xF8)) * 0.1f;
                 v10[2] = 0.0f;
-                func_00282CC0(v0, v0, v10);
+                FastVecAdd(v0, v0, v10);
                 v0[2] -= 0.05f;
                 *(TI128 *)(data + 0x260) = *(TI128 *)v0;
                 v10[0] = func_00283180(*(f32 *)(arg0 + 0xF8)) * 25.0f;
                 v10[1] = func_00283198(*(f32 *)(arg0 + 0xF8)) * 25.0f;
                 v10[2] = 0.0f;
-                func_00282CC0(v10, v10, arg0 + 0x10);
-                func_00282CF0(data + 0x280, v10, v0);
+                FastVecAdd(v10, v10, arg0 + 0x10);
+                FastVecSub(data + 0x280, v10, v0);
                 *(f32 *)(data + 0x2C8) = 0.0f;
                 func_L00_003294F0(arg0, 0);
                 k = func_L00_002FCF18(arg0 + 0x10, 5.0f, 0.0f, 1.0f, 0.0f, 0.0f);
@@ -649,7 +649,7 @@ void func_L04_003E2438(u8 *arg0) {
                 v10[0] = func_00283180(*(f32 *)(arg0 + 0xF8)) * 0.1f;
                 v10[1] = func_00283198(*(f32 *)(arg0 + 0xF8)) * 0.1f;
                 v10[2] = 0.0f;
-                func_00282CC0(v0, v0, v10);
+                FastVecAdd(v0, v0, v10);
                 v0[2] -= 0.05f;
                 f = func_002A7878(0.2f, 0.9f) * 0.2f * *(f32 *)(data + 0x2B8);
                 n = func_002A77E0(2);
@@ -671,11 +671,11 @@ void func_L04_003E2438(u8 *arg0) {
             s32 n;
 
             *(f32 *)(data + 0x2C8) = *(f32 *)(data + 0x2C8) + 1.0f;
-            func_00282F20(data + 0x270, data + 0x280, *(f32 *)(data + 0x2C8));
-            func_002A8C00(req, arg0, 0x04000001, hp, data + 0x270);
+            vec_scale_to_length(data + 0x270, data + 0x280, *(f32 *)(data + 0x2C8));
+            make_hit_descriptor(req, arg0, 0x04000001, hp, data + 0x270);
             *(u16 *)(req + 0x1A) = *(u16 *)(arg0 + 0xAA);
-            func_00282CC0(data + 0x270, data + 0x260, data + 0x270);
-            if (func_002761F8(data + 0x260, data + 0x270, 0, arg0, req) != 0) {
+            FastVecAdd(data + 0x270, data + 0x260, data + 0x270);
+            if (CollLine(data + 0x260, data + 0x270, 0, arg0, req) != 0) {
                 *(TI128 *)(data + 0x270) = D_L04_001BFAE0;
                 if (func_002B38B8(arg0) == 0) {
                     func_L04_003E5830(&D_L04_001BFAE0, 0x1E);
@@ -713,7 +713,7 @@ void func_L04_003E2438(u8 *arg0) {
         }
         if (t >= 9.0f && t < 15.0f && arg0[0x42] == 0xA) {
                         
-            if (func_00282E80(data + 0x260, data + 0x270) > 0.5f) {
+            if (vec_distance_xy(data + 0x260, data + 0x270) > 0.5f) {
                 u8 req[0x30] __attribute__((aligned(16)));
                 f32 v30[4] __attribute__((aligned(16)));
                 f32 v40[4] __attribute__((aligned(16)));
@@ -722,19 +722,19 @@ void func_L04_003E2438(u8 *arg0) {
                 s32 n;
 
                 *(f32 *)(data + 0x2C8) = *(f32 *)(data + 0x2C8) + 1.0f;
-                func_00282F20(data + 0x270, data + 0x280, *(f32 *)(data + 0x2C8));
-                func_002A8C00(req, arg0, 0x04000001, hp, data + 0x270);
+                vec_scale_to_length(data + 0x270, data + 0x280, *(f32 *)(data + 0x2C8));
+                make_hit_descriptor(req, arg0, 0x04000001, hp, data + 0x270);
                 *(u16 *)(req + 0x1A) = *(u16 *)(arg0 + 0xAA);
-                func_00282CC0(data + 0x270, data + 0x260, data + 0x270);
-                if (func_002761F8(data + 0x260, data + 0x270, 0, arg0, req) != 0) {
+                FastVecAdd(data + 0x270, data + 0x260, data + 0x270);
+                if (CollLine(data + 0x260, data + 0x270, 0, arg0, req) != 0) {
                     *(TI128 *)(data + 0x270) = D_L04_001BFAE0;
                     if (func_002B38B8(arg0) == 0) {
                         func_L04_003E5830(&D_L04_001BFAE0, 0x1E);
                         func_L00_003294F0(arg0, 1);
                     }
                 }
-                func_00282F20(v30, data + 0x280, 1.6666667f);
-                func_00282CC0(data + 0x260, data + 0x260, v30);
+                vec_scale_to_length(v30, data + 0x280, 1.6666667f);
+                FastVecAdd(data + 0x260, data + 0x260, v30);
                 f = func_002A7878(1.0f, 6.0f);
                 n = func_002A7820(0x19, 0x23);
                 if (n == 0)
@@ -773,21 +773,21 @@ void func_L04_003E2438(u8 *arg0) {
         u8 *p = arg0 + 0x10;
 
         if (arg0[0x60] & 2) {
-            if (func_00282E80(p, *(u8 **)(data + 0x240) + 0x10) < 25.0f && *(u8 **)(data + 0x2AC) != 0) {
+            if (vec_distance_xy(p, *(u8 **)(data + 0x240) + 0x10) < 25.0f && *(u8 **)(data + 0x2AC) != 0) {
                 func_002A7750(arg0, 0x14, -1);
                 func_L04_003E22B0(arg0, 5, 4, 0, 0xA);
             } else {
                 func_002A7750(arg0, 0xB, -1);
                 func_L04_003E22B0(arg0, 6, 5, 0, 0xA);
             }
-        } else if (func_00282E80(p, *(u8 **)(data + 0x240) + 0x10) < 6.0f) {
+        } else if (vec_distance_xy(p, *(u8 **)(data + 0x240) + 0x10) < 6.0f) {
             func_L04_003E22B0(arg0, 9, 6, 0, 0xA);
             func_002A7750(arg0, 0xE, -1);
         }
         break;
     }
     case 20:
-        if (func_00283C80(*(f32 *)(arg0 + 0xF8), func_00283248(*(f32 *)(data + 0x230) - *(f32 *)(arg0 + 0x10),
+        if (FastDiffRots(*(f32 *)(arg0 + 0xF8), func_00283248(*(f32 *)(data + 0x230) - *(f32 *)(arg0 + 0x10),
                                                              *(f32 *)(data + 0x234) - *(f32 *)(arg0 + 0x14))) <= 0.087266475f) {
             func_L04_003E22B0(arg0, 9, 6, 0, 0xA);
             func_002A7750(arg0, 0xE, -1);
@@ -813,7 +813,7 @@ void func_L04_003E2438(u8 *arg0) {
     }
     func_L04_003E51F0(arg0);
     if (*(f32 *)(arg0 + 0x18) < 40.0f) {
-        func_002A6C58(arg0, 0, 3);
+        SetDeathBits(arg0, 0, 3);
         func_0029F338(arg0);
     }
 }

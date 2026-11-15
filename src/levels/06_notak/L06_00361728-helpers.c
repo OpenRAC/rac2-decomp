@@ -30,7 +30,7 @@ int func_L06_00361728(char *moby, char *target, float distance)
             *(unsigned char *)(candidate + 0x20) != 0xFE &&
             *(unsigned char *)(candidate + 0x20) != 0xFD &&
             *(unsigned char *)(candidate + 0x20) == 3) {
-            float current = func_00282E80(moby + 0x10, candidate + 0x10);
+            float current = vec_distance_xy(moby + 0x10, candidate + 0x10);
             if (current < distance) {
                 best = candidate;
                 distance = current;

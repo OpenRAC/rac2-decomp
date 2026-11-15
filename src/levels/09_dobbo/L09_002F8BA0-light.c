@@ -33,7 +33,7 @@ void func_L09_0039BA18(unsigned char *object)
     s = *(unsigned char **)(object + 0x68);
     if (!s)
         return;
-    if (H(s, 0x28) != -1 && func_00282978((unsigned short *)(s + 0x28))) {
+    if (H(s, 0x28) != -1 && FastDecTimer((unsigned short *)(s + 0x28))) {
         if (S(s, 0x2E) != -1) {
             func_00291450(S(s, 0x2E));
             S(s, 0x2E) = -1;
@@ -59,13 +59,13 @@ void func_L09_0039BA18(unsigned char *object)
         break;
     case 2:
         p = s + 0x38 + s[0x2D] * 5;
-        r = func_00283CE0(*p++) * 0.01f;
-        g = func_00283CE0(*p++) * 0.01f;
-        b = func_00283CE0(*p++) * 0.01f;
-        pitch = func_00283CE0(*p++);
+        r = IntToFloat(*p++) * 0.01f;
+        g = IntToFloat(*p++) * 0.01f;
+        b = IntToFloat(*p++) * 0.01f;
+        pitch = IntToFloat(*p++);
         length = *p++;
-        num = func_00283CE0(I(s, 0x30));
-        den = func_00283CE0(length);
+        num = IntToFloat(I(s, 0x30));
+        den = IntToFloat(length);
         t = num / den;
         if (s[0x2C] < s[0x2D] + 1) {
             if (I(s, 0x24) & 0x4000)
@@ -73,10 +73,10 @@ void func_L09_0039BA18(unsigned char *object)
             else
                 p -= 5;
         }
-        nr = func_00283CE0(*p++) * 0.01f;
-        ng = func_00283CE0(*p++) * 0.01f;
-        nb = func_00283CE0(*p++) * 0.01f;
-        np = func_00283CE0(*p);
+        nr = IntToFloat(*p++) * 0.01f;
+        ng = IntToFloat(*p++) * 0.01f;
+        nb = IntToFloat(*p++) * 0.01f;
+        np = IntToFloat(*p);
         r2 = r + (nr - r) * t;
         g2 = g + (ng - g) * t;
         b2 = b + (nb - b) * t;
@@ -100,7 +100,7 @@ void func_L09_0039BA18(unsigned char *object)
                     } else {
                         int saved = I(s, 0xC);
                         I(s, 0xC) = 0;
-                        func_00282D30(&delta, s, func_002A7878(F(s, 0xC), 1.0f));
+                        FastVecScale(&delta, s, func_002A7878(F(s, 0xC), 1.0f));
                         I(s, 0xC) = saved;
                     }
                 } else {
@@ -110,13 +110,13 @@ void func_L09_0039BA18(unsigned char *object)
                     I(s, 0xC) = saved;
                 }
                 if ((I(s, 0x24) & 0x400000) && *(unsigned char **)(s + 0x34))
-                    func_00283098(&delta, &delta, *(unsigned char **)(s + 0x34) + 0xC0);
-                func_00282CC0((char *)(object + 0x10), (char *)&origin, (char *)&delta);
+                    matrix_mul_vec3(&delta, &delta, *(unsigned char **)(s + 0x34) + 0xC0);
+                FastVecAdd((char *)(object + 0x10), (char *)&origin, (char *)&delta);
             } else {
                 qcopy(object + 0x10, &origin);
             }
             if (S(s, 0x2E) == -1) {
-                s[0x2E] = func_L00_002FCF18(object + 0x10, pitch2, func_00283CE0(s[0x2A]) * 0.01f, r2, g2, b2);
+                s[0x2E] = func_L00_002FCF18(object + 0x10, pitch2, IntToFloat(s[0x2A]) * 0.01f, r2, g2, b2);
             } else {
                 sound = D_L09_001C7B80 + (S(s, 0x2E) << 5);
                 qcopy(sound + 0x10, object + 0x10);
@@ -124,7 +124,7 @@ void func_L09_0039BA18(unsigned char *object)
                 F(sound, 0) = r2;
                 F(sound, 4) = g2;
                 F(sound, 8) = b2;
-                F(sound, 0xC) = func_00283CE0(s[0x2A]) * 0.01f;
+                F(sound, 0xC) = IntToFloat(s[0x2A]) * 0.01f;
             }
         } else {
         stop:

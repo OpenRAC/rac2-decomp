@@ -39,16 +39,16 @@ int func_002CF7F0(void)
 
     available = func_002B0E90();
     z = 0.84f;
-    func_0027C540(0);
+    SetupGifPaging(0);
     r = func_00336D50(D_001A8CFC + 0x8710, 0x8B);
     func_00300A00((char *)r, 0x60442D00, (float)(D_001A7340 / 2), (float)D_001AB9F0, 1.0f, D_001B23A8, z);
     r = func_00336D50(D_001A8CFC + 0x8710, 0x8C);
     func_00300A00((char *)r, 0x55F0C070, (float)(D_001A7340 / 2), (float)D_001AB9F0, 1.0f, D_001B23A8, z);
     r = func_00336D50(D_001A8CFC + 0x8710, 0x8D);
     func_00300A00((char *)r, 0x55F0C070, (float)(D_001A7340 / 2), (float)D_001AB9F0, 1.0f, D_001B23A8, z);
-    func_0027FAA8(D_001A7340 / 2, 0x41, 0x80F0F0F0ULL, func_00288FB8(0x2E12), -1);
-    func_0027FAA8(D_001A7340 / 2, 0x141, 0x80F0F0F0ULL, func_00288FB8(0x2D4E), -1);
-    func_0027FAA8(D_001A7340 / 2, 0x15A, 0x80F0F0F0ULL, func_00288FB8(0x2D4F), -1);
+    func_0027FAA8(D_001A7340 / 2, 0x41, 0x80F0F0F0ULL, GetLocalizedString(0x2E12), -1);
+    func_0027FAA8(D_001A7340 / 2, 0x141, 0x80F0F0F0ULL, GetLocalizedString(0x2D4E), -1);
+    func_0027FAA8(D_001A7340 / 2, 0x15A, 0x80F0F0F0ULL, GetLocalizedString(0x2D4F), -1);
     for (i = 0, y = 0x70; i < 12; i++) {
         limit = D_001ABCD0[i].limit;
         if (limit == 100) continue;
@@ -61,11 +61,11 @@ locked:
         {
             color = 0x80808080;
             if (i == D_001AB9EC) color = 0x7029A1FF;
-            func_0027F5B8(0x2B, y, color, func_00288FB8(0x2DC0), -1);
+            func_0027F5B8(0x2B, y, color, GetLocalizedString(0x2DC0), -1);
             if (limit == 90)
-                func_00115DA8(buf, D_001AB9F8, func_00288FB8(0x2E28));
+                func_00115DA8(buf, D_001AB9F8, GetLocalizedString(0x2E28));
             else
-                func_00115DA8(buf, D_001AB9D8, limit, func_00288FB8(0x2E10));
+                func_00115DA8(buf, D_001AB9D8, limit, GetLocalizedString(0x2E10));
             style = color;
             func_0027F120();
             r = func_001157AC(buf);
@@ -77,12 +77,12 @@ enabled:
         {
             color = 0x80F0F0F0;
             if (i == D_001AB9EC) color = 0x7029A1FF;
-            func_0027F5B8(0x2B, y, color, func_00288FB8(D_001ABCD0[i].text), -1);
-            func_0027FB40(0x195, y, color, func_00288FB8(D_001A7A40[D_001ABCD0[i].index] ? 0x2DC6 : 0x2DC7), -1);
+            func_0027F5B8(0x2B, y, color, GetLocalizedString(D_001ABCD0[i].text), -1);
+            func_0027FB40(0x195, y, color, GetLocalizedString(D_001A7A40[D_001ABCD0[i].index] ? 0x2DC6 : 0x2DC7), -1);
         }
 next:
         y += 19;
     }
-    func_0027C660();
+    DoGifPaging();
     return 0;
 }

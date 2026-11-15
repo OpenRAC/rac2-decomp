@@ -23,23 +23,23 @@ void func_002C8880(char *self) {
     b[2] = *(float *)(p + 8);
     b[3] = 0;
     func_00300190(self + 0x10, self + 0x10);
-    t = func_00283CE0(*(short *)(self + 0xA)) / func_00283CE0(*(unsigned char *)(p + 0x11));
+    t = IntToFloat(*(short *)(self + 0xA)) / IntToFloat(*(unsigned char *)(p + 0x11));
     f22 = 1.0f - t;
     if (*(unsigned char *)(p + 0x13) == 0) {
-        color = func_00283D38(f22, 0x103080, *(int *)(p + 0xC));
+        color = FastTweenColor(f22, 0x103080, *(int *)(p + 0xC));
         *(int *)(self + 4) = color | (*(unsigned char *)(p + 0x12) << 24);
         *(float *)(self + 0xC) = *(float *)(p + 0x14) + (*(float *)(p + 0x18) - *(float *)(p + 0x14)) * f22;
-        func_00282D30(a, b, *(float *)(p + 0x1C) * func_002A7798(f22));
+        FastVecScale(a, b, *(float *)(p + 0x1C) * func_002A7798(f22));
     } else {
-        f21 = func_00283CE0(*(unsigned char *)(p + 0x12));
-        f20 = func_00283CE0(*(unsigned char *)(p + 0x12));
+        f21 = IntToFloat(*(unsigned char *)(p + 0x12));
+        f20 = IntToFloat(*(unsigned char *)(p + 0x12));
         f20 = f20 * func_002A7790(f22);
-        *(int *)(self + 4) = *(int *)(p + 0xC) | (func_00283CF0(f21 - f20) << 24);
-        func_00282D30(a, b, *(float *)(p + 0x1C));
+        *(int *)(self + 4) = *(int *)(p + 0xC) | (FloatToInt(f21 - f20) << 24);
+        FastVecScale(a, b, *(float *)(p + 0x1C));
     }
-    func_00282CC0(self + 0x10, a, self + 0x10);
+    FastVecAdd(self + 0x10, a, self + 0x10);
     *(unsigned char *)(self + 8) = *(unsigned char *)(self + 8) + *(unsigned char *)(p + 0x10);
-    if (func_00282978(self + 0xA) != 0) {
+    if (FastDecTimer(self + 0xA) != 0) {
         if (*(unsigned char *)(p + 0x13) == 0) {
             *(unsigned char *)(p + 0x13) = 1;
             *(unsigned char *)(p + 0x11) = 0x14;

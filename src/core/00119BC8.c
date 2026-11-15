@@ -5,5 +5,5 @@
 extern int func_00119BF8(void *arg0, void *arg1, int arg2, int arg3);
 
 int func_00119BC8(void *arg0, int arg1, int arg2) {
-    return func_00119BF8(*(int *)((char *)arg0 + 0x54), arg0, arg1, arg2);
+    return VfprintfInteger(*(int *)((char *)arg0 + 0x54), arg0, arg1, arg2);
 }

@@ -50,13 +50,13 @@ int func_L05_003CF350(char *obj)
                 speed = D_L05_001AFBDC * 0.01666666753590107f;
                 if ((unsigned char)r[0x28] == 0)
                     speed *= 3.0f;
-                func_00282F20(base, r + 0x10, speed);
+                vec_scale_to_length(base, r + 0x10, speed);
                 if ((unsigned char)r[0x28] != 0 && func_002A77E0(4) == 0) {
-                    func_00282CF0(offset, obj + 0x10, D_L05_001B96C0);
-                    func_00282DD8(center, offset, D_L05_001B96C0 + 0x250);
+                    FastVecSub(offset, obj + 0x10, D_L05_001B96C0);
+                    FastVecCross(center, offset, D_L05_001B96C0 + 0x250);
                     func_002ACEC0(offset, center, offset, func_002A7940());
-                    func_00282F20(offset, offset, D_L05_001AFBE0 * 0.01666666753590107f);
-                    func_00282CC0(base, base, offset);
+                    vec_scale_to_length(offset, offset, D_L05_001AFBE0 * 0.01666666753590107f);
+                    FastVecAdd(base, base, offset);
                 }
                 for (i = 0; i < D_L05_001AFBC8[index]; i++) {
                     char *p, *s;
@@ -72,7 +72,7 @@ int func_L05_003CF350(char *obj)
                         a = func_002A7940();
                         b = func_002A7940();
                         func_002AF000(center, size, a, b);
-                        func_00282CC0(s + 0x10, base, center);
+                        FastVecAdd(s + 0x10, base, center);
                         p[0x20] = 2;
                     }
                 }
@@ -94,14 +94,14 @@ int func_L05_003CF350(char *obj)
                     if (p) {
                         s = *(char **)(p + 0x68);
                         if (*(short *)(obj + 0xaa) == big) {
-                            func_00282CF0(center, pos, obj + 0x10);
-                            func_00282F20(center, center, size);
+                            FastVecSub(center, pos, obj + 0x10);
+                            vec_scale_to_length(center, center, size);
                         } else {
                             a = func_002A7940();
                             b = func_002A7940();
                             func_002AF000(center, size, a, b);
                         }
-                        func_00282CC0(s + 0x10, base, center);
+                        FastVecAdd(s + 0x10, base, center);
                         p[0x20] = 3;
                     }
                 }
@@ -111,9 +111,9 @@ int func_L05_003CF350(char *obj)
             count = (float)D_L05_001AFBB0[index];
             qcopy(center, obj + 0x10);
             if ((unsigned char)r[0x28] == 0) {
-                func_00282F20(base, D_L05_001B96C0 + 0x230, speed * 0.5f);
-                func_00282F20(vel, D_L05_001B96C0 + 0x230, 0.5f);
-                func_00282CC0(center, center, vel);
+                vec_scale_to_length(base, D_L05_001B96C0 + 0x230, speed * 0.5f);
+                vec_scale_to_length(vel, D_L05_001B96C0 + 0x230, 0.5f);
+                FastVecAdd(center, center, vel);
                 angle = 0.05000000447034836f;
                 if (*(short *)(obj + 0xaa) == 0x955) {
                     count = 40.0f;
@@ -135,9 +135,9 @@ int func_L05_003CF350(char *obj)
                     a = func_002A7940();
                     b = func_002A7940();
                     func_002AF000(vel, angle, a, b);
-                    func_00282CC0(vel, vel, base);
+                    FastVecAdd(vel, vel, base);
                     spin = func_002A7820(-3, 3);
-                    p = func_002BDCE8(pos, spin, 0.0f, 1.0f, 1.0f, spread * 210000.0f, vel, color, 0);
+                    p = SpawnSpinningSparkParticle(pos, spin, 0.0f, 1.0f, 1.0f, spread * 210000.0f, vel, color, 0);
                     if (p) {
                         *(short *)(p + 0xa) = 120;
                         s = p + 0x20;

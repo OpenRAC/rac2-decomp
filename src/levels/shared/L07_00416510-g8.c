@@ -99,7 +99,7 @@ void func_L07_00416510(unsigned char *object)
         }
     }
     if (object[0x20] == 0) {
-        UI(data, 0x34) = func_L00_00329E90(object, 0, &scratch);
+        UI(data, 0x34) = AcquireEntitySlot(object, 0, &scratch);
         D_L07_001B18C0 = func_L00_0032A088(*(short *)(object + 0xAA), UI(data, 0x34));
         D_L07_001B18B8 = func_L00_0041A490(D_L07_001B18C0 + 0x33E0);
         D_L07_001B18BC = func_L00_0041A490(D_L07_001B18B8 + 0x1F40);
@@ -142,12 +142,12 @@ void func_L07_00416510(unsigned char *object)
         if (!func_00282948(&D_00189E20.timer)) allowed = 0;
     } else D_00189E20.timer = 40;
     if ((D_00138180.held & D_00189E20.mask) && allowed &&
-        func_L00_002D4040(-1) && !D_00189E20.disabled) {
+        get_ammo(-1) && !D_00189E20.disabled) {
         func_002AA3A8((float *)(data + 0x50), (float *)(data + 0x54), 10.0f, 0.0075f, 0.002f, 10.0f);
         if (UI(data, 0x60) % 10 == 0) func_L00_002D3F30(-1, 1);
         UI(data, 0x60)++;
         if (!func_002E59B0(object, UI(data, 0x38)))
-            UI(data, 0x38) = func_002E5CF8(0, 4, object);
+            UI(data, 0x38) = PlayMobySound(0, 4, object);
         if (object[0x43] != 2) func_002A7470(object, 2, 0, 0);
         count = func_00277F48(0.5f, data, 16, object, 0);
         if (count > 0) {
@@ -156,10 +156,10 @@ void func_L07_00416510(unsigned char *object)
             remaining = count;
             do {
                 if (*targets != D_00189E20.object) {
-                    func_00282CF0(&delta, *targets + 0x10, object + 0x10);
-                    func_00282F20(&delta, &delta, 1.0f);
-                    func_00282F20(&request, &request, 1.0f);
-                    func_002A8C00(&request, object, 0x910000,
+                    FastVecSub(&delta, *targets + 0x10, object + 0x10);
+                    vec_scale_to_length(&delta, &delta, 1.0f);
+                    vec_scale_to_length(&request, &request, 1.0f);
+                    make_hit_descriptor(&request, object, 0x910000,
                         ((UpdateMaterial *)((unsigned int)D_L07_002628A0 + D_00139568.material * sizeof(UpdateMaterial)))->value, &delta);
                     request.position.q = delta.q;
                     request.enabled = 1;
@@ -167,9 +167,9 @@ void func_L07_00416510(unsigned char *object)
                     request.kind = 9;
                     request.active = 1;
                     request.owner = *(unsigned short *)(*targets + 0xAA);
-                    func_002A8E20(*targets, &request);
-                    func_0032D758(*targets, 0x1D, object);
-                    func_002E5CF8(1, 0, object);
+                    QueueMobyImpact(*targets, &request);
+                    StartAttachedEffect(*targets, 0x1D, object);
+                    PlayMobySound(1, 0, object);
                 }
                 targets++;
             } while (--remaining);
@@ -179,8 +179,8 @@ void func_L07_00416510(unsigned char *object)
         if (index != -1 && ((UpdateSound *)(D_00188660 + index * 0x70))->owner == object && ((UpdateSound *)(D_00188660 + index * 0x70))->active)
             func_002E59F8(index);
         UI(data, 0x38) = -1;
-        if ((D_00138180.pressed & D_00189E20.mask) && !func_L00_002D4040(-1) && !D_00189E20.disabled)
-            func_002E5CF8(2, 0, object);
+        if ((D_00138180.pressed & D_00189E20.mask) && !get_ammo(-1) && !D_00189E20.disabled)
+            PlayMobySound(2, 0, object);
         func_002AA3A8((float *)(data + 0x50), (float *)(data + 0x54), 0.0f, 0.06f, 0.01f, 0.125f);
         UI(data, 0x60) = 0;
     }
@@ -188,21 +188,21 @@ void func_L07_00416510(unsigned char *object)
     func_0029FCC0(object, 0, data);
     func_00282C88(&vector);
     vector.f[1] = -1.0f;
-    func_00283098(&vector, &vector, object + 0xC0);
+    matrix_mul_vec3(&vector, &vector, object + 0xC0);
     vector.f[2] += 0.02f;
-    func_00282F20(&vector, &vector, UF(data, 0x50) * 0.05f);
+    vec_scale_to_length(&vector, &vector, UF(data, 0x50) * 0.05f);
     if (D_00189E20.view) {
         D_00189E20.camera = D_00189E20.view;
         func_L00_0032A1A8(D_00189E20.view, data, &vector, UF(data, 0x50) * 0.05f);
         if (D_L07_001A8FF0) {
-            func_00282D30(&delta, object + 0xE0, 0.02f);
-            func_00282CC0(&vector, &vector, &delta);
+            FastVecScale(&delta, object + 0xE0, 0.02f);
+            FastVecAdd(&vector, &vector, &delta);
         } else vector.f[2] += 0.02f;
     }
     qcopy(data + 0x10, data);
     if (D_00189E20.weapon)
         func_002ACEC0(&vector, &vector, D_00189E20.object + 0xD0, -0.098174773f);
-    if (UF(data, 0x50) != 0.0f) func_L00_0041ABB8(object, data, &vector, 40);
+    if (UF(data, 0x50) != 0.0f) AppendVectorRingEntry(object, data, &vector, 40);
     UF(data, 0x58) -= 0.1f;
     if (UF(data, 0x58) <= -8.0f) UF(data, 0x58) += 8.0f;
     UF(data, 0x5C) -= 0.025f;

@@ -56,14 +56,14 @@ void func_0032AF50(s8 *arg0) {
     do {
         s5++;
         if ((s8 *)(s64)*(s32 *)(s0 + 0x44) == arg0) {
-            t = func_00283CE0(*(s32 *)(s0 + 0x3C));
-            t20 = t / func_00283CE0(*(s32 *)(s0 + 0x40));
-            *(s32 *)(s0 + 0x34) = func_00283CF0(func_00283CE0(*(s32 *)(s0 + 0x30)) * t20);
-            *(f32 *)(s0 + 0x2C) = func_00283B98(*(f32 *)(s0 + 0x2C), *(f32 *)(s0 + 0x28));
-            func_00282CC0(s0, s0, s1);
+            t = IntToFloat(*(s32 *)(s0 + 0x3C));
+            t20 = t / IntToFloat(*(s32 *)(s0 + 0x40));
+            *(s32 *)(s0 + 0x34) = FloatToInt(IntToFloat(*(s32 *)(s0 + 0x30)) * t20);
+            *(f32 *)(s0 + 0x2C) = FastAddRotations(*(f32 *)(s0 + 0x2C), *(f32 *)(s0 + 0x28));
+            FastVecAdd(s0, s0, s1);
             func_002FE8D8(*(s32 *)(s6 + 0x2290) + 0x10, v);
-            func_00282D30(v, v, -0.00089999998454f);
-            func_00282CC0(s1, s1, v);
+            FastVecScale(v, v, -0.00089999998454f);
+            FastVecAdd(s1, s1, v);
             if (func_00282948(s3) != 0) {
                 temp_v0 = *(s32 *)(s0 + 0x34);
                 if (temp_v0 > 0) {

@@ -7,7 +7,7 @@ extern void func_00283360(void *);
 extern int D_L22_001AF37C;
 
 char *func_L22_003FC780(char *obj, TI128 *pos, int arg3, f32 f) {
-    char *o = func_0029EFD0(0xE3B);
+    char *o = CreateMoby(0xE3B);
     if (o != 0) {
         u8 *ctl = *(u8 **)(o + 0x68);
         *(short *)(ctl + 0x2A) = arg3;
@@ -24,7 +24,7 @@ char *func_L22_003FC780(char *obj, TI128 *pos, int arg3, f32 f) {
         *(f32 *)(o + 0x2C) = *(f32 *)(*(u32 *)(o + 0x24) + 0x24) * f;
         *(u32 *)(ctl + 0x20) = (u32)obj;
         qcopy(o + 0x10, pos);
-        func_00283360(o + 0xC0);
+        set_identity_rotation_rows(o + 0xC0);
     }
     return o;
 }

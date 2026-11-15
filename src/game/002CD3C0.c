@@ -36,18 +36,18 @@ int func_002CD3C0(void)
     int y;
     float position;
 
-    func_0027C540(0);
+    SetupGifPaging(0);
     func_0029C1A8();
     position = 367.0f;
     y = (int)(D_001B23A4[0] * position + 0.5f);
     do {
-        func_0027FAA8(0x1B5, y, 0x80F0F0F0ULL, (char *)func_00288FB8(0x2D4F), -1);
+        func_0027FAA8(0x1B5, y, 0x80F0F0F0ULL, (char *)GetLocalizedString(0x2D4F), -1);
     } while (0);
-    func_0027C660();
+    DoGifPaging();
     if (D_001A8CFC[0] != 0) {
         if (*(int *)((char *)D_001A8CFC[0] + 0x38000 + 0x7364) != 0) {
             char *owner;
-            func_002A0250();
+            DrawMobysSetup();
             func_002A01C8();
             func_002A01F0();
             owner = *(char **)(D_001A8CFC[0] + 0x38000 + 0x7364);
@@ -58,7 +58,7 @@ int func_002CD3C0(void)
             func_002A0220();
             func_002A0380();
             func_002FC3C0(0x10);
-            func_0029FEE0();
+            PatchMobyGifs();
         }
     }
     return 0;

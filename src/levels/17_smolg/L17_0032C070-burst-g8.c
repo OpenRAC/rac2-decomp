@@ -40,18 +40,18 @@ void func_L17_003A14A0(unsigned char *obj)
         random.f[2] = func_002A7878(-1.0f, 1.0f);
         jitter.q = random.q;
         qcopy(&position, obj + 0x10);
-        func_00283410(matrix, obj + 0xF0);
+        euler_to_matrix(matrix, obj + 0xF0);
         func_00282C88(&velocity);
         velocity.f[0] = *(float *)state * (D_L17_001AF320 * 3.0f) * 0.016666668f;
-        func_00282D30(&jitter, &jitter, velocity.f[0] * D_L17_001AF324);
-        func_002830C0(&velocity, &velocity, matrix);
-        func_00282CD8(&random, &velocity, &jitter);
+        FastVecScale(&jitter, &jitter, velocity.f[0] * D_L17_001AF324);
+        transform_vector(&velocity, &velocity, matrix);
+        add_vectors(&random, &velocity, &jitter);
         if (*(int *)(state + 0xC) >= 10 || func_002A77E0(10 - *(int *)(state + 0xC)) == 0) {
-            func_00282D30(&step, &velocity, 0.33f);
+            FastVecScale(&step, &velocity, 0.33f);
             func_002C02F0(&position, &velocity, 0x40, obj, 0x80, 0x1FF);
         }
         if (*(int *)(state + 0xC) >= 10 || func_002A77E0(10 - *(int *)(state + 0xC)) == 0) {
-            func_00282CC0(&position, &position, &step);
+            FastVecAdd(&position, &position, &step);
             func_002C02F0(&position, &velocity, 0x40, obj, 0x80, 0x1FF);
         }
         if (func_00282948(state + 0xC)) {

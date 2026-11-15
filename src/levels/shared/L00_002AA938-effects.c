@@ -38,8 +38,8 @@ void func_L00_002AA938(int count, int sourceMode, int sparks) {
                 func_0029FCC0(*(char **)(player + 0x2290), 22, (char *)&position);
         }
         qcopy(&velocity, inheritedVelocity);
-        if (*(int *)(player + 0x2294) == 0x33) func_00282D30(&velocity, &velocity, 1.15f);
-        else func_00282D30(&velocity, &velocity, 0.7f);
+        if (*(int *)(player + 0x2294) == 0x33) FastVecScale(&velocity, &velocity, 1.15f);
+        else FastVecScale(&velocity, &velocity, 0.7f);
         velocity.f[0] += func_002A7878(-0.0066666672937572f, 0.0066666672937572f);
         velocity.f[1] += func_002A7878(-0.0066666672937572f, 0.0066666672937572f);
         velocity.f[2] += func_002A7878(-0.01666666753590107f, 0.0f);

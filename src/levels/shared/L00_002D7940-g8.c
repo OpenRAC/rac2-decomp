@@ -59,7 +59,7 @@ void func_L00_002E30B8(char *text, float t, int mode, int color, int y, int pass
         break;
     }
     if (pass == 0) {
-        func_002802E0(box, y, y + D_L00_001BC588[D_L00_001BC200.layout].height, -D_001A7340, D_001A7340 * 2,
+        FontSetWindow(box, y, y + D_L00_001BC588[D_L00_001BC200.layout].height, -D_001A7340, D_001A7340 * 2,
                       x, y + D_L00_001BC588[D_L00_001BC200.layout].height / 2, D_L00_001BC200.style, 3);
         func_00280190(box, color, text, -1);
     } else if (pass == 1) {

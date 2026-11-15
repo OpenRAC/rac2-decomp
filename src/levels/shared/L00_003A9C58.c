@@ -49,17 +49,17 @@ void func_L00_003A9C58(char *m)
  qcopy(old,m+0x10);
  func_002FEE70(I(d,0x48),d,0);
  scale=0.45f;
- func_00282CC0(m+0x10,m+0x10,d);
- func_00282978(d+0x2C);
+ FastVecAdd(m+0x10,m+0x10,d);
+ FastDecTimer(d+0x2C);
  if(H(d,0x2C)) {
  short life=50;
  for(i=0;i<3;i++) {
    float third=0.3333f; float one=1.0f; int type=2;
    *(Quad9C58 *)b=*(Quad9C58 *)(m+0x10);
-   func_L00_0031D670(a,old,b,func_00283CE0(i)*third);
+   LerpVector4(a,old,b,IntToFloat(i)*third);
    n=func_002A77E0(6);if(func_002A77E0(2))n=-n;
-   t=H(d,0x2C)/func_00283CE0(50)*70000.0f+10000.0f;
-   { Particle9C58 *particle=(Particle9C58 *)func_002BDCE8(a,0.025f,one,one,n,D_L00_001A8F20,t,0x80808080,1);
+   t=H(d,0x2C)/IntToFloat(50)*70000.0f+10000.0f;
+   { Particle9C58 *particle=(Particle9C58 *)SpawnSpinningSparkParticle(a,0.025f,one,one,n,D_L00_001A8F20,t,0x80808080,1);
    if(particle) {
      Payload9C58 *payload;
      particle->age.lifetime=life;
@@ -69,47 +69,47 @@ void func_L00_003A9C58(char *m)
    } }
  }
  }
- if(H(d,0x14)<7) {scale=func_00283CE0(H(d,0x14))/func_00283CE0(7);scale*=0.45f;
+ if(H(d,0x14)<7) {scale=IntToFloat(H(d,0x14))/IntToFloat(7);scale*=0.45f;
  qcopy(a,m+0x10);
- func_00282D30(b,direction,F(d,0x20));func_00282CF0(c,m+0x10,b);
- if(func_002761F8(a,c,18,m,0))func_00282CC0(m+0x10,D_L00_001BF220,b);
+ FastVecScale(b,direction,F(d,0x20));FastVecSub(c,m+0x10,b);
+ if(CollLine(a,c,18,m,0))FastVecAdd(m+0x10,D_L00_001BF220,b);
  }
- F(d,0x24)=func_00283B98(F(d,0x24),0.025f);
- func_00282D30(a,direction,F(d,0x28));func_00282CF0(m+0x10,m+0x10,a);
+ F(d,0x24)=FastAddRotations(F(d,0x24),0.025f);
+ FastVecScale(a,direction,F(d,0x28));FastVecSub(m+0x10,m+0x10,a);
  F(d,0x28)=func_00283198(F(d,0x24))*0.25f;
- func_00282D30(a,direction,F(d,0x28));func_00282CC0(m+0x10,m+0x10,a);
- F(m,0xF0)=func_00283B98(F(m,0xF0),F(d,0x30));
- F(m,0xF4)=func_00283B98(F(m,0xF4),F(d,0x34));
- F(m,0xF8)=func_00283B98(F(m,0xF8),F(d,0x38));
+ FastVecScale(a,direction,F(d,0x28));FastVecAdd(m+0x10,m+0x10,a);
+ F(m,0xF0)=FastAddRotations(F(m,0xF0),F(d,0x30));
+ F(m,0xF4)=FastAddRotations(F(m,0xF4),F(d,0x34));
+ F(m,0xF8)=FastAddRotations(F(m,0xF8),F(d,0x38));
  func_00282948(d+0x44);
  if(func_00277258(m+0x10,0,D_00189E20.collision_flags,scale)) {
    qcopy(m+0x10,D_L00_001BF200.position);
-   speed=func_00282DF0(d);bounce=speed*0.25f;if(bounce<0.033333335f)bounce=0.033333335f;
+   speed=FastVecLength(d);bounce=speed*0.25f;if(bounce<0.033333335f)bounce=0.033333335f;
    if(D_L00_001BF200.hit) {
-     func_00282CF0(a,m+0x10,D_L00_001BF200.hit+0x10);
-     t=func_00282DB0(direction,a);func_00282D30(b,direction,t);
-     func_00282CC0(c,D_L00_001BF200.hit+0x10,b);
-     func_00282CF0(a,m+0x10,c);func_00283028(d,d,a);
+     FastVecSub(a,m+0x10,D_L00_001BF200.hit+0x10);
+     t=FastVecDot(direction,a);FastVecScale(b,direction,t);
+     FastVecAdd(c,D_L00_001BF200.hit+0x10,b);
+     FastVecSub(a,m+0x10,c);func_00283028(d,d,a);
    } else {
-     func_00282D30(a,D_L00_001BF200.normal,0.0009765625f);func_00282F20(a,a,1.0f);
-     t=func_00282DB0(a,direction);t=func_00282C48(t);if(t>=0.8f)bounce=speed;
+     FastVecScale(a,D_L00_001BF200.normal,0.0009765625f);vec_scale_to_length(a,a,1.0f);
+     t=FastVecDot(a,direction);t=func_00282C48(t);if(t>=0.8f)bounce=speed;
      func_00283028(d,d,a);
    }
-   if(!I(d,0x44)) {func_002E5CF8(2,0,m);I(d,0x44)=15;}
-   func_00282F20(d,d,bounce);
+   if(!I(d,0x44)) {PlayMobySound(2,0,m);I(d,0x44)=15;}
+   vec_scale_to_length(d,d,bounce);
  }
- func_00282D08(d,d,d+0x50,0.01f);
+ lerp_vector(d,d,d+0x50,0.01f);
  p=D_00188660+I(d,0x40)*0x70;
- if(*(char **)(p+0x88)!=m || !B(p,0x74)) I(d,0x40)=func_002E5CF8(0,4,m);
+ if(*(char **)(p+0x88)!=m || !B(p,0x74)) I(d,0x40)=PlayMobySound(0,4,m);
  if(!((D_00138180.pressed&D_00189E20.control_mask) ||
        (!(D_00138180.held&D_00189E20.control_mask) && H(d,0x2E)>20) ||
        ((D_00189E20.state!=25 && D_00189E20.state!=70) || B(m,0x20)==1)))goto steer;
  if(H(d,0x14)>=21) {
    B(m,0x20)=1;prior=H(d,0x16);
-   if(func_00282978(d+0x16)) {
-     func_002E59F8(I(d,0x40));func_002E5CF8(1,0,m);
-     if(!prior)func_0032C700(m+0x10,1,40,20,30,40,50,1,1,1,0,D_L00_001ADB2C,1.5f,20.0f);
-     else func_0032C700(m+0x10,1,20,15,30,15,30,1,1,0,0,D_L00_001ADB2C,0.6f,20.0f);
+   if(FastDecTimer(d+0x16)) {
+     func_002E59F8(I(d,0x40));PlayMobySound(1,0,m);
+     if(!prior)SpawnExplosion(m+0x10,1,40,20,30,40,50,1,1,1,0,D_L00_001ADB2C,1.5f,20.0f);
+     else SpawnExplosion(m+0x10,1,20,15,30,15,30,1,1,0,0,D_L00_001ADB2C,0.6f,20.0f);
      func_L00_003A9798(m,d,m+0x10,1);goto destroy;
    }
  }
@@ -119,11 +119,11 @@ steer:
    if(D_00189E20.weapon!=49)D_00189E20.control_state=2;
    func_L00_00427078();
    if(D_00138180.axis_x!=0 || D_00138180.axis_y!=0) {
-     float speed2=func_00282DF0(d);
+     float speed2=FastVecLength(d);
      if(speed2!=0) {
-       func_00282D30(a,D_L00_001B9000,-D_00138180.axis_x*0.004166667f);func_00282CC0(d,d,a);
-       func_00282D30(a,D_L00_001B9000+16,-D_00138180.axis_y*0.00083333341f);func_00282CC0(d,d,a);
-       func_00282F20(d,d,speed2);
+       FastVecScale(a,D_L00_001B9000,-D_00138180.axis_x*0.004166667f);FastVecAdd(d,d,a);
+       FastVecScale(a,D_L00_001B9000+16,-D_00138180.axis_y*0.00083333341f);FastVecAdd(d,d,a);
+       vec_scale_to_length(d,d,speed2);
      }
    }
  }

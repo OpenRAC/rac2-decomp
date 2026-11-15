@@ -57,7 +57,7 @@ void func_L03_002AD540(void) {
         ref_L03_002AD540_00();
         return;
     }
-    func_L00_002D24E8();
+    AdvanceHeroAnimation();
     ref_L03_002AD540_01();
     ref_L03_002AD540_02();
     ref_L03_002AD540_03(p + 0x80, p + 0x90, p + 0x550);
@@ -70,20 +70,20 @@ void func_L03_002AD540(void) {
             func_L00_002D3068();
         return;
     }
-    func_L00_002AE0C8();
+    RebuildRegionObjectMembership();
     if (*(unsigned char *)(p + 0x22B4) != 0)
         return;
-    func_L00_002B9CA8();
-    func_L00_002AC1A0();
+    UpdateDelayedSounds();
+    UpdateHeroEasingTargetsAndPointEffects();
     func_L00_002AB1D8();
-    func_L00_002AB420();
-    func_L00_002ABBA0();
-    func_L00_002AB948();
-    func_L00_002A5518();
-    func_L00_002A5840();
-    func_L00_002B7718();
+    UpdateHeroPitchAndYawEasingTargets();
+    UpdateHeroAutoAimAngles();
+    UpdateHeroIdleRandomRotationTargets();
+    ClampHeroControlAndUpdateEffects();
+    UpdateHeroGlowAndExtraManipulators();
+    UpdateHeroTiltPoseTargets();
     func_L00_002A5368();
-    func_L00_002A9460();
+    update_hero_moby();
     func_L00_002AA178(0);
     func_L00_002B2120();
     func_L00_002B2318();
@@ -94,11 +94,11 @@ void func_L03_002AD540(void) {
     else
         func_L00_002D3068();
     func_L00_002A7958();
-    func_L00_002A7748();
+    ApplyHeroAxisScales();
     func_L00_002A67F8();
     func_L00_002D5EB8();
     func_L00_002A6420();
-    func_L00_002D5158();
+    UpdateHeroAimAndTransitions();
     {
         char *q = D_00189E20;
         if ((*(int *)(q + 0x229C) != 0x16 && *(int *)(q + 0x229C) != 0x1F
@@ -110,5 +110,5 @@ void func_L03_002AD540(void) {
         func_002A677C(*(int *)(q + 0x2290));
     }
     ref_L03_002AD540_06();
-    func_L00_002A9760();
+    UpdateHeroMobyProbedHeightBounds();
 }

@@ -95,11 +95,11 @@ int func_L03_00329EF0(void *unused, int *ids, RegionRecord *records, int capacit
         geometry = (RegionGeometry *)D_L03_001FE700[records[i].id];
         func_00282C88(&center);
         for (j = 0; j < geometry->count; j++)
-            func_00282CC0(&center, &center, &geometry->points[j]);
-        func_00282D30(&center, &center, 1.0f / (float)geometry->count);
+            FastVecAdd(&center, &center, &geometry->points[j]);
+        FastVecScale(&center, &center, 1.0f / (float)geometry->count);
         center.w = 0;
         for (k = 0; k < geometry->count; k++) {
-            distance = func_00282E80(&center, &geometry->points[k]);
+            distance = vec_distance_xy(&center, &geometry->points[k]);
             if (distance > center.w)
                 center.w = distance;
         }

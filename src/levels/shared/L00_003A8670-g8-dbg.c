@@ -44,7 +44,7 @@ void func_L00_003A8670(TI128 *position, int index)
             entry->spin = func_002A78D8(D_L00_001AF718, D_L00_001AF71C) * 0.017453294f;
             entry->scale = func_002A7878(D_L00_001AF728, D_L00_001AF724);
             entry->duration = func_002A7820(D_L00_001AF734, D_L00_001AF738);
-            entry->reciprocal = 1.0f / func_00283CE0(entry->duration);
+            entry->reciprocal = 1.0f / IntToFloat(entry->duration);
             if (context->level == 29)
                 high = D_L00_001AF744;
             else

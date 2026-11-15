@@ -11,7 +11,7 @@ extern float D_L00_001B0910 __attribute__((sda));
 
 char *func_L00_003F4B68(int owner, char *position, char *velocity, int value, float scale)
 {
-    char *object = func_0029EFD0(0xcf3);
+    char *object = CreateMoby(0xcf3);
     char *state;
     float angle;
     unsigned short timer;

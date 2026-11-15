@@ -82,20 +82,20 @@ void func_L00_00423038(int reposition)
         scratch.offset.y = 0.0f;
         scratch.offset.z = *(float *)(movement + 0x30);
         scratch.offset.w = 0.0f;
-        func_00283678(&scratch.basis, D_00189E20);
-        func_00283098(&scratch.transformed, &scratch.offset, *(char **)(transform + 0xC0) + 0xC0);
+        copy_matrix3x4(&scratch.basis, D_00189E20);
+        matrix_mul_vec3(&scratch.transformed, &scratch.offset, *(char **)(transform + 0xC0) + 0xC0);
         target = object + 0x30;
-        func_00282CC0(target, transform, &scratch.transformed);
-        func_00282D30(&scratch.scaled, *(char **)(transform + 0xC0) + 0xE0, *(float *)(transform + 0xB0));
-        func_00282CC0(&scratch.endpoint, transform, &scratch.scaled);
-        if (func_002761F8(&scratch.endpoint, target, D_L00_001B184C, *(char **)(D_00189E20 + 0x2290), 0)) {
-            func_00282CF0(&scratch.difference, &D_L00_001BF220, &scratch.endpoint);
-            length = func_00282DF0(&scratch.difference);
+        FastVecAdd(target, transform, &scratch.transformed);
+        FastVecScale(&scratch.scaled, *(char **)(transform + 0xC0) + 0xE0, *(float *)(transform + 0xB0));
+        FastVecAdd(&scratch.endpoint, transform, &scratch.scaled);
+        if (CollLine(&scratch.endpoint, target, D_L00_001B184C, *(char **)(D_00189E20 + 0x2290), 0)) {
+            FastVecSub(&scratch.difference, &D_L00_001BF220, &scratch.endpoint);
+            length = FastVecLength(&scratch.difference);
             if (length == 0.0f) {
                 qcopy(target, &scratch.endpoint);
             } else {
-                func_00282D30(&scratch.difference, &scratch.difference, (length - 0.5f) / length);
-                func_00282CC0(target, &scratch.endpoint, &scratch.difference);
+                FastVecScale(&scratch.difference, &scratch.difference, (length - 0.5f) / length);
+                FastVecAdd(target, &scratch.endpoint, &scratch.difference);
             }
         }
     }
@@ -107,14 +107,14 @@ void func_L00_00423038(int reposition)
         previous[2] = *(float *)(position + 8);
     }
     qcopy(&scratch.up, &D_L00_001B8E50);
-    func_00282F20(&scratch.scaled, &scratch.up, *(float *)(transform + 0xB0));
-    func_00282CC0(&scratch.endpoint, &scratch.scaled, transform);
-    func_00282CF0(&scratch.delta, &scratch.endpoint, position);
-    func_00282F20(object, &scratch.delta, 1.0f);
+    vec_scale_to_length(&scratch.scaled, &scratch.up, *(float *)(transform + 0xB0));
+    FastVecAdd(&scratch.endpoint, &scratch.scaled, transform);
+    FastVecSub(&scratch.delta, &scratch.endpoint, position);
+    vec_scale_to_length(object, &scratch.delta, 1.0f);
     qcopy(object + 0x20, &scratch.up);
-    func_00282DD8(object + 0x10, object, object + 0x20);
-    func_00282F20(object + 0x10, object + 0x10, 1.0f);
-    func_00282DD8(object + 0x20, object + 0x10, object);
+    FastVecCross(object + 0x10, object, object + 0x20);
+    vec_scale_to_length(object + 0x10, object + 0x10, 1.0f);
+    FastVecCross(object + 0x20, object + 0x10, object);
     qcopy(object + 0x40, object);
 }
 
@@ -145,11 +145,11 @@ void func_L00_00423BC0(char *a0, void *a1, void *a2, void *a3,
     p = (void *)((int)p + 176);
 
     func_00282CF0_2(&b0, a2, a3);
-    func_00282F20(&b1, &b0, t0);
-    func_00282CC0(a2, a2, &b1);
+    vec_scale_to_length(&b1, &b0, t0);
+    FastVecAdd(a2, a2, &b1);
     func_00282CF0_2(&b2, a2, p);
-    func_00282F20(&b2, &b2, t1);
-    func_00282CC0(&b3, p, &b2);
+    vec_scale_to_length(&b2, &b2, t1);
+    FastVecAdd(&b3, p, &b2);
     func_00282CF0_2(a1, &b3, a4);
 }
 
@@ -376,22 +376,22 @@ float func_L00_00424C90(char *object, char *vector, float threshold)
     float signed_angle = 0.0f;
     float sign;
     float factor;
-    func_00282D30(temporary, up, func_00282DB0(vector, up));
-    func_00282CF0(first, vector, temporary);
-    func_00282D30(temporary, up, func_00282DB0(direction, up));
-    func_00282CF0(second, direction, temporary);
-    dot = func_00282DB0(first, second);
-    length = func_00282DF0(first);
+    FastVecScale(temporary, up, FastVecDot(vector, up));
+    FastVecSub(first, vector, temporary);
+    FastVecScale(temporary, up, FastVecDot(direction, up));
+    FastVecSub(second, direction, temporary);
+    dot = FastVecDot(first, second);
+    length = FastVecLength(first);
     if (length == 0.0f) return 0.0f;
-    length *= func_00282DF0(second);
+    length *= FastVecLength(second);
     if (length == 0.0f) return 0.0f;
     angle = 1.57079632679f - func_002831B0(dot / length);
     sign = -1.0f;
-    func_00282DD8(cross, first, up);
-    if (func_00282DB0(cross, second) >= 0.0f) sign = 1.0f;
-    signed_angle = func_00283BE0(3.14159265359f, angle);
+    FastVecCross(cross, first, up);
+    if (FastVecDot(cross, second) >= 0.0f) sign = 1.0f;
+    signed_angle = fast_subtract_rotations(3.14159265359f, angle);
     if (threshold != 0.0f && func_00282C48(signed_angle) > threshold) return signed_angle;
-    factor = func_002A7AA8(-1.0f, 0.0f, 1.0f, 0.0f, signed_angle * 0.63661975f);
+    factor = cubic_hermite_scalar(-1.0f, 0.0f, 1.0f, 0.0f, signed_angle * 0.63661975f);
     if (factor > 1.0f) factor = 1.0f;
     *(float *)(output + 0x1C) = factor * sign;
     return signed_angle;
@@ -446,8 +446,8 @@ void func_L00_00425490(char *obj)
 
     if (*(short *)(p + 16) <= 0) return;
     func_00282CF0_4(buf, p, p + 176);
-    func_00282D08((float *)q, q, (char *)buf, D_L00_001A8900);
-    a = func_00282DF0((float *)q);
+    lerp_vector((float *)q, q, (char *)buf, D_L00_001A8900);
+    a = FastVecLength((float *)q);
     b = *(float *)(q + 44);
     if (b < a) {
         a = b;
@@ -503,7 +503,7 @@ void func_L00_00426248(void)
                 GridCellEntry *entry = (GridCellEntry *)((char *)cell + 16) + k;
 
                 if (entry->type == 5) {
-                    func_00282DF0(D_L00_001B1F94[0] + (entry->index << 7));
+                    FastVecLength(D_L00_001B1F94[0] + (entry->index << 7));
                 }
             }
         }

@@ -33,7 +33,7 @@ extern float D_L08_001B1F94 __attribute__((sda));
 /* Same body as func_L08_00435600, with this function's own callees. */
 SpawnObject *func_L22_003F85A0(u8 *owner, SpawnVector *position)
 {
-    SpawnObject *object = func_0029EFD0(0xD55);
+    SpawnObject *object = CreateMoby(0xD55);
     if (object != 0) {
         AttachedState *state;
         object->enabled = 1;

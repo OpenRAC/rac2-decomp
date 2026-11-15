@@ -59,15 +59,15 @@ void func_0030E030(char *actor) {
         float halfAngle;
         short type;
         func_002FE8D8(actor + 0x10, scratch.desired.f);
-        func_00282F20(&scratch.forward, actor + 0xE0, 1.0f);
-        func_00282DD8(&scratch.axis, &scratch.forward, &scratch.desired);
-        halfAngle = func_00282DB0(&scratch.forward, &scratch.desired) * 0.5f;
-        func_00282D30(&scratch.quaternion, &scratch.axis, func_00283198(halfAngle));
+        vec_scale_to_length(&scratch.forward, actor + 0xE0, 1.0f);
+        FastVecCross(&scratch.axis, &scratch.forward, &scratch.desired);
+        halfAngle = FastVecDot(&scratch.forward, &scratch.desired) * 0.5f;
+        FastVecScale(&scratch.quaternion, &scratch.axis, func_00283198(halfAngle));
         scratch.quaternion.f[3] = func_00283180(halfAngle);
-        func_00283958(&scratch.quaternion, scratch.rotation);
-        func_00283738(actor + 0xC0, scratch.rotation, actor + 0xC0);
+        quaternion_to_rotation_basis(&scratch.quaternion, scratch.rotation);
+        multiply_matrix3x3(actor + 0xC0, scratch.rotation, actor + 0xC0);
         qcopy(&scratch.oldPosition, (actor + 0x10));
-        func_00282CC0(actor + 0x10, actor + 0x10, state + 0x10);
+        FastVecAdd(actor + 0x10, actor + 0x10, state + 0x10);
         func_002FEE70(*(int *)(state + 0x20), state + 0x10, 0);
         func_002FE880(actor + 0x10, (float *)(state + 0x10), 0.0030555557f);
         func_00300190(actor + 0x10, actor + 0x10);
@@ -79,12 +79,12 @@ void func_0030E030(char *actor) {
         scratch.phase.query.owner = actor; scratch.phase.query.ignore = scratch.ignore; scratch.phase.query.ignoreCount = 2;
         scratch.phase.query.radius = 0.2f; scratch.phase.query.friction = 0.45f; scratch.phase.query.bounce = 0.5555556f;
         scratch.phase.query.flags = 0; scratch.phase.query.mask = 0; scratch.phase.query.gravity = 1; scratch.phase.query.response = 1; scratch.phase.query.maxTurn = 0.174f;
-        collision = func_002FE9D0(&scratch.phase.query);
+        collision = CollideSweptSphere(&scratch.phase.query);
         qcopy((actor + 0x10), &scratch.phase.query.position);
         qcopy((state + 0x10), &scratch.phase.query.velocity);
         if (D_001A8CA4 && *(float *)(actor + 0x18) < 462.43f) {
             func_002ACB48(scratch.scatter.f, 0.5f);
-            func_002ABBB8(actor, &scratch.scatter, 0, 0.0f, 0.0f, 0, 0, 0,
+            SpawnExplosionEffects(actor, &scratch.scatter, 0, 0.0f, 0.0f, 0, 0, 0,
                          4.0f, 3.0f, 9.0f, 1.0f, 2, 12.0f, 1, 1, -1, 0, 0x810001);
             actor[0x20] = 6;
         }
@@ -96,26 +96,26 @@ void func_0030E030(char *actor) {
             *(char **)(state + 0x38) = hit;
         }
         {
-            func_00282D30(&scratch.desired, &D_001BAFC0, 0.0009765625f);
-            func_00282F20(&scratch.desired, &scratch.desired, 1);
-            func_00282F20(&scratch.forward, actor + 0xE0, 1);
-            func_00282DD8(&scratch.axis, &scratch.forward, &scratch.desired);
-            halfAngle = func_00282DB0(&scratch.forward, &scratch.desired) * 0.5f;
-            func_00282D30(&scratch.quaternion, &scratch.axis, func_00283198(halfAngle));
+            FastVecScale(&scratch.desired, &D_001BAFC0, 0.0009765625f);
+            vec_scale_to_length(&scratch.desired, &scratch.desired, 1);
+            vec_scale_to_length(&scratch.forward, actor + 0xE0, 1);
+            FastVecCross(&scratch.axis, &scratch.forward, &scratch.desired);
+            halfAngle = FastVecDot(&scratch.forward, &scratch.desired) * 0.5f;
+            FastVecScale(&scratch.quaternion, &scratch.axis, func_00283198(halfAngle));
             scratch.quaternion.f[3] = func_00283180(halfAngle);
-            func_00283958(&scratch.quaternion, scratch.rotation);
-            func_00283738(actor + 0xC0, scratch.rotation, actor + 0xC0);
+            quaternion_to_rotation_basis(&scratch.quaternion, scratch.rotation);
+            multiply_matrix3x3(actor + 0xC0, scratch.rotation, actor + 0xC0);
             actor[0x20] = collision;
             if (((u8 *)actor)[0x43] != 1) func_002A7470(actor, 1, 0, 10);
             *(int *)(actor + 0x98) = *(int *)(*(char **)(actor + 0x24) + 0x10);
         }
         goto response_done;
 accelerate:
-        func_00282D30(state + 0x10, state + 0x10, 1.1f);
+        FastVecScale(state + 0x10, state + 0x10, 1.1f);
 response_done:
         if (func_00300540(scratch.phase.query.surface)) {
             func_002ACB48(scratch.scatter.f, 0.5f);
-            func_002ABBB8(actor, &scratch.scatter, 0, 0.0f, 0.0f, 0, 0, 0,
+            SpawnExplosionEffects(actor, &scratch.scatter, 0, 0.0f, 0.0f, 0, 0, 0,
                          4.0f, 3.0f, 9.0f, 1.0f, 2, 12.0f, 1, 1, -1, 0, 0x810001);
             actor[0x20] = 6;
         }
@@ -136,14 +136,14 @@ response_done:
         break;
     case 6:
         func_002FEE50(*(int *)(state + 0x20));
-        if (!*(int *)(state + 0x40)) func_002ACAD0((int)actor, D_001B1CB0);
+        if (!*(int *)(state + 0x40)) RemoveMobyFromIndexList((int)actor, D_001B1CB0);
         func_0029F338(actor);
         return;
     }
     if ((u32)(((u8 *)actor)[0x20] - 2) < 3 && *(char **)(state + 0x38)) {
-        func_00283658(scratch.phase.attachment.transform, actor + 0xC0);
+        copy_matrix_rotation(scratch.phase.attachment.transform, actor + 0xC0);
         func_002AB6D8((float *)scratch.phase.attachment.transform, scratch.phase.attachment.angles.f);
         if (func_002AD0E0((int)actor, *(int *)(state + 0x38), actor + 0x10, &scratch.phase.attachment.angles, actor + 0x10, &scratch.phase.attachment.adjusted))
-            func_002833F0(actor + 0xC0, &scratch.phase.attachment.adjusted);
+            euler_rotation_basis(actor + 0xC0, &scratch.phase.attachment.adjusted);
     }
 }

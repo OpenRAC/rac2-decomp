@@ -109,12 +109,12 @@ void func_L12_004163E8(Actor *self)
             u8 *t = (u8 *)D_L12_001B2E9C + (s1->f0 << 8);
             f32 local[4];
 
-            func_0032C700(t + 0x10, 1, 0xE, 0xA, 0xF, 0xA, 0x14, 1,
+            SpawnExplosion(t + 0x10, 1, 0xE, 0xA, 0xF, 0xA, 0x14, 1,
                           2.0f, 20.0f, 1, 1, 0, 0);
             self->f98 = 0;
             self->f34 = (self->f34 | 0x41) & 0xEFFF;
             func_L12_0041E8F8(t);
-            func_00282F20(local, self->fC0, -0.10000000894069672f);
+            vec_scale_to_length(local, self->fC0, -0.10000000894069672f);
             func_002B0A68(3.0f, 6.0f, 3.0f, 6.0f, (char *)self, 0x3F, local, 0xFF);
             if (s1->f0 != -1) {
                 ((Actor *)D_L12_001B2E9C)[s1->f0].f34 &= 0xEFFF;

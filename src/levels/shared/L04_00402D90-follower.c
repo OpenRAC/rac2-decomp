@@ -55,7 +55,7 @@ void func_L04_004045E0(u8 *obj)
     *(f32 *)(obj + 0x2C) = *(f32 *)(*(u8 **)(obj + 0x24) + 0x24) * 0.25f;
     obj[0x30] = 0xFF;
     *(s16 *)(obj + 0x32) = 0x7F;
-    if (obj[0x31] != 0 && func_00282E48(obj + 0x10, D_L04_001B9680) < 9.0f) {
+    if (obj[0x31] != 0 && fast_vec_dist(obj + 0x10, D_L04_001B9680) < 9.0f) {
         func_002A93B0(obj);
         obj[0x6F] = 8;
     }
@@ -87,7 +87,7 @@ void func_L04_004045E0(u8 *obj)
         scale = *(f32 *)(obj + 0x2C) / *(f32 *)(*(u8 **)(obj + 0x24) + 0x24);
         src = (u8 *)&u.axes;
         for (i = 2; i >= 0; i--) {
-            func_00282D30(dst, src, scale);
+            FastVecScale(dst, src, scale);
             src += 0x10;
             dst += 0x10;
         }
@@ -100,7 +100,7 @@ void func_L04_004045E0(u8 *obj)
     case 2:
         if (*(u8 **)(st + 0x164) != 0 && (*(u8 **)(st + 0x164))[0x20] == 2 && (*(u8 **)(st + 0x164))[0xBC] == 0)
             return;
-        func_L04_00403530(obj, st);
+        UpdateRouteFollowerPace(obj, st);
         func_L04_004027B0(obj, st);
         func_L04_00400EE0(obj, st);
         func_L04_004044B8(obj, st);
@@ -108,9 +108,9 @@ void func_L04_004045E0(u8 *obj)
         return;
     case 3:
         if (*(u16 *)(obj + 0x96) == 0) {
-            k = func_L04_00400AB0(obj, *(u8 **)(st + 0x110), 1);
+            k = FindNearestRoutePointIndex(obj, *(u8 **)(st + 0x110), 1);
             *(Quad *)(obj + 0x10) = *(Quad *)(*(u8 **)(st + 0x110) + k * 16 + 0x10);
-            f = func_00283CE0(k) * *(f32 *)(*(u8 **)(st + 0x110) + 0x1C) +
+            f = IntToFloat(k) * *(f32 *)(*(u8 **)(st + 0x110) + 0x1C) +
                 (*(s32 *)(st + 0x244) != 0 ? 15.0f : 5.0f);
             *(f32 *)(st + 0xA8) = f;
             func_002C96F8(f, *(f32 *)(*(u8 **)(st + 0x110) + 0x1C), *(u8 **)(st + 0x110),
@@ -119,13 +119,13 @@ void func_L04_004045E0(u8 *obj)
         if (*(u16 *)(obj + 0x96) >= 300 && (e = *(u8 **)(st + 0x164)) != 0) {
             pos = obj + 0x10;
             es = *(u8 **)(e + 0x68);
-            func_00282CF0(u.d, pos, e + 0x10);
-            if (func_00283DB8(pos, 60.0f) == -1 && func_00282DB0(u.d, u.d) > 25.0f) {
+            FastVecSub(u.d, pos, e + 0x10);
+            if (func_00283DB8(pos, 60.0f) == -1 && FastVecDot(u.d, u.d) > 25.0f) {
                 *(s32 *)(obj + 0x98) = *(s32 *)(*(u8 **)(obj + 0x24) + 0x10);
                 *(u16 *)(obj + 0x34) = (*(u16 *)(obj + 0x34) & 0xFFBE) | 0x1400;
                 if (*(u8 **)(st + 0x8C) != 0)
                     *(u16 *)(*(u8 **)(st + 0x8C) + 0x34) &= 0xFFBE;
-                func_L04_00410518(obj, es, st + 0x120, st + 0x124, st + 0x11C, *(void **)(st + 0x160));
+                FindNearestRoutePoint(obj, es, st + 0x120, st + 0x124, st + 0x11C, *(void **)(st + 0x160));
                 obj[0x20] = 2;
             }
         }

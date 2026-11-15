@@ -40,18 +40,18 @@ int func_002D99E8(Menu_002D99E8 *menu)
     mask = 0;
     y = 4;
     x = 4;
-    func_0027C540(0);
+    SetupGifPaging(0);
     list = (int *)0x70000000;
     count = func_0029DB28(list, &mask, 0, 0);
-    func_002FC560(0x42, 0x44);
-    func_002FC560(0x47, 0x10B);
+    VU1_addGSregister(0x42, 0x44);
+    VU1_addGSregister(0x47, 0x10B);
     if (!D_001AB910) {
         x = menu->x;
         y = menu->y;
     }
-    func_0027F538(x, y, 0x80FFA888, (signed char *)func_00288FB8(0x2DC5), -1);
+    func_0027F538(x, y, 0x80FFA888, (signed char *)GetLocalizedString(0x2DC5), -1);
     y += 20;
-    func_00115484(&initial, 0, 24);
+    memset(&initial, 0, 24);
     initial.bottom = menu->height;
     initial.right = menu->width;
     initial.line = 16;
@@ -71,7 +71,7 @@ int func_002D99E8(Menu_002D99E8 *menu)
         limit = x + 16;
         draw.x = limit;
         draw.y = y - menu->scroll;
-        func_00280200(&draw, color, (signed char *)func_00288FB8(list[i]), -1);
+        func_00280200(&draw, color, (signed char *)GetLocalizedString(list[i]), -1);
         if (selected) {
             if ((s16)draw.y < (limit = (s16)draw.top + 4))
                 menu->scroll -= 4;
@@ -84,9 +84,9 @@ int func_002D99E8(Menu_002D99E8 *menu)
             iconY += 6;
         iconTop = iconY - menu->scroll;
         if ((s16)draw.top + 4 <= iconTop && iconTop <= (s16)draw.bottom - 4)
-            func_002D9CF8(iconX + 5, iconTop, (mask >> i) & 1);
+            DrawMenuCheckBox(iconX + 5, iconTop, (mask >> i) & 1);
         y += rows * 16;
     }
-    func_0027C660();
+    DoGifPaging();
     return 2;
 }

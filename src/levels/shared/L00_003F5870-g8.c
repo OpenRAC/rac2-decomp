@@ -38,14 +38,14 @@ void func_L00_003F5870(L00Joint *joints, int index)
     if (ref_L00_003F5870_00 != 0)
         func_002AFFD8(up, joints[index].position, 1);
     if ((float)index == 0.0f || func_00282C48(joints[index].angle) < 0.00001f) {
-        func_00282D30(dir, up, joints[index].length);
+        FastVecScale(dir, up, joints[index].length);
     } else {
-        func_00282CF0(diff, joints[index].position, joints[index - 1].position);
-        func_00282F20(normal, diff, 1.0f);
+        FastVecSub(diff, joints[index].position, joints[index - 1].position);
+        vec_scale_to_length(normal, diff, 1.0f);
         func_002AB668(normal, normal, joints[index].angle);
         func_002ACDE8(dir, up, normal);
-        func_00282D30(dir, dir, joints[index].length);
+        FastVecScale(dir, dir, joints[index].length);
     }
-    func_00282CC0(joints[index].offset, joints[index].position, dir);
+    FastVecAdd(joints[index].offset, joints[index].position, dir);
     joints[index].offset[3] = ref_L00_003F5870_01;
 }

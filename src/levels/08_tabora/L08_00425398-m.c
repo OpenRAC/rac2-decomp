@@ -13,7 +13,7 @@ void func_L08_00425398(char *a0)
     qcopy(aim, a0 + 0x10);
     aim[2] = aim[2] + 20.0f;
     *(float *)(q + 0x1C4) = func_L08_00425328(aim, *(float *)(q + 0x178) + 10.0f, *(float *)(q + 0x178) - 3.0f, *(float *)(q + 0x90));
-    if (func_00278E78() == 0)
+    if (GetCollHitMaterial() == 0)
         *(float *)(q + 0x1C4) = *(float *)(q + 0x1C4) + 2.0f;
     {
         float v = *(float *)(q + 0x1C4) + 6.5f;

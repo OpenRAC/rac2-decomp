@@ -57,7 +57,7 @@ void func_L16_002B5EE0(void)
     float oldPosition[4],horizontal[4],vertical[4];
     float limit,saved;
     qcopy(oldPosition,V(0x80));
-    func_L00_002D4140(D_00189E20.field588,V(0x100),V(0x90));
+    UpdateHeroAttachment(D_00189E20.field588,V(0x100),V(0x90));
     if (D_00189E20.field2294==0x14 || D_00189E20.field2294==0x5B || D_00189E20.field2294==0x58 || D_00189E20.field2294==0x81) {
         if (D_00189E20.field1f0==0 && func_L00_002D3A58(V(0xF0))>D_00189E20.field264-0.02f)
             func_L00_002D3BD8(V(0xF0),V(0xF0),D_00189E20.field264-0.02f);
@@ -67,75 +67,75 @@ void func_L16_002B5EE0(void)
             func_L00_002D3B58((Quad *)V(0xF0),(Quad *)V(0xF0),limit);
         }
     } else if (D_00189E20.field229c==15) {
-        if (D_00189E20.field1f0==0 && func_00282E20(V(0xF0))>D_00189E20.field264-0.02f)
+        if (D_00189E20.field1f0==0 && vec_length_xy(V(0xF0))>D_00189E20.field264-0.02f)
             func_00282F70(V(0xF0),V(0xF0),D_00189E20.field264-0.02f);
     } else {
         if (D_00189E20.field229c==13) goto moved;
         if (D_00189E20.field229c==14) goto moved;
-        if (D_00189E20.field1f0==0 && func_00282DF0(V(0xF0))>D_00189E20.field264-0.02f)
-            func_00282F20(V(0xF0),V(0xF0),D_00189E20.field264-0.02f);
+        if (D_00189E20.field1f0==0 && FastVecLength(V(0xF0))>D_00189E20.field264-0.02f)
+            vec_scale_to_length(V(0xF0),V(0xF0),D_00189E20.field264-0.02f);
     }
 moved:
-    func_00282CC0(V(0x80),V(0x80),V(0xF0));
-    func_00282CC0(V(0x80),V(0x80),V(0xA60));
+    FastVecAdd(V(0x80),V(0x80),V(0xF0));
+    FastVecAdd(V(0x80),V(0x80),V(0xA60));
     func_00282C88((Quad *)V(0xA60));
     D_00189E20.field287=0;
     D_00189E20.field26c=0;
-    if (func_00282DF0(V(0x100))<=0.0001f) {
+    if (FastVecLength(V(0x100))<=0.0001f) {
         func_L00_002B5A88();
         func_L09_002B7238();
-        func_00282CF0(V(0x110),V(0x80),oldPosition);
-        func_L00_002B5250();
+        FastVecSub(V(0x110),V(0x80),oldPosition);
+        EaseHeroPositionToGoal();
     } else func_L09_002B7238();
-    func_00282CF0(V(0x120),V(0x80),oldPosition);
+    FastVecSub(V(0x120),V(0x80),oldPosition);
     qcopy(V(0x140),V(0x120));
     qcopy(V(0x130),V(0x120));
-    func_00282F20(V(0x120),V(0x120),1.0f);
+    vec_scale_to_length(V(0x120),V(0x120),1.0f);
     { float dot;
-    dot=func_00282DB0(V(0x120),V(0xF0));
+    dot=FastVecDot(V(0x120),V(0xF0));
     if (dot<0.0f) dot=0.0f;
-    func_00282F20(V(0x120),V(0xF0),dot);
+    vec_scale_to_length(V(0x120),V(0xF0),dot);
     }
     qcopy(horizontal,V(0xF0));
     func_L00_002D3960((char *)horizontal,(char *)horizontal);
     func_L00_002D3960(V(0x140),V(0x140));
-    func_00282F20(V(0x140),V(0x140),1.0f);
+    vec_scale_to_length(V(0x140),V(0x140),1.0f);
     { float dot;
-    dot=func_00282DB0(V(0x140),horizontal);
+    dot=FastVecDot(V(0x140),horizontal);
     if (dot<0.0f) dot=0.0f;
-    func_00282F20(V(0x140),horizontal,dot);
+    vec_scale_to_length(V(0x140),horizontal,dot);
     }
     qcopy(vertical,V(0xF0));
     func_L00_002D3BD8((char *)vertical,(char *)vertical,0.0f);
     func_L00_002D3BD8(V(0x130),V(0x130),0.0f);
-    func_00282F20(V(0x130),V(0x130),1.0f);
+    vec_scale_to_length(V(0x130),V(0x130),1.0f);
     { float dot;
-    dot=func_00282DB0(V(0x130),vertical);
+    dot=FastVecDot(V(0x130),vertical);
     if (dot<0.0f) dot=0.0f;
-    func_00282F20(V(0x130),vertical,dot);
+    vec_scale_to_length(V(0x130),vertical,dot);
     }
-    D_00189E20.field170=func_00282DF0(V(0x120));
+    D_00189E20.field170=FastVecLength(V(0x120));
     D_00189E20.field174=func_L00_002D3A58(V(0x120));
     *(Quad *)horizontal=*(Quad *)V(0x120);
     D_00189E20.field178=func_L00_002B5590(horizontal);
     D_00189E20.field180=func_L00_002D3B00(V(0x120));
     if (D_00189E20.field178<0.0f) D_00189E20.field178=0.0f;
     qcopy(horizontal,V(0x80));
-    if (func_00282DF0(V(0x100))>0.0001f) {
-        func_00282CC0(V(0x80),V(0x80),V(0x100));
+    if (FastVecLength(V(0x100))>0.0001f) {
+        FastVecAdd(V(0x80),V(0x80),V(0x100));
         saved=D_00189E20.field10c;
         func_00282C88((Quad *)V(0x100));
         D_00189E20.field10c=saved;
         func_L00_002B5A88();
         func_L09_002B7238();
-        func_00282CF0(V(0x110),V(0x80),oldPosition);
-        func_L00_002B5250();
+        FastVecSub(V(0x110),V(0x80),oldPosition);
+        EaseHeroPositionToGoal();
     }
-    func_00282CF0(V(0x150),V(0x80),horizontal);
-    D_00189E20.field184=func_00282DF0(V(0x150));
+    FastVecSub(V(0x150),V(0x80),horizontal);
+    D_00189E20.field184=FastVecLength(V(0x150));
     D_00189E20.field15c=D_00189E20.field10c;
     D_00189E20.field10c=0.0f;
-    func_00282CF0(V(0x110),V(0x80),oldPosition);
+    FastVecSub(V(0x110),V(0x80),oldPosition);
     D_00189E20.field17c=0.0f;
     if (D_00189E20.field174>0.004f) {
         D_00189E20.field17c=D_00189E20.field118/D_00189E20.field174;
@@ -143,7 +143,7 @@ moved:
         else if (D_00189E20.field17c<-0.5f) D_00189E20.field17c=-0.5f;
     }
     if (D_00189E20.field170>0.86666673f) {
-        func_00282D30(V(0x110),V(0x110),0.86666673f/D_00189E20.field170);
+        FastVecScale(V(0x110),V(0x110),0.86666673f/D_00189E20.field170);
         D_00189E20.field170=0.86666673f;
     }
 }

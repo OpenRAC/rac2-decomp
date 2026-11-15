@@ -57,7 +57,7 @@ void func_002A7398(s8 *arg0, s32 arg1, s32 arg2) {
     if ((u8) (*(u8 *)((s8 *)(arg0) + (0x41))) >= a1c) {
         (*(s8 *)((s8 *)(arg0) + (0x41))) = 0;
     }
-    func_0029F390(arg0);
+    update_moby_animation_state(arg0);
     f0 = *(*(f32 **)((s8 *)(arg0) + (0x58)));
     (*(f32 *)((s8 *)(arg0) + (0x4C))) = f0;
     (*(u8 *)((s8 *)(arg0) + (0x60))) = (*(u8 *)((s8 *)(arg0) + (0x60))) & 0xFD;

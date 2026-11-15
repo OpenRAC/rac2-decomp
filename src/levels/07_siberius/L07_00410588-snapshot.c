@@ -31,8 +31,8 @@ void func_L07_00410588(u8 *self)
     records = D_L07_001B23CC;
     qcopy(self + 0x10, &records[index].position);
     qcopy(self + 0xF0, &records[index].rotation);
-    func_002833F0(self + 0xC0, self + 0xF0);
-    func_L00_00323448(self, state + 0x1B0, 0x40, -1, *(int *)(state + 0xCC), -1, 7, 0);
+    euler_rotation_basis(self + 0xC0, self + 0xF0);
+    BuildObjectAttachmentTransforms(self, state + 0x1B0, 0x40, -1, *(int *)(state + 0xCC), -1, 7, 0);
     cursor = state;
     tag = D_L07_00227E7F;
     end = cursor + 0x1400;
@@ -53,5 +53,5 @@ void func_L07_00410588(u8 *self)
     } while ((s32)cursor < (s32)end);
     qcopy(self + 0x10, &saved[0]);
     qcopy(self + 0xF0, &saved[1]);
-    func_002833F0(self + 0xC0, self + 0xF0);
+    euler_rotation_basis(self + 0xC0, self + 0xF0);
 }

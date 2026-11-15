@@ -15,7 +15,7 @@ u8 *func_L05_00352B28(float *position,float *velocity,int duration,int color,int
         *(Quad *)(effect+0x10) = *(Quad *)position;
         *(int *)(effect+4) = (alpha << 24) | color;
         motion = effect+0x20;
-        effect[9] = func_00283CF0(4.0f)+64;
+        effect[9] = FloatToInt(4.0f)+64;
         effect[1] = 0;
         *(float *)(effect+0xC) = size;
         effect[3] = 0x48;
@@ -27,7 +27,7 @@ u8 *func_L05_00352B28(float *position,float *velocity,int duration,int color,int
         *(float *)(motion+8) = velocity[2];
         *(float *)(motion+0xC) = drag;
         motion[0x15] = kind;
-        lifetime = func_00283CE0(duration);
+        lifetime = IntToFloat(duration);
         *(float *)(motion+0x10) = (endSize-size)/lifetime;
         motion[0x14] = (endAlpha-alpha)/duration;
         *(void (**)(char *))(motion+0x1C) = func_L00_00340490;

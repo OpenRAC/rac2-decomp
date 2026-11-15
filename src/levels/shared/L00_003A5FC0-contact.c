@@ -55,29 +55,29 @@ void func_L00_003A5FC0(void *owner, void *position)
     /* This clear precedes every read of drift; surrounding objects do not alias it. */
     qzero_nc(drift);
     if (D_00189E20.motionActive)
-        func_00282D30(drift, D_00189E20.motion, 1.7f);
-    func_00282D30(offset, D_00189E20.axis, 0.4f);
-    func_00282CC0(origin, origin, offset);
+        FastVecScale(drift, D_00189E20.motion, 1.7f);
+    FastVecScale(offset, D_00189E20.axis, 0.4f);
+    FastVecAdd(origin, origin, offset);
     for (count = 19; count >= 0; count--) {
         char *particle;
         float size;
         int spin;
-        angle = func_00283B98(angle, func_002A7878(0.0f, 0.6283186078f));
-        func_00282D30(velocity, direction, func_002A7878(0.2000000179f, 0.2666666806f));
-        func_00282CC0(velocity, velocity, drift);
+        angle = FastAddRotations(angle, func_002A7878(0.0f, 0.6283186078f));
+        FastVecScale(velocity, direction, func_002A7878(0.2000000179f, 0.2666666806f));
+        FastVecAdd(velocity, velocity, drift);
         jitter[0] = origin[0] + func_002A78D8(0.0f, 0.3f);
         jitter[1] = origin[1] + func_002A78D8(0.0f, 0.3f);
         jitter[2] = origin[2] + func_002A78D8(0.0f, 0.3f);
-        spin = func_00283CF0(func_002A78D8(1.0f, 2.0f));
+        spin = FloatToInt(func_002A78D8(1.0f, 2.0f));
         size = func_002A7878(0.2f, 0.75f) * 210000.0f;
-        particle = func_002BDCE8(jitter, 0.0f, 1.0f, 1.00999999f, spin,
+        particle = SpawnSpinningSparkParticle(jitter, 0.0f, 1.0f, 1.00999999f, spin,
                                  D_00189E20.motion, size, 0x7F202020, 0);
         if (particle) {
             char *tail = particle + 0x20;
             ((ContactParticle *)particle)->flags = 0x44;
             ((ContactParticle *)particle)->life.frames = 60;
-            ((ContactParticle *)particle)->tile = func_00283CF0(4.0f) + 0x40;
-            *(float *)(tail + 0x1C) = func_00283CE0(5);
+            ((ContactParticle *)particle)->tile = FloatToInt(4.0f) + 0x40;
+            *(float *)(tail + 0x1C) = IntToFloat(5);
             *(int *)(tail + 4) = 3;
             *(unsigned char *)(tail + 0xA) = 0x30;
             *(unsigned char *)(tail + 0xB) = ((ContactParticle *)particle)->life.bytes[0];
@@ -86,7 +86,7 @@ void func_L00_003A5FC0(void *owner, void *position)
         jitter[1] = origin[1] + func_002A78D8(0.0f, 0.6f);
         jitter[2] = origin[2] + func_002A78D8(0.0f, 0.6f);
         size = func_002A7878(0.2f, 1.75f) * 210000.0f;
-        func_00282CF0(jitter, jitter, velocity);
+        FastVecSub(jitter, jitter, velocity);
         func_002C16C0(jitter, velocity, 6, 0x7F, 0x404040, spin,
                       size, 500.0f, 0.95f, 0.0f, 0.0f);
         if (func_00282C48(angle) > 0.00001f) {
@@ -98,14 +98,14 @@ void func_L00_003A5FC0(void *owner, void *position)
         int streakCount;
         float speed = func_002A7878(8.0f, 12.0f);
         float scale = 0.5f;
-        func_00282D30(base, D_00189E20.axis, speed * (1.0f / 60.0f));
+        FastVecScale(base, D_00189E20.axis, speed * (1.0f / 60.0f));
         for (streakCount = 1; streakCount >= 0; streakCount--) {
             float cone = func_002A7878(0.2617994249f, 1.396263599395752f);
             float heading = func_002A7940();
             float length = func_002A7878(7.0f, 10.5f);
             int firstColor, secondColor, life;
             func_002AF000(scatter, scale * (1.0f / 60.0f) * length, heading, cone);
-            func_00282CC0(scatter, scatter, base);
+            FastVecAdd(scatter, scatter, base);
             scatter[2] += 0.05000000447f;
             firstColor = func_002AAFA0(0x4F007FFF, 0);
             secondColor = func_002AAFA0(0x1F00007F, 0);

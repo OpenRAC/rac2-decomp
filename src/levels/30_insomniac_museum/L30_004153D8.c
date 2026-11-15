@@ -31,7 +31,7 @@ char *func_L30_004153D8(void *pos, float scale, int shake, int a2, int a3, int a
     float normal[4] __attribute__((aligned(16)));
     float sphere[4] __attribute__((aligned(16)));
     float towardPlayer[4] __attribute__((aligned(16)));
-    char *obj = func_0029EFD0(0x11E5);
+    char *obj = CreateMoby(0x11E5);
     State153 *st;
     if (obj) {
         st = *(State153 **)(obj + 0x68);
@@ -40,13 +40,13 @@ char *func_L30_004153D8(void *pos, float scale, int shake, int a2, int a3, int a
         *(unsigned char *)(obj + 0x20) = 0;
         qcopy(obj + 0x10, pos);
         *(float *)(obj + 0x1C) = 1.0f;
-        func_00282CF0(direction, D_L30_001B9C80.position, obj + 0x10);
-        func_00282F20(direction, direction, 1.0f);
+        FastVecSub(direction, D_L30_001B9C80.position, obj + 0x10);
+        vec_scale_to_length(direction, direction, 1.0f);
         func_002AFFD8(obj + 0x10, normal, 1);
         qcopy(obj + 0xC0, direction);
-        func_00282DD8(obj + 0xD0, obj + 0xC0, normal);
-        func_00282F20(obj + 0xD0, obj + 0xD0, 1.0f);
-        func_00282DD8(obj + 0xE0, obj + 0xD0, obj + 0xC0);
+        FastVecCross(obj + 0xD0, obj + 0xC0, normal);
+        vec_scale_to_length(obj + 0xD0, obj + 0xD0, 1.0f);
+        FastVecCross(obj + 0xE0, obj + 0xD0, obj + 0xC0);
         *(float *)(obj + 0xCC) = *(float *)(obj + 0xDC) = *(float *)(obj + 0xEC) = 0.0f;
         st->initialLife = st->life = 60;
         st->inner = scale + scale;
@@ -66,15 +66,15 @@ char *func_L30_004153D8(void *pos, float scale, int shake, int a2, int a3, int a
         if (func_00283DB8(sphere, 128.0f) == 1) {
             st->duration = 10;
             st->strength = 0.1f;
-            if (func_00282E48(pos, D_L30_001B9C80.position) < 48.0f && shake) {
+            if (fast_vec_dist(pos, D_L30_001B9C80.position) < 48.0f && shake) {
                 D_L30_001B9C80.shakeTimer = 0;
                 D_L30_001B9C80.shakeDuration = 40;
                 D_L30_001B9C80.shakeStrength = 0.075f;
             }
             if (st->sound) {
-                func_00282CF0(towardPlayer, obj + 0x10, D_L30_001B9C80.position);
-                func_00282F20(towardPlayer, towardPlayer, 1.0f);
-                if (1.5707963705062866f - func_002831B0(func_00282DB0(towardPlayer, D_L30_001B9C80.forward)) < 0.45378565788269043f)
+                FastVecSub(towardPlayer, obj + 0x10, D_L30_001B9C80.position);
+                vec_scale_to_length(towardPlayer, towardPlayer, 1.0f);
+                if (1.5707963705062866f - func_002831B0(FastVecDot(towardPlayer, D_L30_001B9C80.forward)) < 0.45378565788269043f)
                     st->sound = 1;
                 else
                     st->sound = 0;
@@ -83,7 +83,7 @@ char *func_L30_004153D8(void *pos, float scale, int shake, int a2, int a3, int a
             st->duration = 0;
             st->sound = 0;
         }
-        func_L30_004158B0(obj, normal);
+        EmitMuseumExplosionParticles(obj, normal);
     }
     return obj;
 }

@@ -113,20 +113,20 @@ void func_L00_003FFBA0(char *obj)
     func_L00_003252A8(obj, D_L00_001B2C00, 1);
     else
     func_002FE8D8(obj + 0x10, D_L00_001B2C00);
-    func_00282D30(D_L00_001B2C00, D_L00_001B2C00, -1.0f);
-    func_00282D30(&scratch.ahead, obj + 0xE0, D_L00_001B0CAC);
-    func_00282CC0(&scratch.ahead, obj + 0x10, &scratch.ahead);
-    func_00282D30(&scratch.behind, obj + 0xE0, -1.0f);
-    func_00282CC0(&scratch.behind, obj + 0x10, &scratch.behind);
-    if (func_002761F8(&scratch.ahead, &scratch.behind, 2, obj, 0)) {
-        if (func_00278E78() == 2) {
-            func_00282D30(D_L00_001B2C00, D_L00_001BF240, 0.0009765625f);
-            func_00282F20(D_L00_001B2C00, D_L00_001B2C00, -1.0f);
+    FastVecScale(D_L00_001B2C00, D_L00_001B2C00, -1.0f);
+    FastVecScale(&scratch.ahead, obj + 0xE0, D_L00_001B0CAC);
+    FastVecAdd(&scratch.ahead, obj + 0x10, &scratch.ahead);
+    FastVecScale(&scratch.behind, obj + 0xE0, -1.0f);
+    FastVecAdd(&scratch.behind, obj + 0x10, &scratch.behind);
+    if (CollLine(&scratch.ahead, &scratch.behind, 2, obj, 0)) {
+        if (GetCollHitMaterial() == 2) {
+            FastVecScale(D_L00_001B2C00, D_L00_001BF240, 0.0009765625f);
+            vec_scale_to_length(D_L00_001B2C00, D_L00_001B2C00, -1.0f);
             D_L00_001B2C14[0] = 1;
         } else {
             update_collision = 0;
         }
-        if (func_00278E78() == 6)
+        if (GetCollHitMaterial() == 6)
         update_water = 1;
         else
         update_water = 0;
@@ -134,7 +134,7 @@ void func_L00_003FFBA0(char *obj)
         update_collision = 0;
         D_L00_001B2C18[0] = 0;
     }
-    func_002B0CE0(6, 0, 1);
+    ForceClaimNotice(6, 0, 1);
     switch (STATE(obj)) {
     case 0:
         STATE(obj) = 1;
@@ -166,18 +166,18 @@ void func_L00_003FFBA0(char *obj)
         if (F(obj, 0x2C) > 0.023f)
             F(obj, 0x2C) = 0.023f;
         qcopy(&scratch.previous, obj + 0x10);
-        func_00282CC0(obj + 0x10, obj + 0x10, vars);
+        FastVecAdd(obj + 0x10, obj + 0x10, vars);
         func_002FEE70(D_L00_001B2C28[0], vars, 0);
         func_00300190(obj + 0x10, obj + 0x10);
         func_00300248(vars, vars);
         func_002FE880(obj + 0x10, vars, 0.0030555557f);
-        if (func_002761F8(&scratch.previous, obj + 0x10, 0, obj, 0)) {
+        if (CollLine(&scratch.previous, obj + 0x10, 0, obj, 0)) {
             UpdateCollision *collision = &D_L00_001BF200;
             char *other = collision->hit;
             if (other && (other == P(hero, 0x2290) || *(short *)(other + 0xAA) == 0x907))
                 break;
             qcopy(obj + 0x10, &collision->point);
-            func_002B0CE0(6, 0, 1);
+            ForceClaimNotice(6, 0, 1);
             func_L00_002C42E0(28, 1);
             func_00335798(obj + 0x10, obj + 0xF0, obj);
             STATE(obj) = 2;
@@ -187,7 +187,7 @@ void func_L00_003FFBA0(char *obj)
         break;
     case 2:
         STATE(obj) = 3;
-        func_002E5CF8(2, 0, obj);
+        PlayMobySound(2, 0, obj);
         if (D_0018C0B4 != 28 || D_L00_001A8F00 == 2) {
             ref_L00_003FFBA0_00();
             STATE(obj) = 9;
@@ -216,7 +216,7 @@ void func_L00_003FFBA0(char *obj)
         break;
     case 4:
         qcopy(&scratch.previous, obj + 0x10);
-        func_00282CC0(obj + 0x10, obj + 0x10, vars);
+        FastVecAdd(obj + 0x10, obj + 0x10, vars);
         func_002FE880(obj + 0x10, vars, 0.0061111115f);
         func_00300190(obj + 0x10, obj + 0x10);
         func_00300248(vars, vars);
@@ -233,7 +233,7 @@ void func_L00_003FFBA0(char *obj)
         scratch.workspace.query.flags = 0;
         scratch.workspace.query.mask = 0;
         scratch.workspace.query.gravity = 0;
-        hit = func_002FE9D0(&scratch.workspace.query);
+        hit = CollideSweptSphere(&scratch.workspace.query);
         qcopy(obj + 0x10, &scratch.workspace.query.end);
         qcopy(vars, &scratch.workspace.query.velocity);
         if (hit == 2) {
@@ -244,7 +244,7 @@ void func_L00_003FFBA0(char *obj)
                 STATE(obj) = 2;
                 func_00282C88(vars);
             }
-        } else if (func_00282DF0(vars) > 0.4f) {
+        } else if (FastVecLength(vars) > 0.4f) {
             STATE(obj) = 9;
             I(vars, 0x60) = 10;
         }
@@ -255,8 +255,8 @@ void func_L00_003FFBA0(char *obj)
         /* fall through */
     case 5:
         if (func_00282948(vars + 0x60)) {
-            func_002E5CF8(1, 0, obj);
-            func_00282F20(&scratch.rotation, obj + 0xC0, 1.0f);
+            PlayMobySound(1, 0, obj);
+            vec_scale_to_length(&scratch.rotation, obj + 0xC0, 1.0f);
             func_0032DA58(obj, obj + 0x10, &scratch.rotation, F(obj, 0x18));
             STATE(obj) = 6;
             *(unsigned short *)(obj + 0x34) |= 0x41;
@@ -269,7 +269,7 @@ void func_L00_003FFBA0(char *obj)
         }
         break;
     case 6:
-        func_00330CA0(obj);
+        QueueRadialMobyImpacts(obj);
         F(vars, 0x64) += D_L00_001B0C98 * 0.016666668f;
         if (func_00282948(vars + 0x60) && !I(vars, 0x68))
             STATE(obj) = 8;
@@ -293,12 +293,12 @@ void func_L00_003FFBA0(char *obj)
         return;
     }
     if (STATE(obj) >= 2 && D_L00_001ADB2C[0]) {
-        func_00283658(scratch.workspace.attachment.transform, obj + 0xC0);
+        copy_matrix_rotation(scratch.workspace.attachment.transform, obj + 0xC0);
         func_002AB6D8(scratch.workspace.attachment.transform, &scratch.workspace.attachment.angles);
         func_002AD0E0(obj, D_L00_001ADB2C[0], obj + 0x10,
                      &scratch.workspace.attachment.angles, obj + 0x10,
                      &scratch.workspace.attachment.adjusted);
-        func_002833F0(obj + 0xC0, &scratch.workspace.attachment.adjusted);
+        euler_rotation_basis(obj + 0xC0, &scratch.workspace.attachment.adjusted);
     }
     if ((unsigned int)(STATE(obj) - 2) < 2)
         func_0032F598(obj);

@@ -28,7 +28,7 @@ void func_002DF838(void)
     y = D_001A6480.y;
     n = x / 32;
 
-    func_002FC560(0x42, 0x64);
+    VU1_addGSregister(0x42, 0x64);
 
     /* The packet cursor is reloaded between these header writes in retail. */
     *(int *)D_001B22A8 = (n + 5) | 0x10000000;

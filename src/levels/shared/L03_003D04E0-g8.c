@@ -32,15 +32,15 @@ void func_L03_003D04E0(char *m) {
     p = m + 0x10;
     if (P(v, 0x40)) {
         func_002AD0E0(m, P(v, 0x40), p, m + 0xF0, p, m + 0xF0);
-        func_00282CF0(p, p, P(v, 0x40) + 0x10);
+        FastVecSub(p, p, P(v, 0x40) + 0x10);
         func_002AFDD8(P(v, 0x40), p, p, 0);
     }
-    func_00282D08(tmp, v, v + 0x10, F(v, 0x20));
-    func_00282CC0(p, p, tmp);
-    func_002AA2E8(v + 0x20, 1.0f, F(v, 0x24));
+    lerp_vector(tmp, v, v + 0x10, F(v, 0x20));
+    FastVecAdd(p, p, tmp);
+    ApproachValue(v + 0x20, 1.0f, F(v, 0x24));
     if (P(v, 0x40)) {
-        func_00283098(p, p, P(v, 0x40) + 0xC0);
-        func_00282CC0(p, p, P(v, 0x40) + 0x10);
+        matrix_mul_vec3(p, p, P(v, 0x40) + 0xC0);
+        FastVecAdd(p, p, P(v, 0x40) + 0x10);
     }
     switch ((unsigned char)m[0x20]) {
     case 0:
@@ -52,8 +52,8 @@ void func_L03_003D04E0(char *m) {
         qcopy(a, p);
         qcopy(b, p);
         b[2] -= F(v, 0x20) * 5.0f;
-        func_002A8C00(hit, m, 0x10001, D_L03_001A8F20, (float)I(v, 0x38));
-        if (func_002761F8(a, b, 0, m, hit) && !P(v, 0x40)) {
+        make_hit_descriptor(hit, m, 0x10001, D_L03_001A8F20, (float)I(v, 0x38));
+        if (CollLine(a, b, 0, m, hit) && !P(v, 0x40)) {
             angle = func_002A7940();
             speed = func_002A7878(0, 0.5f) * (1.0f / 60.0f);
             pos[0] = func_00283180(angle) * speed;
@@ -71,14 +71,14 @@ void func_L03_003D04E0(char *m) {
         e = (char *)(I(v, 0x3C) * 0x70);
         e = (char *)((int)e + (int)D_00188660);
         if (P(e, 0x88) != m || !((unsigned char *)e)[0x74])
-            I(v, 0x3C) = func_002E5CF8(0, 4, m);
+            I(v, 0x3C) = PlayMobySound(0, 4, m);
         if (F(v, 0x34) < 1)
-            func_002AA2E8(v + 0x34, 1, 1.0f / 15.0f);
+            ApproachValue(v + 0x34, 1, 1.0f / 15.0f);
         if (func_00282948(v + 0x28))
             func_002A7750(m, 2, -1);
         break;
     case 2:
-        func_002AA2E8(v + 0x34, 0, 1.0f / 30.0f);
+        ApproachValue(v + 0x34, 0, 1.0f / 30.0f);
         if (F(v, 0x34) <= 0) {
             int handle = I(v, 0x3C);
             if (handle != -1) {

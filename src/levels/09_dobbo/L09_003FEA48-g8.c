@@ -112,7 +112,7 @@ void func_L09_00404E58(char *a0) {
         func_L09_00404C50();
     }
     if (*(u8 *)(s0 + 0x31) != 0) {
-        if (func_00282E48(s0 + 0x10, D_L09_001B9A00) < 24.0f) {
+        if (fast_vec_dist(s0 + 0x10, D_L09_001B9A00) < 24.0f) {
             func_002A93B0(s0);
             *(u8 *)(s0 + 0x6F) = 0x16;
         }
@@ -155,7 +155,7 @@ void func_L09_00403270(char *a0) {
         func_L09_00402D50();
     }
     if (*(u8 *)(s0 + 0x31) != 0) {
-        if (func_00282E48(s0 + 0x10, D_L09_001B9A00) < 48.0f) {
+        if (fast_vec_dist(s0 + 0x10, D_L09_001B9A00) < 48.0f) {
             func_002A93B0(s0);
             *(u8 *)(s0 + 0x6F) = 0x2D;
         }
@@ -238,11 +238,11 @@ void func_L09_004052F8(u8 *a0) {
     f32 angle;
     f32 wave;
 
-    angle = func_00283B98(*(f32 *)(state + 0x348), 0.20943954f);
+    angle = FastAddRotations(*(f32 *)(state + 0x348), 0.20943954f);
     *(f32 *)(state + 0x348) = angle;
     wave = func_00283198(angle) * 0.5f + 0.5f;
     *(f32 *)(state + 0x34C) = wave;
-    ((TintedObject *)a0)->colour = func_00283D38(color.a, color.b, wave);
+    ((TintedObject *)a0)->colour = FastTweenColor(color.a, color.b, wave);
     if (*(s32 *)(state + 0x350) != D_L09_001B2388) {
         for (p = D_L09_001FB560[a0[0x21]];
              a0[0x21] != 0xFF && a0[0x21] <= D_L09_001B2878 && p != 0 &&
@@ -293,9 +293,9 @@ void func_L09_00405490(u8 *a0) {
             if (e[0x20] != 0xFE) {
                 if (e[0x20] != 0xFD) {
                     state = *(u8 **)(e + 0x68);
-                    func_00282D30((char *)buf, D_L09_001B1410, *(f32 *)(state + 0x344));
-                    func_002830C0((char *)buf, (char *)buf, (char *)(state + 0x240));
-                    r = func_00283D38(D_L09_001B1420[0], D_L09_001B1420[1],
+                    FastVecScale((char *)buf, D_L09_001B1410, *(f32 *)(state + 0x344));
+                    transform_vector((char *)buf, (char *)buf, (char *)(state + 0x240));
+                    r = FastTweenColor(D_L09_001B1420[0], D_L09_001B1420[1],
                                       *(f32 *)(state + 0x34C));
                     func_L00_00325AE8((char *)buf, r, *(f32 *)(state + 0x344) * 0.2f, 0.08f);
                 }

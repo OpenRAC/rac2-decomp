@@ -38,18 +38,18 @@ void func_L03_003CA290(u8 *m) {
         break;
     case 1:
         if (m[0x31]) {
-            func_L00_002E6CF0(func_L03_003CA4B0, m);
-            *(int *)(m+0x78) = func_00283D38(D_L03_001B02F8, D_L03_001B02FC[0],
+            func_L00_002E6CF0(DrawGadgebotSpawnContainer, m);
+            *(int *)(m+0x78) = FastTweenColor(D_L03_001B02F8, D_L03_001B02FC[0],
                 (func_00283198((D_L03_001B2548[0] % 150) * 0.04188786819577217f - 3.14159f) + 1.0f) * 0.5f);
         }
         if (func_002A9640(m, 0x10000, 0)) {
             *(quadword *)a = 0; *(quadword *)b = 0;
             b[2] = 0.050000004f;
             a[2] = 0.5f;
-            func_00282CC0(a, a, m+0x10);
-            func_L00_003263D0(m,a,0.333000004f,3.0f,0.5f,1.0f,5,1,b,0x504040c0,0);
+            FastVecAdd(a, a, m+0x10);
+            SpawnTintedEffects(m,a,0.333000004f,3.0f,0.5f,1.0f,5,1,b,0x504040c0,0);
             func_002B0A68(m,D_L03_001B0308,D_L03_001A8F20,255,D_L03_001B030C,D_L03_001B0310,D_L03_001B0314,D_L03_001B0318);
-            func_002E5CF8(0,0,m);
+            PlayMobySound(0,0,m);
             *(unsigned short *)(m+0x7c) = D_L03_001B0304;
             func_L00_003294F0(m,1);
             *(int *)(m+0x9c) = 15;

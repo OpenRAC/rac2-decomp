@@ -85,27 +85,27 @@ void func_L16_003E7248(u8 *unused, int ua, float uf, int ub, int uc,
     if (state[10] >= 4.0f)
         state[10] -= 4.0f;
 
-    func_00282F20(nearPoint, state, -0.17f);
+    vec_scale_to_length(nearPoint, state, -0.17f);
     position = (float *)(object + 0x10);
-    func_00282CC0(nearPoint, position, nearPoint);
-    func_00282CF0(viewDelta, position, D_L16_001B9B00);
-    func_00282F20(beamStep, state, -4.0f);
-    func_00282CC0(farPoint, nearPoint, beamStep);
-    func_00282DD8(side, viewDelta, beamStep);
-    func_00282F20(side, side, D_L16_001B0C88);
-    func_00282CC0(packet.v[0], position, side);
-    func_00282CF0(packet.v[1], position, side);
-    func_00282CC0(packet.v[2], farPoint, side);
-    func_00282CF0(packet.v[3], farPoint, side);
-    func_00280B90(&packet, 0, 0);
+    FastVecAdd(nearPoint, position, nearPoint);
+    FastVecSub(viewDelta, position, D_L16_001B9B00);
+    vec_scale_to_length(beamStep, state, -4.0f);
+    FastVecAdd(farPoint, nearPoint, beamStep);
+    FastVecCross(side, viewDelta, beamStep);
+    vec_scale_to_length(side, side, D_L16_001B0C88);
+    FastVecAdd(packet.v[0], position, side);
+    FastVecSub(packet.v[1], position, side);
+    FastVecAdd(packet.v[2], farPoint, side);
+    FastVecSub(packet.v[3], farPoint, side);
+    draw_world_quad(&packet, 0, 0);
     packet.color[0] = packet.color[2];
     packet.color[1] = packet.color[3];
     packet.color[2] = packet.color[3] = 0x801010;
     qcopy(packet.v[0], packet.v[2]);
     qcopy(packet.v[1], packet.v[3]);
-    func_00282CC0(packet.v[2], packet.v[2], beamStep);
-    func_00282CC0(packet.v[3], packet.v[3], beamStep);
-    func_00280B90(&packet, 0, 0);
+    FastVecAdd(packet.v[2], packet.v[2], beamStep);
+    FastVecAdd(packet.v[3], packet.v[3], beamStep);
+    draw_world_quad(&packet, 0, 0);
     func_00281DE8(&packet, D_L16_001B0CA0, 1, 128);
     {
         unsigned alpha = (D_L16_001B0CE0 << 24);
@@ -130,14 +130,14 @@ void func_L16_003E7248(u8 *unused, int ua, float uf, int ub, int uc,
         packet.color[3] = rgb;
         packet.color[2] = packet.color[3];
     }
-    func_00282F20(side, side, D_L16_001B0C7C);
-    func_00282CC0(packet.v[0], position, side);
-    func_00282CF0(packet.v[1], position, side);
-    func_00282CC0(farPoint, position, beamStep);
-    func_00282CC0(farPoint, farPoint, beamStep);
-    func_00282CC0(packet.v[2], farPoint, side);
-    func_00282CF0(packet.v[3], farPoint, side);
-    func_00280B90(&packet, 0, 0);
+    vec_scale_to_length(side, side, D_L16_001B0C7C);
+    FastVecAdd(packet.v[0], position, side);
+    FastVecSub(packet.v[1], position, side);
+    FastVecAdd(farPoint, position, beamStep);
+    FastVecAdd(farPoint, farPoint, beamStep);
+    FastVecAdd(packet.v[2], farPoint, side);
+    FastVecSub(packet.v[3], farPoint, side);
+    draw_world_quad(&packet, 0, 0);
     {
         unsigned alpha = (D_L16_001B0CE0 << 24);
         unsigned alphaBlue = alpha | (D_L16_001B0CDC << 16);
@@ -151,16 +151,16 @@ void func_L16_003E7248(u8 *unused, int ua, float uf, int ub, int uc,
         unsigned rgb = blueGreen | D_L16_001B0CD4;
         packet.color[2] = packet.color[3] = rgb;
     }
-    func_00282F20(side, side, D_L16_001B0C80);
-    func_00282F20(nearPoint, state, -0.1f);
-    func_00282CC0(nearPoint, position, nearPoint);
-    func_00282CC0(packet.v[0], nearPoint, side);
-    func_00282CF0(packet.v[1], nearPoint, side);
-    func_00282CC0(farPoint, nearPoint, beamStep);
-    func_00282CC0(farPoint, farPoint, beamStep);
-    func_00282CC0(packet.v[2], farPoint, side);
-    func_00282CF0(packet.v[3], farPoint, side);
-    func_00280B90(&packet, 0, 0);
+    vec_scale_to_length(side, side, D_L16_001B0C80);
+    vec_scale_to_length(nearPoint, state, -0.1f);
+    FastVecAdd(nearPoint, position, nearPoint);
+    FastVecAdd(packet.v[0], nearPoint, side);
+    FastVecSub(packet.v[1], nearPoint, side);
+    FastVecAdd(farPoint, nearPoint, beamStep);
+    FastVecAdd(farPoint, farPoint, beamStep);
+    FastVecAdd(packet.v[2], farPoint, side);
+    FastVecSub(packet.v[3], farPoint, side);
+    draw_world_quad(&packet, 0, 0);
     {
         unsigned alpha = (D_L16_001B0CF0 << 24);
         unsigned alphaBlue = alpha | (D_L16_001B0CEC << 16);
@@ -174,16 +174,16 @@ void func_L16_003E7248(u8 *unused, int ua, float uf, int ub, int uc,
         unsigned rgb = blueGreen | D_L16_001B0CE4;
         packet.color[2] = packet.color[3] = rgb;
     }
-    func_00282F20(side, side, D_L16_001B0C80);
-    func_00282F20(nearPoint, state, -0.1f);
-    func_00282CC0(nearPoint, position, nearPoint);
-    func_00282CC0(packet.v[0], nearPoint, side);
-    func_00282CF0(packet.v[1], nearPoint, side);
-    func_00282CC0(farPoint, nearPoint, beamStep);
-    func_00282CC0(farPoint, farPoint, beamStep);
-    func_00282CC0(packet.v[2], farPoint, side);
-    func_00282CF0(packet.v[3], farPoint, side);
-    func_00280B90(&packet, 0, 0);
+    vec_scale_to_length(side, side, D_L16_001B0C80);
+    vec_scale_to_length(nearPoint, state, -0.1f);
+    FastVecAdd(nearPoint, position, nearPoint);
+    FastVecAdd(packet.v[0], nearPoint, side);
+    FastVecSub(packet.v[1], nearPoint, side);
+    FastVecAdd(farPoint, nearPoint, beamStep);
+    FastVecAdd(farPoint, farPoint, beamStep);
+    FastVecAdd(packet.v[2], farPoint, side);
+    FastVecSub(packet.v[3], farPoint, side);
+    draw_world_quad(&packet, 0, 0);
     packet.color[0] = packet.color[1] = 0x40FFFFFF;
     {
         unsigned blue = (D_L16_001B0CDC << 16);
@@ -191,15 +191,15 @@ void func_L16_003E7248(u8 *unused, int ua, float uf, int ub, int uc,
         unsigned rgb = blueGreen | D_L16_001B0CD4;
         packet.color[2] = packet.color[3] = rgb;
     }
-    func_00282F20(side, side, D_L16_001B0C7C);
-    func_00282CC0(packet.v[0], position, side);
-    func_00282CF0(packet.v[1], position, side);
-    func_00282F20(beamStep, state, -0.6f);
-    func_00282CC0(farPoint, position, beamStep);
-    func_00282CC0(farPoint, farPoint, beamStep);
-    func_00282CC0(packet.v[2], farPoint, side);
-    func_00282CF0(packet.v[3], farPoint, side);
-    func_00280B90(&packet, 0, 0);
+    vec_scale_to_length(side, side, D_L16_001B0C7C);
+    FastVecAdd(packet.v[0], position, side);
+    FastVecSub(packet.v[1], position, side);
+    vec_scale_to_length(beamStep, state, -0.6f);
+    FastVecAdd(farPoint, position, beamStep);
+    FastVecAdd(farPoint, farPoint, beamStep);
+    FastVecAdd(packet.v[2], farPoint, side);
+    FastVecSub(packet.v[3], farPoint, side);
+    draw_world_quad(&packet, 0, 0);
     random = func_002A7940();
     func_00281EB8(position, D_L16_001B0C98, D_L16_001B0CB0, 1, D_L16_001B0C8C, 0.08f, random);
 }

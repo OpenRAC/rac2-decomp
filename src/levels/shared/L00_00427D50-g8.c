@@ -38,7 +38,7 @@ void func_L00_00427D50(char *object)
     char *focus = state + 0xB0;
 
     *(float *)(object + 0x50) = func_002703B0(state, *(float *)(object + 0x50),
-        func_00283B98(*(float *)(focus + 0x18), *(float *)(state + 0x14)),
+        FastAddRotations(*(float *)(focus + 0x18), *(float *)(state + 0x14)),
         *(float *)(state + 0x28), *(float *)(state + 0x3C), *(float *)(state + 0x50));
     *(float *)(object + 0x54) = func_002703B0(state + 4, *(float *)(object + 0x54),
         *(float *)(state + 0x18), *(float *)(state + 0x2C), *(float *)(state + 0x40),
@@ -68,10 +68,10 @@ void func_L00_00427D50(char *object)
     if (D_L00_001A8FF0[0] && *(char **)(focus + 0x44)) {
         char *owner;
 
-        func_00282D30(scaled0, *(char **)(focus + 0x44) + 0xE0, D_L00_001B1624);
-        func_00282CC0(object + 0x30, *(char **)(focus + 0x44) + 0x10, scaled0);
-        func_00282D30(scaled1, *(char **)(focus + 0x44) + 0xC0, D_L00_001B1628);
-        func_00282CC0(object + 0x30, object + 0x30, scaled1);
+        FastVecScale(scaled0, *(char **)(focus + 0x44) + 0xE0, D_L00_001B1624);
+        FastVecAdd(object + 0x30, *(char **)(focus + 0x44) + 0x10, scaled0);
+        FastVecScale(scaled1, *(char **)(focus + 0x44) + 0xC0, D_L00_001B1628);
+        FastVecAdd(object + 0x30, object + 0x30, scaled1);
         owner = *(char **)(focus + 0x44);
         qcopy(object, owner + 0xC0);
         qcopy(object + 0x10, owner + 0xD0);
@@ -82,12 +82,12 @@ void func_L00_00427D50(char *object)
     } else {
         func_L00_002DA0B8(object + 0x30, object + 0x50, focus);
         *(float *)(object + 0x40) = *(float *)(state + 0xAC);
-        *(float *)(object + 0x44) = func_00283B98(*(float *)(object + 0x54),
+        *(float *)(object + 0x44) = FastAddRotations(*(float *)(object + 0x54),
                                                   *(float *)(object + 0x5C));
-        *(float *)(object + 0x48) = func_00283B98(3.1415927f, *(float *)(object + 0x50));
-        *(float *)(object + 0x48) = func_00283B98(*(float *)(object + 0x48),
+        *(float *)(object + 0x48) = FastAddRotations(3.1415927f, *(float *)(object + 0x50));
+        *(float *)(object + 0x48) = FastAddRotations(*(float *)(object + 0x48),
                                                   *(float *)(object + 0x60));
-        func_00283410(matrix, object + 0x40);
-        func_00283678(object, matrix);
+        euler_to_matrix(matrix, object + 0x40);
+        copy_matrix3x4(object, matrix);
     }
 }

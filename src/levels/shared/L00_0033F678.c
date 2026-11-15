@@ -248,10 +248,10 @@ void func_L00_00341658(char *p)
     float r1, r2, r3, r4;
     int x, y;
 
-    r1 = func_00283CE0(*(short *)(p + 10));
-    r2 = func_00283CE0(*(int *)(s0 + 24));
+    r1 = IntToFloat(*(short *)(p + 10));
+    r2 = IntToFloat(*(int *)(s0 + 24));
     r1 = r1 / r2;
-    r3 = func_00283CE0(*(int *)(s0 + 16));
+    r3 = IntToFloat(*(int *)(s0 + 16));
     x = func_00283CF0_2(r3 * r1);
     y = func_00283D38_1(0, *(int *)(s0 + 20), r1 * 0.5f);
     *(char *)(p + 8) = *(unsigned char *)(p + 8) + 1;
@@ -304,10 +304,10 @@ float func_L00_00341A88(void *a0, void *a1, float scale)
         t = p0[2];
         u = p1[2];
         if (func_00282C48_4(t - u) < scale) {
-            return func_00282E80(p0, p1);
+            return vec_distance_xy(p0, p1);
         }
     }
-    return func_00282E48(p0, p1);
+    return fast_vec_dist(p0, p1);
 }
 
 
@@ -345,7 +345,7 @@ int func_L00_00341FA8(const Path *path, const Vector *point, Vector *out,
     }
     searchRange = step + range;
     do {
-        finished = func_L00_00341820(path, &current, &scanIndex, &scanOffset, step, wrap);
+        finished = Spline_AdvanceByDistance(path, &current, &scanIndex, &scanOffset, step, wrap);
         a.q = point->q;
         distance = func_L00_00341A88(&current, &a, height);
         if (distance < nearestDistance) {
@@ -357,10 +357,10 @@ int func_L00_00341FA8(const Path *path, const Vector *point, Vector *out,
     if (searchRange < nearestDistance) return 0;
     left = nearestIndex;
     scanOffset = nearestOffset;
-    func_L00_00341820(path, &current, &left, &scanOffset, -step, wrap);
+    Spline_AdvanceByDistance(path, &current, &left, &scanOffset, -step, wrap);
     right = nearestIndex;
     scanOffset = nearestOffset;
-    func_L00_00341820(path, &current, &right, &scanOffset, step, wrap);
+    Spline_AdvanceByDistance(path, &current, &right, &scanOffset, step, wrap);
     right = func_L00_003417B8(&path->count, right, 1, wrap);
     scanIndex = left;
     nearestDistance = 1000000000.0f;
@@ -382,7 +382,7 @@ int func_L00_00341FA8(const Path *path, const Vector *point, Vector *out,
         float projected;
         previous = path->count - 1;
         previous = (nearestIndex + previous) % path->count;
-        projected = func_L00_00341D08(out, point, &((const Vector *)path)[previous + 1], &((const Vector *)path)[nearestIndex + 1], height);
+        projected = ProjectPointOntoSegment(out, point, &((const Vector *)path)[previous + 1], &((const Vector *)path)[nearestIndex + 1], height);
         *index = previous;
         a.q = ((const Vector *)path)[previous + 1].q;
         b.q = out->q;
@@ -391,7 +391,7 @@ int func_L00_00341FA8(const Path *path, const Vector *point, Vector *out,
     }
     if (nearestIndex < path->count - 1 || wrap) {
         next = (nearestIndex + 1) % path->count;
-        distance = func_L00_00341D08(&a, point, &((const Vector *)path)[nearestIndex + 1], &((const Vector *)path)[next + 1], height);
+        distance = ProjectPointOntoSegment(&a, point, &((const Vector *)path)[nearestIndex + 1], &((const Vector *)path)[next + 1], height);
         if (distance < nearestDistance) {
             qcopy(out, &a);
             *index = nearestIndex;
@@ -452,9 +452,9 @@ int func_L00_00346AB8(void) {
 
 int func_L00_00346B50(void)
 {
-    func_0027C540(0);
+    SetupGifPaging(0);
     func_L00_0030DCF8();
-    func_0027C660();
+    DoGifPaging();
     return 0;
 }
 
@@ -532,9 +532,9 @@ int func_L00_0034C038(void)
 
 int func_L00_0034C060(void)
 {
-    func_0027C540(0);
+    SetupGifPaging(0);
     func_L00_0030D6E8();
-    func_0027C660();
+    DoGifPaging();
     return 0;
 }
 
@@ -704,9 +704,9 @@ return_value:
 }
 int func_L00_0034C3F8(void)
 {
-    func_0027C540(0);
+    SetupGifPaging(0);
     func_L00_0030D8E8();
-    func_0027C660();
+    DoGifPaging();
     return 0;
 }
 
@@ -740,9 +740,9 @@ extern void func_L00_0030DB18(void);
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
 int func_L00_0034C4B0(void)
 {
-    func_0027C540(0);
+    SetupGifPaging(0);
     func_L00_0030DB18();
-    func_0027C660();
+    DoGifPaging();
     return 0;
 }
 
@@ -776,9 +776,9 @@ extern void func_L00_0030DAA8(void);
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
 int func_L00_0034C568(void)
 {
-    func_0027C540(0);
+    SetupGifPaging(0);
     func_L00_0030DAA8();
-    func_0027C660();
+    DoGifPaging();
     return 0;
 }
 
@@ -787,9 +787,9 @@ extern void func_L00_0030D958(void);
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
 int func_L00_0034C638(void)
 {
-    func_0027C540(0);
+    SetupGifPaging(0);
     func_L00_0030D958();
-    func_0027C660();
+    DoGifPaging();
     return 0;
 }
 
@@ -879,9 +879,9 @@ extern void func_L00_0030D678(void);
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
 int func_L00_0034C8E8(void)
 {
-    func_0027C540(0);
+    SetupGifPaging(0);
     func_L00_0030D678();
-    func_0027C660();
+    DoGifPaging();
     return 0;
 }
 
@@ -923,9 +923,9 @@ extern void func_L00_0030DBF8(void);
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
 int func_L00_0034EB78(void)
 {
-    func_0027C540(0);
+    SetupGifPaging(0);
     func_L00_0030DBF8();
-    func_0027C660();
+    DoGifPaging();
     return 0;
 }
 
@@ -970,9 +970,9 @@ extern void func_L00_0030DB88(void);
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
 int func_L00_0034ECD0(void)
 {
-    func_0027C540(0);
+    SetupGifPaging(0);
     func_L00_0030DB88();
-    func_0027C660();
+    DoGifPaging();
     return 0;
 }
 
@@ -987,9 +987,9 @@ extern void func_L00_0030D448(void);
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
 int func_L00_0034ED80(void)
 {
-    func_0027C540(0);
+    SetupGifPaging(0);
     func_L00_0030D448();
-    func_0027C660();
+    DoGifPaging();
     return 0;
 }
 
@@ -1009,9 +1009,9 @@ extern void func_L00_0030D4B8(void);
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
 int func_L00_0034EF68(void)
 {
-    func_0027C540(0);
+    SetupGifPaging(0);
     func_L00_0030D4B8();
-    func_0027C660();
+    DoGifPaging();
     return 0;
 }
 

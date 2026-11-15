@@ -186,15 +186,15 @@ int func_002D9DA0(MenuStream *stream)
 
             func_002DE7A0(stream->buffer[0]);
             if (stream->flags & 0x20) {
-                func_0029D4D0((u8 *)stream->buffer[0] + stream->offset, (u8 *)stream->buffer[0]);
+                fast_decompress((u8 *)stream->buffer[0] + stream->offset, (u8 *)stream->buffer[0]);
                 stream->offset = 0;
             }
             image = (StreamImage *)stream->buffer[0];
             clut = image->clut;
             pixels = image->pixels;
-            logWidth = func_00282A18(image->width);
-            logHeight = func_00282A18(image->height);
-            D_001C4FA0.tex0 = func_00294D80(logWidth, logHeight, clut, pixels,
+            logWidth = log2dim(image->width);
+            logHeight = log2dim(image->height);
+            D_001C4FA0.tex0 = register_8bit_texture(logWidth, logHeight, clut, pixels,
                                             D_001C4FA0.clutVram, D_001C4FA0.imageVram);
             func_0029D0E0();
             stream->frames = 0;

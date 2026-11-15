@@ -129,7 +129,7 @@ void func_002EAB18(void)
     loadEngine.y = 0;
     loadEngine.flag = 0;
     D_001B15A4 = 0;
-    func_00290B48();
+    InitMemSlots();
     D_001A72D0 = D_001A72F4;
     D_001A72D4 = D_001A72F4;
     func_00282A60(D_001B1740, 0x87654321, 16);
@@ -137,7 +137,7 @@ void func_002EAB18(void)
     func_00282A60(D_001D1580, -1, 0xf00);
     func_00282A60(D_001D0E00, 0, 0xf0);
     func_0027A9F0();
-    func_0027AB40();
+    UpdateViewContext();
     func_002FC1D8();
     {
         char *disc = D_0014B540;
@@ -149,23 +149,23 @@ void func_002EAB18(void)
                       *(int *)(index + (int)sector) + *(int *)(disc + 0x3e24),
                       *(int *)(index + (int)length));
     }
-    func_0027D330(6);
-    func_00133580(0);
+    FadeToBlack(6);
+    snd_CheckLoadInProgress(0);
     func_0011AEA0(0);
-    size = func_0029D4D0((int)loadBuffers.header + 0x400000, (int)loadBuffers.header);
+    size = fast_decompress((int)loadBuffers.header + 0x400000, (int)loadBuffers.header);
     func_0011AEA0(0);
 
     header = loadBuffers.header;
-    func_00293000((char *)header + header->texture, header->textureCount, 0,
+    UploadTextureImages((char *)header + header->texture, header->textureCount, 0,
                   (char *)header + header->textureInfo);
     base = (char *)header + header->data;
     records = base + header->classData;
     textures = (TextureRecord *)((char *)header + header->classes);
     D_001B1B4C = header->classCount;
     for (i = 0; i < D_001B1B4C; i++)
-        D_001D0600[i] = (int)records + textures[i].offset + (func_00282A18(textures[i].dimension) << 28);
+        D_001D0600[i] = (int)records + textures[i].offset + (log2dim(textures[i].dimension) << 28);
 
-    func_00291EC0(base + header->sky);
+    RelocateSkyDefinition(base + header->sky);
     moby = (MobyRecord *)((char *)header + header->mobys);
     D_001B1B40 = 0;
     for (j = 0; j < header->mobyCount; j++, moby++) {

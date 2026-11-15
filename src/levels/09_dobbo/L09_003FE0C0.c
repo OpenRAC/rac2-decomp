@@ -28,7 +28,7 @@ int func_L09_003FE0C0(unsigned char *a0, int a1) {
     int i;
     unsigned char *e;
 
-    if (func_00282E80(a0 + 0x10, s1 + 0x140) <
+    if (vec_distance_xy(a0 + 0x10, s1 + 0x140) <
         (float)*(short *)(a0 + 0x32) * 2.0f) {
         unsigned char *blk;
         unsigned char *copy;
@@ -39,13 +39,13 @@ int func_L09_003FE0C0(unsigned char *a0, int a1) {
         func_0029FC20((char *)a0, 1, s1 + 0x340);
         done = 1;
         blk = s1 + 0x390;
-        func_00282CF0(v, (float *)blk, (float *)(s1 + 0x370));
+        FastVecSub(v, (float *)blk, (float *)(s1 + 0x370));
         x = func_00283248(v[0], v[1]);
-        y = -func_00283248(func_00282E20(v), v[2]);
-        r = func_00283BE0(x, *(float *)(a0 + 0xF8));
+        y = -func_00283248(vec_length_xy(v), v[2]);
+        r = fast_subtract_rotations(x, *(float *)(a0 + 0xF8));
         *(float *)(s1 + 0x278) = r;
         *(float *)(s1 + 0x3DC) = r;
-        r = func_00283BE0(y, *(float *)(a0 + 0xF4));
+        r = fast_subtract_rotations(y, *(float *)(a0 + 0xF4));
         *(float *)(s1 + 0x274) = r;
         *(float *)(s1 + 0x3E0) = r;
         qcopy(s1 + 0x330, blk);

@@ -62,7 +62,7 @@ char *func_L18_0035B6B8(char *p0, float f0, float f1, float f2, float f3, float 
         *(u8 *)(s0 + 1) = 0;
         *(u8 *)(s0 + 2) = D_L18_001FF4D4[p3];
         *(u8 *)(s0 + 8) = func_001163B0();
-        *(u8 *)(s0 + 9) = func_00283CF0(1.0f) + 0x40;
+        *(u8 *)(s0 + 9) = FloatToInt(1.0f) + 0x40;
         *(u32 *)(s0 + 4) = p2;
         *(float *)(s0 + 0xC) = f3 * 210000.0f;
         *(u32 *)(s1 + 0) = p0;
@@ -113,7 +113,7 @@ void func_L18_003A0C28(u8 *entity) {
     if (D_0018CF40 != 0)
         goto after;
     if (D_001A7AFD[0] != 0) {
-        if (func_00282978((s16 *)(state + 0xE)) != 0)
+        if (FastDecTimer((s16 *)(state + 0xE)) != 0)
             func_00288E18(0xA27, 0x7E);
     }
 after:
@@ -124,7 +124,7 @@ after:
     switch (substate) {
     case 0: {
         u8 *block = D_00189EA0;
-        if (func_002ACBC8(block, *(u32 *)(state + 0)) != 0) {
+        if (IsPointInCuboid(block, *(u32 *)(state + 0)) != 0) {
             if (*(u32 *)(block + 0x221C) == 15)
                 *(u32 *)(state + 8) = mode;
         }
@@ -134,7 +134,7 @@ after:
         u8 *block = D_00189E20;
         if (*(u32 *)(block + 0x2294) == 0x3E) {
             *(u32 *)(state + 8) = 0;
-        } else if (func_002ACBC8(block + 0x80, *(u32 *)(state + 4)) != 0) {
+        } else if (IsPointInCuboid(block + 0x80, *(u32 *)(state + 4)) != 0) {
             if (D_001A7A60[7] == 0) {
                 D_001A7A60[7] = substate;
                 func_002E5E58(1, 0, 0);
@@ -242,14 +242,14 @@ void func_L18_003F7EF8(char *p)
         (*(unsigned char *)(p + 0x94) == 9 || *(unsigned char *)(p + 0x94) == 4 || *(unsigned char *)(p + 0x94) == 3))
         *(unsigned char *)(p + 0x94) = old;
     if (*(float *)(p + 0x18) < 90.0f) {
-        func_002A6C58(p, 0, 3);
+        SetDeathBits(p, 0, 3);
         func_0029F338(p);
         return;
     }
     *(u128 *)zero = 0;
     zero[2] = *(float *)(data + 0x114) + *(float *)(data + 0x110);
     *(u128 *)temp = *(u128 *)zero;
-    func_00282CC0(v, p + 0x10, temp);
+    FastVecAdd(v, p + 0x10, temp);
     func_002A8C28(p, v, *(float *)(data + 0x110) + 0.2f, 10.0f, 1.0f, 0x4000000, 0, 1, 0);
     if (*(unsigned char *)(p + 0x20) >= 2) func_L00_002E6EF8(D_L18_003F9018, p);
 }

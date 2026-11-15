@@ -45,12 +45,12 @@ extern SifClientData D_001A7140 __attribute__((sda));
  * error at 0x10) is written by the IOP, so its fields are volatile. RAC2's retail EE
  * code shows that second writer (no IOP code is read):
  * - this function hands the block's address to the IOP: init.read_active is copied
- *   into the RPC send buffer and sent by func_00132C48 through sceSifCallRpc
+ *   into the RPC send buffer and sent by snd_SendCommandSync through sceSifCallRpc
  *   (func_0011D620) on the sound client;
- * - func_001334B8 stores the count and error, then calls func_0011B3D0(0x001A7100,
+ * - CdStartRead stores the count and error, then calls func_0011B3D0(0x001A7100,
  *   0x001A713F), SyncDCache (DIntr, _sceSDC's index writeback-invalidate of each
  *   cache line in the range, EIntr), before asking the IOP for the read;
- * - func_00133580 calls func_0011B500 on the same range, InvalidDCache (_sceIDC's
+ * - snd_CheckLoadInProgress calls func_0011B500 on the same range, InvalidDCache (_sceIDC's
  *   index invalidate, no writeback), before each poll read of the count. Discarding
  *   the cached lines unwritten is only right for memory another bus master writes.
  * _sceSDC (0x0011B328) and _sceIDC (0x0011B458) are symbol_addrs' digest-matched SDK
@@ -130,5 +130,5 @@ int func_00131DE8(int options)
     init.read_active = D_001A7100;
     init.options = options;
     D_001A7110[0] = 0;
-    return func_00132C48(0, 8, &init);
+    return snd_SendCommandSync(0, 8, &init);
 }

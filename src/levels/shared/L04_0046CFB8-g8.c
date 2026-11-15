@@ -50,7 +50,7 @@ void func_L04_0046CFB8(char *obj)
         D_L04_001B1CB8 = -1;
         for (i = 0; i < 16; i++) {
             if (*(int *)(definition + 0x20 + i * 4) != -1
-                && func_002ACBC8(moby + 0x10, *(int *)(definition + 0x20 + i * 4)))
+                && IsPointInCuboid(moby + 0x10, *(int *)(definition + 0x20 + i * 4)))
                 D_L04_001B1CB8 = i;
         }
         if (D_L04_001B1CB8 == -1) {
@@ -60,7 +60,7 @@ void func_L04_0046CFB8(char *obj)
                 func_L04_0046CD68(obj, 1);
                 sine = func_00283198(0.562170565f);
                 D_L04_001BDC30[0] = sine / func_00283180(0.562170565f);
-                func_0027AB40();
+                UpdateViewContext();
                 D_L04_001B1CC8 = 0;
                 D_L04_001B1CBC = D_L04_001B1CB8;
             }
@@ -90,7 +90,7 @@ void func_L04_0046CFB8(char *obj)
                 float half = D_L04_001B1CC0 * .5f;
                 float sine2 = func_00283198(half);
                 D_L04_001BDC30[0] = sine2 / func_00283180(half);
-                func_0027AB40();
+                UpdateViewContext();
                 func_L04_0046D6A8(obj);
             } else {
                 follow = 1;
@@ -100,7 +100,7 @@ void func_L04_0046CFB8(char *obj)
         follow = *(unsigned char *)(moby + 0xBC) != 0;
     }
     if (follow) {
-        func_L04_0046D250(obj);
+        UpdatePlayerRelativeCameraPosition(obj);
         func_L04_0046D6A8(obj);
     }
 }

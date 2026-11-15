@@ -38,7 +38,7 @@ void func_L20_004429F0(char *object)
     interval = func_L20_00444B48(5, 20, 0.0f, rate);
     attempts = 0;
     spawned = 0;
-    *(int *)(state + 0x1848) = func_00283CF0((float)(int)(interval * rate)) + 1200;
+    *(int *)(state + 0x1848) = FloatToInt((float)(int)(interval * rate)) + 1200;
     if (*(int *)(state + 0x182C) == 2)
         requested = 6;
     polygon = D_L20_001FEC80[*(int *)(state + 0x234)];
@@ -49,7 +49,7 @@ void func_L20_004429F0(char *object)
         first = func_002A77E0(6);
         next = (first + 1) % sides;
         blend = func_002A7878(0.2f, 0.8f);
-        func_00282D08(point, polygon + (first * 16 + 16),
+        lerp_vector(point, polygon + (first * 16 + 16),
                      polygon + (next * 16 + 16), blend);
         point[2] = func_002A89A8((char *)point, 0, 0.5f) + height;
         if (func_00277258(point, 0, 0, 0.9f) == 0) {

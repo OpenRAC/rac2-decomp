@@ -186,7 +186,7 @@ void func_L23_004402D8(Moby_004402D8 *moby)
             tmp[1] = entry->y;
             tmp[2] = entry->z;
             tmp[3] = 0.0f;
-            vars->f24 = func_00282E48(tmp, D_00189E20.fB0);
+            vars->f24 = fast_vec_dist(tmp, D_00189E20.fB0);
             vars->f20 = 1;
         }
         return;
@@ -209,10 +209,10 @@ void func_L23_004402D8(Moby_004402D8 *moby)
         if (vars->f28[i] < 0) {
             break;
         }
-        if (func_002ACBC8(D_00189E20.f80, vars->f28[i]) != 0) {
+        if (IsPointInCuboid(D_00189E20.f80, vars->f28[i]) != 0) {
             func_L00_00424BB8(0.04f, 0.2f);
-            func_L00_00424A08(0, vars->f40, 0.003f);
-            func_L00_00424A50(vars->f44, 0.003f);
+            follow_camera_set_distance(0, vars->f40, 0.003f);
+            follow_camera_set_height(vars->f44, 0.003f);
             return;
         }
         i++;
@@ -221,11 +221,11 @@ void func_L23_004402D8(Moby_004402D8 *moby)
         if (D_00189E20.f1454 != 0 || D_00189E20.f2294 == 0x5B
             || func_00282C48(D_00138180.f100) >= 0.3f || func_00282C48(D_00138180.f104) >= 0.3f) {
             func_L00_00424C00();
-            func_L00_00424B48(0);
+            set_follow_camera_orbit_clamp_mode(0);
         }
     } else {
         func_L00_00424C00();
-        func_L00_00424B48(0);
+        set_follow_camera_orbit_clamp_mode(0);
     }
     func_L00_00424C28();
     func_L00_00424B70(D_L23_001B1EF4, 0.2f);
@@ -241,15 +241,15 @@ void func_L23_004402D8(Moby_004402D8 *moby)
         D_L23_001BA500.cam->f70->f250 = 2;
         n = 0;
         if (D_00189E20.f49E != 0) {
-            n = func_00283CF0(func_L00_002D2A10(90.0f, D_00189E20.f520, -1.0f));
+            n = FloatToInt(func_L00_002D2A10(90.0f, D_00189E20.f520, -1.0f));
         }
         if (D_00189E20.f2294 == 0x5B && (D_00189E20.f49E == 0 || n >= 20)) {
             func_L00_00424B70(0.5f, 1.0f);
             func_L00_00424BB8(0.05f, 0.2f);
             func_L16_0042FB10(0.04f, 0.0f);
             func_L00_00424A88(0, D_L23_001B1F14, 0.005f);
-            func_L00_00424A08(1, D_L23_001B1F08, 0.01f);
-            func_L00_00424A50(D_L23_001B1F0C, 0.01f);
+            follow_camera_set_distance(1, D_L23_001B1F08, 0.01f);
+            follow_camera_set_height(D_L23_001B1F0C, 0.01f);
             D_L23_001B1D6C = D_L23_001B1F1C * 0.017453294f;
             func_L00_00424B20(D_L23_001B1F18 * 0.017453294f);
         } else {
@@ -264,7 +264,7 @@ void func_L23_004402D8(Moby_004402D8 *moby)
             } else {
                 func_L00_00424BB8(0.015f, 0.2f);
             }
-            d = func_00282E48(D_00189E20.f80, D_00189E20.fB0) - vars->f24;
+            d = fast_vec_dist(D_00189E20.f80, D_00189E20.fB0) - vars->f24;
             if (D_L23_001B1EEC < d) {
                 d = D_L23_001B1EEC;
             } else if (d < 0.0f) {
@@ -273,8 +273,8 @@ void func_L23_004402D8(Moby_004402D8 *moby)
             t = d / D_L23_001B1EEC;
             a = (D_L23_001B1F00 - D_L23_001B1EF8) * t + D_L23_001B1EF8;
             b = (D_L23_001B1F04 - D_L23_001B1EFC) * t + D_L23_001B1EFC;
-            func_L00_00424A08(1, a, 0.005f);
-            func_L00_00424A50(b, 0.005f);
+            follow_camera_set_distance(1, a, 0.005f);
+            follow_camera_set_height(b, 0.005f);
         }
         if (D_L23_001B1F20 < func_002B0360(D_L23_001BA500.f140)) {
             D_L23_001B234C = 3;
@@ -286,12 +286,12 @@ void func_L23_004402D8(Moby_004402D8 *moby)
         func_L16_0042FB10(0.04f, 0.0f);
         if (D_001A79F0 == 16) {
             func_L00_00424A88(0, 0.5f, 0.04f);
-            func_L00_00424A08(0, 4.0f, 0.002f);
-            func_L00_00424A50(2.0f, 0.04f);
+            follow_camera_set_distance(0, 4.0f, 0.002f);
+            follow_camera_set_height(2.0f, 0.04f);
         } else {
             func_L00_00424A88(0, 1.0f, 0.04f);
-            func_L00_00424A08(0, 2.0f, 0.002f);
-            func_L00_00424A50(7.0f, 0.04f);
+            follow_camera_set_distance(0, 2.0f, 0.002f);
+            follow_camera_set_height(7.0f, 0.04f);
         }
     } else {
         if (D_00189E20.f229C == 2) {
@@ -300,15 +300,15 @@ void func_L23_004402D8(Moby_004402D8 *moby)
             func_L00_00424BB8(0.015f, 0.2f);
         }
         if (D_00189E20.f229C == 5) {
-            func_L00_00424A08(0, 4.0f, 0.003f);
-            func_L00_00424A50(6.0f, 0.003f);
+            follow_camera_set_distance(0, 4.0f, 0.003f);
+            follow_camera_set_height(6.0f, 0.003f);
         } else {
             f32 d;
             f32 t;
             f32 a;
             f32 b;
 
-            d = func_00282E48(D_00189E20.f80, D_00189E20.fB0) - vars->f24;
+            d = fast_vec_dist(D_00189E20.f80, D_00189E20.fB0) - vars->f24;
             if (D_L23_001B1EEC < d) {
                 d = D_L23_001B1EEC;
             } else if (d < 0.0f) {
@@ -317,8 +317,8 @@ void func_L23_004402D8(Moby_004402D8 *moby)
             t = d / D_L23_001B1EEC;
             a = (vars->f48 - vars->f40) * t + vars->f40;
             b = (vars->f4C - vars->f44) * t + vars->f44;
-            func_L00_00424A08(0, a, 0.003f);
-            func_L00_00424A50(b, 0.003f);
+            follow_camera_set_distance(0, a, 0.003f);
+            follow_camera_set_height(b, 0.003f);
         }
     }
 }

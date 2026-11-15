@@ -96,8 +96,8 @@ void func_L12_004285A8(u8 *self) {
         s32 i;
         if (func_002B3868(self)) {
             I(self,0x98)=0;
-            func_0032C700(self+0x10,1,20,20,20,20,20,0,2.5f,20.0f,1,1,1,0);
-            func_002E5CF8(0,0,self);
+            SpawnExplosion(self+0x10,1,20,20,20,20,20,0,2.5f,20.0f,1,1,1,0);
+            PlayMobySound(0,0,self);
         }
         F(self,0xf0)+=F(st,0x64);
         F(st,0x64)+=0.0002181661839131266f;
@@ -124,7 +124,7 @@ void func_L12_004285A8(u8 *self) {
         func_L12_00429610(self,0);
         {
             L12Sound *slot=(L12Sound *)(D_00188660+I(st,0x80)*0x70);
-            if (slot->owner!=self || !slot->active) I(st,0x80)=func_002E5CF8(3,4,self);
+            if (slot->owner!=self || !slot->active) I(st,0x80)=PlayMobySound(3,4,self);
         }
         if (!func_00282948(st+0x68) && I(st,0x68)<220) func_L12_004293A0(self);
         F(self,0x18)+=F(st,0x6c); F(st,0x6c)+=0.00022222222469281405f;
@@ -148,7 +148,7 @@ void func_L12_004285A8(u8 *self) {
         if (I(st,0x68)) {
             {
                 L12Sound *slot=(L12Sound *)(D_00188660+I(st,0x80)*0x70);
-                if (slot->owner!=self || !slot->active) I(st,0x80)=func_002E5CF8(3,4,self);
+                if (slot->owner!=self || !slot->active) I(st,0x80)=PlayMobySound(3,4,self);
             }
             func_L12_00429610(self,0);
             if (!func_00282948(st+0x68) && I(st,0x68)<140) func_L12_004293A0(self);
@@ -169,7 +169,7 @@ void func_L12_004285A8(u8 *self) {
         u8 *p;
         p=D_L12_001B2E9C+(I(st,0x74)<<8);
         if (p && p[0x20]!=254 && p[0x20]!=253) {
-            if (func_00282E80(p+0x10,D_00189EA0)<45.0f && p[0x31]) {
+            if (vec_distance_xy(p+0x10,D_00189EA0)<45.0f && p[0x31]) {
                 H(self,0x34)=(H(self,0x34)&0xffbe)|0x1000;
                 I(self,0x98)=I(P(self,0x24),0x10);
                 F(st,0x78)=F(p,0x18);
@@ -191,7 +191,7 @@ void func_L12_004285A8(u8 *self) {
         F(self,0x18)+=F(st,0x6c);
         {
             L12Sound *slot=(L12Sound *)(D_00188660+I(st,0x80)*0x70);
-            if (slot->owner!=self || !slot->active) I(st,0x80)=func_002E5CF8(3,4,self);
+            if (slot->owner!=self || !slot->active) I(st,0x80)=PlayMobySound(3,4,self);
         }
         if (F(self,0x18)<F(st,0x78)+6.44f && (H(self,0x7c)&4)) {
             if (I(st,0x80)!=-1) {
@@ -201,32 +201,32 @@ void func_L12_004285A8(u8 *self) {
                 }
             }
             I(st,0x80)=-1;
-            func_0032C700(pos,1,25,20,20,20,45,1,1.0f,20.0f,1,1,0,0);
+            SpawnExplosion(pos,1,25,20,20,20,45,1,1.0f,20.0f,1,1,0,0);
             func_L00_0032A258(self,&D_L12_001B2290,&D_L12_001B2288,&D_L12_001B2280,255,-1,D_L12_001B22D0,15,4,255,func_L12_00429868);
             func_L00_00326110(self,25,0.0f);
             func_0029F338(self);
             return;
         }
         if (F(self,0x18)<F(st,0x78)+11.2f && (H(self,0x7c)&2)) {
-            func_0032C700(pos,1,25,20,20,20,45,1,2.0f,20.0f,1,1,0,0);
+            SpawnExplosion(pos,1,25,20,20,20,45,1,2.0f,20.0f,1,1,0,0);
             func_L00_0032A258(self,&D_L12_001B2290,&D_L12_001B2288,&D_L12_001B2280,255,-1,D_L12_001B22D0,15,2,255,func_L12_00429868);
             H(self,0x7c)=0x8004;
         } else if (F(self,0x18)<F(st,0x78)+16.27f && !H(self,0x7c)) {
-            func_002E5CF8(1,0,self);
-            func_0032C700(pos,1,25,20,20,20,45,1,3.0f,20.0f,1,1,0,0);
+            PlayMobySound(1,0,self);
+            SpawnExplosion(pos,1,25,20,20,20,45,1,3.0f,20.0f,1,1,0,0);
             func_L00_0032A258(self,&D_L12_001B2290,&D_L12_001B2288,&D_L12_001B2280,255,-1,D_L12_001B22D0,15,1,255,func_L12_00429868);
             H(self,0x7c)=0x8006;
         } else {
         vecv.q=0; vec[2]=-12.27f;
-        func_00282CC0(vec,self+0x10,vec);
+        FastVecAdd(vec,self+0x10,vec);
         func_002A8C28(self,4.0f,vec,0x10000,1000.0f,1.0f,0,1,0);
         }
         func_L12_00429610(self,1);
         break;
     case 7:
-        if (func_002B3868(self)) func_002E5CF8(4,0,self);
+        if (func_002B3868(self)) PlayMobySound(4,0,self);
         qcopy(pos,self+0x10);
-        func_0032C700(pos,1,25,20,20,20,45,1,4.0f,20.0f,1,1,0,0);
+        SpawnExplosion(pos,1,25,20,20,20,45,1,4.0f,20.0f,1,1,0,0);
         func_L00_0032A258(self,&D_L12_001B2290,&D_L12_001B2288,&D_L12_001B2280,255,-1,D_L12_001B22D0,15,255,255,func_L12_00429868);
         func_L00_00326110(self,25,0.0f);
         func_0029F338(self);
@@ -234,21 +234,21 @@ void func_L12_004285A8(u8 *self) {
     case 8: {
         s32 i; u8 *p;
         for (i=0;i<3;i++) {
-            p=func_0029EFD0(0x12e2-i);
+            p=CreateMoby(0x12e2-i);
             if (p) {
-                func_00282D30(p+0x10,self+0xe0,D_L12_001B2260[i]);
-                func_00282CC0(p+0x10,p+0x10,self+0x10);
+                FastVecScale(p+0x10,self+0xe0,D_L12_001B2260[i]);
+                FastVecAdd(p+0x10,p+0x10,self+0x10);
                 qcopy_nc(p+0xf0,self+0xf0);
-                func_002833F0(p+0xc0,self+0xf0);
+                euler_rotation_basis(p+0xc0,self+0xf0);
                 F(p,0x2c)=F(P(p,0x24),0x24)*(F(self,0x2c)/F(P(self,0x24),0x24));
                 posv.q=0; pos[2]=0.13333334028720856f;
                 func_002B0A68(p,D_L12_001B2270[i],pos,6.0f,12.0f,6.0f,12.0f,255);
-                func_0032C700(p+0x10,0,25,20,20,20,45,1,1.0f,20.0f,1,1,0,0);
+                SpawnExplosion(p+0x10,0,25,20,20,20,45,1,1.0f,20.0f,1,1,0,0);
                 func_0029F338(p);
             }
         }
         func_L00_00326110(self,25,0.0f);
-        func_002E5CF8(1,0,self);
+        PlayMobySound(1,0,self);
         func_0029F338(self);
         return;
     }

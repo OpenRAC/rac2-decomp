@@ -92,10 +92,10 @@ int func_002900B8(void)
         half = 0.5f;
         saved = D_001B9040.opacity;
         D_001B9040.opacity = 0.62f;
-        func_0027AB40();
-        pulse = func_00283CE0(D_001A9000) * 0.1f;
-        first = func_00283D38(0x442D00, 0x60442D00, pulse);
-        second = func_00283D38(0xF0C070, 0x55F0C070, pulse);
+        UpdateViewContext();
+        pulse = IntToFloat(D_001A9000) * 0.1f;
+        first = FastTweenColor(0x442D00, 0x60442D00, pulse);
+        second = FastTweenColor(0xF0C070, 0x55F0C070, pulse);
         text = func_00336D50(D_001A8CFC[0] + 0x8710, 0xA6);
         y = (float)label_y(text, 206.0f, D_001B23A4[0], half, one);
         scale = 1.0f;
@@ -117,8 +117,8 @@ int func_002900B8(void)
                 float edge2;
                 float s;
 
-                color1 = func_00283D38(D_001A900C & 0xFFFFFF, D_001A900C, pulse);
-                color2 = func_00283D38(D_001A9010 & 0xFFFFFF, D_001A9010, pulse);
+                color1 = FastTweenColor(D_001A900C & 0xFFFFFF, D_001A900C, pulse);
+                color2 = FastTweenColor(D_001A9010 & 0xFFFFFF, D_001A9010, pulse);
                 s = D_001B23A4[0];
                 top = hud_coord((float)(285 - (int)((scale - D_001A9008) * 157.0f)), s, half, one);
                 s = (float)hud_coord(128.0f, D_001B23A4[0], half, one);
@@ -163,7 +163,7 @@ int func_002900B8(void)
             float s;
             float edge;
 
-            color = func_00283D38(D_001A900C & 0xFFFFFF, D_001A900C, pulse);
+            color = FastTweenColor(D_001A900C & 0xFFFFFF, D_001A900C, pulse);
             s = D_001B23A4[0];
             top = hud_coord((float)(285 - (int)((1.0f - D_001A9008) * 157.0f)), s, 0.5f, 1);
             s = (float)hud_coord(128.0f, D_001B23A4[0], 0.5f, 1);
@@ -184,7 +184,7 @@ int func_002900B8(void)
         }
         }
         D_001B9040.opacity = saved;
-        func_0027AB40();
+        UpdateViewContext();
     }
     return D_001A8D40;
 }

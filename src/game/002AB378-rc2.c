@@ -41,7 +41,7 @@ void func_002AB378(f32 *arg0, f32 *arg1) {
 
     tr = arg1[0] + arg1[5] + arg1[10];
     if (tr > 0.0f) {
-        s = func_00282C10(tr + 1.0f);
+        s = square_root(tr + 1.0f);
         arg0[3] = s * 0.5f;
         s = 0.5f / s;
         arg0[0] = (arg1[9] - arg1[6]) * s;
@@ -66,7 +66,7 @@ void func_002AB378(f32 *arg0, f32 *arg1) {
         }
         j = ord.w[i];
         k = ord.w[j];
-        s = func_00282C10(t[i][i] - (t[j][j] + t[k][k]) + 1.0f);
+        s = square_root(t[i][i] - (t[j][j] + t[k][k]) + 1.0f);
         arg0[i] = s * 0.5f;
         if (s != 0.0f) {
             s = 0.5f / s;

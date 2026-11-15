@@ -91,22 +91,22 @@ void func_L02_003E1A40(L02E1A40Object *obj)
         } else func_002A7750(obj,1,-1);
         break;
     case 1:
-        d->angle=func_00283B98(d->angle,D_L02_001B0760*0.0002908882452175021f);
-        func_L00_002E6CF0(func_L02_003E2150,obj);
-        if(d->fade!=0.0f) func_002AA2E8(&d->fade,0.0f,0.033333335f);
+        d->angle=FastAddRotations(d->angle,D_L02_001B0760*0.0002908882452175021f);
+        func_L00_002E6CF0(DrawPulsingRingEffect,obj);
+        if(d->fade!=0.0f) ApproachValue(&d->fade,0.0f,0.033333335f);
         if(obj->active && !func_002A77E0(5)) {
             angle=func_002A7940();
             pos[0]=func_00283180(angle)*1.15f;
             pos[1]=func_00283198(angle)*1.15f;
             pos[2]=0;
-            func_00282CC0(pos,pos,obj->position);
+            FastVecAdd(pos,pos,obj->position);
             pos[2]+=0.1f;
             size=func_002A7878(D_L02_001B0768,D_L02_001B0768_abs[1]);
-            color=func_00283D38(D_L02_001B0770,D_L02_001B0770_abs[1],func_002A7878(0,1));
+            color=FastTweenColor(D_L02_001B0770,D_L02_001B0770_abs[1],func_002A7878(0,1));
             speed=func_002A7878(1,2);
             duration=func_002A7820(60,180);
             func_00282C88(vel);
-            vel[2]=speed/func_00283CE0(duration);
+            vel[2]=speed/IntToFloat(duration);
             func_002C3150(pos,vel,color,size,(unsigned char)duration,(unsigned char)func_002A77E0(255),0);
         }
         if(D_0018A15C[0]==(char *)obj) {
@@ -117,13 +117,13 @@ void func_L02_003E1A40(L02E1A40Object *obj)
             }
         } else {
             other=(D_L02_001B359C[0]+d->other);
-            if(func_00282E80(obj->position,other->position)<1.5f && func_00282C48(obj->position[2]-other->position[2])<0.5f)
+            if(vec_distance_xy(obj->position,other->position)<1.5f && func_00282C48(obj->position[2]-other->position[2])<0.5f)
                 func_002A7750(obj,3,-1);
         }
         break;
     case 2:
         if(func_002B3868(obj)) {
-            func_002E5CF8(1,0,(char *)obj);
+            PlayMobySound(1,0,(char *)obj);
             d->color0=D_L02_001B0780;
             d->color1=D_L02_001B0780_abs[1];
             d->fade=0;d->alpha=0;
@@ -135,13 +135,13 @@ void func_L02_003E1A40(L02E1A40Object *obj)
             }
         }
         if(D_0018A15C[0]!=(char *)obj) func_002A7750(obj,1,-1);
-        d->angle=func_00283B98(d->angle,D_L02_001B0760*0.0002908882452175021f);
-        angle=func_00283B98(d->angle2,D_L02_001B0764*0.0002908882452175021f);
+        d->angle=FastAddRotations(d->angle,D_L02_001B0760*0.0002908882452175021f);
+        angle=FastAddRotations(d->angle2,D_L02_001B0764*0.0002908882452175021f);
         frame=D_L02_001B30C8[0];
         d->angle2=angle;
         if((frame&1) && d->alpha<255) d->alpha++;
-        func_L00_002E6CF0(func_L02_003E2150,obj);
-        func_002AA2E8(&d->fade,1,0.033333335f);
+        func_L00_002E6CF0(DrawPulsingRingEffect,obj);
+        ApproachValue(&d->fade,1,0.033333335f);
         break;
     case 3:
         if(func_002B3868(obj)) {
@@ -162,17 +162,17 @@ void func_L02_003E1A40(L02E1A40Object *obj)
             func_L00_003294F0((D_L02_001B359C[0]+d->first),1);
             func_L00_003294F0((D_L02_001B359C[0]+d->second),1);
         }
-        d->angle=func_00283B98(d->angle,D_L02_001B0760*0.0002908882452175021f);
-        angle=func_00283B98(d->angle2,D_L02_001B0764*0.0002908882452175021f);
+        d->angle=FastAddRotations(d->angle,D_L02_001B0760*0.0002908882452175021f);
+        angle=FastAddRotations(d->angle2,D_L02_001B0764*0.0002908882452175021f);
         frame=D_L02_001B30C8[0];
         d->angle2=angle;
         if((frame&1) && d->alpha<255) d->alpha++;
-        func_L00_002E6CF0(func_L02_003E2150,obj);
-        func_002AA2E8(&d->fade,1,0.033333335f);
+        func_L00_002E6CF0(DrawPulsingRingEffect,obj);
+        ApproachValue(&d->fade,1,0.033333335f);
         break;
     case 4:
-        func_L00_002E6CF0(func_L02_003E2150,obj);
-        func_002AA2E8(&d->fade,0,0.033333335f);
+        func_L00_002E6CF0(DrawPulsingRingEffect,obj);
+        ApproachValue(&d->fade,0,0.033333335f);
         if(d->fade<=0) {
             completedIndex=obj->index;
             if(completedIndex&1) {

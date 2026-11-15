@@ -432,7 +432,7 @@ void func_L00_003F0B10(char *pos, int a1, int a2, char *a3, int t0,
     long long r;
 
     ref_L00_003F0B10_00(pkt);
-    r = func_0027C878(a3);
+    r = GetEffectTextureDescriptor(a3);
 
     *(long long *)(pkt + 136) = ((long long)t0 << 2) | 0x8000000040LL;
     *(long long *)(pkt + 128) = 280993940374112LL;
@@ -446,13 +446,13 @@ void func_L00_003F0B10(char *pos, int a1, int a2, char *a3, int t0,
     quat[3] = 0.0f;
     quat[2] = func_00283248(D_L00_001B8C80.x_140 - *(float *)(pos + 0),
                             D_L00_001B8C80.y_144 - *(float *)(pos + 4));
-    quat[1] = -func_00283248(func_00282E80(pos, &D_L00_001B8C80.x_140),
+    quat[1] = -func_00283248(vec_distance_xy(pos, &D_L00_001B8C80.x_140),
                              D_L00_001B8C80.z_148 - *(float *)(pos + 8));
     quat[0] = fB;
 
-    func_00283410(m, quat);
-    func_00282CF0(off, &D_L00_001B8C80.x_140, pos);
-    func_00282F20(off, off, fC);
+    euler_to_matrix(m, quat);
+    FastVecSub(off, &D_L00_001B8C80.x_140, pos);
+    vec_scale_to_length(off, off, fC);
 
     m[12] = *(float *)(pos + 0) + off[0];
     m[13] = *(float *)(pos + 4) + off[1];
@@ -460,7 +460,7 @@ void func_L00_003F0B10(char *pos, int a1, int a2, char *a3, int t0,
     m[15] = 1.0f;
 
     ref_L00_003F0B10_01(pkt, fA);
-    func_00280B90(pkt, m, 0);
+    draw_world_quad(pkt, m, 0);
 }
 
 
@@ -530,7 +530,7 @@ void func_L00_003F1EB8(char *pos, int a1, int a2, char *a3, int t0,
     long long r;
 
     ref_L00_003F1EB8_00(pkt);
-    r = func_0027C878(a3);
+    r = GetEffectTextureDescriptor(a3);
 
     *(long long *)(pkt + 136) = ((long long)t0 << 2) | 0x8000000040LL;
     *(long long *)(pkt + 128) = 280993940374112LL;
@@ -544,13 +544,13 @@ void func_L00_003F1EB8(char *pos, int a1, int a2, char *a3, int t0,
     quat[3] = 0.0f;
     quat[2] = func_00283248(D_L00_001B8C80.x_140 - *(float *)(pos + 0),
                             D_L00_001B8C80.y_144 - *(float *)(pos + 4));
-    quat[1] = -func_00283248(func_00282E80(pos, &D_L00_001B8C80.x_140),
+    quat[1] = -func_00283248(vec_distance_xy(pos, &D_L00_001B8C80.x_140),
                              D_L00_001B8C80.z_148 - *(float *)(pos + 8));
     quat[0] = fB;
 
-    func_00283410(m, quat);
-    func_00282CF0(off, &D_L00_001B8C80.x_140, pos);
-    func_00282F20(off, off, fC);
+    euler_to_matrix(m, quat);
+    FastVecSub(off, &D_L00_001B8C80.x_140, pos);
+    vec_scale_to_length(off, off, fC);
 
     m[12] = *(float *)(pos + 0) + off[0];
     m[13] = *(float *)(pos + 4) + off[1];
@@ -558,7 +558,7 @@ void func_L00_003F1EB8(char *pos, int a1, int a2, char *a3, int t0,
     m[15] = 1.0f;
 
     ref_L00_003F1EB8_01(pkt, fA);
-    func_00280B90(pkt, m, 0);
+    draw_world_quad(pkt, m, 0);
 }
 
 /* func_L00_003F26C8 is defined in L00_003F26C8-qcopy.c. */
@@ -652,19 +652,19 @@ void func_L00_003F3160(char *obj)
         return;
     case 1:
         if (*(int *)(st + 0x64) != -1) {
-            if (func_002ACBC8(&D_L00_001B8C80.x_140, *(int *)(st + 0x64)) == 0)
+            if (IsPointInCuboid(&D_L00_001B8C80.x_140, *(int *)(st + 0x64)) == 0)
                 return;
         }
-        angle = func_00283B98(*(float *)(st + 0xC), *(float *)(st + 4));
+        angle = FastAddRotations(*(float *)(st + 0xC), *(float *)(st + 4));
         prev = *(int *)(st + 0x10);
         *(float *)(st + 0xC) = angle;
         if (*(float *)(st + 8) != 0.0f) {
             target = *(int *)(st + 0x14);
             if (angle > *(float *)(st + 8))
                 target = *(int *)(st + 0x18);
-            *(int *)(st + 0x10) = func_00283D38(prev, target, 0.1f);
+            *(int *)(st + 0x10) = FastTweenColor(prev, target, 0.1f);
         } else {
-            *(int *)(st + 0x10) = func_00283D38(*(int *)(st + 0x14), *(int *)(st + 0x18),
+            *(int *)(st + 0x10) = FastTweenColor(*(int *)(st + 0x14), *(int *)(st + 0x18),
                                                 func_00283198(angle) * 0.5f + 0.5f);
         }
         if (*(int *)(st + 0x10) == prev)
@@ -680,7 +680,7 @@ void func_L00_003F3160(char *obj)
         return;
     case 2:
         if (*(int *)(st + 0x64) == -1 ||
-            func_002ACBC8(&D_L00_001B8C80.x_140, *(int *)(st + 0x64)) != 0)
+            IsPointInCuboid(&D_L00_001B8C80.x_140, *(int *)(st + 0x64)) != 0)
             ref_L00_003F3160_00((void *)func_L00_003F3518, obj);
         return;
     }
@@ -726,7 +726,7 @@ extern float D_L00_0029D490[][2];
 
 /* Draws 50 quads through the object's frame (its basis at 0xC0 and position at 0x10). Per
    quad, a transformed table point is offset from the 0x001B8C80 vector and normalised, a
-   second table vector is transformed, and both go to func_00282DB0 (its result is unused);
+   second table vector is transformed, and both go to FastVecDot (its result is unused);
    the four corners then take their vertices and UVs from tables, and a corner at
    z = -0.002112 gets a transparent colour. */
 void func_L00_003F37E8(char *object)
@@ -741,7 +741,7 @@ void func_L00_003F37E8(char *object)
     unsigned int color;
     Vector *matrix;
 
-    packet.f78 = func_0027C878((char *)5);
+    packet.f78 = GetEffectTextureDescriptor((char *)5);
     matrix = scratch.frame.row;
     packet.f80 = 0xff9000000260LL;
     packet.flags = 0x8000000048LL;
@@ -759,24 +759,24 @@ void func_L00_003F37E8(char *object)
     packet.color[1] = color;
     packet.color[0] = color;
     for (face = 0; face < 50; face++) {
-        func_00282D30(&scratch.transformed, &D_L00_0029DAE0[face], 1.0f);
-        func_002830C0(&scratch.transformed, &scratch.transformed, &scratch.frame);
-        func_00282CF0((char *)&scratch.facing, (char *)&scratch.transformed,
+        FastVecScale(&scratch.transformed, &D_L00_0029DAE0[face], 1.0f);
+        transform_vector(&scratch.transformed, &scratch.transformed, &scratch.frame);
+        FastVecSub((char *)&scratch.facing, (char *)&scratch.transformed,
                       (char *)&D_L00_001B8C80.x_140);
-        func_00282F20((char *)&scratch.facing, (char *)&scratch.facing, 1.0f);
-        func_00283098(&scratch.transformed, &D_L00_0029D7C0[face], matrix);
-        func_00282DB0(&scratch.facing, &scratch.transformed);
+        vec_scale_to_length((char *)&scratch.facing, (char *)&scratch.facing, 1.0f);
+        matrix_mul_vec3(&scratch.transformed, &D_L00_0029D7C0[face], matrix);
+        FastVecDot(&scratch.facing, &scratch.transformed);
         for (corner = 0; corner < 4; corner++) {
             Vector *position = &D_L00_0029CB30[D_L00_0029D170[face][corner][0]];
             int uv = D_L00_0029D170[face][corner][1];
 
-            func_00282D30(&packet.vertex[corner], position, 1.0f);
+            FastVecScale(&packet.vertex[corner], position, 1.0f);
             packet.uv[corner][0] = D_L00_0029D490[uv][0];
             packet.uv[corner][1] = D_L00_0029D490[uv][1];
             if (position->v[2] == -0.002112f)
                 packet.color[corner] = 0xff0000;
         }
-        func_00280B90((char *)&packet, (float *)&scratch.frame, 0);
+        draw_world_quad((char *)&packet, (float *)&scratch.frame, 0);
     }
 }
 
@@ -822,7 +822,7 @@ void func_L00_003F3AD0(char *object)
     unsigned int color;
     Vector *matrix;
 
-    packet.f78 = func_0027C878((char *)5);
+    packet.f78 = GetEffectTextureDescriptor((char *)5);
     matrix = scratch.frame.row;
     packet.f80 = 0xff9000000260LL;
     packet.flags = 0x8000000048LL;
@@ -840,24 +840,24 @@ void func_L00_003F3AD0(char *object)
     packet.color[1] = color;
     packet.color[0] = color;
     for (face = 0; face < 50; face++) {
-        func_00282D30(&scratch.transformed, &D_L00_0029EDB0[face], 1.0f);
-        func_002830C0(&scratch.transformed, &scratch.transformed, &scratch.frame);
-        func_00282CF0((char *)&scratch.facing, (char *)&scratch.transformed,
+        FastVecScale(&scratch.transformed, &D_L00_0029EDB0[face], 1.0f);
+        transform_vector(&scratch.transformed, &scratch.transformed, &scratch.frame);
+        FastVecSub((char *)&scratch.facing, (char *)&scratch.transformed,
                       (char *)&D_L00_001B8C80.x_140);
-        func_00282F20((char *)&scratch.facing, (char *)&scratch.facing, 1.0f);
-        func_00283098(&scratch.transformed, &D_L00_0029EA90[face], matrix);
-        func_00282DB0(&scratch.facing, &scratch.transformed);
+        vec_scale_to_length((char *)&scratch.facing, (char *)&scratch.facing, 1.0f);
+        matrix_mul_vec3(&scratch.transformed, &D_L00_0029EA90[face], matrix);
+        FastVecDot(&scratch.facing, &scratch.transformed);
         for (corner = 0; corner < 4; corner++) {
             Vector *position = &D_L00_0029DE00[D_L00_0029E440[face][corner][0]];
             int uv = D_L00_0029E440[face][corner][1];
 
-            func_00282D30(&packet.vertex[corner], position, 1.0f);
+            FastVecScale(&packet.vertex[corner], position, 1.0f);
             packet.uv[corner][0] = D_L00_0029E760[uv][0];
             packet.uv[corner][1] = D_L00_0029E760[uv][1];
             if (position->v[2] == 0.001432f)
                 packet.color[corner] = 0xff0000;
         }
-        func_00280B90((char *)&packet, (float *)&scratch.frame, 0);
+        draw_world_quad((char *)&packet, (float *)&scratch.frame, 0);
     }
 }
 
@@ -876,9 +876,9 @@ void func_L00_003F51A0(char *obj, char *arg)
     float one = 1.0f;
 
     func_00282F20_1(base, (char *)(*(int *)(obj + 104)), one);
-    func_00282DD8(other, base, arg);
+    FastVecCross(other, base, arg);
     func_00282F20_1(other, other, one);
-    func_00282DD8(obj + 224, other, base);
+    FastVecCross(obj + 224, other, base);
 }
 
 /* func_L00_003F5238 is in L00_003F5238-helpers.c. */
@@ -919,7 +919,7 @@ void func_L00_003F56F0(char *p)
     if (func_002B4038(3076, *(short *)(*(int *)(p + 104) + 26)) == 0)
         func_0029F338_1(p);
     else {
-        func_L00_003F5B10(p);
+        RenderTwoLayerEffectStrip(p);
         func_L00_003F6308(p);
         func_L00_003F6B10(p);
     }
@@ -955,11 +955,11 @@ int func_L00_003F6A58(int *a0)
 
     for (i = 119; i >= 0; i--) {
         if (*(short *)(rec + 18) != 0) {
-            if (func_00282978(obj) != 0) {
+            if (FastDecTimer(obj) != 0) {
                 *(short *)(rec + 18) = 0;
             } else {
                 count++;
-                *(float *)(rec + 24) = func_00283B98(*(float *)(rec + 24), *(float *)(rec + 28));
+                *(float *)(rec + 24) = FastAddRotations(*(float *)(rec + 24), *(float *)(rec + 28));
             }
         }
         obj += 64;
@@ -986,8 +986,8 @@ void func_L00_003F71E8(char *a0)
     if (*(char **)(s1 + 0x3C) != 0) {
         func_002AD0E0(a0, *(char **)(s1 + 0x3C), a0 + 0x10, a0 + 0xF0, a0 + 0x10, a0 + 0xF0);
     }
-    if (func_00282978(s1) == 0) {
-        func_00282978(s1 + 4);
+    if (FastDecTimer(s1) == 0) {
+        FastDecTimer(s1 + 4);
         ref_L00_003F71E8_01((void *)ref_L00_003F71E8_00, a0);
     } else {
         func_0029F338(a0);
@@ -1030,34 +1030,34 @@ void func_L00_003F8280(Vector *position, float size, float offset, float roll,
     packet.uv[3][0] = 1.0f;
     packet.uv[3][1] = 1.0f;
     qcopy(&frame.position, position);
-    func_00282CF0((char *)&frame.row[0], (char *)&D_L00_001B8C80.x_140, (char *)&frame.position);
-    func_00282F20((char *)&frame.row[0], (char *)&frame.row[0], 1.0f);
-    func_00282DD8((char *)&frame.row[1], (char *)&frame.row[0], (char *)&D_0018A0E0);
-    func_00282F20((char *)&frame.row[1], (char *)&frame.row[1], 1.0f);
-    func_00282DD8((char *)&frame.row[2], (char *)&frame.row[1], (char *)&frame.row[0]);
+    FastVecSub((char *)&frame.row[0], (char *)&D_L00_001B8C80.x_140, (char *)&frame.position);
+    vec_scale_to_length((char *)&frame.row[0], (char *)&frame.row[0], 1.0f);
+    FastVecCross((char *)&frame.row[1], (char *)&frame.row[0], (char *)&D_0018A0E0);
+    vec_scale_to_length((char *)&frame.row[1], (char *)&frame.row[1], 1.0f);
+    FastVecCross((char *)&frame.row[2], (char *)&frame.row[1], (char *)&frame.row[0]);
     if (roll != 0.0f) {
         scratch.angles.word = 0;
         scratch.angles.v[0] = roll;
-        func_002833F0(scratch.u.rotation, &scratch.angles);
-        func_00283738(frame.row, frame.row, scratch.u.rotation);
+        euler_rotation_basis(scratch.u.rotation, &scratch.angles);
+        multiply_matrix3x3(frame.row, frame.row, scratch.u.rotation);
     }
-    func_00282D30(&scratch.angles, &frame.row[0], offset);
-    func_00282CC0(&frame.position, &frame.position, &scratch.angles);
+    FastVecScale(&scratch.angles, &frame.row[0], offset);
+    FastVecAdd(&frame.position, &frame.position, &scratch.angles);
     {
         Vector *vertex = packet.vertex;
         int count;
         corner = D_L00_001AA310;
         count = 3;
         do {
-            func_00282D30(vertex, corner, size);
+            FastVecScale(vertex, corner, size);
             ++corner;
             --count;
-            func_002830C0(vertex, vertex, &frame);
+            transform_vector(vertex, vertex, &frame);
             ++vertex;
         } while (count >= 0);
     }
-    func_002FC560(0x47, 0x31001ULL);
-    func_00280B90((char *)&packet, 0, 0);
+    VU1_addGSregister(0x47, 0x31001ULL);
+    draw_world_quad((char *)&packet, 0, 0);
     if (mode != 0) {
         int i;
 
@@ -1067,18 +1067,18 @@ void func_L00_003F8280(Vector *position, float size, float offset, float roll,
             int count;
             count = 2;
             do {
-                func_00282CC0(&scratch.u.projection.center, &scratch.u.projection.center,
+                FastVecAdd(&scratch.u.projection.center, &scratch.u.projection.center,
                               vertex);
                 ++vertex;
                 --count;
             } while (count >= 0);
         }
-        func_00282D30(&scratch.u.projection.center, &scratch.u.projection.center, 0.25f);
+        FastVecScale(&scratch.u.projection.center, &scratch.u.projection.center, 0.25f);
         for (i = 0; i < 4; ++i) {
-            func_00282CF0((char *)&scratch.u.projection.point, (char *)&packet.vertex[i],
+            FastVecSub((char *)&scratch.u.projection.point, (char *)&packet.vertex[i],
                           (char *)&scratch.u.projection.center);
-            func_00282D30(&scratch.u.projection.point, &scratch.u.projection.point, 0.8f);
-            func_00282CC0(&scratch.u.projection.point, &scratch.u.projection.center,
+            FastVecScale(&scratch.u.projection.point, &scratch.u.projection.point, 0.8f);
+            FastVecAdd(&scratch.u.projection.point, &scratch.u.projection.center,
                           &scratch.u.projection.point);
             func_0027C768((int)&scratch.u.projection.point, &packet.uv[i][0], &packet.uv[i][1]);
             if (func_002A77E0(1) == 0) {
@@ -1107,9 +1107,9 @@ void func_L00_003F8280(Vector *position, float size, float offset, float roll,
     }
     func_00281DE8(&packet, -1, 1, 0x80);
     packet.flags = 0x8000000054ULL;
-    func_002FC560(0x47, 0x33001ULL);
-    func_00280B90((char *)&packet, 0, 0);
-    func_002FC560(0x47, 0x5360bULL);
+    VU1_addGSregister(0x47, 0x33001ULL);
+    draw_world_quad((char *)&packet, 0, 0);
+    VU1_addGSregister(0x47, 0x5360bULL);
 }
 
 /* func_L00_003F87B0 is in L00_003F87B0.c. */

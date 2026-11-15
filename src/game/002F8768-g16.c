@@ -33,9 +33,9 @@ void func_002F8768(void)
     Vec4_2F8768 in;
 
     if (D_0021F240.f7C != -1)
-        func_0028B6C8(D_0021F240.f7C, 0);
+        set_animation_parameter(D_0021F240.f7C, 0);
     if (D_0021F240.f78 != -1)
-        func_0028B6C8(D_0021F240.f78, 0);
+        set_animation_parameter(D_0021F240.f78, 0);
     D_0021F240.f7C = -1;
     D_0021F240.f78 = -1;
     func_0028E440();
@@ -45,11 +45,11 @@ void func_002F8768(void)
     func_0026F728();
     if (D_0021F240.f60 == 0) {
         qcopy(&in, &D_001AD200);
-        func_00283098(&out, &in, D_0021F240.obj + 0xC0);
-        func_00282CC0(&out, &out, D_0021F240.obj + 0x10);
+        matrix_mul_vec3(&out, &in, D_0021F240.obj + 0xC0);
+        FastVecAdd(&out, &out, D_0021F240.obj + 0x10);
         dir[0] = 0;
         dir[1] = 0;
-        dir[2] = func_00283B98(*(float *)(D_0021F240.obj + 0xF8), 3.1415927f);
+        dir[2] = FastAddRotations(*(float *)(D_0021F240.obj + 0xF8), 3.1415927f);
         func_0026F778((char *)&out, dir, 0, 0);
         func_003355A8(2);
     }
@@ -61,6 +61,6 @@ void func_002F8768(void)
     if (D_0021F240.f60 != 0)
         func_0029F338(D_0021F240.obj);
     func_00132B28(0x5D);
-    func_002B7320();
-    func_00132028();
+    music_Unpause();
+    snd_Pump();
 }

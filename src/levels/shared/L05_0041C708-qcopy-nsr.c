@@ -7,7 +7,7 @@ extern void func_002A0F48(char *a0);
  * copies the owner's position and three matrix rows into the rung, folds the rate, then starts it. */
 char *func_L05_0041C708(char *a0, char *a1, int kind, f32 f12)
 {
-    char *s0 = func_0029EFD0(kind);
+    char *s0 = CreateMoby(kind);
     char *sub;
     char *src;
     char *dst;

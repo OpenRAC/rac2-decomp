@@ -8,7 +8,7 @@ typedef struct {
     u16 object_class;
     float damage;
     int enabled;
-    /* func_002A8E20 reads this word; this retail caller does not initialize it. */
+    /* QueueMobyImpact reads this word; this retail caller does not initialize it. */
     float field24;
 } Impact;
 typedef char ImpactExtentCheck[sizeof(Impact) == 0x28 ? 1 : -1];
@@ -31,7 +31,7 @@ void func_L05_00427E10(unsigned char *object)
     impact.damage = 100.0f;
     impact.attacker = object;
     qcopy(impact.direction, state);
-    func_00282F20(impact.direction, impact.direction, 1.0f);
+    vec_scale_to_length(impact.direction, impact.direction, 1.0f);
     impact.direction[3] = 5627.9248046875f;
     impact.kind = 3;
     impact.mode = 2;
@@ -40,7 +40,7 @@ void func_L05_00427E10(unsigned char *object)
         if (target[0x31] != 0 && target != 0 && target[0x20] != 0xFE &&
             target[0x20] != 0xFD && *(s16 *)(target + 0xAA) != 0xCBE &&
             *(s16 *)(target + 0xAA) != 0x110A)
-            func_002A8E20(target, &impact);
+            QueueMobyImpact(target, &impact);
     }
     func_L05_00427FC8(object + 0x10, object, 0, 50, 30, 30, 30, 40,
                       1, 1, 1, 1, 67, 4.0f);

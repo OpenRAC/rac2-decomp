@@ -20,14 +20,14 @@ void func_L03_003CAB80(u8 *object, void *unused, f32 *output)
     } else if (func_L03_00419BD8(*(u32 *)(vars + 0x64), (u8 *)second, D_00189EA0) != 0) {
         qcopy(output, second);
     } else {
-        region = func_L03_00419C58(*(u32 *)(vars + 0x64), first);
+        region = FindRouteNodeIndex(*(u32 *)(vars + 0x64), first);
         if (region != -1) {
             qcopy(output, first);
-        } else if (func_L03_00419C58(*(u32 *)(vars + 0x64), second) != region) {
+        } else if (FindRouteNodeIndex(*(u32 *)(vars + 0x64), second) != region) {
             qcopy(output, second);
         } else {
-            distance = func_00282E80(D_00189EA0, first);
-            if (distance < func_00282E80(D_00189EA0, second))
+            distance = vec_distance_xy(D_00189EA0, first);
+            if (distance < vec_distance_xy(D_00189EA0, second))
                 qcopy(output, first);
             else
                 qcopy(output, second);

@@ -33,11 +33,11 @@ void func_L11_0046B9F0(char *object)
         position[0] = 0.0f;
         position[1] = *(float *)(state + 0x20);
         position[2] = 0.0f;
-        func_00282CC0(state + 0x10, state, position);
+        FastVecAdd(state + 0x10, state, position);
         qcopy(position, state + 0x10);
         if (D_001A79F0 != 4 && D_001A79F0 != 11) D_L11_001B25A0 = func_002A77E0(20);
         else D_L11_001B25A0 = 20;
-        func_L11_0046BC08(object);
+        ResetBoltPointsToLine(object);
         func_L11_0046BD18(object);
         source = D_L11_001FF580[*(int *)(state + 0x34)];
         count = D_L11_001B25A0;
@@ -45,7 +45,7 @@ void func_L11_0046B9F0(char *object)
         for (i = count - 4; i < count; i++) {
             qcopy_nc(&((Vec128_L11 *)(D_L11_00264760 + *(int *)(state + 0x38) * 640))[i], &((Vec128_L11 *)source)[i + 1]);
         }
-        func_L00_002E6EF8(func_L11_0046C118, object);
+        func_L00_002E6EF8(DrawObjectRibbonPair, object);
         if (!*(unsigned char *)(object + 0x20)) {
             *(int *)(state + 0x24) = func_00291308(state, 0, 0.0f, 0.0f);
             object[0x20] = 1;

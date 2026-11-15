@@ -90,7 +90,7 @@ void func_L00_003AA708(char *moby)
         } else {
             char *target;
             char *hero;
-            func_002AF580(moby + 0x10, state, &work.phase.search.count, 3.14159298f, 3.14159298f, work.phase.search.list, 0x20, 0, 8.0f, 0.0f, 0.0f, 0, 0);
+            SelectBestTargetInCone(moby + 0x10, state, &work.phase.search.count, 3.14159298f, 3.14159298f, work.phase.search.list, 0x20, 0, 8.0f, 0.0f, 0.0f, 0, 0);
             work.phase.search.found = 0;
             hero = D_00189E20;
             target = func_L00_0037DEF8(P(hero, 0x2290), work.phase.search.list, work.phase.search.count, &work.phase.search.found, -1);
@@ -98,7 +98,7 @@ void func_L00_003AA708(char *moby)
             if (!target)
                 goto acquired;
             if (work.phase.search.found)
-                func_L00_0037DD18(P(hero, 0x2290), target, 0x14);
+                KeyOwnerTableInsert(P(hero, 0x2290), target, 0x14);
         }
         if (P(state, 0x14)) {
             B(moby, 0x20) = 1;
@@ -113,33 +113,33 @@ acquired:
     switch (B(moby, 0x20)) {
     case 0: {
         float step;
-        func_00282CC0(moby + 0x10, moby + 0x10, state);
+        FastVecAdd(moby + 0x10, moby + 0x10, state);
         qcopy(work.phase.flight.a, moby + 0x10);
         moved = 0;
-        func_00282D30(work.phase.flight.b, work.phase.flight.dir, 0.5f);
-        func_00282CF0(work.phase.flight.c, moby + 0x10, work.phase.flight.b);
-        if (func_002761F8(work.phase.flight.a, work.phase.flight.c, 0x12, HERO_PLAYER, 0)) {
-            func_00282CF0(work.phase.flight.d, moby + 0x10, D_L00_001BF200.pos);
-            step = 0.5f - func_00282DF0(work.phase.flight.d);
+        FastVecScale(work.phase.flight.b, work.phase.flight.dir, 0.5f);
+        FastVecSub(work.phase.flight.c, moby + 0x10, work.phase.flight.b);
+        if (CollLine(work.phase.flight.a, work.phase.flight.c, 0x12, HERO_PLAYER, 0)) {
+            FastVecSub(work.phase.flight.d, moby + 0x10, D_L00_001BF200.pos);
+            step = 0.5f - FastVecLength(work.phase.flight.d);
             if (step > 0.06666667f)
                 step = 0.06666667f;
             if (F(state, 0x7C) < step) {
                 moved = 1;
-                func_00282D30(work.phase.flight.b, work.phase.flight.b, step + step);
-                func_00282CC0(moby + 0x10, moby + 0x10, work.phase.flight.b);
+                FastVecScale(work.phase.flight.b, work.phase.flight.b, step + step);
+                FastVecAdd(moby + 0x10, moby + 0x10, work.phase.flight.b);
                 F(state, 0x7C) = step;
             }
         }
         if (!moved && F(state, 0x7C) != 0.0f) {
-            func_00282D30(work.phase.flight.d, work.phase.flight.dir, F(state, 0x7C));
-            func_00282CC0(moby + 0x10, moby + 0x10, work.phase.flight.d);
+            FastVecScale(work.phase.flight.d, work.phase.flight.dir, F(state, 0x7C));
+            FastVecAdd(moby + 0x10, moby + 0x10, work.phase.flight.d);
             func_002AA3A8((float *)(state + 0x7C), 0.0f, (float *)(state + 0x58), 0.02f, 0.2f, 0.0f);
             if (F(state, 0x7C) < 0.001f)
                 F(state, 0x7C) = 0.0f;
         }
         if (!func_002E59B0(moby, I(state, 0x5C)))
-            I(state, 0x5C) = func_002E5CF8(0, 4, moby);
-        if (func_00282978(state + 0x18)) {
+            I(state, 0x5C) = PlayMobySound(0, 4, moby);
+        if (FastDecTimer(state + 0x18)) {
             D_L00_001BF200.moby = 0;
             func_L00_003AB388(moby, state, moby + 0x10);
             func_002FEE50(I(state, 0x70));
@@ -150,7 +150,7 @@ acquired:
     }
     case 3: {
         char *target;
-        if (func_00282978(state + 0x54)) {
+        if (FastDecTimer(state + 0x54)) {
             D_L00_001BF200.moby = 0;
             func_L00_003AB388(moby, state, moby + 0x10);
             func_002FEE50(I(state, 0x70));
@@ -158,8 +158,8 @@ acquired:
             return;
         }
         {
-            float now = func_00283CE0(H(state, 0x54));
-            float total = func_00283CE0(10);
+            float now = IntToFloat(H(state, 0x54));
+            float total = IntToFloat(10);
             float ratio = now / total;
             F(state, 0x50) = func_002A7C00(0.5f, 1.5f, ratio);
         }
@@ -175,52 +175,52 @@ acquired:
         }
         func_L00_003AB618(moby + 0x10, state, target, state + 0x30, 1, 0.02f, 0.3f, 0.0f);
     drift:
-        func_00282CC0(moby + 0x10, moby + 0x10, state);
+        FastVecAdd(moby + 0x10, moby + 0x10, state);
         break;
     }
     case 1:
-        if (func_00282978(state + 0x54)) {
+        if (FastDecTimer(state + 0x54)) {
             B(moby, 0x20) = 2;
             H(state, 0x56) = 10;
         }
         func_L00_003AB618(moby + 0x10, state, P(state, 0x14), state + 0x30, 0, 0.04f, 0.3f, 0.0f);
-        func_00282D30(state + 0x40, state + 0x40, 0.85f);
-        func_00282CC0(moby + 0x10, moby + 0x10, state + 0x40);
+        FastVecScale(state + 0x40, state + 0x40, 0.85f);
+        FastVecAdd(moby + 0x10, moby + 0x10, state + 0x40);
         {
-            float now = func_00283CE0(H(state, 0x54));
-            float total = func_00283CE0(20);
+            float now = IntToFloat(H(state, 0x54));
+            float total = IntToFloat(20);
             float ratio = now / total;
             F(state, 0x50) = func_002A7C00(1.5f, 0.5f, ratio);
         }
         if (P(state, 0x14)) {
-            func_00282CF0(work.phase.flight.a, moby + 0x10, P(state, 0x14) + 0x10);
-            func_00282F20(work.phase.flight.a, work.phase.flight.a, 0.083333336f);
-            func_00282CC0(moby + 0x10, moby + 0x10, work.phase.flight.a);
+            FastVecSub(work.phase.flight.a, moby + 0x10, P(state, 0x14) + 0x10);
+            vec_scale_to_length(work.phase.flight.a, work.phase.flight.a, 0.083333336f);
+            FastVecAdd(moby + 0x10, moby + 0x10, work.phase.flight.a);
         }
         break;
     case 2: {
-        float half = func_00283CE0(10) * 0.5f;
-        float t = func_00283CE0(H(state, 0x56)) - half;
+        float half = IntToFloat(10) * 0.5f;
+        float t = IntToFloat(H(state, 0x56)) - half;
         float ratio = t / half;
         float scale;
         if (ratio < 0.0f)
             ratio = 0.0f;
         scale = ratio * 0.083333336f;
         if (P(state, 0x14)) {
-            func_00282CF0(work.phase.flight.a, moby + 0x10, P(state, 0x14) + 0x10);
-            func_00282F20(work.phase.flight.a, work.phase.flight.a, scale);
-            func_00282CC0(moby + 0x10, moby + 0x10, work.phase.flight.a);
+            FastVecSub(work.phase.flight.a, moby + 0x10, P(state, 0x14) + 0x10);
+            vec_scale_to_length(work.phase.flight.a, work.phase.flight.a, scale);
+            FastVecAdd(moby + 0x10, moby + 0x10, work.phase.flight.a);
         }
-        if (func_00282978(state + 0x56)) {
+        if (FastDecTimer(state + 0x56)) {
             B(moby, 0x20) = 3;
-            func_00282F20(state, state, 1.0f);
+            vec_scale_to_length(state, state, 1.0f);
             if (P(state, 0x14)) {
                 float targetScale;
                 func_002AFFD8(moby + 0x10, work.phase.flight.a, 1);
                 targetScale = func_002AB1F0(P(state, 0x14))[4];
-                func_00282D30(work.phase.flight.b, work.phase.flight.a, targetScale);
-                func_00282CC0(work.phase.flight.c, P(state, 0x14) + 0x10, work.phase.flight.b);
-                H(state, 0x54) = func_00283CF0(func_00282E48(work.phase.flight.c, moby + 0x10) + 5.0f);
+                FastVecScale(work.phase.flight.b, work.phase.flight.a, targetScale);
+                FastVecAdd(work.phase.flight.c, P(state, 0x14) + 0x10, work.phase.flight.b);
+                H(state, 0x54) = FloatToInt(fast_vec_dist(work.phase.flight.c, moby + 0x10) + 5.0f);
             } else {
                 H(state, 0x54) = 10;
             }
@@ -230,7 +230,7 @@ acquired:
                     func_002E59F8(I(state, 0x5C));
             }
             I(state, 0x5C) = -1;
-            func_002E5CF8(1, 0, moby);
+            PlayMobySound(1, 0, moby);
         }
         break;
     }
@@ -242,12 +242,12 @@ acquired:
         return;
     }
     qcopy(work.phase.flight.a, moby + 0x10);
-    func_00282D30(work.phase.flight.b, work.phase.flight.dir, -2.0f);
-    func_00282CC0(work.phase.flight.b, moby + 0x10, work.phase.flight.b);
-    if (func_002761F8(work.phase.flight.a, work.phase.flight.b, 0x12, moby, 0)) {
+    FastVecScale(work.phase.flight.b, work.phase.flight.dir, -2.0f);
+    FastVecAdd(work.phase.flight.b, moby + 0x10, work.phase.flight.b);
+    if (CollLine(work.phase.flight.a, work.phase.flight.b, 0x12, moby, 0)) {
         float length, limit;
-        func_00282CF0(work.phase.flight.c, work.phase.flight.a, D_L00_001BF200.pos);
-        length = func_00282DF0(work.phase.flight.c);
+        FastVecSub(work.phase.flight.c, work.phase.flight.a, D_L00_001BF200.pos);
+        length = FastVecLength(work.phase.flight.c);
         if (length < 0.0001f) {
             D_L00_001BF200.moby = 0;
             func_L00_003AB388(moby, state, moby + 0x10);
@@ -256,28 +256,28 @@ acquired:
             return;
         }
         limit = 0.025000002f;
-        func_00282D30(work.phase.flight.c, work.phase.flight.c, 1.0f / length);
-        func_00282CC0(work.phase.flight.d, D_L00_001BF200.pos, work.phase.flight.c);
-        func_00282CF0(work.phase.flight.e, work.phase.flight.d, moby + 0x10);
-        if (func_00282DB0(work.phase.flight.e, work.phase.flight.dir) > 0.0f) {
-            float distance = func_00282DF0(work.phase.flight.e);
+        FastVecScale(work.phase.flight.c, work.phase.flight.c, 1.0f / length);
+        FastVecAdd(work.phase.flight.d, D_L00_001BF200.pos, work.phase.flight.c);
+        FastVecSub(work.phase.flight.e, work.phase.flight.d, moby + 0x10);
+        if (FastVecDot(work.phase.flight.e, work.phase.flight.dir) > 0.0f) {
+            float distance = FastVecLength(work.phase.flight.e);
             if (distance > limit)
-                func_00282D30(work.phase.flight.e, work.phase.flight.e, limit / distance);
-            func_00282CC0(moby + 0x10, moby + 0x10, work.phase.flight.e);
+                FastVecScale(work.phase.flight.e, work.phase.flight.e, limit / distance);
+            FastVecAdd(moby + 0x10, moby + 0x10, work.phase.flight.e);
         }
     }
     magnitude = 1.0f;
-    func_00282F20(moby + 0xC0, state, magnitude);
-    func_00282DD8(moby + 0xD0, moby + 0xC0, work.phase.flight.dir);
-    func_00282F20(moby + 0xD0, moby + 0xD0, magnitude);
+    vec_scale_to_length(moby + 0xC0, state, magnitude);
+    FastVecCross(moby + 0xD0, moby + 0xC0, work.phase.flight.dir);
+    vec_scale_to_length(moby + 0xD0, moby + 0xD0, magnitude);
     magnitude = 0.00001f;
-    func_00282DD8(moby + 0xE0, moby + 0xD0, moby + 0xC0);
-    F(state, 0x20) = func_00283B98(F(state, 0x20), 0.06f);
-    func_00282D30(work.phase.flight.c, work.phase.flight.dir, F(state, 0x24));
-    func_00282CF0(moby + 0x10, moby + 0x10, work.phase.flight.c);
+    FastVecCross(moby + 0xE0, moby + 0xD0, moby + 0xC0);
+    F(state, 0x20) = FastAddRotations(F(state, 0x20), 0.06f);
+    FastVecScale(work.phase.flight.c, work.phase.flight.dir, F(state, 0x24));
+    FastVecSub(moby + 0x10, moby + 0x10, work.phase.flight.c);
     F(state, 0x24) = func_00283198(F(state, 0x20)) * 0.15f;
-    func_00282D30(work.phase.flight.c, work.phase.flight.dir, F(state, 0x24));
-    func_00282CC0(moby + 0x10, moby + 0x10, work.phase.flight.c);
+    FastVecScale(work.phase.flight.c, work.phase.flight.dir, F(state, 0x24));
+    FastVecAdd(moby + 0x10, moby + 0x10, work.phase.flight.c);
     func_002AEF28(moby, state + 0x28, state + 0x2C, 0.5f, 0.1f, 0.025f);
     if (func_00282C48(F(moby, 0xF0)) > magnitude) {
         func_002AB668(work.phase.flight.c, moby + 0xC0, F(moby, 0xF0));
@@ -293,13 +293,13 @@ acquired:
     moved = 0;
     func_002A9288(moby, 0.2f);
     hero = D_00189E20;
-    if (func_002761F8(work.saved, moby + 0x10, 0x10, P(hero, 0x2290), 0)) {
+    if (CollLine(work.saved, moby + 0x10, 0x10, P(hero, 0x2290), 0)) {
         work.hitPlayer = 1;
     } else if (B(moby, 0x20) == 3) {
-        func_00282D30(work.phase.flight.c, work.phase.flight.dir, func_002AB1F0(P(state, 0x14))[4]);
-        func_00282CC0(work.phase.flight.d, P(state, 0x14) + 0x10, work.phase.flight.c);
+        FastVecScale(work.phase.flight.c, work.phase.flight.dir, func_002AB1F0(P(state, 0x14))[4]);
+        FastVecAdd(work.phase.flight.d, P(state, 0x14) + 0x10, work.phase.flight.c);
         func_L00_0031BDC0(work.phase.flight.e, work.saved, moby + 0x10, work.phase.flight.d);
-        if (func_00282E48(work.phase.flight.e, work.phase.flight.d) <= 0.5f) {
+        if (fast_vec_dist(work.phase.flight.e, work.phase.flight.d) <= 0.5f) {
             moved = 1;
             qcopy(moby + 0x10, work.phase.flight.e);
             D_L00_001BF200.moby = P(state, 0x14);
@@ -320,7 +320,7 @@ acquired:
         func_0029F338(moby);
         return;
     }
-    func_00282D30(work.phase.flight.c, moby + 0xC0, -0.25f);
-    func_00282CC0(work.phase.flight.c, work.phase.flight.c, moby + 0x10);
+    FastVecScale(work.phase.flight.c, moby + 0xC0, -0.25f);
+    FastVecAdd(work.phase.flight.c, work.phase.flight.c, moby + 0x10);
     func_L00_003AB6F0(moby, work.phase.flight.c);
 }

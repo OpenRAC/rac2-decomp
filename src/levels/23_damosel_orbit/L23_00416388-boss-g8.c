@@ -205,10 +205,10 @@ void func_L23_00416388(u8 *object)
         return;
     func_L23_0041B6D8((char *)object);
     S32(0x604) = 0;
-    func_00282D30((char *)D_L23_001B36C0, PLAYER + 0xe0, D_L23_001B1488);
-    func_00282CC0((char *)D_L23_001B36C0, (char *)D_L23_001B36C0, PLAYER_POS);
-    func_00282D30((char *)D_L23_001B36D0, PLAYER + 0xe0, D_L23_001B148C);
-    func_00282CC0((char *)D_L23_001B36D0, (char *)D_L23_001B36D0, PLAYER_POS);
+    FastVecScale((char *)D_L23_001B36C0, PLAYER + 0xe0, D_L23_001B1488);
+    FastVecAdd((char *)D_L23_001B36C0, (char *)D_L23_001B36C0, PLAYER_POS);
+    FastVecScale((char *)D_L23_001B36D0, PLAYER + 0xe0, D_L23_001B148C);
+    FastVecAdd((char *)D_L23_001B36D0, (char *)D_L23_001B36D0, PLAYER_POS);
     qcopy(state+(0x3f0),PLAYER_POS);
     func_L23_00418650(state + 0x3f0, 0.0f);
     qcopy(state+(0x3e0),object + 0x10);
@@ -218,21 +218,21 @@ void func_L23_00416388(u8 *object)
         SF(0x5c0) = playerHeight;
         D_L23_001B3710[0] = SF(0x588) < playerHeight;
     }
-    func_00282CF0(direction, state + 0x3f0, state + 0x3e0);
-    SF(0x5b8) = func_00282DF0(direction);
+    FastVecSub(direction, state + 0x3f0, state + 0x3e0);
+    SF(0x5b8) = FastVecLength(direction);
     func_L23_004183F0((char *)object);
-    SF(0x5bc) = func_00282E48(((char *)object + 0x10), PLAYER_POS);
+    SF(0x5bc) = fast_vec_dist(((char *)object + 0x10), PLAYER_POS);
     func_0029FCC0((char *)object, 0x2a, jointOffset);
     func_0029FC20((char *)object, 0x27, (char *)jointMatrix);
-    func_00282D30((char *)D_L23_001B3860, (char *)jointMatrix, D_L23_001B1600);
-    func_00282CC0((char *)D_L23_001B3860, (char *)D_L23_001B3860, jointOffset);
+    FastVecScale((char *)D_L23_001B3860, (char *)jointMatrix, D_L23_001B1600);
+    FastVecAdd((char *)D_L23_001B3860, (char *)D_L23_001B3860, jointOffset);
     jointPosition = (char *)jointMatrix + 0x30;
-    func_00282CF0(blendedPosition, (char *)D_L23_001B36C0, jointPosition);
-    func_00282F20(blendedPosition, blendedPosition, D_L23_001B1604);
-    func_00282CC0((char *)D_L23_001B3880, jointPosition, blendedPosition);
+    FastVecSub(blendedPosition, (char *)D_L23_001B36C0, jointPosition);
+    vec_scale_to_length(blendedPosition, blendedPosition, D_L23_001B1604);
+    FastVecAdd((char *)D_L23_001B3880, jointPosition, blendedPosition);
     SB(0x404) = 0;
     if (SF(0x5bc) < D_L23_001B1634)
-        SB(0x404) = !func_002761F8(D_L23_001B3880, D_L23_001B36C0, 0x10, PLAYER, 0);
+        SB(0x404) = !CollLine(D_L23_001B3880, D_L23_001B36C0, 0x10, PLAYER, 0);
     if (!(D_L23_001B1648 / 2 < D_L23_001B36AC[0])) {
         func_00282948((char *)&D_L23_001B142C);
         if (object[0x20] == 7 &&
@@ -276,7 +276,7 @@ state4:
     HERO->state1e0 = 10;
     if (func_002B3868(object)) {
         func_L23_0041D930();
-        func_0027D330(D_L23_001B13E4);
+        FadeToBlack(D_L23_001B13E4);
     } else {
         char transform[64] __attribute__((aligned(16)));
         char secondPosition[16] __attribute__((aligned(16)));
@@ -285,33 +285,33 @@ state4:
         if (D_L23_001B13E4 / 2 < AGE) {
             func_L23_0041D398((char *)object);
         } else if (AGE == D_L23_001B13E4 / 2 - 4) {
-            func_0027D330(1);
+            FadeToBlack(1);
             qcopy(transform+0x00,&D_L23_001BA870[0]);
             qcopy(transform+0x10,&D_L23_001BA870[1]);
             qcopy(transform+0x20,&D_L23_001BA870[2]);
             qzero_nc(transform + 0x30);
             func_002AB6D8((float *)transform, (float *)localPosition);
-            func_00335438((char *)D_L23_001BA640, localPosition, 1, 0, 0);
+            SetCamera5Pose((char *)D_L23_001BA640, localPosition, 1, 0, 0);
         } else if (D_L23_001B13E4 / 2 - 4 < AGE) {
-            func_0027D330(1);
+            FadeToBlack(1);
             qcopy((transform + 0x00) ,(object + 0xc0));
             qcopy((transform + 0x10) ,(object + 0xd0));
             qcopy((transform + 0x20) ,(object + 0xe0));
             qzero_nc(transform + 0x30);
             func_002AB6D8((float *)transform, (float *)localPosition);
-            func_00282D30(secondPosition, (char *)object + 0xc0, -D_L23_001B13E0);
-            func_00282CC0(secondPosition, secondPosition, ((char *)object + 0x10));
+            FastVecScale(secondPosition, (char *)object + 0xc0, -D_L23_001B13E0);
+            FastVecAdd(secondPosition, secondPosition, ((char *)object + 0x10));
             func_L23_00418650(secondPosition, 0.0f);
             func_L00_002B9D60(secondPosition, localPosition, 0x6f, 0);
             func_003353C8(localPosition);
-            func_00282D30(thirdPosition, (char *)object + 0xc0, -D_L23_001B13D8);
-            func_00282CC0(thirdPosition, thirdPosition, ((char *)object + 0x10));
+            FastVecScale(thirdPosition, (char *)object + 0xc0, -D_L23_001B13D8);
+            FastVecAdd(thirdPosition, thirdPosition, ((char *)object + 0x10));
             func_L23_00418650(thirdPosition, D_L23_001B13DC);
             func_00335370(thirdPosition);
             qzero(&D_L23_001C87D0);
             qzero(&D_L23_001C87C0);
         } else {
-            func_0027D330(1);
+            FadeToBlack(1);
         }
     }
     ++AGE;
@@ -321,15 +321,15 @@ state2:
         func_L23_0041B540((char *)object, &D_L23_001B1498);
         func_L23_0041B668((char *)object, &D_L23_001B14D0);
         if (!SB(0x4b1))
-            func_0029F978(object, 0x27, (u8 *)state + 0x4b0);
+            AttachManipulator(object, 0x27, (u8 *)state + 0x4b0);
         SF(0x578) = 1.4726215600967407f;
-        func_00283898(state + 0x4c0, 1, 1.4726215600967407f);
+        build_axis_rotation_quaternion(state + 0x4c0, 1, 1.4726215600967407f);
     }
     goto state_default;
 state3:
     qcopy(state+(0x3d0),D_L23_001B3760);
     SP(0x400) = state + 0x3d0;
-    func_L23_004186D0((char *)object, SF(0x588));
+    FollowWaypointPath((char *)object, SF(0x588));
     func_L23_0041A648((char *)object);
     func_002A7750(object, 7, 1);
     goto state_default;
@@ -340,10 +340,10 @@ state1:
         func_L23_0041B540((char *)object, &D_L23_001B1498);
         func_L23_0041B668((char *)object, &D_L23_001B14C4);
     }
-    if (func_00282E48(state + 0x3e0, (char *)D_L23_001B3760) < 10.0f)
+    if (fast_vec_dist(state + 0x3e0, (char *)D_L23_001B3760) < 10.0f)
         func_002A7750(object, 3, 0);
     else
-        func_L23_004186D0((char *)object, SF(0x588));
+        FollowWaypointPath((char *)object, SF(0x588));
     goto state_default;
 state7:
     func_L23_0041B8F8((char *)object);
@@ -387,7 +387,7 @@ state9:
         func_L23_0041B188((char *)object);
         func_L23_0041B668((char *)object, &D_L23_001B14C8);
         S32(0x598) = D_L23_001B14EC;
-        func_002E5CF8(6, 0, (char *)object);
+        PlayMobySound(6, 0, (char *)object);
     } else if (S32(0x5d8)) {
         if (S32(0x598) <= 0) {
             func_002A7750(object, 10, 1);
@@ -395,7 +395,7 @@ state9:
             if (S32(0x598) == D_L23_001B14EC) {
                 int next;
                 int i;
-                func_002E5CF8(0, 0, (char *)object);
+                PlayMobySound(0, 0, (char *)object);
                 next = D_L23_001B164C;
                 for (i = 0; i < 4; ++i) {
                     char jointVector[16] __attribute__((aligned(16)));
@@ -408,13 +408,13 @@ state9:
                     next = (next + 1) % 25;
                     func_0029FCC0((char *)object, i + 30, jointVector);
                     func_0029FC20((char *)object, i + 30, (char *)matrix);
-                    func_00282D30(localPosition, (char *)matrix + 0x20, -16.0f);
+                    FastVecScale(localPosition, (char *)matrix + 0x20, -16.0f);
                     qcopy_nc(extraPosition, jointVector);
                     func_L23_00418650(extraPosition, 0.0f);
-                    func_00282CF0(thirdPosition, extraPosition, state + 0x3e0);
-                    func_00282D30(thirdPosition, thirdPosition, D_L23_001B1420);
-                    func_00282CC0(localPosition, localPosition, thirdPosition);
-                    func_00282CC0(jointVector, state + 0x3e0, localPosition);
+                    FastVecSub(thirdPosition, extraPosition, state + 0x3e0);
+                    FastVecScale(thirdPosition, thirdPosition, D_L23_001B1420);
+                    FastVecAdd(localPosition, localPosition, thirdPosition);
+                    FastVecAdd(jointVector, state + 0x3e0, localPosition);
                     func_L23_00418650(jointVector, 0.0f);
                     qcopy((enemy + 0xc0) ,(object + 0xc0));
                     qcopy((enemy + 0xd0) ,(object + 0xd0));
@@ -475,7 +475,7 @@ state11:
         S32(0x608) = D_L23_001B1638;
         if (object[0x31] && SB(0x404)) {
             func_002A7750(object, 13, 2);
-            D_L23_001B15BC = func_002E5CF8(8, 4, (char *)object);
+            D_L23_001B15BC = PlayMobySound(8, 4, (char *)object);
             D_L23_001B140C = 0;
         } else {
             func_002A7750(object, 7, 1);
@@ -529,8 +529,8 @@ state5:
     if (func_002B3868(object)) {
         SP(0x400) = (char *)D_L23_001B3770;
         func_L23_0041B540((char *)object, &D_L23_001B1494);
-    } else if (func_00282E48(state + 0x3e0, (char *)D_L23_001B3770) > 1.0f) {
-        func_L23_004186D0((char *)object, SF(0x588));
+    } else if (fast_vec_dist(state + 0x3e0, (char *)D_L23_001B3770) > 1.0f) {
+        FollowWaypointPath((char *)object, SF(0x588));
     } else {
         func_002A7750(object, 17, 2);
     }
@@ -541,8 +541,8 @@ state6:
         SP(0x400) = (char *)D_L23_001B3760;
         func_L23_0041B540((char *)object, &D_L23_001B1494);
         func_L23_0041B668((char *)object, &D_L23_001B14C4);
-    } else if (func_00282E48(state + 0x3e0, (char *)D_L23_001B3760) > 1.0f) {
-        func_L23_004186D0((char *)object, SF(0x588));
+    } else if (fast_vec_dist(state + 0x3e0, (char *)D_L23_001B3760) > 1.0f) {
+        FollowWaypointPath((char *)object, SF(0x588));
     } else {
         func_002A7750(object, 16, 2);
     }
@@ -582,8 +582,8 @@ state20:
     if (func_002B1C20(object, (DispatchContext *)(state + 0x140)) & 1) {
         func_002A7750(object, 4, 0);
         HERO->field2294 = 0;
-        func_L00_002AF7D0();
-        func_L00_00310C88((LvlSlotCtx *)PLAYER, &HERO->slotList);
+        cancel_hero_item_animation();
+        release_moby_animation_slot((LvlSlotCtx *)PLAYER, &HERO->slotList);
         HERO->slotCount = 0;
         func_L22_002C9898(0, 1);
         D_L23_001B1694 = 0;
@@ -631,7 +631,7 @@ state_default:
     }
     func_L23_00419D60((char *)object);
     qcopy(localPosition ,D_L23_001B36C0);
-    func_L23_0041A038((char *)object, localPosition);
+    UpdateAimTurn((char *)object, localPosition);
     func_L23_0041A3B8((char *)object, localPosition);
     func_L23_0041C0E8((char *)object);
     if (!SP(0x40c))
@@ -647,9 +647,9 @@ state_default:
         (object[0x20] == 16 || object[0x20] == 12) && D_L23_001B1500 < SF(0x5bc)) {
         char *attachment = (char *)func_L23_00423698((int)PLAYER) + 0x10;
         height = func_002B0360(attachment) - D_L23_001B36A4[0];
-        distance = func_00282E48(attachment, (char *)D_L23_001B3760);
+        distance = fast_vec_dist(attachment, (char *)D_L23_001B3760);
         if (distance < D_L23_001B1500 * 0.6f && height < D_L23_001B14D0 - 2.0f) {
-            func_0032C700(attachment, 0, 15, 10, 15, 15, 15, 1, 2.0f, 20.0f, 0, 0, 0, 0);
+            SpawnExplosion(attachment, 0, 15, 10, 15, 15, 15, 1, 2.0f, 20.0f, 0, 0, 0, 0);
             func_L23_00423588((int)PLAYER, 1);
         }
     }

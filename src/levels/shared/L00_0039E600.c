@@ -24,10 +24,10 @@ void func_L00_0039E600(char *actor) {
     ownerState = *(char **)(owner + 0x68);
     func_00282C88((Quad *)(actor + 0x10));
     *(float *)(actor + 0x14) = -*(float *)(state + 4);
-    func_00283098(actor + 0x10, actor + 0x10, *(char **)state + 0xC0);
-    func_00282CC0(actor + 0x10, actor + 0x10, ownerState);
+    matrix_mul_vec3(actor + 0x10, actor + 0x10, *(char **)state + 0xC0);
+    FastVecAdd(actor + 0x10, actor + 0x10, ownerState);
     *(Quad *)(actor + 0xF0) = *(Quad *)(*(char **)state + 0xF0);
     if (*(float *)(state + 4) > D_L00_001AFFA4)
-        *(unsigned char *)(actor + 0x23) = func_00283CF0((1.0f - (*(float *)(state + 4) - D_L00_001AFFA4) * 10.0f) * 127.0f);
+        *(unsigned char *)(actor + 0x23) = FloatToInt((1.0f - (*(float *)(state + 4) - D_L00_001AFFA4) * 10.0f) * 127.0f);
     *(float *)(actor + 0x2C) = *(float *)(state + 0xC) * 0.1f + (*(float *)(state + 0xC) * *(float *)(state + 4)) / D_L00_001AFFA4;
 }

@@ -74,7 +74,7 @@ void func_L18_003170F8(void)
             *(unsigned short *)(object + 0x34) |= 0x800;
         }
         if (*(short *)(object + 0xAA) == 0xD54) {
-            func_002E64A0(object);
+            UpdateEquipmentPieces(object);
         }
         if (object && *(short *)(object + 0xAA) == 0xFA0) {
             state = *(unsigned char **)(object + 0x68);
@@ -98,10 +98,10 @@ void func_L18_003170F8(void)
         if (timer == spot->time) {
             qcopy(position, spot->position);
             if (spot->cameraRelative) {
-                func_00283098(position, position, D_L18_001B9680.matrix);
-                func_00282CC0(position, position, D_L18_001B9680.position);
+                matrix_mul_vec3(position, position, D_L18_001B9680.matrix);
+                FastVecAdd(position, position, D_L18_001B9680.position);
             }
-            func_0032C700(position, 0, 25, 20, 20, 20, 45, 1, spot->scale, 20.0f, 1, 1, 0, 0);
+            SpawnExplosion(position, 0, 25, 20, 20, 20, 45, 1, spot->scale, 20.0f, 1, 1, 0, 0);
             if (spot->shake > 0.0f) {
                 D_L18_001B9680.shakeTime = 55;
                 D_L18_001B9680.secondaryShakeTime = 70;

@@ -23,7 +23,7 @@ u8 *func_L16_0040DAE0(u8 *owner, SnivelakMatrix *matrix)
     s32 n;
     TI128 *dst;
     TI128 *src;
-    obj = func_0029EFD0(0xF4E);
+    obj = CreateMoby(0xF4E);
     if (obj) {
         scale = func_L07_003F90E8(0, 15, 0.125f, 0.3f);
         func_L00_00310748(obj, 0, scale, 0.0f, D_L16_001A8F20);
@@ -32,7 +32,7 @@ u8 *func_L16_0040DAE0(u8 *owner, SnivelakMatrix *matrix)
         func_002B37E8(obj, owner);
         pos = obj + 0x10;
         qcopy(pos, matrix->row);
-        func_0032C700(pos, 0, 0, 0, 0, 20, 45, 1, 2.0f, 20.0f, 1, 0, 0, 0);
+        SpawnExplosion(pos, 0, 0, 0, 0, 20, 45, 1, 2.0f, 20.0f, 1, 0, 0, 0);
         dst = (TI128 *)state;
         src = matrix->row;
         n = 3;

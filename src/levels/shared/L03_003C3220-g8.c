@@ -153,13 +153,13 @@ void func_L03_003C3220(u8 *object)
         vars->initial_height = mob->position[2];
         type = mob->type;
         if (type == 0x964) {
-            vars->child = func_0029EFD0(0x972);
+            vars->child = CreateMoby(0x972);
             if (vars->child) {
                 func_002B37E8(vars->child, object);
                 *(u16 *)(vars->child + 0x32) = 0x30;
             }
         } else {
-            vars->child = func_0029EFD0(0xD75);
+            vars->child = CreateMoby(0xD75);
             if (vars->child) {
                 func_002B37E8(vars->child, object);
                 *(u16 *)(vars->child + 0x7C) = D_L03_001AFF00;
@@ -182,8 +182,8 @@ void func_L03_003C3220(u8 *object)
         case 0x940:
             vars->collision_radius = 0.39f;
             mob->position[2] += 0.089f;
-            func_00282F20(&point, &mob->forward, -0.2f);
-            func_00282CC0(mob->position, &point, mob->position);
+            vec_scale_to_length(&point, &mob->forward, -0.2f);
+            FastVecAdd(mob->position, &point, mob->position);
             break;
         case 0xA59:
             vars->collision_radius = 0.42f;
@@ -222,7 +222,7 @@ void func_L03_003C3220(u8 *object)
             func_002A7470(object, 6, 0, 0);
         }
     }
-    if (mob->active && func_00282E48(mob->position, D_L03_001B9980) < 24.0f) {
+    if (mob->active && fast_vec_dist(mob->position, D_L03_001B9980) < 24.0f) {
         func_002A93B0(object);
         mob->event = 0x16;
     }
@@ -230,18 +230,18 @@ void func_L03_003C3220(u8 *object)
     if (func_002A9640(object, 1, 0) ||
         (mob->position[2] < vars->initial_height - 10.0f &&
          mob->position[2] - 10.0f < vars->floor_height)) {
-        if (func_00282C30(D_L03_001AFEF8 - D_L03_001B2548) > D_L03_001AFEFC) {
+        if (subtract_integer_with_clamp(D_L03_001AFEF8 - D_L03_001B2548) > D_L03_001AFEFC) {
             point.q = 0;
             point.f[2] = 0.5f;
             D_L03_001AFEF8 = D_L03_001B2548;
-            func_00282CC0(&point, &point, mob->position);
-            func_0032C700(mob->position,0,5,5,5,10,20,0,0.25f,20.0f,1,0,0,0);
+            FastVecAdd(&point, &point, mob->position);
+            SpawnExplosion(mob->position,0,5,5,5,10,20,0,0.25f,20.0f,1,0,0,0);
             if (mob->type == 0x964)
                 func_002B0A68((char *)object, 15, (float *)(state + 0x1B0), 3.0f, 6.0f, 3.0f, 6.0f, 255);
             func_002A7750(object, 4, 1);
             qzero(state + 0x1B0);
             vars->path_index = -1;
-            func_L03_003C5668(object, first.f, second.f);
+            ChooseVisibleGroupTarget(object, first.f, second.f);
             func_L02_002EF388(object, &first, &second, 0, 0);
         }
         mob->flags_A8 = 255;
@@ -280,7 +280,7 @@ void func_L03_003C3220(u8 *object)
             D_0018C958[97].flags = (D_0018C958[97].flags | (1U << D_001A79F0)) | 0x80000000U;
         }
     }
-    if (mob->state != 1 && func_00282E80(mob->position, D_00189E20.position) < 16.0f) {
+    if (mob->state != 1 && vec_distance_xy(mob->position, D_00189E20.position) < 16.0f) {
         D_L03_001B2750.near_player++;
         switch (mob->type) {
         case 0x940: D_L03_001B2750.near_940++; break;
@@ -298,7 +298,7 @@ void func_L03_003C3220(u8 *object)
     switch (D_00189E20.command) {
     case 1:
         if (mob->mode == 1) return;
-        distance = func_00282E80(mob->position, D_00189E20.position);
+        distance = vec_distance_xy(mob->position, D_00189E20.position);
         if (distance > D_L03_001AFEE4) {
             func_002A7750(object, 3, 1);
             if (mob->animation == 2) return;

@@ -47,7 +47,7 @@ void func_L00_002D1C40(int a0, int a1, float f12)
     {
 
         if (D_00189E20.action == 0) {
-            if (func_L00_002D1B70((unsigned char)p1[0x43], &a0) != 0 && a0 == 0)
+            if (FindSlotTableKey((unsigned char)p1[0x43], &a0) != 0 && a0 == 0)
                 flag = 0;
         }
         if (flag == 0)
@@ -55,7 +55,7 @@ void func_L00_002D1C40(int a0, int a1, float f12)
 
         s0 = 7;
         if (D_00189E20.state == 8) {
-            if (func_L00_002ADEA0(3) == 2)
+            if (hero_slot_item_id(3) == 2)
                 s0 = 0x13;
         }
     }

@@ -153,10 +153,10 @@ void func_L11_00420C88(unsigned char *object)
     }
     switch (BYTE(object, 0x95)) {
     case 10:
-        if (func_00282E80(((char *)object + 0x10), &D_00189E20.position) < 6.0f) {
+        if (vec_distance_xy(((char *)object + 0x10), &D_00189E20.position) < 6.0f) {
             limit = 1.5707965f;
             angle = func_00283248(REAL(D_00189E20.moby, 0x10) - REAL(object, 0x10), REAL(D_00189E20.moby, 0x14) - REAL(object, 0x14));
-            angle = func_00283BE0(angle, REAL(object, 0xf8));
+            angle = fast_subtract_rotations(angle, REAL(object, 0xf8));
             if (func_002B38B8(object) != 0) angle = -angle;
             if (angle > limit) angle = limit;
             else if (angle < -limit) angle = -limit;
@@ -299,7 +299,7 @@ void func_L11_00420C88(unsigned char *object)
             node = 0;
             nearest = 0;
             for (; node < WORD(D_L11_001FF580[WORD(state, 0x284)], 0); ++node) {
-                float d = func_00282E80(((char *)object + 0x10), D_L11_001FF580[WORD(state, 0x284)] + 0x10 + node * 0x10);
+                float d = vec_distance_xy(((char *)object + 0x10), D_L11_001FF580[WORD(state, 0x284)] + 0x10 + node * 0x10);
                 if (d < nearest_distance) {
                     nearest_distance = d;
                     nearest = node;
@@ -398,7 +398,7 @@ void func_L11_00420C88(unsigned char *object)
         flags = func_002B1C20(object, state + 0x60);
         if ((flags & 1) != 0) {
             --D_L11_001AED04;
-            func_002A6C58(object, 0, 3);
+            SetDeathBits(object, 0, 3);
             func_L01_003E9CF8(object, 0, 0);
             return;
         }
@@ -407,9 +407,9 @@ void func_L11_00420C88(unsigned char *object)
         if ((unsigned int)(UHALF(state, 0x264) - 1) < 2) {
             PLAY(object, 15, 0, 10);
             func_002A7750(object, 0x1c, 2);
-            if (func_00282E80(((char *)object + 0x10), &D_00189E20.position) < 2.5f) {
+            if (vec_distance_xy(((char *)object + 0x10), &D_00189E20.position) < 2.5f) {
                 angle = func_00283248(D_00189E20.position.v[0] - REAL(object, 0x10), D_00189E20.position.v[1] - REAL(object, 0x14));
-                if (func_00283C80(REAL(object, 0xf8), angle) < 0.6108653f) {
+                if (FastDiffRots(REAL(object, 0xf8), angle) < 0.6108653f) {
                     PLAY(object, 0x11, 9, 4);
                     func_002B60B0(object, 0.00388888898f, 0.1166666746f, 0.001163552981f, 0.1047197729f);
                     func_002A7750(object, 0x22, 2);
@@ -491,7 +491,7 @@ void func_L11_00420C88(unsigned char *object)
     }
     case 6:
         if (func_002B3890(object) != 0 && POINTER(state, 0x29c) == 0) {
-            POINTER(state, 0x29c) = func_0029EFD0(0x9ac);
+            POINTER(state, 0x29c) = CreateMoby(0x9ac);
             if (POINTER(state, 0x29c) != 0) {
                 BYTE(POINTER(state, 0x29c), 0x30) = BYTE(object, 0x30);
                 UHALF(POINTER(state, 0x29c), 0x32) = UHALF(object, 0x32);
@@ -503,7 +503,7 @@ void func_L11_00420C88(unsigned char *object)
                 WORD(state, 0x290) = 1;
                 REAL(object, 0xf0) = 0.0f;
                 REAL(object, 0xf4) = 0.0f;
-                func_002833F0(object + 0xc0, object + 0xf0);
+                euler_rotation_basis(object + 0xc0, object + 0xf0);
             } else {
                 func_0029F338(object);
                 return;
@@ -527,7 +527,7 @@ void func_L11_00420C88(unsigned char *object)
         } else { REAL(linked, 0x48) = 1.0f; REAL(object, 0x48) = 1.0f; }
         if (BYTE(object, 0x20) != 0x28) {
             func_002B50E0(object, ((char *)object + 0x10), func_00283248(D_00189E20.position.v[0] - REAL(object, 0x10), D_00189E20.position.v[1] - REAL(object, 0x14)));
-            distance = func_00282E80(((char *)object + 0x10), &D_00189E20.aim);
+            distance = vec_distance_xy(((char *)object + 0x10), &D_00189E20.aim);
             pitch = func_00283248(distance, D_00189E20.aim.v[2] - REAL(object, 0x18));
             if (pitch < -0.52359885f) pitch = -0.52359885f;
             else if (pitch > 0.52359885f) pitch = 0.52359885f;
@@ -537,7 +537,7 @@ void func_L11_00420C88(unsigned char *object)
         REAL(object, 0x10) = REAL(linked, 0x10);
         REAL(object, 0x14) = REAL(linked, 0x14);
         REAL(object, 0x18) = REAL(linked, 0x18) + 1.5f;
-        func_002833F0(linked + 0xc0, object + 0xf0);
+        euler_rotation_basis(linked + 0xc0, object + 0xf0);
         if ((unsigned int)(UHALF(state, 0x264) - 1) > 1 && BYTE(object, 0x20) != 0x26 && BYTE(object, 0x20) != 0x28) {
             PLAY(object, 0x1f, 0, 10);
             func_002A7470(linked, 0, 0, 10);
@@ -582,8 +582,8 @@ void func_L11_00420C88(unsigned char *object)
             side.v[1] = func_00283198(REAL(object, 0xf8) + 1.5707965f) * 0.05f;
             side.v[2] = 0.0f;
             point.word = QUAD(object, 0x10);
-            func_00282CC0(&point, ((char *)object + 0x10), &side);
-            func_00282CC0(&point, ((char *)object + 0x10), &offset);
+            FastVecAdd(&point, ((char *)object + 0x10), &side);
+            FastVecAdd(&point, ((char *)object + 0x10), &offset);
             func_002A7EA0(object, ((char *)object + 0x10), &point, 0.5f, 0.55f, 0.5f, 0.52359885f, 0);
         }
         break;
@@ -595,7 +595,7 @@ void func_L11_00420C88(unsigned char *object)
         if (WORD(state, 0x540) == 3 && BYTE(object, 0x95) != 10) {
             limit = 1.5707965f;
             angle = func_00283248(REAL(target, 0x10) - REAL(object, 0x10), REAL(target, 0x14) - REAL(object, 0x14));
-            angle = func_00283BE0(angle, REAL(object, 0xf8));
+            angle = fast_subtract_rotations(angle, REAL(object, 0xf8));
             if (func_002B38B8(object) != 0) angle = -angle;
             if (angle > limit) angle = limit;
             else if (angle < -limit) angle = -limit;
@@ -657,7 +657,7 @@ void func_L11_00420C88(unsigned char *object)
         break;
     case 9:
         func_L01_00321178((char *)object, D_L11_001FF580[WORD(state, 0x574)] + 0x10);
-        if (func_00282E80(((char *)object + 0x10), D_L11_001FF580[WORD(state, 0x574)] + 0x10) < 0.5f) {
+        if (vec_distance_xy(((char *)object + 0x10), D_L11_001FF580[WORD(state, 0x574)] + 0x10) < 0.5f) {
             PLAY(object, 0x25, 0, 10);
             func_002A7750(object, 10, -1);
         }
@@ -692,7 +692,7 @@ void func_L11_00420C88(unsigned char *object)
         func_002B50E0(object, ((char *)object + 0x10),
                       func_00283248(REAL(POINTER(state, 0x55c), 0x10) - REAL(object, 0x10), REAL(POINTER(state, 0x55c), 0x14) - REAL(object, 0x14)));
         angle = func_00283248(REAL(POINTER(state, 0x55c), 0x10) - REAL(object, 0x10), REAL(POINTER(state, 0x55c), 0x14) - REAL(object, 0x14));
-        if (func_00283C80(REAL(object, 0xf8), angle) < 0.087266475f) func_002A7750(object, 5, -1);
+        if (FastDiffRots(REAL(object, 0xf8), angle) < 0.087266475f) func_002A7750(object, 5, -1);
         break;
     case 14:
         func_002B60B0(object, 0.001527777873f, 0.04583333433f, 0.003781547071f, 0.2967060208f);
@@ -708,8 +708,8 @@ void func_L11_00420C88(unsigned char *object)
         func_002B60B0(object, 0.001527777873f, 0.04583333433f, 0.007563094143f, 0.5934120417f);
         if (func_002B6120((char *)object, D_L11_001FF580[WORD(state, 0x54c)]) != 0) {
             path = D_L11_001FF580[WORD(state, 0x54c)];
-            distance = func_00282E80(((char *)object + 0x10), path + 0x10);
-            other_angle = func_00282E80(((char *)object + 0x10), path + WORD(path, 0) * 0x10);
+            distance = vec_distance_xy(((char *)object + 0x10), path + 0x10);
+            other_angle = vec_distance_xy(((char *)object + 0x10), path + WORD(path, 0) * 0x10);
             if (other_angle < distance) func_002B6228(object, D_L11_001FF580[WORD(state, 0x54c)], 0, WORD(path, 0) - 1);
             else func_002B6228(object, D_L11_001FF580[WORD(state, 0x54c)], WORD(path, 0) - 1, 0);
             if (func_002A77E0(5) == 1) {
@@ -719,11 +719,11 @@ void func_L11_00420C88(unsigned char *object)
         }
         limit = 1.5707965f;
         angle = func_00283248(D_00189E20.position.v[0] - REAL(object, 0x10), D_00189E20.position.v[1] - REAL(object, 0x14));
-        angle = func_00283BE0(angle, REAL(object, 0xf8));
-        if (func_002B38B8(object) != 0) angle = func_00283B98(angle, 3.141593f);
+        angle = fast_subtract_rotations(angle, REAL(object, 0xf8));
+        if (func_002B38B8(object) != 0) angle = FastAddRotations(angle, 3.141593f);
         if (angle > limit) angle = limit;
         else if (angle < -limit) angle = -limit;
-        turned = func_00283B98(angle * turn_scale, REAL(state, 0x308));
+        turned = FastAddRotations(angle * turn_scale, REAL(state, 0x308));
         REAL(state, 0x308) = turned;
         if (turned > limit) REAL(state, 0x308) = limit;
         else if (turned < -limit) REAL(state, 0x308) = -limit;
@@ -739,8 +739,8 @@ void func_L11_00420C88(unsigned char *object)
     case 17:
         if ((BYTE(object, 0x60) & 2) != 0) {
             path = D_L11_001FF580[WORD(state, 0x54c)];
-            distance = func_00282E80(((char *)object + 0x10), path + 0x10);
-            other_angle = func_00282E80(((char *)object + 0x10), path + WORD(path, 0) * 0x10);
+            distance = vec_distance_xy(((char *)object + 0x10), path + 0x10);
+            other_angle = vec_distance_xy(((char *)object + 0x10), path + WORD(path, 0) * 0x10);
             if (other_angle < distance) func_002B6228(object, D_L11_001FF580[WORD(state, 0x54c)], 0, WORD(path, 0) - 1);
             else func_002B6228(object, D_L11_001FF580[WORD(state, 0x54c)], WORD(path, 0) - 1, 0);
             func_002A7750(object, 14, -1);
@@ -763,7 +763,7 @@ void func_L11_00420C88(unsigned char *object)
                      0.001f, 0.01f, 0.1f);
         func_002B60B0(object, 0.000555555569f, 0.01666666754f, 0.001163552981f, 0.1047197729f);
         func_L01_00321178((char *)object, state + 0x110);
-        if (func_00282E80(((char *)object + 0x10), state + 0x110) < 2.0f) {
+        if (vec_distance_xy(((char *)object + 0x10), state + 0x110) < 2.0f) {
             WORD(state, 0x178) &= ~0x10;
             func_002A7750(object, 0x15, -1);
             PLAY(object, 0x18, 0, 20);
@@ -780,8 +780,8 @@ void func_L11_00420C88(unsigned char *object)
     case 23:
         if ((BYTE(object, 0x60) & 2) != 0) {
             path = D_L11_001FF580[WORD(state, 0x56c)];
-            distance = func_00282E80(((char *)object + 0x10), path + 0x10);
-            other_angle = func_00282E80(((char *)object + 0x10), path + WORD(path, 0) * 0x10);
+            distance = vec_distance_xy(((char *)object + 0x10), path + 0x10);
+            other_angle = vec_distance_xy(((char *)object + 0x10), path + WORD(path, 0) * 0x10);
             if (other_angle < distance) func_002B6228(object, D_L11_001FF580[WORD(state, 0x56c)], 0, WORD(path, 0) - 1);
             else func_002B6228(object, D_L11_001FF580[WORD(state, 0x56c)], WORD(path, 0) - 1, 0);
             func_002A7750(object, 22, -1);
@@ -791,23 +791,23 @@ void func_L11_00420C88(unsigned char *object)
     case 28: {
         char *other_state;
 
-        if (func_00282E80(((char *)object + 0x10), &D_00189E20.position) < 3.5f && REAL(state, 0x20) > 1.0f) {
+        if (vec_distance_xy(((char *)object + 0x10), &D_00189E20.position) < 3.5f && REAL(state, 0x20) > 1.0f) {
             WORD(state, 0x290) = 1;
             func_002B60B0(object, 0.000555555569f, 0.01666666754f, 0.001163552981f, 0.1047197729f);
             func_002A7750(object, 0x1b, -1);
             PLAY(object, 0x17, 0, 10);
             break;
         }
-        if (func_00282E80(((char *)object + 0x10), &D_00189E20.position) < 2.5f) {
+        if (vec_distance_xy(((char *)object + 0x10), &D_00189E20.position) < 2.5f) {
             angle = func_00283248(D_00189E20.position.v[0] - REAL(object, 0x10), D_00189E20.position.v[1] - REAL(object, 0x14));
-            if (func_00283C80(REAL(object, 0xf8), angle) < 0.3490659f) {
+            if (FastDiffRots(REAL(object, 0xf8), angle) < 0.3490659f) {
                 PLAY(object, 0x11, 0, 10);
                 func_002B60B0(object, 0.00388888898f, 0.1166666746f, 0.001163552981f, 0.1047197729f);
                 func_002A7750(object, 0x22, 2);
                 break;
             }
         }
-        if (func_00282E80(((char *)object + 0x10), &D_00189E20.position) < 2.5f) {
+        if (vec_distance_xy(((char *)object + 0x10), &D_00189E20.position) < 2.5f) {
             func_002B50E0(object, ((char *)object + 0x10), func_00283248(D_00189E20.position.v[0] - REAL(object, 0x10), D_00189E20.position.v[1] - REAL(object, 0x14)));
             break;
         }
@@ -826,8 +826,8 @@ void func_L11_00420C88(unsigned char *object)
                 partner = (char *)(D_L11_001B359C + (id & 0x7fff) * 0x100);
                 other_state = POINTER(partner, 0x68);
                 if (WORD(other_state, 0x294) == 0) {
-                    distance = func_00282E80(partner + 0x10, &D_00189E20.position);
-                    other_angle = func_00282E80(((char *)object + 0x10), &D_00189E20.position);
+                    distance = vec_distance_xy(partner + 0x10, &D_00189E20.position);
+                    other_angle = vec_distance_xy(((char *)object + 0x10), &D_00189E20.position);
                     if (distance < other_angle && REAL(other_state, 0x20) > 0.0f) {
                         WORD(other_state, 0x294) = 1;
                         WORD(state, 0x294) = 0;
@@ -849,11 +849,11 @@ void func_L11_00420C88(unsigned char *object)
         other_state = POINTER(linked, 0x68);
         if (BYTE(linked, 0x20) != 5) {
             func_002AA458(linked + 0xf0, object + 0xf0, state + 0x550, 0.001163552981f, 0.002327105962f, 0.1047197729f);
-            func_002833F0(linked + 0xc0, linked + 0xf0);
+            euler_rotation_basis(linked + 0xc0, linked + 0xf0);
             REAL(linked, 0x18) += ((REAL(other_state, 0x5c) - 1.2f) - REAL(linked, 0x18)) * 0.11f;
         }
         func_L01_00321178((char *)object, linked + 0x10);
-        if (func_00282E80(((char *)object + 0x10), linked + 0x10) < 1.5f && BYTE(linked, 0x20) != 5) {
+        if (vec_distance_xy(((char *)object + 0x10), linked + 0x10) < 1.5f && BYTE(linked, 0x20) != 5) {
             BYTE(linked, 0x20) = 6;
             REAL(object, 0x10) = REAL(linked, 0x10);
             REAL(object, 0x14) = REAL(linked, 0x14);
@@ -871,8 +871,8 @@ void func_L11_00420C88(unsigned char *object)
 
         linked = (char *)(D_L11_001B359C + WORD(state, 0x580) * 0x100);
         func_L01_00321178((char *)object, linked + 0x10);
-        if (func_00282E80(((char *)object + 0x10), linked + 0x10) < 0.25f) {
-            if (func_00282E80(((char *)object + 0x10), &D_00189E20.position) < 8.0f) {
+        if (vec_distance_xy(((char *)object + 0x10), linked + 0x10) < 0.25f) {
+            if (vec_distance_xy(((char *)object + 0x10), &D_00189E20.position) < 8.0f) {
                 WORD(state, 0x290) = 1;
                 PLAY(object, 0x15, 0, 10);
                 func_002A7750(object, 0x19, -1);
@@ -902,7 +902,7 @@ void func_L11_00420C88(unsigned char *object)
             PLAY(linked, 1, 0, 5);
         }
         angle = func_00283248(D_00189E20.position.v[0] - REAL(object, 0x10), D_00189E20.position.v[1] - REAL(object, 0x14));
-        if (func_00283C80(REAL(object, 0xf8), angle) < 0.26179942f && BYTE(linked, 0x43) != 1) {
+        if (FastDiffRots(REAL(object, 0xf8), angle) < 0.26179942f && BYTE(linked, 0x43) != 1) {
             func_002A7470(linked, 1, 0, 5);
             PLAY(object, 0x20, 0, 5);
             break;
@@ -910,14 +910,14 @@ void func_L11_00420C88(unsigned char *object)
         if (BYTE(linked, 0x42) != 1) break;
         if (func_002AEB60(linked, 6.0f) != 0 || func_002AEB60(linked, 12.0f) != 0 || func_002AEB60(linked, 0.0f) != 0) {
             func_0029FCC0(linked, 1, (char *)&offset);
-            func_00282CF0(&side, &D_00189E20.aim, &offset);
-            func_00282F20(&side, &side, 0.5f);
+            FastVecSub(&side, &D_00189E20.aim, &offset);
+            vec_scale_to_length(&side, &side, 0.5f);
             func_L11_00450328(linked, &side, &offset, 0, (float)BYTE(state, 0x36));
             break;
         } else if (func_002AEB60(linked, 3.0f) != 0 || func_002AEB60(linked, 9.0f) != 0 || func_002AEB60(linked, 15.0f) != 0) {
             func_0029FCC0(linked, 0, (char *)&offset);
-            func_00282CF0(&side, &D_00189E20.aim, &offset);
-            func_00282F20(&side, &side, 0.5f);
+            FastVecSub(&side, &D_00189E20.aim, &offset);
+            vec_scale_to_length(&side, &side, 0.5f);
             func_L11_00450328(linked, &side, &offset, 0, (float)BYTE(state, 0x36));
             break;
         }
@@ -929,14 +929,14 @@ void func_L11_00420C88(unsigned char *object)
         linked = (char *)(D_L11_001B359C + WORD(state, 0x548) * 0x100);
         if (func_002AEB60(linked, 6.0f) != 0 || func_002AEB60(linked, 12.0f) != 0 || func_002AEB60(linked, 0.0f) != 0) {
             func_0029FCC0(linked, 1, (char *)&offset);
-            func_00282CF0(&side, &D_00189E20.aim, &offset);
-            func_00282F20(&side, &side, 0.5f);
+            FastVecSub(&side, &D_00189E20.aim, &offset);
+            vec_scale_to_length(&side, &side, 0.5f);
             func_L11_00450328(linked, &side, &offset, 0, (float)BYTE(state, 0x36));
             break;
         } else if (func_002AEB60(linked, 3.0f) != 0 || func_002AEB60(linked, 9.0f) != 0 || func_002AEB60(linked, 15.0f) != 0) {
             func_0029FCC0(linked, 0, (char *)&offset);
-            func_00282CF0(&side, &D_00189E20.aim, &offset);
-            func_00282F20(&side, &side, 0.5f);
+            FastVecSub(&side, &D_00189E20.aim, &offset);
+            vec_scale_to_length(&side, &side, 0.5f);
             func_L11_00450328(linked, &side, &offset, 0, (float)BYTE(state, 0x36));
             break;
         }
@@ -953,10 +953,10 @@ void func_L11_00420C88(unsigned char *object)
         REAL(object, 0x10) = REAL(mount, 0x10);
         REAL(object, 0x14) = REAL(mount, 0x14);
         REAL(object, 0x18) = REAL(mount, 0x18) + 1.5f;
-        func_002833F0(mount + 0xc0, object + 0xf0);
+        euler_rotation_basis(mount + 0xc0, object + 0xf0);
         next = D_L11_001FF580[WORD(state, 0x564)] + WORD(state, 0x568) * 0x10;
         angle = func_00283248(REAL(next, 0x10) - REAL(object, 0x10), REAL(next, 0x14) - REAL(object, 0x14));
-        if (func_00283C80(REAL(object, 0xf8), angle) <= 0.087266475f) {
+        if (FastDiffRots(REAL(object, 0xf8), angle) <= 0.087266475f) {
             ++WORD(state, 0x568);
             if (WORD(state, 0x568) > 1) WORD(state, 0x568) = 0;
             if (BYTE(object, 0x42) == 0x20 && UHALF(object, 0x96) > 120) {
@@ -965,7 +965,7 @@ void func_L11_00420C88(unsigned char *object)
             }
         }
         if (WORD(state, 0x584) != 0) {
-            func_0026FEB8(D_L11_001B0FC8);
+            STUB_printf(D_L11_001B0FC8);
             PLAY(object, 0x20, 0, 5);
             func_002A7470(mount, 1, 0, 5);
             WORD(state, 0x584) = 0;
@@ -975,12 +975,12 @@ void func_L11_00420C88(unsigned char *object)
         if (func_002AEB60(mount, 6.0f) != 0 || func_002AEB60(mount, 12.0f) != 0 || func_002AEB60(mount, 0.0f) != 0) {
             func_0029FCC0(mount, 1, (char *)&offset);
             func_002AF000(side.v, 0.5f, REAL(object, 0xf8),
-                          func_00283248(func_00282E80(&offset, &D_00189E20.aim), D_00189E20.aim.v[2] - offset.v[2]));
+                          func_00283248(vec_distance_xy(&offset, &D_00189E20.aim), D_00189E20.aim.v[2] - offset.v[2]));
             func_L11_00450328(mount, &side, &offset, 0, (float)BYTE(state, 0x36));
         } else if (func_002AEB60(mount, 3.0f) != 0 || func_002AEB60(mount, 9.0f) != 0 || func_002AEB60(mount, 15.0f) != 0) {
             func_0029FCC0(mount, 0, (char *)&offset);
             func_002AF000(side.v, 0.5f, REAL(object, 0xf8),
-                          func_00283248(func_00282E80(&offset, &D_00189E20.aim), D_00189E20.aim.v[2] - offset.v[2]));
+                          func_00283248(vec_distance_xy(&offset, &D_00189E20.aim), D_00189E20.aim.v[2] - offset.v[2]));
             func_L11_00450328(mount, &side, &offset, 0, (float)BYTE(state, 0x36));
         }
         break;
@@ -989,7 +989,7 @@ void func_L11_00420C88(unsigned char *object)
         WORD(state, 0x290) = 0;
         func_002B50E0(object, ((char *)object + 0x10), func_00283248(D_00189E20.position.v[0] - REAL(object, 0x10), D_00189E20.position.v[1] - REAL(object, 0x14)));
         if ((BYTE(object, 0x60) & 2) == 0 && WORD(state, 0x578) == 0 && BYTE(object, 0x42) != 15) break;
-        if (func_00282E80(((char *)object + 0x10), &D_00189E20.position) < 8.0f) {
+        if (vec_distance_xy(((char *)object + 0x10), &D_00189E20.position) < 8.0f) {
             WORD(state, 0x290) = 1;
             PLAY(object, 0x15, 0, 10);
             func_002A7750(object, 0x19, -1);
@@ -1005,18 +1005,18 @@ void func_L11_00420C88(unsigned char *object)
         break;
     case 31:
         func_L01_00321178((char *)object, POINTER(state, 0x274) + 0x10);
-        if (func_00282E80(((char *)object + 0x10), POINTER(state, 0x274) + 0x10) < 2.1f) {
+        if (vec_distance_xy(((char *)object + 0x10), POINTER(state, 0x274) + 0x10) < 2.1f) {
             PLAY(object, 0, 0, 20);
             func_002A7750(object, 0x21, -1);
         }
         break;
     case 33:
-        func_002A7CA0((struct family_27f9_object *)object, (float *)(state + 0x27c), REAL(POINTER(state, 0x274), 0xf8),
+        MobySpringTurn((struct family_27f9_object *)object, (float *)(state + 0x27c), REAL(POINTER(state, 0x274), 0xf8),
                      0.003f, 0.03f, 0.1047197729f);
-        func_00282CF0(&offset, POINTER(state, 0x274) + 0x10, ((char *)object + 0x10));
-        func_00282F20(&offset, &offset, 0.1000000089f);
-        func_00282CC0(((char *)object + 0x10), ((char *)object + 0x10), &offset);
-        if (func_00282E80(((char *)object + 0x10), POINTER(state, 0x274) + 0x10) < 0.05f) {
+        FastVecSub(&offset, POINTER(state, 0x274) + 0x10, ((char *)object + 0x10));
+        vec_scale_to_length(&offset, &offset, 0.1000000089f);
+        FastVecAdd(((char *)object + 0x10), ((char *)object + 0x10), &offset);
+        if (vec_distance_xy(((char *)object + 0x10), POINTER(state, 0x274) + 0x10) < 0.05f) {
             func_002A7750(object, 1, 5);
             {
                 char *dock = POINTER(state, 0x274);
@@ -1032,7 +1032,7 @@ void func_L11_00420C88(unsigned char *object)
                 POINTER(dock_state, 0x27c) = (char *)object;
                 WORD(dock_state, 0x2c8) = 0;
             }
-            POINTER(state, 0x280) = func_0029EFD0(0x911);
+            POINTER(state, 0x280) = CreateMoby(0x911);
             if (POINTER(state, 0x280) != 0) {
                 BYTE(POINTER(state, 0x280), 0x30) = BYTE(object, 0x30);
                 BYTE(POINTER(state, 0x280), 0x31) = 0;
@@ -1049,11 +1049,11 @@ void func_L11_00420C88(unsigned char *object)
         break;
     case 25:
         func_002A7E08((struct family_27f9_object *)object, (float *)D_00189E20.moby, (float *)(state + 0x27c), 0.001f, 0.01f, 0.1f);
-        if (func_00282E80(((char *)object + 0x10), &D_00189E20.position) > 12.0f) {
+        if (vec_distance_xy(((char *)object + 0x10), &D_00189E20.position) > 12.0f) {
             PLAY(object, 15, 0, 10);
             func_002A7750(object, 0x1a, -1);
         }
-        if (func_00282E80(((char *)object + 0x10), &D_00189E20.position) < 2.5f) {
+        if (vec_distance_xy(((char *)object + 0x10), &D_00189E20.position) < 2.5f) {
             PLAY(object, 0x11, 0, 10);
             func_002A7750(object, 0x22, -1);
         }
@@ -1072,26 +1072,26 @@ void func_L11_00420C88(unsigned char *object)
         } else {
             func_002B4FF0((char *)object, D_00189E20.position.v, REAL(state, 0x298));
         }
-        if (func_00282E80(((char *)object + 0x10), &D_00189E20.position) < 8.0f) {
+        if (vec_distance_xy(((char *)object + 0x10), &D_00189E20.position) < 8.0f) {
             PLAY(object, 0x15, 0, 10);
             func_002A7750(object, 0x19, -1);
         }
         break;
     case 27:
-        if (func_00282E80(((char *)object + 0x10), &D_00189E20.position) < 2.5f) {
+        if (vec_distance_xy(((char *)object + 0x10), &D_00189E20.position) < 2.5f) {
             angle = func_00283248(D_00189E20.position.v[0] - REAL(object, 0x10), D_00189E20.position.v[1] - REAL(object, 0x14));
-            if (func_00283C80(REAL(object, 0xf8), angle) < 0.3490659f) {
+            if (FastDiffRots(REAL(object, 0xf8), angle) < 0.3490659f) {
                 PLAY(object, 0x11, 0, 6);
                 func_002B60B0(object, 0.00388888898f, 0.1166666746f, 0.001163552981f, 0.1047197729f);
                 func_002A7750(object, 0x22, 2);
                 break;
             }
         }
-        if (func_00282E80(((char *)object + 0x10), &D_00189E20.position) < 2.5f) {
+        if (vec_distance_xy(((char *)object + 0x10), &D_00189E20.position) < 2.5f) {
             func_002B50E0(object, ((char *)object + 0x10), func_00283248(D_00189E20.position.v[0] - REAL(object, 0x10), D_00189E20.position.v[1] - REAL(object, 0x14)));
             break;
         }
-        if (func_00282E80(((char *)object + 0x10), &D_00189E20.position) > 5.0f) {
+        if (vec_distance_xy(((char *)object + 0x10), &D_00189E20.position) > 5.0f) {
             func_002B60B0(object, 0.00388888898f, 0.1166666746f, 0.001163552981f, 0.1047197729f);
             PLAY(object, 15, 0, 10);
             func_002A7750(object, 0x1c, -1);
@@ -1101,7 +1101,7 @@ void func_L11_00420C88(unsigned char *object)
         }
         break;
     case 30:
-        if (func_00282E80(((char *)object + 0x10), &D_00189E20.position) < 2.5f) {
+        if (vec_distance_xy(((char *)object + 0x10), &D_00189E20.position) < 2.5f) {
             PLAY(object, 0x11, 0, 2);
             func_002A7750(object, 0x22, -1);
             WORD(state, 0x284) = -1;
@@ -1136,12 +1136,12 @@ void func_L11_00420C88(unsigned char *object)
             side.v[0] = func_00283180(REAL(object, 0xf8)) * 0.5f;
             side.v[1] = func_00283198(REAL(object, 0xf8)) * 0.5f;
             side.v[2] = 0.0f;
-            func_00282CC0(&offset, &offset, &side);
+            FastVecAdd(&offset, &offset, &side);
             func_002A8C28(object, &offset, 1, 0.4f, REAL(state, 0x28c), 1.0f, 0, 1, 0);
             side.v[0] = func_00283180(REAL(object, 0xf8));
             side.v[1] = func_00283198(REAL(object, 0xf8));
             side.v[2] = 0.0f;
-            func_00282CC0(&offset, &offset, &side);
+            FastVecAdd(&offset, &offset, &side);
             func_002A8C28(object, &offset, 1, 0.4f, REAL(state, 0x28c), 1.0f, 0, 1, 0);
         } else REAL(object, 0x48) = 1.0f;
         if ((BYTE(object, 0x60) & 2) == 0) break;
@@ -1162,7 +1162,7 @@ void func_L11_00420C88(unsigned char *object)
     }
     case 35:
         if ((BYTE(object, 0x60) & 2) != 0) {
-            if (func_00282E80(((char *)object + 0x10), &D_00189E20.position) < 2.5f) {
+            if (vec_distance_xy(((char *)object + 0x10), &D_00189E20.position) < 2.5f) {
                 PLAY(object, 15, 0, 10);
                 func_002A7750(object, 0x1c, -1);
             } else {

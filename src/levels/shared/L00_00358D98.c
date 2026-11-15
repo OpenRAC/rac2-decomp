@@ -131,7 +131,7 @@ int func_L00_0035F5A0(int index, int a1, int a2)
     index = index + D_001B8F0C;
     if (index >= D_001B19E8)
         return -1;
-    r = func_002E5AD0((char *)(D_001B19EC + index * 32), a1, a2, 0, 1024);
+    r = AllocateSoundVoice((char *)(D_001B19EC + index * 32), a1, a2, 0, 1024);
     if (r >= 0) {
         p = D_00188660_3 + r * 112;
         *(int *)(p + 136) = a2;
@@ -153,7 +153,7 @@ int func_L00_0035F640(int index, int a1, int a2, int a3)
     if (index == 0xFFFFFFFFU) {
         return -1;
     } else {
-        r = func_002E5AD0((char *)(D_001B19EC + index * 32), a1, 0, a2 + 0x40, a3);
+        r = AllocateSoundVoice((char *)(D_001B19EC + index * 32), a1, 0, a2 + 0x40, a3);
         if (r >= 0) {
             p = D_00188660_3 + r * 112;
             *(int *)(p + 140) = a2;
@@ -179,7 +179,7 @@ int func_L00_0035F6D8(int a0, int a1, int a2, int a3, int a4, int a5)
     index = sum + D_001B8F0C;
     if (index >= D_001B19E8)
         return -1;
-    r = func_002E5AD0((char *)(D_001B19EC + index * 32), a3, a4, 0, a5);
+    r = AllocateSoundVoice((char *)(D_001B19EC + index * 32), a3, a4, 0, a5);
     if (r >= 0) {
         p = D_00188660_3 + r * 112;
         *(int *)(p + 136) = a4;
@@ -280,35 +280,35 @@ void func_L00_003603C0(unsigned char *object) {
     char *spawn;
     unsigned int shade;
     int available;
-    if (!D_L00_001A8F00) func_002E64A0(object);
+    if (!D_L00_001A8F00) UpdateEquipmentPieces(object);
     if ((unsigned char)object[0x31]) {
         private[0xE] = (unsigned char)private[0xE] + 2;
         key = D_L00_001A8F80[(D_001A7AF0 >> 4) & 1];
         for (index = 0; D_L00_00220DA0[index]; index++) {
             slot = D_L00_00220DA0 + index;
             if (*(short *)(D_L00_00220DA0[index] + 0xAA) == key) {
-                shade = (int)(func_00283180(func_00283CE0((unsigned char)private[0xE] - 128) * 0.024543693f) * 50.0f) + 140;
+                shade = (int)(func_00283180(IntToFloat((unsigned char)private[0xE] - 128) * 0.024543693f) * 50.0f) + 140;
                 *(unsigned int *)(*slot + 0x78) = shade | (shade << 8) | (shade << 16);
                 *(unsigned short *)(*slot + 0x34) |= 0x10;
                 break;
             }
         }
-        ref_L00_003603C0_00(func_002ECB70, object);
-        if (func_00282E80(object + 0x10, &D_L00_001B8DC0) < 32.0f)
+        ref_L00_003603C0_00(render_environment_mapped_object, object);
+        if (vec_distance_xy(object + 0x10, &D_L00_001B8DC0) < 32.0f)
             func_L00_002E6CF0(func_002E6B78, object);
     }
     if (*(short *)(private + 0xC) != 0) {
-        if (func_00282E48(object + 0x10, &D_00189EA0) > 6.1f && !HERO_RIDING_D54())
+        if (fast_vec_dist(object + 0x10, &D_00189EA0) > 6.1f && !HERO_RIDING_D54())
             *(short *)(private + 0xC) = 0;
     } else {
-        if (func_00282E80(object + 0x10, &D_00189EA0) < 8.0f || HERO_RIDING_D54()) {
-            if (func_00282E48(object + 0x10, &D_00189EA0) < 6.0f || HERO_RIDING_D54())
+        if (vec_distance_xy(object + 0x10, &D_00189EA0) < 8.0f || HERO_RIDING_D54()) {
+            if (fast_vec_dist(object + 0x10, &D_00189EA0) < 6.0f || HERO_RIDING_D54())
                 *(short *)(private + 0xC) = 1;
         }
     }
     if (*(unsigned short *)(object + 0x34) & 1) *(short *)(private + 0xC) = 0;
     if (*(short *)(private + 0xC)) {
-        available = func_002B0C28(2, 0x2798, 1) != 0;
+        available = TryClaimNotice(2, 0x2798, 1) != 0;
         if ((D_00138324 & 0x10) && available) {
             offset.q = 0;
             angles.q = 0;
@@ -317,10 +317,10 @@ void func_L00_003603C0(unsigned char *object) {
             angles.f[0] = -0.021118486f;
             angles.f[1] = 0.0588176f;
             angles.f[2] = 1.2252212f;
-            func_00283098(&position, &offset, object + 0xC0);
-            func_00282CC0(&position, &position, object + 0x10);
+            matrix_mul_vec3(&position, &offset, object + 0xC0);
+            FastVecAdd(&position, &position, object + 0x10);
             position.f[2] = func_002A89A8(&position, 0, 0.5f);
-            angles.f[2] = func_00283B98(angles.f[2], *(float *)(object + 0xF8));
+            angles.f[2] = FastAddRotations(angles.f[2], *(float *)(object + 0xF8));
             spawn = D_00152C00 + 0x70;
             qcopy(spawn, &position);
             qcopy(spawn + 0x10, &angles);
@@ -449,7 +449,7 @@ void func_L00_0036FA68(void)
 {
     L00_0036FA68_Object *object;
 
-    func_00284E18(0, 0, 0);
+    SetBackgroundColor(0, 0, 0);
     if (ref_L00_001A8F00_00 == 0 && (D_001A7424 & 1)) {
         if (func_002B49E0(4, 1, 1, 0, 0) == 0)
             return;
@@ -457,7 +457,7 @@ void func_L00_0036FA68(void)
     if (ref_L00_0036FA68_00() != 0)
         return;
     func_002F5220();
-    func_002E4AC8();
+    UpdateSoundVoices();
     func_002B9390();
     func_L00_00310048();
     object = ref_L00_001AC0C0_00;
@@ -484,16 +484,16 @@ void func_L00_00374B98(void)
 {
     switch (D_0022F810) {
     case 0:
-        func_002F93B0();
+        UpdateShopMenuInput();
         break;
     case 1:
         func_L00_00374B78();
         break;
     case 2:
-        func_002F93B0();
+        UpdateShopMenuInput();
         break;
     case 3:
-        func_002F93B0();
+        UpdateShopMenuInput();
         break;
     }
 }
@@ -520,16 +520,16 @@ void func_L00_003778F0(void) {
     int index = *(int *)(model + 0x80);
     colors = D_L00_001AD768;
     D_L00_001B1BB8[1] = 0;
-    func_0028EA58(func_0028E588(0xEAA8, 0), 16, (int)(D_L00_001B25E0 * 51.0f + 0.5f),
+    func_0028EA58(GetIconFrame(0xEAA8, 0), 16, (int)(D_L00_001B25E0 * 51.0f + 0.5f),
                   192, (int)(D_L00_001B25E0 * 96.0f + 0.5f), colors.word);
-    func_0028EA58(func_0028E588(0xEAA8, 0), 400, (int)(D_L00_001B25E0 * 51.0f + 0.5f),
+    func_0028EA58(GetIconFrame(0xEAA8, 0), 400, (int)(D_L00_001B25E0 * 51.0f + 0.5f),
                   -192, (int)(D_L00_001B25E0 * 96.0f + 0.5f), colors.word);
-    func_0028EA58(func_0028E588(0xEAA8, 0), 16, (int)(D_L00_001B25E0 * 243.0f + 0.5f),
+    func_0028EA58(GetIconFrame(0xEAA8, 0), 16, (int)(D_L00_001B25E0 * 243.0f + 0.5f),
                   192, -(int)(D_L00_001B25E0 * 96.0f + 0.5f), colors.word);
-    func_0028EA58(func_0028E588(0xEAA8, 0), 400, (int)(D_L00_001B25E0 * 243.0f + 0.5f),
+    func_0028EA58(GetIconFrame(0xEAA8, 0), 400, (int)(D_L00_001B25E0 * 243.0f + 0.5f),
                   -192, -(int)(D_L00_001B25E0 * 96.0f + 0.5f), colors.word);
     func_0027FA10(270, (int)(D_L00_001B25E0 * 218.0f + 0.5f), 0x80F0F0F0ULL,
-                  (unsigned char *)func_00288FB8(0x318C), -1);
+                  (unsigned char *)GetLocalizedString(0x318C), -1);
     func_002F9BC0(text, D_L00_0022F7C0.items[index].price);
     func_0027F5B8(270, (int)(D_L00_001B25E0 * 218.0f + 0.5f), 0x80F0F0F0ULL, (unsigned char *)text, -1);
     func_0027FB40(D_001A7340 >> 1, (int)(D_L00_001B25E0 * 277.0f + 0.5f), 0x80F0F0F0ULL,
@@ -540,7 +540,7 @@ void func_L00_003778F0(void) {
     colors.word[0] = 0x60F0F0B0;
     func_002F9BC0(text, D_001A79FC);
     func_0027F980(444, 17, 0x80FFFFFFULL, (unsigned char *)text, -1);
-    func_0028EA58(func_0028E588(0xEAA2, 3), 458, (int)(D_L00_001B25E0 * 15.0f + 0.5f),
+    func_0028EA58(GetIconFrame(0xEAA2, 3), 458, (int)(D_L00_001B25E0 * 15.0f + 0.5f),
                   32, (int)(D_L00_001B25E0 * 32.0f + 0.5f), colors.word);
 }
 
@@ -563,7 +563,7 @@ void func_L00_00378818(void) {
     int message;
     unsigned short unit_price;
     if (model->active == 0) return;
-    func_00115484(&seed.layout, 0, 24);
+    memset(&seed.layout, 0, 24);
     seed.layout.field[0] = 120;
     seed.layout.field[1] = (short)(D_L00_001B25E0 * 200.0f + 0.5f);
     seed.layout.field[2] = 160;
@@ -582,7 +582,7 @@ void func_L00_00378818(void) {
         if ((int)unit_price <= D_001A79F8) {
             copy.field[9] = 1;
             copy.field[5] = (short)((float)(copy.field[0] + 12) * D_L00_001B25E0 + 0.5f);
-            func_00280200(&copy, 0x80F0F0F0ULL, (unsigned char *)func_00288FB8(0x1127), -1);
+            func_00280200(&copy, 0x80F0F0F0ULL, (unsigned char *)GetLocalizedString(0x1127), -1);
             func_00115DA8(text, D_L00_001AD798, D_L00_001B25A8);
             copy.field[5] = (short)((float)(copy.field[0] + 40) * D_L00_001B25E0 + 0.5f);
             func_00280200(&copy, 0x80F0F0F0ULL, (unsigned char *)text, -1);
@@ -593,22 +593,22 @@ void func_L00_00378818(void) {
             seed.colors[1] = 0x60F0F0B0;
             seed.colors[2] = 0x60F0F0B0;
             seed.colors[3] = 0x60F0F0B0;
-            func_0028EA58(func_0028E588(0x7567, 0), 260, (int)(D_L00_001B25E0 * 180.0f + 0.5f),
+            func_0028EA58(GetIconFrame(0x7567, 0), 260, (int)(D_L00_001B25E0 * 180.0f + 0.5f),
                           16, (int)(D_L00_001B25E0 * 16.0f + 0.5f), seed.colors);
             return;
         }
         message = 0x1128;
     } else {
-        if (D_001A79F8 >= func_002F6510()) {
+        if (D_001A79F8 >= GetSelectedShopItemPrice()) {
             copy.field[9] = 1;
             copy.field[5] = (short)((float)(copy.field[0] + 6) * D_L00_001B25E0 + 0.5f);
             message = 0x1129;
         } else goto no_money;
     }
-    func_00280200(&copy, 0x80F0F0F0ULL, (unsigned char *)func_00288FB8(message), -1);
+    func_00280200(&copy, 0x80F0F0F0ULL, (unsigned char *)GetLocalizedString(message), -1);
     return;
 no_money:
-    func_00280200(&copy, 0x80F0F0F0ULL, (unsigned char *)func_00288FB8(0x1128), -1);
+    func_00280200(&copy, 0x80F0F0F0ULL, (unsigned char *)GetLocalizedString(0x1128), -1);
 }
 
 /* Measured rows of the confirmation prompt: the price is their first word. */
@@ -648,9 +648,9 @@ void func_L00_00378C18(void) {
     if (D_001A79F8 >= model->rows[model->index].price) {
         copy.field[9] = 1;
         copy.field[5] = (short)((float)(copy.field[0] + 40) * scale + 0.5f);
-        func_00280200(&copy, 0x80F0F0F0ULL, (unsigned char *)func_00288FB8(0x1129), -1);
+        func_00280200(&copy, 0x80F0F0F0ULL, (unsigned char *)GetLocalizedString(0x1129), -1);
     } else {
-        func_00280200(&copy, 0x80F0F0F0ULL, (unsigned char *)func_00288FB8(0x1128), -1);
+        func_00280200(&copy, 0x80F0F0F0ULL, (unsigned char *)GetLocalizedString(0x1128), -1);
     }
 }
 

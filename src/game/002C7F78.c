@@ -22,38 +22,38 @@ void func_002C7F78(char *p)
     float a, b;
     d = p + 32;
     func_00300190(position, position);
-    func_00282D30(d, d, 0.9f);
+    FastVecScale(d, d, 0.9f);
     *(float *)(d + 8) -= *(float *)(d + 12);
-    func_00282CC0(position, position, d);
+    FastVecAdd(position, position, d);
     hero = D_00189EA0;
-    if (func_00282E48(position, hero) < 1.05f) {
+    if (fast_vec_dist(position, hero) < 1.05f) {
       base = hero - 128;
       if (*(float *)(base + 0x170) != 0) {
         qcopy(origin, hero);
-        func_00282CF0((char *)v, position, (char *)origin);
+        FastVecSub((char *)v, position, (char *)origin);
         a = func_002A7878(0.1f, 2.0f);
-        func_00282F20((char *)v, (char *)v, *(float *)(base + 0x170) * 0.2f + a * 0.016666667f * 0.15f);
+        vec_scale_to_length((char *)v, (char *)v, *(float *)(base + 0x170) * 0.2f + a * 0.016666667f * 0.15f);
         *(unsigned char *)(p + 8) += (int)(*(short *)(d + 22) * *(float *)(base + 0x170) * 0.5f);
-        func_00282CC0(position, position, (char *)v);
+        FastVecAdd(position, position, (char *)v);
     }
     }
     if (D_001B1688 % 10 == 0) {
-        *(float *)(d + 28) = func_00283B98(*(float *)(d + 28), 1.0f);
+        *(float *)(d + 28) = FastAddRotations(*(float *)(d + 28), 1.0f);
         a = func_00283198(*(float *)(d + 28));
-        func_00282F20((char *)v, D_001B5200, a * 0.0075f);
-        func_00282CC0(d, d, (char *)v);
+        vec_scale_to_length((char *)v, D_001B5200, a * 0.0075f);
+        FastVecAdd(d, d, (char *)v);
     }
     if (*(short *)(d + 20) >= 160) {
         if (*(short *)(p + 10) < *(short *)(d + 20)) {
-            a = func_00283CE0(*(short *)(p + 10)); b = func_00283CE0(*(short *)(d + 20));
-            *(int *)(p + 4) = (func_00283CF0((a /= b) * 128.0f) << 24) | 0x353535;
+            a = IntToFloat(*(short *)(p + 10)); b = IntToFloat(*(short *)(d + 20));
+            *(int *)(p + 4) = (FloatToInt((a /= b) * 128.0f) << 24) | 0x353535;
         } else *(int *)(p + 4) = 0x9F353535;
     } else {
         if (*(short *)(p + 10) < *(short *)(d + 20)) {
-            a = func_00283CE0(*(short *)(p + 10)); b = func_00283CE0(*(short *)(d + 20));
-            *(int *)(p + 4) = (func_00283CF0((a /= b) * 64.0f) << 24) | 0x909090;
+            a = IntToFloat(*(short *)(p + 10)); b = IntToFloat(*(short *)(d + 20));
+            *(int *)(p + 4) = (FloatToInt((a /= b) * 64.0f) << 24) | 0x909090;
         } else *(int *)(p + 4) = 0x40909090;
     }
     *(unsigned char *)(p + 8) += *(unsigned char *)(d + 22);
-    if (func_00282978(p + 10)) func_002B9180(p);
+    if (FastDecTimer(p + 10)) func_002B9180(p);
 }

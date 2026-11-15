@@ -26,10 +26,10 @@ char *func_L00_004051C8(char *obj,Vec *origin,float *yaw,float *pitch) {
     Vec *pos; int index,accepted,visible;
     float best=D_L00_001B0E38,heading,elevation,delta,distance,dot,length,angle,radius;
     start->q=origin->q;
-    func_00282D30(&frame.offset,D_00189E20.object+0xE0,0.5f);
+    FastVecScale(&frame.offset,D_00189E20.object+0xE0,0.5f);
     selected=0;
-    func_00282CC0(&frame.player,D_00189E20.object+0x10,&frame.offset);
-    if(func_002761F8(&frame.player,start,6,D_00189E20.object,0)) {
+    FastVecAdd(&frame.player,D_00189E20.object+0x10,&frame.offset);
+    if(CollLine(&frame.player,start,6,D_00189E20.object,0)) {
         qcopy(start,&D_L00_001BF220);
         return 0;
     }
@@ -41,23 +41,23 @@ char *func_L00_004051C8(char *obj,Vec *origin,float *yaw,float *pitch) {
         { Vec *t=&frame.target; pos=(Vec *)(candidate+0x10); qcopy(t,pos); }
         definition=func_002AB1F0(candidate);
         if(!definition || *(unsigned char *)(definition+0xE)==3) goto next;
-        func_00282D30(&frame.aim,candidate+0xE0,*(float *)(definition+0x10));
-        func_00282CC0(&frame.target,&frame.target,&frame.aim);
+        FastVecScale(&frame.aim,candidate+0xE0,*(float *)(definition+0x10));
+        FastVecAdd(&frame.target,&frame.target,&frame.aim);
         if(!candidate || !*(char **)(candidate+0x24) || *(short *)(*(char **)(candidate+0x24)+0x46)!=5) goto next;
         accepted=0;
         heading=func_00283248(frame.target.f[0]-start->f[0],frame.target.f[1]-start->f[1]);
-        elevation=func_00283248(func_00282E80(start,&frame.target),frame.target.f[2]-start->f[2]);
-        delta=func_00283C80(*yaw,heading);
-        distance=func_00282E48(start,&frame.target);
+        elevation=func_00283248(vec_distance_xy(start,&frame.target),frame.target.f[2]-start->f[2]);
+        delta=FastDiffRots(*yaw,heading);
+        distance=fast_vec_dist(start,&frame.target);
         if(D_L00_001A8FF0 || D_00189E20.allowed) {
             if(distance<2.5f) {
-            func_00282CF0(&frame.ray,pos,D_00189E20.object+0x10);
-            dot=func_00282DB0(&frame.ray,D_00189E20.object+0xE0);
+            FastVecSub(&frame.ray,pos,D_00189E20.object+0x10);
+            dot=FastVecDot(&frame.ray,D_00189E20.object+0xE0);
             if(func_00282C48(dot)<2.0f) {
-                func_00282D30(&frame.axis,D_00189E20.object+0xE0,dot);
-                func_00282CF0(&frame.ray,&frame.ray,&frame.axis);
-                dot=func_00282DB0(&frame.ray,D_00189E20.object+0xC0);
-                { float len=func_00282DF0(&frame.ray);
+                FastVecScale(&frame.axis,D_00189E20.object+0xE0,dot);
+                FastVecSub(&frame.ray,&frame.ray,&frame.axis);
+                dot=FastVecDot(&frame.ray,D_00189E20.object+0xC0);
+                { float len=FastVecLength(&frame.ray);
                 if(len!=0.0f && 1.5707964f-func_002831B0(dot/len)<1.0471977f) accepted=1; }
             }
             }
@@ -65,23 +65,23 @@ char *func_L00_004051C8(char *obj,Vec *origin,float *yaw,float *pitch) {
             if(distance<2.5f) {
                 char *pobj=D_00189E20.object;
                 angle=func_00283248(*(float *)(candidate+0x10)-D_00189E20.position.f[0],*(float *)(candidate+0x14)-D_00189E20.position.f[1]);
-                if(func_00283C80(*(float *)(pobj+0xF8),angle)<1.0471977f && func_00282C48(start->f[2]-frame.target.f[2])<2.0f) accepted=1;
+                if(FastDiffRots(*(float *)(pobj+0xF8),angle)<1.0471977f && func_00282C48(start->f[2]-frame.target.f[2])<2.0f) accepted=1;
             }
         }
-        if(accepted && !func_002761F8(start,&frame.target,6,D_00189E20.object,0)) { selected=candidate; *pitch=-elevation; *yaw=heading; break; }
+        if(accepted && !CollLine(start,&frame.target,6,D_00189E20.object,0)) { selected=candidate; *pitch=-elevation; *yaw=heading; break; }
         if((distance>best && candidate!=*(char **)(ctx+0x10)) || distance>D_L00_001B0E38) goto next;
         func_002AF000(&frame.aim,distance,*yaw,*pitch+D_00189E20.pitch*0.5f);
-        func_00282CC0(&frame.aim,&frame.aim,start);
-        angle=func_00282E48(&frame.aim,&frame.target);
+        FastVecAdd(&frame.aim,&frame.aim,start);
+        angle=fast_vec_dist(&frame.aim,&frame.target);
         angle=func_002831B0(angle/(distance+distance)); angle+=angle;
         if(D_L00_001B0E34*0.017453294f<angle && (definition=func_002AB1F0(candidate))!=0) {
-            radius=func_00283CE0((unsigned char)definition[10])*0.125f;
+            radius=IntToFloat((unsigned char)definition[10])*0.125f;
             length=func_002831B0(radius/distance);
             if(radius<distance) { angle-=length; if(angle<0.0f) angle=0.0f; }
         }
         if(angle<D_L00_001B0E34*0.017453294f) {
             visible=1;
-            if(func_002761F8(start,&frame.target,6,obj,0)) {
+            if(CollLine(start,&frame.target,6,obj,0)) {
                 hit=D_L00_001BF218[0];
                 if(!hit || hit!=candidate) visible=0;
             }

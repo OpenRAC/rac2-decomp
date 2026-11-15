@@ -31,7 +31,7 @@ void func_L16_0040D258(u8 *moby)
         func_002BAE50(position, velocity, 0xefff7f4f, 0xff0000, size, lifetime, -lifetime, 1);
     }
     for (bone = 3; bone < 5; bone++) {
-        func_00282F20(velocity, moby + 0xc0, -(func_002A7878(4.5f, 5.5f) * 0.016666668f));
+        vec_scale_to_length(velocity, moby + 0xc0, -(func_002A7878(4.5f, 5.5f) * 0.016666668f));
         func_0029FCC0(moby, bone, position);
         if (D_L16_001B2648 & 1) {
             size = func_002A7820(18, 22);

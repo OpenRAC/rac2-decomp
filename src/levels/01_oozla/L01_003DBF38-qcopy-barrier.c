@@ -21,7 +21,7 @@ void func_L01_003DBF38(u8 *arg0)
     int i;
 
     func_002A89A8(arg0 + 0x10, 0, 0.5f);
-    if (func_00278E78() != 3)
+    if (GetCollHitMaterial() != 3)
         return;
     {
         u8 *p = arg0 + 0x10;
@@ -36,7 +36,7 @@ void func_L01_003DBF38(u8 *arg0)
                           (int)((((u32)func_002A77E0(6) + 0x14) << 24) | 0x5060), f, 10000.0f);
             i--;
         }
-        if (0.0333333333f < func_00282DF0(q))
+        if (0.0333333333f < FastVecLength(q))
             func_L01_003DBCB8(arg0, 3, 10, 1);
     }
 }

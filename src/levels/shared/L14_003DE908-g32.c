@@ -30,11 +30,11 @@ void func_L14_004272D8(u8 *self) {
         kind = 0;
     }
     n = func_002A7820(D_L14_001B1830[kind * 2], D_L14_001B1830[kind * 2 + 1]);
-    func_00283098(pos, D_L14_001B1850[side], self + 0xC0);
-    func_00282CC0(pos, pos, self + 0x10);
-    func_00282CF0(step, D_L14_001B1850[(side + 1) & 1], D_L14_001B1850[side]);
-    func_00283098(step, step, self + 0xC0);
-    func_00282D30(step, step, 1.0f / func_00283CE0(n));
+    matrix_mul_vec3(pos, D_L14_001B1850[side], self + 0xC0);
+    FastVecAdd(pos, pos, self + 0x10);
+    FastVecSub(step, D_L14_001B1850[(side + 1) & 1], D_L14_001B1850[side]);
+    matrix_mul_vec3(step, step, self + 0xC0);
+    FastVecScale(step, step, 1.0f / IntToFloat(n));
     {
         s32 *cp = &D_L14_001B1828[kind];
         f32 *fp = &D_L14_001B1820[kind];

@@ -7,7 +7,7 @@ typedef int TI128 __attribute__((mode(TI)));
 
 char *func_L05_00432080(char *a0, float f12)
 {
-    char *obj = func_0029EFD0(0x10E3);
+    char *obj = CreateMoby(0x10E3);
 
     if (obj != 0) {
         int i;

@@ -47,7 +47,7 @@ void func_L08_003F6610(u8 *m)
     void *a2,*t0;
     int a3,t1;
     func_L08_003F6348(m,p);
-    if(m[0x31] && func_00282E48(m+0x10,D_L08_001B9B00)<24.0f) {
+    if(m[0x31] && fast_vec_dist(m+0x10,D_L08_001B9B00)<24.0f) {
         func_002A93B0(m);m[0x6f]=0x16;
     }
     switch(m[0x20]) {
@@ -56,19 +56,19 @@ void func_L08_003F6610(u8 *m)
             int i;
             found=0;
             for(i=0;i<2;i++) {
-                while(!func_002A8600(&found,((FVars *)p)->children[i],0,0)) func_0029F338(found);
+                while(!GetFirstMobyInGroup(&found,((FVars *)p)->children[i],0,0)) func_0029F338(found);
             }
             m[0x20]=1;
         }
         p[0x29]=1;
         break;
     case 1:
-        if(!func_00282978(p+0x12e)) break;
+        if(!FastDecTimer(p+0x12e)) break;
         if(!func_002A77E0(7)) {
             a2=0;a3=0;t0=0;t1=0;
             if(E_I(p,0x124)!=-1) {a2=p+0x124;a3=1;}
             if(E_I(p,0x128)!=-1) {u8 *obj=D_L08_001FE7C0[E_I(p,0x128)];t1=E_I(obj,0);t0=obj+0x10;}
-            func_L04_003429F8(m,p+0xc0,a2,a3,t0,t1,E_F(p,0x120));
+            FindHeroOrMobyTarget(m,p+0xc0,a2,a3,t0,t1,E_F(p,0x120));
         } else {
             u8 *obj=*(u8 **)(p+0x100);
             if(obj && obj[0x20]!=0xfe && obj[0x20]!=0xfd) qcopy(p+0xc0,obj+0x10);
@@ -98,16 +98,16 @@ void func_L08_003F6610(u8 *m)
             for(i=0;i<4;i++) {
                 if(((FVars *)p)->targets[i]!=-1) {
                     u8 *obj=D_L08_001B2ACC+((FVars *)p)->targets[i]*128;
-                    d=func_00282E48(D_00189EA0,obj+0x30);
+                    d=fast_vec_dist(D_00189EA0,obj+0x30);
                     if(d<best) {chosen=obj;best=d;}
                 }
             }
             if(!chosen) {
-                func_00282CF0(&frame.target,p+0xc0,(m+0x10));
-                func_00282D30(&frame.target,&frame.target,0.5f);
+                FastVecSub(&frame.target,p+0xc0,(m+0x10));
+                FastVecScale(&frame.target,&frame.target,0.5f);
                 if(E_F(p,0x120)>3.0f) func_00282FB8(&frame.target,&frame.target,3.0f);
-                if(func_00282DF0(&frame.target)<3.0f) func_00282F20(&frame.target,&frame.target,3.0f);
-                func_00282CC0(&frame.target,&frame.target,(m+0x10));
+                if(FastVecLength(&frame.target)<3.0f) vec_scale_to_length(&frame.target,&frame.target,3.0f);
+                FastVecAdd(&frame.target,&frame.target,(m+0x10));
             } else qcopy(&frame.target,chosen+0x30);
         } else {
             int k=func_002A7820(0,3);
@@ -122,24 +122,24 @@ void func_L08_003F6610(u8 *m)
             if(!chosen) {
                 float radius=E_F(p,0x120);if(radius<3.0f) radius=3.0f;
                 func_L02_0031E9E8(&frame.target,radius);
-                func_00282CC0(&frame.target,&frame.target,(m+0x10));
+                FastVecAdd(&frame.target,&frame.target,(m+0x10));
             } else qcopy(&frame.target,chosen+0x30);
         }
         if(chosen) {
-            func_00282D30(&frame.direction,chosen,func_002A7878(-1.0f,1.0f));
-            func_00282CC0(&frame.target,&frame.target,&frame.direction);
-            func_00282D30(&frame.direction,chosen+0x10,func_002A7878(-1.0f,1.0f));
-            func_00282CC0(&frame.target,&frame.target,&frame.direction);
+            FastVecScale(&frame.direction,chosen,func_002A7878(-1.0f,1.0f));
+            FastVecAdd(&frame.target,&frame.target,&frame.direction);
+            FastVecScale(&frame.direction,chosen+0x10,func_002A7878(-1.0f,1.0f));
+            FastVecAdd(&frame.target,&frame.target,&frame.direction);
         }
         {float height=func_002A89A8(&frame.target,0,0.5f);
         if(height!=0.0f) E_F(&frame.target,8)=height;}
-        func_00282CF0(&frame.direction,&frame.target,(m+0x10));
-        f=func_00282DF0(&frame.direction)/D_L08_001B0B5C<0.08000000566f ? func_00282DF0(&frame.direction)/D_L08_001B0B5C : 0.08000000566f;
-        func_00282F20(&frame.direction,&frame.direction,f);
+        FastVecSub(&frame.direction,&frame.target,(m+0x10));
+        f=FastVecLength(&frame.direction)/D_L08_001B0B5C<0.08000000566f ? FastVecLength(&frame.direction)/D_L08_001B0B5C : 0.08000000566f;
+        vec_scale_to_length(&frame.direction,&frame.direction,f);
         func_0029FCC0(m,0,&frame.velocity);
-        func_00282F20(&frame.step,&frame.direction,0.05f);
+        vec_scale_to_length(&frame.step,&frame.direction,0.05f);
         func_002ACB48(&frame.step,0.025f);
-        func_00282CC0(&frame.velocity,&frame.velocity,&frame.step);
+        FastVecAdd(&frame.velocity,&frame.velocity,&frame.step);
         E_F(&frame.direction,8)=func_L00_0031CDD0(&frame.velocity,&frame.target,0,f,-0.002722222358f);
         func_L08_003F6018(m,&frame.velocity,&frame.direction);
         ((FVars *)p)->timer=((FVars *)p)->delay;
@@ -147,16 +147,16 @@ void func_L08_003F6610(u8 *m)
         break;
     }
     case 3:
-        func_L06_0035EA68(m,p+0x60);
+        mine_fall(m,p+0x60);
         if(m[0x60]&2) {
             m[0x20]=1;
             if(m[0x43]) func_002A7470(m,0,0,20);
         }
         break;
     case 4:
-        if(func_L06_0035EA68(m,p+0x60)&0x40) {
-            func_00282F20(&frame.target,D_L08_001AC5E0,0.1666666716f);
-            func_002ABBB8(m,&frame.target,0,0.0f,0.0f,30,8,20,8.0f,4.0f,18.0f,1.0f,1,15.0f,1,1,-1,0,0x810001);
+        if(mine_fall(m,p+0x60)&0x40) {
+            vec_scale_to_length(&frame.target,D_L08_001AC5E0,0.1666666716f);
+            SpawnExplosionEffects(m,&frame.target,0,0.0f,0.0f,30,8,20,8.0f,4.0f,18.0f,1.0f,1,15.0f,1,1,-1,0,0x810001);
             func_0029F338(m);
         }
         break;

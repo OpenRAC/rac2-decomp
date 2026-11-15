@@ -32,14 +32,14 @@ void func_L08_003D8AB0(char *object)
                     char *entry = D_L08_001B29DC[0];
                     *(float *)(state + 0x3F8) = 0;
                     *(float *)(state + 0x3F4) = y;
-                    func_00282CC0(target, target, entry + (handle << 8) + 0x10);
+                    FastVecAdd(target, target, entry + (handle << 8) + 0x10);
                 }
             }
         } else {
             *(float *)(state + 0x3F0) = func_00283180(func_002A7878(-3.1415927f, 3.1415927f)) * 3.0f;
             *(float *)(state + 0x3F4) = func_00283198(func_002A7878(-3.1415927f, 3.1415927f)) * 3.0f;
             *(float *)(state + 0x3F8) = 0;
-            func_00282CC0(pos, pos, D_00189EA0);
+            FastVecAdd(pos, pos, D_00189EA0);
         }
     }
 }

@@ -78,22 +78,22 @@ void func_L05_00441F30(char *obj)
 
     switch (D_L05_001B1B20) {
     case 0:
-        func_L05_00442A58(obj, &first, &second);
+        UpdateSteeringInput(obj, &first, &second);
         func_L05_004431A0(obj, &first, &second);
         func_L05_004432E0(obj);
-        func_L05_00443740(obj);
+        UpdateDrivenMobyTransform(obj);
         break;
     case 1:
-        func_L05_00442A58(obj, &first, &second);
+        UpdateSteeringInput(obj, &first, &second);
         func_L05_004431A0(obj, &first, &second);
         func_L05_004432E0(obj);
-        func_L05_00443740(obj);
+        UpdateDrivenMobyTransform(obj);
         D_L05_001B1F60_sda = D_L05_001B1F60 + 0.05f;
         if (D_L05_001B1F60_sda >= 1.0f) {
             D_L05_001B1F60 = 1.0f;
             D_L05_001B1B20 = 4;
             qcopy(obj + 0x30, D_L05_001B3620);
-            func_002833F0(obj, D_L05_001B3610);
+            euler_rotation_basis(obj, D_L05_001B3610);
         }
         break;
     case 4:
@@ -118,10 +118,10 @@ void func_L05_00441F30(char *obj)
         }
         break;
     case 2:
-        func_L05_00442A58(obj, &first, &second);
+        UpdateSteeringInput(obj, &first, &second);
         func_L05_004431A0(obj, &first, &second);
         func_L05_004432E0(obj);
-        func_L05_00443740(obj);
+        UpdateDrivenMobyTransform(obj);
         D_L05_001B1F60_sda = D_L05_001B1F60 - 0.05f;
         if (D_L05_001B1F60_sda <= 0.0f) {
             D_L05_001B1F60_sda = 0.0f;
@@ -130,7 +130,7 @@ void func_L05_00441F30(char *obj)
         break;
     case 6:
         qcopy(obj + 0x30, D_L05_001B3620);
-        func_002833F0(obj, D_L05_001B3610);
+        euler_rotation_basis(obj, D_L05_001B3610);
         if (func_00282948(&D_L05_001B1B24)) {
             func_L00_002B30E8();
         } else {

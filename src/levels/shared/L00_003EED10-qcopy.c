@@ -9,7 +9,7 @@ extern void func_002A0F48(char *);
 
 char *func_L00_003EED10(int owner, char *position, char *direction)
 {
-    char *object = func_0029EFD0(0xce4);
+    char *object = CreateMoby(0xce4);
     char *state;
     float first,second;
     unsigned char stamp;

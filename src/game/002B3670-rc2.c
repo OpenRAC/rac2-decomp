@@ -48,10 +48,10 @@ s32 func_002B3670(void *arg0, s32 *arg1, s32 arg2, s32 arg3, void *arg4, f32 fpa
     if (D_001A8BB0 != 0) {
         return 0;
     }
-    temp_f20 = func_00282E80(&buf, temp_a1 + 0x10);
+    temp_f20 = vec_distance_xy(&buf, temp_a1 + 0x10);
     if (arg2 != -1) {
         temp_a1_2 = D_001F1700[arg2];
-        if (func_002A8AF0(*arg1 + 0x10, (s8 *)temp_a1_2 + 0x10, *temp_a1_2) != 0) {
+        if (point_in_path_xy(*arg1 + 0x10, (s8 *)temp_a1_2 + 0x10, *temp_a1_2) != 0) {
             return 2;
         }
     } else {
@@ -61,7 +61,7 @@ s32 func_002B3670(void *arg0, s32 *arg1, s32 arg2, s32 arg3, void *arg4, f32 fpa
     }
     if (arg3 != -1) {
         temp_a1_3 = D_001F1700[arg3];
-        if (func_002A8AF0(*arg1 + 0x10, (s8 *)temp_a1_3 + 0x10, *temp_a1_3) != 0) {
+        if (point_in_path_xy(*arg1 + 0x10, (s8 *)temp_a1_3 + 0x10, *temp_a1_3) != 0) {
             return 1;
         }
     } else {

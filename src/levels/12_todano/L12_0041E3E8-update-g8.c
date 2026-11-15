@@ -49,20 +49,20 @@ void func_L12_0041E3E8(u8 *self) {
         func_L01_0031AB20(self, st + 0x50, 1.5f, 1.5f, 0.1f, *(s32 *)(st + 0xec));
         if (*(s32 *)(st + 0xe0) != -1) {
             qcopy(temp, D_L12_001B2F8C[*(s32 *)(st + 0xe0)].position);
-            if (func_00282E80(self + 0x10, temp) < 1.0f) {
+            if (vec_distance_xy(self + 0x10, temp) < 1.0f) {
                 *(u16 *)(self + 0x34) &= 0xefff;
-                *(f32 *)(st + 0xf0) = func_00282DF0(st + 0x50);
+                *(f32 *)(st + 0xf0) = FastVecLength(st + 0x50);
                 self[0x20] = 2;
             }
         }
         break;
     case 2: {
         f32 angle;
-        func_00282CF0(delta, D_L12_001B2F8C[*(s32 *)(st + 0xe0)].position, self + 0x10);
-        angle = func_00282DF0(delta);
+        FastVecSub(delta, D_L12_001B2F8C[*(s32 *)(st + 0xe0)].position, self + 0x10);
+        angle = FastVecLength(delta);
         func_002AAC80(angle, 0.0055555557f, 0.0055555557f, 0.06666667f, st + 0xf0);
-        func_00282F20(temp, delta, *(f32 *)(st + 0xf0));
-        func_00282CC0(self + 0x10, self + 0x10, temp);
+        vec_scale_to_length(temp, delta, *(f32 *)(st + 0xf0));
+        FastVecAdd(self + 0x10, self + 0x10, temp);
         if (angle < 0.001f) func_002A7750(self, 3, -1);
         break;
     }
@@ -71,25 +71,25 @@ void func_L12_0041E3E8(u8 *self) {
         break;
     }
     if (self[0x31] && self[0x20] != 3 && self[0x20] != 4) {
-        f32 phase = func_00283CE0(D_L12_001B29C8_gp % 60);
-        f32 period = func_00283CE0(60);
+        f32 phase = IntToFloat(D_L12_001B29C8_gp % 60);
+        f32 period = IntToFloat(60);
         phase *= 6.28318548f;
         phase /= period;
-        ((ColorActor *)self)->color = func_L01_0031BC68(D_L12_001B1E00_gp, D_L12_001B1E04, phase - 3.14159274f);
+        ((ColorActor *)self)->color = PulseColor(D_L12_001B1E00_gp, D_L12_001B1E04, phase - 3.14159274f);
     }
     if (self[0x31] && self[0x20] == 3) {
-        f32 phase = func_00283CE0(D_L12_001B29C8 % 60);
-        f32 period = func_00283CE0(60);
+        f32 phase = IntToFloat(D_L12_001B29C8 % 60);
+        f32 period = IntToFloat(60);
         phase *= 6.28318548f;
         phase /= period;
-        ((ColorActor *)self)->color = func_L01_0031BC68(D_L12_001B1E08_gp, D_L12_001B1E0C, phase - 3.14159274f);
+        ((ColorActor *)self)->color = PulseColor(D_L12_001B1E08_gp, D_L12_001B1E0C, phase - 3.14159274f);
     }
     if (self[0x31] && self[0x20] == 4) {
-        f32 phase = func_00283CE0(D_L12_001B29C8 % 60);
-        f32 period = func_00283CE0(60);
+        f32 phase = IntToFloat(D_L12_001B29C8 % 60);
+        f32 period = IntToFloat(60);
         phase *= 6.28318548f;
         phase /= period;
-        ((ColorActor *)self)->color = func_L01_0031BC68(D_L12_001B1E10_gp, D_L12_001B1E14, phase - 3.14159274f);
+        ((ColorActor *)self)->color = PulseColor(D_L12_001B1E10_gp, D_L12_001B1E14, phase - 3.14159274f);
         {
         SoundAnchor *sound = (SoundAnchor *)(D_L12_001B3DA8 * 112 + (s32)D_00188660);
         if (sound->owner != D_L12_001B3DAC || !sound->active) {
@@ -98,6 +98,6 @@ void func_L12_0041E3E8(u8 *self) {
         }
         }
     }
-    func_00282CF0(temp, self + 0x10, oldpos);
+    FastVecSub(temp, self + 0x10, oldpos);
     func_002AD6F0(st + 0xa0, temp, oldrot, self + 0xf0);
 }

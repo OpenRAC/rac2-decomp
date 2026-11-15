@@ -31,10 +31,10 @@ void func_L03_003F6BA8(char *object)
     int i, j;
     float alpha;
     func_0029FC20(object, 7, (char *)matrix);
-    func_L02_002EF968(&packets[0], D_L03_001B1108, D_L03_001B1138, D_L03_001B1118, D_L03_001B1150, 1);
-    func_L02_002EF968(&packets[1], D_L03_001B1108, D_L03_001B1138, D_L03_001B1118, D_L03_001B1150, 1);
-    func_L02_002EF968(&packets[2], D_L03_001B110C, D_L03_001B1140, D_L03_001B1118, D_L03_001B1190, 1);
-    func_L02_002EF968(&packets[3], D_L03_001B110C, D_L03_001B1140, D_L03_001B1118, D_L03_001B1190, 1);
+    FillQuadPacket(&packets[0], D_L03_001B1108, D_L03_001B1138, D_L03_001B1118, D_L03_001B1150, 1);
+    FillQuadPacket(&packets[1], D_L03_001B1108, D_L03_001B1138, D_L03_001B1118, D_L03_001B1150, 1);
+    FillQuadPacket(&packets[2], D_L03_001B110C, D_L03_001B1140, D_L03_001B1118, D_L03_001B1190, 1);
+    FillQuadPacket(&packets[3], D_L03_001B110C, D_L03_001B1140, D_L03_001B1118, D_L03_001B1190, 1);
     {
         int k;
         for (k = 0; k < 4; ++k) {
@@ -56,27 +56,27 @@ void func_L03_003F6BA8(char *object)
     packets[3].colors[1] = D_L03_001B1144;
     func_00282C88((BeamQuad *)euler);
     euler[2] = 0.09817477f;
-    func_002833F0(rotation, euler);
+    euler_rotation_basis(rotation, euler);
     {
         int k;
         for (k = 0; k < 2; ++k) {
-            func_00283098(&packets[k].vertices[2], &packets[k].vertices[2], rotation);
-            func_00283098(&packets[k].vertices[3], &packets[k].vertices[3], rotation);
+            matrix_mul_vec3(&packets[k].vertices[2], &packets[k].vertices[2], rotation);
+            matrix_mul_vec3(&packets[k].vertices[3], &packets[k].vertices[3], rotation);
         }
     }
-    func_00283738(squared, rotation, rotation);
+    multiply_matrix3x3(squared, rotation, rotation);
     alpha = 1.0f / D_L03_001B11D0;
     for (i = 0; i < 32; ++i) {
         int edge = (i & 1) ? 2 : 0;
         for (j = 0; j < 4; ++j) {
             int color;
-            func_00283098(&packets[j].vertices[edge], &packets[j].vertices[edge], squared);
-            func_00283098(&packets[j].vertices[edge+1], &packets[j].vertices[edge+1], squared);
+            matrix_mul_vec3(&packets[j].vertices[edge], &packets[j].vertices[edge], squared);
+            matrix_mul_vec3(&packets[j].vertices[edge+1], &packets[j].vertices[edge+1], squared);
             color = packets[j].colors[edge];
-            packets[j].colors[edge] = func_00283D38(color, color & 0xffffff, alpha);
+            packets[j].colors[edge] = FastTweenColor(color, color & 0xffffff, alpha);
             color = packets[j].colors[edge+1];
-            packets[j].colors[edge+1] = func_00283D38(color, color & 0xffffff, alpha);
-            func_00280B90(&packets[j], matrix, 1);
+            packets[j].colors[edge+1] = FastTweenColor(color, color & 0xffffff, alpha);
+            draw_world_quad(&packets[j], matrix, 1);
         }
     }
 }

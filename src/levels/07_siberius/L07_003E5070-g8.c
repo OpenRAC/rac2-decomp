@@ -26,15 +26,15 @@ void func_L07_003E5070(char *actor)
     float angle[4] __attribute__((aligned(16)));
     char *state = *(char **)(actor + 0x68);
     int colour;
-    func_00283658(world, actor + 0xc0);
+    copy_matrix_rotation(world, actor + 0xc0);
     qcopy(world + 12, actor + 0x10);
     world[15] = 1.0f;
     *(Quad5070 *)angle = 0;
     angle[2] = 0.19634955f;
-    func_002833F0(rotation, angle);
-    colour = func_L01_0031BC68(*(float *)(state + 0x1c), D_L07_001B0A80_gp[0], D_L07_001B0A80[1]);
-    colour = func_00283D38(*(float *)(state + 0x18), colour & 0xffffff, colour);
-    func_L02_002EF968(&packets[0], 5, colour, D_L07_001B0A60, D_L07_0029F5B0[0], 1);
-    func_L02_002EF968(&packets[1], 5, colour, D_L07_001B0A60, D_L07_0029F5B0[4], 1);
+    euler_rotation_basis(rotation, angle);
+    colour = PulseColor(*(float *)(state + 0x1c), D_L07_001B0A80_gp[0], D_L07_001B0A80[1]);
+    colour = FastTweenColor(*(float *)(state + 0x18), colour & 0xffffff, colour);
+    FillQuadPacket(&packets[0], 5, colour, D_L07_001B0A60, D_L07_0029F5B0[0], 1);
+    FillQuadPacket(&packets[1], 5, colour, D_L07_001B0A60, D_L07_0029F5B0[4], 1);
     func_L01_002E1510(packets, 2, rotation, 32, world);
 }

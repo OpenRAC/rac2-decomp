@@ -62,7 +62,7 @@ void func_L01_003D1F40(u8 *m)
 
         if (m[0xBC])
             func_002A7750(m, 2, -1);
-        if (I(s, 0xA0) != -1 && func_002ACBC8(D_00189EA0, I(s, 0xA0))) {
+        if (I(s, 0xA0) != -1 && IsPointInCuboid(D_00189EA0, I(s, 0xA0))) {
             uid = *(u16 *)(m + 0xB2);
             if (uid & 1) {
                 u8 *entry = D_0019B4A8 + (((s16)uid >> 1) + (D_001A79F0[0] << 10));
@@ -88,13 +88,13 @@ void func_L01_003D1F40(u8 *m)
             F(s, 0xAC) = 0.0f;
         t = 1.0f - func_00283180(F(s, 0xAC) * 3.14159274f);
         t = t * 0.5f;
-        func_00282D30(delta, s + 0x80, t);
-        func_002833F0(rotation, s + 0x70);
-        func_00283098(delta, delta, rotation);
-        func_00282CC0(m + 0x10, s + 0x60, delta);
-        F(m, 0xF8) = func_002AA150(F(s, 0x78), func_00283B98(F(s, 0x78), F(s, 0x98)), t);
-        F(m, 0xF4) = func_002AA150(F(s, 0x74), func_00283B98(F(s, 0x74), F(s, 0x94)), t);
-        F(m, 0xF0) = func_002AA150(F(s, 0x70), func_00283B98(F(s, 0x70), F(s, 0x90)), t);
+        FastVecScale(delta, s + 0x80, t);
+        euler_rotation_basis(rotation, s + 0x70);
+        matrix_mul_vec3(delta, delta, rotation);
+        FastVecAdd(m + 0x10, s + 0x60, delta);
+        F(m, 0xF8) = func_002AA150(F(s, 0x78), FastAddRotations(F(s, 0x78), F(s, 0x98)), t);
+        F(m, 0xF4) = func_002AA150(F(s, 0x74), FastAddRotations(F(s, 0x74), F(s, 0x94)), t);
+        F(m, 0xF0) = func_002AA150(F(s, 0x70), FastAddRotations(F(s, 0x70), F(s, 0x90)), t);
         if (F(s, 0xAC) >= 1.0f) {
             I(s, 0xB0) = H(s, 0xAA);
             func_002A7750(m, 3, -1);
@@ -104,7 +104,7 @@ void func_L01_003D1F40(u8 *m)
     case 3: {
         u16 uid;
 
-        if (I(s, 0xA0) != -1 && func_002ACBC8(D_00189EA0, I(s, 0xA0))) {
+        if (I(s, 0xA0) != -1 && IsPointInCuboid(D_00189EA0, I(s, 0xA0))) {
             uid = *(u16 *)(m + 0xB2);
             if (uid & 1) {
                 u8 *entry = D_0019B4A8 + (((s16)uid >> 1) + (D_001A79F0[0] << 10));
@@ -131,18 +131,18 @@ void func_L01_003D1F40(u8 *m)
             F(s, 0xAC) = 0.0f;
         t = 1.0f - func_00283180(F(s, 0xAC) * 3.14159274f);
         t = t * 0.5f;
-        func_00282D30(delta, s + 0x80, t);
-        func_002833F0(rotation, s + 0x70);
-        func_00283098(delta, delta, rotation);
-        func_00282CC0(m + 0x10, s + 0x60, delta);
-        F(m, 0xF8) = func_002AA150(F(s, 0x78), func_00283B98(F(s, 0x78), F(s, 0x98)), t);
-        F(m, 0xF4) = func_002AA150(F(s, 0x74), func_00283B98(F(s, 0x74), F(s, 0x94)), t);
-        F(m, 0xF0) = func_002AA150(F(s, 0x70), func_00283B98(F(s, 0x70), F(s, 0x90)), t);
+        FastVecScale(delta, s + 0x80, t);
+        euler_rotation_basis(rotation, s + 0x70);
+        matrix_mul_vec3(delta, delta, rotation);
+        FastVecAdd(m + 0x10, s + 0x60, delta);
+        F(m, 0xF8) = func_002AA150(F(s, 0x78), FastAddRotations(F(s, 0x78), F(s, 0x98)), t);
+        F(m, 0xF4) = func_002AA150(F(s, 0x74), FastAddRotations(F(s, 0x74), F(s, 0x94)), t);
+        F(m, 0xF0) = func_002AA150(F(s, 0x70), FastAddRotations(F(s, 0x70), F(s, 0x90)), t);
         if (F(s, 0xAC) >= 1.0f)
             func_002A7750(m, 1, -1);
         if (m[0xBC])
             func_002A7750(m, 2, -1);
-        if (I(s, 0xA0) != -1 && func_002ACBC8(D_00189EA0, I(s, 0xA0))) {
+        if (I(s, 0xA0) != -1 && IsPointInCuboid(D_00189EA0, I(s, 0xA0))) {
             s[0xA8] = 1;
             func_002A7750(m, 2, -1);
         }
@@ -152,7 +152,7 @@ void func_L01_003D1F40(u8 *m)
     if (H(m, 0xAA) == 0xA9D && m[0x20] >= 2 && m[0x20] < 5)
         func_L00_002E6CF0(func_L01_003D1A48, m);
     if (m[0x20] < 5) {
-        func_00282CF0(delta, m + 0x10, oldPos);
+        FastVecSub(delta, m + 0x10, oldPos);
         func_002AD6F0(s + 0x20, delta, oldAngle, m + 0xF0);
     }
     if (s[0xA9])

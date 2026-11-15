@@ -27,7 +27,7 @@ void func_002A8F70(char *object, int kind, int bits, void *position, void *vecto
     entry->strength=strength;
     entry->g=strength;
     entry->h=0;
-    if(func_00282DF0(vector)>0.0001f) entry->f=1;
+    if(FastVecLength(vector)>0.0001f) entry->f=1;
     else entry->f=0;
     qcopy(&D_001BF200[index].a,position);
     qcopy(&D_001BF200[index].b,vector);

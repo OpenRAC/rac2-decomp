@@ -212,7 +212,7 @@ void func_L15_0042DCE0(Moby *moby)
         func_L00_002C42E0(0x31, 0);
         if (D_L15_001B15C4) {
             func_L05_00379F48(on);
-            D_L15_001B1530 = func_L05_0041ED18();
+            D_L15_001B1530 = LockedEntryMenuInput();
             if (D_L15_001B1530 != -2)
                 func_L05_00445A98();
             break;
@@ -237,7 +237,7 @@ void func_L15_0042DCE0(Moby *moby)
                 func_L15_004307E0(moby);
                 break;
             case 1:
-                func_L15_00430B30(moby);
+                ApplyGornStageMaterials(moby);
                 break;
             case 2:
                 func_L15_00430C80(moby);
@@ -248,7 +248,7 @@ void func_L15_0042DCE0(Moby *moby)
             }
         }
         if (D_L15_001A904C && !D_L15_001B1578 && !D_L15_001B15CC) {
-            func_0029B758(0, func_L15_0042E1B0);
+            func_0029B758(0, DrawGornStageHud);
             D_L15_001B157C = 0;
             D_L15_001B1578 = 1;
         }

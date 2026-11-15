@@ -123,8 +123,8 @@ phase_wait:
     switch (object[0x20]) {
     case 0:
         if (STATE_INT(0x32C)>=21)
-            func_002AA2E8((float *)(state+0x214),0.03333333507180214f,0.0011111111380159855f);
-        else func_002AA2E8((float *)(state+0x214),0.0f,0.0011111111380159855f);
+            ApproachValue((float *)(state+0x214),0.03333333507180214f,0.0011111111380159855f);
+        else ApproachValue((float *)(state+0x214),0.0f,0.0011111111380159855f);
         if (func_00282948((int *)(state+0x32C))) {
             if (object[0x43]!=4) func_002A7470(object,4,0,func_002A7820(18,24));
             func_002A7750(object,1,-1);
@@ -144,16 +144,16 @@ phase_wait:
     case 3:
         if (func_00282948((int *)(state+0x360))) {
             func_L01_003B57A8(object,&local.target);
-            func_00282CF0(&local.delta,&local.target,object+0x10);
-            if (func_00282DF0(&local.delta)*0.03333333507180214f < 0.13333334028720856f)
-                speed=func_00282DF0(&local.delta)*0.03333333507180214f;
+            FastVecSub(&local.delta,&local.target,object+0x10);
+            if (FastVecLength(&local.delta)*0.03333333507180214f < 0.13333334028720856f)
+                speed=FastVecLength(&local.delta)*0.03333333507180214f;
             else speed=0.13333334028720856f;
-            func_00282F20(&local.delta,&local.delta,speed);
+            vec_scale_to_length(&local.delta,&local.delta,speed);
             duration=0.0f;
             ((float *)&local.delta)[2]=func_L00_0031CDD0(object+0x10,&local.target,&duration,speed,-0.004999999888241291f);
             qcopy(state+0x2F0, &local.delta);
             qcopy(state+0x2E0, &local.target);
-            func_002E5CF8(5,0,(char *)object);
+            PlayMobySound(5,0,(char *)object);
             if (object[0x43]!=3) func_002A7470(object,3,0,10);
             if (duration>0.0f) *(float *)(object+0x48)=38.0f/duration;
             func_002A7750(object,1,2);
@@ -176,9 +176,9 @@ phase_airborne:
     if (object[0x42]!=3) goto phase_done;
     frame=func_0029F530((char *)object);
     if (!(frame>5.0f)) goto phase_done;
-    func_00282CC0(object+0x10,object+0x10,state+0x2F0);
+    FastVecAdd(object+0x10,object+0x10,state+0x2F0);
     angle=func_00283248(STATE_FLOAT(0x2E0)-*(float *)(object+0x10),STATE_FLOAT(0x2E4)-*(float *)(object+0x14));
-    func_002A7CA0(object,angle,STATE_FLOAT(0x124)*10.0f,STATE_FLOAT(0x134)*10.0f,STATE_FLOAT(0x12C)*10.0f,
+    MobySpringTurn(object,angle,STATE_FLOAT(0x124)*10.0f,STATE_FLOAT(0x134)*10.0f,STATE_FLOAT(0x12C)*10.0f,
                   state+0x1C4);
     STATE_FLOAT(0x2F8)-=0.004999999888241291f;
     if (!(STATE_FLOAT(0x2F8)<0.0f)) goto phase_done;
@@ -198,8 +198,8 @@ phase_pursuit:
     goto pursuit_done;
 pursuit_idle:
     if (STATE_INT(0x32C)>=21)
-        func_002AA2E8((float *)(state+0x214),0.03333333507180214f,0.0011111111380159855f);
-    else func_002AA2E8((float *)(state+0x214),0.0f,0.0011111111380159855f);
+        ApproachValue((float *)(state+0x214),0.03333333507180214f,0.0011111111380159855f);
+    else ApproachValue((float *)(state+0x214),0.0f,0.0011111111380159855f);
     if (func_00282948((int *)(state+0x32C))) {
         if (!object[0xBC]) {
             STATE_INT(0x32C)=180;
@@ -231,14 +231,14 @@ pursuit_wait:
     }
     goto pursuit_done;
 pursuit_weave:
-    weave=func_00283198(func_002ABB18(func_00283CE0(D_L01_001B2088)*0.01163553074002266f))*0.8726646900177002f;
-    if (func_00282E80(object+0x10,state+0x230)<4.75f) weave=0.0f;
+    weave=func_00283198(func_002ABB18(IntToFloat(D_L01_001B2088)*0.01163553074002266f))*0.8726646900177002f;
+    if (vec_distance_xy(object+0x10,state+0x230)<4.75f) weave=0.0f;
     func_L01_003B4AD0(object,state+0x2E0,&weave);
     func_L01_003B50C8((char *)object,1,-1.0f);
-    if (func_00282E80(object+0x10,STATE_POINTER(0x240)+0x10)<3.75f) {
+    if (vec_distance_xy(object+0x10,STATE_POINTER(0x240)+0x10)<3.75f) {
         if (func_00282C48(*(float *)(object+0x18)-*(float *)(STATE_POINTER(0x240)+0x18))<0.5f) {
             angle=func_00283248(*(float *)(STATE_POINTER(0x240)+0x10)-*(float *)(object+0x10),*(float *)(STATE_POINTER(0x240)+0x14)-*(float *)(object+0x14));
-            if (func_00283C80(*(float *)(object+0xF8),angle)<0.174532949924469f) {
+            if (FastDiffRots(*(float *)(object+0xF8),angle)<0.174532949924469f) {
                 qzero(state+0x1B0);
                 state[0x35C]=0;
                 if (object[0x43]!=10) func_002A7470(object,10,D_L01_001AFDB0,func_002A7820(16,22));
@@ -274,7 +274,7 @@ pursuit_group:
         D_L01_001B255C[STATE_INT(0x38C)*256+0xBC])) func_002A7750(object,7,-1);
     goto pursuit_done;
 pursuit_leave:
-    pursuit=func_00283198(func_002ABB18(func_00283CE0(D_L01_001B2088)*0.01163553074002266f))*0.8726646900177002f;
+    pursuit=func_00283198(func_002ABB18(IntToFloat(D_L01_001B2088)*0.01163553074002266f))*0.8726646900177002f;
     qcopy(state+0x2E0, D_L01_001B264C[STATE_INT(0x380)].position);
     func_L01_003B4AD0(object,state+0x2E0,&pursuit);
     func_L01_003B50C8((char *)object,1,-1.0f);
@@ -301,7 +301,7 @@ pursuit_done:
         if (object[0x20]==2) goto copy_pursuit_target;
         if (object[0x21]!=255 && **(int **)(state+0x33C)>1) goto pursuit_distance;
         if (STATE_INT(0x334)) goto pursuit_distance;
-        if (!(func_00282E80(object+0x10,STATE_POINTER(0x240)+0x10)<14.0f)) goto pursuit_distance;
+        if (!(vec_distance_xy(object+0x10,STATE_POINTER(0x240)+0x10)<14.0f)) goto pursuit_distance;
         qcopy(state+0x2E0, STATE_POINTER(0x240)+0x10);
         animation=19;
         if (*(u16 *)(object+0xB2)&1) animation=8;
@@ -330,10 +330,10 @@ mirror_hero:
     if (STATE_POINTER(0x240)==HERO_TARGET->object)
         qcopy(state+0x2E0, HERO_TARGET->position);
 pursuit_distance:
-    if (func_00282E80(object+0x10,STATE_POINTER(0x240)+0x10)<3.5f) {
+    if (vec_distance_xy(object+0x10,STATE_POINTER(0x240)+0x10)<3.5f) {
         if (func_00282C48(*(float *)(object+0x18)-*(float *)(STATE_POINTER(0x240)+0x18))<0.5f) {
             angle=func_00283248(*(float *)(STATE_POINTER(0x240)+0x10)-*(float *)(object+0x10),*(float *)(STATE_POINTER(0x240)+0x14)-*(float *)(object+0x14));
-            if (func_00283C80(*(float *)(object+0xF8),angle)<0.523598849773407f) {
+            if (FastDiffRots(*(float *)(object+0xF8),angle)<0.523598849773407f) {
                 qzero(state+0x1B0);
                 state[0x35C]=0;
                 if (object[0x43]!=10) func_002A7470(object,10,D_L01_001AFDB0,func_002A7820(8,12));
@@ -388,7 +388,7 @@ phase_dispatch:
         *(int *)(object+0x98)=*(int *)(*(u8 **)(object+0x24)+0x10);
         func_L01_003B4480(object);
         func_L01_003B4BD8(object);
-        if (func_00278E78()==3) {
+        if (GetCollHitMaterial()==3) {
             if (object[0x43]!=4) func_002A7470(object,4,0,110);
             func_002A7750(object,0,6);
         } else {
@@ -406,7 +406,7 @@ phase_dispatch:
 
 phase_removed:
     func_L01_003B5290(object);
-    func_002A6C58(object,0,3);
+    SetDeathBits(object,0,3);
     func_L01_003B4480(object);
     func_L01_003B50C8((char *)object,5,-1.0f);
     func_L01_003B4BD8(object);
@@ -417,9 +417,9 @@ phase_done:
         local.target=0;
         ((float *)&local.target)[2]=*(float *)(object+0xF8);
         local.delta=local.target;
-        func_00283410(local.rotation,&local.delta);
-        func_00283698(local.inverse,local.rotation);
-        func_00283698(local.object_inverse,object+0xC0);
+        euler_to_matrix(local.rotation,&local.delta);
+        matrix_from_basis_rows(local.inverse,local.rotation);
+        matrix_from_basis_rows(local.object_inverse,object+0xC0);
         {
             Quadword *v;
             u8 *target = STATE_POINTER(0x198);
@@ -428,9 +428,9 @@ phase_done:
                 v = &local.target;
                 qcopy(v, D_L01_001AC5A0);
             } else
-                func_00282F20(&local.target,state+0x160,1.0f);
+                vec_scale_to_length(&local.target,state+0x160,1.0f);
             v = &local.target;
-            func_00283098(v,v,local.inverse);
+            matrix_mul_vec3(v,v,local.inverse);
         }
         yaw=func_00283248(((float *)&local.target)[2],((float *)&local.target)[0]);
         pitch=-func_00283248(((float *)&local.target)[2],((float *)&local.target)[1]);

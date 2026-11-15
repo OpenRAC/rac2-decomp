@@ -24,7 +24,7 @@ void func_L15_00436C68(char *arg)
     qcopy(pos, src + 0x10);
     func_002EE920(arg, src + 0x20);
     mat = ent + 0x90;
-    func_00282CF0(mat, ent + 0x60, pos);
-    func_00282F20(mat, mat, 0.083333336f);
+    FastVecSub(mat, ent + 0x60, pos);
+    vec_scale_to_length(mat, mat, 0.083333336f);
     *(int *)(ent + 0x130) = 2000000;
 }

@@ -98,8 +98,8 @@ void func_L09_00402D50(char *obj) {
     data->field_274 = -1;
     if (data->field_260 == -1.0f) data->field_260 = 0.0174532942f * func_002A78D8(25.0f, 100.0f);
     else data->field_260 *= 0.0174532942f;
-    data->field_48 = func_00283CF0(15.0f);
-    data->field_4A = func_00283CF0(2.4f);
+    data->field_48 = FloatToInt(15.0f);
+    data->field_4A = FloatToInt(2.4f);
     data->field_60 = 9;
     data->field_61 = 0;
     data->field_62 = 0;

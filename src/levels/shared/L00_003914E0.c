@@ -24,10 +24,10 @@ void func_L00_003914E0(char *actor, int fragments) {
     for (k = 0; k < 5; k++)
         func_002BC768(point, 1, 0x40808080, 0.3f, 1.01f, 1.07f, 0.05f, 50000.0f);
     if (!fragments) return;
-    func_00282CF0(delta, D_L00_001B8DC0, actor + 0x10);
+    FastVecSub(delta, D_L00_001B8DC0, actor + 0x10);
     func_00282C88((Quad *)velocity);
-    distance = func_00282DF0(delta);
-    if (distance < 8.0f) count = func_00283CF0(distance) + 2;
+    distance = FastVecLength(delta);
+    if (distance < 8.0f) count = FloatToInt(distance) + 2;
     else count = 10;
     nearPenalty = 0;
     if (distance < 7.0f) nearPenalty = 7.0f - distance;

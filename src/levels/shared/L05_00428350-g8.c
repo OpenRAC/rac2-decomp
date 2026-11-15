@@ -99,7 +99,7 @@ int func_L05_00442860(void)
 }
 
 /* On the first pass seeds the slot's speed and timer, then picks the state's +0x40 rate from
-   the distance to D_L05_001B96C0; afterwards either chains func_L05_00428518 or releases the
+   the distance to D_L05_001B96C0; afterwards either chains DrawExpandingBillboardEffect or releases the
    slot and drops the live count. */
 void func_L05_00428350(char *object)
 {
@@ -109,18 +109,18 @@ void func_L05_00428350(char *object)
         D_L05_001B3580[*(int *)(state + 0x3C)] = 0.01f;
         D_L05_001B3598[*(int *)(state + 0x3C)] = 0x80;
         *(unsigned char *)(object + 0x20) = 1;
-        if (func_00282E48(object + 0x10, D_L05_001B96C0) > 200.0f)
+        if (fast_vec_dist(object + 0x10, D_L05_001B96C0) > 200.0f)
             *(float *)(state + 0x40) = 4.0f;
-        else if (func_00282E48(object + 0x10, D_L05_001B96C0) > 100.0f)
+        else if (fast_vec_dist(object + 0x10, D_L05_001B96C0) > 100.0f)
             *(float *)(state + 0x40) = 2.0f;
-        else if (func_00282E48(object + 0x10, D_L05_001B96C0) > 25.0f)
+        else if (fast_vec_dist(object + 0x10, D_L05_001B96C0) > 25.0f)
             *(float *)(state + 0x40) = 1.0f;
-        else if (func_00282E48(object + 0x10, D_L05_001B96C0) > 0.0f)
+        else if (fast_vec_dist(object + 0x10, D_L05_001B96C0) > 0.0f)
             *(float *)(state + 0x40) = 0.5f;
     }
-    if (!func_00282978(state)) {
-        func_00282978(state + 4);
-        func_L00_002E6DB8(func_L05_00428518, object);
+    if (!FastDecTimer(state)) {
+        FastDecTimer(state + 4);
+        func_L00_002E6DB8(DrawExpandingBillboardEffect, object);
     } else {
         D_L05_001B35B0[*(int *)(state + 0x3C)] = 0;
         D_L05_001B157C -= 1.0f;
@@ -221,7 +221,7 @@ char *func_L05_0042C928(float *pos, u32 kind, s32 a2, s32 a3)
 
     if (kind >= 4 || collected[kind + (D_001A79F0_1 << 2)] != 0)
         return 0;
-    moby = func_0029EFD0(0x126C);
+    moby = CreateMoby(0x126C);
     if (moby != 0) {
         float x, y, z, r;
 
@@ -252,7 +252,7 @@ char *func_L05_0042C928(float *pos, u32 kind, s32 a2, s32 a3)
         *(float *)(vars + 0x64) = y;
         *(u8 *)(moby + 0x20) = 1;
         func_L01_00397950(moby);
-        func_002A0488(moby, 0x82, 0x82, 0x82);
+        set_moby_color(moby, 0x82, 0x82, 0x82);
         if (D_L05_001B1780 == 0) {
             for (p = D_L05_001B2528; p != 0; p = p->next) {
                 if (p->oclass == 0xFBF)

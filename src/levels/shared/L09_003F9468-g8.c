@@ -78,8 +78,8 @@ void func_L09_0041A700(TriggerObject *obj)
         break;
     case 1:
         /* Pulse the colour: the angle advances 6 degrees per update. */
-        s->angle = func_00283B98(s->angle, 0.10471977f);
-        shade = func_00283CF0((func_00283198(s->angle) * 4.0f - 3.0f) * 128.0f);
+        s->angle = FastAddRotations(s->angle, 0.10471977f);
+        shade = FloatToInt((func_00283198(s->angle) * 4.0f - 3.0f) * 128.0f);
         if (shade > 128) shade = 128;
         else if (shade < 32) shade = 32;
         green = (shade << 8) | (int)0x80000000;
@@ -107,7 +107,7 @@ activate:
             obj->status = 2;
             obj->activated = 1;
             obj->color = 0x80208020;
-            func_002E5CF8(0, 0, obj);
+            PlayMobySound(0, 0, obj);
             id = obj->id;
             if (id & 1) {
                 u8 *counts = &D_0019B4A8[((short)id >> 1) + (D_001A79F0 << 10)];
@@ -127,7 +127,7 @@ proximity:
             /* Retail fills this raised copy but measures from the position itself. */
             qcopy(pos, obj->position);
             pos[2] += 0.35f;
-            if (func_00282E80(obj->position, player + 0x10) < 0.5f) {
+            if (vec_distance_xy(obj->position, player + 0x10) < 0.5f) {
                 int id = obj->id;
                 if (id & 1) {
                     u8 *counts = &D_0019B4A8[((short)id >> 1) + (D_001A79F0 << 10)];
@@ -139,7 +139,7 @@ proximity:
                 obj->status = 2;
                 obj->activated = 1;
                 obj->color = 0x80208020;
-                func_002E5CF8(0, 0, obj);
+                PlayMobySound(0, 0, obj);
             }
         }
         break;

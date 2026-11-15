@@ -26,11 +26,11 @@ extern int func_00277258(char *, int, char *, float);
 void func_L01_003A65B0(char *arg0) {
     char buf[16];
 
-    func_00282F20(buf, arg0 + 0xE0, D_L01_001AF87C);
-    func_00282CC0(buf, buf, arg0 + 0x10);
+    vec_scale_to_length(buf, arg0 + 0xE0, D_L01_001AF87C);
+    FastVecAdd(buf, buf, arg0 + 0x10);
     if (func_00277258(buf, 0, arg0, D_L01_001AF87C) != 0) {
-        func_00282CF0(buf, D_L01_001BF930, buf);
-        func_00282CC0(arg0 + 0x10, arg0 + 0x10, buf);
+        FastVecSub(buf, D_L01_001BF930, buf);
+        FastVecAdd(arg0 + 0x10, arg0 + 0x10, buf);
     }
 }
 
@@ -99,8 +99,8 @@ void func_L01_003A5BB8(u8 *object)
     case 0:
         if (I(state,0x50) == -1) { func_0029F338(object); return; }
         D_L01_001AF864 = 0;
-        first = func_00282E48(path + 0x10,path + 0x20);
-        last = func_00282E48(path + 0x10,path + I(path,0)*16);
+        first = fast_vec_dist(path + 0x10,path + 0x20);
+        last = fast_vec_dist(path + 0x10,path + I(path,0)*16);
         F(state,0x74) = (D_L01_001AF85C * 0.016666668f) / first;
         I(state,0x70) = func_00282C48(first-last) < 0.1f;
         F(state,0x5C) = F(state,0x58) * I(path,0);
@@ -121,7 +121,7 @@ void func_L01_003A5BB8(u8 *object)
         }
         if (!func_002A9640(object,0x10000,0)) return;
         F(state,0x60) = D_L01_001AF85C * 0.008333334f;
-        func_00283098(state+0x60,state+0x60,object+0xC0);
+        matrix_mul_vec3(state+0x60,state+0x60,object+0xC0);
         count = D_L01_001AF864 + 1;
         F(state,0x68) = -0.0500000045f;
         if ((D_L01_001AF864 = count) > 3 && (mode = D_001A79F0) == 1 && !D_001A7A60[13]) {
@@ -135,14 +135,14 @@ void func_L01_003A5BB8(u8 *object)
     case 2:
         if (func_002B3868(object)) {
             func_002AC728(object,object+0x10,-1,0.5f,13.0f);
-            func_002E5CF8(0,0,object);
+            PlayMobySound(0,0,object);
         }
         F(object,0x48) = 0.5f;
-        func_00282CC0(object+0x10,object+0x10,state+0x60);
+        FastVecAdd(object+0x10,object+0x10,state+0x60);
         F(state,0x68) -= 0.003f;
         F(state,0x60) *= 0.98f;
         F(state,0x64) *= 0.98f;
-        F(object,0xF0) = func_00283B98(-3.1415927f,(F(object,0xF0)+3.1415927f)*0.95f);
+        F(object,0xF0) = FastAddRotations(-3.1415927f,(F(object,0xF0)+3.1415927f)*0.95f);
         if (func_00282C48(func_002A89A8(object+0x10,0,0.5f)-F(object,0x18)) < 0.5f) {
             I(state,0x78) = 30;
             func_002A7750(object,3,-1);
@@ -150,8 +150,8 @@ void func_L01_003A5BB8(u8 *object)
         break;
     case 3:
         if (func_002B3868(object)) {
-            func_L01_003A6028(object);
-            func_002E5CF8(1,0,object);
+            OozlaSpawnSplashParticles(object);
+            PlayMobySound(1,0,object);
             func_L00_00326110(object,1,0.0f);
         }
         F(object,0x18) += F(state,0x68);
@@ -191,7 +191,7 @@ void func_L01_003B53C8(u8 *object)
     u8 *state = C(object,0x68);
     u8 *target, *detail;
     float angle, distance, best;
-    if (object[0x31] && func_00282E48(object+0x10,D_L01_001B94C0) < 24.0f) {
+    if (object[0x31] && fast_vec_dist(object+0x10,D_L01_001B94C0) < 24.0f) {
         func_002A93B0(object);
         object[0x6F] = 22;
     }
@@ -199,7 +199,7 @@ void func_L01_003B53C8(u8 *object)
     saved[1] = *(OozlaQuad *)(state+0x240);
     if (func_002B3BA8(object,I(state,0x398),0,0,F(state,0x388),0.5f) != 1 && ((int *)saved)[5] == 1) {
         target = ((u8 **)saved)[4];
-        if (target && target[0x20] != 254 && target[0x20] != 253 && func_00282E80(object+0x10,target+0x10) < F(state,0x39C)) {
+        if (target && target[0x20] != 254 && target[0x20] != 253 && vec_distance_xy(object+0x10,target+0x10) < F(state,0x39C)) {
             *(OozlaQuad *)(state+0x230) = saved[0];
             *(OozlaQuad *)(state+0x240) = saved[1];
             target = C(state,0x240);
@@ -228,7 +228,7 @@ void func_L01_003B53C8(u8 *object)
     if (object[0x31]) {
         u8 *goal = C(state,0x240);
         angle = func_00283248(F(goal,0x10)-F(object,0x10),F(goal,0x14)-F(object,0x14));
-        F(state,0x2B8) = func_00283BE0(angle,F(object,0xF8));
+        F(state,0x2B8) = fast_subtract_rotations(angle,F(object,0xF8));
         func_002AEC48(object,state+0x250,4,0.03f,0.3f);
         if (F(object,0x18) <= func_L01_003BAFB0()+0.3f && (object[0x95] >= 2 || func_002A77E0(9) == 0))
             func_L01_003B4480(object);
@@ -238,17 +238,17 @@ void func_L01_003B53C8(u8 *object)
             *P(state,0x36C) = -1;
             *P(state,0x370) = -1;
             best = 100000.0f;
-            func_002A8600(&iterator,object[0x21],0,0);
+            GetFirstMobyInGroup(&iterator,object[0x21],0,0);
             while (iterator) {
                 if (*(short *)(iterator+0xAA) == *(short *)(object+0xAA)) {
-                    distance = func_00282E80(iterator+0x10,D_00189EA0);
+                    distance = vec_distance_xy(iterator+0x10,D_00189EA0);
                     if (distance < best && iterator[0x95] == 3 && iterator[0x20] < 3) {
                         best = distance;
                         *P(state,0x370) = *P(state,0x36C);
                         *P(state,0x36C) = *(short *)(iterator+0xB2);
                     }
                 }
-                func_002A86E8(&iterator,iterator,0,0);
+                GetNextMobyInGroup(&iterator,iterator,0,0);
             }
             *P(state,0x368) = D_L01_001B2088;
         }

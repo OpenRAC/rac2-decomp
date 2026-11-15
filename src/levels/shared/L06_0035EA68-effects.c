@@ -7,7 +7,7 @@ extern void func_00282F20(void *, void *, float);
 
 char *func_L06_00463D40(char *moby, void *position, void *velocity, int kind, float size, float life)
 {
-    char *obj = func_0029EFD0(0x11B7);
+    char *obj = CreateMoby(0x11B7);
     u8 *st;
     int r, g, b, ga;
     if (obj) {
@@ -24,7 +24,7 @@ char *func_L06_00463D40(char *moby, void *position, void *velocity, int kind, fl
         qcopy(st + 0x20, velocity);
         qcopy(st + 0x10, velocity);
         *(float *)(st + 0x18) = 0;
-        func_00282F20(st + 0x10, st + 0x10, 1.0f);
+        vec_scale_to_length(st + 0x10, st + 0x10, 1.0f);
         if (!kind) {
             *(unsigned short *)(obj + 0x34) &= ~1;
             obj[0x23] = 0x50;

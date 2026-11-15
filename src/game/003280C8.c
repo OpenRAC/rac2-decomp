@@ -35,7 +35,7 @@ extern float func_002A7878(float, float);
 /* Spawn class 0xB7F at a position, owned by a parent, with a random spin. */
 Moby_3280C8 *func_003280C8(Moby_3280C8 *parent, f32 *rot, f32 *pos, s32 unused, s32 arg, f32 scale)
 {
-    Moby_3280C8 *m = func_0029EFD0(0xB7F);
+    Moby_3280C8 *m = CreateMoby(0xB7F);
     if (m != 0) {
         Pvar_3280C8 *pv;
         m->f30 = 0xFF;

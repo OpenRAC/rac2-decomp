@@ -38,14 +38,14 @@ void func_L02_003D6690(char *self, int joint) {
     func_0029FC20(self, joint, (char *)matrix);
     qcopy(direction, matrix);
     error = 100.0f;
-    func_00282F20(direction, direction, 5.3f);
-    func_00282CC0(endpoint, origin, direction);
+    vec_scale_to_length(direction, direction, 5.3f);
+    FastVecAdd(endpoint, origin, direction);
     sample = D_L02_001B0344;
     if (sample > 0) {
         qcopy(previous_end, &D_L02_00241290[sample]);
         qcopy(previous_origin, &D_L02_002415B0[sample]);
-        error = func_00282E48(previous_end, endpoint);
-        error += func_00282E48(previous_origin, origin);
+        error = fast_vec_dist(previous_end, endpoint);
+        error += fast_vec_dist(previous_origin, origin);
         if (error > 0.01f) {
             do {
                 int next;

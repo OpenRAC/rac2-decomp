@@ -47,13 +47,13 @@ void func_L23_0041D398(char *object) {
     cursor.state = *(PartState **)(D_L23_001B1484 + 0x68);
     if (D_001A7A00[0xFD]) {
         if (*(unsigned short *)(object + 0x96) > D_L23_001B1468 + 60) {
-            func_002A6C58(object, 0, 3);
+            SetDeathBits(object, 0, 3);
             func_L23_0041D9B0();
             return;
         }
     } else {
         if (*(unsigned short *)(object + 0x96) > D_L23_001B1468 + 200 && !func_002F5D10()) {
-            func_002A6C58(object, 0, 3);
+            SetDeathBits(object, 0, 3);
             func_L23_0041D9B0();
             return;
         }
@@ -76,15 +76,15 @@ void func_L23_0041D398(char *object) {
                 func_0029F338(*cursor.parts);
                 *cursor.parts = 0;
                 *(unsigned short *)(object + 0x34) |= 0x41;
-                func_0032C700(object + 16, 1, 135, 120, 120, 115, 125, 1, 6.5f, 20.0f, 1, 1, 1, 0);
-                func_002E5CF8(12, 0, object);
+                SpawnExplosion(object + 16, 1, 135, 120, 120, 115, 125, 1, 6.5f, 20.0f, 1, 1, 1, 0);
+                PlayMobySound(12, 0, object);
             } else if (*cursor.parts) {
                 int debrisIndex = 10 - D_L23_001B3720;
                 func_0029FC20(object, i - 4, (char *)local.matrix);
-                func_00282D30((char *)&local.velocity, (char *)&local.matrix[1], D_L23_001B16D0);
+                FastVecScale((char *)&local.velocity, (char *)&local.matrix[1], D_L23_001B16D0);
                 scale = func_002A7878(0.0f, D_L23_001B16D0 * 0.5f);
-                func_00282D30((char *)&local.random, object + 0xE0, scale);
-                func_00282CC0((char *)&local.velocity, (char *)&local.velocity, (char *)&local.random);
+                FastVecScale((char *)&local.random, object + 0xE0, scale);
+                FastVecAdd((char *)&local.velocity, (char *)&local.velocity, (char *)&local.random);
                 {
                     char *oldPart = *cursor.parts;
                     particle = func_00273730(oldPart, 1, *(short *)(oldPart + 0xAA), debrisIndex, oldPart + 16, oldPart + 0xF0, (float *)&local.velocity, 255, 140.0f, 25.0f);
@@ -99,8 +99,8 @@ void func_L23_0041D398(char *object) {
     if ((D_L23_001B1468 << 1) / 3 < timer) {
         int i;
         cursor.parts = cursor.state->parts;
-        func_0032C700(object + 16, 1, 45, 30, 40, 25, 85, 1, 4.5f, 20.0f, 1, 1, 1, 0);
-        func_002E5CF8(11, 0, object);
+        SpawnExplosion(object + 16, 1, 45, 30, 40, 25, 85, 1, 4.5f, 20.0f, 1, 1, 1, 0);
+        PlayMobySound(11, 0, object);
         for (i = 4; i >= 0; i--, cursor.parts++) {
             char *replacement = cursor.parts[5];
             if (replacement) {
@@ -133,13 +133,13 @@ void func_L23_0041D398(char *object) {
             char *direction = *slot + 0xD0;
             int parity;
             scale = func_002A7878(4.0f, 12.0f);
-            func_00282D30((char *)&local.velocity, direction, scale);
-            func_00282CC0((char *)&local.velocity, (char *)&local.velocity, *slot + 16);
+            FastVecScale((char *)&local.velocity, direction, scale);
+            FastVecAdd((char *)&local.velocity, (char *)&local.velocity, *slot + 16);
             scale = func_002A7878(2.3f, 3.7f);
             parity = index & 1;
-            func_0032C700(&local.velocity, parity, 20, 10, 14, 15, 25, 0, scale, 20.0f, parity, 0, 0, 0);
+            SpawnExplosion(&local.velocity, parity, 20, 10, 14, 15, 25, 0, scale, 20.0f, parity, 0, 0, 0);
         }
-        func_002E5CF8(func_002A77E0(3) + 13, 0, object);
+        PlayMobySound(func_002A77E0(3) + 13, 0, object);
         return;
     }
     if (timer & 31) return;
@@ -150,11 +150,11 @@ void func_L23_0041D398(char *object) {
         char *direction = *slot + 0xD0;
         int parity;
         scale = func_002A7878(4.0f, 12.0f);
-        func_00282D30((char *)&local.velocity, direction, scale);
-        func_00282CC0((char *)&local.velocity, (char *)&local.velocity, *slot + 16);
+        FastVecScale((char *)&local.velocity, direction, scale);
+        FastVecAdd((char *)&local.velocity, (char *)&local.velocity, *slot + 16);
         scale = func_002A7878(2.3f, 3.7f);
         parity = index & 1;
-        func_0032C700(&local.velocity, parity, 20, 10, 14, 15, 25, 0, scale, 20.0f, parity, 0, 0, 0);
+        SpawnExplosion(&local.velocity, parity, 20, 10, 14, 15, 25, 0, scale, 20.0f, parity, 0, 0, 0);
     }
-    func_002E5CF8(func_002A77E0(3) + 13, 0, object);
+    PlayMobySound(func_002A77E0(3) + 13, 0, object);
 }

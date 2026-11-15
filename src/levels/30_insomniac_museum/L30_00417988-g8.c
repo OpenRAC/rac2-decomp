@@ -118,9 +118,9 @@ void func_L30_00417988(char *obj) {
     }
     case 1:
         if (D_00189E20.focus!=obj || D_L30_001B2C40<16 || !D_001A7B2B) break;
-        func_002B0CE0(12,0x2803,1);
+        ForceClaimNotice(12,0x2803,1);
         if (!func_00294630(((MuseumSound *)D_L30_002693F0)[D_00139568.mode].handle)) {
-            func_00294420(((MuseumSound *)D_L30_002693F0)[D_00139568.mode].handle);
+            LoadClassIntoFreeCacheSlot(((MuseumSound *)D_L30_002693F0)[D_00139568.mode].handle);
             break;
         }
         if (D_00138180.buttons.words.high&0x10) {
@@ -132,9 +132,9 @@ void func_L30_00417988(char *obj) {
     case 2: {
         unsigned int cameraState;
         if (func_002B3868(obj)) {
-            func_00283098(vec,D_L30_001B1FC0_gp,obj+0xC0);
-            func_00282CC0(vec,vec,obj+0x10);
-            func_L00_002D40A0(vec,0,func_00283B98(F(obj,0xF8),3.1415927f));
+            matrix_mul_vec3(vec,D_L30_001B1FC0_gp,obj+0xC0);
+            FastVecAdd(vec,vec,obj+0x10);
+            func_L00_002D40A0(vec,0,FastAddRotations(F(obj,0xF8),3.1415927f));
         }
         cameraState=func_L00_002D40F0();
         if (cameraState==2) func_002A7750(obj,3,-1);
@@ -144,28 +144,28 @@ void func_L30_00417988(char *obj) {
     }
     case 3:
         if (func_002B3868(obj)) {
-            func_L00_002C42E0(0x6F,0);func_L00_002D2168(0x54,0,20.0f);
-            func_00282CF0(vec,D_L30_001B9DC0,D_00189E20.position);
-            func_00283098(vec,vec,D_00189E20.matrix40);
+            func_L00_002C42E0(0x6F,0);set_hero_animation(0x54,0,20.0f);
+            FastVecSub(vec,D_L30_001B9DC0,D_00189E20.position);
+            matrix_mul_vec3(vec,vec,D_00189E20.matrix40);
             func_L30_0042BEB8(D_L30_001B9DC0,D_L30_001B9DC0,3,120,0);
             st->fade=0;
         }
-        func_00283098(vec,D_L30_001B1FC0_gp,obj+0xC0);
-        func_00282CC0(vec,vec,obj+0x10);
-        func_00282CF0(D_00189E20.velocity,vec,D_00189E20.position);
+        matrix_mul_vec3(vec,D_L30_001B1FC0_gp,obj+0xC0);
+        FastVecAdd(vec,vec,obj+0x10);
+        FastVecSub(D_00189E20.velocity,vec,D_00189E20.position);
         D_00189E20.velocity[2]=0;
         func_002AC9F8(D_00189E20.velocity,0.012500001f);
-        func_002AA800(D_00189E20.rotation,0,func_00283B98(F(obj,0xF8),3.1415927f),0.017453296f);
+        StepAngleTowardTarget(D_00189E20.rotation,0,FastAddRotations(F(obj,0xF8),3.1415927f),0.017453296f);
         D_00189E20.mode=3;
-        if ((D_00189E20.flags&2) && B(D_00189E20.animation,0x43)==0x54) func_L00_002D2168(0x55,0,7.0f);
+        if ((D_00189E20.flags&2) && B(D_00189E20.animation,0x43)==0x54) set_hero_animation(0x55,0,7.0f);
         if (D_00189E20.animationId!=0x6F) func_002A7750(obj,1,-1);
-        func_00283098(pos,D_L30_001B1FD0_gp,&D_00189E20);
-        func_00282CC0(pos,pos,D_00189E20.position);
+        matrix_mul_vec3(pos,D_L30_001B1FD0_gp,&D_00189E20);
+        FastVecAdd(pos,pos,D_00189E20.position);
         qzero_nc(rot);
-        func_00283098(target,D_L30_001B1FE0_gp,&D_00189E20);
-        func_00282CC0(target,target,D_00189E20.position);
+        matrix_mul_vec3(target,D_L30_001B1FE0_gp,&D_00189E20);
+        FastVecAdd(target,target,D_00189E20.position);
         rot[2]=func_00283248(target[0]-pos[0],target[1]-pos[1]);
-        rot[1]=-func_00283248(func_00282E80(pos,target),target[2]-pos[2]);
+        rot[1]=-func_00283248(vec_distance_xy(pos,target),target[2]-pos[2]);
         func_L30_0042BDF0(pos);func_L30_0042BE48(rot);
         if ((AdvanceMuseumTimer(obj)>=61)) func_002A7750(obj,4,-1);
         break;
@@ -177,7 +177,7 @@ void func_L30_00417988(char *obj) {
         }
         D_00189E20.mode=3;
         if ((AdvanceMuseumTimer(obj)<21)) break;
-        func_002AA2E8(&st->fade,1.0f,0.116666675f);
+        ApproachValue(&st->fade,1.0f,0.116666675f);
         elapsed=U(obj,0x96);
         D_L30_001B2764=st->fade;
         if (elapsed<31) break;
@@ -204,15 +204,15 @@ void func_L30_00417988(char *obj) {
             U(st->display,0x34)&=~1;
             B(st->display,0x31)=1;
             U(st->display,0x34)&=~0x80;
-            func_00283360(D_L30_001B9FF0);
+            set_identity_rotation_rows(D_L30_001B9FF0);
             func_00282C88((char *)st->display+0xF0);
             F(st->display,0xF4)=-1.5707964f;
-            func_002833F0((char *)st->display+0xC0,(char *)st->display+0xF0);
+            euler_rotation_basis((char *)st->display+0xC0,(char *)st->display+0xF0);
             func_002A7750(obj,6,-1);
         } else if ((AdvanceMuseumTimer(obj)>=6)) func_002A7750(obj,1,-1);
         break;
     case 6:
-        if (D_L30_001A8F00==7) {func_00283360(D_L30_001B9FF0);func_L30_004185E0(obj);break;}
+        if (D_L30_001A8F00==7) {set_identity_rotation_rows(D_L30_001B9FF0);func_L30_004185E0(obj);break;}
         func_L30_00418670(obj);
         if (st->cleanupId!=-1) func_L30_0042E658(st->cleanupId);
         if (st->completed) {
@@ -238,26 +238,26 @@ void func_L30_00417988(char *obj) {
     case 9:
         if (func_002B3868(obj)) {
             st->menu=func_L30_00413490(obj);
-            func_L30_00413528(st->menu,&st->settings,D_L30_001B1FF0,0,0,10000);
-            func_L30_00413528(st->menu,&st->duration,D_L30_001B2000,0,30,1000);
-            func_L30_00413528(st->menu,&st->limit,D_L30_001B2010,0,15,1000);
-            func_L30_00413528(st->menu,&st->trackIds[0],D_L30_001B2020,0,-1,3);
-            func_L30_00413528(st->menu,&st->trackIds[1],D_L30_001B2030,0,-1,3);
-            func_L30_00413528(st->menu,&st->trackIds[2],D_L30_001B2040,0,-1,3);
-            func_L30_00413528(st->menu,&st->trackIds[3],D_L30_001B2050,0,-1,3);
-            func_L30_00413528(st->menu,&st->trackIds[4],D_L30_001B2060,0,-1,3);
-            func_L30_00413528(st->menu,&st->trackIds[5],D_L30_001B2070,0,-1,3);
-            func_L30_00413528(st->menu,&st->trackIds[6],D_L30_001B2080,0,-1,3);
-            func_L30_00413528(st->menu,&st->trackIds[7],D_L30_001B2090,0,-1,3);
-            func_L30_00413528(st->menu,&st->trackIds[8],D_L30_001B20A0,0,-1,3);
-            func_L30_00413528(st->menu,&st->trackIds[9],D_L30_001B20B0,0,-1,3);
-            func_L30_00413528(st->menu,&st->trackIds[10],D_L30_001B20C0,0,-1,3);
-            func_L30_00413528(st->menu,&st->trackIds[11],D_L30_001B20D0,0,-1,3);
-            func_L30_00413528(st->menu,&st->trackIds[12],D_L30_001B20E0,0,-1,3);
-            func_L30_00413528(st->menu,&st->trackIds[13],D_L30_001B20F0,0,-1,3);
+            MuseumTweakMenuAddItem(st->menu,&st->settings,D_L30_001B1FF0,0,0,10000);
+            MuseumTweakMenuAddItem(st->menu,&st->duration,D_L30_001B2000,0,30,1000);
+            MuseumTweakMenuAddItem(st->menu,&st->limit,D_L30_001B2010,0,15,1000);
+            MuseumTweakMenuAddItem(st->menu,&st->trackIds[0],D_L30_001B2020,0,-1,3);
+            MuseumTweakMenuAddItem(st->menu,&st->trackIds[1],D_L30_001B2030,0,-1,3);
+            MuseumTweakMenuAddItem(st->menu,&st->trackIds[2],D_L30_001B2040,0,-1,3);
+            MuseumTweakMenuAddItem(st->menu,&st->trackIds[3],D_L30_001B2050,0,-1,3);
+            MuseumTweakMenuAddItem(st->menu,&st->trackIds[4],D_L30_001B2060,0,-1,3);
+            MuseumTweakMenuAddItem(st->menu,&st->trackIds[5],D_L30_001B2070,0,-1,3);
+            MuseumTweakMenuAddItem(st->menu,&st->trackIds[6],D_L30_001B2080,0,-1,3);
+            MuseumTweakMenuAddItem(st->menu,&st->trackIds[7],D_L30_001B2090,0,-1,3);
+            MuseumTweakMenuAddItem(st->menu,&st->trackIds[8],D_L30_001B20A0,0,-1,3);
+            MuseumTweakMenuAddItem(st->menu,&st->trackIds[9],D_L30_001B20B0,0,-1,3);
+            MuseumTweakMenuAddItem(st->menu,&st->trackIds[10],D_L30_001B20C0,0,-1,3);
+            MuseumTweakMenuAddItem(st->menu,&st->trackIds[11],D_L30_001B20D0,0,-1,3);
+            MuseumTweakMenuAddItem(st->menu,&st->trackIds[12],D_L30_001B20E0,0,-1,3);
+            MuseumTweakMenuAddItem(st->menu,&st->trackIds[13],D_L30_001B20F0,0,-1,3);
             st->completed=0;
         }
-        func_002B0CE0(1,0,1);
+        ForceClaimNotice(1,0,1);
         if (!st->menu || H(st->menu,0xAA)!=0x118A || B(st->menu,0x20)==254 || B(st->menu,0x20)==253) func_002A7750(obj,1,-1);
         break;
     }

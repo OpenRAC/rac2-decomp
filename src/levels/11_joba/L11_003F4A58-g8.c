@@ -88,7 +88,7 @@ void func_L11_003F4A58(char *pos, int count) {
 
     *(TI128 *)axis = 0;
     axis[2] = 1.0f;
-    func_00282CF0(direction, D_L11_001BA8C0, (float *)pos);
+    FastVecSub(direction, D_L11_001BA8C0, (float *)pos);
     direction[2] = 0.0f;
     for (i = 0; i < count; i++) {
         size = func_002A7878(D_L11_001B0668, D_L11_001B066C);
@@ -98,29 +98,29 @@ void func_L11_003F4A58(char *pos, int count) {
         angle = func_002A7878(-1.0471977f, 1.0471977f);
         func_002ACEC0(velocity, direction, axis, angle);
         speed = func_002A7878(D_L11_001B0654, D_L11_001B0658) * (1.0f / 60.0f);
-        func_00282F20((char *)velocity, (char *)velocity, speed);
+        vec_scale_to_length((char *)velocity, (char *)velocity, speed);
         velocity[2] = func_002A7878(D_L11_001B065C, D_L11_001B0660) * (1.0f / 60.0f);
         qcopy(point, pos);
         point[0] += func_002A78D8(0.0f, 0.15f);
         point[1] += func_002A78D8(0.0f, 0.15f);
         point[2] += func_002A78D8(0.0f, 0.15f);
         if (!(func_001163B0() & 1)) {
-            func_00282D30(velocity, velocity, 1.5f);
+            FastVecScale(velocity, velocity, 1.5f);
             particle = func_002C2210(point, 60, size * 0.35f, size, 0x7F800000, 0, sign, velocity, 0, D_L11_001B0664);
             if (particle)
-                particle[9] = func_00283CF0(4.0f) + 0x70;
+                particle[9] = FloatToInt(4.0f) + 0x70;
             particle = func_002C2210(point, 60, size * 0.245f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, D_L11_001B0664);
         } else {
-            func_00282CF0(extra, D_L11_001BA8C0, point);
-            func_00282F20((char *)extra, (char *)extra, speed);
-            func_00282CC0((char *)velocity, (char *)velocity, (char *)extra);
+            FastVecSub(extra, D_L11_001BA8C0, point);
+            vec_scale_to_length((char *)extra, (char *)extra, speed);
+            FastVecAdd((char *)velocity, (char *)velocity, (char *)extra);
             particle = func_002C2210(point, 40, size * 2.05f, size, 0x7F800000, 0, sign, velocity, 0, D_L11_001B0664);
             if (particle)
-                particle[9] = func_00283CF0(4.0f) + 0x70;
+                particle[9] = FloatToInt(4.0f) + 0x70;
             particle = func_002C2210(point, 40, size * 1.43500006f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, D_L11_001B0664);
         }
         if (particle)
-            particle[9] = func_00283CF0(4.0f) + 0x70;
+            particle[9] = FloatToInt(4.0f) + 0x70;
     }
 }
 

@@ -45,7 +45,7 @@ void func_L09_00410608(char *object)
         FLOAT(state,0x64) *= 0.0166666675f;
         FLOAT(object,0x2c) *= 1.75f;
         if (WORD(state,0x60) == -1)
-            func_0026FEB8(D_L09_001B17F8, HALF(object,0xaa), HALF(object,0xb2));
+            STUB_printf(D_L09_001B17F8, HALF(object,0xaa), HALF(object,0xb2));
         WORD(state,0x6c) = -1;
         func_002A7750(object,1,-1);
         break;
@@ -60,7 +60,7 @@ void func_L09_00410608(char *object)
         }
         slot = SLOT(WORD(state,0x6c));
         if (*(char **)(slot+0x88) != object || !BYTE(slot,0x74))
-            WORD(state,0x6c) = func_002E5CF8(1,4,object);
+            WORD(state,0x6c) = PlayMobySound(1,4,object);
         if (WORD(state,0x60) != -1 && D_00189E20.object==object && D_00189E20.active)
             func_002A7750(object,2,-1);
         break;
@@ -75,11 +75,11 @@ void func_L09_00410608(char *object)
         }
         slot = SLOT(WORD(state,0x6c));
         if (*(char **)(slot+0x88) != object || !BYTE(slot,0x74))
-            WORD(state,0x6c) = func_002E5CF8(0,4,object);
-        func_00282CF0(delta,D_L09_001B294C+WORD(state,0x60)*0x80+0x30,object+0x10);
-        func_00282F20(delta,delta,FLOAT(state,0x64));
-        func_00282CC0(object+0x10,object+0x10,delta);
-        if (func_00282E48(object+0x10,D_L09_001B294C+WORD(state,0x60)*0x80+0x30)<=0.88f)
+            WORD(state,0x6c) = PlayMobySound(0,4,object);
+        FastVecSub(delta,D_L09_001B294C+WORD(state,0x60)*0x80+0x30,object+0x10);
+        vec_scale_to_length(delta,delta,FLOAT(state,0x64));
+        FastVecAdd(object+0x10,object+0x10,delta);
+        if (fast_vec_dist(object+0x10,D_L09_001B294C+WORD(state,0x60)*0x80+0x30)<=0.88f)
             func_002A7750(object,3,-1);
         break;
     case 3:
@@ -93,7 +93,7 @@ void func_L09_00410608(char *object)
         }
         slot = SLOT(WORD(state,0x6c));
         if (*(char **)(slot+0x88) != object || !BYTE(slot,0x74))
-            WORD(state,0x6c) = func_002E5CF8(1,4,object);
+            WORD(state,0x6c) = PlayMobySound(1,4,object);
         if (D_00189E20.object!=object)
             func_002A7750(object,4,-1);
         break;
@@ -108,17 +108,17 @@ void func_L09_00410608(char *object)
         if (func_00277258(object+0x10,0x10,object,D_L09_001B17F4) && D_L09_001BFE58)
             break;
         if (SOUND_SLOT(WORD(state,0x6c))->owner != object || !SOUND_SLOT(WORD(state,0x6c))->active)
-            WORD(state,0x6c) = func_002E5CF8(0,4,object);
-        func_00282CF0(delta,state+0x80,object+0x10);
-        func_00282F20(delta,delta,FLOAT(state,0x64));
-        func_00282CC0(object+0x10,object+0x10,delta);
-        if (func_00282E48(object+0x10,state+0x80)<=0.88f)
+            WORD(state,0x6c) = PlayMobySound(0,4,object);
+        FastVecSub(delta,state+0x80,object+0x10);
+        vec_scale_to_length(delta,delta,FLOAT(state,0x64));
+        FastVecAdd(object+0x10,object+0x10,delta);
+        if (fast_vec_dist(object+0x10,state+0x80)<=0.88f)
             func_002A7750(object,1,-1);
         break;
     }
     }
     func_L09_00410B40(object);
     func_L09_00410BC8(object);
-    func_00282CF0(delta,object+0x10,old_position);
+    FastVecSub(delta,object+0x10,old_position);
     func_002AD6F0(state+0x20,delta,old_rotation,object+0xf0);
 }

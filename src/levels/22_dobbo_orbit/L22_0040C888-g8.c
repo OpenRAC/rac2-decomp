@@ -54,19 +54,19 @@ void func_L22_0040C888(unsigned char *obj) {
     if (!D_L22_001AF314[0]) return;
     collision = 0; facing = 0; distance = 0.0f; visible = 0;
     if (obj[0x20] != 6 && obj[0x95] != 5) {
-        if (func_00282E48(D_L22_001AF314[0] + 0x10, obj + 0x10) < D_L22_001B11A0) {
+        if (fast_vec_dist(D_L22_001AF314[0] + 0x10, obj + 0x10) < D_L22_001B11A0) {
             collision = 1;
             func_002A7750(obj, 5, 3);
         }
-        func_00282CF0(&delta, (&D_00189E20.position), obj + 0x10);
+        FastVecSub(&delta, (&D_00189E20.position), obj + 0x10);
         if (func_L02_00329C48(obj, &delta, 0) <= 0.785398185f) facing = 1;
-        if (func_L22_003A2780(D_L22_001AF314[0], (&D_00189E20.position), obj + 0x10)) visible = 1;
-        distance = func_00282E48((&D_00189E20.position), obj + 0x10);
+        if (WalkPathIsClear(D_L22_001AF314[0], (&D_00189E20.position), obj + 0x10)) visible = 1;
+        distance = fast_vec_dist((&D_00189E20.position), obj + 0x10);
         if (func_002B0360(obj + 0x10) - D_L22_001B2AA4 > 9.19999981f) {
             qcopy(&temp, obj + 0x10);
             func_L22_003A2988(&temp, 2.0f);
             if (func_00277258(&temp, 0, obj, 5.0f) && (hit = D_L22_001C00D8) && *(short *)(hit + 0xAA) == 0xDCE) {
-                func_0032C700(hit + 0x10, 0, 0x19, 0x14, 0x14, 0xA, 0xF, 1, 1, 0, 0, 0, 1.5f, 20.0f);
+                SpawnExplosion(hit + 0x10, 0, 0x19, 0x14, 0x14, 0xA, 0xF, 1, 1, 0, 0, 0, 1.5f, 20.0f);
                 func_0029F338(hit);
             }
         }
@@ -111,13 +111,13 @@ void func_L22_0040C888(unsigned char *obj) {
                 for (i = 0; i < 5; i++) {
                     func_002A7A00(&delta, D_L22_001B11BC * 0.0166666675f, D_L22_001B11C0 * 0.0166666675f);
                     delta.f[2] = func_00282C48(delta.f[2]) * D_L22_001B11C4;
-                    func_00283098(&delta, &delta, obj + 0xC0);
+                    matrix_mul_vec3(&delta, &delta, obj + 0xC0);
                     part = func_00273730(obj, 1, *(short *)(obj + 0xAA), i, obj + 0x10, obj + 0xF0, &delta, 255, 30.0f, 15.0f);
                     *(void **)(part + 0x64) = func_00310C88;
                 }
-                func_00282CF0(&temp, D_L22_001B9C80, &delta);
-                func_00282F20(&temp, &temp, 1.0f);
-                func_0032C700(obj + 0x10, 0, 25, 20, 20, 10, 15, 1, 1, 0, 0, 0, 1.5f, 20.0f);
+                FastVecSub(&temp, D_L22_001B9C80, &delta);
+                vec_scale_to_length(&temp, &temp, 1.0f);
+                SpawnExplosion(obj + 0x10, 0, 25, 20, 20, 10, 15, 1, 1, 0, 0, 0, 1.5f, 20.0f);
                 *(short *)(ctx + 0x178) = 0;
                 *(int *)(obj + 0x98) = *(int *)(*(char **)(obj + 0x24) + 0x10);
                 *(float *)(ctx + 0x20) = *(short *)(ctx + 0x24);
@@ -126,36 +126,36 @@ void func_L22_0040C888(unsigned char *obj) {
                  * access depends on moving across its copy. */
                 qcopy_nc(saved_position, (&D_00189E20.position));
                 func_L22_003A2988(saved_position, 0.0f);
-                func_00282D30(&push, D_00189E20.moby + 0xE0, -80.0f);
+                FastVecScale(&push, D_00189E20.moby + 0xE0, -80.0f);
                 switch (func_002A77E0(7)) {
-                case 0: func_00282D30(&offset, D_00189E20.moby + 0xC0, -50.0f); break;
-                case 1: func_00282D30(&offset, D_00189E20.moby + 0xD0, 50.0f); break;
-                case 2: func_00282D30(&offset, D_00189E20.moby + 0xD0, -50.0f); break;
+                case 0: FastVecScale(&offset, D_00189E20.moby + 0xC0, -50.0f); break;
+                case 1: FastVecScale(&offset, D_00189E20.moby + 0xD0, 50.0f); break;
+                case 2: FastVecScale(&offset, D_00189E20.moby + 0xD0, -50.0f); break;
                 case 3:
-                    func_00282D30(&posy, D_00189E20.moby + 0xD0, 50.0f);
-                    func_00282D30(&posx, D_00189E20.moby + 0xC0, 50.0f);
-                    func_00282CC0(&offset, &posy, &posx); func_00282D30(&offset, &offset, 0.5f); break;
+                    FastVecScale(&posy, D_00189E20.moby + 0xD0, 50.0f);
+                    FastVecScale(&posx, D_00189E20.moby + 0xC0, 50.0f);
+                    FastVecAdd(&offset, &posy, &posx); FastVecScale(&offset, &offset, 0.5f); break;
                 case 4:
-                    func_00282D30(&posx, D_00189E20.moby + 0xC0, 50.0f);
-                    func_00282D30(&negy, D_00189E20.moby + 0xD0, -50.0f);
-                    func_00282CC0(&offset, &posx, &negy); func_00282D30(&offset, &offset, 0.5f); break;
+                    FastVecScale(&posx, D_00189E20.moby + 0xC0, 50.0f);
+                    FastVecScale(&negy, D_00189E20.moby + 0xD0, -50.0f);
+                    FastVecAdd(&offset, &posx, &negy); FastVecScale(&offset, &offset, 0.5f); break;
                 case 5:
-                    func_00282D30(&negy, D_00189E20.moby + 0xD0, -50.0f);
-                    func_00282D30(&negx, D_00189E20.moby + 0xC0, -50.0f);
-                    func_00282CC0(&offset, &negy, &negx); func_00282D30(&offset, &offset, 0.5f); break;
+                    FastVecScale(&negy, D_00189E20.moby + 0xD0, -50.0f);
+                    FastVecScale(&negx, D_00189E20.moby + 0xC0, -50.0f);
+                    FastVecAdd(&offset, &negy, &negx); FastVecScale(&offset, &offset, 0.5f); break;
                 case 6:
-                    func_00282D30(&negx, D_00189E20.moby + 0xC0, -50.0f);
-                    func_00282D30(&posy, D_00189E20.moby + 0xD0, 50.0f);
-                    func_00282CC0(&offset, &negx, &posy); func_00282D30(&offset, &offset, 0.5f); break;
+                    FastVecScale(&negx, D_00189E20.moby + 0xC0, -50.0f);
+                    FastVecScale(&posy, D_00189E20.moby + 0xD0, 50.0f);
+                    FastVecAdd(&offset, &negx, &posy); FastVecScale(&offset, &offset, 0.5f); break;
                 }
-                func_00282CC0(&push, &push, &offset);
-                func_00282CC0(&push, &push, saved_position);
+                FastVecAdd(&push, &push, &offset);
+                FastVecAdd(&push, &push, saved_position);
                 func_L22_003A2B90(D_L22_001AF314[0], obj + 0x10, &push, 1);
                 func_L22_003A2988(obj + 0x10, 7.19999981f);
                 if (func_00277258(obj + 0x10, 1, 0, 3.0f) && *(short *)(D_L22_001C00D8 + 0xAA) == 0xEDD && D_L22_001C00D8[0x20] != 6) {
-                    func_00282D30(&scatter, obj + 0xC0 + func_002A77E0(2) * 16,
+                    FastVecScale(&scatter, obj + 0xC0 + func_002A77E0(2) * 16,
                                   2.0f * (func_002A77E0(2) ? D_L22_001AF308 : -D_L22_001AF308));
-                    func_00282CC0(obj + 0x10, obj + 0x10, &scatter);
+                    FastVecAdd(obj + 0x10, obj + 0x10, &scatter);
                     func_L22_003A2988(obj + 0x10, 7.19999981f);
                 }
                 qcopy(ctx + 0x2A0, obj + 0x10);
@@ -176,7 +176,7 @@ void func_L22_0040C888(unsigned char *obj) {
         qcopy(&delta, obj + 0x10);
         func_L22_003A2988(&delta, 7.19999981f);
         if (*(unsigned short *)(obj + 0x96) >= 61 && !(*(unsigned short *)(obj + 0x96) & 63)) func_L22_0040DB20(obj, ctx + 0x2A0, 50.0f);
-        if (func_00282E48(obj + 0x10, &delta) < 0.1f) {
+        if (fast_vec_dist(obj + 0x10, &delta) < 0.1f) {
             func_002A7750(obj, 2, 0);
             *(int *)(ctx + 0x88) &= ~0x10;
         } else func_L22_0040DC40(obj, &delta, 0, D_L22_001B11B0);
@@ -184,13 +184,13 @@ void func_L22_0040C888(unsigned char *obj) {
     case 7:
         if ((*(unsigned short *)(obj + 0x96) & 7) == 7) {
             qcopy(&delta, *(void **)(ctx + 0x2B0));
-            func_00282F20(&delta, &delta, *(float *)(ctx + 0x2B4));
-            func_00282CC0(&delta, (&D_00189E20.position), &delta);
+            vec_scale_to_length(&delta, &delta, *(float *)(ctx + 0x2B4));
+            FastVecAdd(&delta, (&D_00189E20.position), &delta);
             func_L22_003A2988(&delta, 7.19999981f);
             qcopy(ctx + 0x2A0, &delta);
         }
         if (*(unsigned short *)(obj + 0x96) >= 61 && !(*(unsigned short *)(obj + 0x96) & 511)) func_L22_0040DB20(obj, ctx + 0x2A0, 50.0f);
-        if (func_00282E48(obj + 0x10, ctx + 0x2A0) < 2.0f || func_00282E48(obj + 0x10, (&D_00189E20.position)) < 20.0f) {
+        if (fast_vec_dist(obj + 0x10, ctx + 0x2A0) < 2.0f || fast_vec_dist(obj + 0x10, (&D_00189E20.position)) < 20.0f) {
             func_002A7750(obj, 9, 5);
             *(int *)(ctx + 0x280) = 0;
         } else func_L22_0040DC40(obj, ctx + 0x2A0, 0, D_L22_001B11B4);
@@ -200,21 +200,21 @@ void func_L22_0040C888(unsigned char *obj) {
         *(float *)(ctx + 0x2B4) = func_002A7878(0.0f, 15.0f) + 10.0f;
         choice = func_002A77E0(4);
         switch (choice) {
-        case 0: qcopy(&temp, D_00189E20.moby + 0xD0); func_00282D30(&temp, &temp, -1.0f); break;
+        case 0: qcopy(&temp, D_00189E20.moby + 0xD0); FastVecScale(&temp, &temp, -1.0f); break;
         case 1: qcopy(&temp, D_00189E20.moby + 0xD0); break;
-        case 2: qcopy(&temp, D_00189E20.moby + 0xC0); func_00282D30(&temp, &temp, -1.0f); break;
+        case 2: qcopy(&temp, D_00189E20.moby + 0xC0); FastVecScale(&temp, &temp, -1.0f); break;
         case 3: qcopy(&temp, D_00189E20.moby + 0xC0); break;
         }
         min = D_L22_001B11A4; max = D_L22_001B11A8;
         *(void **)(ctx + 0x2B0) = D_00189E20.moby + 0xC0;
-        func_00282D30(&delta, &temp, func_002A7878(min, max));
-        func_00282CC0(&delta, &delta, (&D_00189E20.position));
+        FastVecScale(&delta, &temp, func_002A7878(min, max));
+        FastVecAdd(&delta, &delta, (&D_00189E20.position));
         func_002A7988(&push, 0.1f, D_L22_001B11A4 * 0.333333343f);
-        func_00282CC0(&delta, &delta, &push);
+        FastVecAdd(&delta, &delta, &push);
         qcopy(obj + 0x10, &delta);
         qcopy(&old, *(void **)(ctx + 0x2B0));
-        func_00282F20(&old, &old, *(float *)(ctx + 0x2B4));
-        func_00282CC0(&old, (&D_00189E20.position), &old);
+        vec_scale_to_length(&old, &old, *(float *)(ctx + 0x2B4));
+        FastVecAdd(&old, (&D_00189E20.position), &old);
         func_L22_003A2988(&old, 7.19999981f);
         qcopy(ctx + 0x2A0, &old);
         func_002A7750(obj, 7, 5);

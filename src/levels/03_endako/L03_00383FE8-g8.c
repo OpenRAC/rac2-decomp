@@ -58,14 +58,14 @@ void func_L03_00383FE8(char *m)
             } while (i >= 0);
         }
         func_L00_0032A258(m, D_L03_001AEC10, D_L03_001AEC08, D_L03_001AEC00, 65535, 0, -1, 6, 65535, 255, 0);
-        func_0032C700(position, 0, 25, 20, 20, 20, 45, 1, 1, 1, 0, 0, 0.5f, 20);
+        SpawnExplosion(position, 0, 25, 20, 20, 20, 45, 1, 1, 1, 0, 0, 0.5f, 20);
         func_0029F338(m);
         break;
     }
     case 3:
         if (func_002B3868(m)) func_L02_002DCEA0(1, 15);
         if (D_L03_001B2460 >= 1) {
-            p = func_0029EFD0(0x1335);
+            p = CreateMoby(0x1335);
             if (p) {
                 qcopy(p + 0x10, D_L03_001B9980);
                 *(unsigned char *)(p + 0x30) = 255;

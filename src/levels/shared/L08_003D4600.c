@@ -28,7 +28,7 @@ extern void func_002A0F48(void *);
 /* Inherits colour and orientation, while installing a separate position. */
 SpawnObject *func_L08_003D4600(SpawnObject *owner, SpawnVector *position)
 {
-    SpawnObject *object = func_0029EFD0(0x9A1);
+    SpawnObject *object = CreateMoby(0x9A1);
     if (object != 0) {
         SpawnVector *destination = &object->position;
         object->intensity = owner->intensity;

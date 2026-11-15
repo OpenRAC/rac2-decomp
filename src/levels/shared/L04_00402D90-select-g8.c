@@ -34,7 +34,7 @@ void func_L04_0040BA68(char *m, char *p)
     char *obj, *extra, *child, *base;
     if (!D_L04_001B0978) {
         D_L04_001A8ED0[5] = 1;
-        func_00132AF8(0x5d); func_002B72E8(0); func_00132028();
+        func_00132AF8(0x5d); music_Pause(0); snd_Pump();
         D_L04_001A8ED0[0] = 1;
         func_L04_0040A3B8(m,0);
         D_L04_001B0904 = D_L04_001B090C;
@@ -83,7 +83,7 @@ void func_L04_0040BA68(char *m, char *p)
         S32_AT(p,0x320)=-1;m[0x20]=4;
     }
     if (done) {
-        func_00132B28(0x5d);func_002B7320();func_00132028();
+        func_00132B28(0x5d);music_Unpause();snd_Pump();
         D_L04_001A8ED0[5]=0;D_L04_001A8ED0[0]=0;D_L04_001B0978=0;
     }
 }

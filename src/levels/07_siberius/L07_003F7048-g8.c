@@ -60,7 +60,7 @@ void func_L07_003F7048(u8 *a)
     f32 pos[4];
     f32 rot[4];
     u8 *s = P(a,0x68);
-    func_L07_003F7BF0(a);
+    UpdatePhasedDamageState(a);
     switch (a[0x95]) {
     case 0:
     case 1:
@@ -76,7 +76,7 @@ void func_L07_003F7048(u8 *a)
     }
     switch (a[0x20]) {
     case 1:
-        if (func_002ACBC8(D_00189EA0,W(s,0x170))) {
+        if (IsPointInCuboid(D_00189EA0,W(s,0x170))) {
             D_L07_001B104C=1;
             if (!D_0013962A) {
                 if (func_00288AA0(D_L07_001BF400,0x4f)) {
@@ -95,8 +95,8 @@ start_path:
     case 2:
         if (!func_002F5D10()) {
             D_0013962A=1;
-            func_00282F20(pos,(u8 *)&D_L07_001B23CC[0][W(s,0x174)]+0x10,8.0f);
-            func_00282CC0(pos,pos,D_L07_001B23CC[0][W(s,0x174)].pos);
+            vec_scale_to_length(pos,(u8 *)&D_L07_001B23CC[0][W(s,0x174)]+0x10,8.0f);
+            FastVecAdd(pos,pos,D_L07_001B23CC[0][W(s,0x174)].pos);
             qzero_nc(rot);
             rot[2]=func_00283248(D_L07_001B23CC[0][W(s,0x174)].pos[0]-pos[0],D_L07_001B23CC[0][W(s,0x174)].pos[1]-pos[1]);
             func_L00_002B9D60(pos,rot,0,1);
@@ -130,8 +130,8 @@ start_path:
         else if (W(s,0x444)<H(a,0x96))
             func_002A7750(a,W(s,0x43c),-1);
         if (W(s,0x43c)==7) {
-            s32 n = func_00283CF0(45.3f);
-            if (H(a,0x96)==W(s,0x444)-n) func_002E5CF8(8,0,a);
+            s32 n = FloatToInt(45.3f);
+            if (H(a,0x96)==W(s,0x444)-n) PlayMobySound(8,0,a);
         }
         break;
     case 6: case 7: case 8: case 9:
@@ -164,8 +164,8 @@ start_path:
             F(s,0x434)=1.0833334f;
         }
         func_L07_003F80B8(a,F(s,0x434));
-        func_002AA2E8((f32 *)(s+0x434),0.0f,0.0055555557f);
-        func_002AA2E8((f32 *)(s+0x3e8),18.0f,0.033333335f);
+        ApproachValue((f32 *)(s+0x434),0.0f,0.0055555557f);
+        ApproachValue((f32 *)(s+0x3e8),18.0f,0.033333335f);
         if (!a[0x31]) {
             func_002A7750(a,1,2);
             func_L07_003F78F8(a);
@@ -176,7 +176,7 @@ start_path:
             if (a[0x43]!=7) func_002A7470(a,7,0,20);
             F(s,0x3e8)+=1.0f;
             W(s,0x440)=600;
-            if (F(s,0x20)==0.0f && !a[0x7f]) func_002A6C58(a,10,3);
+            if (F(s,0x20)==0.0f && !a[0x7f]) SetDeathBits(a,10,3);
         }
         func_L07_003F80B8(a,-1.0f);
         if (F(s,0x20)<=0.0f) {

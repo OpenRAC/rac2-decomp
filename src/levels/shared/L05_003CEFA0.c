@@ -6,7 +6,7 @@ extern float D_L05_001AFB68[] SDATA(D_L05_001AFB68);
 
 char *func_L05_003CEFA0(char *owner,void *position,int kind)
 {
-    char *object=func_0029EFD0(kind);
+    char *object=CreateMoby(kind);
     if (object) {
         char *state=*(char **)(object+0x68);
         int index;

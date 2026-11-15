@@ -42,7 +42,7 @@ void func_L11_00456938(RetreatObject *object)
         return;
     }
 
-    distance = func_00282E80(object->position, target + 0x10);
+    distance = vec_distance_xy(object->position, target + 0x10);
     if (distance < D_L11_001B1DA4) {
         func_002A7750(object, 7, 3);
     } else {

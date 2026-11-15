@@ -15,7 +15,7 @@ int func_L14_003DE908(char *a0)
     qcopy(buf, D_00189EA0);
     qcopy(buf + 0x10, D_00189EA0);
     *(float *)(buf + 0x18) = *(float *)(buf + 0x18) - 3.0f;
-    if (func_002761F8(buf, buf + 0x10, 0x10, 0, 0) != 0 && ref_L14_003DE908_00 == (int)a0)
+    if (CollLine(buf, buf + 0x10, 0x10, 0, 0) != 0 && ref_L14_003DE908_00 == (int)a0)
         return 1;
     return 0;
 }

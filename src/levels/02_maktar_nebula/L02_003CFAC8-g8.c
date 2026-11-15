@@ -44,7 +44,7 @@ void func_L02_003CFAC8(char *self) {
         if (D_L02_001B0130) { D_L02_001B0130 = 0; func_002A7750((u8 *)self, 5, -1); break; }
         if (*(char **)(D_00189E20 + 0x5C0) != self) break;
         D_0018CA60 = 0xFFFF; func_002A7750((u8 *)self, 2, -1);
-        *(int *)(state + 0xD4) = func_00283CF0(*(float *)(state + 0xC0) * 60.0f);
+        *(int *)(state + 0xD4) = FloatToInt(*(float *)(state + 0xC0) * 60.0f);
         break;
     case 2:
         if (func_002B3868((u8 *)self)) *(int *)(state + 0xDC) = 0;
@@ -56,7 +56,7 @@ void func_L02_003CFAC8(char *self) {
         if (func_002B38B8((u8 *)self)) func_002A7750((u8 *)self, 3, -1);
         break;
     case 4:
-        func_00282CC0((self + 0x10), (self + 0x10), state + 0xB0);
+        FastVecAdd((self + 0x10), (self + 0x10), state + 0xB0);
         *(float *)(state + 0xB8) -= 0.004166667f;
         hits = 0; i = 0;
         do {
@@ -71,10 +71,10 @@ void func_L02_003CFAC8(char *self) {
         break;
     case 5:
         if (func_002B3868((u8 *)self)) {
-            func_0032C700((self + 0x10), 1, 25, 20, 20, 20, 45, 0, 1, 1, 0, 0, D_L02_001B0134, 20.0f);
+            SpawnExplosion((self + 0x10), 1, 25, 20, 20, 20, 45, 0, 1, 1, 0, 0, D_L02_001B0134, 20.0f);
             ((u8 *)self)[0x31] = 0; *(u16 *)(self + 0x34) = (*(u16 *)(self + 0x34) | 1) & 0xEFFF;
-            func_002E5CF8(1, 0, self);
-            shake = (24.0f - func_00282E48(&D_L02_001BA500, (self + 0x10))) * 0.0062500006f;
+            PlayMobySound(1, 0, self);
+            shake = (24.0f - fast_vec_dist(&D_L02_001BA500, (self + 0x10))) * 0.0062500006f;
             if (shake > 0.15f) shake = 0.15f; else if (shake < 0) shake = 0;
             if (shake != 0) {
                 D_L02_001BA3C0.slot[1].time = 90;
@@ -100,12 +100,12 @@ void func_L02_003CFAC8(char *self) {
     case 3: default: break;
     }
     if (((u8 *)self)[0x31]) {
-        *(float *)(self + 0xF4) = func_00283B98(*(float *)(self + 0xF4), 0.026179943f);
-        *(float *)(self + 0xF8) = func_00283B98(*(float *)(self + 0xF4), 0.015126189216971397f);
+        *(float *)(self + 0xF4) = FastAddRotations(*(float *)(self + 0xF4), 0.026179943f);
+        *(float *)(self + 0xF8) = FastAddRotations(*(float *)(self + 0xF4), 0.015126189216971397f);
         if (((u8 *)self)[0x20] == 1) *(int *)(self + 0x78) = D_L02_001B0138[0];
         else {
-            *(float *)(state + 0xD8) = func_00283B98(*(float *)(state + 0xD8), 0.20943955f);
-            *(int *)(self + 0x78) = func_L01_0031BC68(D_L02_001B0138[1], D_L02_001B0138[2], *(float *)(state + 0xD8));
+            *(float *)(state + 0xD8) = FastAddRotations(*(float *)(state + 0xD8), 0.20943955f);
+            *(int *)(self + 0x78) = PulseColor(D_L02_001B0138[1], D_L02_001B0138[2], *(float *)(state + 0xD8));
         }
     }
     ++*(u16 *)(self + 0x96);

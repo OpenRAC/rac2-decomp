@@ -146,18 +146,18 @@ void func_L23_00429430(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, u8 *obj) {
     if (vars->scroll >= 4.0f) {
         vars->scroll -= 4.0f;
     }
-    func_00282CF0(rel, (float *)pos, D_L23_001BA640);
-    func_00282F20(axis, vars->dir, -D_L23_001B1B1C);
-    func_00282CC0(tip, (float *)pos, axis);
-    func_00282DD8(side, rel, axis);
-    func_00282F20(side, side, D_L23_001B1AFC);
-    func_00282F20(base, vars->dir, D_L23_001B1B90);
-    func_00282CC0(base, (float *)pos, base);
-    func_00282CC0((float *)&q.corner[0], base, side);
-    func_00282CF0(((float *)&q.corner[1]), base, side);
-    func_00282CC0(((float *)&q.corner[2]), tip, side);
-    func_00282CF0(((float *)&q.corner[3]), tip, side);
-    func_00280B90(&q, 0, 0);
+    FastVecSub(rel, (float *)pos, D_L23_001BA640);
+    vec_scale_to_length(axis, vars->dir, -D_L23_001B1B1C);
+    FastVecAdd(tip, (float *)pos, axis);
+    FastVecCross(side, rel, axis);
+    vec_scale_to_length(side, side, D_L23_001B1AFC);
+    vec_scale_to_length(base, vars->dir, D_L23_001B1B90);
+    FastVecAdd(base, (float *)pos, base);
+    FastVecAdd((float *)&q.corner[0], base, side);
+    FastVecSub(((float *)&q.corner[1]), base, side);
+    FastVecAdd(((float *)&q.corner[2]), tip, side);
+    FastVecSub(((float *)&q.corner[3]), tip, side);
+    draw_world_quad(&q, 0, 0);
 
     q.rgba[0] = q.rgba[2];
     q.rgba[1] = q.rgba[3];
@@ -165,11 +165,11 @@ void func_L23_00429430(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, u8 *obj) {
     q.rgba[2] = 0x801010;
     qcopy(&q.corner[0],&q.corner[2]);
     qcopy(&q.corner[1],&q.corner[3]);
-    func_00282CC0(((float *)&q.corner[2]), ((float *)&q.corner[2]), axis);
-    func_00282CC0(((float *)&q.corner[3]), ((float *)&q.corner[3]), axis);
-    func_00280B90(&q, 0, 0);
+    FastVecAdd(((float *)&q.corner[2]), ((float *)&q.corner[2]), axis);
+    FastVecAdd(((float *)&q.corner[3]), ((float *)&q.corner[3]), axis);
+    draw_world_quad(&q, 0, 0);
 
-    func_00282F20(axis, vars->dir, -D_L23_001B1B20);
+    vec_scale_to_length(axis, vars->dir, -D_L23_001B1B20);
     q.uv[0][0] = 0.0f;
     q.uv[0][1] = 0.0f;
     q.uv[1][0] = 0.0f;
@@ -189,7 +189,7 @@ void func_L23_00429430(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, u8 *obj) {
         q.uv[j][0] += 0.5f;
         q.uv[j][1] += 0.5f;
     }
-    vars->spin = func_00283B98(vars->spin, D_L23_001B1B18 * 0.017453294f);
+    vars->spin = FastAddRotations(vars->spin, D_L23_001B1B18 * 0.017453294f);
     func_00281DE8(&q, D_L23_001B1B28, 1, 0x80);
     q.d70 = 5;
 
@@ -202,16 +202,16 @@ void func_L23_00429430(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, u8 *obj) {
     q.rgba[3] |= D_L23_001B1B64;
     q.rgba[0] = q.rgba[1];
     q.rgba[2] = q.rgba[3];
-    func_00282F20(side, side, D_L23_001B1AF0);
-    func_00282F20(base, vars->dir, D_L23_001B1B90);
-    func_00282CC0(base, (float *)pos, base);
-    func_00282CC0((float *)&q.corner[0], base, side);
-    func_00282CF0(((float *)&q.corner[1]), base, side);
-    func_00282CC0(tip, base, axis);
-    func_00282CC0(tip, tip, axis);
-    func_00282CC0(((float *)&q.corner[2]), tip, side);
-    func_00282CF0(((float *)&q.corner[3]), tip, side);
-    func_00280B90(&q, 0, 0);
+    vec_scale_to_length(side, side, D_L23_001B1AF0);
+    vec_scale_to_length(base, vars->dir, D_L23_001B1B90);
+    FastVecAdd(base, (float *)pos, base);
+    FastVecAdd((float *)&q.corner[0], base, side);
+    FastVecSub(((float *)&q.corner[1]), base, side);
+    FastVecAdd(tip, base, axis);
+    FastVecAdd(tip, tip, axis);
+    FastVecAdd(((float *)&q.corner[2]), tip, side);
+    FastVecSub(((float *)&q.corner[3]), tip, side);
+    draw_world_quad(&q, 0, 0);
 
     q.rgba[1] = (u32)D_L23_001B1B0C << 24;
     q.rgba[1] |= (u32)D_L23_001B1B5C << 16;
@@ -222,16 +222,16 @@ void func_L23_00429430(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, u8 *obj) {
     q.rgba[3] |= D_L23_001B1B64;
     q.rgba[0] = q.rgba[1];
     q.rgba[2] = q.rgba[3];
-    func_00282F20(side, side, D_L23_001B1AF4);
-    func_00282F20(base, vars->dir, D_L23_001B1B84);
-    func_00282CC0(base, (float *)pos, base);
-    func_00282CC0((float *)&q.corner[0], base, side);
-    func_00282CF0(((float *)&q.corner[1]), base, side);
-    func_00282CC0(tip, base, axis);
-    func_00282CC0(tip, tip, axis);
-    func_00282CC0(((float *)&q.corner[2]), tip, side);
-    func_00282CF0(((float *)&q.corner[3]), tip, side);
-    func_00280B90(&q, 0, 0);
+    vec_scale_to_length(side, side, D_L23_001B1AF4);
+    vec_scale_to_length(base, vars->dir, D_L23_001B1B84);
+    FastVecAdd(base, (float *)pos, base);
+    FastVecAdd((float *)&q.corner[0], base, side);
+    FastVecSub(((float *)&q.corner[1]), base, side);
+    FastVecAdd(tip, base, axis);
+    FastVecAdd(tip, tip, axis);
+    FastVecAdd(((float *)&q.corner[2]), tip, side);
+    FastVecSub(((float *)&q.corner[3]), tip, side);
+    draw_world_quad(&q, 0, 0);
 
     q.rgba[1] = (u32)D_L23_001B1B14 << 24;
     q.rgba[1] |= (u32)D_L23_001B1B5C << 16;
@@ -242,16 +242,16 @@ void func_L23_00429430(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, u8 *obj) {
     q.rgba[3] |= D_L23_001B1B64;
     q.rgba[0] = q.rgba[1];
     q.rgba[2] = q.rgba[3];
-    func_00282F20(side, side, D_L23_001B1AF8);
-    func_00282F20(base, vars->dir, D_L23_001B1B84);
-    func_00282CC0(base, (float *)pos, base);
-    func_00282CC0((float *)&q.corner[0], base, side);
-    func_00282CF0(((float *)&q.corner[1]), base, side);
-    func_00282CC0(tip, base, axis);
-    func_00282CC0(tip, tip, axis);
-    func_00282CC0(((float *)&q.corner[2]), tip, side);
-    func_00282CF0(((float *)&q.corner[3]), tip, side);
-    func_00280B90(&q, 0, 0);
+    vec_scale_to_length(side, side, D_L23_001B1AF8);
+    vec_scale_to_length(base, vars->dir, D_L23_001B1B84);
+    FastVecAdd(base, (float *)pos, base);
+    FastVecAdd((float *)&q.corner[0], base, side);
+    FastVecSub(((float *)&q.corner[1]), base, side);
+    FastVecAdd(tip, base, axis);
+    FastVecAdd(tip, tip, axis);
+    FastVecAdd(((float *)&q.corner[2]), tip, side);
+    FastVecSub(((float *)&q.corner[3]), tip, side);
+    draw_world_quad(&q, 0, 0);
 
     q.rgba[1] = (u32)D_L23_001B1B10 << 24;
     q.rgba[1] |= (u32)D_L23_001B1B7C << 16;
@@ -262,17 +262,17 @@ void func_L23_00429430(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, u8 *obj) {
     q.rgba[3] |= D_L23_001B1B64;
     q.rgba[0] = q.rgba[1];
     q.rgba[2] = q.rgba[3];
-    func_00282F20(side, side, D_L23_001B1AF0);
-    func_00282F20(base, vars->dir, D_L23_001B1B88);
-    func_00282CC0(base, (float *)pos, base);
-    func_00282CC0((float *)&q.corner[0], base, side);
-    func_00282CF0(((float *)&q.corner[1]), base, side);
-    func_00282F20(axis, vars->dir, -0.6f);
-    func_00282CC0(tip, base, axis);
-    func_00282CC0(tip, tip, axis);
-    func_00282CC0(((float *)&q.corner[2]), tip, side);
-    func_00282CF0(((float *)&q.corner[3]), tip, side);
-    func_00280B90(&q, 0, 0);
+    vec_scale_to_length(side, side, D_L23_001B1AF0);
+    vec_scale_to_length(base, vars->dir, D_L23_001B1B88);
+    FastVecAdd(base, (float *)pos, base);
+    FastVecAdd((float *)&q.corner[0], base, side);
+    FastVecSub(((float *)&q.corner[1]), base, side);
+    vec_scale_to_length(axis, vars->dir, -0.6f);
+    FastVecAdd(tip, base, axis);
+    FastVecAdd(tip, tip, axis);
+    FastVecAdd(((float *)&q.corner[2]), tip, side);
+    FastVecSub(((float *)&q.corner[3]), tip, side);
+    draw_world_quad(&q, 0, 0);
 
     func_00281EB8(pos, D_L23_001B1B00, D_L23_001B1B08, 1, D_L23_001B1B04, 0.08f, func_002A7940());
     func_00281EB8(pos, D_L23_001B1B00, 0x80808080, 1, D_L23_001B1B04 * 0.4f, 0.08f, func_002A7940());

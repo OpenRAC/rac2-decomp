@@ -23,41 +23,41 @@ void func_0030C188(char *obj) {
     Vec *state = *(Vec **)(obj + 0x68);
     float size;
     int i;
-    p.texture = func_0027C878(11);
+    p.texture = GetEffectTextureDescriptor(11);
     p.flags = 0x8000000048ULL;
     p.mode = 0xFF9000000260ULL;
     p.primitive = 0;
-    func_00282CF0(&matrix[3], &D_001B5340, state);
-    func_00282F20(&matrix[3], &matrix[3], 0.3f);
-    func_00282CC0(&matrix[3], &matrix[3], state);
+    FastVecSub(&matrix[3], &D_001B5340, state);
+    vec_scale_to_length(&matrix[3], &matrix[3], 0.3f);
+    FastVecAdd(&matrix[3], &matrix[3], state);
     matrix[3].f[3] = 1.0f;
-    func_00282CF0(&matrix[0], &D_001B5340, &matrix[3]);
-    func_00282F20(&matrix[0], &matrix[0], 1.0f);
-    func_00282DD8(&matrix[1], &matrix[0], &D_0018A0E0);
-    func_00282F20(&matrix[1], &matrix[1], -1.0f);
-    func_00282DD8(&matrix[2], &matrix[1], &matrix[0]);
+    FastVecSub(&matrix[0], &D_001B5340, &matrix[3]);
+    vec_scale_to_length(&matrix[0], &matrix[0], 1.0f);
+    FastVecCross(&matrix[1], &matrix[0], &D_0018A0E0);
+    vec_scale_to_length(&matrix[1], &matrix[1], -1.0f);
+    FastVecCross(&matrix[2], &matrix[1], &matrix[0]);
     p.color[3] = D_001AEF00;
     p.color[2] = D_001AEF00;
     p.color[1] = D_001AEF00;
     p.color[0] = D_001AEF00;
     size = D_001AEF08 + func_002A78D8(0.0f, 0.025f);
     for (i = 0; i < 4; i++) {
-        func_00282D30(&p.vertex[i], &D_001AEEA0[i], size);
-        func_002830C0(&p.vertex[i], &p.vertex[i], &matrix[0]);
+        FastVecScale(&p.vertex[i], &D_001AEEA0[i], size);
+        transform_vector(&p.vertex[i], &p.vertex[i], &matrix[0]);
         p.uv[i].u = D_001AEEE0[2 * i];
         p.uv[i].v = D_001AEEE4[2 * i];
     }
-    func_00280B90(&p, 0, 0);
+    draw_world_quad(&p, 0, 0);
     p.color[3] = D_001AEE58;
     p.color[2] = D_001AEE58;
     p.color[1] = D_001AEE58;
     p.color[0] = D_001AEE58;
     size = D_001AEF0C + func_002A78D8(0.0f, 0.05f);
     for (i = 0; i < 4; i++) {
-        func_00282D30(&p.vertex[i], &D_001AEEA0[i], size);
-        func_002830C0(&p.vertex[i], &p.vertex[i], &matrix[0]);
+        FastVecScale(&p.vertex[i], &D_001AEEA0[i], size);
+        transform_vector(&p.vertex[i], &p.vertex[i], &matrix[0]);
         p.uv[i].u = D_001AEEE0[2 * i];
         p.uv[i].v = D_001AEEE4[2 * i];
     }
-    func_00280B90(&p, 0, 0);
+    draw_world_quad(&p, 0, 0);
 }

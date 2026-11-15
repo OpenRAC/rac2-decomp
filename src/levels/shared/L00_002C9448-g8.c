@@ -155,7 +155,7 @@ int func_L00_002C9448(void)
     float threshold, movement;
     if (D_00189E20.action_locked) break;
     if (D_00189E20.state < 2 || (D_00189E20.state == 4 && D_00189E20.grounded)) {
-        if (func_L00_0032EF10(mask, 10, &scratch.input_age)) {
+        if (PadPressedWithin(mask, 10, &scratch.input_age)) {
             object = D_00189E20.object;
             if (!object) goto clear_action;
             if (!func_L00_002B3248((unsigned char *)object) || *(unsigned char *)(object + 0x20))
@@ -189,7 +189,7 @@ buffered_attack:
     buffered_window = 14;
     if (D_00189E20.mode == 11 || D_00189E20.mode == 14)
         buffered_window = 18;
-    if (!func_L00_0032EF10(mask, buffered_window, 0)) goto clear_action;
+    if (!PadPressedWithin(mask, buffered_window, 0)) goto clear_action;
     if ((!D_00189E20.fast_attack && D_00189E20.movement > 0.1f) ||
         (D_00189E20.fast_attack && D_00189E20.movement > 0.57f) ||
         (D_00189E20.mode == 8 && D_00189E20.movement > 0.57f)) {
@@ -207,7 +207,7 @@ ranged_attack:
             if (D_00189E20.input_locked) goto check_attack_delay;
             if (D_00189E20.attack_delay) goto clear_action;
             if ((float)range->trigger_frame <= D_00189E20.animation_frame && (D_00138180.buttons.word.held & 8) &&
-                func_L00_0032EF10(mask, 15, 0)) {
+                PadPressedWithin(mask, 15, 0)) {
                 func_L00_002C42E0(21, 1);
                 break;
             }
@@ -217,10 +217,10 @@ check_attack_delay:
             if (!D_00189E20.input_locked) {
                 float frame = D_00189E20.animation_frame;
                 if (!((float)range->trigger_frame <= frame)) goto clear_action;
-                difference = (func_00283CF0(frame) - range->first_frame) * 2;
+                difference = (FloatToInt(frame) - range->first_frame) * 2;
                 action = difference > 0 ? difference : 1;
                 action = action < 16 ? action : 15;
-                if (func_L00_0032EF10(mask, action, 0)) {
+                if (PadPressedWithin(mask, action, 0)) {
                     if (D_00138180.buttons.word.held & 8) {
                         func_L00_002C42E0(21, 1);
                         goto clear_action;
@@ -243,7 +243,7 @@ clear_action:
     if (D_00189E20.pending_action && D_00189E20.pending_action != 22 && D_00189E20.pending_action != 65)
         break;
     if (!(D_00138180.buttons.word.held & 32) || D_00189E20.input_window < 23) break;
-    if (func_L00_002D4040(state)) {
+    if (get_ammo(state)) {
         func_L00_002C42E0(131, 1);
         break;
     }
@@ -261,19 +261,19 @@ clear_action:
         D_00189E20.aim_target = 0;
         break;
     }
-    target = func_L00_002AE888(&D_00189E20, 21, 0, 20.0f, D_00189E20.heading,
+    target = SelectBestEligibleTarget(&D_00189E20, 21, 0, 20.0f, D_00189E20.heading,
                               0.5235988497734069824f, 0.6981317996978759766f);
     D_00189E20.aim_target = target;
     if (target) {
         qcopy(&scratch.point, target + 16);
         ((float *)&scratch.point)[2] += 0.5f;
-        if (func_002761F8(&scratch.point, (char *)&D_00189E20 + 0xE0, 2, target, 0))
+        if (CollLine(&scratch.point, (char *)&D_00189E20 + 0xE0, 2, target, 0))
             D_00189E20.aim_target = 0;
         else {
             char *aim_target = D_00189E20.aim_target;
             direction = func_00283248(D_00189E20.position[0] - *(float *)(aim_target + 16),
                                      D_00189E20.position[1] - *(float *)(aim_target + 20));
-            D_00189E20.target_angle = func_00283BE0(*(float *)(D_00189E20.aim_target + 0xF8), direction);
+            D_00189E20.target_angle = fast_subtract_rotations(*(float *)(D_00189E20.aim_target + 0xF8), direction);
         }
     }
     break;
@@ -287,7 +287,7 @@ clear_action:
     action = D_00189E20.extended_range ? 8 : 5;
     if (D_00189E20.mode == 40) action = 11;
     if (D_00189E20.mode == 39 && (D_00189E20.alternate_target_ready || D_00189E20.nearby_ready)) {
-        if (func_L00_0032EF10(mask, action, 0) ||
+        if (PadPressedWithin(mask, action, 0) ||
             ((D_00138180.buttons.word.held & mask) && D_00189E20.input_window >= 16)) {
             func_L00_002C42E0(40, 1);
             break;
@@ -297,7 +297,7 @@ clear_action:
           D_00189E20.state == 2 || D_00189E20.state == 30 || D_00189E20.state == 5 ||
           (D_00189E20.mode == 40 && D_00189E20.frame >= 6) || D_00189E20.mode == 29))
         break;
-    if (!func_L00_0032EF10(mask, action, 0) &&
+    if (!PadPressedWithin(mask, action, 0) &&
         (!(D_00138180.buttons.word.held & mask) || D_00189E20.input_window < 16)) break;
     if (D_00189E20.alternate_target_ready) {
         if (D_00189E20.nearby_ready) {
@@ -333,17 +333,17 @@ clear_action:
     frame_window = D_00189E20.input_window;
     action = 7;
     if (frame_window < action) action = frame_window;
-    if (!func_L00_0032EF10(mask, action, &scratch.action_age) && !(D_00138180.buttons.word.held & 32)) break;
+    if (!PadPressedWithin(mask, action, &scratch.action_age) && !(D_00138180.buttons.word.held & 32)) break;
     if (frame_window < 23) break;
-    if (func_L00_002D4040(-1)) {
+    if (get_ammo(-1)) {
         if (D_00189E20.state == 12 || D_00189E20.state == 0 || D_00189E20.mode == 3 ||
             (D_00189E20.state == 1 && D_00189E20.transition_progress < 0.7f)) {
             func_L00_002C42E0(34, 1);
             break;
         }
-        func_L00_002AF568();
+        start_equipped_item_animation();
     } else if (D_00189E20.object && (D_00138180.buttons.word.pressed & 32))
-        func_002E5CF8(0, 0, D_00189E20.object);
+        PlayMobySound(0, 0, D_00189E20.object);
     break;
 
     }
@@ -355,10 +355,10 @@ clear_action:
         frame_window = D_00189E20.input_window;
         action = 9;
         action = action < frame_window ? 10 : frame_window;
-        if (!func_L00_0032EF10(mask, action, &scratch.detach_age)) break;
+        if (!PadPressedWithin(mask, action, &scratch.detach_age)) break;
         if (D_00189E20.object) {
             func_L00_002C42E0(31, 1);
-            if (D_00189E20.object) func_002E5CF8(0, 0, D_00189E20.object);
+            if (D_00189E20.object) PlayMobySound(0, 0, D_00189E20.object);
         }
     }
     break;

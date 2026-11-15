@@ -42,19 +42,19 @@ int func_L06_003E4BE0(char *moby, int path, int *sound)
     *(float *)(st + 0x108) = target.f[2];
     *(float *)(st + 0xEC) = 0;
     *(float *)(st + 0xE8) = 0;
-    func_00282CF0(&delta, &target, moby + 0x10);
-    if (func_00282DF0(&delta) < D_L06_001AF528 * (1.0f / 60.0f) * 2.0f) {
+    FastVecSub(&delta, &target, moby + 0x10);
+    if (FastVecLength(&delta) < D_L06_001AF528 * (1.0f / 60.0f) * 2.0f) {
         ++*(int *)(st + 0x64);
         done = *(int *)(st + 0x64) == *(int *)*route;
     }
-    limit = func_00282E48(moby + 0x10, *route + *(int *)*route * 16);
+    limit = fast_vec_dist(moby + 0x10, *route + *(int *)*route * 16);
     func_002AA548(&height, st + 0x60, limit,
         D_L06_001AF52C * 0.00027777778450399637f,
         D_L06_001AF52C * 0.00027777778450399637f,
         D_L06_001AF528 * (1.0f/60.0f));
-    func_00282F20(&delta, &delta, *(float *)(st + 0x60));
-    func_00282CC0(moby + 0x10, &delta, moby + 0x10);
-    angle = -func_00283248(func_00282E20(&delta), delta.f[2]);
+    vec_scale_to_length(&delta, &delta, *(float *)(st + 0x60));
+    FastVecAdd(moby + 0x10, &delta, moby + 0x10);
+    angle = -func_00283248(vec_length_xy(&delta), delta.f[2]);
     if (angle > 0.2617994248867035f) angle = 0.2617994248867035f;
     else if (angle < -0.2617994248867035f) angle = -0.2617994248867035f;
     yaw = (float *)(moby + 0xF8);

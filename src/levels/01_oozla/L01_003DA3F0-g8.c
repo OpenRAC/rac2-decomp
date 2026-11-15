@@ -49,7 +49,7 @@ void func_L01_003DA3F0(u8 *a0, void *a1)
         speed = func_002A7878(D_L01_001B0858, D_L01_001B085C);
         z = func_002A7878(D_L01_001B0860, D_L01_001B0864);
         r = func_002A7878(0.0f, D_L01_001B0890);
-        func_00282D30(vel, a1, r * 0.016666668f);
+        FastVecScale(vel, a1, r * 0.016666668f);
         vel[0] += func_00283180(angle) * 0.016666668f * speed;
         vel[1] += func_00283198(angle) * 0.016666668f * speed;
         vel[2] += z * 0.016666668f;
@@ -61,19 +61,19 @@ void func_L01_003DA3F0(u8 *a0, void *a1)
             acc[3] = scale * D_L01_001B0870;
             func_002ACB48(pos, D_L01_001B0850);
             func_002ACB48(acc, D_L01_001B0854 * 0.016666668f);
-            c1 = func_00283D38(D_L01_001B0874, D_L01_001B087C,
+            c1 = FastTweenColor(D_L01_001B0874, D_L01_001B087C,
                               func_002A7878(0.0f, 1.0f));
             upperScale = 2.5f;
-            c2 = func_00283D38(D_L01_001B0878, D_L01_001B0880,
+            c2 = FastTweenColor(D_L01_001B0878, D_L01_001B0880,
                               func_002A7878(0.0f, 1.0f));
             lifetime = (float)D_L01_001B088C;
             maximum = lifetime * upperScale;
-            n = func_00283CF0(func_002A7878(lifetime * 0.5f, maximum));
+            n = FloatToInt(func_002A7878(lifetime * 0.5f, maximum));
             func_002BAA28(pos, vel, acc, c1, c2, D_L01_001B0884,
                           D_L01_001B0888, n, -1);
         }
     }
-    func_002ABBB8(a0, p, 0, 4, 0, 0, -1, 0, 0, -1, 1, 0x810001,
+    SpawnExplosionEffects(a0, p, 0, 4, 0, 0, -1, 0, 0, -1, 1, 0x810001,
                   D_L01_001B083C, *(float *)(p + 0x18), 4.0f, 2.0f,
                   9.0f, 1.2f, 0.0f);
 }

@@ -40,7 +40,7 @@ Obj_L00_00338AE0 *func_L00_00338AE0(char *src1, char *src2, s32 a2, f32 value, f
         qcopy(&o->v10, src1);
         payload = (EffectPayload *)&o->v20;
         o->w4 = ((func_002A77E0(10) + 0x26) << 24) | 0x00808080;
-        o->b9 = func_00283CF0(1.0f) + 0x20;
+        o->b9 = FloatToInt(1.0f) + 0x20;
         o->b3 = 0x48;
         o->b1 = 1;
         tag = *ref_L00_00338AE0_00;
@@ -50,7 +50,7 @@ Obj_L00_00338AE0 *func_L00_00338AE0(char *src1, char *src2, s32 a2, f32 value, f
         qcopy(&payload->vector, src2);
         r = func_002A7878(0.0f, 256.0f);
         payload->random = r;
-        o->b8 = func_00283CF0(r);
+        o->b8 = FloatToInt(r);
         payload->rate = value2;
         payload->id = a2;
     }

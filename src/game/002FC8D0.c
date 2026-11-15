@@ -122,8 +122,8 @@ long long func_002FCB00(int data, int destination, int width, int height)
 {
     int block = width << 7;
     int offset = 0;
-    int logwidth = func_00282A18(width);
-    int logheight = func_00282A18(height);
+    int logwidth = log2dim(width);
+    int logheight = log2dim(height);
     int width_mask = width & (width - 1);
     int height_mask = height & (height - 1);
     int remaining = width * (height << 2);
@@ -280,8 +280,8 @@ void func_002FE880(void *object, float *destination, float scale)
 {
     float vector[4];
     func_002FE8D8(object, vector);
-    func_00282D30(vector, vector, scale);
-    func_00282CF0(destination, destination, vector);
+    FastVecScale(vector, vector, scale);
+    FastVecSub(destination, destination, vector);
 }
 
 void func_002FE8D8(void *object, float *destination)
@@ -294,14 +294,14 @@ void func_002FE8D8(void *object, float *destination)
         }
     }
     if (ref_L00_002FE8D8_01) {
-        func_00282CF0(destination, ref_L00_002FE8D8_02, object);
+        FastVecSub(destination, ref_L00_002FE8D8_02, object);
         destination[2] = 0;
-        func_00282F20(destination, destination, 1.0f);
+        vec_scale_to_length(destination, destination, 1.0f);
     } else if (ref_L00_002FE8D8_03) {
         float sign = 1.0f;
         if (*(float *)(state + 0xBC) > 0.0f) sign = -1.0f;
-        func_00282CF0(destination, (float *)(state + 0xB0), object);
-        func_00282F20(destination, destination, sign);
+        FastVecSub(destination, (float *)(state + 0xB0), object);
+        vec_scale_to_length(destination, destination, sign);
     } else {
         func_00282C98(destination);
     }
@@ -310,7 +310,7 @@ void func_002FE8D8(void *object, float *destination)
 /* A sphere moved along a velocity and tested for collisions: the contact
    normal, the position and velocity it updates, the moby it belongs to (then
    the moby it hit) and the ids of mobys to ignore. Field names describe how
-   func_002FE9D0 uses them. */
+   CollideSweptSphere uses them. */
 typedef struct {
     float normal[4];
     float position[4];
@@ -372,8 +372,8 @@ int func_002FE9D0(SweptSphere *sphere)
 
     func_002FE8D8(sphere->moby + 0x10, facing);
     if (sphere->useOffset) {
-        func_00282F20(point, (float *)(sphere->moby + 0xE0), sphere->offset);
-        func_00282CC0(point, sphere->position, point);
+        vec_scale_to_length(point, (float *)(sphere->moby + 0xE0), sphere->offset);
+        FastVecAdd(point, sphere->position, point);
         position = sphere->position;
         query = point;
     } else {
@@ -386,11 +386,11 @@ int func_002FE9D0(SweptSphere *sphere)
         hit = 1;
     } else {
         hit = 0;
-        if (func_002761F8(sphere, position, sphere->collisionFlags, sphere->moby, 0)) hit = 2;
+        if (CollLine(sphere, position, sphere->collisionFlags, sphere->moby, 0)) hit = 2;
     }
     sphere->moby = 0;
     if (hit) {
-        sphere->surface = func_00278E78();
+        sphere->surface = GetCollHitMaterial();
         moby = ref_L00_002FE9D0_00.moby;
         if (moby) {
             for (i = 0; i < sphere->ignoredCount; i++) {
@@ -400,19 +400,19 @@ int func_002FE9D0(SweptSphere *sphere)
         }
         if (hit == 1) qcopy(position, ref_L00_002FE9D0_00.center);
         else qcopy(position, ref_L00_002FE9D0_00.point);
-        func_00282D30(sphere->normal, ref_L00_002FE9D0_00.normal, 0.0009765625f);
-        func_00282F20(sphere->normal, sphere->normal, 1.0f);
-        if (func_00282DB0(facing, sphere->normal) < sphere->minFacing ||
+        FastVecScale(sphere->normal, ref_L00_002FE9D0_00.normal, 0.0009765625f);
+        vec_scale_to_length(sphere->normal, sphere->normal, 1.0f);
+        if (FastVecDot(facing, sphere->normal) < sphere->minFacing ||
             (sphere->moby && *(short *)(*(char **)(sphere->moby + 0x24) + 0x46) == 5 &&
              sphere->slideOnCreatures)) {
             velocity = sphere->velocity;
             func_00283028(velocity, velocity, sphere->normal);
             result++;
-            dot = func_00282DB0(velocity, sphere->normal);
-            func_00282D30(along, sphere->normal, dot);
-            func_00282CF0(across, velocity, along);
-            func_00282D30(velocity, along, sphere->bounce);
-            func_00282CC0(velocity, across, velocity);
+            dot = FastVecDot(velocity, sphere->normal);
+            FastVecScale(along, sphere->normal, dot);
+            FastVecSub(across, velocity, along);
+            FastVecScale(velocity, along, sphere->bounce);
+            FastVecAdd(velocity, across, velocity);
         } else {
             qcopy(position, ref_L00_002FE9D0_00.point);
             result = 2;
@@ -462,7 +462,7 @@ int func_002FEC78(unsigned char *object, unsigned int flags)
             *(int *)(p + 0x28) = 0;
             *(int *)(p + 0x2C) = 0;
             p[1] = 0;
-            func_0029F978(object, flags, (unsigned char *)p);
+            AttachManipulator(object, flags, (unsigned char *)p);
             break;
         }
     } while (i < 64);
@@ -586,33 +586,33 @@ void func_002FF968(PreviewObjectPrefix *object)
         object->classId == 0x907 || object->classId == 0xE7A || special)
         compact = 1;
     if (special) {
-        func_00282D30(offset, D_001B5200.forward, 2.5f);
+        FastVecScale(offset, D_001B5200.forward, 2.5f);
     } else if (compact) {
-        func_00282D30(offset, D_001B5200.forward, 2.0f);
+        FastVecScale(offset, D_001B5200.forward, 2.0f);
     } else {
-        func_00282D30(offset, D_001B5200.forward, 3.0f);
+        FastVecScale(offset, D_001B5200.forward, 3.0f);
     }
-    func_00282CC0(object->position, D_001B5200.position, offset);
+    FastVecAdd(object->position, D_001B5200.position, offset);
     if (D_001B2310.spin)
-        object->rotation[0] = func_00283B98(object->rotation[0], 0.03490659f);
+        object->rotation[0] = FastAddRotations(object->rotation[0], 0.03490659f);
     else
-        object->rotation[2] = func_00283B98(object->rotation[2], 0.03490659f);
-    func_002833F0(basis, object->rotation);
+        object->rotation[2] = FastAddRotations(object->rotation[2], 0.03490659f);
+    euler_rotation_basis(basis, object->rotation);
     if (D_001B2310.spin) {
         if (compact) {
-            func_00282D30(temporary, basis + 4, D_001AD818);
-            func_00282CC0(object->position, object->position, temporary);
-            func_00282D30(temporary, basis, D_001AD814);
-            func_00282CC0(object->position, object->position, temporary);
+            FastVecScale(temporary, basis + 4, D_001AD818);
+            FastVecAdd(object->position, object->position, temporary);
+            FastVecScale(temporary, basis, D_001AD814);
+            FastVecAdd(object->position, object->position, temporary);
         } else {
-            func_00282D30(temporary, basis + 4, D_001AD80C);
-            func_00282CC0(object->position, object->position, temporary);
-            func_00282D30(temporary, basis, D_001AD808);
-            func_00282CC0(object->position, object->position, temporary);
+            FastVecScale(temporary, basis + 4, D_001AD80C);
+            FastVecAdd(object->position, object->position, temporary);
+            FastVecScale(temporary, basis, D_001AD808);
+            FastVecAdd(object->position, object->position, temporary);
         }
     } else {
-        func_00282D30(temporary, basis + 8, D_001AD810);
-        func_00282CC0(object->position, object->position, temporary);
+        FastVecScale(temporary, basis + 8, D_001AD810);
+        FastVecAdd(object->position, object->position, temporary);
     }
     func_002A0F48(object);
     func_00300048(object);
@@ -661,32 +661,32 @@ void func_002FFD78(void)
     int secondPhase;
     float size, interpolation;
     Particle_C65A0 *particle;
-    func_00282D30(offset, D_001B5200.forward, 9.0f);
-    func_00282CC0(farPoint, D_001B5200.position, offset);
-    func_00282D30(offset, D_001B5200.forward, 0.1f);
-    func_00282CC0(nearPoint, D_001B5200.position, offset);
-    interpolation = func_00283CE0(D_001B2310.frames) * D_001B2310.rate;
-    func_00282D08(position, nearPoint, farPoint, interpolation);
+    FastVecScale(offset, D_001B5200.forward, 9.0f);
+    FastVecAdd(farPoint, D_001B5200.position, offset);
+    FastVecScale(offset, D_001B5200.forward, 0.1f);
+    FastVecAdd(nearPoint, D_001B5200.position, offset);
+    interpolation = IntToFloat(D_001B2310.frames) * D_001B2310.rate;
+    lerp_vector(position, nearPoint, farPoint, interpolation);
     size = D_001AD81C * 210000.0f;
     particle = func_002C65A0(position, D_001A8BD0, 4, 0xFF2020, phase, 127, 127,
                             size, size, 0.0f, 0);
     if (particle) {
         particle->shade = *D_001F2614;
-        particle->variation = func_00283CF0(0.4f) + 64;
+        particle->variation = FloatToInt(0.4f) + 64;
     }
     secondPhase = (phase + 128) % 255;
     particle = func_002C65A0(position, D_001A8BD0, 4, 0xFF2020, secondPhase, 127, 127,
                             size, size, 0.0f, 0);
     if (particle) {
         particle->shade = *D_001F2614;
-        particle->variation = func_00283CF0(0.4f) + 64;
+        particle->variation = FloatToInt(0.4f) + 64;
     }
     size *= 0.5f;
     particle = func_002C65A0(position, D_001A8BD0, 4, 0xFFFFFF, secondPhase, 127, 127,
                             size, size, 0.0f, 0);
     if (particle) {
         particle->shade = *D_001F2614;
-        particle->variation = func_00283CF0(0.4f) + 64;
+        particle->variation = FloatToInt(0.4f) + 64;
     }
     D_001B2310.phase++;
 }
@@ -704,7 +704,7 @@ extern void func_0027DE50(int, int, int, int, int);
 void func_002FFFE0(void)
 {
     short v;
-    func_002FC560(0x42, ((long long)ref_L00_002FFFE0_00 << 32) | 0x44);
+    VU1_addGSregister(0x42, ((long long)ref_L00_002FFFE0_00 << 32) | 0x44);
     v = ref_L00_002FFFE0_00;
     func_0027DE50(0, D_001A6480[0xA9], 0, D_001A6480[0xA8], (v << 24) | 0xFFFFFF);
 }

@@ -76,26 +76,26 @@ void func_L00_002D5158(void)
     char *object;
     if (func_L00_002D6418()) {
         aim = (char *)&D_00189E20 + 0x14E0;
-        if (func_00282DF0(aim) == 0.0f)
-            func_00282F20(aim, aim - 0x14E0, 1.0f);
+        if (FastVecLength(aim) == 0.0f)
+            vec_scale_to_length(aim, aim - 0x14E0, 1.0f);
         hero = aim - 0x14E0;
         if (HF(0x2C8) > -0.99f)
-            func_00283098(aim, aim, aim - 0x14A0);
+            matrix_mul_vec3(aim, aim, aim - 0x14A0);
         yaw = func_00283248(HF(0x14E0), HF(0x14E4));
-        pitch = func_00283248(func_00282E20(aim), HF(0x14E8));
+        pitch = func_00283248(vec_length_xy(aim), HF(0x14E8));
         if (func_L00_002D64B8(&target, &probeRate, &probeLimit)) {
             func_002AAC80(-pitch, (float *)(aim + 0x10), probeRate, probeRate, probeLimit);
-            value = func_00283BE0(target, yaw);
+            value = fast_subtract_rotations(target, yaw);
             func_002AAC80(value, (float *)(aim + 0x14), probeRate, probeRate, probeLimit);
         } else {
             distance = 0.0f;
-            func_00282F20(direction, D_L00_001B8FF0, 30.0f);
+            vec_scale_to_length(direction, D_L00_001B8FF0, 30.0f);
             hit = 0;
-            func_00282CC0(direction, direction, D_L00_001B8FF0 - 0x230);
-            if (func_002761F8(D_L00_001B8FF0 - 0x230, direction, 1, HI(0x2290), 0)) {
+            FastVecAdd(direction, direction, D_L00_001B8FF0 - 0x230);
+            if (CollLine(D_L00_001B8FF0 - 0x230, direction, 1, HI(0x2290), 0)) {
                 char *probeObject = D_L00_001BF200.object;
                 if (probeObject && *(short *)(*(char **)(probeObject + 0x24) + 0x46) == 5) {
-                    distance = func_00282E48(D_L00_001B8FF0 - 0x230, D_L00_001BF200.position);
+                    distance = fast_vec_dist(D_L00_001B8FF0 - 0x230, D_L00_001BF200.position);
                     hit = 1;
                 }
             }
@@ -112,7 +112,7 @@ void func_L00_002D5158(void)
                 float cap = D_L00_001A7FA0 * 0.0002908882452175021f;
                 func_L00_002D3B58(local, (char *)&D_00189E20 + 0x120, 0.0f);
                 if (func_00282C48(D_00138180.pitch) < 1.0f) {
-                    float correction = func_00282DB0(local, D_L00_001B8FF0 + 0x10);
+                    float correction = FastVecDot(local, D_L00_001B8FF0 + 0x10);
                     correction = -(correction / distance) * D_L00_001A7FB4;
                     if (correction > cap) correction = cap;
                     else if (correction < -cap) correction = -cap;
@@ -120,7 +120,7 @@ void func_L00_002D5158(void)
                     else { limit -= correction; limit *= D_L00_001A7FBC; limit += correction; }
                 }
                 if (func_00282C48(D_00138180.yaw) < 1.0f) {
-                    float correction = func_00282DB0(local, D_L00_001B8FF0 + 0x20);
+                    float correction = FastVecDot(local, D_L00_001B8FF0 + 0x20);
                     correction = (correction / distance) * D_L00_001A7FB4;
                     if (correction > cap) correction = cap;
                     else if (correction < -cap) correction = -cap;
@@ -130,25 +130,25 @@ void func_L00_002D5158(void)
             }
             value = func_00282C48(D_00189E20.pitchRate);
             if (func_00282C48(rate) < value || D_00189E20.pitchRate * rate < 0.0f)
-                func_002AA2E8(&D_00189E20.pitchRate, rate, D_L00_001A7FB0 * 4.848137450608192e-06f);
+                ApproachValue(&D_00189E20.pitchRate, rate, D_L00_001A7FB0 * 4.848137450608192e-06f);
             else
-                func_002AA2E8(&D_00189E20.pitchRate, rate, D_L00_001A7FA8 * (yawScale * 4.848137450608192e-06f));
+                ApproachValue(&D_00189E20.pitchRate, rate, D_L00_001A7FA8 * (yawScale * 4.848137450608192e-06f));
             value = func_00282C48(D_00189E20.yawRate);
             if (func_00282C48(limit) < value || D_00189E20.yawRate * limit < 0.0f)
-                func_002AA2E8(&D_00189E20.yawRate, limit, D_L00_001A7FAC * 4.848137450608192e-06f);
+                ApproachValue(&D_00189E20.yawRate, limit, D_L00_001A7FAC * 4.848137450608192e-06f);
             else
-                func_002AA2E8(&D_00189E20.yawRate, limit, D_L00_001A7FA4 * (pitchScale * 4.848137450608192e-06f));
+                ApproachValue(&D_00189E20.yawRate, limit, D_L00_001A7FA4 * (pitchScale * 4.848137450608192e-06f));
         }
-        yaw = func_00283B98(yaw, D_00189E20.yawRate);
-        pitch = func_00283B98(pitch, D_00189E20.pitchRate);
-        if (!D_L00_001A8FF0) yaw = func_00283B98(yaw, D_00189E20.heading);
+        yaw = FastAddRotations(yaw, D_00189E20.yawRate);
+        pitch = FastAddRotations(pitch, D_00189E20.pitchRate);
+        if (!D_L00_001A8FF0) yaw = FastAddRotations(yaw, D_00189E20.heading);
         pitchBound = 1.483529999f;
         if (pitch > pitchBound) { pitch = pitchBound; D_00189E20.pitchRate = 0; }
         else if (pitch < -pitchBound) { D_00189E20.pitchRate = 0; pitch = -pitchBound; }
         aim = (char *)&D_00189E20 + 0x14E0;
         func_002AF000(aim, 1.0f, yaw, pitch);
         hero = aim - 0x14E0;
-        if (D_00189E20.groundNormalZ > -0.99f) func_00283098(aim, aim, hero);
+        if (D_00189E20.groundNormalZ > -0.99f) matrix_mul_vec3(aim, aim, hero);
         func_L00_002D6588();
         if (!func_L00_002D64B8(0, 0, 0)) {
             AimCamera *camera = &D_L00_001B8C80;
@@ -164,8 +164,8 @@ void func_L00_002D5158(void)
         if (!D_00189E20.active) {
             object = D_00189E20.targetObject;
             if (object && *(short *)(object + 0xAA) != 0x47) {
-                func_00282CF0((char *)&D_00189E20 + 0x14A0, object + 0x10, (char *)&D_00189E20 + 0x80);
-                func_00283098((char *)&D_00189E20 + 0x14A0, (char *)&D_00189E20 + 0x14A0, (char *)&D_00189E20 + 0x40);
+                FastVecSub((char *)&D_00189E20 + 0x14A0, object + 0x10, (char *)&D_00189E20 + 0x80);
+                matrix_mul_vec3((char *)&D_00189E20 + 0x14A0, (char *)&D_00189E20 + 0x14A0, (char *)&D_00189E20 + 0x40);
                 func_002A91F0((char *)&D_00189E20 + 0x14B0, object + 0xF0);
             }
             D_00189E20.active = 1;
@@ -176,15 +176,15 @@ void func_L00_002D5158(void)
     } else if (D_00189E20.state != 1 && D_00189E20.state != 0x1D) {
         char *oldObject;
         if (!D_00189E20.active) return;
-        func_L00_002D5940();
+        UpdateHeroHeldObject();
         oldObject = D_00189E20.targetObject;
         if (oldObject && *(short *)(oldObject + 0xAA) != 0x47) {
-            func_00282CF0((char *)&D_00189E20 + 0x14A0, oldObject + 0x10, (char *)&D_00189E20 + 0x80);
-            func_00283098((char *)&D_00189E20 + 0x14A0, (char *)&D_00189E20 + 0x14A0, (char *)&D_00189E20 + 0x40);
+            FastVecSub((char *)&D_00189E20 + 0x14A0, oldObject + 0x10, (char *)&D_00189E20 + 0x80);
+            matrix_mul_vec3((char *)&D_00189E20 + 0x14A0, (char *)&D_00189E20 + 0x14A0, (char *)&D_00189E20 + 0x40);
             D_00189E20.blendTime = 0;
             D_00189E20.blend.value = 1.0f;
         }
         D_00189E20.active = 0;
     }
-    if (D_00189E20.active) func_L00_002D5940();
+    if (D_00189E20.active) UpdateHeroHeldObject();
 }

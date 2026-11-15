@@ -34,7 +34,7 @@ void func_L00_00407C18(char *object)
     float basis[4][4];
     float vertex[4], offset[4];
     int i;
-    packet.regs[1] = func_0027C878(11);
+    packet.regs[1] = GetEffectTextureDescriptor(11);
     packet.regs[3] = 0x8000000048ULL;
     packet.regs[2] = 0xFF9000000260ULL;
     packet.regs[0] = 0;
@@ -42,22 +42,22 @@ void func_L00_00407C18(char *object)
     packet.params[4] = 1; packet.params[5] = 0; packet.params[6] = 1; packet.params[7] = 1;
     packet.colours[0] = packet.colours[1] =
         packet.colours[2] = packet.colours[3] = D_L00_001B0F6C;
-    func_00282F20(offset, object + 0xD0, D_L00_001B0F68);
+    vec_scale_to_length(offset, object + 0xD0, D_L00_001B0F68);
     func_002EE108(basis[3], D_L00_00254A60, offset);
-    func_00282CF0(offset, D_L00_001B8DC0, basis[3]);
-    func_00282F20(basis[0], offset, 1.0f);
-    func_00282DD8(basis[1], basis[0], D_0018A0E0);
-    func_00282F20(basis[1], basis[1], -1.0f);
-    func_00282DD8(basis[2], basis[1], basis[0]);
+    FastVecSub(offset, D_L00_001B8DC0, basis[3]);
+    vec_scale_to_length(basis[0], offset, 1.0f);
+    FastVecCross(basis[1], basis[0], D_0018A0E0);
+    vec_scale_to_length(basis[1], basis[1], -1.0f);
+    FastVecCross(basis[2], basis[1], basis[0]);
     for (i = 3; i >= 0; i--) {
-        func_00282D30(vertex, D_L00_001B0F20[3 - i], D_L00_001B0F60);
-        func_002830C0(packet.points[3 - i], vertex, basis);
+        FastVecScale(vertex, D_L00_001B0F20[3 - i], D_L00_001B0F60);
+        transform_vector(packet.points[3 - i], vertex, basis);
     }
-    func_00280B90(&packet, 0, 0);
+    draw_world_quad(&packet, 0, 0);
     packet.colours[3] = -1; packet.colours[2] = -1; packet.colours[1] = -1; packet.colours[0] = -1;
     for (i = 3; i >= 0; i--) {
-        func_00282D30(vertex, D_L00_001B0F20[3 - i], D_L00_001B0F64);
-        func_002830C0(packet.points[3 - i], vertex, basis);
+        FastVecScale(vertex, D_L00_001B0F20[3 - i], D_L00_001B0F64);
+        transform_vector(packet.points[3 - i], vertex, basis);
     }
-    func_00280B90(&packet, 0, 0);
+    draw_world_quad(&packet, 0, 0);
 }

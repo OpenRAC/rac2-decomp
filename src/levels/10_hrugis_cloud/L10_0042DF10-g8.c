@@ -50,16 +50,16 @@ Actor *func_L10_0042DF10(int arg)
     int index;
     int kind = func_002A77E0(5);
 
-    if (kind == 0) p = func_0029EFD0(0x1315);
-    else if (kind == 1) p = func_0029EFD0(0x1328);
-    else p = func_0029EFD0(0x1327);
+    if (kind == 0) p = CreateMoby(0x1315);
+    else if (kind == 1) p = CreateMoby(0x1328);
+    else p = CreateMoby(0x1327);
     if (p) {
         p->state = 0;
         p->alpha = 255;
         p->flags = 255;
         p->active = 1;
         st = p->work;
-        func_002A0488(p, 20, 20, 20);
+        set_moby_color(p, 20, 20, 20);
         index = func_002A77E0(5);
         st->index = index;
         qcopy(&p->pos, D_L10_002BABF0 + index * 16);

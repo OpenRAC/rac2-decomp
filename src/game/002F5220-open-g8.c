@@ -101,12 +101,12 @@ void func_002F8178(char *moby)
     mode = (int)moby;
     if ((unsigned)moby < 4) {
         D_0021F240.restore = 1;
-        moby = func_0029EFD0(11);
+        moby = CreateMoby(11);
         *(short *)(moby + 0x32) = 64;
         if (D_001A7BB1) qcopy(vec, D_001AD1F0);
         else qcopy(vec, D_001AD1E0);
         vec[2] = -vec[2];
-        func_00282CC0(moby + 0x10, D_001B5340, vec);
+        FastVecAdd(moby + 0x10, D_001B5340, vec);
         func_00282C88(moby + 0xF0);
         *(float *)(moby + 0xF8) = 3.1415927f;
         func_002A0F48(moby);
@@ -176,11 +176,11 @@ void func_002F8178(char *moby)
     D_001B2298 = 85;
     D_001B228C = 0;
     func_00132AF8(93);
-    func_002B72E8(0);
-    func_00132028();
+    music_Pause(0);
+    snd_Pump();
     if (D_0021F240.mode == 0) func_002F6608(0);
     else if (D_0021F240.mode == 3) func_002F71B8();
-    else if (D_0021F240.mode == 1) func_002F73A8();
+    else if (D_0021F240.mode == 1) BuildShopChannelList();
     else if (D_0021F240.mode == 2) func_002F7738();
     count = D_0021F240.count;
     visible = count / 2;
@@ -198,7 +198,7 @@ void func_002F8178(char *moby)
     D_0021F240.fieldC = 1;
     D_0021F240.moby = moby;
     D_0021F240.base14 = D_001BAEC0.baseC + 0x60000;
-    func_002E5CF8(3, 17, moby);
+    PlayMobySound(3, 17, moby);
     D_0021F240.field4C = D_001A7AF0;
     D_0021F240.fieldA0 = *(short *)D_00152CE4;
     func_00288EA0();
@@ -210,18 +210,18 @@ void func_002F8178(char *moby)
     D_00189E20.flag22B5 = 1;
     func_0026F720();
     if (!D_0021F240.restore) {
-        if (D_001A7BB1) func_00283098(D_0021F240.position, D_001AD1F0, D_0021F240.moby + 0xC0);
-        else func_00283098(D_0021F240.position, D_001AD1E0, D_0021F240.moby + 0xC0);
-        func_00282CC0(D_0021F240.position, D_0021F240.position, D_0021F240.moby + 0x10);
-        D_0021F240.rotation[2] = func_00283B98(*(float *)(D_0021F240.moby + 0xF8), 3.1415927f);
-        func_00335438(D_0021F240.position, D_0021F240.rotation, 1, 0, 0);
+        if (D_001A7BB1) matrix_mul_vec3(D_0021F240.position, D_001AD1F0, D_0021F240.moby + 0xC0);
+        else matrix_mul_vec3(D_0021F240.position, D_001AD1E0, D_0021F240.moby + 0xC0);
+        FastVecAdd(D_0021F240.position, D_0021F240.position, D_0021F240.moby + 0x10);
+        D_0021F240.rotation[2] = FastAddRotations(*(float *)(D_0021F240.moby + 0xF8), 3.1415927f);
+        SetCamera5Pose(D_0021F240.position, D_0021F240.rotation, 1, 0, 0);
         qcopy(vec, D_0021F240.position);
         if (D_0021F240.mode == 2) vec[1] += 5.0f;
         func_00335370(vec);
         func_003353C8(D_0021F240.rotation);
         func_00272368();
     }
-    func_00283098(D_001C2AC0 + 0x10, D_001AD210, D_0021F240.moby + 0xC0);
+    matrix_mul_vec3(D_001C2AC0 + 0x10, D_001AD210, D_0021F240.moby + 0xC0);
     qcopy(D_001C2AC0, D_001AD220);
     qzero_nc(D_001C2AC0 + 0x30);
     qzero_nc(D_001C2AC0 + 0x20);

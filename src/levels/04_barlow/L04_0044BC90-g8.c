@@ -23,7 +23,7 @@ void func_L04_0044BC90(unsigned char *object)
     velocity.f[0] = -21.5f;
     switch (object[0x20]) {
     case 0:
-        func_00282D30(&velocity, &velocity, *(float *)(object + 0x2c));
+        FastVecScale(&velocity, &velocity, *(float *)(object + 0x2c));
         *(char **)(state + 4) = func_L00_0033E220(&velocity, object, 0x40208080, -1, 1, -1, 0, -1,
                                                 *(float *)(object + 0x2c) * 5250000.0f, *(float *)(object + 0x2c) * 15.0f);
         func_002A7750(object, 1, -1);
@@ -44,9 +44,9 @@ void func_L04_0044BC90(unsigned char *object)
         max_offset.f[0] = -3.0f;
         max_offset.f[1] = 5.0f;
         max_offset.f[2] = 4.0f;
-        func_L03_002ECF08(object, &lower, &upper, &min_offset, &max_offset, 45, 0);
+        SpawnParticleBurst(object, &lower, &upper, &min_offset, &max_offset, 45, 0);
         func_L00_00324F18(object, &velocity, -21.5f, 0.0f, 0.0f);
-        func_0032C700(object + 0x10, 0, 25, 20, 20, 20, 45, 1,
+        SpawnExplosion(object + 0x10, 0, 25, 20, 20, 20, 45, 1,
                      *(float *)(object + 0x2c) * 5.0f, 20.0f, 1, 1, 0, 0);
         func_0029F338(object);
         break;

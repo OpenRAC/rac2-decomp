@@ -84,8 +84,8 @@ void func_L03_003F5590(u8 *entity) {
     union { Quad q; float f[4]; } local;
 
     if (entity[0x20] == 0) {
-        state->timer48 = func_00283CF0(30);
-        state->timer4A = func_00283CF0(32);
+        state->timer48 = FloatToInt(30);
+        state->timer4A = FloatToInt(32);
         state->hitMode = 1;
         func_L00_003294F0(D_L03_001B2A1C[0] + (state->startRecord << 8), 1);
         if (D_0019B2E8[(entity[0xB0] & 0x7F) + (D_001A79F0[0] << 4)] & 0x80) {
@@ -95,10 +95,10 @@ void func_L03_003F5590(u8 *entity) {
         state->difficulty = func_L00_002E3B38(entity[0xB0]);
         switch (state->difficulty) {
         case 2:
-            state->maxHealth = func_00283CF0(state->maxHealth * 0.9f);
+            state->maxHealth = FloatToInt(state->maxHealth * 0.9f);
             break;
         case 1:
-            state->maxHealth = func_00283CF0(state->maxHealth * 0.7f);
+            state->maxHealth = FloatToInt(state->maxHealth * 0.7f);
             break;
         }
         state->target = -1;
@@ -140,13 +140,13 @@ void func_L03_003F5590(u8 *entity) {
     amount = func_002A96A0(entity, hit);
     if (amount != 0 || state->hitMode == 2) {
         state->timer77 = 150;
-        func_002E5CF8(1, 0, entity);
+        PlayMobySound(1, 0, entity);
         func_002AB800(entity, state->hit70);
         if (entity[0x95]) {
             if (state->hitMode == 2) {
                 state->health = 0;
             } else {
-                func_002AA2E8(&state->health, 0, amount);
+                ApproachValue(&state->health, 0, amount);
             }
             if (state->health == 0 && entity[0x20] != 14 && entity[0x20] != 15) {
                 func_002A7750(entity, 14, 1);
@@ -160,7 +160,7 @@ void func_L03_003F5590(u8 *entity) {
                     if (part) {
                         local.f[1] = -0.116666675f;
                     }
-                    func_00283098(&local, &local, entity + 0xC0);
+                    matrix_mul_vec3(&local, &local, entity + 0xC0);
                     effect = func_00273730(entity, 1, *(s16 *)(entity + 0xAA), i, entity + 0x10,
                                            entity + 0xF0, &local, 255, 30, 15);
                     *(void **)(effect + 0x64) = func_00310C88;
@@ -168,7 +168,7 @@ void func_L03_003F5590(u8 *entity) {
                 }
                 state->stage++;
                 func_002A7750(entity, 13, 6);
-                state->threshold = (func_00283CF0(state->health * 4 / state->maxHealth) * state->maxHealth) * 0.25f;
+                state->threshold = (FloatToInt(state->health * 4 / state->maxHealth) * state->maxHealth) * 0.25f;
             }
         } else if (entity[0x20] == 2) {
             func_002A7750(entity, 3, -1);

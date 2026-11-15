@@ -78,9 +78,9 @@ void func_L02_003CEFD8(struct L02PushObject *a0)
             break;
         if (e->f31 != 0 && e->type == 0xA4E && e->state != 0xFE && e->state != 0xFD) {
             o = e->obj;
-            func_00282D30(tmp, &vec, o->f324);
-            func_002830C0(tmp, tmp, (char *)o + 0x220);
-            r = func_00283D38(k.a, k.b, o->f32C);
+            FastVecScale(tmp, &vec, o->f324);
+            transform_vector(tmp, tmp, (char *)o + 0x220);
+            r = FastTweenColor(k.a, k.b, o->f32C);
             func_L00_00325AE8(tmp, r, o->f324 * 0.2f, 0.08f);
         }
         p++;

@@ -44,22 +44,22 @@ void func_L03_0041A090(u8 *e) {
     case 2:
         func_L00_0032A258(e,D_L03_001B1AF0,D_L03_001B1AE8,D_L03_001B1AE0,63,0,D_L03_001B1B10,0,65535,255,0);
         func_L00_00324F18(e,&p,0,0,0);
-        func_0032C700(e+0x10,0,25,20,20,20,45,1,0.75f,20,1,1,0,0);
-        func_002E5CF8(0,0,e);
+        SpawnExplosion(e+0x10,0,25,20,20,20,45,1,0.75f,20,1,1,0,0);
+        PlayMobySound(0,0,e);
         func_L01_0031A278(e,&a,*(float *)(e+0x2c)*12,*(float *)(e+0x2c)*-15,*(float *)(e+0x2c)*20);
         b.f[0]=0; b.f[1]=-0.050000004f; b.f[2]=0;
-        func_00283098(&b,&b,e+0xc0);
-        func_L00_003263D0(e,&a,2,1,0.15f,2,0.5f,1,&b,0x50404040,0);
+        matrix_mul_vec3(&b,&b,e+0xc0);
+        SpawnTintedEffects(e,&a,2,1,0.15f,2,0.5f,1,&b,0x50404040,0);
         func_L01_0031A278(e,&a,*(float *)(e+0x2c)*-12,*(float *)(e+0x2c)*-15,*(float *)(e+0x2c)*20);
-        func_L00_003263D0(e,&a,2,1,0.15f,2,0.5f,1,&b,0x50404040,0);
+        SpawnTintedEffects(e,&a,2,1,0.15f,2,0.5f,1,&b,0x50404040,0);
         c.q=0; d.q=0; f.q=0; g.q=0;
         c.f[0]=12; c.f[1]=-12; c.f[2]=20;
         d.f[0]=12; d.f[1]=-12; d.f[2]=20;
         f.f[0]=-1.5f; f.f[1]=-5; f.f[2]=-1.5f;
         g.f[0]=1.5f; g.f[1]=-15; g.f[2]=1.5f;
-        func_L03_002ECF08(e,&c,&d,&f,&g,15,0); c.f[0]=-12;
+        SpawnParticleBurst(e,&c,&d,&f,&g,15,0); c.f[0]=-12;
         d.f[0]=-12;
-        func_L03_002ECF08(e,&c,&d,&f,&g,15,0);
+        SpawnParticleBurst(e,&c,&d,&f,&g,15,0);
         if(D_L03_001B1B10>=0) {
             *(u16 *)(e+0x7c)=(1<<D_L03_001B1B10)|0x8000;
             func_002A7750(e,3,-1);

@@ -51,7 +51,7 @@ void func_L09_003F8598(unsigned char *object) {
         if (candidate == 0)
             break;
         candidate_data = *(unsigned char **)(candidate + 0x68);
-        distance = func_00282E80(candidate + 0x10, &position);
+        distance = vec_distance_xy(candidate + 0x10, &position);
         if (candidate_data == 0)
             continue;
         if ((candidate_data[0x302] & 1) == 0)

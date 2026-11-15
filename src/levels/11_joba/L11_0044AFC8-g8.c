@@ -73,16 +73,16 @@ void func_L11_0044AFC8(char *object)
     if (*(char **)(state + 0x490)) *(TIAfc8 *)target = *(TIAfc8 *)(*(char **)(state + 0x490) + 0x10);
     else *(TIAfc8 *)target = *(TIAfc8 *)D_00189EA0;
     if (*(short *)(state + 0x4D2)) {
-        func_00282CF0(direction, target, object + 0x10);
+        FastVecSub(direction, target, object + 0x10);
         position = object + 0x10;
         difference = func_002B04E0(object, direction, state + 0x230);
         angle = 0.0f;
     } else {
         position = object + 0x10;
         angle = func_00283248(target[0] - *(float *)(object + 0x10), target[1] - *(float *)(object + 0x14));
-        difference = func_00283C80(angle, *(float *)(object + 0xF8));
+        difference = FastDiffRots(angle, *(float *)(object + 0xF8));
     }
-    distance = func_00282E48(position, target);
+    distance = fast_vec_dist(position, target);
     if (*(u8 *)(object + 0x95) == 2) {
         if (func_002B3890(object)) {
             if (*(u8 *)(object + 0x43) != 10) func_002A7470(object, 10, 0, 10);
@@ -109,7 +109,7 @@ void func_L11_0044AFC8(char *object)
         }
         if (difference > 2.792527198791504f) func_L11_0044C818(object);
         waypoint = state + 0x470;
-        if (*(u8 *)(object + 0xBC) == 0 && func_00282E80(position, waypoint) < 0.5f) *(u8 *)(object + 0xBC) = 1;
+        if (*(u8 *)(object + 0xBC) == 0 && vec_distance_xy(position, waypoint) < 0.5f) *(u8 *)(object + 0xBC) = 1;
         else if (*(short *)(state + 0x4D2)) func_L02_00333438(object,waypoint);
         else func_L01_00321178(object,waypoint);
     }
@@ -159,7 +159,7 @@ void func_L11_0044AFC8(char *object)
             else if (!func_L11_0044C850(object)) func_002B4FF0(object,target,*(float *)(state+0x494));
         } else {
             if (*(short *)(state+0x4D2)) {
-                func_00282CF0(direction,target,position);
+                FastVecSub(direction,target,position);
                 func_L02_00333480(object,position,direction);
             } else func_002B50E0(object,position,angle);
         }
@@ -203,10 +203,10 @@ void func_L11_0044AFC8(char *object)
         break;
     case 11:
         if (func_002B3868(object)) {
-            func_00282CF0(state+0x1A0,func_L11_004417E8(*(int *)(object+0xB8)),position);
+            FastVecSub(state+0x1A0,func_L11_004417E8(*(int *)(object+0xB8)),position);
             *(int *)(state+0x1A8)=0;
             scale=func_002A7878(3.0f,5.0f);
-            func_00282F20(state+0x1A0,state+0x1A0,scale*0.01666666753590107f);
+            vec_scale_to_length(state+0x1A0,state+0x1A0,scale*0.01666666753590107f);
             if (*(u8 *)(object+0x43)!=17) func_002A7470(object,17,0,30);
             *(short *)(state+0x4D2)=0;
             rotation = (float *)(state + 0x480);
@@ -219,13 +219,13 @@ void func_L11_0044AFC8(char *object)
         }
         *(float *)(state+0x1A8)-=*(float *)(state+0x12C);
         func_L07_00321D68(object,state+0x1A0);
-        func_00282D30(state+0x480,state+0x480,0.98f);
+        FastVecScale(state+0x480,state+0x480,0.98f);
         scale=*(float *)(object+0x2C)*0.0009765625f;
         collision_flags=6;
-        func_002A3F10(object,1,&collision_flags,matrix);
-        func_00282D30(direction,matrix+12,scale);
+        get_moby_joint_matrices(object,1,&collision_flags,matrix);
+        FastVecScale(direction,matrix+12,scale);
         func_002B4090(object,direction,*(float *)(state+0x480),*(float *)(state+0x484),*(float *)(state+0x488));
-        func_002833F0(object+0xC0,object+0xF0);
+        euler_rotation_basis(object+0xC0,object+0xF0);
         if (*(float *)(object+0x18)<*(float *)(func_L11_004417E8(*(int *)(object+0xB8))+8)+5.0f ||
             !func_002A77E0(450) || *(u16 *)(object+0x96)>300) {
             func_L02_003FC248(object,0,-1); func_L11_0044C4F0(object);

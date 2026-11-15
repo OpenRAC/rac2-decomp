@@ -90,10 +90,10 @@ void func_L20_00447930(char *arg0) {
         }
         t = *(float *)(state + 0x88);
         ease = (1.0f - func_00283180(t * 3.1415927f)) * 0.5f;
-        func_00282F20(arg0 + 0xE0, arg0 + 0xE0, 1.0f - ease);
-        func_00282CF0(&v2, &D_L20_001B308C[*(int *)(state + 0x80)].pos, state + 0x60);
-        func_00282D30(&v2, &v2, ease);
-        func_00282CC0(arg0 + 0x10, state + 0x60, &v2);
+        vec_scale_to_length(arg0 + 0xE0, arg0 + 0xE0, 1.0f - ease);
+        FastVecSub(&v2, &D_L20_001B308C[*(int *)(state + 0x80)].pos, state + 0x60);
+        FastVecScale(&v2, &v2, ease);
+        FastVecAdd(arg0 + 0x10, state + 0x60, &v2);
         if (*(float *)(state + 0x88) >= 1.0f) {
             func_002A7750(arg0, 3, -1);
         }
@@ -111,7 +111,7 @@ void func_L20_00447930(char *arg0) {
         break;
     }
     if (*(u8 *)(arg0 + 0x20) < 3) {
-        func_00282CF0(&v2, arg0 + 0x10, &v0);
+        FastVecSub(&v2, arg0 + 0x10, &v0);
         func_002AD6F0(state + 0x20, &v2, &v1, arg0 + 0xF0);
     }
 }

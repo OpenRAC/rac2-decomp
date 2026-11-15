@@ -93,15 +93,15 @@ void func_00306A40(ProjectileObject *self)
         /* fall through */
     case 1:
         func_002FE8D8(&self->position, &direction);
-        func_00282F20(&velocity, &self->transform[8], 1.0f);
-        func_00282DD8(&axis, &velocity, &direction);
-        angle = func_00282DB0(&velocity, &direction) / 2.0f;
-        func_00282D30(&quaternion, &axis, func_00283198(angle));
+        vec_scale_to_length(&velocity, &self->transform[8], 1.0f);
+        FastVecCross(&axis, &velocity, &direction);
+        angle = FastVecDot(&velocity, &direction) / 2.0f;
+        FastVecScale(&quaternion, &axis, func_00283198(angle));
         quaternion.w = func_00283180(angle);
-        func_00283958(&quaternion, matrix);
-        func_00283738(self->transform, matrix, self->transform);
+        quaternion_to_rotation_basis(&quaternion, matrix);
+        multiply_matrix3x3(self->transform, matrix, self->transform);
         qcopy(&old, &self->position);
-        func_00282CC0(&self->position, &self->position, child);
+        FastVecAdd(&self->position, &self->position, child);
         func_002FEE70(child->flightEffect, child, 0);
         func_002FE880(&self->position, child, D_001AEC50 * 0.00027777778f);
         func_00300190(&self->position, &self->position);
@@ -121,7 +121,7 @@ void func_00306A40(ProjectileObject *self)
         sweep.flag = 1;
         sweep.flag58 = 1;
         sweep.epsilon = 0.0962f;
-        result = func_002FE9D0(&sweep);
+        result = CollideSweptSphere(&sweep);
         qcopy(&self->position, &sweep.to);
         qcopy(child, &sweep.velocity);
         if (result != 2)
@@ -140,7 +140,7 @@ void func_00306A40(ProjectileObject *self)
                 child->velocity.z = -0.025000002f;
                 self->state = 7;
                 if (!sweep.surface) {
-                    func_002FD1B8(D_001B22D0, D_001B22D8, 1, self->position.x, self->position.y, 0.5f, -0.35f);
+                    RippleDisturb(D_001B22D0, D_001B22D8, 1, self->position.x, self->position.y, 0.5f, -0.35f);
                     hit = func_00312D58(&self->position, 2.0f);
                     if (hit)
                         hit->field23 = 0x70;
@@ -161,9 +161,9 @@ void func_00306A40(ProjectileObject *self)
             func_002FEE50(child->flightEffect);
             ref_00306A40_01[child->slot] = D_001AD7EC;
             if (D_001AD7EC) {
-                func_00282CF0(&relative, &self->position, &D_001AD7EC->position);
-                func_00283698(inverse, ref_00306A40_01[child->slot]->transform);
-                func_002830C0(&relative, &relative, inverse);
+                FastVecSub(&relative, &self->position, &D_001AD7EC->position);
+                matrix_from_basis_rows(inverse, ref_00306A40_01[child->slot]->transform);
+                transform_vector(&relative, &relative, inverse);
                 {
                     /* Set twice, so alias analysis keeps the row's stores in order with the stack. */
                     int row = child->slot * 12;
@@ -176,7 +176,7 @@ void func_00306A40(ProjectileObject *self)
             }
             self->collision = *(int *)(self->classData + 0x10);
         } else {
-            func_00282D30(child, child, 1.1f);
+            FastVecScale(child, child, 1.1f);
         }
         break;
     case 2:
@@ -252,8 +252,8 @@ void func_00306A40(ProjectileObject *self)
         direction.y = ((float *)row)[1];
         direction.z = ((float *)row)[2];
         direction.w = 0;
-        func_00283098(&direction, &direction, ref_00306A40_01[child->slot]->transform);
-        func_00282CC0(&self->position, &ref_00306A40_01[child->slot]->position, &direction);
+        matrix_mul_vec3(&direction, &direction, ref_00306A40_01[child->slot]->transform);
+        FastVecAdd(&self->position, &ref_00306A40_01[child->slot]->position, &direction);
     }
     if (self->state == 3 || self->state == 4)
         func_003079E8(self);

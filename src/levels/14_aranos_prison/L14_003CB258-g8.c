@@ -33,7 +33,7 @@ void func_L14_003CB258(char *self) {
   *(int *)(s+0x5C) |= 1;
   qcopy(s+0x70,self+0x10);
   *(float *)(s+0x78) += D_L14_001AFF0C;
-  e=func_0029EFD0(0xF4D);
+  e=CreateMoby(0xF4D);
   if(e) {
    unsigned short flags,link;
    func_002B37E8(e,self);
@@ -53,7 +53,7 @@ void func_L14_003CB258(char *self) {
   if(func_002B38B8(self)) {
    func_002A7750(self,2,-1);
    func_L00_003294F0(self,0);
-   func_L14_003CB868(self);
+   UpdateLaunchVolume(self);
   }
   break;
  case 2:
@@ -69,12 +69,12 @@ void func_L14_003CB258(char *self) {
    restitution=D_L14_001AFF00;
    *(float *)(s+0x80)=b;
    *(float *)(s+0x84)*=restitution;
-   func_002E5CF8(0,0,self);
+   PlayMobySound(0,0,self);
   } else if(*(float *)(s+0x80)<0.0f) {
    restitution=D_L14_001AFF00;
    *(float *)(s+0x80)=0.0f;
    *(float *)(s+0x84)*=restitution;
-   func_002E5CF8(0,0,self);
+   PlayMobySound(0,0,self);
    if(*(float *)(s+0x84)<=D_L14_001AFF08*0.0002908882452175021f)func_002A7750(self,1,-1);
   }
   D_0018CDD8=-1;

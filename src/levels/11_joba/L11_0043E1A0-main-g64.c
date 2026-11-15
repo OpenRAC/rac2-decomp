@@ -341,12 +341,12 @@ void func_L11_0043E1A0(u8 *obj) {
     case 1:
         if (func_L00_003206B8(&HERO->f[0x80 / 4], st->zone) != 0) {
             func_002A7750(obj, 4, -1);
-        } else if (func_002ACBC8(&HERO->f[0x80 / 4], st->trigger1) != 0) {
-            func_002B0C28(4, 0x2F3C, 1);
+        } else if (IsPointInCuboid(&HERO->f[0x80 / 4], st->trigger1) != 0) {
+            TryClaimNotice(4, 0x2F3C, 1);
             func_L02_003FF698(obj);
         } else if (D_001395B8[func_L11_0043E108(1)] != 0) {
-            if (func_002ACBC8(&HERO->f[0x80 / 4], st->trigger2) != 0) {
-                func_002B0C28(4, 0x2F3C, 1);
+            if (IsPointInCuboid(&HERO->f[0x80 / 4], st->trigger2) != 0) {
+                TryClaimNotice(4, 0x2F3C, 1);
                 func_L02_003FF698(obj);
             }
         }
@@ -373,8 +373,8 @@ void func_L11_0043E1A0(u8 *obj) {
             m1->y = 419.766f;
         } else if (OBJ->phase == 0) {
             if (OBJ->timer < 0x1F) {
-                D_L11_001B2FE0 = func_00283CE0(OBJ->timer) * 0.05f < 1.0f
-                                     ? func_00283CE0(OBJ->timer) * 0.05f
+                D_L11_001B2FE0 = IntToFloat(OBJ->timer) * 0.05f < 1.0f
+                                     ? IntToFloat(OBJ->timer) * 0.05f
                                      : 1.0f;
             } else {
                 f32 v[4] __attribute__((aligned(16)));
@@ -390,7 +390,7 @@ void func_L11_0043E1A0(u8 *obj) {
                 func_L01_00323310(st->music, st->volume);
                 *(TI128 *)v = *(TI128 *)(D_L11_001B368C + ((st->camera << 7) + 0x30));
                 v[2] += 2.0f;
-                func_00335438((char *)v, (char *)(D_L11_001B368C + (st->camera << 7) + 0x70), 1, 0, 0);
+                SetCamera5Pose((char *)v, (char *)(D_L11_001B368C + (st->camera << 7) + 0x70), 1, 0, 0);
                 OBJ->phase = 2;
             }
         } else if (OBJ->phase == 2) {
@@ -402,7 +402,7 @@ void func_L11_0043E1A0(u8 *obj) {
                 func_L00_002D40A0(func_L11_004417E8(obj), 0, 0.0f);
             }
         } else if (OBJ->phase == 3) {
-            if (func_00282E80(&HERO->f[0x80 / 4], func_L11_004417E8(obj)) < 10.0f) {
+            if (vec_distance_xy(&HERO->f[0x80 / 4], func_L11_004417E8(obj)) < 10.0f) {
                 if (D_001395B8[0x4A] == 0) {
                     D_001395B8[0x4A] = 1;
                     OBJ->phase = 1;
@@ -522,7 +522,7 @@ void func_L11_0043E1A0(u8 *obj) {
             }
             st->result = sel;
         }
-        func_L11_00443498(obj);
+        UpdateJobaClassSelectionMenu(obj);
         break;
     case 8:
         func_L11_0043E108(1);
@@ -610,8 +610,8 @@ void func_L11_0043E1A0(u8 *obj) {
                 for (k5 = 0; k5 < 6; k5++) {
                     sum1 += st->counts[k5];
                 }
-                func_00115DA8(buf, D_L11_001B15A0, func_00288FB8(0x3269), D_L11_001B14B8[st->wave] + sum1 - st->lost,
-                              func_00288FB8(0x2F61));
+                func_00115DA8(buf, D_L11_001B15A0, GetLocalizedString(0x3269), D_L11_001B14B8[st->wave] + sum1 - st->lost,
+                              GetLocalizedString(0x2F61));
                 func_L00_0030DD70((int)buf, -1);
                 func_002A7750(obj, 11, -1);
                 func_L00_003DF6B0(1, -1);
@@ -620,7 +620,7 @@ void func_L11_0043E1A0(u8 *obj) {
             }
         }
         if (st->cls == 9 && st->frames >= 0x2A31) {
-            func_L00_0030DD70(func_00288FB8(0x3269), -1);
+            func_L00_0030DD70(GetLocalizedString(0x3269), -1);
             func_002A7750(obj, 11, -1);
             func_L00_003DF6B0(1, -1);
             func_L00_004028C0((char *)1, -1);
@@ -634,8 +634,8 @@ void func_L11_0043E1A0(u8 *obj) {
                 for (k6 = 0; k6 < 6; k6++) {
                     sum2 += st->counts[k6];
                 }
-                func_00115DA8(buf, D_L11_001B15A0, func_00288FB8(0x3269), D_L11_001B14D0[st->wave] + sum2 - st->lost,
-                              func_00288FB8(0x2F61));
+                func_00115DA8(buf, D_L11_001B15A0, GetLocalizedString(0x3269), D_L11_001B14D0[st->wave] + sum2 - st->lost,
+                              GetLocalizedString(0x2F61));
                 func_L00_0030DD70((int)buf, -1);
                 func_002A7750(obj, 11, -1);
                 func_L00_003DF6B0(1, -1);
@@ -644,7 +644,7 @@ void func_L11_0043E1A0(u8 *obj) {
             }
         }
         if ((st->cls == 3 || st->cls == 11) && HERO->i[0x24CC / 4] < D_001A7A00) {
-            func_L00_0030DD70(func_00288FB8(0x326A), -1);
+            func_L00_0030DD70(GetLocalizedString(0x326A), -1);
             func_002A7750(obj, 11, -1);
             func_L00_003DF6B0(1, -1);
             func_L00_004028C0((char *)1, -1);
@@ -772,7 +772,7 @@ void func_L11_0043E1A0(u8 *obj) {
                 } else {
                     func_L11_002D8EF8(0x81, 1);
                 }
-                if (func_00282E80(&HERO->f[0x80 / 4], lt1->pos) < 0.01f) {
+                if (vec_distance_xy(&HERO->f[0x80 / 4], lt1->pos) < 0.01f) {
                     HERO->f[0x84 / 4] += 0.01f;
                 }
             }
@@ -822,7 +822,7 @@ void func_L11_0043E1A0(u8 *obj) {
                 }
                 st->heading = func_00283248(HERO->f[0x80 / 4] - ((f32 *)func_L11_004417E8(obj))[0],
                                            HERO->f[0x84 / 4] - ((f32 *)func_L11_004417E8(obj))[1]);
-                st->heading = func_00283B98(st->heading, -1.5707965f);
+                st->heading = FastAddRotations(st->heading, -1.5707965f);
                 for (k10 = st->counts[3]; k10 < rec6->h[3]; k10++) {
                     func_L11_00440790(obj, 0xDF7, 1);
                 }
@@ -857,7 +857,7 @@ void func_L11_0043E1A0(u8 *obj) {
                 if (w1 + 1 < cl1->count && next1->b[3] != 0) {
                     st->heading = func_00283248(HERO->f[0x80 / 4] - ((f32 *)func_L11_004417E8(obj))[0],
                                                HERO->f[0x84 / 4] - ((f32 *)func_L11_004417E8(obj))[1]);
-                    st->heading = func_00283B98(st->heading, -1.5707965f);
+                    st->heading = FastAddRotations(st->heading, -1.5707965f);
                     st->wave++;
                     rec8 = &TABLE[st->cls]->records[st->wave];
                     for (k11 = st->counts[3]; k11 < rec8->h[3]; k11++) {
@@ -909,8 +909,8 @@ void func_L11_0043E1A0(u8 *obj) {
                     for (k12 = 0; k12 < 6; k12++) {
                         sum3 += st->counts[k12];
                     }
-                    func_00115DA8(buf, D_L11_001B15A0, func_00288FB8(0x3269), D_L11_001B14D8[st->wave] + sum3 - st->lost,
-                                  func_00288FB8(0x2F61));
+                    func_00115DA8(buf, D_L11_001B15A0, GetLocalizedString(0x3269), D_L11_001B14D8[st->wave] + sum3 - st->lost,
+                                  GetLocalizedString(0x2F61));
                     func_L00_0030DD70((int)buf, -1);
                     lt4 = &D_L11_001B3C1C[*D_L11_001A9014[st->light] & 0x7FFF];
                     m2 = &D_L11_001B359C[st->lamp];

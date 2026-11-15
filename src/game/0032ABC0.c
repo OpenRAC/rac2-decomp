@@ -36,9 +36,9 @@ void func_0032ABC0(void *owner)
             debris->scale = func_002A7878(0.3f, 0.4f);
             func_002FE8D8(((Hero_0032ABC0 *)D_00189E20)->ptr[0x2290 / 4] + 0x10, out);
             qcopy(&pos, ((Hero_0032ABC0 *)D_00189E20)->ptr[0x2290 / 4] + 0x10);
-            func_00282CC0(&delta, &pos, out);
-            func_00282DD8(&pos, &pos, &delta);
-            func_00282F20(debris->dir, (float *)&pos, debris->scale);
+            FastVecAdd(&delta, &pos, out);
+            FastVecCross(&pos, &pos, &delta);
+            vec_scale_to_length(debris->dir, (float *)&pos, debris->scale);
             return;
         }
     }

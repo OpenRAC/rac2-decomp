@@ -44,25 +44,25 @@ void func_L00_003C94D8(char *object)
     *(BurstQuad *)&saved = 0;
     saved.x=0.3f; saved.y=-1.0f; saved.w=1.0f;
     local.x=0.513f; local.y=-1.0f; local.z=0.183f; local.w=1.0f;
-    func_00283098(&local,&local,object+0xC0);
-    func_00282CC0(&position,object+0x10,&local);
+    matrix_mul_vec3(&local,&local,object+0xC0);
+    FastVecAdd(&position,object+0x10,&local);
     angle=0.0f;
     object[0xBC]=6;
     func_002ACEC0(&saved,D_0018A550,D_0018A550+0x10,0.3490659f);
     qcopy(&start,&saved);
     for(i=0;i<10;i++) {
         BurstParticle *p;
-        angle=func_00283B98(angle,func_002A7878(0.0f,0.6283186f));
+        angle=FastAddRotations(angle,func_002A7878(0.0f,0.6283186f));
         speed=func_002A7878(0.10000001f,0.3f);
-        func_00282D30(&velocity,&start,speed);
+        FastVecScale(&velocity,&start,speed);
         p=func_L00_00333F90(&position,&velocity);
         if(p) {
             BurstVec *tail;
             float tailW;
-            func_00282D30(&velocity,&start,0.75f);
+            FastVecScale(&velocity,&start,0.75f);
             tail = &p->velocity;
             tailW = 2.0f;
-            func_00282CC0(&p->position,&position,&velocity);
+            FastVecAdd(&p->position,&position,&velocity);
             qcopy_nc(&p->previous,&position);
             tail->w=tailW;
             p->position.w=0.05f;
@@ -79,20 +79,20 @@ void func_L00_003C94D8(char *object)
     angle=0.0f;
     qcopy(&start,&saved);
     qzero_nc(&offset);
-    if(D_00189E20.active) func_00282D30(&offset,&D_00189E20.velocity,1.7f);
+    if(D_00189E20.active) FastVecScale(&offset,&D_00189E20.velocity,1.7f);
     for(i=9;i>=0;i--) {
         char *p;
-        angle=func_00283B98(angle,func_002A7878(0.0f,0.6283186f));
+        angle=FastAddRotations(angle,func_002A7878(0.0f,0.6283186f));
         speed=func_002A7878(D_L00_001B0114*0.016666668f,D_L00_001B0118*0.016666668f);
-        func_00282D30(&velocity,&start,speed);
-        func_00282CC0(&velocity,&velocity,&offset);
+        FastVecScale(&velocity,&start,speed);
+        FastVecAdd(&velocity,&velocity,&offset);
         kind=D_L00_001B010C;
-        mode=func_00283CF0(func_002A78D8(1.0f,2.0f));
+        mode=FloatToInt(func_002A78D8(1.0f,2.0f));
         temp.x=position.x+func_002A78D8(0.0f,D_L00_001B0100);
         temp.y=position.y+func_002A78D8(0.0f,D_L00_001B0100);
         temp.z=position.z+func_002A78D8(0.0f,D_L00_001B0100);
         life=func_002A7878(D_L00_001B011C,D_L00_001B0120)*210000.0f;
-        func_00282CF0(&temp,&temp,&velocity);
+        FastVecSub(&temp,&temp,&velocity);
         p=func_002C16C0(&temp,&velocity,kind,D_L00_001B0104,0x505050,mode,life,D_L00_001B0124,D_L00_001B0110,0.0f,0.0f);
         if(p) p[2]=D_L00_001FE940.burstColors[1];
         if(func_00282C48(angle)>0.00001f) {

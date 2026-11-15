@@ -37,23 +37,23 @@ void func_002C6EF0(Spark2C6EF0 *e) {
     f32 t;
     u32 a;
 
-    if (func_00282978(&e->age)) {
+    if (FastDecTimer(&e->age)) {
         func_002B9180(e);
         return;
     }
     pos = e->pos;
     e->shade = D_001F26A8[0][func_002A77E0(2)];
     qcopy(old, pos);
-    func_00282CC0(pos, pos, vel);
-    func_00282CF0(step, pos, old);
-    func_00282F20(step, step, 0.9f);
-    func_00282CF0(e->prev, pos, step);
+    FastVecAdd(pos, pos, vel);
+    FastVecSub(step, pos, old);
+    vec_scale_to_length(step, step, 0.9f);
+    FastVecSub(e->prev, pos, step);
     e->prev[3] = 2.0f;
     vel[2] = vel[2] - vel[3];
     if (e->age < e->life) {
-        t = func_00283CE0(e->age);
-        t = t / func_00283CE0(e->life);
-        a = func_00283CF0(t * 127.0f) << 24;
+        t = IntToFloat(e->age);
+        t = t / IntToFloat(e->life);
+        a = FloatToInt(t * 127.0f) << 24;
         e->color = a | (e->color & 0xFFFFFF);
         e->color2 = a | (e->color2 & 0xFFFFFF);
     }

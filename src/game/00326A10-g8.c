@@ -53,7 +53,7 @@ int func_00326A10(void)
     func_00300A00(id, 0x55F0C070, 454.0f, (float)y, ox, sc, z);
     func_002ED578(D_001B27C0[0], &a, &b, &c);
     func_00115DA8(text, D_001B0110, a, b, c);
-    func_0027F5B8(func_00283CF0(405.0f), hud_coord(372.0f, D_001B23A4[0], half, one),
+    func_0027F5B8(FloatToInt(405.0f), hud_coord(372.0f, D_001B23A4[0], half, one),
                   0x80808080UL, text, 128);
     return 1;
 }

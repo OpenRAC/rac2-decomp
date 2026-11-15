@@ -143,8 +143,8 @@ void func_L08_003D8348(InitObject *object)
     int handle;
     unsigned short flag;
     int bits;
-    s->f48 = func_00283CF0(15.0f);
-    s->f4A = func_00283CF0(9.6f);
+    s->f48 = FloatToInt(15.0f);
+    s->f4A = FloatToInt(9.6f);
     s->f29 = 1;
     if (D_L08_001CA080.fC) {
         if (object->f18 < D_L08_001CA080.f28 && D_L08_001CA080.f0 == 1)
@@ -182,12 +182,12 @@ void func_L08_003D8348(InitObject *object)
     *(InitVector *)position = *(InitVector *)((char *)object + 0x10);
     value = func_L08_0032EF80(position, s->f410, s->f418, s->f414, -1);
     if (value > 0)
-        object->f30 = func_00283CF0(value + 2.0f);
+        object->f30 = FloatToInt(value + 2.0f);
     s->f408 = s->f40A = object->f30;
     *(InitVector *)position = *(InitVector *)((char *)object + 0x10);
     value = func_L08_0032EF80(position, s->f41C, s->f424, s->f420, -1);
     if (value > 0)
-        s->f408 = func_00283CF0(value + 2.0f);
+        s->f408 = FloatToInt(value + 2.0f);
     if (s->f428 == -1)
         func_L01_003377C8(D_L08_001FE7BC);
     s->f88 = 0;
@@ -250,7 +250,7 @@ void func_L08_003D8348(InitObject *object)
         break;
     case 2:
         qzero_nc((char *)s + 0x1C0);
-        func_00282CC0((char *)object + 0x10, (char *)object + 0x10, (char *)s + 0xD0);
+        FastVecAdd((char *)object + 0x10, (char *)object + 0x10, (char *)s + 0xD0);
         qcopy_nc((char *)s + 0x3E0, (char *)object + 0x10);
         if (object->f43 != 14)
             func_002A7470(object, 14, 0, 2);

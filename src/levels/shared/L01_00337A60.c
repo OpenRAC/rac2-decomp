@@ -21,8 +21,8 @@ s32 func_L01_00337A60(void *out, void *p, char *pts, s32 n)
     for (i = 0; i < n; i++) {
         j = i + 1;
         func_L01_00311C18(near, pts + i * 16, pts + (j % n) * 16, p);
-        func_00282CF0(d, p, near);
-        len = func_00282DF0(d);
+        FastVecSub(d, p, near);
+        len = FastVecLength(d);
         if (i == 0 || len < best) {
             best = len;
             qcopy(out, near);

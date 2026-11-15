@@ -32,8 +32,8 @@ void func_L11_0044BD68(char *object)
         if (func_002A77E0(2)) speed = -speed;
         *(float *)(state + 0x494) = speed;
         if (func_002A77E0(2) == 1) *(u16 *)(object + 0x34) |= 0x8000;
-        *(u8 *)(state + 0x48) = func_00283CF0(15.0f);
-        *(u8 *)(state + 0x4A) = func_00283CF0(12.0f);
+        *(u8 *)(state + 0x48) = FloatToInt(15.0f);
+        *(u8 *)(state + 0x4A) = FloatToInt(12.0f);
         *(float *)(state + 0x80) = 0.8f;
         *(float *)(state + 0x8C) = 0.4f;
         *(s8 *)(state + 0xBC) = -1;
@@ -61,12 +61,12 @@ void func_L11_0044BD68(char *object)
     }
     if (*(short *)(state + 0x4D2) == 0 && *(u8 *)(object + 0x20) != 11 && !D_001A8FF4) {
         *(u16 *)(object + 0x34) |= 0x400;
-        if (*(u8 *)(object + 0x31) && func_00282E48(object + 0x10, D_L11_001BA8C0) < 24.0f) {
+        if (*(u8 *)(object + 0x31) && fast_vec_dist(object + 0x10, D_L11_001BA8C0) < 24.0f) {
             func_002A93B0(object);
             *(u8 *)(object + 0x6F) = 22;
         }
     } else *(u16 *)(object + 0x34) &= 0xFBFF;
-    angle = func_00283B98(*(float *)(state + 0x49C), *(float *)(state + 0x4AC) * 0.01745329424738884f);
+    angle = FastAddRotations(*(float *)(state + 0x49C), *(float *)(state + 0x4AC) * 0.01745329424738884f);
     *(float *)(state + 0x49C) = angle;
     func_00325C50(object, state + 0x4A0, 1, D_L11_001A8F20, angle);
     func_00325DA0(object, state + 0x4BC);
@@ -82,7 +82,7 @@ void func_L11_0044BD68(char *object)
         }
         func_L11_0044C268(object);
         if (*(short *)(state + 0x4D2)) {
-            func_00283698(state + 0x230, object + 0xC0);
+            matrix_from_basis_rows(state + 0x230, object + 0xC0);
             func_002AFFD8(object + 0x10, state + 0x260, 0);
             if (!func_L11_004461C0(*(int *)(object + 0xB8), object + 0x10)) {
                 *(int *)(state + 0x20) = 0;

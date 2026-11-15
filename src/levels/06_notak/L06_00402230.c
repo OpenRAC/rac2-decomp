@@ -30,9 +30,9 @@ void func_L06_00402230(char *moby)
                 velocity[1] = func_00283198(angle) * 0.25f;
                 velocity[2] = 0.0f;
                 velocity[2] = ((float)ring - 0.5f) * 0.25f;
-                func_00282F20(velocity, velocity,
+                vec_scale_to_length(velocity, velocity,
                               func_002A7878(8.0f, 14.0f) * (1.0f / 60.0f));
-                func_00283098(velocity, velocity, moby + 0xC0);
+                matrix_mul_vec3(velocity, velocity, moby + 0xC0);
                 position[0] = *(float *)(moby + 0x10) + velocity[0];
                 position[1] = *(float *)(moby + 0x14) + velocity[1] * 3.0f;
                 position[2] = *(float *)(moby + 0x18) + 0.75f + shell * 0.5f;

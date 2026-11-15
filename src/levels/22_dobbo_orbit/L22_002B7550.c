@@ -127,7 +127,7 @@ s32 func_L22_002B7550(s32 arg0) {
         return 0;
     }
     if (D_00189E20.f22B4 == 2) {
-        D_00189E20.f1874 -= func_00283CF0(e->f2C);
+        D_00189E20.f1874 -= FloatToInt(e->f2C);
         if (D_00189E20.f1874 < 0) {
             D_00189E20.f1874 = 0;
         }
@@ -143,7 +143,7 @@ s32 func_L22_002B7550(s32 arg0) {
             flag = 1;
         }
     } else if (e->f20 != 0) {
-        func_00282CF0(&vec, &D_00189E20.f80, e->f20 + 0x10);
+        FastVecSub(&vec, &D_00189E20.f80, e->f20 + 0x10);
     } else {
         func_L00_002D36E0(&vec, 0, -1.0f, 0.0f, 0.0f);
     }
@@ -159,7 +159,7 @@ s32 func_L22_002B7550(s32 arg0) {
             u8 *r = func_002A9640(D_00189E20.f2290, 1, 0);
 
             if (r != 0) {
-                func_L00_002A4EF8(func_00283CF0(*(float *)(r + 0x2C)));
+                AdjustPlayerHealth(FloatToInt(*(float *)(r + 0x2C)));
             }
             if (D_00189E20.f24CC == 0) {
                 func_L22_002C9898(0x16, 1);
@@ -201,13 +201,13 @@ s32 func_L22_002B7550(s32 arg0) {
                 func_L22_002C9898(0x59, 1);
             }
             func_L22_003B9358(D_00189E20.f2290);
-            func_00282D30(&vec, &vec, 0.095f);
+            FastVecScale(&vec, &vec, 0.095f);
         } else {
             func_00282C88(&vec);
         }
         break;
     }
-    func_00282CC0(&D_00189E20.fF0, &D_00189E20.fF0, &vec);
-    func_00282CC0(&D_00189E20.f110, &D_00189E20.f110, &vec);
+    FastVecAdd(&D_00189E20.fF0, &D_00189E20.fF0, &vec);
+    FastVecAdd(&D_00189E20.f110, &D_00189E20.f110, &vec);
     return 1;
 }

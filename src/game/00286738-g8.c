@@ -2,7 +2,7 @@
  * (config/cflags.txt). D_001B17D0's sda declaration gives retail's repeated
  * lui/addiu; D_0018C0D4, D_001F29A0 and D_001F2930 need absolute addressing;
  * D_001B1680 uses an incomplete sda view for its absolute store macro.
- * func_002AA548 returns float; func_0028B3D0 and func_002E4AC8 return int.
+ * func_002AA548 returns float; func_0028B3D0 and UpdateSoundVoices return int.
  * ref_00286738_00 is 0x1A8A44 in the boot and 0x1A8D94 in every level, where
  * func_L00_003A0C00 uses the name D_001A8A44 for a different word at 0x1A8A44.
  */
@@ -168,7 +168,7 @@ void func_00286738(void)
     ModalState *loadDialog, *saveDialog, *phaseDialog;
     ModalInput *saveInput;
 
-    func_002E4AC8();
+    UpdateSoundVoices();
     D_001B170C = D_001BAC80.gameState;
     if (D_001BAC80.countdown)
         --D_001BAC80.countdown;
@@ -218,7 +218,7 @@ void func_00286738(void)
             if (D_00138180.buttons & 0x10)
                 { func_002B4B70(0, 0); break; }
             if (D_00138180.buttons & 0x40) {
-                func_0027D330(4);
+                FadeToBlack(4);
                 D_001B1F10 = 0;
                 D_001BAC80.phase = 2;
                 D_001BAC80.elapsed = 600;
@@ -231,7 +231,7 @@ void func_00286738(void)
                 break;
             }
             if (D_00138180.buttons & 0x10) {
-                func_0027D330(4);
+                FadeToBlack(4);
                 D_001B1F10 = 1;
                 { func_002B4B70(0, 0); break; }
             } else if (D_00138180.buttons & 0x40) {
@@ -499,12 +499,12 @@ acceptReload:
             break;
         case 1:
             D_001B170C = 3;
-            func_00282CF0(delta, D_001B5340.position, D_001B17D0);
-            distance = func_00282DF0(delta);
+            FastVecSub(delta, D_001B5340.position, D_001B17D0);
+            distance = FastVecLength(delta);
             func_002AA548(&distance, &D_001BAC80.fraction, (float)D_001A8A78,
                     0.041666668f, 0.041666668f, 5.0000005f);
-            func_00282F20(delta, delta, distance);
-            func_00282CC0(D_001B5340.position, delta, D_001B17D0);
+            vec_scale_to_length(delta, delta, distance);
+            FastVecAdd(D_001B5340.position, delta, D_001B17D0);
             func_00287BD8((char *)&D_001BAC80.angle, 0);
             if ((float)D_001A8A78 <= distance)
                 D_001BAC80.phase = 2;
@@ -516,9 +516,9 @@ acceptReload:
                 target[1] = D_00138180.horizontal;
                 target[2] = D_00138180.vertical;
                 *(Quadword *)delta = *(Quadword *)target;
-                func_00283098(delta, delta, D_001B5340.matrix);
+                matrix_mul_vec3(delta, delta, D_001B5340.matrix);
                 func_002AC9F8(delta, 1.0f);
-                func_00282D30(delta, delta,
+                FastVecScale(delta, delta,
                         (float)-D_001A8A78 * 0.00029088825f * D_001A8A7C);
                 func_00287D98((char *)delta);
             }
@@ -529,27 +529,27 @@ acceptReload:
             float speed;
             D_001B170C = 3;
             speed = (float)D_001A8A78 * 0.00029088825f * D_001A8A7C;
-            func_00282CF0(target, D_001BAC80.cameraPosition, D_001B17D0);
-            func_00282F20(target, target, (float)D_001A8A78);
-            func_00282CC0(target, target, D_001B17D0);
-            func_00282CF0(delta, target, D_001B5340.position);
-            func_00283698(transform, D_001B5340.matrix);
-            func_00283098(delta, delta, transform);
+            FastVecSub(target, D_001BAC80.cameraPosition, D_001B17D0);
+            vec_scale_to_length(target, target, (float)D_001A8A78);
+            FastVecAdd(target, target, D_001B17D0);
+            FastVecSub(delta, target, D_001B5340.position);
+            matrix_from_basis_rows(transform, D_001B5340.matrix);
+            matrix_mul_vec3(delta, delta, transform);
             delta[0] = 0.0f;
             if (delta[1] == 0.0f && delta[2] == 0.0f)
                 delta[1] = 1.0f;
             func_002AC9F8(delta, speed);
-            func_00283098(delta, delta, D_001B5340.matrix);
+            matrix_mul_vec3(delta, delta, D_001B5340.matrix);
             func_00287D98((char *)delta);
             func_00287BD8((char *)&D_001BAC80.angle, 1);
-            if (func_00282DF0(delta) < speed - 0.01f) {
+            if (FastVecLength(delta) < speed - 0.01f) {
                 /* The transition publishes its separate state word before capturing the return pose. */
                 { extern int D_001B1710; D_001B1710 = 2; }
                 qcopy(D_001BAC80.returnPosition, D_001B5340.position);
                 if (D_001A7A44) {
-                    func_00282D30(D_001B5340.matrix + 4, D_001B5340.matrix + 4, -1.0f);
+                    FastVecScale(D_001B5340.matrix + 4, D_001B5340.matrix + 4, -1.0f);
                     func_002AB6D8(D_001B5340.matrix, D_001BAC80.returnAngles);
-                    func_00282D30(D_001B5340.matrix + 4, D_001B5340.matrix + 4, -1.0f);
+                    FastVecScale(D_001B5340.matrix + 4, D_001B5340.matrix + 4, -1.0f);
                 } else {
                     func_002AB6D8(D_001B5340.matrix, D_001BAC80.returnAngles);
                 }
@@ -561,14 +561,14 @@ acceptReload:
             D_001B170C = 3;
             func_002AA548(&D_001BAC80.fraction, &D_001BAC80.angle,
                     1.0f, 0.00055555557f, 0.00055555557f, 0.025000002f);
-            func_00282D08(D_001B5340.position, D_001BAC80.returnPosition,
+            lerp_vector(D_001B5340.position, D_001BAC80.returnPosition,
                     D_001BAC80.cameraPosition, D_001BAC80.fraction);
             func_002A91F0(delta, D_001BAC80.returnAngles);
             func_002A91F0(target, D_001BAC80.cameraAngles);
             func_00283810(transform, delta, target, D_001BAC80.fraction);
-            func_00283958(transform, D_001B5340.matrix);
+            quaternion_to_rotation_basis(transform, D_001B5340.matrix);
             if (D_001A7A44)
-                func_00282D30(D_001B5340.matrix + 4, D_001B5340.matrix + 4, -1.0f);
+                FastVecScale(D_001B5340.matrix + 4, D_001B5340.matrix + 4, -1.0f);
             if (D_001BAC80.fraction >= 1.0f)
                 func_002B4B70(0, 0);
             break;
@@ -607,7 +607,7 @@ acceptReload:
                 func_0026F7B0();
                 func_0028B3D0(0x23, 0, func_0028BDB0, func_0028BE00, func_0028C6D0, 0, 0);
             } else {
-                func_0028B3D0(0x23, 0, func_0028CC98, func_0028CCE0, func_0028D1E8, 0, 0);
+                func_0028B3D0(0x23, 0, func_0028CC98, UpdateRadialMenuSelection, DrawRadialSelectorPanel, 0, 0);
             }
             func_0029CE38();
             func_0029B720(360);
@@ -632,7 +632,7 @@ acceptReload:
                 func_0026F7B0();
                 func_0028B3D0(0x23, 0, func_0028BDB0, func_0028BE00, func_0028C6D0, 0, 0);
             } else {
-                func_0028B3D0(0x23, 0, func_0028CC98, func_0028CCE0, func_0028D1E8, 0, 0);
+                func_0028B3D0(0x23, 0, func_0028CC98, UpdateRadialMenuSelection, DrawRadialSelectorPanel, 0, 0);
             }
             func_0029CE38();
             func_0029B720(360);

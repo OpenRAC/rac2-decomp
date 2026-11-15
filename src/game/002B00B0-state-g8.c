@@ -19,14 +19,14 @@ int func_002B0C28(int a0, int a1, int a2)
 
     if (current == a0) {
         if (a1 != 0)
-            func_0029CCD8(func_00288FB8(a1), a2);
+            func_0029CCD8(GetLocalizedString(a1), a2);
         D_001B1D48 = a1;
         D_001A8C60_1 = 2;
         return 2;
     }
     if (current == 0) {
         if (a1 != 0)
-            func_0029CCD8(func_00288FB8(a1), a2);
+            func_0029CCD8(GetLocalizedString(a1), a2);
         D_001A8C64_1 = a0;
         D_001A8C60 = 2;
         D_001B1D48_1 = a1;
@@ -37,11 +37,11 @@ int func_002B0C28(int a0, int a1, int a2)
 
 int func_002B0CE0(int a0, int a1, int a2)
 {
-    int result = func_002B0C28(a0, a1, a2);
+    int result = TryClaimNotice(a0, a1, a2);
 
     if (result == 0) {
         if (a1 != 0) {
-            func_0029CCD8(func_00288FB8(a1), a2);
+            func_0029CCD8(GetLocalizedString(a1), a2);
             D_001A8C60 = a2;
             result = 3;
         } else {

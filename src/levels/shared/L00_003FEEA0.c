@@ -107,7 +107,7 @@ void func_L00_003FEEA0(char *self)
     switch ((unsigned char)self[0x20]) {
     case 0:
         qcopy(work.old.f, self + 0x10);
-        func_00282CC0(self + 0x10, self + 0x10, p);
+        FastVecAdd(self + 0x10, self + 0x10, p);
         func_002FEE70(p->rotation, p, 0);
         func_002FE880(self + 0x10, p, 0.004055555909872055f);
         func_00282948(&p->trail);
@@ -120,13 +120,13 @@ void func_L00_003FEEA0(char *self)
                 float third = 0.33329999446868896f;
                 float one = 1.0f;
                 *(EffectQuad *)work.tmp.f = *(EffectQuad *)(self + 0x10);
-                func_L00_0031D670(work.params.point.f, work.old.f, work.tmp.f, func_00283CE0(i) * third);
+                LerpVector4(work.params.point.f, work.old.f, work.tmp.f, IntToFloat(i) * third);
                 id = func_002A77E0(6);
                 if (func_002A77E0(2)) {
                     id = -id;
                 }
-                x = (float)p->trail / func_00283CE0(50) * 65000.0f + 10000.0f;
-                r = func_002BDCE8(work.params.point.f, 0.025f, one, one, id, D_L00_001A8F20, x, 0x80808080, 1);
+                x = (float)p->trail / IntToFloat(50) * 65000.0f + 10000.0f;
+                r = SpawnSpinningSparkParticle(work.params.point.f, 0.025f, one, one, id, D_L00_001A8F20, x, 0x80808080, 1);
                 if (r) {
                     short life = 50;
                     EffectParticleExtension *extension = (EffectParticleExtension *)(r + 1);
@@ -158,7 +158,7 @@ void func_L00_003FEEA0(char *self)
         work.query.field48 = 0;
         work.query.field4c = 0;
         work.query.field58 = 0;
-        swept = func_002FE9D0(&work.query);
+        swept = CollideSweptSphere(&work.query);
         kind = func_00300540(work.query.hit);
         if (swept > 0 && (unsigned)(kind - 1) < 2) {
             func_L00_003FF530(self);
@@ -175,7 +175,7 @@ void func_L00_003FEEA0(char *self)
         { EffectPlayer *pl = &D_L00_00262570[D_0013958D[0]]; work.hit.scale = pl->scale; }
         work.hit.enabled = 1;
         qcopy(work.hit.pos, p);
-        func_00282F20(work.hit.pos, work.hit.pos, 1.0f);
+        vec_scale_to_length(work.hit.pos, work.hit.pos, 1.0f);
         work.hit.type = 3;
         work.hit.radius = 5627.9248046875f;
         work.hit.classId = *(unsigned short *)(self + 0xAA);
@@ -187,7 +187,7 @@ void func_L00_003FEEA0(char *self)
                     targets = D_L00_001C3280;
                     remaining = result;
                     do {
-                        func_0032D758(*targets, 0x4C, *(void **)(self + 0xB8));
+                        StartAttachedEffect(*targets, 0x4C, *(void **)(self + 0xB8));
                         targets++;
                     } while (--remaining);
                 }
@@ -196,7 +196,7 @@ void func_L00_003FEEA0(char *self)
                     targets = D_L00_001C3280;
                     remaining = result;
                     do {
-                        func_0032D758(*targets, 0x25, *(void **)(self + 0xB8));
+                        StartAttachedEffect(*targets, 0x25, *(void **)(self + 0xB8));
                         targets++;
                     } while (--remaining);
                 }
@@ -208,10 +208,10 @@ void func_L00_003FEEA0(char *self)
         if (swept > 0) {
             qcopy(work.tmp.f, p);
             work.tmp.f[2] = 0;
-            func_00282DD8(work.tmp.f, work.tmp.f, work.normal.f);
-            func_00282F20(work.tmp.f, work.tmp.f, 1.0f);
+            FastVecCross(work.tmp.f, work.tmp.f, work.normal.f);
+            vec_scale_to_length(work.tmp.f, work.tmp.f, 1.0f);
             func_002AB668(p->axis.f, work.tmp.f, func_002A7878(0.05235988646745682f, 0.10471977293491364f));
-            func_002E5CF8(1, 0, self);
+            PlayMobySound(1, 0, self);
             p->bounces += 1;
             if (p->bounces >= 4) {
                 qcopy(self + 0x10, D_L00_001BF230);
@@ -222,24 +222,24 @@ void func_L00_003FEEA0(char *self)
                     speed *= D_L00_001B0C34;
                 }
                 func_L00_003252A8(self, work.offset.f, 1);
-                scale = func_00282DB0(work.offset.f, p);
-                func_00282D30(work.step.f, work.offset.f, scale);
-                func_00282CF0(p, p, work.step.f);
-                func_00282F20(p, p, speed);
+                scale = FastVecDot(work.offset.f, p);
+                FastVecScale(work.step.f, work.offset.f, scale);
+                FastVecSub(p, p, work.step.f);
+                vec_scale_to_length(p, p, speed);
                 qcopy(p->axis.f, work.tmp.f);
                 p->axis.f[3] = 0.05235988646745682f;
             }
         }
         break;
     case 1:
-        func_00282CC0(self + 0x10, self + 0x10, p);
+        FastVecAdd(self + 0x10, self + 0x10, p);
         func_002AB668(work.old.f, p->axis.f, p->axis.f[3]);
         func_002ACDE8(self + 0xC0, self + 0xC0, work.old.f);
         func_002ACDE8(self + 0xD0, self + 0xD0, work.old.f);
         func_002ACDE8(self + 0xE0, self + 0xE0, work.old.f);
         scale = (D_L00_001B0C40 - 1.0f) + 1.0f;
         p->axis.f[3] *= scale;
-        func_00282D30(p, p, scale);
+        FastVecScale(p, p, scale);
         if (func_00282948(&p->timer)) {
             func_L00_003FF530(self);
             func_0029F338(self);

@@ -16,34 +16,34 @@ float func_L18_0035D238(float radius, float *out, float *reference, float *point
     float along, distance, length, reach, firstT, secondT;
     float firstError, secondError, threshold;
     float *second;
-    func_00282CF0(vectors.offset, start, point);
-    func_00282CF0(vectors.segment, end, start);
-    length = func_00282DB0(vectors.segment, vectors.segment);
-    along = -func_00282DB0(vectors.offset, vectors.segment) / length;
-    func_00282D30(vectors.closest, vectors.segment, along);
-    func_00282CC0(vectors.closest, vectors.closest, start);
-    distance = func_00282E48(vectors.closest, point);
+    FastVecSub(vectors.offset, start, point);
+    FastVecSub(vectors.segment, end, start);
+    length = FastVecDot(vectors.segment, vectors.segment);
+    along = -FastVecDot(vectors.offset, vectors.segment) / length;
+    FastVecScale(vectors.closest, vectors.segment, along);
+    FastVecAdd(vectors.closest, vectors.closest, start);
+    distance = fast_vec_dist(vectors.closest, point);
     if (distance < radius) {
-        reach = func_00282C10(radius * radius - distance * distance);
+        reach = square_root(radius * radius - distance * distance);
         /* One statement keeps debug labels from adding padding before this division. */
-        reach /= func_00282DF0(vectors.segment);
+        reach /= FastVecLength(vectors.segment);
         firstT = along - reach;
         if (firstT < 0.0f) firstT = 0.0f;
         else if (firstT > 1.0f) firstT = 1.0f;
         secondT = along + reach;
         if (secondT < 0.0f) secondT = 0.0f;
         else if (secondT > 1.0f) secondT = 1.0f;
-        func_00282D30(vectors.first, vectors.segment, firstT);
-        func_00282CC0(vectors.first, vectors.first, start);
-        firstError = func_00282C48(func_00282E48(vectors.first, point) - radius);
+        FastVecScale(vectors.first, vectors.segment, firstT);
+        FastVecAdd(vectors.first, vectors.first, start);
+        firstError = func_00282C48(fast_vec_dist(vectors.first, point) - radius);
         threshold = radius * 0.01f;
         if (firstError < threshold) firstError = 0.0f;
         second = vectors.second;
-        func_00282D30(second, vectors.segment, secondT);
-        func_00282CC0(second, second, start);
-        secondError = func_00282C48(func_00282E48(second, point) - radius);
+        FastVecScale(second, vectors.segment, secondT);
+        FastVecAdd(second, second, start);
+        secondError = func_00282C48(fast_vec_dist(second, point) - radius);
         if (secondError < threshold) secondError = 0.0f;
-        if (firstError < secondError || (firstError == secondError && func_00282E48(vectors.first, reference) < func_00282E48(second, reference))) {
+        if (firstError < secondError || (firstError == secondError && fast_vec_dist(vectors.first, reference) < fast_vec_dist(second, reference))) {
             qcopy(out, vectors.first);
             distance = firstError;
         } else {
@@ -53,10 +53,10 @@ float func_L18_0035D238(float radius, float *out, float *reference, float *point
     } else {
         if (along < 0.0f) {
             qcopy(out, start);
-            distance = func_00282C48(func_00282E48(out, point) - radius);
+            distance = func_00282C48(fast_vec_dist(out, point) - radius);
         } else if (along > 1.0f) {
             qcopy(out, end);
-            distance = func_00282C48(func_00282E48(out, point) - radius);
+            distance = func_00282C48(fast_vec_dist(out, point) - radius);
         } else {
             qcopy(out, vectors.closest);
         }

@@ -39,7 +39,7 @@ extern void func_002AFFD8(char *, char *, int), func_00282DD8(void *, void *, vo
 extern int func_002FED90(void *, int, float, float, float);
 /* Creates the active tether actor and its attachments, inheriting the hero's support frame. */
 char *func_L00_00390FF8(char *owner, char *position, float yaw, float pitch) {
-    char *actor = func_0029EFD0(0xAC);
+    char *actor = CreateMoby(0xAC);
     TetherState *state;
     float start[4] __attribute__((aligned(16)));
     float side[4];
@@ -67,7 +67,7 @@ char *func_L00_00390FF8(char *owner, char *position, float yaw, float pitch) {
         state->field08 = 0;
         state->field0c = 0;
         if (D_00189E20.supportObject && func_002AD0B0(D_00189E20.supportObject))
-            state->speed = func_00282DF0(D_00189E20.velocity);
+            state->speed = FastVecLength(D_00189E20.velocity);
         else state->speed = 0;
         state->field18 = 0;
         state->field1c = 0;
@@ -83,8 +83,8 @@ char *func_L00_00390FF8(char *owner, char *position, float yaw, float pitch) {
         }
         func_00282A60(state->matrix24, 0, 64);
         func_00282A60(state->matrix28, 0, 64);
-        func_0029F978((u8 *)actor, 0, state->matrix24);
-        func_0029F978((u8 *)actor, 1, state->matrix28);
+        AttachManipulator((u8 *)actor, 0, state->matrix24);
+        AttachManipulator((u8 *)actor, 1, state->matrix28);
         {
             char *attachment = func_L00_00395240(actor);
             float dt = D_L00_001AF0E4;
@@ -92,22 +92,22 @@ char *func_L00_00390FF8(char *owner, char *position, float yaw, float pitch) {
             state->field48 = dt * 0.016666668f;
         }
         func_002AB650((u8 *)actor);
-        state->field2c = func_002E5CF8(0, 4, actor);
+        state->field2c = PlayMobySound(0, 4, actor);
         *(Quad *)(start) = *(Quad *)(owner + 0x10);
         start[2] = ((float *)position)[2];
-        if (func_002761F8(start, position, 0, D_00189E20.object, 0)) {
+        if (CollLine(start, position, 0, D_00189E20.object, 0)) {
             *(u8 *)(actor + 0xBC) = 1;
             qcopy(actor + 0x10, D_L00_001BF220);
         }
         D_L00_001B1A4C[0] = 1;
-        func_002B0CE0(6, 0, 1);
+        ForceClaimNotice(6, 0, 1);
         if (D_L00_001A8FF0) {
             *(u16 *)(actor + 0x34) |= 0x100;
             qcopy(actor + 0xC0, D_00189E20.axis);
             func_002AFFD8(actor + 0x10, actor + 0xE0, 1);
-            func_00282DD8(side, actor + 0xC0, actor + 0xE0);
-            func_00282F20(actor + 0xD0, side, 1.0f);
-            func_00282DD8(actor + 0xE0, actor + 0xD0, actor + 0xC0);
+            FastVecCross(side, actor + 0xC0, actor + 0xE0);
+            vec_scale_to_length(actor + 0xD0, side, 1.0f);
+            FastVecCross(actor + 0xE0, actor + 0xD0, actor + 0xC0);
             *(float *)(actor + 0xCC) = *(float *)(actor + 0xDC) = *(float *)(actor + 0xEC) = 0.0f;
         }
         state->field4c = func_002FED90(actor, 0, 1.0f, 1.0f, 1.0f);

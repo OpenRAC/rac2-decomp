@@ -40,10 +40,10 @@ void func_L00_003E4508(char *moby)
     char *collision;
     if (H->h[4726] == 1) {
         func_0029FCC0(moby, 0, (char *)origin);
-        func_00282F20(velocity, moby+0xD0, -speed);
+        vec_scale_to_length(velocity, moby+0xD0, -speed);
     } else {
         func_0029FCC0(moby, 0, (char *)origin);
-        func_00282F20(velocity, (&H->f[472]), speed);
+        vec_scale_to_length(velocity, (&H->f[472]), speed);
     }
     *(int *)(state + 0x10) = func_00291308(origin, 10.0f, 0.0f, 0xFF0000FF);
     *(int *)(state + 0x14) = 30;
@@ -62,20 +62,20 @@ void func_L00_003E4508(char *moby)
             else
                 /* lq ignores the low four address bits: this reads the quadword holding +0xBF8. */
                 qcopy(targetPosition, &H->ptr[766]);
-            func_00282CF0(delta, targetPosition, origin);
-            func_00282F20(unit, velocity, 1.0f);
-            func_00282D30(velocity, unit, func_00282DB0(unit, delta) + 3.0f);
+            FastVecSub(delta, targetPosition, origin);
+            vec_scale_to_length(unit, velocity, 1.0f);
+            FastVecScale(velocity, unit, FastVecDot(unit, delta) + 3.0f);
             mode = 2;
         }
     }
-    func_00282D30(targetPosition, moby+0xD0, -1.5f);
-    func_00282CC0(targetPosition, targetPosition, moby + 0x10);
-    func_00282D30(delta, moby + 0xC0, 0.275f);
-    func_00282CC0(targetPosition, targetPosition, delta);
+    FastVecScale(targetPosition, moby+0xD0, -1.5f);
+    FastVecAdd(targetPosition, targetPosition, moby + 0x10);
+    FastVecScale(delta, moby + 0xC0, 0.275f);
+    FastVecAdd(targetPosition, targetPosition, delta);
     if (func_00277F48(targetPosition, 1, H->ptr[2212], 0, 1.0f) &&
         (((collision = D_L00_001BF200[6]) && (model = *(char **)(collision + 0x24)) && *(short *)(model + 0x46) == 5) ||
          func_002ABB78(D_L00_001BF200[6]))) {
-        func_L00_003F5390(moby, targetPosition);
+        ApplyAreaHitOrEmitParticles(moby, targetPosition);
     } else {
         beam = func_L00_003F4C68(origin, velocity, *(int *)(state + 0x18), mode);
         if (beam)

@@ -51,19 +51,19 @@ int func_L00_002CAB08(void)
         return 1;
     }
     if (D_00189E20.count_1b8 < 7) goto fail;
-    if (!func_L00_0032EF10(0x40, 9, 0)) goto fail;
-    if (func_L00_002ADEA0(3) == 2 && D_001A7AF8[2] != 0 && D_00189E20.flag_24fc == 0 &&
+    if (!PadPressedWithin(0x40, 9, 0)) goto fail;
+    if (hero_slot_item_id(3) == 2 && D_001A7AF8[2] != 0 && D_00189E20.flag_24fc == 0 &&
         (2.5f < D_00189E20.distance_278 || D_00189E20.angle_280 < 0.785398244857788086f) &&
         0.7f < D_00189E20.timer && 0.015000000596046448f < D_00189E20.speed_178)
         ref_L00_002CAB08_00(10, 1);
-    else if (func_L00_002ADEA0(3) == 3 && D_00189E20.flag_24fc == 0 && 0.7f < D_00189E20.timer &&
+    else if (hero_slot_item_id(3) == 3 && D_00189E20.flag_24fc == 0 && 0.7f < D_00189E20.timer &&
              (2.5f < D_00189E20.distance_278 || D_00189E20.flag_284 != 0) &&
              0.015000000596046448f < D_00189E20.speed_178) {
         if (D_00189E20.flag_1e4 != 0) return 1;
         ref_L00_002CAB08_00(16, 1);
-    } else if (func_L00_002ADEA0(3) == 3 && D_00189E20.flag_24fc == 0)
+    } else if (hero_slot_item_id(3) == 3 && D_00189E20.flag_24fc == 0)
         ref_L00_002CAB08_00(13, 1);
-    else if (func_L00_002ADEA0(3) == 2 && D_00189E20.flag_24fc == 0 && D_001A7AF8[2] != 0)
+    else if (hero_slot_item_id(3) == 2 && D_00189E20.flag_24fc == 0 && D_001A7AF8[2] != 0)
         ref_L00_002CAB08_00(15, 1);
     else
         ref_L00_002CAB08_00(7, 1);

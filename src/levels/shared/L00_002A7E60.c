@@ -68,32 +68,32 @@ void func_L00_002A7E60(void)
         if (HERO(u8, 0x22B8) != 0) {
             rate = 0.12217307f;
         }
-        t = func_00283B98(*ph, rate);
+        t = FastAddRotations(*ph, rate);
         *ph = t;
         if (HERO(u8, 0x22B8) != 0) {
-            r = func_00283CF0(func_00283198(t) * 30.0f) + 0x32;
-            g = func_00283CF0(func_00283198(t) * 30.0f) + 0x32;
-            b = func_00283CF0(func_00283198(t) * 90.0f) + 0xAA;
+            r = FloatToInt(func_00283198(t) * 30.0f) + 0x32;
+            g = FloatToInt(func_00283198(t) * 30.0f) + 0x32;
+            b = FloatToInt(func_00283198(t) * 90.0f) + 0xAA;
         } else {
-            r = func_00283CF0(func_00283198(t) * 70.0f) + 0x64;
-            g = func_00283CF0(func_00283198(t) * 40.0f) + 0x46;
-            b = func_00283CF0(func_00283198(t) * 40.0f) + 0x46;
+            r = FloatToInt(func_00283198(t) * 70.0f) + 0x64;
+            g = FloatToInt(func_00283198(t) * 40.0f) + 0x46;
+            b = FloatToInt(func_00283198(t) * 40.0f) + 0x46;
         }
         c = (b << 16) | 0x80000000;
         c |= g << 8;
-        F(moby, s32, 0x78) = func_00283D38(F(moby, s32, 0x78), c | r, 0.15f);
+        F(moby, s32, 0x78) = FastTweenColor(F(moby, s32, 0x78), c | r, 0.15f);
         break;
     }
     case 14: {
         f32 t;
         s32 c;
-        t = func_00283B98(*ph, 0.078539826f);
+        t = FastAddRotations(*ph, 0.078539826f);
         *ph = t;
         c = 0x2814D214;
         if (t > 0.0f && t < 2.0943954f) {
             c = 0x281414D2;
         }
-        F(moby, s32, 0x78) = func_00283D38(F(moby, s32, 0x78), c, 0.05f);
+        F(moby, s32, 0x78) = FastTweenColor(F(moby, s32, 0x78), c, 0.05f);
         func_0029FCC0(moby, 0, v);
         func_L00_002A7DE8(v, F(moby, s32, 0x78), 0.1f, 0.03f);
         break;
@@ -101,9 +101,9 @@ void func_L00_002A7E60(void)
     case 42:
         if (ARMED(42)) {
             f32 t;
-            t = func_00283B98(*ph, 0.040724356f);
+            t = FastAddRotations(*ph, 0.040724356f);
             *ph = t;
-            F(moby, s32, 0x78) = func_00283D38(0xFF204090, 0xFF804040, func_00283198(t) * 0.5f + 0.5f);
+            F(moby, s32, 0x78) = FastTweenColor(0xFF204090, 0xFF804040, func_00283198(t) * 0.5f + 0.5f);
             *(TI128 *)v = 0;
             v[2] = 0.1263f;
             v[0] = 0.423f;
@@ -116,9 +116,9 @@ void func_L00_002A7E60(void)
             func_L00_0033E220(w, moby, F(moby, s32, 0x78) & 0x40FFFFFF, 57750.0f, -1, 1, 0.15f, 2, 0, -1);
         } else {
             f32 t;
-            t = func_00283B98(*ph, 0.052359886f);
+            t = FastAddRotations(*ph, 0.052359886f);
             *ph = t;
-            F(moby, s32, 0x78) = func_00283D38(0xFF00FFFF, 0xFF104080, func_00283198(t) * 0.5f + 0.5f);
+            F(moby, s32, 0x78) = FastTweenColor(0xFF00FFFF, 0xFF104080, func_00283198(t) * 0.5f + 0.5f);
             *(TI128 *)v = 0;
             v[0] = 0.333f;
             v[1] = -0.05f;
@@ -129,16 +129,16 @@ void func_L00_002A7E60(void)
         if (ARMED(30)) {
             if (HERO(u8, 0x22B8) != 0) {
                 f32 t;
-                t = func_00283B98(*ph, 0.20362177f);
+                t = FastAddRotations(*ph, 0.20362177f);
                 *ph = t;
-                F(moby, s32, 0x78) = func_00283D38(F(moby, s32, 0x78), func_00283D38(0xFF0040FF, 0xFF104080, func_00283198(t) * 0.5f + 0.5f), 0.15f);
+                F(moby, s32, 0x78) = FastTweenColor(F(moby, s32, 0x78), FastTweenColor(0xFF0040FF, 0xFF104080, func_00283198(t) * 0.5f + 0.5f), 0.15f);
             } else {
                 f32 t;
-                t = func_00283B98(*ph, 0.040724356f);
+                t = FastAddRotations(*ph, 0.040724356f);
                 *ph = t;
-                F(moby, s32, 0x78) = func_00283D38(F(moby, s32, 0x78), func_00283D38(0xFF0040AA, 0xFF104046, func_00283198(t) * 0.5f + 0.5f), 0.15f);
+                F(moby, s32, 0x78) = FastTweenColor(F(moby, s32, 0x78), FastTweenColor(0xFF0040AA, 0xFF104046, func_00283198(t) * 0.5f + 0.5f), 0.15f);
             }
-            F(moby, s32, 0x78) = func_00283D38(0xFF0020FF, 0xFF104080, func_00283198(*ph) * 0.5f + 0.5f);
+            F(moby, s32, 0x78) = FastTweenColor(0xFF0020FF, 0xFF104080, func_00283198(*ph) * 0.5f + 0.5f);
             *(TI128 *)v = 0;
             v[0] = -0.059f;
             v[1] = -0.516f;
@@ -155,9 +155,9 @@ void func_L00_002A7E60(void)
             v[1] = -0.317f;
             if (HERO(u8, 0x22B8) != 0) {
                 f32 t;
-                t = func_00283B98(*ph, 0.1163553f);
+                t = FastAddRotations(*ph, 0.1163553f);
                 *ph = t;
-                F(moby, s32, 0x78) = func_00283D38(F(moby, s32, 0x78), func_00283D38(0xFF0040FF, 0xFF10BEBE, func_00283198(t) * 0.5f + 0.5f), 0.22f);
+                F(moby, s32, 0x78) = FastTweenColor(F(moby, s32, 0x78), FastTweenColor(0xFF0040FF, 0xFF10BEBE, func_00283198(t) * 0.5f + 0.5f), 0.22f);
                 {
                     s32 m = 0x32FFFFFF;
                     if (alpha < m) {
@@ -167,9 +167,9 @@ void func_L00_002A7E60(void)
                 }
             } else {
                 f32 t;
-                t = func_00283B98(*ph, 0.040724356f);
+                t = FastAddRotations(*ph, 0.040724356f);
                 *ph = t;
-                F(moby, s32, 0x78) = func_00283D38(F(moby, s32, 0x78), func_00283D38(0xFF0028C8, 0xFF10B4B4, func_00283198(t) * 0.5f + 0.5f), 0.15f);
+                F(moby, s32, 0x78) = FastTweenColor(F(moby, s32, 0x78), FastTweenColor(0xFF0028C8, 0xFF10B4B4, func_00283198(t) * 0.5f + 0.5f), 0.15f);
                 {
                     s32 m = 0x38FFFFFF;
                     if (alpha < m) {
@@ -183,9 +183,9 @@ void func_L00_002A7E60(void)
     case 29:
         if (ARMED(29)) {
             f32 t;
-            t = func_00283B98(*ph, 0.040724356f);
+            t = FastAddRotations(*ph, 0.040724356f);
             *ph = t;
-            F(moby, s32, 0x78) = func_00283D38(0xFF00FFFF, 0xFF104080, func_00283198(t) * 0.5f + 0.5f);
+            F(moby, s32, 0x78) = FastTweenColor(0xFF00FFFF, 0xFF104080, func_00283198(t) * 0.5f + 0.5f);
             *(TI128 *)v = 0;
             v[0] = -0.07f;
             v[1] = -0.67f;
@@ -196,9 +196,9 @@ void func_L00_002A7E60(void)
             v[1] = -0.509f;
             if (HERO(u8, 0x22B8) != 0) {
                 f32 t;
-                t = func_00283B98(*ph, 0.10762865f);
+                t = FastAddRotations(*ph, 0.10762865f);
                 *ph = t;
-                F(moby, s32, 0x78) = func_00283D38(0xFF00FFFF, 0xFF104080, func_00283198(t) * 0.5f + 0.5f);
+                F(moby, s32, 0x78) = FastTweenColor(0xFF00FFFF, 0xFF104080, func_00283198(t) * 0.5f + 0.5f);
                 {
                     s32 m = 0x28FFFFFF;
                     if (alpha < m) {
@@ -208,9 +208,9 @@ void func_L00_002A7E60(void)
                 }
             } else {
                 f32 t;
-                t = func_00283B98(*ph, 0.05817765f);
+                t = FastAddRotations(*ph, 0.05817765f);
                 *ph = t;
-                F(moby, s32, 0x78) = func_00283D38(0xFF00FFFF, 0xFF104080, func_00283198(t) * 0.5f + 0.5f);
+                F(moby, s32, 0x78) = FastTweenColor(0xFF00FFFF, 0xFF104080, func_00283198(t) * 0.5f + 0.5f);
                 {
                     s32 m = 0x30FFFFFF;
                     if (alpha < m) {
@@ -224,9 +224,9 @@ void func_L00_002A7E60(void)
     case 16:
         if (ARMED(16)) {
             f32 t;
-            t = func_00283B98(*ph, 0.040724356f);
+            t = FastAddRotations(*ph, 0.040724356f);
             *ph = t;
-            F(moby, s32, 0x78) = func_00283D38(0xFF00BFFF, 0xFF104080, func_00283198(t) * 0.5f + 0.5f);
+            F(moby, s32, 0x78) = FastTweenColor(0xFF00BFFF, 0xFF104080, func_00283198(t) * 0.5f + 0.5f);
             *(TI128 *)v = 0;
             v[0] = 0.16f;
             v[1] = -0.41f;
@@ -237,9 +237,9 @@ void func_L00_002A7E60(void)
             v[1] = -0.41f;
             if (HERO(u8, 0x22B8) != 0) {
                 f32 t;
-                t = func_00283B98(*ph, 0.10762865f);
+                t = FastAddRotations(*ph, 0.10762865f);
                 *ph = t;
-                F(moby, s32, 0x78) = func_00283D38(0xFF00BFEF, 0xFF104080, func_00283198(t) * 0.5f + 0.5f);
+                F(moby, s32, 0x78) = FastTweenColor(0xFF00BFEF, 0xFF104080, func_00283198(t) * 0.5f + 0.5f);
                 {
                     s32 m = 0x28FFFFFF;
                     if (alpha < m) {
@@ -249,9 +249,9 @@ void func_L00_002A7E60(void)
                 }
             } else {
                 f32 t;
-                t = func_00283B98(*ph, 0.05817765f);
+                t = FastAddRotations(*ph, 0.05817765f);
                 *ph = t;
-                F(moby, s32, 0x78) = func_00283D38(0xFF00BFEF, 0xFF104080, func_00283198(t) * 0.5f + 0.5f);
+                F(moby, s32, 0x78) = FastTweenColor(0xFF00BFEF, 0xFF104080, func_00283198(t) * 0.5f + 0.5f);
                 {
                     s32 m = 0x30FFFFFF;
                     if (alpha < m) {
@@ -265,22 +265,22 @@ void func_L00_002A7E60(void)
     case 22:
         if (ARMED(22)) {
             f32 t;
-            t = func_00283B98(*ph, 0.040724356f);
+            t = FastAddRotations(*ph, 0.040724356f);
             *ph = t;
-            F(moby, s32, 0x78) = func_00283D38(0xFFFF20BF, 0xFFFF2070, func_00283198(t) * 0.5f + 0.5f);
+            F(moby, s32, 0x78) = FastTweenColor(0xFFFF20BF, 0xFFFF2070, func_00283198(t) * 0.5f + 0.5f);
         } else {
             f32 t;
-            t = func_00283B98(*ph, 0.05817765f);
+            t = FastAddRotations(*ph, 0.05817765f);
             *ph = t;
-            F(moby, s32, 0x78) = func_00283D38(0xFFFF20FF, 0xFFFF2090, func_00283198(t) * 0.5f + 0.5f);
+            F(moby, s32, 0x78) = FastTweenColor(0xFFFF20FF, 0xFFFF2090, func_00283198(t) * 0.5f + 0.5f);
         }
         break;
     case 24:
         if (ARMED(24)) {
             f32 t;
-            t = func_00283B98(*ph, 0.046542123f);
+            t = FastAddRotations(*ph, 0.046542123f);
             *ph = t;
-            F(moby, s32, 0x78) = func_00283D38(0xFF5F5F5F, 0xFFEFEFEF, func_00283198(t) * 0.5f + 0.5f);
+            F(moby, s32, 0x78) = FastTweenColor(0xFF5F5F5F, 0xFFEFEFEF, func_00283198(t) * 0.5f + 0.5f);
             *(TI128 *)v = 0;
             v[0] = -0.158f;
             v[1] = -0.194f;
@@ -291,9 +291,9 @@ void func_L00_002A7E60(void)
             v[1] = -0.194f;
             if (HERO(u8, 0x22B8) != 0) {
                 f32 t;
-                t = func_00283B98(*ph, 0.10762865f);
+                t = FastAddRotations(*ph, 0.10762865f);
                 *ph = t;
-                F(moby, s32, 0x78) = func_00283D38(0xFFFF2050, 0xFFFF2080, func_00283198(t) * 0.5f + 0.5f);
+                F(moby, s32, 0x78) = FastTweenColor(0xFFFF2050, 0xFFFF2080, func_00283198(t) * 0.5f + 0.5f);
                 {
                     s32 m = 0x28FFFFFF;
                     if (alpha < m) {
@@ -303,9 +303,9 @@ void func_L00_002A7E60(void)
                 }
             } else {
                 f32 t;
-                t = func_00283B98(*ph, 0.05817765f);
+                t = FastAddRotations(*ph, 0.05817765f);
                 *ph = t;
-                F(moby, s32, 0x78) = func_00283D38(0xFFFF2050, 0xFFFF2080, func_00283198(t) * 0.5f + 0.5f);
+                F(moby, s32, 0x78) = FastTweenColor(0xFFFF2050, 0xFFFF2080, func_00283198(t) * 0.5f + 0.5f);
                 {
                     s32 m = 0x30FFFFFF;
                     if (alpha < m) {
@@ -319,9 +319,9 @@ void func_L00_002A7E60(void)
     case 25:
         if (ARMED(25)) {
             f32 t;
-            t = func_00283B98(*ph, 0.046542123f);
+            t = FastAddRotations(*ph, 0.046542123f);
             *ph = t;
-            F(moby, s32, 0x78) = func_00283D38(0xFF5F5F5F, 0xFFDFDFDF, func_00283198(t) * 0.5f + 0.5f);
+            F(moby, s32, 0x78) = FastTweenColor(0xFF5F5F5F, 0xFFDFDFDF, func_00283198(t) * 0.5f + 0.5f);
             *(TI128 *)v = 0;
             v[0] = 0.05f;
             v[1] = -0.35f;
@@ -332,9 +332,9 @@ void func_L00_002A7E60(void)
             v[1] = -0.45f;
             if (HERO(u8, 0x22B8) != 0) {
                 f32 t;
-                t = func_00283B98(*ph, 0.10762865f);
+                t = FastAddRotations(*ph, 0.10762865f);
                 *ph = t;
-                F(moby, s32, 0x78) = func_00283D38(0xFF5F5F5F, 0xFFDFDFDF, func_00283198(t) * 0.5f + 0.5f);
+                F(moby, s32, 0x78) = FastTweenColor(0xFF5F5F5F, 0xFFDFDFDF, func_00283198(t) * 0.5f + 0.5f);
                 {
                     s32 m = 0x20FFFFFF;
                     if (alpha < m) {
@@ -344,9 +344,9 @@ void func_L00_002A7E60(void)
                 }
             } else {
                 f32 t;
-                t = func_00283B98(*ph, 0.06399541f);
+                t = FastAddRotations(*ph, 0.06399541f);
                 *ph = t;
-                F(moby, s32, 0x78) = func_00283D38(0xFF5F5F5F, 0xFFDFDFDF, func_00283198(t) * 0.5f + 0.5f);
+                F(moby, s32, 0x78) = FastTweenColor(0xFF5F5F5F, 0xFFDFDFDF, func_00283198(t) * 0.5f + 0.5f);
                 {
                     s32 m = 0x30FFFFFF;
                     if (alpha < m) {
@@ -360,61 +360,61 @@ void func_L00_002A7E60(void)
     case 26:
         if (ARMED(26)) {
             f32 t;
-            t = func_00283B98(*ph, 0.043633237f);
+            t = FastAddRotations(*ph, 0.043633237f);
             *ph = t;
-            F(moby, s32, 0x78) = func_00283D38(0xFFDFDFDF, 0xFF20205F, func_00283198(t) * 0.5f + 0.5f);
+            F(moby, s32, 0x78) = FastTweenColor(0xFFDFDFDF, 0xFF20205F, func_00283198(t) * 0.5f + 0.5f);
         } else {
             f32 t;
-            t = func_00283B98(*ph, 0.05817765f);
+            t = FastAddRotations(*ph, 0.05817765f);
             *ph = t;
-            F(moby, s32, 0x78) = func_00283D38(0xFFDFDFDF, 0xFF20205F, func_00283198(t) * 0.5f + 0.5f);
+            F(moby, s32, 0x78) = FastTweenColor(0xFFDFDFDF, 0xFF20205F, func_00283198(t) * 0.5f + 0.5f);
         }
         break;
     case 27:
         if (ARMED(27)) {
             f32 t;
-            t = func_00283B98(*ph, 0.040724356f);
+            t = FastAddRotations(*ph, 0.040724356f);
             *ph = t;
-            F(moby, s32, 0x78) = func_00283D38(0xFF20205F, 0xFFDFDFDF, func_00283198(t) * 0.5f + 0.5f);
+            F(moby, s32, 0x78) = FastTweenColor(0xFF20205F, 0xFFDFDFDF, func_00283198(t) * 0.5f + 0.5f);
         }
         break;
     case 28:
         if (ARMED(28)) {
             f32 t;
-            t = func_00283B98(*ph, 0.040724356f);
+            t = FastAddRotations(*ph, 0.040724356f);
             *ph = t;
-            F(moby, s32, 0x78) = func_00283D38(0xFF202020, 0xFFEFEFEF, func_00283198(t) * 0.5f + 0.5f);
+            F(moby, s32, 0x78) = FastTweenColor(0xFF202020, 0xFFEFEFEF, func_00283198(t) * 0.5f + 0.5f);
         } else {
             f32 t;
-            t = func_00283B98(*ph, 0.05817765f);
+            t = FastAddRotations(*ph, 0.05817765f);
             *ph = t;
-            F(moby, s32, 0x78) = func_00283D38(0xFF202020, 0xFFEFEFEF, func_00283198(t) * 0.5f + 0.5f);
+            F(moby, s32, 0x78) = FastTweenColor(0xFF202020, 0xFFEFEFEF, func_00283198(t) * 0.5f + 0.5f);
         }
         break;
     case 32:
         if (ARMED(32)) {
             f32 t;
-            t = func_00283B98(*ph, 0.040724356f);
+            t = FastAddRotations(*ph, 0.040724356f);
             *ph = t;
-            F(moby, s32, 0x78) = func_00283D38(0xFF505050, 0xFFEFEFEF, func_00283198(t) * 0.5f + 0.5f);
+            F(moby, s32, 0x78) = FastTweenColor(0xFF505050, 0xFFEFEFEF, func_00283198(t) * 0.5f + 0.5f);
         } else {
             f32 t;
-            t = func_00283B98(*ph, 0.049451005f);
+            t = FastAddRotations(*ph, 0.049451005f);
             *ph = t;
-            F(moby, s32, 0x78) = func_00283D38(0xFF505050, 0xFFEFEFEF, func_00283198(t) * 0.5f + 0.5f);
+            F(moby, s32, 0x78) = FastTweenColor(0xFF505050, 0xFFEFEFEF, func_00283198(t) * 0.5f + 0.5f);
         }
         break;
     case 41:
         if (ARMED(41)) {
             f32 t;
-            t = func_00283B98(*ph, 0.040724356f);
+            t = FastAddRotations(*ph, 0.040724356f);
             *ph = t;
-            F(moby, s32, 0x78) = func_00283D38(0xFF505050, 0xFFEFEFEF, func_00283198(t) * 0.5f + 0.5f);
+            F(moby, s32, 0x78) = FastTweenColor(0xFF505050, 0xFFEFEFEF, func_00283198(t) * 0.5f + 0.5f);
         } else {
             f32 t;
-            t = func_00283B98(*ph, 0.049451005f);
+            t = FastAddRotations(*ph, 0.049451005f);
             *ph = t;
-            F(moby, s32, 0x78) = func_00283D38(0xFF505050, 0xFFEFEFEF, func_00283198(t) * 0.5f + 0.5f);
+            F(moby, s32, 0x78) = FastTweenColor(0xFF505050, 0xFFEFEFEF, func_00283198(t) * 0.5f + 0.5f);
         }
         break;
     case 23:
@@ -437,9 +437,9 @@ void func_L00_002A7E60(void)
         *(TI128 *)v = 0;
         v[0] = -0.1245f;
         v[1] = -0.8f;
-        t = func_00283B98(*ph, 0.06399541f);
+        t = FastAddRotations(*ph, 0.06399541f);
         *ph = t;
-        F(moby, s32, 0x78) = func_00283D38(0xFF9F4F7F, 0xFFDFDFDF, func_00283198(t) * 0.5f + 0.5f);
+        F(moby, s32, 0x78) = FastTweenColor(0xFF9F4F7F, 0xFFDFDFDF, func_00283198(t) * 0.5f + 0.5f);
         {
             s32 m = 0x20FFFFFF;
             if (alpha < m) {
@@ -453,9 +453,9 @@ void func_L00_002A7E60(void)
     }
     case 44: {
         f32 t;
-        t = func_00283B98(*ph, 0.031997707f);
+        t = FastAddRotations(*ph, 0.031997707f);
         *ph = t;
-        F(moby, s32, 0x78) = func_00283D38(0xFFDF6060, 0xFFDFBFBF, func_00283198(t) * 0.5f + 0.5f);
+        F(moby, s32, 0x78) = FastTweenColor(0xFFDF6060, 0xFFDFBFBF, func_00283198(t) * 0.5f + 0.5f);
         break;
     }
     }

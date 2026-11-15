@@ -13,10 +13,10 @@ int func_L17_003C3A00(u8 *object,Vector *point)
     float matrix[16];
     Vector transformed,delta;
     origin.q=point->q;
-    func_00283698(matrix,object+0xc0);
-    func_00282CF0(&delta,&origin,object+0x10);
+    matrix_from_basis_rows(matrix,object+0xc0);
+    FastVecSub(&delta,&origin,object+0x10);
     transformed.q=delta.q;
-    func_002830C0(&transformed,&transformed,matrix);
+    transform_vector(&transformed,&transformed,matrix);
     if (func_00282C48(transformed.f[0])<D_L17_001B023C &&
         func_00282C48(transformed.f[1])<D_L17_001B0238 &&
         func_00282C48(origin.f[2]-*(float *)(object+0x18))<4.0f)

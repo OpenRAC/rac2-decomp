@@ -33,13 +33,13 @@ void func_L08_0042A980(s32 unused, s32 index)
 
     qcopy(position, D_L08_00260410[index]);
     position[3] = 1.0f;
-    func_00282CF0(basis[0], D_L08_001B9B00, position);
-    func_00282F20(basis[0], basis[0], 1.0f);
-    func_00282DD8(basis[1], basis[0], D_0018A0E0);
-    func_00282F20(basis[1], basis[1], -1.0f);
-    func_00282DD8(basis[2], basis[1], basis[0]);
+    FastVecSub(basis[0], D_L08_001B9B00, position);
+    vec_scale_to_length(basis[0], basis[0], 1.0f);
+    FastVecCross(basis[1], basis[0], D_0018A0E0);
+    vec_scale_to_length(basis[1], basis[1], -1.0f);
+    FastVecCross(basis[2], basis[1], basis[0]);
 
-    packet.texture = func_0027C878(11);
+    packet.texture = GetEffectTextureDescriptor(11);
     packet.tag = 0xFF00000044LL;
     packet.blend = 0xFF9000000260LL;
     packet.primitive = 5;
@@ -67,12 +67,12 @@ void func_L08_0042A980(s32 unused, s32 index)
         for (corner = 0; corner < 4; corner++) {
             out = &packet.vertices[corner];
             p = &D_L08_001B1CE0[corner];
-            func_00282D30(out, p, size);
-            func_002830C0(out, out, basis[0]);
-            func_00282CC0(out, out, jitter);
+            FastVecScale(out, p, size);
+            transform_vector(out, out, basis[0]);
+            FastVecAdd(out, out, jitter);
         }
     }
-    func_00280B90(packet.vertices, 0, 0);
+    draw_world_quad(packet.vertices, 0, 0);
 
     packet.tag = 0xFF00000048LL;
     packet.colors[0] = packet.colors[1] = packet.colors[2] = packet.colors[3] = 0x60FF10FF;
@@ -83,18 +83,18 @@ void func_L08_0042A980(s32 unused, s32 index)
         for (corner = 0; corner < 4; corner++) {
             out = &packet.vertices[corner];
             p = &D_L08_001B1CE0[corner];
-            func_00282D30(out, p, size * 3.0f);
-            func_002830C0(out, out, basis[0]);
+            FastVecScale(out, p, size * 3.0f);
+            transform_vector(out, out, basis[0]);
         }
     }
-    func_00280B90(packet.vertices, 0, 0);
+    draw_world_quad(packet.vertices, 0, 0);
 
     qcopy(position, D_L08_001B3A70[index]);
-    func_00282CF0(basis[0], D_L08_001B9B00, position);
-    func_00282F20(basis[0], basis[0], 1.0f);
-    func_00282DD8(basis[1], basis[0], D_0018A0E0);
-    func_00282F20(basis[1], basis[1], -1.0f);
-    func_00282DD8(basis[2], basis[1], basis[0]);
+    FastVecSub(basis[0], D_L08_001B9B00, position);
+    vec_scale_to_length(basis[0], basis[0], 1.0f);
+    FastVecCross(basis[1], basis[0], D_0018A0E0);
+    vec_scale_to_length(basis[1], basis[1], -1.0f);
+    FastVecCross(basis[2], basis[1], basis[0]);
 
     size = func_002A7878(0.2f, 0.225f);
     if (!func_L02_002F1658()) size = 0.2225f;
@@ -107,12 +107,12 @@ void func_L08_0042A980(s32 unused, s32 index)
         for (corner = 0; corner < 4; corner++) {
             out = &packet.vertices[corner];
             p = &D_L08_001B1CE0[corner];
-            func_00282D30(out, p, size);
-            func_002830C0(out, out, basis[0]);
-            func_00282CC0(out, out, jitter);
+            FastVecScale(out, p, size);
+            transform_vector(out, out, basis[0]);
+            FastVecAdd(out, out, jitter);
         }
     }
-    func_00280B90(packet.vertices, 0, 0);
+    draw_world_quad(packet.vertices, 0, 0);
 
     packet.tag = 0xFF00000048LL;
     packet.colors[0] = packet.colors[1] = packet.colors[2] = packet.colors[3] = 0x60FF10FF;
@@ -123,9 +123,9 @@ void func_L08_0042A980(s32 unused, s32 index)
         for (corner = 0; corner < 4; corner++) {
             out = &packet.vertices[corner];
             p = &D_L08_001B1CE0[corner];
-            func_00282D30(out, p, size * 3.0f);
-            func_002830C0(out, out, basis[0]);
+            FastVecScale(out, p, size * 3.0f);
+            transform_vector(out, out, basis[0]);
         }
     }
-    func_00280B90(packet.vertices, 0, 0);
+    draw_world_quad(packet.vertices, 0, 0);
 }

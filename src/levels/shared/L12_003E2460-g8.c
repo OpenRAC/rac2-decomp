@@ -132,14 +132,14 @@ void func_L12_003E2460(u8 *obj) {
         *(int *)(obj + 0x98) = *(int *)(*(u8 **)(obj + 0x24) + 0x10);
     }
     func_L12_003E3A88(obj);
-    distance = func_00282E80(((L12PathEnemyState *)state)->targetObject + 0x10, obj + 0x10);
+    distance = vec_distance_xy(((L12PathEnemyState *)state)->targetObject + 0x10, obj + 0x10);
     if (distance < 8.0f && !((L12PathEnemyState *)state)->damageState) {
         ((L12PathEnemyState *)state)->damageState = 3;
         ((L12PathEnemyState *)state)->alertTimer = 50;
     }
     if (((L12PathEnemyState *)state)->damageState == 5) {
-        func_002E5CF8(3, 0, obj);
-        func_0032C700((obj + 0x10), 1, 25, 20, 20, 20, 45, 1, 1.0f, 20.0f, 1, 1, 0, 0);
+        PlayMobySound(3, 0, obj);
+        SpawnExplosion((obj + 0x10), 1, 25, 20, 20, 20, 45, 1, 1.0f, 20.0f, 1, 1, 0, 0);
         if (((L12PathEnemyState *)state)->persistent) {
             u16 id = *(u16 *)(obj + 0xB2);
             if (id & 1) {
@@ -157,12 +157,12 @@ void func_L12_003E2460(u8 *obj) {
         qcopy(&pos, (obj + 0x10));
         damage = func_002B1C20(obj, state + 0x60);
         if (*(float *)(state + 0x218) >= D_L12_001B0B04 * 0.01666666753590107f) {
-            func_0026FEB8(D_L12_001B0B38);
+            STUB_printf(D_L12_001B0B38);
             *(float *)(state + 0x218) = 0;
         }
         if (damage & 1) {
-            func_002E5CF8(3, 0, obj);
-            func_0032C700((obj + 0x10), 1, 25, 20, 20, 20, 45, 1, 1.0f, 20.0f, 1, 1, 0, 0);
+            PlayMobySound(3, 0, obj);
+            SpawnExplosion((obj + 0x10), 1, 25, 20, 20, 20, 45, 1, 1.0f, 20.0f, 1, 1, 0, 0);
             if (((L12PathEnemyState *)state)->persistent) {
                 u16 id = *(u16 *)(obj + 0xB2);
                 if (id & 1) {
@@ -176,7 +176,7 @@ void func_L12_003E2460(u8 *obj) {
                 }
             }
 deathFinish:
-            func_002A6C58(obj, 0, 3);
+            SetDeathBits(obj, 0, 3);
 destroy:
             func_0029F338(obj);
             return;
@@ -219,7 +219,7 @@ destroy:
             if (obj[0x43] != 3)
                 func_002A7470(obj, 3, 0, 20);
         }
-        if (func_00282978(state + 0x29E)) {
+        if (FastDecTimer(state + 0x29E)) {
             func_L12_003E2418(obj);
             func_002A7750(obj, 4, 10);
             if (obj[0x43] != 3)
@@ -241,7 +241,7 @@ destroy:
         } else {
             if (((L12PathEnemyState *)state)->perception == 1 || ((L12PathEnemyState *)state)->damageState)
                 ((L12PathEnemyState *)state)->idleTimer = 250;
-            if (((L12PathEnemyState *)state)->perception == 0 && ((L12PathEnemyState *)state)->damageState == 0 && func_00282978(state + 0x260)) {
+            if (((L12PathEnemyState *)state)->perception == 0 && ((L12PathEnemyState *)state)->damageState == 0 && FastDecTimer(state + 0x260)) {
                 if (obj[0x43] != 0)
                     func_002A7470(obj, 0, 0, 20);
                 func_002A7750(obj, 5, 0);
@@ -261,19 +261,19 @@ destroy:
                 func_002A7750(obj, obj[0x20], 6);
             func_002B3868(obj);
         }
-        if (((L12PathEnemyState *)state)->grouped && func_00282978(state + 0x29C) && ((L12PathEnemyState *)state)->damageState != 1) {
+        if (((L12PathEnemyState *)state)->grouped && FastDecTimer(state + 0x29C) && ((L12PathEnemyState *)state)->damageState != 1) {
             func_L12_003E2448(obj);
             break;
         }
         func_0029FC20(obj, 2, matrix);
-        func_002830C0(&pos, D_L12_001B0A90, matrix);
-        if (obj[0x95] != 15 && func_002761F8(&pos, state + 0x130, 2, obj, 0)) {
+        transform_vector(&pos, D_L12_001B0A90, matrix);
+        if (obj[0x95] != 15 && CollLine(&pos, state + 0x130, 2, obj, 0)) {
             func_002A7750(obj, obj[0x20], 6);
             func_002B3868(obj);
         }
         if (((L12PathEnemyState *)state)->perception == 1 || ((L12PathEnemyState *)state)->damageState)
             ((L12PathEnemyState *)state)->idleTimer = 250;
-        if (((L12PathEnemyState *)state)->perception == 0 && ((L12PathEnemyState *)state)->damageState == 0 && func_00282978(state + 0x260)) {
+        if (((L12PathEnemyState *)state)->perception == 0 && ((L12PathEnemyState *)state)->damageState == 0 && FastDecTimer(state + 0x260)) {
             if (obj[0x43] != 0)
                 func_002A7470(obj, 0, 0, 20);
             func_002A7750(obj, 5, 0);
@@ -283,7 +283,7 @@ destroy:
             u8 *other = ((L12PathEnemyState *)state)->targetObject;
             angle = func_00283248(*(float *)(other + 0x10) - *(float *)(obj + 0x10),
                                   *(float *)(other + 0x14) - *(float *)(obj + 0x14));
-            func_002AA800(obj + 0xF8, 0, angle, 0.10471977293491364f);
+            StepAngleTowardTarget(obj + 0xF8, 0, angle, 0.10471977293491364f);
         }
         break;
     case 6: {
@@ -296,9 +296,9 @@ destroy:
             ((L12PathEnemyState *)state)->destination = -1;
             initialPath = D_L12_001FEAC0[*(int *)(state + 0x158)];
             func_L12_003E1CB0(obj);
-            initialDistance = func_00282E48((obj + 0x10), initialPath + 0x10 + (((L12PathEnemyState *)state)->pathIndex << 4));
+            initialDistance = fast_vec_dist((obj + 0x10), initialPath + 0x10 + (((L12PathEnemyState *)state)->pathIndex << 4));
             if (initialDistance > 0.5f)
-                func_0026FEB8(D_L12_001B0B50, (double)initialDistance);
+                STUB_printf(D_L12_001B0B50, (double)initialDistance);
         }
         if (*(int *)(state + 0x16C)) {
             func_L12_003E20F0(obj);
@@ -313,22 +313,22 @@ destroy:
                 i = *(int *)path - 1;
             if (next == *(int *)path)
                 next = 0;
-            if (i >= 0 && !func_002761F8(path + 0x10 + i * 16, state + 0x130, 2, 0, 0))
+            if (i >= 0 && !CollLine(path + 0x10 + i * 16, state + 0x130, 2, 0, 0))
                 ((L12PathEnemyState *)state)->destination = i;
             if (((L12PathEnemyState *)state)->destination == -1) {
-                if (next < *(int *)path && !func_002761F8(path + 0x10 + next * 16, state + 0x130, 2, 0, 0))
+                if (next < *(int *)path && !CollLine(path + 0x10 + next * 16, state + 0x130, 2, 0, 0))
                     ((L12PathEnemyState *)state)->destination = next;
                 if (((L12PathEnemyState *)state)->destination == -1) {
                     int j;
                     for (j = i - 1; j >= 0; j--) {
-                        if (!func_002761F8(path + 0x10 + j * 16, state + 0x130, 2, 0, 0)) {
+                        if (!CollLine(path + 0x10 + j * 16, state + 0x130, 2, 0, 0)) {
                             ((L12PathEnemyState *)state)->destination = j;
                             break;
                         }
                     }
                     if (((L12PathEnemyState *)state)->destination == -1) {
                         for (i = next + 1; i < *(int *)path; i++) {
-                            if (!func_002761F8(path + 0x10 + i * 16, state + 0x130, 2, 0, 0)) {
+                            if (!CollLine(path + 0x10 + i * 16, state + 0x130, 2, 0, 0)) {
                                 ((L12PathEnemyState *)state)->destination = i;
                                 break;
                             }
@@ -357,7 +357,7 @@ destroy:
             u8 *other = ((L12PathEnemyState *)state)->targetObject;
             angle = func_00283248(*(float *)(other + 0x10) - *(float *)(obj + 0x10),
                                   *(float *)(other + 0x14) - *(float *)(obj + 0x14));
-            func_002AA800(obj + 0xF8, 0, angle, 6.000000476837158f);
+            StepAngleTowardTarget(obj + 0xF8, 0, angle, 6.000000476837158f);
         }
         oldZ = *(float *)(obj + 0x18);
         *(float *)(state + 0x218) = 0;
@@ -369,7 +369,7 @@ destroy:
             else if (*(float *)(obj + 0x18) < ((L12PathEnemyState *)state)->minimumHeight)
                 *(float *)(obj + 0x18) = ((L12PathEnemyState *)state)->minimumHeight;
             else
-                func_0026FEB8(D_L12_001B0B18, (double)(*(float *)(obj + 0x18) - func_002A89A8((obj + 0x10), 0, 0.5f)), *(s16 *)(obj + 0xB2));
+                STUB_printf(D_L12_001B0B18, (double)(*(float *)(obj + 0x18) - func_002A89A8((obj + 0x10), 0, 0.5f)), *(s16 *)(obj + 0xB2));
         }
         if (*(float *)(obj + 0x18) < *(float *)(path + (((L12PathEnemyState *)state)->nextPoint << 4) + 0x18) &&
             *(float *)(path + (((L12PathEnemyState *)state)->nextPoint << 4) + 0x18) - *(float *)(obj + 0x18) > 0.8f) {
@@ -416,7 +416,7 @@ destroy:
                 func_002A7470(obj, 0, 0, 20);
             ((L12PathEnemyState *)state)->attackTimer = 150;
         }
-        if (func_00282978(state + 0x262)) {
+        if (FastDecTimer(state + 0x262)) {
             if (obj[0x43] != 1)
                 func_002A7470(obj, 1, 0, 20);
             func_002A7750(obj, 21, -1);
@@ -428,7 +428,7 @@ destroy:
             ((L12PathEnemyState *)state)->flags = (((L12PathEnemyState *)state)->flags & ~0x10) | 1;
             *(int *)(state + 0x168) = 1;
         }
-        if (func_L12_003E1EE8(obj, D_L12_001FEAC0[*(int *)(state + 0x164)])) {
+        if (AdvanceAlongPath(obj, D_L12_001FEAC0[*(int *)(state + 0x164)])) {
             func_002A7750(obj, 5, 0);
             if (obj[0x43] != 0)
                 func_002A7470(obj, 0, 0, 0);
@@ -460,7 +460,7 @@ destroy:
             else if (*(float *)(obj + 0x18) < ((L12PathEnemyState *)state)->minimumHeight)
                 *(float *)(obj + 0x18) = ((L12PathEnemyState *)state)->minimumHeight;
             else
-                func_0026FEB8(D_L12_001B0B18, (double)(*(float *)(obj + 0x18) - func_002A89A8((obj + 0x10), 0, 0.5f)), *(s16 *)(obj + 0xB2));
+                STUB_printf(D_L12_001B0B18, (double)(*(float *)(obj + 0x18) - func_002A89A8((obj + 0x10), 0, 0.5f)), *(s16 *)(obj + 0xB2));
             heightLimit = *(float *)(path + (((L12PathEnemyState *)state)->nextPoint << 4) + 0x18) < oldZ ? *(float *)(path + (((L12PathEnemyState *)state)->nextPoint << 4) + 0x18) : oldZ;
             if (*(float *)(obj + 0x18) < heightLimit)
                 *(float *)(obj + 0x18) = heightLimit;
@@ -496,7 +496,7 @@ destroy:
                           0.10471977293491364f, 0.10471977293491364f);
             *(float *)(state + 0x198) = D_L12_001B0AB0 * 0.25f;
         }
-        if (func_00282978(state + 0x262) || (distance < 4.0f && ((L12PathEnemyState *)state)->attackTimer < 20)) {
+        if (FastDecTimer(state + 0x262) || (distance < 4.0f && ((L12PathEnemyState *)state)->attackTimer < 20)) {
             float turn = D_L12_001B0AA8 * 0.00027777778450399637f;
             float speed = D_L12_001B0AAC * 0.01666666753590107f;
             *(float *)(state + 0x198) = D_L12_001B0AB0;
@@ -507,20 +507,20 @@ destroy:
             func_002A7750(obj, 16, -1);
         } else {
             func_0029FC20(obj, 2, matrix);
-            func_002830C0(&pos, D_L12_001B0A90, matrix);
+            transform_vector(&pos, D_L12_001B0A90, matrix);
             goto smoke;
         }
         break;
     case 16:
         if (func_002B3868(obj))
-            func_002E5CF8(3, 0, obj);
+            PlayMobySound(3, 0, obj);
         func_0029FC20(obj, 2, matrix);
-        func_002830C0(&pos, D_L12_001B0A90, matrix);
+        transform_vector(&pos, D_L12_001B0A90, matrix);
         angle = func_00283248(*(float *)(state + 0x130) - *(float *)(obj + 0x10),
                               *(float *)(state + 0x134) - *(float *)(obj + 0x14));
-        if (func_00282C48(func_00283BE0(*(float *)(obj + 0xF8), angle)) > 0.174532949924469f) {
-            float speed = func_00282E80(&pos, (obj + 0x10));
-            func_00282F20(&velocity, obj + 0xC0, speed * 0.01666666753590107f);
+        if (func_00282C48(fast_subtract_rotations(*(float *)(obj + 0xF8), angle)) > 0.174532949924469f) {
+            float speed = vec_distance_xy(&pos, (obj + 0x10));
+            vec_scale_to_length(&velocity, obj + 0xC0, speed * 0.01666666753590107f);
             velocity.z = (*(float *)(state + 0x138) - pos.z) * 0.01666666753590107f;
         }
         if (!func_002AEB60(obj, D_L12_001B0A50)) {
@@ -531,14 +531,14 @@ smoke:
                          D_L12_001B0A58, 0, i, D_L12_001A8F20, 0, 0.0f);
             break;
         }
-        if (func_00282C48(func_00283BE0(*(float *)(obj + 0xF8), angle)) > 0.174532949924469f) {
-            func_00282F20(&velocity, obj + 0xC0, 0.5333333611488342f);
+        if (func_00282C48(fast_subtract_rotations(*(float *)(obj + 0xF8), angle)) > 0.174532949924469f) {
+            vec_scale_to_length(&velocity, obj + 0xC0, 0.5333333611488342f);
             velocity.z = (*(float *)(state + 0x138) - pos.z + D_L12_001B0B34) * 0.01666666753590107f;
         } else {
             qcopy(&target, state + 0x130);
             target.z += D_L12_001B0B34;
-            func_00282CF0(&velocity, &target, &pos);
-            func_00282F20(&velocity, &velocity, 0.5333333611488342f);
+            FastVecSub(&velocity, &target, &pos);
+            vec_scale_to_length(&velocity, &velocity, 0.5333333611488342f);
         }
         if (velocity.z > D_L12_001B0B08 * 0.01666666753590107f)
             velocity.z = D_L12_001B0B08 * 0.01666666753590107f;
@@ -549,11 +549,11 @@ smoke:
         func_002A7750(obj, 23, -1);
         break;
     case 23:
-        if (func_00282978(state + 0x262))
+        if (FastDecTimer(state + 0x262))
             func_002A7750(obj, 15, -1);
         if (((L12PathEnemyState *)state)->attackTimer < 30 && obj[0x42] != 3 && obj[0x43] != 3)
             func_002A7470(obj, 3, 0, 20);
-        if (func_00282E80(state + 0x130, (obj + 0x10)) < 8.0f && ((L12PathEnemyState *)state)->attackTimer < 35) {
+        if (vec_distance_xy(state + 0x130, (obj + 0x10)) < 8.0f && ((L12PathEnemyState *)state)->attackTimer < 35) {
             if (obj[0x43] != 7)
                 func_002A7470(obj, 7, 0, 20);
             func_002A7750(obj, 16, -1);

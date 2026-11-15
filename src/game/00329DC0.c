@@ -11,7 +11,7 @@ int func_00329DC0(char *self, void *arg)
     char *state = *(char **)(self + 0x68);
     char *object;
 
-    if (func_002761F8(arg, self + 0x10, 0, self, 0) != 0) {
+    if (CollLine(arg, self + 0x10, 0, self, 0) != 0) {
         object = (char *)ref_L00_00329DC0_01[0];
         if (object != 0 && (*(short *)(object + 0xAA) == 0xFB0 || object == (char *)D_0018C0B0))
             return 0;

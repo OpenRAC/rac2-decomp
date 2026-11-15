@@ -31,9 +31,9 @@ void func_L00_00375718(void) {
         ((HudModel *)D_L00_0022F7C0)->i[0x64 / 4] = ((HudModel *)D_L00_0022F7C0)->i[0x64 / 4] + 2;
     else if (((HudModel *)D_L00_0022F7C0)->i[0x744 / 4] == 0 && (unsigned int)(((HudModel *)D_L00_0022F7C0)->i[0x50 / 4] - 1) > 1) {
         choice = func_002A77E0(12);
-        if (choice >= 6) func_002F88D8((void *)func_00288FB8(D_L00_001AD690));
-        else func_002F88D8((void *)func_00288FB8(D_L00_001AD698[choice]));
+        if (choice >= 6) func_002F88D8((void *)GetLocalizedString(D_L00_001AD690));
+        else func_002F88D8((void *)GetLocalizedString(D_L00_001AD698[choice]));
     }
     y = (int)((float)baseline * D_L00_001B25E0 + 0.5f);
-    func_002F97A0((float)-((HudModel *)D_L00_0022F7C0)->i[0x64 / 4], (float)(D_001A7B90 ? y - 4 : y), 0xF0C070ULL, ((HudModel *)D_L00_0022F7C0)->ptr[0x3C / 4], -1, magnification);
+    draw_large_text_edge_faded((float)-((HudModel *)D_L00_0022F7C0)->i[0x64 / 4], (float)(D_001A7B90 ? y - 4 : y), 0xF0C070ULL, ((HudModel *)D_L00_0022F7C0)->ptr[0x3C / 4], -1, magnification);
 }

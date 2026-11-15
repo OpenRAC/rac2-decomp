@@ -127,29 +127,29 @@ void func_L00_003E3258(float *pos, int unused, int extra)
     float angle, speed, scale, mag, direction;
     int id, i, n;
     char *p, *d;
-    func_00282CF0((char *)v, D_L00_001B8DC0, (char *)pos);
+    FastVecSub((char *)v, D_L00_001B8DC0, (char *)pos);
     angle = func_00283248(v[0], v[1]);
     for (i = 19; i >= 0; i--) {
-        func_00282D30(dir, D_0018A0E0, -(func_002A7878(0.2f, 3.0f) * 0.01666666753590107f));
-        id = func_00283CF0(func_002A78D8(1.0f, 2.0f));
+        FastVecScale(dir, D_0018A0E0, -(func_002A7878(0.2f, 3.0f) * 0.01666666753590107f));
+        id = FloatToInt(func_002A78D8(1.0f, 2.0f));
         speed = func_002A7878(0.3f, 0.75f) * 210000.0f;
         out[0] = pos[0] + func_002A78D8(0.0f, 0.2f);
         out[1] = pos[1] + func_002A78D8(0.0f, 0.2f);
         out[2] = pos[2] + func_002A78D8(0.0f, 0.2f);
-        p = func_002BDCE8(out, 0.0f, 1.0f, id, dir, 1.01f, speed, 0x7F202020, 1);
+        p = SpawnSpinningSparkParticle(out, 0.0f, 1.0f, id, dir, 1.01f, speed, 0x7F202020, 1);
         if (p) {
             p[3] = 68;
             *(short *)(p + 10) = 90;
             d = p + 32;
-            p[9] = func_00283CF0(4.0f) + 64;
-            *(float *)(d + 28) = func_00283CE0(5);
+            p[9] = FloatToInt(4.0f) + 64;
+            *(float *)(d + 28) = IntToFloat(5);
             *(int *)(d + 4) = 3;
             d[10] = 48;
             d[11] = p[10];
         }
         scale = func_002A7878(1.0f, 2.0f);
         mag = func_002A7878(0.0f, 1.396263599395752f);
-        direction = func_00283B98(angle, func_002A78D8(0.0f, 1.396263599395752f));
+        direction = FastAddRotations(angle, func_002A78D8(0.0f, 1.396263599395752f));
         func_002AF000(dir, scale * 0.01666666753590107f, direction, mag);
         out[0] = pos[0] + func_002A78D8(0.0f, 0.1f);
         out[1] = pos[1] + func_002A78D8(0.0f, 0.1f);
@@ -201,16 +201,16 @@ void func_L00_003E3668(float *pos)
     int id;
     int i;
 
-    func_00282CF0((char *)v, D_L00_001B8DC0, (char *)pos);
+    FastVecSub((char *)v, D_L00_001B8DC0, (char *)pos);
     ang = func_00283248(v[0], v[1]);
 
     for (i = 19; i >= 0; i--) {
         scale = func_002A7878(0.25f, 0.5f);
-        id = func_00283CF0(func_002A78D8(1.0f, 2.0f));
+        id = FloatToInt(func_002A78D8(1.0f, 2.0f));
         func_002A7878(0.05f, 0.2f);
         speed = 210000.0f;
         mag = func_002A7878(0.0f, 1.396263599395752f);
-        angle = func_00283B98(ang, func_002A78D8(0.0f, 1.396263599395752f));
+        angle = FastAddRotations(ang, func_002A78D8(0.0f, 1.396263599395752f));
         func_002AF000(dir, scale * 0.01666666753590107f, angle, mag);
         out[0] = pos[0] + func_002A78D8(0.0f, 0.075f);
         out[1] = pos[1] + func_002A78D8(0.0f, 0.075f);
@@ -288,11 +288,11 @@ void func_L00_003E4968(char *a0) {
     a[1] = p[1];
     a[2] = p[2]; }
     a[3] = 0.0f;
-    func_00282D30(b, a0 + 0xD0, -0.1f);
-    func_00282CC0(a, a, b);
-    func_00282D30(c, a0 + 0xE0, 0.15f);
-    func_00282CC0(a, a, c);
-    func_00282D30(c, a0 + 0xE0, -0.033333335f);
+    FastVecScale(b, a0 + 0xD0, -0.1f);
+    FastVecAdd(a, a, b);
+    FastVecScale(c, a0 + 0xE0, 0.15f);
+    FastVecAdd(a, a, c);
+    FastVecScale(c, a0 + 0xE0, -0.033333335f);
     tbl = D_L00_001FE940;
     for (i = 8; i >= 0; i--) {
         d[0] = a[0] + func_002A78D8(0.0f, 0.1f);
@@ -305,7 +305,7 @@ void func_L00_003E4968(char *a0) {
         r = func_002C65A0(a, D_L00_001A8F20, 4, 0x406080, n, 0x10, 0x10, big, big, 0.0f, 1);
         if (r != 0)
             *(unsigned char *)(r + 2) = *(unsigned char *)(*(unsigned *)(tbl + 0xD4));
-        func_00282CC0(a, a, c);
+        FastVecAdd(a, a, c);
     }
 }
 
@@ -346,17 +346,17 @@ void func_L00_003E5340(char *object, float *position)
     int i = 8;
     int mode;
 
-    func_00282CF0((char *)delta, D_L00_001B8DC0, (char *)position);
-    distance = func_00282DF0(delta);
+    FastVecSub((char *)delta, D_L00_001B8DC0, (char *)position);
+    distance = FastVecLength(delta);
     *(VectorBits *)random = 0;
     random[0] = func_002A7878(-1.0f, 1.0f);
     random[1] = func_002A7878(-1.0f, 1.0f);
     random[2] = func_002A7878(-1.0f, 1.0f);
     delta[2] += distance * 0.5f;
     *(VectorBits *)velocity = *(VectorBits *)random;
-    func_00282F20(velocity, velocity, distance * 0.0033333336468786f);
-    func_00282F20(delta, delta, (distance + distance) * 0.01666666753590107f);
-    func_00282CC0(velocity, velocity, delta);
+    vec_scale_to_length(velocity, velocity, distance * 0.0033333336468786f);
+    vec_scale_to_length(delta, delta, (distance + distance) * 0.01666666753590107f);
+    FastVecAdd(velocity, velocity, delta);
     func_00282FB8(velocity, velocity, 0.1666666716337204f);
     ref_L00_003E5340_00(position, velocity, func_002A7820(60, 90), 0, 0);
     for (; i >= 0; i--) {
@@ -370,7 +370,7 @@ void func_L00_003E5340(char *object, float *position)
         random[2] += 0.05000000447034836f;
         if (func_001163B0() % divisor == 0)
             mode = 1;
-        func_00283098(random, random, object + 0xC0);
+        matrix_mul_vec3(random, random, object + 0xC0);
         ref_L00_003E5340_00(position, random, func_002A7820(60, 90), mode, 0);
     }
 }
@@ -409,8 +409,8 @@ void func_L00_003E6628(char *object)
                     *(int *)(rec + 0x30) = 0;
                 }
             } else if ((func_001163B0() & 1) == 0) {
-                func_L00_003E6778(rec, 0, amount, amount, 0);
-                func_L00_003E6778(rec, 0, amount, amount, 0);
+                AllocateOwnedEffectParticle(rec, 0, amount, amount, 0);
+                AllocateOwnedEffectParticle(rec, 0, amount, amount, 0);
             }
             func_L00_003E6C10(rec);
         }
@@ -516,11 +516,11 @@ void func_L00_003E80A8(int index, char *object)
     int high;
 
     *(char *)((char *)D_L00_0024EFC0[index].object + 0x23) =
-        func_00283CF0(D_L00_0024EFC0[index].scale * 96.0f);
-    r = func_00283D38(object, D_L00_0024EFC0[index].index,
+        FloatToInt(D_L00_0024EFC0[index].scale * 96.0f);
+    r = FastTweenColor(object, D_L00_0024EFC0[index].index,
                       D_L00_0024EFC0[index].scale);
     high = (r >> 16) & 0xFF;
-    func_002A0488((int)D_L00_0024EFC0[index].object, r & 0xFF, (r >> 8) & 0xFF,
+    set_moby_color((int)D_L00_0024EFC0[index].object, r & 0xFF, (r >> 8) & 0xFF,
                   high);
 }
 

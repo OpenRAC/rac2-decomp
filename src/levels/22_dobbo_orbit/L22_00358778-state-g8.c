@@ -57,8 +57,8 @@ void func_L22_0040D638(char *obj) {
                 float scale;
                 if (func_002A77E0(2)) scale=D_L22_001AF308;
                 else scale=-D_L22_001AF308;
-                func_00282D30(&offset,axis,scale);
-                func_00282CC0(obj+0x10,obj+0x10,&offset);
+                FastVecScale(&offset,axis,scale);
+                FastVecAdd(obj+0x10,obj+0x10,&offset);
                 func_L22_003A2988(obj+0x10,7.2f);
             }
             qcopy(ctx+0x2a0,obj+0x10);
@@ -71,7 +71,7 @@ void func_L22_0040D638(char *obj) {
             float distance;
             if (state == 6) goto respawn;
             {
-                distance=func_00282E48(D_L22_00189EA0,obj+0x10);
+                distance=fast_vec_dist(D_L22_00189EA0,obj+0x10);
                 if (U8(obj,0x20)!=6 && distance<55.0f) I32(ctx,0x288)=D_L22_001B2A88;
             }
             if (U8(obj,0x20)==6 || distance>55.0f) {

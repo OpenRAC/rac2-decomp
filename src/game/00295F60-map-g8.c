@@ -200,16 +200,16 @@ void func_00295F60(s32 paging, s32 set_clip) {
     if (D_001C4FA0.enabled == 0 || D_001C4FA0.selected_map >= 21) {
         u8 *font = D_001A95F8;
 
-        if (paging) func_0027C540(0);
+        if (paging) SetupGifPaging(0);
         func_0027FAA8(((s16)D_001A6480.size[0] >> 1) + 30, (s16)D_001A6480.size[1] >> 2, 0x80F0F0F0, font, -1);
-        if (paging) func_0027C660();
+        if (paging) DoGifPaging();
         return;
     }
     if (D_001C4FA0.selected_map < 0) {
         return;
     }
 
-    if (paging) func_0027C540(0);
+    if (paging) SetupGifPaging(0);
     rx0 = 0x1000;
     ry0 = 0x800;
     mirror_sign = 1;
@@ -239,8 +239,8 @@ void func_00295F60(s32 paging, s32 set_clip) {
     u = ((left_tile_count + right_tile_count) << 9) + 0x2000;
     v = ((top_tile_count + bottom_tile_count) << 9) + 0x2000;
 
-    func_002FC560(8, 0);
-    func_002FC560(0x47, 0);
+    VU1_addGSregister(8, 0);
+    VU1_addGSregister(0x47, 0);
     if (set_clip) func_002FC620(D_001A960C, D_001A9614, D_001A9610, D_001A9618);
     D_001B22A8.p->tag = 0x10000005;
     D_001B22A8.p->addr = 0;
@@ -248,7 +248,7 @@ void func_00295F60(s32 paging, s32 set_clip) {
     D_001B22A8.p->vif1 = 0x50000005;
     D_001B22A8.p++;
     background_tex0 =
-        func_0028E640(func_0028E588(0xE999, D_001C4FA0.selected_map));
+        GetFrameTexture(GetIconFrame(0xE999, D_001C4FA0.selected_map));
     packet_words = (u64 *)D_001B22A8.p;
     packet_words[0] = 0x7400000000008001;
     packet_words[1] = 0x5353106;
@@ -263,8 +263,8 @@ void func_00295F60(s32 paging, s32 set_clip) {
                       ((u64)D_001C4FA0.z << 32);
     packet_words[9] = 0;
     D_001B22A8.p = (struct DmaTag_205E70 *)((u8 *)D_001B22A8.p + 0x50);
-    func_002FC560(8, 5);
-    func_002FC560(0x47, 0x60B);
+    VU1_addGSregister(8, 5);
+    VU1_addGSregister(0x47, 0x60B);
 
     palette_block = (background_tex0 >> 37) & 0x3FFF;
     D_001B22A8.p->tag = 0x10000005;
@@ -290,7 +290,7 @@ void func_00295F60(s32 paging, s32 set_clip) {
                       ((u64)D_001C4FA0.z << 32);
     packet_words[9] = 0;
     D_001B22A8.p = (struct DmaTag_205E70 *)((u8 *)D_001B22A8.p + 0x50);
-    func_002FC560(0x47, 0x360B);
+    VU1_addGSregister(0x47, 0x360B);
 
     if (D_001C4FA0.show_markers != 0 && D_001C4FA0.marks_enabled != 0) {
         dx = rx1 - rx0;
@@ -301,7 +301,7 @@ void func_00295F60(s32 paging, s32 set_clip) {
             if (cell >= 0) {
                 cell_x = cell % 16;
                 cell_y = cell / 16;
-                func_0028FC48(rx0 + cell_x * dx / 16, ry0 + cell_y * dy / 16,
+                AppendScreenRectPacket(rx0 + cell_x * dx / 16, ry0 + cell_y * dy / 16,
                                           rx0 + (cell_x + 1) * dx / 16,
                                           ry0 + (cell_y + 1) * dy / 16, 0x20000000, 1);
             }
@@ -331,7 +331,7 @@ void func_00295F60(s32 paging, s32 set_clip) {
                     if (D_001C4FA0.icons[i].flags & 0x80) {
                         icon_size_multiplier = 1.5f;
                     }
-                    image_index = func_0028E588(texture_id,
+                    image_index = GetIconFrame(texture_id,
                                                                    D_001C4FA0.icons[i].frame_index);
                     icon_center_x = (f32)rx0 + D_001C4FA0.icons[i].x * (f32)(rx1 - rx0);
                     icon_center_y = (f32)ry0 + D_001C4FA0.icons[i].y * (f32)(ry1 - ry0);
@@ -438,7 +438,7 @@ void func_00295F60(s32 paging, s32 set_clip) {
                         sprite_word = D_001C4FA0.icons[i].frame_index;
                         if (id != 0) {
                             if (D_001C4FA0.icons[i].flags & 0x40) {
-                                func_0028FC48(
+                                AppendScreenRectPacket(
                                     icon_bounds[i].x0 - 0x20, icon_bounds[i].y0 - 0x20,
                                     icon_bounds[i].x1 + 0x20, icon_bounds[i].y1 + 0x20, 0x80000000, 1);
                             }
@@ -459,7 +459,7 @@ void func_00295F60(s32 paging, s32 set_clip) {
                                 sprite_height = s * 256.0f;
                                 sprite_width = sprite_height;
                                 if (D_001C4FA0.icons[i].flags & 0x400) {
-                                    angle = func_00283B98(angle, 1.5707964f);
+                                    angle = FastAddRotations(angle, 1.5707964f);
                                     texture_width = 0x40;
                                     sprite_width = s * D_001A95E0;
                                     sprite_height = s * D_001A95E4;
@@ -468,7 +468,7 @@ void func_00295F60(s32 paging, s32 set_clip) {
                                     }
                                 }
                                 if (D_001C4FA0.icons[i].flags & 0x800) {
-                                    angle = func_00283B98(angle, 1.5707964f);
+                                    angle = FastAddRotations(angle, 1.5707964f);
                                     texture_width = 0x40;
                                     sprite_width = s * D_001A95D8;
                                     sprite_height = s * D_001A95DC;
@@ -477,15 +477,15 @@ void func_00295F60(s32 paging, s32 set_clip) {
                                     }
                                 }
                                 if (D_001C4FA0.icons[i].flags & 0x1000) {
-                                    angle = func_00283B98(angle, 1.5707964f);
+                                    angle = FastAddRotations(angle, 1.5707964f);
                                     sprite_width = s * D_001A95E8;
                                     sprite_height = s * D_001A95EC;
                                 }
                                 center_x = (f32)(icon_bounds[i].x0 + icon_bounds[i].x1) * 0.5f;
                                 center_y = (f32)(icon_bounds[i].y0 + icon_bounds[i].y1) * 0.5f;
-                                func_0028F410(center_x, center_y, sprite_width, sprite_height,
+                                DrawRotatedSprite(center_x, center_y, sprite_width, sprite_height,
                                                     angle, texture_width, 0x20,
-                                                    func_0028E640(func_0028E588(
+                                                    GetFrameTexture(GetIconFrame(
                                                         id, sprite_word)));
                             } else {
                                 u32 tint = 0x7f7f7f;
@@ -508,12 +508,12 @@ void func_00295F60(s32 paging, s32 set_clip) {
                                         }
                                     }
                                 tint_done:
-                                    func_0028F078(func_0028E588(id, sprite_word),
+                                    DrawHudSpriteSubpixel(GetIconFrame(id, sprite_word),
                                         icon_bounds[i].x0 - 8, icon_bounds[i].y0 - 8,
                                         icon_bounds[i].x1 - icon_bounds[i].x0 + 8,
                                         icon_bounds[i].y1 - icon_bounds[i].y0 + 8, 0x80, 0);
                                 }
-                                func_0028F078(func_0028E588(id, sprite_word),
+                                DrawHudSpriteSubpixel(GetIconFrame(id, sprite_word),
                                     icon_bounds[i].x0, icon_bounds[i].y0,
                                     icon_bounds[i].x1 - icon_bounds[i].x0,
                                     icon_bounds[i].y1 - icon_bounds[i].y0, 0x80, tint);
@@ -543,10 +543,10 @@ void func_00295F60(s32 paging, s32 set_clip) {
                                         label_y = (icon_bounds[i].y0 >> 4) - label_height / 2 + label_offset_y;
                                     }
                                 }
-                                func_0028FC48(label_x, label_y, label_x + label_width,
+                                AppendScreenRectPacket(label_x, label_y, label_x + label_width,
                                               label_y + label_height * 2, 0x40000000, 0);
                                 func_00297E00(i, &label_buffer);
-                                func_00115484(&text_window, 0, sizeof(text_window));
+                                memset(&text_window, 0, sizeof(text_window));
                                 text_window.s[1] = label_y + label_height;
                                 text_window.s[3] = label_x + label_width;
                                 text_window.s[4] = label_x + label_width / 2;
@@ -574,18 +574,18 @@ void func_00295F60(s32 paging, s32 set_clip) {
             f32 angle;
             s32 flip;
 
-            image_index = func_0028E588(0xE99A, 5);
+            image_index = GetIconFrame(0xE99A, 5);
             s = ((m->zoom[m->selected_map] * 4.0f + 10.0f) * 0.75f) / 13.0f;
             angle = D_00189E20.angle;
             flip = D_00189E20.mode == 0xF;
             if (flip) {
-                angle = func_00283B98(angle, 1.5707964f);
+                angle = FastAddRotations(angle, 1.5707964f);
             }
             if (D_001A79F0 == 20 && D_001C4F40 == 2)
                 angle = 3.1415927f;
             else if (func_003005A0() >= 0 && D_001A79F0 == 7)
                 angle = D_001A9660[func_003005A0()];
-            if (!func_00297218(D_00189E20.x, D_00189E20.y,
+            if (!GetSpecialMapCoordinates(D_00189E20.x, D_00189E20.y,
                                &label_buffer.f[0], &label_buffer.f[1], D_001A79F0))
                 func_00297FE8(D_00189E20.x, D_00189E20.y,
                               &label_buffer.f[0], &label_buffer.f[1], D_001A79F0);
@@ -594,11 +594,11 @@ void func_00295F60(s32 paging, s32 set_clip) {
             {
                 f32 sz = s * 256.0f;
 
-                func_0028F410(label_buffer.f[0], label_buffer.f[1], sz, sz, angle, 0x40, 0x40,
-                                    func_0028E640(image_index));
+                DrawRotatedSprite(label_buffer.f[0], label_buffer.f[1], sz, sz, angle, 0x40, 0x40,
+                                    GetFrameTexture(image_index));
             }
         }
     }
     func_002FC620(0, D_001A7340.width - 1, 0, D_001A7340.height - 1);
-    if (paging) func_0027C660();
+    if (paging) DoGifPaging();
 }

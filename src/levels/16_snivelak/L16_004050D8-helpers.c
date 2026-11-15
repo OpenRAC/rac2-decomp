@@ -10,7 +10,7 @@ void func_L16_004050D8(u8 *owner)
     u8 *state = *(u8 **)(owner + 0x68);
     u8 *child = *(u8 **)(state + 0x274);
     if (child == 0) {
-        u8 *created = func_0029EFD0(0xECB);
+        u8 *created = CreateMoby(0xECB);
         *(u8 **)(state + 0x274) = created;
         if (created == 0)
             return;

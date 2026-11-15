@@ -51,7 +51,7 @@ void func_L07_003F6F00(u8 *a0)
     func_00282C88(vel);
     for (i = 0; i < D_L07_001B1010; i++) {
         func_002A7A00(pos, 0.0f, 0.5f);
-        func_00282CC0(pos, pos, a0 + 0x10);
+        FastVecAdd(pos, pos, a0 + 0x10);
         vel[2] = -(func_002A7878(D_L07_001B0FE8[0], D_L07_001B0FE8[1]) * 0.016666668f);
         func_002C3150(pos, vel, D_L07_001B0FFC, (u8)func_002A7820(D_L07_001B1008, D_L07_001B100C),
                       (u8)func_002A77E0(0xFF), 0, D_L07_001B0FF4);
@@ -96,7 +96,7 @@ void func_L07_00410B48(u8 *a0)
         s0[0xA8] = 0xFF;
         break;
     case 2:
-        func_002E5CF8(0, 0, s0);
+        PlayMobySound(0, 0, s0);
         func_L00_0032A258(s0, ref_L07_00410B48_02, ref_L07_00410B48_01,
                           ref_L07_00410B48_00, 0xFFFF, 0, -1, 0, 0xFFFF, 0xFF, 0);
         func_0029F338(s0);

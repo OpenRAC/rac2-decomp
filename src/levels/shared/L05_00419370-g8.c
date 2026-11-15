@@ -46,15 +46,15 @@ void func_L05_00419370(char *object)
                     *(float *)(p) += func_002A7878(-0.2f, 0.2f);
                     *(float *)(p + 4) += func_002A7878(-0.2f, 0.2f);
                     *(float *)(p + 8) += func_002A7878(-0.2f, 0.2f);
-                    func_00282F20(p, p, func_002A7878(24.0f, 30.0f));
-                    func_00282CC0(p, p, object + 0x10);
+                    vec_scale_to_length(p, p, func_002A7878(24.0f, 30.0f));
+                    FastVecAdd(p, p, object + 0x10);
                     *life = func_002A7878(11.0f, 14.0f);
                 }
                 qcopy(local, axis);
                 t = func_002A7878(0.15f, 0.25f);
-                func_00282F20(local, local, -t);
+                vec_scale_to_length(local, local, -t);
                 *life -= t;
-                func_00282CC0(p, p, local);
+                FastVecAdd(p, p, local);
                 a = func_002A7878(0.07f, 0.12f);
                 t = func_002A7878(0.0f, 1.0f);
                 func_00281EB8(p, 0x47, 0x7F7F6464, 0, a, 0.0f, t);
@@ -76,26 +76,26 @@ void func_L05_00419370(char *object)
                 *(float *)state += func_002A7878(-0.2f, 0.2f);
                 *(float *)(state + 4) += func_002A7878(-0.2f, 0.2f);
                 *(float *)(state + 8) += func_002A7878(-0.2f, 0.2f);
-                func_00282F20(state, state, func_002A7878(15.0f, 30.0f));
-                func_00282CC0(state, state, object + 0x10);
+                vec_scale_to_length(state, state, func_002A7878(15.0f, 30.0f));
+                FastVecAdd(state, state, object + 0x10);
                 *life = func_002A7878(10.0f, 30.0f);
             }
             qcopy(local, axis);
             t = func_002A7878(0.15f, 0.25f);
-            func_00282F20(local, local, -t);
+            vec_scale_to_length(local, local, -t);
             *life -= t;
-            func_00282CC0(state, state, local);
-            effect = func_002BDCE8(state, 2.0f, 1.03f, 1, D_L05_001A8F20, 0x0A786E64, 1.045f, 210000.0f, 0);
+            FastVecAdd(state, state, local);
+            effect = SpawnSpinningSparkParticle(state, 2.0f, 1.03f, 1, D_L05_001A8F20, 0x0A786E64, 1.045f, 210000.0f, 0);
             if (effect) {
                 effect[3] = kind;
                 *(short *)(effect + 10) = func_002A7820(40, 70);
             }
-            effect = func_002BDCE8(state, 1.8f, 1.03f, 1, D_L05_001A8F20, 0x0AADA196, 1.045f, 210000.0f, 0);
+            effect = SpawnSpinningSparkParticle(state, 1.8f, 1.03f, 1, D_L05_001A8F20, 0x0AADA196, 1.045f, 210000.0f, 0);
             if (effect) {
                 effect[3] = kind;
                 detail = effect + 0x20;
                 *(short *)(effect + 10) = func_002A7820(40, 70);
-                effect[9] = func_00283CF0(4.0f) + 0x40;
+                effect[9] = FloatToInt(4.0f) + 0x40;
                 *(float *)(detail + 0x1C) = 20.0f;
                 *(int *)(detail + 4) = 3;
                 detail[10] = 0x7F;

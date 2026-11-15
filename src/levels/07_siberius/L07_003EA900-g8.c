@@ -89,8 +89,8 @@ void func_L07_003EA900(unsigned char *object)
         else if (INT_AT(state, 0x2D4) == 0) func_002A7750(object, 1, 0);
         break;
     case 2:
-        func_L00_00424A08(0, D_L07_001B0BA0, 0.003000000026077032f);
-        func_L00_00424A50(D_L07_001B0BA4, 0.003000000026077032f);
+        follow_camera_set_distance(0, D_L07_001B0BA0, 0.003000000026077032f);
+        follow_camera_set_height(D_L07_001B0BA4, 0.003000000026077032f);
         if (INT_AT(state, 0x2DC) != 1) {
             func_002A7750(object, 2, 1);
             INT_AT(state, 0x2D4) = func_002A7820(580, 600);
@@ -127,26 +127,26 @@ void func_L07_003EA900(unsigned char *object)
                 qcopy(targetPosition, D_00189E20.targetPosition);
                 if (PTR_AT(state, 0x314)) {
                     func_002AD330(object, PTR_AT(state, 0x314), targetPosition, axis);
-                    func_00282CC0(targetPosition, targetPosition, axis);
+                    FastVecAdd(targetPosition, targetPosition, axis);
                 }
             } else if (targetObject) {
                 qcopy(targetPosition, targetObject + 0x10);
                 targetPosition[2] += FLOAT_AT(targetObject, 0xC) * 0.0009765625f;
             } else qcopy(targetPosition, state + 0x210);
-            func_00282CF0(unitDirection, targetPosition, origin);
-            func_00282F20(unitDirection, unitDirection, 1.0f);
-            angle = func_00282DB0(object + 0xC0, unitDirection);
+            FastVecSub(unitDirection, targetPosition, origin);
+            vec_scale_to_length(unitDirection, unitDirection, 1.0f);
+            angle = FastVecDot(object + 0xC0, unitDirection);
             if (angle < func_00283180(0.3490658700466156f)) {
-                func_00282CF0(delta, targetPosition, origin);
+                FastVecSub(delta, targetPosition, origin);
                 qcopy(direction, object + 0xC0);
-                func_00282DD8(axis, object + 0xC0, delta);
+                FastVecCross(axis, object + 0xC0, delta);
                 func_002ACEC0(direction, direction, axis, -0.3490658700466156f);
-            } else func_00282CF0(direction, targetPosition, origin);
-            func_00282F20(direction, direction, 0.3333333432674408f);
+            } else FastVecSub(direction, targetPosition, origin);
+            vec_scale_to_length(direction, direction, 0.3333333432674408f);
             func_003280C8(object, direction, origin, 0, INT_AT(state, 0x314), (float)BYTE_AT(state, 0x34));
         } else if (object[0x60] & 2) {
             if (func_002A77E0(2) ||
-                func_00283C80(FLOAT_AT(object, 0xF8),
+                FastDiffRots(FLOAT_AT(object, 0xF8),
                     func_00283248(D_00189E20.position[0] - FLOAT_AT(object, 0x10),
                                   D_00189E20.position[1] - FLOAT_AT(object, 0x14))) > 0.3490658700466156f)
                 func_002A7750(object, 5, -1);
@@ -162,7 +162,7 @@ void func_L07_003EA900(unsigned char *object)
             if (object[0x43] != 7) func_002A7470(object, 7, 0, 15);
             angle = func_00283248(D_00189E20.position[0] - FLOAT_AT(object, 0x10),
                                   D_00189E20.position[1] - FLOAT_AT(object, 0x14));
-            FLOAT_AT(state, 0x324) = func_00283B98(angle, func_002A78D8(45.0f, 100.0f) * 0.01745329424738884f);
+            FLOAT_AT(state, 0x324) = FastAddRotations(angle, func_002A78D8(45.0f, 100.0f) * 0.01745329424738884f);
         }
         func_L02_00331440(object, D_L07_001A8F20, INT_AT(state, 0x88) | 0x10,
                          FLOAT_AT(state, 0x324), -1.0f, -1.0f);
@@ -185,20 +185,20 @@ void func_L07_003EA900(unsigned char *object)
         break;
     case 9:
         if (func_002B3868(object) && object[0x43] != 10) func_002A7470(object, 10, 0, 2);
-        func_L00_00424A08(0, D_L07_001B0BA0, 0.003000000026077032f);
-        func_L00_00424A50(D_L07_001B0BA4, 0.003000000026077032f);
-        func_00282CF0(origin, object + 0x10, D_L07_001B23CC[0] + (INT_AT(state, 0x2C0) << 7) + 0x30);
-        func_00283098(origin, origin, D_L07_001B23CC[0] + (INT_AT(state, 0x2C0) << 7) + 0x40);
+        follow_camera_set_distance(0, D_L07_001B0BA0, 0.003000000026077032f);
+        follow_camera_set_height(D_L07_001B0BA4, 0.003000000026077032f);
+        FastVecSub(origin, object + 0x10, D_L07_001B23CC[0] + (INT_AT(state, 0x2C0) << 7) + 0x30);
+        matrix_mul_vec3(origin, origin, D_L07_001B23CC[0] + (INT_AT(state, 0x2C0) << 7) + 0x40);
         origin[0] = 0.5f;
-        func_00283098(origin, origin, D_L07_001B23CC[0] + (INT_AT(state, 0x2C0) << 7));
-        func_00282CC0(origin, origin, D_L07_001B23CC[0] + (INT_AT(state, 0x2C0) << 7) + 0x30);
+        matrix_mul_vec3(origin, origin, D_L07_001B23CC[0] + (INT_AT(state, 0x2C0) << 7));
+        FastVecAdd(origin, origin, D_L07_001B23CC[0] + (INT_AT(state, 0x2C0) << 7) + 0x30);
         func_L01_00321178(object, origin);
-        if (func_002ACBC8(object + 0x10, INT_AT(state, 0x2C0))) {
-            func_00282CF0(targetPosition, object + 0x10, D_L07_001B23CC[0] + (INT_AT(state, 0x2C0) << 7) + 0x30);
-            func_00283098(targetPosition, targetPosition, D_L07_001B23CC[0] + (INT_AT(state, 0x2C0) << 7) + 0x40);
+        if (IsPointInCuboid(object + 0x10, INT_AT(state, 0x2C0))) {
+            FastVecSub(targetPosition, object + 0x10, D_L07_001B23CC[0] + (INT_AT(state, 0x2C0) << 7) + 0x30);
+            matrix_mul_vec3(targetPosition, targetPosition, D_L07_001B23CC[0] + (INT_AT(state, 0x2C0) << 7) + 0x40);
             targetPosition[0] = func_002A7878(0.0f, 1.0f);
-            func_00283098(targetPosition, targetPosition, D_L07_001B23CC[0] + (INT_AT(state, 0x2C4) << 7));
-            func_00282CC0(targetPosition, targetPosition, D_L07_001B23CC[0] + (INT_AT(state, 0x2C4) << 7) + 0x30);
+            matrix_mul_vec3(targetPosition, targetPosition, D_L07_001B23CC[0] + (INT_AT(state, 0x2C4) << 7));
+            FastVecAdd(targetPosition, targetPosition, D_L07_001B23CC[0] + (INT_AT(state, 0x2C4) << 7) + 0x30);
             func_L02_003329C8(object, targetPosition, 0.10000000894069672f, 0.0055555556900799274f);
             func_002A7750(object, 10, -1);
         }
@@ -206,11 +206,11 @@ void func_L07_003EA900(unsigned char *object)
     case 10:
         if (func_002B3868(object) && object[0x43] != 4) func_002A7470(object, 4, 0, 2);
         func_L07_00323038(object, 1.0f, 8.0f, 12.5f);
-        func_L00_00424A08(0, D_L07_001B0BA0, 0.003000000026077032f);
-        func_L00_00424A50(D_L07_001B0BA4, 0.003000000026077032f);
+        follow_camera_set_distance(0, D_L07_001B0BA0, 0.003000000026077032f);
+        follow_camera_set_height(D_L07_001B0BA4, 0.003000000026077032f);
         FLOAT_AT(state, 0x180) = FLOAT_AT(object, 0x18)-3.0f;
         if (object[0x60] & 2) {
-            angle = func_00283C80(FLOAT_AT(object, 0xF8),
+            angle = FastDiffRots(FLOAT_AT(object, 0xF8),
                 func_00283248(FLOAT_AT(state, 0x210) - FLOAT_AT(object, 0x10),
                               FLOAT_AT(state, 0x214) - FLOAT_AT(object, 0x14)));
             if (angle < 0.1745329350233078f) func_002A7750(object, 3, 2);

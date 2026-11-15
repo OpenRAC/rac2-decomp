@@ -47,15 +47,15 @@ void func_L11_00446C78(char *object)
     for (i = 0; i < D_L11_001B1928; i++) {
         qzero_nc(velocity);
         velocity[2] = func_002A7878(D_L11_001B1900[0], D_L11_001B1900[1]) * (1.0f / 60.0f);
-        func_00283098(velocity, velocity, D_L11_001B359C[0] + (*(int *)(state + 0x1D0) << 8) + 0xC0);
+        matrix_mul_vec3(velocity, velocity, D_L11_001B359C[0] + (*(int *)(state + 0x1D0) << 8) + 0xC0);
         angle = func_002A7940();
         radius = func_002A7878(D_L11_001B1920, D_L11_001B1924[0]);
         position[0] = func_00283180(angle) * radius;
         position[1] = func_00283198(angle) * radius;
         position[2] = 0;
-        func_00283098(position, position, D_L11_001B359C[0] + (*(int *)(state + 0x1D0) << 8) + 0xC0);
-        func_00282CC0(position, position, D_L11_001B359C[0] + (*(int *)(state + 0x1D0) << 8) + 0x10);
-        func_00282CC0(position, position, D_L11_001B1930);
+        matrix_mul_vec3(position, position, D_L11_001B359C[0] + (*(int *)(state + 0x1D0) << 8) + 0xC0);
+        FastVecAdd(position, position, D_L11_001B359C[0] + (*(int *)(state + 0x1D0) << 8) + 0x10);
+        FastVecAdd(position, position, D_L11_001B1930);
         color = func_002A7820(D_L11_001B1918[0], D_L11_001B1918[1]);
         scale = func_002A7878(D_L11_001B1908, D_L11_001B1900[3]);
         kind = func_002A77E0(2) ? D_L11_001B1910 : D_L11_001B1914[0];

@@ -31,8 +31,8 @@ void func_L07_003E56B8(char *arg)
     float f, g;
 
     if (*(unsigned char *)(arg + 0x20) == 0) {
-        *(unsigned char *)(o + 0x48) = func_00283CF0(15.0f);
-        *(unsigned char *)(o + 0x4A) = func_00283CF0(2.4f);
+        *(unsigned char *)(o + 0x48) = FloatToInt(15.0f);
+        *(unsigned char *)(o + 0x4A) = FloatToInt(2.4f);
         *(unsigned char *)(o + 0x60) = 7;
         *(unsigned char *)(o + 0x2E) = 1;
         *(unsigned char *)(o + 0xC7) = 1;
@@ -62,14 +62,14 @@ void func_L07_003E56B8(char *arg)
             func_002A7750(arg, 8, 4);
         }
     }
-    if (*(unsigned char *)(arg + 0x31) && func_00282E48(arg + 0x10, D_L07_001B9200) < 24.0f) {
+    if (*(unsigned char *)(arg + 0x31) && fast_vec_dist(arg + 0x10, D_L07_001B9200) < 24.0f) {
         func_002A93B0(arg);
         *(unsigned char *)(arg + 0x6F) = 22;
     }
     if (*(unsigned char *)(arg + 0x95) != 4) {
         slot = D_00188660 + *(int *)(o + 0x264) * 0x70;
         if (*(char **)(slot + 0x88) != arg || !*(unsigned char *)(slot + 0x74))
-            *(int *)(o + 0x264) = func_002E5CF8(1, 4, arg);
+            *(int *)(o + 0x264) = PlayMobySound(1, 4, arg);
     }
     if (func_002B0ED8(arg, o + 0x50, 0) >= 2 || *(unsigned char *)(o + 0x2E) == 2) {
         func_L07_003E5AC8(arg);

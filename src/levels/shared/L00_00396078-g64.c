@@ -21,9 +21,9 @@ void func_L00_00396078(char *actor) {
     float alpha;
     float *source;
     float *vertex;
-    func_00282D30(axisOffset, actor + 0xD0, D_L00_001AF28C);
-    func_00282CC0(basis[3], axisOffset, actor + 0x10);
-    packet.texture = func_0027C878(D_L00_001AF298);
+    FastVecScale(axisOffset, actor + 0xD0, D_L00_001AF28C);
+    FastVecAdd(basis[3], axisOffset, actor + 0x10);
+    packet.texture = GetEffectTextureDescriptor(D_L00_001AF298);
     packet.flags = 0x8000000048ULL;
     packet.mode = 0xFF9000000260ULL;
     packet.primitive = 0;
@@ -31,23 +31,23 @@ void func_L00_00396078(char *actor) {
     packet.uv[4] = 1; packet.uv[5] = 0; packet.uv[6] = 1; packet.uv[7] = 1;
     if (func_002A77E0(4) == 0) color = D_L00_001AF294;
     else color = D_L00_001AF290;
-    alpha = func_00283CE0(color >> 24);
-    color = (color & 0xFFFFFF) | (func_00283CF0(alpha * D_L00_001B27DC) << 24);
+    alpha = IntToFloat(color >> 24);
+    color = (color & 0xFFFFFF) | (FloatToInt(alpha * D_L00_001B27DC) << 24);
     packet.color[0] = packet.color[1] = packet.color[2] = packet.color[3] = color;
-    func_00282CF0(difference, D_L00_001B8DC0, basis[3]);
-    func_00282F20(basis[0], difference, 1.0f);
-    func_00282DD8(basis[1], basis[0], D_0018A0E0);
-    func_00282F20(basis[1], basis[1], -1.0f);
-    func_00282DD8(basis[2], basis[1], basis[0]);
-    func_00282D30(difference, basis[0], 0.2f);
-    func_00282CC0(basis[3], basis[3], difference);
+    FastVecSub(difference, D_L00_001B8DC0, basis[3]);
+    vec_scale_to_length(basis[0], difference, 1.0f);
+    FastVecCross(basis[1], basis[0], D_0018A0E0);
+    vec_scale_to_length(basis[1], basis[1], -1.0f);
+    FastVecCross(basis[2], basis[1], basis[0]);
+    FastVecScale(difference, basis[0], 0.2f);
+    FastVecAdd(basis[3], basis[3], difference);
     source = D_L00_001AF2A0[0];
     vertex = packet.vertex[0];
     for (i = 3; i >= 0; i--) {
-        func_00282D30(transformed, source, D_L00_001AF288);
+        FastVecScale(transformed, source, D_L00_001AF288);
         source += 4;
-        func_002830C0(vertex, transformed, basis);
+        transform_vector(vertex, transformed, basis);
         vertex += 4;
     }
-    func_00280B90(&packet, 0, 0);
+    draw_world_quad(&packet, 0, 0);
 }

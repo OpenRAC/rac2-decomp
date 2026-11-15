@@ -33,8 +33,8 @@ void func_L20_00442890(char *arg0)
     if (*(short *)(*(char **)(base + 0x190) + 0x86) != 0) {
         return;
     }
-    func_L00_00424A08(0, D_L20_001B2158, 0.003f);
-    func_L00_00424A50(D_L20_001B215C, 0.003f);
+    follow_camera_set_distance(0, D_L20_001B2158, 0.003f);
+    follow_camera_set_height(D_L20_001B215C, 0.003f);
     func_L00_00424A88(0, D_L20_001B2160, 0.005f);
     if (*(unsigned char *)(s0 + 0x95) == 4 ||
         *(unsigned char *)(s0 + 0x95) == 2) {
@@ -51,8 +51,8 @@ void func_L20_00442890(char *arg0)
     x = p[0];
     s0 += 0x1C0;
     q = func_00283248(x, p[1]);
-    q = func_00283B98(q, 3.1415927f);
-    w = func_00283BE0(r, q);
+    q = FastAddRotations(q, 3.1415927f);
+    w = fast_subtract_rotations(r, q);
     func_002AAA00((char *)&w, 0.0f,
                    D_L20_001B2150 * 4.84813745e-06f,
                    D_L20_001B2150 * 4.84813745e-06f,

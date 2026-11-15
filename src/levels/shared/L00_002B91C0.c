@@ -224,8 +224,8 @@ void func_L00_002B9598(void)
         limit = 0.0030555557f;
     if (D_00189E20_9598.f170 > 0.09833333641290665f) limit = 0.0036111111f;
     if (D_00189E20_9598.fa70 > 0.0f) {
-        x = -func_00282DB0(original, previous);
-        length = func_00282DF0(original);
+        x = -FastVecDot(original, previous);
+        length = FastVecLength(original);
         if (length > 0.0f) x /= length;
         length = func_00282E20_3(previous);
         adjustment = (length - x) / length * 0.00083333335f;
@@ -234,7 +234,7 @@ void func_L00_002B9598(void)
     }
     func_00282CF0_3(delta, desired, D_00189E20_9598.v140);
     delta[2] = 0.0f;
-    if (func_00282DF0(delta) > limit) func_00282F20(delta, delta, limit);
+    if (FastVecLength(delta) > limit) vec_scale_to_length(delta, delta, limit);
     func_00282CC0_3(D_00189E20_9598.vf0, D_00189E20_9598.v140, delta);
     if (D_00189E20_9598.f320 > 0.087266475f) {
         angle = func_00283248_5(D_00189E20_9598.v2a0[0], D_00189E20_9598.v2a0[1]);
@@ -245,13 +245,13 @@ void func_L00_002B9598(void)
         delta[2] = 0.0f;
         func_00282CF0_3(correction, delta, D_00189E20_9598.vf0);
         correction[2] = 0.0f;
-        if (func_00282DF0(correction) > step) func_00282F20(correction, correction, step);
+        if (FastVecLength(correction) > step) vec_scale_to_length(correction, correction, step);
         func_00282CC0_3(D_00189E20_9598.vf0, D_00189E20_9598.vf0, correction);
     }
     qcopy_nc(delta, D_00189E20_9598.vf0);
     delta[2] = 0.0f;
-    D_00189E20_9598.f400 = func_00282DB0(delta, desired);
-    t = func_00282DF0(desired);
+    D_00189E20_9598.f400 = FastVecDot(delta, desired);
+    t = FastVecLength(desired);
     if (t > 0.0f) D_00189E20_9598.f400 /= t * 0.09833333641290665f;
     ref_L00_002B9598_0(0);
     if (D_00189E20_9598.f404 < 0.017453294f && D_00189E20_9598.f324 > 0.087266475f)
@@ -277,7 +277,7 @@ float func_L00_002B9B38(void *a0, int selector)
 {
     float v[4];
 
-    func_002830C0(v, a0, D_00189E60);
+    transform_vector(v, a0, D_00189E60);
     return func_002AA738(func_00283248(v[0], v[1]), selector, 0.0f);
 }
 
@@ -289,7 +289,7 @@ extern int func_002E5CF8(int index, int flags, char *object);
 /* Forward the sound index, flags and resident object pointer; return the result. */
 int func_L00_002B9B88(int index, int flags)
 {
-    return func_002E5CF8(index, flags, (char *)D_0018C0B0);
+    return PlayMobySound(index, flags, (char *)D_0018C0B0);
 }
 
 
@@ -421,7 +421,7 @@ void func_L00_002B9D60(void *position, void *direction, int sound, int refresh)
     res->i3A0 = 0;
     res->b24EF = 0;
 
-    func_L00_002AF7D0();
+    cancel_hero_item_animation();
     func_L00_002A53B8();
 
     if (sound != -1)
@@ -543,7 +543,7 @@ void func_L00_002BA508(void)
 
     if (special && !func_L00_002BA410()) {
         D_00189E20_A508.fC04 = D_L00_001B8C80_A508.z;
-        D_00189E20_A508.fC08 = func_00283B98(-D_L00_001B8C80_A508.y, 0.12217305600643158f);
+        D_00189E20_A508.fC08 = FastAddRotations(-D_L00_001B8C80_A508.y, 0.12217305600643158f);
     }
 
     object = D_00189E20_A508.p1220;
@@ -567,17 +567,17 @@ void func_L00_002BA508(void)
         func_002AF000(matrix, 1.0f, D_00189E20_A508.fC04, D_00189E20_A508.fC08);
 
     func_00282C88(scratch);
-    func_002833F0(transform, scratch);
+    euler_rotation_basis(transform, scratch);
     if (special) {
         scratch[0] = D_L00_001B8C80_A508.x;
         scratch[1] = D_L00_001B8C80_A508.y;
         scratch[2] = D_L00_001B8C80_A508.z;
-        func_002833F0(level_transform, scratch);
-        func_00283738(transform, level_transform, transform);
+        euler_rotation_basis(level_transform, scratch);
+        multiply_matrix3x3(transform, level_transform, transform);
     } else {
-        func_00283738(transform, D_00189E20_A508.p2290 + 0xC0, transform);
+        multiply_matrix3x3(transform, D_00189E20_A508.p2290 + 0xC0, transform);
     }
-    func_00283658(composed, transform);
+    copy_matrix_rotation(composed, transform);
     func_002AB6D8(composed, object + 0xF0);
 
     *(int *)(record + 0x64) = 0;

@@ -45,15 +45,15 @@ void func_L05_004161B0(char *obj)
         }
         func_0029FCC0(obj, 0, (char *)&p->origin);
         qcopy(a, *(char **)(state + 0x120) + 0x10);
-        func_00282CC0(a, (char *)&p->offset, a);
-        func_00282D30(b, *(char **)(state + 0x120) + 0xC0, 0.5f);
-        func_00282CF0(a, a, b);
+        FastVecAdd(a, (char *)&p->offset, a);
+        FastVecScale(b, *(char **)(state + 0x120) + 0xC0, 0.5f);
+        FastVecSub(a, a, b);
         switch (p->mode) {
         case 0: {
             float d;
             qcopy(position, (char *)&p->origin);
-            func_00282D08((char *)&p->next, (char *)p, a, p->progress);
-            d = func_00282E48((char *)&p->origin, a);
+            lerp_vector((char *)&p->next, (char *)p, a, p->progress);
+            d = fast_vec_dist((char *)&p->origin, a);
             if (d > 64.0f) d = 64.0f;
             else if (d < 1.0f) d = 1.0f;
             p->progress += 2.0f / d;
@@ -65,12 +65,12 @@ void func_L05_004161B0(char *obj)
         }
         case 1:
             qcopy((char *)&p->next, a);
-            func_00282D08((char *)p, a, (char *)&p->origin, p->progress);
+            lerp_vector((char *)p, a, (char *)&p->origin, p->progress);
             p->progress -= 0.25f;
             if (p->progress <= 0.0f) p->owner = 0;
             break;
         }
-        if (p->hit == 0 && func_002761F8(p, (char *)&p->next, 4, obj, 0)) {
+        if (p->hit == 0 && CollLine(p, (char *)&p->next, 4, obj, 0)) {
             char *hit = D_L05_001BFB00.hit;
             if (hit && *(short *)(hit + 0xAA) == 0xFBF) {
                 D_L05_001B9580.timer = 30;
@@ -100,16 +100,16 @@ void func_L05_0041CB68(char *object)
     char *position;
     if (!v || !*(char **)(v + 0x120) || *(int *)(state + 0x268)) return;
     position = object + 0x10;
-    func_00282CF0(delta, *(char **)(v + 0x120) + 0x10, position);
+    FastVecSub(delta, *(char **)(v + 0x120) + 0x10, position);
     {
         float speed = 0.5833333730697632f;
         qcopy_nc(pos, position);
-        func_00282F20(velocity, delta, speed);
+        vec_scale_to_length(velocity, delta, speed);
     }
 
-    func_00282F20(end, delta, 5.0f);
-    func_00282CC0(end, end, position);
-    if (func_002761F8(position, end, 0, object, 0)) {
+    vec_scale_to_length(end, delta, 5.0f);
+    FastVecAdd(end, end, position);
+    if (CollLine(position, end, 0, object, 0)) {
         char *hit = D_L05_001BFB00.hit;
         if (hit && *(short *)(hit + 0xAA) == 0xFBF) {
             D_L05_001B9580.strength = 0.05f;
@@ -123,7 +123,7 @@ void func_L05_0041CB68(char *object)
         float scale = 1.0f, size = 210000.0f;
         for (i = 0; i < 3; i++) {
             int kind = func_002A7820(1, 5);
-            char *particle = func_002BDCE8(origin, 0.0f, scale, 1.01f, func_002A7878(0.25f, scale) * size,
+            char *particle = SpawnSpinningSparkParticle(origin, 0.0f, scale, 1.01f, func_002A7878(0.25f, scale) * size,
                                            kind, velocity, 0x5A182, 1);
             __builtin_memcpy(colors, D_L05_001B1308, 8);
             if (particle) {
@@ -133,9 +133,9 @@ void func_L05_0041CB68(char *object)
                     particle[3] = colors[index * 4];
                 }
                 *(short *)(particle + 0xA) = 0x23;
-                particle[9] = func_00283CF0(4.0f) + 0x40;
+                particle[9] = FloatToInt(4.0f) + 0x40;
                 {
-                    float value = func_00283CE0(5);
+                    float value = IntToFloat(5);
                     *(int *)(data + 4) = 3;
                     *(float *)(data + 0x1C) = value;
                 }

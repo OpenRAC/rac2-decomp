@@ -22,7 +22,7 @@ void func_0031C498(char *object)
         *(unsigned char *)(object + 0x20) != 3 &&
         *(unsigned char *)(object + 0x95) != 5 &&
         *(int *)(state + 0x294) == 0) {
-        *(float *)(state + 0x27C) = func_00283B98(*(float *)(state + 0x27C), 0.3141593039035797f);
+        *(float *)(state + 0x27C) = FastAddRotations(*(float *)(state + 0x27C), 0.3141593039035797f);
         if (0.00001f <= func_00282C48(*(float *)(state + 0x27C))) {
             char *target;
             target = *(char **)(state + 0x270);
@@ -59,7 +59,7 @@ void func_0031C498(char *object)
             func_0031D070(axis, 1);
         }
         if (!func_002E59B0(*(void **)(state + 0x278), *(int *)(state + 0x290)))
-            *(int *)(state + 0x290) = func_002E5CF8(0, 4, *(void **)(state + 0x278));
+            *(int *)(state + 0x290) = PlayMobySound(0, 4, *(void **)(state + 0x278));
     } else {
         int handle = *(int *)(state + 0x290);
         if (handle != -1) {
@@ -71,8 +71,8 @@ void func_0031C498(char *object)
         *(int *)(state + 0x290) = -1;
     }
     func_002AB8C0(object, state + 0x50);
-    func_00282978(state + 0x240);
-    func_00282978(state + 0x242);
+    FastDecTimer(state + 0x240);
+    FastDecTimer(state + 0x242);
     if (*(unsigned short *)(object + 0x96) < 0xFFFF)
         *(unsigned short *)(object + 0x96) += 1;
 }

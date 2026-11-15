@@ -28,8 +28,8 @@ void func_L11_00431860(u8 *obj) {
   *(void **)(d+0x18)=d+0x140;
   *(float *)(obj+0x18)=height;
   I(0x2a0)=0;
-  B(0x48)=func_00283CF0(20.0f);
-  B(0x4a)=func_00283CF0(12.8f);
+  B(0x48)=FloatToInt(20.0f);
+  B(0x4a)=FloatToInt(12.8f);
   B(0x70)=26; B(0x71)=11; B(0x72)=11; B(0x76)=13;
   F(0x7c)=0.10000000894f; F(0x80)=0.0666666701f; F(0x84)=0.00416666688f;
   F(0x88)=0.00833333377f; F(0x8c)=0.00416666688f;
@@ -47,7 +47,7 @@ void func_L11_00431860(u8 *obj) {
   *(float *)(obj+0x48)=func_002A7878(0.5f,1.25f);
   if (I(0x2bc)!=-1) func_002A7750(obj,2,-1);
  }
- if(obj[0x31] && func_00282E48(obj+0x10,D_L11_001BA8C0)<24.0f) {func_002A93B0(obj);obj[0x6f]=22;}
+ if(obj[0x31] && fast_vec_dist(obj+0x10,D_L11_001BA8C0)<24.0f) {func_002A93B0(obj);obj[0x6f]=22;}
  if(obj[0x95]!=3) {
   float height=func_002A89A8(obj+0x10,0,0.5f);
   *(float *)(obj+0x18)-=1.146666765f;

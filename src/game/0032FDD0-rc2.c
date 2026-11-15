@@ -50,5 +50,5 @@ void func_0032FDD0(s8 *a0) {
     func_00282C88(vec);
     vec[0] = (*(f32 *)((s8 *)(obj) + (0x50)));
     vec[1] = (*(f32 *)((s8 *)(obj) + (0x54)));
-    D_001B284C = func_00282DF0(vec);
+    D_001B284C = FastVecLength(vec);
 }

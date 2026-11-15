@@ -44,10 +44,10 @@ void func_L06_004621C8(char *obj)
             *(Quad *)a = 0;
             a[1] = a[0] = 3.0f;
             *(float *)(hit + 0x18) = 0.75f;
-            func_00282D30(b, hit + 0x10, func_002A7878(6.0f, 8.0f));
+            FastVecScale(b, hit + 0x10, func_002A7878(6.0f, 8.0f));
             qcopy(c, b);
-            func_00282CF0(b, b, a);
-            func_00282CC0(c, c, a);
+            FastVecSub(b, b, a);
+            FastVecAdd(c, c, a);
             func_L00_0032A258(obj, b, D_L06_001B1C08, D_L06_001B1C00,
                              65535, -1, D_L06_001B1C30, 9, state, 255, 0);
             func_002A7750(obj, 2, -1);
@@ -59,14 +59,14 @@ void func_L06_004621C8(char *obj)
                          65535, 0, D_L06_001B1C30, 7, 62, 255, 0);
         func_L00_00326110(obj, 1, pos[2] * 0.33333334f);
         func_L01_0031A278(obj, a, pos[0], pos[1], pos[2]);
-        func_002ABBB8(obj, D_L06_001A8F20, a, 0, 0, 8, 3, 3, 0, 0, 9, 0.35f,
+        SpawnExplosionEffects(obj, D_L06_001A8F20, a, 0, 0, 8, 3, 3, 0, 0, 9, 0.35f,
                       -1, 0, 0, 0, -1, 0, 0x810001);
         for (i = 0; i < 4; i++) {
             b[0] = (i / 2 * 2 - 1) * 0.0166666675f;
             b[1] = (i % 2 * 2 - 1) * 0.0166666675f;
             b[2] = 0.1166666746f;
-            func_00283098(b, b, obj + 0xC0);
-            func_L00_003263D0(obj, a, 3, 0, 1, b, 5, 0x7FFF8080, 0.45f, 0.6f, 0);
+            matrix_mul_vec3(b, b, obj + 0xC0);
+            SpawnTintedEffects(obj, a, 3, 0, 1, b, 5, 0x7FFF8080, 0.45f, 0.6f, 0);
         }
         func_00350388(obj);
         break;

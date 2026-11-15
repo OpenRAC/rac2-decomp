@@ -19,7 +19,7 @@ unsigned char *func_L04_0040EC80(unsigned char *m, AimTargetQuad *origin, AimTar
     *(AimTargetQuad *)startp=*origin;
     *(AimTargetQuad *)dir=*direction;
     *yaw=func_00283248(dirp[0],dirp[1]);
-    *pitch=-func_00283248(func_00282E20(dirp),dirp[2]);
+    *pitch=-func_00283248(vec_length_xy(dirp),dirp[2]);
     { int index;
     for(index=0;(candidate=D_L04_001FB5A0[index])!=0;index++) {
         int type;
@@ -29,18 +29,18 @@ unsigned char *func_L04_0040EC80(unsigned char *m, AimTargetQuad *origin, AimTar
         if(type==0xb2d && candidate[0x20]==3)continue;
         qcopy(target,candidate+0x10);
         target[2]+=0.5f;
-        func_00282CF0(delta,target,startp);
-        distance=func_00282DF0(delta);
-        func_00282D30(unit,delta,1.0f/distance);
+        FastVecSub(delta,target,startp);
+        distance=FastVecLength(delta);
+        FastVecScale(unit,delta,1.0f/distance);
         if((*(short *)(candidate+0xaa)!=0xb2d || (found && *(short *)(found+0xaa)==*(short *)(candidate+0xaa))) && distance>range)continue;
-        dot=func_00282DB0(unit,m+0xc0);
+        dot=FastVecDot(unit,m+0xc0);
         if(dot>0.707f || (dot>0.0f && distance<3.0f)) {
-            if(func_002761F8(startp,target,2,m,0))continue;
-            if(func_002761F8(target,startp,2,m,0))continue;
+            if(CollLine(startp,target,2,m,0))continue;
+            if(CollLine(target,startp,2,m,0))continue;
             range=distance;
             found=candidate;
             *yaw=func_00283248(target[0]-startp[0],target[1]-startp[1]);
-            *pitch=-func_00283248(func_00282E80(startp,target),target[2]-startp[2]);
+            *pitch=-func_00283248(vec_distance_xy(startp,target),target[2]-startp[2]);
             *height=0.5f;
         }
     }

@@ -62,11 +62,11 @@ void func_L10_003170D0(void) {
             src = D_L10_001A93E0;
             for (j = 0; j < 4; j++) {
                 u8 *out = dst + j * 16;
-                func_00283098(out, src + j * 16, obj + 0xC0);
-                func_00282CC0(out, out, obj + 0x10);
-                func_00282CF0(tmp, D_L10_001B9680, out);
-                func_00282F20(tmp, tmp, 0.15f);
-                func_00282CC0(out, out, tmp);
+                matrix_mul_vec3(out, src + j * 16, obj + 0xC0);
+                FastVecAdd(out, out, obj + 0x10);
+                FastVecSub(tmp, D_L10_001B9680, out);
+                vec_scale_to_length(tmp, tmp, 0.15f);
+                FastVecAdd(out, out, tmp);
             }
         }
         *(u8 **)(D_L10_001BD380.target + 0x68) = D_L10_001BD380.objects[slot];

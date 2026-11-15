@@ -101,16 +101,16 @@ void func_00300F58(PickupMoby *m)
         m->renderDistance=32;
         m->updateDistance=32;
         if(!func_002A77E0(2)) p->flags55|=1;
-        func_00282F20(scratch.ground.vector,&m->orientation[8],0.2f);
-        func_00282CC0(scratch.ground.vector,scratch.ground.vector,&m->position[0]);
-        func_00282F20(scratch.ground.other,&m->orientation[8],-3.0f);
-        func_00282CC0(scratch.ground.other,scratch.ground.other,&m->position[0]);
-        collided=func_002761F8(scratch.ground.vector,scratch.ground.other,0x22,0,0);
+        vec_scale_to_length(scratch.ground.vector,&m->orientation[8],0.2f);
+        FastVecAdd(scratch.ground.vector,scratch.ground.vector,&m->position[0]);
+        vec_scale_to_length(scratch.ground.other,&m->orientation[8],-3.0f);
+        FastVecAdd(scratch.ground.other,scratch.ground.other,&m->position[0]);
+        collided=CollLine(scratch.ground.vector,scratch.ground.other,0x22,0,0);
         if(!p->flags54&&collided) {
             qcopy_nc(p->position,&hit.position[0]);
             func_00282C88(&p->rotation[0]);
             p->rotation[2]=func_00283248(hit.normal[0],hit.normal[1]);
-            p->rotation[1]=func_00283248(hit.normal[2],func_00282E20(&hit.normal[0]));
+            p->rotation[1]=func_00283248(hit.normal[2],vec_length_xy(&hit.normal[0]));
             if(hit.surface&&func_002AD0B0(hit.surface)) {
                 PickupMoby *surface=hit.surface;
                 p->surface=surface;
@@ -125,9 +125,9 @@ void func_00300F58(PickupMoby *m)
         p->random1=func_002A7940();
         p->initialHeight=m->position[2];
         func_002AEC18(m,D_001AE8E0);
-        func_002A04B8(m,&x,&y,&z);
+        get_moby_color(m,&x,&y,&z);
         func_002A0468(m,0,13,0,0);
-        func_002A0488(m,x,y,z);
+        set_moby_color(m,x,y,z);
         switch((s16)(m->classId-13)) {
         case 0:m->scale=F(m->pClass,0x24)*D_001AE8B0;
             break;
@@ -148,12 +148,12 @@ void func_00300F58(PickupMoby *m)
     }
     case 1: {
         float distance, t;
-        distance=func_00282E80(&m->position[0],&hero.motion.position[0]);
+        distance=vec_distance_xy(&m->position[0],&hero.motion.position[0]);
         if(!p->activated&&distance<hero.motion.pickupRadius&&func_00282C48(m->position[2]-hero.motion.position[2])<hero.motion.pickupHeight) p->activated=1;
         p->velocity[2]-=0.003f;
-        func_00282CC0(&m->position[0],&m->position[0],&p->velocity[0]);
-        func_00283958(&p->spin[0],scratch.ground.basis);
-        func_00283738(&m->orientation[0],scratch.ground.basis,&m->orientation[0]);
+        FastVecAdd(&m->position[0],&m->position[0],&p->velocity[0]);
+        quaternion_to_rotation_basis(&p->spin[0],scratch.ground.basis);
+        multiply_matrix3x3(&m->orientation[0],scratch.ground.basis,&m->orientation[0]);
         if(m->position[2]<p->initialHeight-2.0f&&m->position[2]<hero.motion.position[2]-2.0f) {
             t=func_002A7878(-15.0f,15.0f);
             func_003022A0(m,hero.motion.moby,t*0.017453294f,0);
@@ -163,19 +163,19 @@ void func_00300F58(PickupMoby *m)
             qcopy_nc(p->position,&hit.position[0]);
             func_00282C88(&p->rotation[0]);
             p->rotation[2]=func_00283248(hit.normal[0],hit.normal[1]);
-            p->rotation[1]=func_00283248(hit.normal[2],func_00282E20(&hit.normal[0]));
-            func_00282CF0(scratch.ground.vector,&m->position[0],&hit.position[0]);
+            p->rotation[1]=func_00283248(hit.normal[2],vec_length_xy(&hit.normal[0]));
+            FastVecSub(scratch.ground.vector,&m->position[0],&hit.position[0]);
             func_00283028(&p->velocity[0],&p->velocity[0],scratch.ground.vector);
             if(hero.motion.magnetEnabled && (p->activated ||
-            (func_00282E80(&m->position[0],&hero.motion.position[0]) < hero.motion.pickupRadius &&
+            (vec_distance_xy(&m->position[0],&hero.motion.position[0]) < hero.motion.pickupRadius &&
             func_00282C48(m->position[2]-hero.motion.position[2]) < hero.motion.pickupHeight) ||
-            func_00278E78() != -1)) {
-                func_00282F20(&p->velocity[0],&p->velocity[0],0.13333334f);
+            GetCollHitMaterial() != -1)) {
+                vec_scale_to_length(&p->velocity[0],&p->velocity[0],0.13333334f);
                 func_003022A0(m,hero.motion.moby,0,0);
             }
-            else if(func_00283248(scratch.ground.vector[2],func_00282E20(scratch.ground.vector))<0.78539824f&&func_00283248(hit.normal[2],func_00282E20(&hit.normal[0]))<0.78539824f) {
+            else if(func_00283248(scratch.ground.vector[2],vec_length_xy(scratch.ground.vector))<0.78539824f&&func_00283248(hit.normal[2],vec_length_xy(&hit.normal[0]))<0.78539824f) {
                 m->state=2;
-                p->hopLength=p->hopRemaining=func_00283CF0(func_002A7878(30,40));
+                p->hopLength=p->hopRemaining=FloatToInt(func_002A7878(30,40));
                 if(hit.surface&&func_002AD0B0(hit.surface)) {
                     PickupMoby *surface=hit.surface;
                     p->surface=surface;
@@ -189,23 +189,23 @@ void func_00300F58(PickupMoby *m)
     }
     case 2: {
         float distance, r, s;
-        distance=func_00282E80(&m->position[0],&hero.motion.position[0]);
+        distance=vec_distance_xy(&m->position[0],&hero.motion.position[0]);
         if(!p->activated&&distance<hero.motion.pickupRadius&&func_00282C48(m->position[2]-hero.motion.position[2])<hero.motion.pickupHeight)p->activated=1;
         func_00301F18(m,scratch.ground.other,0);
         scratch.ground.other[2]+=0.25f;
         func_002AB6D8(&m->orientation[0],scratch.ground.vector);
         func_002A91F0(scratch.ground.basis,scratch.ground.vector);
         r=1.0f/
-        func_00283CE0(p->hopRemaining);
-        s=func_00283CE0(p->hopRemaining) / func_00283CE0(p->hopLength);
+        IntToFloat(p->hopRemaining);
+        s=IntToFloat(p->hopRemaining) / IntToFloat(p->hopLength);
         func_00283810(&p->spin[0],&p->spin[0],scratch.ground.basis,r);
-        func_00282D08(&m->position[0],&m->position[0],scratch.ground.other,s);
+        lerp_vector(&m->position[0],&m->position[0],scratch.ground.other,s);
         s-=0.5f;
         m->position[2]+=(0.25f-s*s)*0.025f*p->hopLength;
-        func_00283958(&p->spin[0],&m->orientation[0]);
+        quaternion_to_rotation_basis(&p->spin[0],&m->orientation[0]);
         if(--p->hopRemaining==0){
             m->state=3;
-            p->hopLength=p->hopRemaining=func_00283CF0(func_002A7878(10,20));
+            p->hopLength=p->hopRemaining=FloatToInt(func_002A7878(10,20));
         }
         goto sparkle;
     }
@@ -213,7 +213,7 @@ void func_00300F58(PickupMoby *m)
         int v;
         BoltHeroMotion *motion = &hero.motion;
         float distance, s;
-        distance=func_00282E80(&m->position[0],motion->position);
+        distance=vec_distance_xy(&m->position[0],motion->position);
         if(p->activated || (distance<hero.motion.pickupRadius&&func_00282C48(m->position[2]-hero.motion.position[2])<hero.motion.pickupHeight)) {
             func_003022A0(m,motion->moby,0,0);
         }
@@ -242,7 +242,7 @@ void func_00300F58(PickupMoby *m)
             if(m->visible||p->surface) {
                 func_00301F18(m,0,0);
                 if(p->hopRemaining){
-                    s=func_00283CE0(p->hopRemaining) / func_00283CE0(p->hopLength);
+                    s=IntToFloat(p->hopRemaining) / IntToFloat(p->hopLength);
                     s-=0.5f;
                     m->position[2]+=(0.25f-s*s)*0.0125f*p->hopLength;
                     --p->hopRemaining;
@@ -260,53 +260,53 @@ void func_00300F58(PickupMoby *m)
         float t, s;
         v=0;
         if((s16)p->target->classId==0){
-            func_00282CF0(scratch.ground.vector,&m->position[0],&hero.motion.cameraPosition[0]);
-            func_002830C0(scratch.ground.vector,scratch.ground.vector,&hero.rotation[0]);
+            FastVecSub(scratch.ground.vector,&m->position[0],&hero.motion.cameraPosition[0]);
+            transform_vector(scratch.ground.vector,scratch.ground.vector,&hero.rotation[0]);
             if(scratch.ground.vector[2]<0)v=1;
         }
         if(v){
-            func_00282F20(scratch.ground.vector,&hero.matrix[8],0.13333334f);
-            func_00282CF0(scratch.ground.other,scratch.ground.vector,&p->velocity[0]);
+            vec_scale_to_length(scratch.ground.vector,&hero.matrix[8],0.13333334f);
+            FastVecSub(scratch.ground.other,scratch.ground.vector,&p->velocity[0]);
             func_002AC9F8(scratch.ground.other,0.013888889f);
-            func_00282CC0(&p->velocity[0],&p->velocity[0],scratch.ground.other);
+            FastVecAdd(&p->velocity[0],&p->velocity[0],scratch.ground.other);
         }
         else {
             t=0.006666667f;
-            if(func_00282DF0(&p->velocity[0])>t){
-                func_00282F20(scratch.ground.vector,&p->velocity[0],t);
-                func_00282CF0(&p->velocity[0],&p->velocity[0],scratch.ground.vector);
+            if(FastVecLength(&p->velocity[0])>t){
+                vec_scale_to_length(scratch.ground.vector,&p->velocity[0],t);
+                FastVecSub(&p->velocity[0],&p->velocity[0],scratch.ground.vector);
             }
-            func_002AA2E8(&p->acceleration,0.53333336f,t);
+            ApproachValue(&p->acceleration,0.53333336f,t);
         }
-        speed=func_00282DF0(&hero.motion.velocity[0]);
+        speed=FastVecLength(&hero.motion.velocity[0]);
         if(speed>0.06666667f){
-            func_00282F20(scratch.ground.vector,&hero.motion.velocity[0],speed-0.06666667f);
-            func_00282CC0(&m->position[0],&m->position[0],scratch.ground.vector);
+            vec_scale_to_length(scratch.ground.vector,&hero.motion.velocity[0],speed-0.06666667f);
+            FastVecAdd(&m->position[0],&m->position[0],scratch.ground.vector);
         }
-        func_00283958(&p->spin[0],scratch.attract.basis);
-        func_00283738(&m->orientation[0],scratch.attract.basis,&m->orientation[0]);
-        func_00282CC0(&m->position[0],&m->position[0],&p->velocity[0]);
-        if((s16)p->target->classId==0)func_00282CF0(scratch.attract.offset,&hero.motion.boltTarget[0],&m->position[0]);
-        else func_00282CF0(scratch.attract.offset,p->target->position,&m->position[0]);
-        if(func_00282DF0(scratch.attract.offset)>p->acceleration) {
+        quaternion_to_rotation_basis(&p->spin[0],scratch.attract.basis);
+        multiply_matrix3x3(&m->orientation[0],scratch.attract.basis,&m->orientation[0]);
+        FastVecAdd(&m->position[0],&m->position[0],&p->velocity[0]);
+        if((s16)p->target->classId==0)FastVecSub(scratch.attract.offset,&hero.motion.boltTarget[0],&m->position[0]);
+        else FastVecSub(scratch.attract.offset,p->target->position,&m->position[0]);
+        if(FastVecLength(scratch.attract.offset)>p->acceleration) {
             if(p->angleZ!=0||p->angleX!=0){
-                func_00283098(scratch.attract.offset,scratch.attract.offset,&hero.rotation[0]);
+                matrix_mul_vec3(scratch.attract.offset,scratch.attract.offset,&hero.rotation[0]);
                 s=func_00283248(scratch.attract.offset[0],scratch.attract.offset[1]);
                 func_00282C88(scratch.attract.angles);
                 scratch.attract.angles[1]=p->angleX;
                 if(s<1.5707964f&&s>-1.5707964f)scratch.attract.angles[1]=-scratch.attract.angles[1];
                 scratch.attract.angles[2]=p->angleZ;
-                func_002833F0(matrix,scratch.attract.angles);
-                func_00283098(scratch.attract.offset,scratch.attract.offset,matrix);
-                func_00283098(scratch.attract.offset,scratch.attract.offset,hero.matrix);
+                euler_rotation_basis(matrix,scratch.attract.angles);
+                matrix_mul_vec3(scratch.attract.offset,scratch.attract.offset,matrix);
+                matrix_mul_vec3(scratch.attract.offset,scratch.attract.offset,hero.matrix);
             }
-            func_00282F20(scratch.attract.offset,scratch.attract.offset,p->acceleration);
-            func_00282CC0(&m->position[0],&m->position[0],scratch.attract.offset);
+            vec_scale_to_length(scratch.attract.offset,scratch.attract.offset,p->acceleration);
+            FastVecAdd(&m->position[0],&m->position[0],scratch.attract.offset);
             goto sparkle_attract;
         }
         {
-            func_00301D10(m);
-            func_002E5CF8(0,32,m);
+            CollectBolts(m);
+            PlayMobySound(0,32,m);
             if(m<D_001B1B60.start){
                 D_00210D40.collected[m->mission]=m->uid+2;
                 {

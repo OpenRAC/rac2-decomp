@@ -41,7 +41,7 @@ void func_L12_0041BF88(u8 *self)
     angle.f[1] = 1.5707964897155762f;
     height = *(float *)(p + 0x44);
     width = *(float *)(p + 0x40);
-    func_00283410(rotation, &angle);
+    euler_to_matrix(rotation, &angle);
     ({
         BF88Vector corner;
         corner.q = 0;
@@ -51,7 +51,7 @@ void func_L12_0041BF88(u8 *self)
         corner.f[3] = 1.0f;
         offset.q = corner.q;
     });
-    func_00283410(matrix, D_L12_001B2F8C + *(int *)p * 128 + 0x70);
+    euler_to_matrix(matrix, D_L12_001B2F8C + *(int *)p * 128 + 0x70);
     qcopy(&matrix[3], D_L12_001B2F8C + *(int *)p * 128 + 0x30);
     matrix[3].f[2] -= height * 0.5f + 0.5f;
     matrix[3].f[3] = 1.0f;
@@ -67,7 +67,7 @@ void func_L12_0041BF88(u8 *self)
             packet.point[n].f[2] += 0.25f;
         }
     }
-    packet.texture = func_0027C878(D_L12_001B1D14);
+    packet.texture = GetEffectTextureDescriptor(D_L12_001B1D14);
     packet.setup = 0xFF9000000260ULL;
     packet.state = ((u64)D_L12_001B1D18 << 2) | ((u64)D_L12_001B1D1C << 6) | 0x8000000000ULL;
     packet.reserved = 0;
@@ -84,8 +84,8 @@ void func_L12_0041BF88(u8 *self)
             BF88Packet rotated;
             rotated = packet;
             for (i = 0; i < 4; i++)
-                func_002830C0(&rotated.point[i], &packet.point[i], matrix);
-            func_00280B90(&rotated, 0, 1);
+                transform_vector(&rotated.point[i], &packet.point[i], matrix);
+            draw_world_quad(&rotated, 0, 1);
         });
     }
     for (k = 0; k < 4; k++) {
@@ -112,23 +112,23 @@ void func_L12_0041BF88(u8 *self)
             BF88Packet rotated, side;
             rotated = packet;
             { int i; for (i = 3; i >= 0; i--) rotated.point[i].f[0] = D_L12_001B1D80; }
-            func_00280B90(&rotated, matrix, 1);
+            draw_world_quad(&rotated, matrix, 1);
             { int i; for (i = 3; i >= 0; i--) rotated.point[i].f[0] = -D_L12_001B1D80; }
-            func_00280B90(&rotated, matrix, 1);
+            draw_world_quad(&rotated, matrix, 1);
             side = packet;
             qcopy(&side.point[0], &packet.point[0]);
             qcopy(&side.point[1], &rotated.point[0]);
             qcopy(&side.point[2], &packet.point[2]);
             qcopy(&side.point[3], &rotated.point[2]);
-            func_00280B90(&side, matrix, 1);
+            draw_world_quad(&side, matrix, 1);
             qcopy(&side.point[0], &packet.point[1]);
             qcopy(&side.point[1], &rotated.point[1]);
             qcopy(&side.point[2], &packet.point[3]);
             qcopy(&side.point[3], &rotated.point[3]);
-            func_00280B90(&side, matrix, 1);
+            draw_world_quad(&side, matrix, 1);
         });
         { int i; for (i = 0; i < 4; i++)
-            packet.color[i] = func_00283D38(D_L12_001B1D50, D_L12_001B1D54, phase); }
+            packet.color[i] = FastTweenColor(D_L12_001B1D50, D_L12_001B1D54, phase); }
         phase = nextPhase;
         if (nextPhase > 0.0f) phase = nextPhase - 1.0f;
     }
@@ -145,25 +145,25 @@ void func_L12_0041BF88(u8 *self)
             BF88Packet rotated, side;
             rotated = packet;
             { int i; for (i = 3; i >= 0; i--) rotated.point[i].f[0] = D_L12_001B1D80; }
-            func_00280B90(&rotated, matrix, 1);
+            draw_world_quad(&rotated, matrix, 1);
             rotated = packet;
-            func_00280B90(&rotated, matrix, 1);
+            draw_world_quad(&rotated, matrix, 1);
             { int i; for (i = 3; i >= 0; i--) rotated.point[i].f[0] = -D_L12_001B1D80; }
-            func_00280B90(&rotated, matrix, 1);
+            draw_world_quad(&rotated, matrix, 1);
             side = packet;
             qcopy(&side.point[0], &packet.point[0]);
             qcopy(&side.point[1], &rotated.point[0]);
             qcopy(&side.point[2], &packet.point[2]);
             qcopy(&side.point[3], &rotated.point[2]);
-            func_00280B90(&side, matrix, 1);
+            draw_world_quad(&side, matrix, 1);
             qcopy(&side.point[0], &packet.point[1]);
             qcopy(&side.point[1], &rotated.point[1]);
             qcopy(&side.point[2], &packet.point[3]);
             qcopy(&side.point[3], &rotated.point[3]);
-            func_00280B90(&side, matrix, 1);
+            draw_world_quad(&side, matrix, 1);
         });
         { int i; for (i = 0; i < 4; i++)
-            packet.color[i] = func_00283D38(D_L12_001B1D50, D_L12_001B1D54, phase); }
+            packet.color[i] = FastTweenColor(D_L12_001B1D50, D_L12_001B1D54, phase); }
         phase = nextPhase;
         if (nextPhase > 0.0f) phase = nextPhase - 1.0f;
     }

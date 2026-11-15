@@ -66,7 +66,7 @@ void func_L07_003E4BD0(unsigned char *o)
         func_002A7750(o,1,-1);
         break;
     case 1:
-        if (func_002ACBC8(D_00189EA0,*(int *)(p+4)) || func_002B38B8(o)) func_002A7750(o,2,-1);
+        if (IsPointInCuboid(D_00189EA0,*(int *)(p+4)) || func_002B38B8(o)) func_002A7750(o,2,-1);
         break;
     case 2:
         if (func_002B3868(o) && o[0x43]!=1) func_002A7470(o,1,0,20);
@@ -75,48 +75,48 @@ void func_L07_003E4BD0(unsigned char *o)
             if (target) {
                 *(u128 *)a=0;
                 a[2]=0.7f;
-                func_00283098(a,a,o+0xC0);
-                func_00282CC0(a,a,o+0x10);
+                matrix_mul_vec3(a,a,o+0xC0);
+                FastVecAdd(a,a,o+0x10);
                 if (!func_00277258(a,0.5f,0,o)) {
                     *(u128 *)b=0;
                     b[2]=0.5f;
-                    func_00282CC0(b,b,o+0x10);
+                    FastVecAdd(b,b,o+0x10);
                     func_L07_003E5C78(target,o+0x10,b,*(int *)(p+0x10));
-                    func_002E5CF8(0,0,o);
+                    PlayMobySound(0,0,o);
                     *(int *)(p+0x14)=60;
                 }
             } else if (!count) func_002A7750(o,3,-1);
         }
-        func_002AA2E8(p+0x18,1.0f,0.05000000447f);
+        ApproachValue(p+0x18,1.0f,0.05000000447f);
         {
             float delta = D_L07_001B0A50;
             delta = turn * delta;
-            *(float *)(p + 0x1C) = func_00283B98(*(float *)(p + 0x1C), delta);
+            *(float *)(p + 0x1C) = FastAddRotations(*(float *)(p + 0x1C), delta);
         }
         func_L00_002E6CF0(func_L07_003E5070,o);
         if (o[0x31] && !func_002A77E0(5)) {
             qzero_nc(b); qzero_nc(a);
             if (*(void **)(p+0x10)) {
                 func_002AD0E0(o,*(void **)(p+0x10),o+0x10,a,b,a);
-                func_00282CF0(b,b,o+0x10);
+                FastVecSub(b,b,o+0x10);
             }
             angle=func_002A7940();
             c[0]=func_00283180(angle)*0.4f;
             c[1]=func_00283198(angle)*0.4f;
             c[2]=0;
-            func_00282CC0(c,c,o+0x10);
+            FastVecAdd(c,c,o+0x10);
             size=func_002A7878(D_L07_001B0A40[0],D_L07_001B0A40[1]);
-            color=func_00283D38(D_L07_001B0A48_gp[0],D_L07_001B0A48[1],func_002A7878(0,1));
+            color=FastTweenColor(D_L07_001B0A48_gp[0],D_L07_001B0A48[1],func_002A7878(0,1));
             speed=func_002A7878(1,2);
             life=func_002A7820(30,60);
             qcopy(d,b);
-            d[2]=speed/func_00283CE0(life);
+            d[2]=speed/IntToFloat(life);
             func_002C3150(c,d,color,size,(unsigned char)life,(unsigned char)func_002A77E0(255),0);
         }
         break;
     case 3:
         if (func_002B3868(o) && o[0x43]) func_002A7470(o,0,0,20);
-        func_002AA2E8(p+0x18,0,0.05000000447f);
+        ApproachValue(p+0x18,0,0.05000000447f);
         func_L00_002E6CF0(func_L07_003E5070,o);
         if (o[0x42]==o[0x43] && *(float *)(p+0x18)<=0) *(unsigned short *)(o+0x34)|=2;
         break;

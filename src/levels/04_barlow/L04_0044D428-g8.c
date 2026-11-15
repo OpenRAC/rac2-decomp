@@ -41,9 +41,9 @@ void func_L04_0044D428(D428Object *object) {
     if (object->state == 4) {
         heading = func_00283248(data->target[0] - object->position[0],
                                data->target[1] - object->position[1]);
-        heading = func_00283B98(heading, data->heading);
-        func_002A7CA0(object, &data->turn, heading, 0.05f, 0.3f, 0.10471977293491364f);
-        data->steps = func_00283CF0(D_L04_001B1870 * 1024.0f);
+        heading = FastAddRotations(heading, data->heading);
+        MobySpringTurn(object, &data->turn, heading, 0.05f, 0.3f, 0.10471977293491364f);
+        data->steps = FloatToInt(D_L04_001B1870 * 1024.0f);
         data->time = D_L04_001B1870;
         func_L04_0033D0C0(object, &data->steps);
         if (data->channel != -1)
@@ -51,8 +51,8 @@ void func_L04_0044D428(D428Object *object) {
     } else if (object->state == 5) {
         heading = func_00283248(data->target[0] - object->position[0],
                                data->target[1] - object->position[1]);
-        heading = func_00283B98(heading, data->heading);
-        func_002A7CA0(object, &data->turn, heading, 0.05f, 0.3f, 0.10471977293491364f);
+        heading = FastAddRotations(heading, data->heading);
+        MobySpringTurn(object, &data->turn, heading, 0.05f, 0.3f, 0.10471977293491364f);
     }
     if (data->ground) {
         angles.q = 0;

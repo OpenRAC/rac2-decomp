@@ -33,7 +33,7 @@ void func_L14_003DFA60(char *self) {
     float angle, u, den;
     float *v, *uv, *src, *src2;
     n = func_L03_004197A8(D_L14_001B259C[0] + (*(int *)(*(char **)(self + 0x68) + 4) << 8));
-    func_00283658(mtx, self + 0xC0);
+    copy_matrix_rotation(mtx, self + 0xC0);
     func_L03_002EFB60(mtx, mtx, *(float *)(self + 0x2C) / *(float *)(*(char **)(self + 0x24) + 0x24));
     qcopy(mtx + 12, self + 0x10);
     mtx[15] = 1.0f;
@@ -41,7 +41,7 @@ void func_L14_003DFA60(char *self) {
     src = D_L14_001B03BC;
     src2 = D_L14_001B03B8;
     for (i = 0; i < 4; i++, src2 += 2) {
-        angle = func_00283B98(D_L14_001B03A0 * 0.01745329424738884f, (float)i * 1.5707964f);
+        angle = FastAddRotations(D_L14_001B03A0 * 0.01745329424738884f, (float)i * 1.5707964f);
         p.pos[i].f[0] = func_00283180(angle) * D_L14_001B03A4;
         p.pos[i].f[1] = func_00283198(angle) * D_L14_001B03A4;
         p.pos[i].f[2] = 0;
@@ -54,7 +54,7 @@ void func_L14_003DFA60(char *self) {
         v = p.pos[i].f;
         if (D_001A7A44[0])
             v[1] = -v[1];
-        func_00282F20(v, v, D_L14_001B03A4);
+        vec_scale_to_length(v, v, D_L14_001B03A4);
         v[0] = D_L14_001B03A8;
         v[3] = 1.0f;
         v[2] += D_L14_001B03B0;
@@ -70,5 +70,5 @@ void func_L14_003DFA60(char *self) {
         p.uv[i][1] = *src;
         src += 2;
     }
-    func_00280B90(&p, mtx, 0);
+    draw_world_quad(&p, mtx, 0);
 }

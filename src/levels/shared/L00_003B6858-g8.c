@@ -32,7 +32,7 @@ int func_L00_003B6858(char *object)
     source=D_L00_001AFA70;
     out=state->positions;
     do {
-        *slot=func_0029EFD0(i?0xe7d:0xeb0);
+        *slot=CreateMoby(i?0xe7d:0xeb0);
         func_002B37E8(*slot,0);
         *(unsigned short *)(*slot+0x34)|=0x4100;
         (*slot)[0xbc]=i;

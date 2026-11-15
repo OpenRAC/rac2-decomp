@@ -37,31 +37,31 @@ void func_0032F598(char *obj)
     float a,b,old1,old2;
     func_0029FCC0(obj,0,&pts[3]);
     params=D_001B0988;
-    target=func_002AF580(&pts[3],obj+0xC0,6.2831855f,6.2831855f,&output,0,0,0,10.0f,0.0f,0.0f,0,&params);
+    target=SelectBestTargetInCone(&pts[3],obj+0xC0,6.2831855f,6.2831855f,&output,0,0,0,10.0f,0.0f,0.0f,0,&params);
     if (!(D_00138180.buttons.flags[0]&0x40)) {
         if (target) {
             qcopy(&pts[2],target+0x10);
             other=func_002AB1F0(target);
             if (other) {
-                func_00282D30(&angles,target+0xE0,F598(other,0x10));
-                func_00282CC0(&pts[2],&angles,target+0x10);
+                FastVecScale(&angles,target+0xE0,F598(other,0x10));
+                FastVecAdd(&pts[2],&angles,target+0x10);
             }
-            func_00282CF0(rec+0x20,&pts[2],&pts[3]);
-            func_00282F20(rec+0x20,rec+0x20,1.0f);
+            FastVecSub(rec+0x20,&pts[2],&pts[3]);
+            vec_scale_to_length(rec+0x20,rec+0x20,1.0f);
             func_002836E8(matrix,obj+0xC0);
-            func_00283098(rec+0x20,rec+0x20,matrix);
+            matrix_mul_vec3(rec+0x20,rec+0x20,matrix);
         } else if (D_00138180.buttons.flags[0]&0x80) {
             func_00282C88(rec+0x20); F598(rec,0x20)=1.0f;
         } else if (func_001163B0()%111==0 && !(D_00138180.buttons.flags[0]&0x80)) {
             float randomAngle, elevation;
             matrix[0].q=0; matrix[0].f[2]=1.0f;
             qcopy(&work[0],rec+0x10);
-            func_00282DD8(&work[1],&work[0],matrix);
-            func_00282F20(&work[1],&work[1],1.0f);
-            func_00282DD8(&work[2],&work[1],&work[0]);
+            FastVecCross(&work[1],&work[0],matrix);
+            vec_scale_to_length(&work[1],&work[1],1.0f);
+            FastVecCross(&work[2],&work[1],&work[0]);
             work[3].f[0]=0.0f;work[3].f[1]=0.0f;work[3].f[2]=0.0f;work[3].f[3]=1.0f;
             func_002AB6D8(&work[0],&angles);
-            randomAngle=func_00283B98(angles.f[2],func_002A78D8(0.78539824f,1.5707965f));
+            randomAngle=FastAddRotations(angles.f[2],func_002A78D8(0.78539824f,1.5707965f));
             elevation = func_002A7878(0.0f,0.4f);
             func_002AF000(rec+0x20,1.0f,randomAngle,elevation);
         }
@@ -71,9 +71,9 @@ void func_0032F598(char *obj)
     else func_002ACF68(rec+0x10,rec+0x10,rec+0x20,0,0.125f);
     angles.q=0;angles.f[2]=1.0f;
     qcopy(matrix,rec+0x10);
-    func_00282DD8(&matrix[1],matrix,&angles);
-    func_00282F20(&matrix[1],&matrix[1],1.0f);
-    func_00282DD8(&matrix[2],&matrix[1],matrix);
+    FastVecCross(&matrix[1],matrix,&angles);
+    vec_scale_to_length(&matrix[1],&matrix[1],1.0f);
+    FastVecCross(&matrix[2],&matrix[1],matrix);
     effect=func_002FEC50(I598(rec,0x6C));
     func_002AB600(effect+0x10,matrix);
     B598(effect,3)=1;
@@ -90,27 +90,27 @@ void func_0032F598(char *obj)
         other=func_002FEC50(I598(rec,0x74));
         old1=D_001B0994; old2=D_001B0998;
         F598(effect,0x20)=a; F598(other,0x20)=b;
-        D_001B0994=func_00283B98(old1,0.36651918292045593f);
-        D_001B0998=func_00283B98(D_001B0998,0.36651918292045593f);
+        D_001B0994=FastAddRotations(old1,0.36651918292045593f);
+        D_001B0998=FastAddRotations(D_001B0998,0.36651918292045593f);
         if (old1<0.0f && D_001B0994>=0.0f) {
             func_0029FCC0(obj,2,&work[0]);
             func_0029FC20(obj,2,&work[4]);
             if (target) {
-                func_00282CF0(&work[1],&pts[2],&work[0]);
-                func_00282F20(&work[1],&work[1],0.25f);
-            } else func_00282F20(&work[1],&work[4],0.25f);
-            func_002E5CF8(6,0,obj);
-            func_00331238(&work[0],&work[1]);
+                FastVecSub(&work[1],&pts[2],&work[0]);
+                vec_scale_to_length(&work[1],&work[1],0.25f);
+            } else vec_scale_to_length(&work[1],&work[4],0.25f);
+            PlayMobySound(6,0,obj);
+            SpawnRandomParticlePairs(&work[0],&work[1]);
             func_00332440(obj,&work[0],&work[1]);
         } else if (old2<0.0f && D_001B0998>=0.0f) {
             func_0029FCC0(obj,1,&work[0]);
             func_0029FC20(obj,1,&work[1]);
             if (target) {
-                func_00282CF0(&work[5],&pts[2],&work[0]);
-                func_00282F20(&work[5],&work[5],0.25f);
-            } else func_00282F20(&work[5],&work[1],0.25f);
-            func_002E5CF8(6,0,obj);
-            func_00331238(&work[0],&work[5]);
+                FastVecSub(&work[5],&pts[2],&work[0]);
+                vec_scale_to_length(&work[5],&work[5],0.25f);
+            } else vec_scale_to_length(&work[5],&work[1],0.25f);
+            PlayMobySound(6,0,obj);
+            SpawnRandomParticlePairs(&work[0],&work[5]);
             func_00332440(obj,&work[0],&work[5]);
         }
     } else if (D_00138180.buttons.flags[0]&0x40) {
@@ -118,19 +118,19 @@ void func_0032F598(char *obj)
         char *slot;
         func_0029FCC0(obj,2,&work[0]);
         func_0029FCC0(obj,1,&work[1]);
-        func_00282CC0(&work[2],&work[0],&work[1]);
-        func_00282D30(&work[2],&work[2],0.5f);
-        func_002FDF40(rec,&work[2],0,1.75f,F598(rec,0x7C),0.10000001f,0.00083333335f,obj);
+        FastVecAdd(&work[2],&work[0],&work[1]);
+        FastVecScale(&work[2],&work[2],0.5f);
+        CalculateAimedLaunchVelocity(rec,&work[2],0,1.75f,F598(rec,0x7C),0.10000001f,0.00083333335f,obj);
         I598(rec,0x78)=func_002FE5A0(&work[2],rec,rec+0x30,rec+0x40,obj,0,0,0.00083333335f);
         charge=F598(rec,0x7C)+0.065f;
         charge = charge < 6.0f ? charge : 6.0f;
         F598(rec,0x7C)=charge;
         func_00331580(&work[2],D_001A8BD0,charge);
         slot=D_00188660+D_001B095C*0x70;
-        if (I598(slot,0x88)!=(int)obj || !B598(slot,0x74)) D_001B095C=func_002E5CF8(4,4,obj);
-        func_00282F20(rec+0x20,rec,1.0f);
+        if (I598(slot,0x88)!=(int)obj || !B598(slot,0x74)) D_001B095C=PlayMobySound(4,4,obj);
+        vec_scale_to_length(rec+0x20,rec,1.0f);
         func_002836E8(&work[3],obj+0xC0);
-        func_00283098(rec+0x20,rec+0x20,&work[3]);
+        matrix_mul_vec3(rec+0x20,rec+0x20,&work[3]);
     }
 
     if (D_00138180.pressed&0x40) {
@@ -139,11 +139,11 @@ void func_0032F598(char *obj)
             if (I598(slot,0x88)==(int)obj && B598(slot,0x74)) func_002E59F8(D_001B095C);
         }
         D_001B095C=-1;
-        func_002E5CF8(8,0,obj);
+        PlayMobySound(8,0,obj);
         func_0029FCC0(obj,2,&work[0]);
         func_0029FCC0(obj,1,&work[1]);
-        func_00282CC0(&work[2],&work[0],&work[1]);
-        func_00282D30(&work[2],&work[2],0.5f);
+        FastVecAdd(&work[2],&work[0],&work[1]);
+        FastVecScale(&work[2],&work[2],0.5f);
         I598(rec,0x78)=0;F598(rec,0x7C)=1.75f;
         func_003313E0(&work[2],rec);
         func_00332590(obj,&work[0],&work[1],rec);

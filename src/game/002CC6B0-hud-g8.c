@@ -50,7 +50,7 @@ int func_002CC6B0(unsigned char *w) {
     unsigned char *glyphs = D_00263B50;
     int font;
     int f0, flags, g, f, content, variant = 0, a21, a23, colour, t, wflags;
-    /* func_0027C878's TEX0 is 64 bits, and FontPrintWindow reads all of them: on the console the
+    /* GetEffectTextureDescriptor's TEX0 is 64 bits, and FontPrintWindow reads all of them: on the console the
        register keeps them whatever the C says, on a PC an int keeps only the low half. */
     long tex;
     int y, x, m; /* FAKEMATCH: y/x/m only serve the second scroll block below */
@@ -66,8 +66,8 @@ int func_002CC6B0(unsigned char *w) {
         font = 2;
         glyphs = D_00263EF0;
     }
-    func_002FC560(0x42, 0x44);
-    ((void (*)(int, long))func_002FC560)(0x47, 0x2004B);
+    VU1_addGSregister(0x42, 0x44);
+    ((void (*)(int, long))VU1_addGSregister)(0x47, 0x2004B);
 
     flags = *(int *)(w + 0x30);
     if (flags & 0x20) {
@@ -205,10 +205,10 @@ int func_002CC6B0(unsigned char *w) {
         a21 = *(int *)(w + 0x24) / 2;
     }
 
-    func_0027C540(0);
-    tex = func_0027C878(font);
+    SetupGifPaging(0);
+    tex = GetEffectTextureDescriptor(font);
     if (D_001F2854 == D_0025A498 || D_001AB9A8 != 0) { originY = a21; originX = a23 + 1; } else { originX = 1; originY = D_001AB974; }
-    func_00115484(&tmp, 0, 0x18);
+    memset(&tmp, 0, 0x18);
     tmp.s[0] = originY;
     tmp.s[1] = *(unsigned short *)(w + 0x24) + originY;
     tmp.s[2] = originX;
@@ -280,6 +280,6 @@ int func_002CC6B0(unsigned char *w) {
             ((LabelSO *)w)->so %= (win.s[7] + *(int *)&D_001AB984 * 3) << 4;
         }
     }
-    func_0027C660();
+    DoGifPaging();
     return 2;
 }

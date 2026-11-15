@@ -89,12 +89,12 @@ void func_L11_00439950(struct RotorObject *obj)
     func_L11_00437DC0(obj, 1, 0, 0);
     func_L11_00437E68(obj, 1, 0, 0);
     state->f374 = -1;
-    func_002A04B8(obj, &red, &green, &blue);
+    get_moby_color(obj, &red, &green, &blue);
 
     for (i = 0; i < 10; i++) {
         state->armed[i] = 0;
         func_L11_0043A9D8(LISTED_RECORD(obj, i));
-        func_002A0488(LISTED_RECORD(obj, i), red, green, blue);
+        set_moby_color(LISTED_RECORD(obj, i), red, green, blue);
     }
 
     for (i = 0; i < 12; i++)
@@ -110,7 +110,7 @@ void func_L11_00439950(struct RotorObject *obj)
 
     if (state->colorPending) {
         state->colorPending = 0;
-        func_002A0488(obj, state->color[0], state->color[1], state->color[2]);
+        set_moby_color(obj, state->color[0], state->color[1], state->color[2]);
         state->colorApplied = 1;
     }
 }

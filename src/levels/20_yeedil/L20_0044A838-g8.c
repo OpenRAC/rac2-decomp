@@ -21,7 +21,7 @@ void func_L20_0044A838(char *arg0) {
     if (*(u8 *)(arg0 + 0x31)) {
         qcopy((arg0 + 0x10), (state + 0x180));
         r = D_L20_001B2414;
-        r = func_00283B98(*(float *)(state + 0x1A0), r * 0.000290888245f);
+        r = FastAddRotations(*(float *)(state + 0x1A0), r * 0.000290888245f);
         *(float *)(state + 0x1A0) = r;
         r = func_00283198(r);
         {

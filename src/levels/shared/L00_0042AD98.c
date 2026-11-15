@@ -17,9 +17,9 @@ void func_L00_0042AD98(char *a)
     int *state = *(int **)(a + 8);
     int kind = 8;
     char *sound;
-    func_00282CF0((char *)v, D_L00_001B8C80_1 + 0x140, a + 0x40);
+    FastVecSub((char *)v, D_L00_001B8C80_1 + 0x140, a + 0x40);
     v[3] = 0;
-    func_00283098((char *)local, (char *)v, a + 0x50);
+    matrix_mul_vec3((char *)local, (char *)v, a + 0x50);
     if (func_00282C48(local[0]) <= 1.0f && func_00282C48(local[1]) <= 1.0f && func_00282C48(local[2]) <= 1.0f) {
         qcopy(v, D_L00_001B8C80_1 + 0x140);
     } else {
@@ -29,7 +29,7 @@ void func_L00_0042AD98(char *a)
         else if (local[1] < -1.0f) local[1] = -1.0f;
         if (local[2] > 1.0f) local[2] = 1.0f;
         else if (local[2] < -1.0f) local[2] = -1.0f;
-        func_00283098((char *)v, (char *)local, a + 0x10);
+        matrix_mul_vec3((char *)v, (char *)local, a + 0x10);
         func_00282CC0_4((char *)v, (char *)v, a + 0x40);
     }
     sound = D_00188660 + state[4] * 0x70;

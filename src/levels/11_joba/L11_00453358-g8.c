@@ -164,7 +164,7 @@ void func_L11_00459640(float *p, int count, int mode)
     char *effect;
     float size, speed, angle, r;
 
-    func_00282CF0(axis, D_L11_001BA8C0, p);
+    FastVecSub(axis, D_L11_001BA8C0, p);
     axis[2] = 0;
     up[0] = 0;
     up[1] = 0;
@@ -178,7 +178,7 @@ void func_L11_00459640(float *p, int count, int mode)
         angle = func_002A7878(-1.0471977f, 1.0471977f);
         func_002ACEC0(vel, axis, up, angle);
         speed = func_002A7878(D_L11_001B1FE0, D_L11_001B1FE4) * (1.0f / 60.0f);
-        func_00282F20((char *)vel, vel, speed);
+        vec_scale_to_length((char *)vel, vel, speed);
         vel[2] = func_002A7878(D_L11_001B1FE8, D_L11_001B1FEC) * (1.0f / 60.0f);
         qcopy(pos, p);
         pos[0] += func_002A78D8(0, 0.15f);
@@ -186,47 +186,47 @@ void func_L11_00459640(float *p, int count, int mode)
         pos[2] += func_002A78D8(0, 0.15f);
         if (!mode) {
             if (!(func_001163B0() & 1)) {
-                func_00282D30((char *)vel, vel, 1.5f);
+                FastVecScale((char *)vel, vel, 1.5f);
                 effect = func_002C2210(pos, 60, D_L11_001B2000, size * 0.35f, size, D_L11_001B1FF0, 0, sign, vel, 0);
                 if (effect)
-                    effect[9] = func_00283CF0(4.0f) + 112;
+                    effect[9] = FloatToInt(4.0f) + 112;
                 effect = func_002C2210(pos, 60, D_L11_001B2004, size * 0.245f, size * 0.7f, D_L11_001B1FF0, 1, -sign, vel, 0);
             } else {
-                func_00282CF0(a, D_L11_001BA8C0, pos);
-                func_00282F20((char *)a, a, speed);
-                func_00282CC0(vel, vel, a);
+                FastVecSub(a, D_L11_001BA8C0, pos);
+                vec_scale_to_length((char *)a, a, speed);
+                FastVecAdd(vel, vel, a);
                 effect = func_002C2210(pos, 40, D_L11_001B2000, size * 2.05f, size, D_L11_001B1FF0, 0, sign, vel, 0);
                 if (effect)
-                    effect[9] = func_00283CF0(4.0f) + 112;
+                    effect[9] = FloatToInt(4.0f) + 112;
                 effect = func_002C2210(pos, 40, D_L11_001B2004, size * 1.4350000619888306f, size * 0.7f, D_L11_001B1FF0, 1, -sign, vel, 0);
             }
         } else {
             if (!(func_001163B0() & 1)) {
-                func_00282D30((char *)vel, vel, 1.5f);
+                FastVecScale((char *)vel, vel, 1.5f);
                 effect = func_002C2210(pos, 60, D_L11_001B2000, size * 0.3f, size, D_L11_001B1FF0, 0, sign, vel, 0);
                 if (effect)
-                    effect[9] = func_00283CF0(4.0f) + 112;
+                    effect[9] = FloatToInt(4.0f) + 112;
                 effect = func_002C2210(pos, 60, D_L11_001B2004, size * (0.3f * 0.7f), size * 0.7f, D_L11_001B1FF0, 1, -sign, vel, 0);
             } else {
-                func_00282CF0(a, D_L11_001BA8C0, pos);
-                func_00282F20((char *)a, a, speed);
-                func_00282CC0(vel, vel, a);
+                FastVecSub(a, D_L11_001BA8C0, pos);
+                vec_scale_to_length((char *)a, a, speed);
+                FastVecAdd(vel, vel, a);
                 effect = func_002C2210(pos, 40, D_L11_001B2000, size * 0.25f, size, D_L11_001B1FF0, 0, sign, vel, 0);
                 if (effect)
-                    effect[9] = func_00283CF0(4.0f) + 112;
+                    effect[9] = FloatToInt(4.0f) + 112;
                 effect = func_002C2210(pos, 40, D_L11_001B2004, size * 0.175f, size * 0.7f, D_L11_001B1FF0, 1, -sign, vel, 0);
             }
         }
         if (effect)
-            effect[9] = func_00283CF0(4.0f) + 112;
+            effect[9] = FloatToInt(4.0f) + 112;
     }
     for (j = 1; j >= 0; j--) {
         angle = func_002A7878(-0.9599312f, -1.3962636f);
         r = func_002A7940();
         func_002AF000(a, func_002A7878(0, 0.5f) * (1.0f / 60.0f), r, angle);
-        func_00282CF0(b, D_L11_001BA8C0, p);
-        func_00282F20((char *)b, b, 0.15f);
-        func_00282CC0(p, p, b);
+        FastVecSub(b, D_L11_001BA8C0, p);
+        vec_scale_to_length((char *)b, b, 0.15f);
+        FastVecAdd(p, p, b);
         size = func_002A7878(30000, 60000);
         out[0] = p[0] + func_002A78D8(0, 0.15f);
         out[1] = p[1] + func_002A78D8(0, 0.15f);
@@ -244,16 +244,16 @@ void func_L11_00459D48(char *p)
     char *q = *(char **)(p + 0x68);
     float v[4];
 
-    func_00282F20((char *)v, q + 0x40, 1.0f);
+    vec_scale_to_length((char *)v, q + 0x40, 1.0f);
     func_002AB668(v, v, *(float *)(q + 0x30));
-    func_00282D30(q + 0x10, q, *(float *)(q + 0x60));
+    FastVecScale(q + 0x10, q, *(float *)(q + 0x60));
     func_002ACDE8(q + 0x10, q + 0x10, v);
     *(float *)(q + 0x20) = -*(float *)(q + 0x10);
     *(float *)(q + 0x24) = -*(float *)(q + 0x14);
     *(float *)(q + 0x28) = -*(float *)(q + 0x18);
-    func_00282CC0(q + 0x10, p + 0x10, q + 0x10);
-    func_00282CC0(q + 0x20, p + 0x10, q + 0x20);
-    *(float *)(q + 0x30) = func_00283BE0(*(float *)(q + 0x30),
+    FastVecAdd(q + 0x10, p + 0x10, q + 0x10);
+    FastVecAdd(q + 0x20, p + 0x10, q + 0x20);
+    *(float *)(q + 0x30) = fast_subtract_rotations(*(float *)(q + 0x30),
                                          D_L11_001B1FFC * 0.000290888245f);
     func_L00_002E6CF0(func_L11_00459E48, p);
 }
@@ -271,13 +271,13 @@ void func_L11_0045A578(char *p)
     int top;
 
     func_L11_00459EA0(pkt);
-    func_00282D08(v, q + 0x10, q + 0x20, func_002A7878(0.0f, 1.0f));
+    lerp_vector(v, q + 0x10, q + 0x20, func_002A7878(0.0f, 1.0f));
 
     v[0] += func_002A7878(-0.1f, 0.1f) * *(float *)(q + 0x60);
     v[1] += func_002A7878(-0.1f, 0.1f) * *(float *)(q + 0x60);
     v[2] += func_002A7878(-0.1f, 0.1f) * *(float *)(q + 0x60);
 
-    *(long long *)(pkt + 120) = func_0027C878((char *)0xB);
+    *(long long *)(pkt + 120) = GetEffectTextureDescriptor((char *)0xB);
     *(long long *)(pkt + 128) = 0x0000FF9000000260LL;
     *(long long *)(pkt + 112) = 0LL;
 
@@ -291,10 +291,10 @@ void func_L11_0045A578(char *p)
 
     quat[3] = 0.0f;
     quat[2] = func_00283248(D_L11_001BA780.x_140 - v[0], D_L11_001BA780.y_144 - v[1]);
-    quat[1] = -func_00283248(func_00282E80((char *)v, &D_L11_001BA780.x_140),
+    quat[1] = -func_00283248(vec_distance_xy((char *)v, &D_L11_001BA780.x_140),
                              D_L11_001BA780.z_148 - v[2]);
     quat[0] = func_002A7940();
-    func_00283410(m, quat);
+    euler_to_matrix(m, quat);
 
     m[12] = v[0];
     m[13] = v[1];
@@ -302,22 +302,22 @@ void func_L11_0045A578(char *p)
     m[15] = 1.0f;
 
     s = func_002A7878(0.05f, 0.15f) * *(float *)(q + 0x60);
-    func_00282D30(pkt, pkt, s);
-    func_00282D30(pkt + 16, pkt + 16, s);
-    func_00282D30(pkt + 32, pkt + 32, s);
-    func_00282D30(pkt + 48, pkt + 48, s);
-    func_00280B90(pkt, m, 0);
+    FastVecScale(pkt, pkt, s);
+    FastVecScale(pkt + 16, pkt + 16, s);
+    FastVecScale(pkt + 32, pkt + 32, s);
+    FastVecScale(pkt + 48, pkt + 48, s);
+    draw_world_quad(pkt, m, 0);
 
     *(int *)(pkt + 76) = (D_L11_001B2020 & 0xFFFFFF) + top;
     *(int *)(pkt + 72) = (D_L11_001B2020 & 0xFFFFFF) + top;
     *(int *)(pkt + 68) = (D_L11_001B2020 & 0xFFFFFF) + top;
     *(int *)(pkt + 64) = (D_L11_001B2020 & 0xFFFFFF) + top;
 
-    func_00282D30(pkt, pkt, 0.5f);
-    func_00282D30(pkt + 16, pkt + 16, 0.5f);
-    func_00282D30(pkt + 32, pkt + 32, 0.5f);
-    func_00282D30(pkt + 48, pkt + 48, 0.5f);
-    func_00280B90(pkt, m, 0);
+    FastVecScale(pkt, pkt, 0.5f);
+    FastVecScale(pkt + 16, pkt + 16, 0.5f);
+    FastVecScale(pkt + 32, pkt + 32, 0.5f);
+    FastVecScale(pkt + 48, pkt + 48, 0.5f);
+    draw_world_quad(pkt, m, 0);
 
     func_L11_0045A8C0(p, v);
 }
@@ -342,8 +342,8 @@ void func_L11_00454508(char *p)
         *(int *)(q + 0x18) = (int)(q + 0x60);
         *(float *)(p + 0x2C) *= 0.75f;
         *(int *)(q + 0x1DC) = -1;
-        *(u8 *)(q + 0x48) = func_00283CF0(15.0f);
-        *(u8 *)(q + 0x4A) = func_00283CF0(12.0f);
+        *(u8 *)(q + 0x48) = FloatToInt(15.0f);
+        *(u8 *)(q + 0x4A) = FloatToInt(12.0f);
         *(float *)(q + 0x1D0) =
             func_002A7878(-*(float *)(q + 0x1D0), *(float *)(q + 0x1D0)) *
             0.01745329424738884f;
@@ -360,7 +360,7 @@ void func_L11_00454508(char *p)
         *(float *)(q + 0x70) = 1.134464144706726f;
         *(float *)(q + 0x90) = 0.523598849773407f;
         *(float *)(q + 0x8C) = 0.0027777778450399637f;
-        func_002A04B8(p, q + 0x1F0, q + 0x1F4, q + 0x1F8);
+        get_moby_color(p, q + 0x1F0, q + 0x1F4, q + 0x1F8);
         *(u8 *)(q + 0x28) = 3;
         *(int *)(q + 0x30) = 0;
         *(short *)(q + 0x1EC) = 0;
@@ -370,7 +370,7 @@ void func_L11_00454508(char *p)
         D_L11_001A8FF4 == 0) {
         *(u16 *)(p + 0x34) |= 0x400;
         if (*(u8 *)(p + 0x31) != 0) {
-            if (func_00282E48(p + 0x10, D_L11_001BA8C0) < 24.0f) {
+            if (fast_vec_dist(p + 0x10, D_L11_001BA8C0) < 24.0f) {
                 func_002A93B0(p);
                 *(u8 *)(p + 0x6F) = 0x16;
             }
@@ -380,7 +380,7 @@ void func_L11_00454508(char *p)
     }
     if (*(u8 *)(p + 0x95) >= 2) {
         if (func_002E59B0(p, *(int *)(q + 0x1DC)) == 0)
-            *(int *)(q + 0x1DC) = func_002E5CF8(1, 4, p);
+            *(int *)(q + 0x1DC) = PlayMobySound(1, 4, p);
     } else {
         if (func_002E59B0(p, *(int *)(q + 0x1DC))) {
             idx = *(int *)(q + 0x1DC);
@@ -411,36 +411,36 @@ void func_L11_00454508(char *p)
     *(float *)(q + 0x20) -= d;
     if (d != 0.0f) {
         if (*(u8 *)(p + 0x20) != 3 && *(u8 *)(p + 0x20) != 0xE) {
-            func_00282F20((char *)vec0, ptr + 0x10, 0.8333333730697632f);
+            vec_scale_to_length((char *)vec0, ptr + 0x10, 0.8333333730697632f);
             func_002A7A00(vec1, -0.1388888955116272f, 0.1388888955116272f);
-            func_00282CC0(vec0, vec0, vec1);
+            FastVecAdd(vec0, vec0, vec1);
             if (*(short *)(q + 0x1FC) == 0) {
                 vec0[2] = func_002A7878(0.0f, 0.0f) * 0.00027777778450399637f;
                 vec0[3] = 5627.9248046875f;
             } else {
-                func_00282CF0(vec2, func_L11_004417E8(*(u8 **)(p + 0xB8)),
+                FastVecSub(vec2, func_L11_004417E8(*(u8 **)(p + 0xB8)),
                               p + 0x10);
                 vec2[2] = 0.0f;
-                func_00282F20((char *)vec2, vec2, 1.0f);
-                dot = func_00282DB0(vec0, vec2);
+                vec_scale_to_length((char *)vec2, vec2, 1.0f);
+                dot = FastVecDot(vec0, vec2);
                 if (dot < 0.0f) {
-                    func_00282F20((char *)vec2, vec2, dot);
-                    len = func_00282DF0(vec0);
-                    func_00282CF0(vec0, vec0, vec2);
-                    func_00282F20((char *)vec0, vec0, len);
+                    vec_scale_to_length((char *)vec2, vec2, dot);
+                    len = FastVecLength(vec0);
+                    FastVecSub(vec0, vec0, vec2);
+                    vec_scale_to_length((char *)vec0, vec0, len);
                 }
             }
-            func_00282CC0(q + 0x100, q + 0x100, vec0);
+            FastVecAdd(q + 0x100, q + 0x100, vec0);
             func_002A7A00(vec1, 0.0017453294713050127f, 0.006981317885220051f);
-            *(float *)(q + 0x1B0) = func_00283B98(*(float *)(q + 0x1B0), vec1[0]);
-            *(float *)(q + 0x1B4) = func_00283B98(*(float *)(q + 0x1B4), vec1[1]);
-            *(float *)(q + 0x1B8) = func_00283B98(*(float *)(q + 0x1B8), vec1[2]);
+            *(float *)(q + 0x1B0) = FastAddRotations(*(float *)(q + 0x1B0), vec1[0]);
+            *(float *)(q + 0x1B4) = FastAddRotations(*(float *)(q + 0x1B4), vec1[1]);
+            *(float *)(q + 0x1B8) = FastAddRotations(*(float *)(q + 0x1B8), vec1[2]);
             func_002AB800(p, q + 0x50);
             func_002A7750(p, 0xD, 4);
         }
     }
     if (*(short *)(q + 0x1FC) != 0) {
-        func_00283698(q + 0x170, p + 0xC0);
+        matrix_from_basis_rows(q + 0x170, p + 0xC0);
         func_002AFFD8(p + 0x10, q + 0x1A0, 0);
         if (func_L11_004461C0(*(u8 **)(p + 0xB8), (u8 *)(p + 0x10)) == 0) {
             *(int *)(q + 0x20) = 0;
@@ -449,12 +449,12 @@ void func_L11_00454508(char *p)
         if (*(u8 *)(p + 0x20) != 0xE) {
             len = *(float *)(p + 0x18);
             r = func_L11_004417E8(*(u8 **)(p + 0xB8));
-            func_00282CF0(vec0, p + 0x10, r);
+            FastVecSub(vec0, p + 0x10, r);
             vec0[2] = 0.0f;
             if (func_L00_002EE290(vec0) > 225.0f) {
-                func_00282F20((char *)vec0, vec0, 15.0f);
+                vec_scale_to_length((char *)vec0, vec0, 15.0f);
                 r = func_L11_004417E8(*(u8 **)(p + 0xB8));
-                func_00282CC0(p + 0x10, vec0, r);
+                FastVecAdd(p + 0x10, vec0, r);
                 *(float *)(p + 0x18) = len;
             }
         }

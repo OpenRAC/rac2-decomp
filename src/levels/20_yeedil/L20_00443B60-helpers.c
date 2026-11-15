@@ -36,16 +36,16 @@ void func_L20_00443B60(char *arg0, char *arg1, char *arg2, float *arg3) {
     v2.v = v3.v;
     transform.adjustment.f.z = *(float *)(state + 0x298) * 0.5f;
     transform.angles = transform.adjustment.v;
-    func_002833F0(transform.basis, &transform.angles);
-    func_00283738(transform.basis, transform.basis, arg0 + 0xC0);
-    func_00282CC0((char *)&v1, (char *)&v1, (char *)&v2);
-    func_00283098((char *)&v1, (char *)&v1, (char *)&transform.basis);
-    func_00282CC0(arg1, (char *)&v1, arg0 + 0x10);
+    euler_rotation_basis(transform.basis, &transform.angles);
+    multiply_matrix3x3(transform.basis, transform.basis, arg0 + 0xC0);
+    FastVecAdd((char *)&v1, (char *)&v1, (char *)&v2);
+    matrix_mul_vec3((char *)&v1, (char *)&v1, (char *)&transform.basis);
+    FastVecAdd(arg1, (char *)&v1, arg0 + 0x10);
     r = func_002A7878(5.0f, 10.0f);
     v2.f.x = r;
     r = func_002A7878(4.0f, 6.0f);
     v2.f.z = r;
-    func_00283098((char *)&v3, (char *)&v2, (char *)&transform.basis);
-    func_00282D30(arg2, (char *)&v3, 0.016666668f);
+    matrix_mul_vec3((char *)&v3, (char *)&v2, (char *)&transform.basis);
+    FastVecScale(arg2, (char *)&v3, 0.016666668f);
     *arg3 = *arg3 * v2.f.y;
 }

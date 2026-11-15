@@ -365,7 +365,7 @@ void func_L22_0039D708(s8 *arg0) {
             M2C_FIELD(M2C_FIELD(D_L22_001AF2E0, void **, 0x68), s8 *, 8) = 0;
             func_L00_003294F0(D_L22_001AF2E0, 1);
             func_002A7750(arg0, 0x27, 0xB);
-            func_0027D330(0);
+            FadeToBlack(0);
             M2C_FIELD(arg0, u16 *, 0x34) = (u16) (M2C_FIELD(arg0, u16 *, 0x34) | 0x41);
             return;
         }
@@ -409,10 +409,10 @@ void func_L22_0039D708(s8 *arg0) {
                 }
                 func_L22_003A4938(arg0);
                 if (D_L22_001AF318 != 0) {
-                    func_00282F20(&scratch[3].q, arg0 + 0xC0, -10.0f);
+                    vec_scale_to_length(&scratch[3].q, arg0 + 0xC0, -10.0f);
                     scratch[3].f[3] = 5627.925f;
-                    func_002A8C00((s32) &workspace.pair.first.query_view.query, D_0018C0B0, 0x10000, 20.0f, (s32) &scratch[3].q);
-                    func_002A8E20(arg0, &workspace.pair.first.query_view.query);
+                    make_hit_descriptor((s32) &workspace.pair.first.query_view.query, D_0018C0B0, 0x10000, 20.0f, (s32) &scratch[3].q);
+                    QueueMobyImpact(arg0, &workspace.pair.first.query_view.query);
                     D_L22_001AF318 = 0;
                 }
             }
@@ -426,7 +426,7 @@ void func_L22_0039D708(s8 *arg0) {
                 temp_v0 = func_L02_00332630(arg0, (s128 *) (D_00189E20 + 0x80));
                 M2C_FIELD(temp_s6, s32 *, 0x3D0) = temp_v0;
             } else {
-                func_00282CF0(&scratch[0].q, (s128 *) (D_00189E20 + 0x80), arg0 + 0x10);
+                FastVecSub(&scratch[0].q, (s128 *) (D_00189E20 + 0x80), arg0 + 0x10);
                 temp_f1 = func_L02_00329C48(arg0, &scratch[0].q, NULL);
                 M2C_FIELD(temp_s6, s32 *, 0x3D4) = 0;
                 M2C_FIELD(temp_s6, s32 *, 0x3D0) = 0;
@@ -449,10 +449,10 @@ void func_L22_0039D708(s8 *arg0) {
             func_L22_003A2988(temp_s0_2, 0.0f);
             M2C_FIELD(temp_s6, f32 *, 0x410) = func_002B0360((arg0 + 0x10));
             M2C_FIELD(temp_s6, f32 *, 0x414) = func_002B0360(M2C_FIELD(var_a0_2, s32 *, 0x2210) + 0x10);
-            M2C_FIELD(temp_s6, f32 *, 0x3DC) = func_00282E48(var_a0_2, (arg0 + 0x10));
-            M2C_FIELD(temp_s6, f32 *, 0x3E0) = func_00282E48(temp_s1, temp_s0_2);
+            M2C_FIELD(temp_s6, f32 *, 0x3DC) = fast_vec_dist(var_a0_2, (arg0 + 0x10));
+            M2C_FIELD(temp_s6, f32 *, 0x3E0) = fast_vec_dist(temp_s1, temp_s0_2);
             if (M2C_FIELD(temp_s6, f32 *, 0x3DC) < 50.0f) {
-                M2C_FIELD(temp_s6, s32 *, 0x3D8) = func_L22_003A2780(arg0, (arg0 + 0x10), var_a0_2);
+                M2C_FIELD(temp_s6, s32 *, 0x3D8) = WalkPathIsClear(arg0, (arg0 + 0x10), var_a0_2);
             } else {
                 M2C_FIELD(temp_s6, s32 *, 0x3D8) = 0;
             }
@@ -461,8 +461,8 @@ void func_L22_0039D708(s8 *arg0) {
                 M2C_FIELD(game, s16 *, 0x1DC) = 0x7D00;
                 func_002A7750(arg0, 0x26, 0xA);
                 M2C_FIELD(game, s32 *, 0x2294) = 0;
-                func_L00_002AF7D0();
-                func_L00_00310C88(M2C_FIELD(game, void **, 0x2290), game + 0x1870);
+                cancel_hero_item_animation();
+                release_moby_animation_slot(M2C_FIELD(game, void **, 0x2290), game + 0x1870);
                 M2C_FIELD(game, s32 *, 0x187C) = 0;
                 func_L22_002C9898(0, 1);
                 M2C_FIELD(temp_s6, s32 *, 0x344) = 0;
@@ -551,7 +551,7 @@ void func_L22_0039D708(s8 *arg0) {
                 func_L22_003A5BD8(arg0, 3, 0);
                 break;
             case 8:                                 /* switch 1 */
-                len8 = func_00282DF0(((s128 *) (temp_s6 + 0xE0)));
+                len8 = FastVecLength(((s128 *) (temp_s6 + 0xE0)));
                 if (len8 > 0.0f) {
                     var_v0_10 = 0;
                     if (M2C_FIELD(temp_s6, f32 *, 0x410) < D_L22_001B2AA4) {
@@ -562,25 +562,25 @@ void func_L22_0039D708(s8 *arg0) {
                     scratch[2].f[2] = M2C_FIELD(temp_s6, f32 *, 0x94);
                     var_v0_10 = scratch[2].q;
                     scratch[1].q = var_v0_10;
-                    func_00283098(&scratch[1].q, &scratch[1].q, arg0 + 0xC0);
-                    func_00282CC0(&scratch[1].q, &scratch[1].q, (arg0 + 0x10));
-                    func_00282F20(&scratch[0].q, ((s128 *) (temp_s6 + 0xE0)), 4.0f);
-                    func_00282CC0(&scratch[1].q, &scratch[1].q, &scratch[0].q);
+                    matrix_mul_vec3(&scratch[1].q, &scratch[1].q, arg0 + 0xC0);
+                    FastVecAdd(&scratch[1].q, &scratch[1].q, (arg0 + 0x10));
+                    vec_scale_to_length(&scratch[0].q, ((s128 *) (temp_s6 + 0xE0)), 4.0f);
+                    FastVecAdd(&scratch[1].q, &scratch[1].q, &scratch[0].q);
                     func_002A8C28((s32) arg0, (s32) &scratch[1].q, 0x90000, 5.0f, 100.0f, 0.0f, 0, 1, 0);
                 }
                 if (func_002B3890(arg0) != 0) {
                     M2C_FIELD(temp_s6, s16 *, 0x26) = 0x1E;
                     if (temp_s3 != NULL) {
-                        if ((func_00282DF0(((s128 *) (temp_s6 + 0xE0))) > 0.0f) && ((M2C_FIELD(temp_s6, f32 *, 0x20) - M2C_FIELD(temp_s3, f32 *, 0x2C)) <= 0.0f)) {
-                            func_00282F20(((s128 *) (temp_s6 + 0xE0)), ((s128 *) (temp_s6 + 0xE0)), 0.6f);
+                        if ((FastVecLength(((s128 *) (temp_s6 + 0xE0))) > 0.0f) && ((M2C_FIELD(temp_s6, f32 *, 0x20) - M2C_FIELD(temp_s3, f32 *, 0x2C)) <= 0.0f)) {
+                            vec_scale_to_length(((s128 *) (temp_s6 + 0xE0)), ((s128 *) (temp_s6 + 0xE0)), 0.6f);
                         }
                         if (M2C_FIELD(temp_s3, f32 *, 0x2C) == 50.0f) {
                             func_L00_0035F5A0(0x13, 0, 0);
                         }
                         if ((M2C_FIELD(D_0018C0B0, u8 *, 0x43) == 4) && (M2C_FIELD(temp_s3, s32 *, 0x20) == D_0018C0B0)) {
-                            func_00282CF0(&scratch[0].q, temp_s6 + 0x400, temp_s6 + 0x3F0);
-                            func_00282F20(((s128 *) (temp_s6 + 0xE0)), &scratch[0].q, D_L22_001AF3F8);
-                            func_0032C700(M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 1, 0xA, 0xA, 0xA, 0x14, 0x32, 0, 1.2f, 20.0f, 0, 1, 0, 0);
+                            FastVecSub(&scratch[0].q, temp_s6 + 0x400, temp_s6 + 0x3F0);
+                            vec_scale_to_length(((s128 *) (temp_s6 + 0xE0)), &scratch[0].q, D_L22_001AF3F8);
+                            SpawnExplosion(M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 1, 0xA, 0xA, 0xA, 0x14, 0x32, 0, 1.2f, 20.0f, 0, 1, 0, 0);
                         }
                     }
                     func_L22_003A45F0(arg0, (s32) M2C_FIELD(arg0, u8 *, 0x43), 0, 4, 2, 1.0f);
@@ -619,7 +619,7 @@ void func_L22_0039D708(s8 *arg0) {
                         func_002B0A18(0x1233, -1);
                         D_L22_001A903C = 1;
                     }
-                    func_0027D330(D_L22_001AF2F8);
+                    FadeToBlack(D_L22_001AF2F8);
                     goto block_183;
                 }
                 temp_a0_13 = M2C_FIELD(arg0, u16 *, 0x96);
@@ -629,12 +629,12 @@ void func_L22_0039D708(s8 *arg0) {
                         func_002A8C28((s32) arg0, (s32) (arg0 + 0x10), 0x90000, 25.0f, 100.0f, 0.0f, 0, 1, 0);
                         func_L02_00333438(arg0, game10 + 0x80);
 
-                        func_002A6C58(arg0, 0, 3);
+                        SetDeathBits(arg0, 0, 3);
                         func_002AC728(arg0, (arg0 + 0x10), 2.0f, 7.0f, -1);
                         for (var_s0_2 = 0; var_s0_2 < 5; var_s0_2++) {
                             func_002A7A00(&scratch[0].q, D_L22_001AF388 * 0.016666668f, D_L22_001AF38C * 0.016666668f);
                             scratch[0].f[2] = func_00282C48(scratch[0].f[2]) * D_L22_001AF390;
-                            func_00283098(&scratch[0].q, &scratch[0].q, M2C_FIELD(temp_s6, s32 *, 0x440) + 0xC0);
+                            matrix_mul_vec3(&scratch[0].q, &scratch[0].q, M2C_FIELD(temp_s6, s32 *, 0x440) + 0xC0);
                             temp_a0_14 = M2C_FIELD(temp_s6, s32 *, 0x440);
                             temp_v0_11 = func_00273730((void *) temp_a0_14, 1, (s32) M2C_FIELD(temp_a0_14, s16 *, 0xAA), var_s0_2, temp_a0_14 + 0x10, temp_a0_14 + 0xF0, &scratch[0].q, 0xFF, 30.0f, 15.0f);
                             *(s32 **)((s8 *)temp_v0_11 + 0x64) = &D_L22_003A6858;
@@ -642,12 +642,12 @@ void func_L22_0039D708(s8 *arg0) {
                         for (var_s0_3 = 0; var_s0_3 < 2; var_s0_3++) {
                             func_002A7A00(&scratch[0].q, D_L22_001AF388 * 0.016666668f, D_L22_001AF38C * 0.016666668f);
                             scratch[0].f[2] = func_00282C48(scratch[0].f[2]) * D_L22_001AF390;
-                            func_00283098(&scratch[0].q, &scratch[0].q, ((void *) (arg0 + 0xC0)));
+                            matrix_mul_vec3(&scratch[0].q, &scratch[0].q, ((void *) (arg0 + 0xC0)));
                             temp_v0_12 = func_00273730(arg0, 1, (s32) M2C_FIELD(arg0, s16 *, 0xAA), var_s0_3, (arg0 + 0x10), ((void *) (arg0 + 0xF0)), &scratch[0].q, 0xFF, 30.0f, 15.0f);
                             *(s32 **)((s8 *)temp_v0_12 + 0x64) = &D_L22_003A6858;
                         }
-                        func_0032C700(M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 0, 0x73, 0x50, 0x46, 0x4E, 0x4B, 1, 7.5f, 20.0f, 1, 1, 0, 0);
-                        func_0032C700((arg0 + 0x10), 1, 0x2D, 0x28, 0x28, 0x28, 0x3A, 1, 3.0f, 20.0f, 1, 1, 0, 0);
+                        SpawnExplosion(M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 0, 0x73, 0x50, 0x46, 0x4E, 0x4B, 1, 7.5f, 20.0f, 1, 1, 0, 0);
+                        SpawnExplosion((arg0 + 0x10), 1, 0x2D, 0x28, 0x28, 0x28, 0x3A, 1, 3.0f, 20.0f, 1, 1, 0, 0);
                         M2C_FIELD(arg0, u16 *, 0x34) = (u16) (M2C_FIELD(arg0, u16 *, 0x34) | 0x41);
                         temp_a0_15 = M2C_FIELD(temp_s6, void **, 0x388);
                         M2C_FIELD(temp_a0_15, u16 *, 0x34) = (u16) (M2C_FIELD(temp_a0_15, u16 *, 0x34) | 0x41);
@@ -692,11 +692,11 @@ void func_L22_0039D708(s8 *arg0) {
                                 func_002A0F48(((VarsD708 *) temp_s6)->p448);
                             } else {
                                 if ((M2C_FIELD(temp_a0_18, u16 *, 0x34) ^ 1) & 1) {
-                                    func_00282D30(&scratch[0].q, temp_a0_18 + 0xC0, 2.2f);
-                                    func_00282CC0(&scratch[0].q, &scratch[0].q, ((VarsD708 *) temp_s6)->p448 + 0x10);
+                                    FastVecScale(&scratch[0].q, temp_a0_18 + 0xC0, 2.2f);
+                                    FastVecAdd(&scratch[0].q, &scratch[0].q, ((VarsD708 *) temp_s6)->p448 + 0x10);
                                     func_L22_003A2988(&scratch[0].q, 0.5f);
-                                    func_0032C700(&scratch[0].q, 1, 0xA, 0xA, 0xA, 0xA, 0x14, 0, 0.9f, 20.0f, 0, 0, 0, 0);
-                                    func_002E5CF8(D_L22_001AF2FC, 0, arg0);
+                                    SpawnExplosion(&scratch[0].q, 1, 0xA, 0xA, 0xA, 0xA, 0x14, 0, 0.9f, 20.0f, 0, 0, 0, 0);
+                                    PlayMobySound(D_L22_001AF2FC, 0, arg0);
                                     temp_v1_15 = ((VarsD708 *) temp_s6)->p448;
                                     M2C_FIELD(temp_v1_15, u16 *, 0x34) = (u16) (M2C_FIELD(temp_v1_15, u16 *, 0x34) | 0x41);
                                 }
@@ -708,10 +708,10 @@ void func_L22_0039D708(s8 *arg0) {
                                 } else {
                                     func_0029FCC0(M2C_FIELD(temp_s6, s32 *, 0x440), func_002A77E0(6), (s32) &scratch[0].q);
                                 }
-                                func_0032C700(&scratch[0].q, 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 0, func_002A7878(1.0f, 1.9f), 20.0f, 0, 0, 0, 0);
+                                SpawnExplosion(&scratch[0].q, 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 0, func_002A7878(1.0f, 1.9f), 20.0f, 0, 0, 0, 0);
                             }
                             if (!(M2C_FIELD(arg0, u16 *, 0x96) & 0xF) && ((M2C_FIELD(arg0, u16 *, 0x34) ^ 1) & 1)) {
-                                func_002E5CF8(D_L22_001AF300, 0, arg0);
+                                PlayMobySound(D_L22_001AF300, 0, arg0);
                             }
                         }
                         goto block_183;
@@ -719,7 +719,7 @@ void func_L22_0039D708(s8 *arg0) {
                 } else {
                     temp_v0_10 = temp_v0_9 - 4;
                     if (temp_a0_13 == temp_v0_10) {
-                        func_0027D330(1);
+                        FadeToBlack(1);
                         func_L22_003A2988((arg0 + 0x10), 0.0f);
                         scratch[4].q = M2C_FIELD(D_L22_001B9EB0, s128 *, 0);
                         scratch[5].q = M2C_FIELD(D_L22_001B9EB0, s128 *, 0x10);
@@ -727,17 +727,17 @@ void func_L22_0039D708(s8 *arg0) {
                         qzero_nc(&scratch[7].q);
                         func_002AB6D8(&workspace.pair.second, &scratch[0].q);
                         temp_s2 = (arg0 + 0x10);
-                        func_00335438(D_L22_001B9C80, &scratch[0].q, 1, 0, 0);
+                        SetCamera5Pose(D_L22_001B9C80, &scratch[0].q, 1, 0, 0);
                         func_L22_003A45F0(arg0, 0xE, 0, 4, 3, 0.6f);
                         M2C_FIELD(temp_s6, f32 *, 0x138) = 0.01f;
-                        func_00282CF0(&scratch[7].q, temp_s6 + 0x3F0, temp_s2);
-                        func_00282F20(&scratch[6].q, &scratch[7].q, -(D_L22_001AF2F4 * 33.0f));
-                        func_00282CC0(&scratch[6].q, &scratch[6].q, temp_s2);
+                        FastVecSub(&scratch[7].q, temp_s6 + 0x3F0, temp_s2);
+                        vec_scale_to_length(&scratch[6].q, &scratch[7].q, -(D_L22_001AF2F4 * 33.0f));
+                        FastVecAdd(&scratch[6].q, &scratch[6].q, temp_s2);
                         func_L22_003A2988(&scratch[6].q, 2.0f);
-                        func_00282F20(&scratch[5].q, &scratch[7].q, -(D_L22_001AF2F4 * 55.0f));
-                        func_00282CC0(&scratch[5].q, &scratch[5].q, temp_s2);
+                        vec_scale_to_length(&scratch[5].q, &scratch[7].q, -(D_L22_001AF2F4 * 55.0f));
+                        FastVecAdd(&scratch[5].q, &scratch[5].q, temp_s2);
                         func_L22_003A2988(&scratch[5].q, D_L22_001AF2F4 * 45.0f);
-                        func_00282F20(&scratch[7].q, &scratch[7].q, 1.0f);
+                        vec_scale_to_length(&scratch[7].q, &scratch[7].q, 1.0f);
                         scratch[0].q = scratch[7].q;
                         {
                             u8 *g = D_00189E20;
@@ -745,7 +745,7 @@ void func_L22_0039D708(s8 *arg0) {
                         }
 
                         qzero_nc(&scratch[3].q);
-                        func_00282DD8(&scratch[2].q, &scratch[0].q, &scratch[1].q);
+                        FastVecCross(&scratch[2].q, &scratch[0].q, &scratch[1].q);
                         func_002AB6D8(&workspace.pair.first.matrix, &scratch[4].q);
                         func_003353C8(&scratch[4].q);
                         func_00335370(&scratch[5].q);
@@ -755,19 +755,19 @@ void func_L22_0039D708(s8 *arg0) {
                         scratch[3].q = M2C_FIELD(D_L22_001B9EB0, s128 *, 0x20);
                         qzero_nc(&scratch[4].q);
                         func_002AB6D8(&workspace.shifted.basis, &workspace.shifted.rotation);
-                        func_00335438(D_L22_001B9C80, &scratch[0].q, 1, 0, 0);
-                        func_00282CF0(&scratch[0].q, (arg0 + 0x10), D_L22_001B9C80);
-                        func_00282F20(&scratch[0].q, &scratch[0].q, 1.0f);
+                        SetCamera5Pose(D_L22_001B9C80, &scratch[0].q, 1, 0, 0);
+                        FastVecSub(&scratch[0].q, (arg0 + 0x10), D_L22_001B9C80);
+                        vec_scale_to_length(&scratch[0].q, &scratch[0].q, 1.0f);
                         scratch[2].q = M2C_FIELD(arg0, s128 *, 0xE0);
                         qzero_nc(&scratch[3].q);
                         temp_s3_2 = D_00189E20;
-                        func_00282F20(&scratch[0].q, &scratch[0].q, 1.0f);
-                        func_00282F20(&scratch[2].q, &scratch[2].q, 1.0f);
-                        func_00282DD8(&scratch[1].q, &scratch[0].q, &scratch[2].q);
-                        func_00282F20(&scratch[1].q, &scratch[1].q, 1.0f);
+                        vec_scale_to_length(&scratch[0].q, &scratch[0].q, 1.0f);
+                        vec_scale_to_length(&scratch[2].q, &scratch[2].q, 1.0f);
+                        FastVecCross(&scratch[1].q, &scratch[0].q, &scratch[2].q);
+                        vec_scale_to_length(&scratch[1].q, &scratch[1].q, 1.0f);
                         func_002AB6D8(&workspace.pair.first.matrix, &scratch[4].q);
                         func_003353C8(&scratch[4].q);
-                        func_0027D330(1);
+                        FadeToBlack(1);
                         func_002A8BD0(&workspace.collision.query, M2C_FIELD(temp_s3_2, s32 *, 0x2290), 0xB0000, 50.0f);
                         scratch[6].b[8] = 7;
                         scratch[6].b[9] = 1;
@@ -775,27 +775,27 @@ void func_L22_0039D708(s8 *arg0) {
                         scratch[6].h[5] = M2C_FIELD(M2C_FIELD(temp_s3_2, s32 *, 0x2290), u16 *, 0xAA);
                         func_002A8C28((s32) arg0, (s32) D_L22_001B9C80, 0x90000, 10.0f, 100.0f, 0.0f, 0, 1, 0);
                         temp_s4 = D_L22_001B9C80 + 0x240;
-                        func_002761F8(D_L22_001B9C80, M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
+                        CollLine(D_L22_001B9C80, M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
                         temp_s5 = D_L22_001B9C80 + 0x250;
-                        func_00282D30(&spA0, M2C_FIELD(temp_s3_2, s32 *, 0x2290) + 0xE0, 4.0f);
-                        func_00282CC0(&spA0, &spA0, temp_s3_2 + 0x80);
-                        func_002761F8(&spA0, M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
+                        FastVecScale(&spA0, M2C_FIELD(temp_s3_2, s32 *, 0x2290) + 0xE0, 4.0f);
+                        FastVecAdd(&spA0, &spA0, temp_s3_2 + 0x80);
+                        CollLine(&spA0, M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
                         temp_f20 = D_L22_001AF2F4 * 6.875f;
                         temp_f21 = -temp_f20;
-                        func_00282D30(&spB0, temp_s4, temp_f20);
-                        func_00282CC0(&spB0, &spB0, D_L22_001B9C80);
-                        func_002761F8(&spB0, M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
-                        func_00282D30(&spB0, temp_s4, temp_f21);
-                        func_00282CC0(&spB0, &spB0, D_L22_001B9C80);
-                        func_002761F8(&spB0, M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
-                        func_00282D30(&spB0, temp_s5, temp_f20);
-                        func_00282CC0(&spB0, &spB0, D_L22_001B9C80);
-                        func_002761F8(&spB0, M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
-                        func_00282D30(&spB0, temp_s5, temp_f21);
-                        func_00282CC0(&spB0, &spB0, D_L22_001B9C80);
-                        func_002761F8(&spB0, M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
+                        FastVecScale(&spB0, temp_s4, temp_f20);
+                        FastVecAdd(&spB0, &spB0, D_L22_001B9C80);
+                        CollLine(&spB0, M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
+                        FastVecScale(&spB0, temp_s4, temp_f21);
+                        FastVecAdd(&spB0, &spB0, D_L22_001B9C80);
+                        CollLine(&spB0, M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
+                        FastVecScale(&spB0, temp_s5, temp_f20);
+                        FastVecAdd(&spB0, &spB0, D_L22_001B9C80);
+                        CollLine(&spB0, M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
+                        FastVecScale(&spB0, temp_s5, temp_f21);
+                        FastVecAdd(&spB0, &spB0, D_L22_001B9C80);
+                        CollLine(&spB0, M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
                     } else {
-                        func_0027D330(1);
+                        FadeToBlack(1);
                     }
 block_183:
                     qzero_nc(((s128 *) (temp_s6 + 0xE0)));
@@ -810,7 +810,7 @@ block_184:
                 case 5:                             /* switch 2 */
                     if ((M2C_FIELD(temp_s6, s32 *, 0x464) == 0) || (M2C_FIELD(temp_s6, s16 *, 0x41E) != 2)) {
                         if (M2C_FIELD(temp_s6, s16 *, 0x380) != 0) {
-                            func_00282978((s32) (temp_s6 + 0x380));
+                            FastDecTimer((s32) (temp_s6 + 0x380));
                         } else {
                             temp_f1_4 = D_L22_001AF3EC;
                             M2C_FIELD(temp_s6, s128 **, 0x3AC) = (s128 *) (D_00189E20 + 0x80);
@@ -845,15 +845,15 @@ block_184:
                         func_L22_003A45F0(arg0, 3, 0, 4, 2, 1.0f);
                         func_002A7470(((VarsD708 *) temp_s6)->p448, 7, 0, 4);
                     }
-                    if (func_00282E48((arg0 + 0x10), M2C_FIELD(temp_s6, s128 **, 0x3AC)) < 8.0f) {
+                    if (fast_vec_dist((arg0 + 0x10), M2C_FIELD(temp_s6, s128 **, 0x3AC)) < 8.0f) {
                         func_002A7750(arg0, 0x14, 9);
                         break;
                     }
-                    func_L22_003A2160(arg0);
+                    WalkPathUpdate(arg0);
                     if (((u16) M2C_FIELD(arg0, u16 *, 0x96) >= 0x1FU) && (M2C_FIELD(temp_s6, f32 *, 0x43C) <= M2C_FIELD(temp_s6, f32 *, 0x140))) {
-                        func_00282CF0(&scratch[0].q, (arg0 + 0x10), (s128 *) (D_00189E20 + 0x80));
-                        func_00282F20(&scratch[0].q, &scratch[0].q, 1.0f);
-                        if ((func_00282DB0(arg0 + 0xC0, &scratch[0].q) < -0.5f) && (func_00282DF0(&scratch[0].q) < 10.0f)) {
+                        FastVecSub(&scratch[0].q, (arg0 + 0x10), (s128 *) (D_00189E20 + 0x80));
+                        vec_scale_to_length(&scratch[0].q, &scratch[0].q, 1.0f);
+                        if ((FastVecDot(arg0 + 0xC0, &scratch[0].q) < -0.5f) && (FastVecLength(&scratch[0].q) < 10.0f)) {
                             func_002A7750(arg0, 0x21, 9);
                             if (M2C_FIELD(D_L22_001B2AB4, s32 *, 0xC) != 0) {
                                 M2C_FIELD(temp_s6, s16 *, 0x3A6) = 3;
@@ -894,12 +894,12 @@ block_184:
                     }
                     break;
                 case 21:                            /* switch 2 */
-                    if (func_00282E48((arg0 + 0x10), M2C_FIELD(temp_s6, s128 **, 0x3AC)) < 8.0f) {
+                    if (fast_vec_dist((arg0 + 0x10), M2C_FIELD(temp_s6, s128 **, 0x3AC)) < 8.0f) {
                         func_002A7750(arg0, 0x16, 9);
                         func_L22_003A45F0(arg0, 0, 0, 0x14, 3, 1.0f);
                         break;
                     }
-                    func_L22_003A2160(arg0);
+                    WalkPathUpdate(arg0);
                     break;
                 case 22:                            /* switch 2 */
                     if ((u16) M2C_FIELD(arg0, u16 *, 0x96) >= 0x1FU) {
@@ -916,7 +916,7 @@ block_184:
                     if (M2C_FIELD(temp_s6, f32 *, 0x3E0) < 33.0f) {
                         func_002A7750(arg0, 0x1E, 4);
                     } else {
-                        func_L22_003A2160(arg0);
+                        WalkPathUpdate(arg0);
                     }
                     break;
                 case 6:                             /* switch 2 */
@@ -925,12 +925,12 @@ block_184:
                         if (temp_f1_4 < 20.0f) {
                             func_002A7750(arg0, 0xF, 6);
                         } else {
-                            func_L22_003A2160(arg0);
+                            WalkPathUpdate(arg0);
                         }
                     } else if (temp_f1_4 < D_L22_001AF3EC) {
                         func_002A7750(arg0, 0x1E, 4);
                     } else {
-                        func_L22_003A2160(arg0);
+                        WalkPathUpdate(arg0);
                     }
                     break;
                 case 28:                            /* switch 2 */
@@ -941,7 +941,7 @@ block_184:
                         func_002A7750(arg0, 0x1E, 4);
                     }
                     M2C_FIELD(temp_s6, s128 **, 0x3AC) = (s128 *) (D_00189E20 + 0x80);
-                    func_L22_003A2160(arg0);
+                    WalkPathUpdate(arg0);
                     break;
                 case 29:                            /* switch 2 */
                     if (func_002B3868(arg0) != 0) {
@@ -951,7 +951,7 @@ block_184:
                         func_002A7750(arg0, 0x1E, 4);
                     }
                     M2C_FIELD(temp_s6, s128 **, 0x3AC) = (s128 *) (D_00189E20 + 0x80);
-                    func_L22_003A2160(arg0);
+                    WalkPathUpdate(arg0);
                     break;
                 case 31:                            /* switch 2 */
                     temp_v1_3 = M2C_FIELD(arg0, u8 *, 0x43);
@@ -963,7 +963,7 @@ block_184:
                             M2C_FIELD(arg0, s32 *, 0x98) = (s32) M2C_FIELD(M2C_FIELD(arg0, void **, 0x24), s32 *, 0x10);
                         }
                         if (M2C_FIELD(arg0, u8 *, 0x60) & 2) {
-                            func_L22_003A2160(arg0);
+                            WalkPathUpdate(arg0);
                             func_L22_003A45F0(arg0, 0xA, 0, 4, 3, D_L22_001AF3E8);
                         }
                         if ((func_0029F530(arg0) > 0.0f) && (func_0029F530(arg0) < 23.0f)) {
@@ -1002,19 +1002,19 @@ block_184:
                             if (func_0029F530((void *) M2C_FIELD(temp_s6, s32 *, 0x440)) < D_L22_001AF3F4) {
                                 func_0029FCC0(M2C_FIELD(temp_s6, s32 *, 0x440), 4, (s32) &scratch[1].q);
                                 func_0029FCC0(M2C_FIELD(temp_s6, s32 *, 0x440), 3, (s32) &scratch[0].q);
-                                func_00282CC0(&scratch[2].q, &scratch[0].q, &scratch[1].q);
-                                func_00282D30(&scratch[2].q, &scratch[2].q, 0.5f);
+                                FastVecAdd(&scratch[2].q, &scratch[0].q, &scratch[1].q);
+                                FastVecScale(&scratch[2].q, &scratch[2].q, 0.5f);
                                 M2C_FIELD(arg0, s32 *, 0x98) = 0;
                                 func_002A8C28((s32) arg0, (s32) &scratch[2].q, 0x10007, 4.0f, 100.0f, 14.5f, 0, 2, 0);
                                 {
                                     u8 *g = D_00189E20;
                                     f32 reach = D_L22_001AF358;
                                     M2C_FIELD(arg0, s32 *, 0x98) = (s32) M2C_FIELD(M2C_FIELD(arg0, void **, 0x24), s32 *, 0x10);
-                                    func_00282D30(&scratch[3].q, M2C_FIELD(g, void **, 0x2290) + 0xE0, reach);
-                                    func_00282CC0(&scratch[3].q, &scratch[3].q, g + 0x80);
+                                    FastVecScale(&scratch[3].q, M2C_FIELD(g, void **, 0x2290) + 0xE0, reach);
+                                    FastVecAdd(&scratch[3].q, &scratch[3].q, g + 0x80);
                                 }
 
-                                if (func_00282E48(&scratch[2].q, &scratch[3].q) < D_L22_001AF35C) {
+                                if (fast_vec_dist(&scratch[2].q, &scratch[3].q) < D_L22_001AF35C) {
                                     func_L00_002D6900(0x2B);
                                     D_L22_001B2AB0 = D_L22_001AF354;
                                 }
@@ -1030,9 +1030,9 @@ block_184:
                     break;
                 case 15:                            /* switch 2 */
                     func_L02_00333438(arg0, (s128 *) (D_00189E20 + 0x80));
-                    func_00282D30(&scratch[0].q, arg0 + 0xC0, 3.0f);
-                    func_00282CC0(&scratch[0].q, &scratch[0].q, (arg0 + 0x10));
-                    if (func_L22_003A2780(arg0, (arg0 + 0x10), &scratch[0].q) == 0) {
+                    FastVecScale(&scratch[0].q, arg0 + 0xC0, 3.0f);
+                    FastVecAdd(&scratch[0].q, &scratch[0].q, (arg0 + 0x10));
+                    if (WalkPathIsClear(arg0, (arg0 + 0x10), &scratch[0].q) == 0) {
                         func_L22_003A45F0(arg0, 9, 0, 4, 3, D_L22_001AF3E8);
                         func_002A7750(arg0, 0x1F, 6);
                         break;
@@ -1064,7 +1064,7 @@ block_184:
                             func_L22_003A47E8(arg0, 2, D_0018C0B0, 0, 0);
                         }
                     } else {
-                        func_00282978((s32) (temp_s6 + 0x386));
+                        FastDecTimer((s32) (temp_s6 + 0x386));
                         if (M2C_FIELD(temp_s6, s16 *, 0x386) <= 0) {
                             func_L22_003A45F0(arg0, 3, 0, 4, 2, 1.0f);
                             func_002A7470(((VarsD708 *) temp_s6)->p448, 1, 0, 4);
@@ -1080,13 +1080,13 @@ block_184:
                         if (M2C_FIELD(temp_s6, f32 *, 0x3DC) < 37.0f) {
                             func_L22_003A45F0(arg0, 0, 0, 4, 1, 1.0f);
                         } else {
-                            func_L22_003A2160(arg0);
+                            WalkPathUpdate(arg0);
                         }
                     } else if (temp_v1_4 == 0xB) {
                         if ((M2C_FIELD(D_L22_001B2AB4, s32 *, 8) >= M2C_FIELD(temp_s6, s16 *, 0x430)) && (M2C_FIELD(temp_s6, f32 *, 0x3DC) > 32.0f)) {
                             func_L22_003A45F0(arg0, 0, 0, 4, 1, 1.0f);
                         } else {
-                            func_L22_003A2160(arg0);
+                            WalkPathUpdate(arg0);
                         }
                     } else {
                         if (M2C_FIELD(D_L22_001B2AB4, s32 *, 8) < M2C_FIELD(temp_s6, s16 *, 0x430)) {
@@ -1101,9 +1101,9 @@ block_184:
                         } else if (temp_f1_6 < 25.0f) {
                             func_L22_003A45F0(arg0, 0xB, 0, 4, 1, 1.0f);
                             temp_s0_3 = temp_s6 + 0x3B0;
-                            func_00282CF0(&scratch[0].q, (arg0 + 0x10), (s128 *) (D_00189E20 + 0x80));
-                            func_00282D30(&scratch[0].q, &scratch[0].q, 20.0f);
-                            func_00282CC0(&scratch[0].q, (arg0 + 0x10), &scratch[0].q);
+                            FastVecSub(&scratch[0].q, (arg0 + 0x10), (s128 *) (D_00189E20 + 0x80));
+                            FastVecScale(&scratch[0].q, &scratch[0].q, 20.0f);
+                            FastVecAdd(&scratch[0].q, (arg0 + 0x10), &scratch[0].q);
                             func_L22_003A2B90(arg0, temp_s0_3, &scratch[0].q, 1);
                             M2C_FIELD(temp_s6, s128 **, 0x3AC) = temp_s0_3;
                         } else {
@@ -1120,7 +1120,7 @@ block_184:
                     temp_s0_4 = temp_s6 + 0x360;
                     M2C_FIELD(temp_s6, s128 *, 0x360) = (s128) M2C_FIELD(((M2C_FIELD(temp_s6, s16 *, 0x356) * 0x10) + D_L22_001FE940[((OwnerD708 *) temp_s6)->paths[M2C_FIELD(temp_s6, s16 *, 0x354)]]), s128 *, 0x10);
                     func_L22_003A2988(temp_s0_4, 8.0f);
-                    M2C_FIELD(temp_s6, f32 *, 0x3A0) = func_00282E48((arg0 + 0x10), temp_s0_4);
+                    M2C_FIELD(temp_s6, f32 *, 0x3A0) = fast_vec_dist((arg0 + 0x10), temp_s0_4);
                     func_002A7750(arg0, 0x22, 5);
                     M2C_FIELD(temp_s6, u16 *, 0x3A4) = 0U;
                     if (M2C_FIELD(temp_s6, s16 *, 0x3A6) == 3) {
@@ -1133,7 +1133,7 @@ block_184:
                     break;
                 case 34:                            /* switch 2 */
                     temp_s0_5 = temp_s6 + 0x360;
-                    if (func_00282E48((arg0 + 0x10), temp_s0_5) < 2.0f) {
+                    if (fast_vec_dist((arg0 + 0x10), temp_s0_5) < 2.0f) {
                         *(s128 *)(arg0 + 0x10) = M2C_FIELD(temp_s6, s128 *, 0x360);
                         func_002A7750(arg0, 0x23, 5);
                         func_L22_003A45F0(arg0, 6, 0, 0x14, 3, 1.0f);
@@ -1141,12 +1141,12 @@ block_184:
                         M2C_FIELD(temp_s6, s16 *, 0x386) = 0;
                         M2C_FIELD(temp_s6, f32 *, 0x3A8) = 0.0f;
                     } else {
-                        func_00282CF0(&scratch[0].q, temp_s0_5, (arg0 + 0x10));
+                        FastVecSub(&scratch[0].q, temp_s0_5, (arg0 + 0x10));
                         spC0 = 0;
-                        temp_f_dist = func_00282DF0(&scratch[0].q);
+                        temp_f_dist = FastVecLength(&scratch[0].q);
                         func_002AA548(&spC0, temp_s6 + 0x3A8, temp_f_dist, 0.011111111f, 0.0055555557f, 0.33333334f);
-                        func_00282F20(&scratch[0].q, &scratch[0].q, M2C_FIELD(temp_s6, f32 *, 0x3A8));
-                        func_00282CC0((arg0 + 0x10), (arg0 + 0x10), &scratch[0].q);
+                        vec_scale_to_length(&scratch[0].q, &scratch[0].q, M2C_FIELD(temp_s6, f32 *, 0x3A8));
+                        FastVecAdd((arg0 + 0x10), (arg0 + 0x10), &scratch[0].q);
                         if ((M2C_FIELD(arg0, u8 *, 0x60) & 2) && (M2C_FIELD(arg0, u8 *, 0x43) == 5)) {
                             func_L22_003A45F0(arg0, 6, 0, 0x14, 3, 1.0f);
                         }
@@ -1211,9 +1211,9 @@ block_184:
                                                 s128 *d = &scratch[0].q;
                                                 if (t <= 22.0f) {
                                                 *d = *(s128 *)(arg0 + 0x10);
-                                                func_00282F20(&scratch[1].q, var_s5, 3.0f);
-                                                func_00282CC0(&scratch[1].q, &scratch[1].q, arg0 + 0xC0);
-                                                func_00282CC0(d, d, &scratch[1].q);
+                                                vec_scale_to_length(&scratch[1].q, var_s5, 3.0f);
+                                                FastVecAdd(&scratch[1].q, &scratch[1].q, arg0 + 0xC0);
+                                                FastVecAdd(d, d, &scratch[1].q);
                                                 func_L22_003B9128(arg0, d, 0);
                                                 M2C_FIELD(M2C_FIELD(temp_s6, s32 *, 0x440), f32 *, 0x48) = 0.35f;
                                                 }
@@ -1221,7 +1221,7 @@ block_184:
                                         }
                                     } else {
                                         var_s5 = arg0 + 0xE0;
-                                        func_00282978((s32) (temp_s6 + 0x386));
+                                        FastDecTimer((s32) (temp_s6 + 0x386));
                                         if (M2C_FIELD(temp_s6, s16 *, 0x386) <= 0) {
                                             temp_v1_6 = M2C_FIELD(temp_s6, s16 *, 0x3A6);
                                             if (temp_v1_6 == 1) {
@@ -1287,14 +1287,14 @@ block_184:
                                     func_L22_003A2988(&scratch[1].q, 8.0f);
                                 }
                                 if (var_s3 != -1) {
-                                    func_00282CF0(&scratch[3].q, &scratch[0].q, (arg0 + 0x10));
-                                    func_00282CF0(&scratch[4].q, (s128 *) (D_00189E20 + 0x80), (arg0 + 0x10));
-                                    scratch[2].f[0] = func_00282DB0(&scratch[3].q, &scratch[4].q);
+                                    FastVecSub(&scratch[3].q, &scratch[0].q, (arg0 + 0x10));
+                                    FastVecSub(&scratch[4].q, (s128 *) (D_00189E20 + 0x80), (arg0 + 0x10));
+                                    scratch[2].f[0] = FastVecDot(&scratch[3].q, &scratch[4].q);
                                 }
                                 if (var_s2 != -1) {
-                                    func_00282CF0(&scratch[3].q, &scratch[1].q, (arg0 + 0x10));
-                                    func_00282CF0(&scratch[4].q, (s128 *) (D_00189E20 + 0x80), (arg0 + 0x10));
-                                    scratch[2].f[1] = func_00282DB0(&scratch[3].q, &scratch[4].q);
+                                    FastVecSub(&scratch[3].q, &scratch[1].q, (arg0 + 0x10));
+                                    FastVecSub(&scratch[4].q, (s128 *) (D_00189E20 + 0x80), (arg0 + 0x10));
+                                    scratch[2].f[1] = FastVecDot(&scratch[3].q, &scratch[4].q);
                                 }
                                 if (var_fp == 3) {
                                     if ((var_s3 != -1) && (var_s2 != -1)) {
@@ -1321,15 +1321,15 @@ block_184:
                                 }
                             }
                         }
-                        if ((spC8 != 0) || (near = ((s128 *) (temp_s6 + 0x360)), func_00282E48((arg0 + 0x10), near) < 2.0f)) {
+                        if ((spC8 != 0) || (near = ((s128 *) (temp_s6 + 0x360)), fast_vec_dist((arg0 + 0x10), near) < 2.0f)) {
                             temp_a1_3 = M2C_FIELD(temp_s6, s16 *, 0x356) + M2C_FIELD(temp_s6, s16 *, 0x352);
                             temp_a2 = D_L22_001FE940[((OwnerD708 *) temp_s6)->paths[M2C_FIELD(temp_s6, s16 *, 0x354)]];
                             if (temp_a1_3 < 0) {
-                                func_L22_003A2E50(arg0, var_fp, 1, M2C_FIELD(temp_a2, f32 *, 0x1C));
+                                WalkPathPickNext(arg0, var_fp, 1, M2C_FIELD(temp_a2, f32 *, 0x1C));
                             } else {
                                 temp_v1_8 = M2C_FIELD(temp_a2, s32 *, 0);
                                 if (temp_a1_3 >= temp_v1_8) {
-                                    func_L22_003A2E50(arg0, var_fp, 1, ((PathD708 *) temp_a2)->points[temp_v1_8 - 1].f[3]);
+                                    WalkPathPickNext(arg0, var_fp, 1, ((PathD708 *) temp_a2)->points[temp_v1_8 - 1].f[3]);
                                 } else {
                                     M2C_FIELD(temp_s6, s16 *, 0x356) = temp_a1_3;
                                 }
@@ -1337,13 +1337,13 @@ block_184:
                             *((s128 *) (temp_s6 + 0x360)) = M2C_FIELD(((M2C_FIELD(temp_s6, s16 *, 0x356) * 0x10) + D_L22_001FE940[((OwnerD708 *) temp_s6)->paths[M2C_FIELD(temp_s6, s16 *, 0x354)]]), s128 *, 0x10);
                             func_L22_003A2988(((s128 *) (temp_s6 + 0x360)), 8.0f);
                         } else {
-                            func_00282CF0(&scratch[0].q, near, (arg0 + 0x10));
+                            FastVecSub(&scratch[0].q, near, (arg0 + 0x10));
                             var_f20 = var_f20 * 0.0625f;
                             if (var_f20 > 0.5f) {
                                 var_f20 = 0.5f;
                             }
-                            func_00282F20(&scratch[0].q, &scratch[0].q, var_f20);
-                            func_00282CC0((arg0 + 0x10), (arg0 + 0x10), &scratch[0].q);
+                            vec_scale_to_length(&scratch[0].q, &scratch[0].q, var_f20);
+                            FastVecAdd((arg0 + 0x10), (arg0 + 0x10), &scratch[0].q);
                             func_L22_003A2988((arg0 + 0x10), 8.0f);
                             M2C_FIELD(temp_s6, s32 *, 0x3E8) = 0;
                         }
@@ -1359,10 +1359,10 @@ block_184:
                         spC4 = func_002B0360((arg0 + 0x10)) - D_L22_001B2AA4;
                         scratch[1].q = *(s128 *)(arg0 + 0x10);
                         func_L22_003A2988(&scratch[1].q, 0.0f);
-                        func_00282CF0(&scratch[0].q, &scratch[1].q, (arg0 + 0x10));
+                        FastVecSub(&scratch[0].q, &scratch[1].q, (arg0 + 0x10));
                         func_002AA548(&spC4, temp_s6 + 0x3A8, 0.0f, 0.011111111f, 0.011111111f, 0.33333334f);
-                        func_00282F20(&scratch[0].q, &scratch[0].q, -M2C_FIELD(temp_s6, f32 *, 0x3A8));
-                        func_00282CC0((arg0 + 0x10), (arg0 + 0x10), &scratch[0].q);
+                        vec_scale_to_length(&scratch[0].q, &scratch[0].q, -M2C_FIELD(temp_s6, f32 *, 0x3A8));
+                        FastVecAdd((arg0 + 0x10), (arg0 + 0x10), &scratch[0].q);
                     }
                     break;
                 case 30:                            /* switch 2 */
@@ -1414,10 +1414,10 @@ block_184:
                                     func_002A7750(arg0, 0x12, 9);
                                 }
                             } else {
-                                func_L22_003A2160(arg0);
+                                WalkPathUpdate(arg0);
                             }
                         } else {
-                            func_L22_003A2160(arg0);
+                            WalkPathUpdate(arg0);
                         }
                     }
                     break;
@@ -1442,7 +1442,7 @@ block_184:
                         func_L22_003A45F0(arg0, 0, 0, 0x14, 3, 1.0f);
                         M2C_FIELD(temp_s6, s16 *, 0x384) = (s16) (func_002A77E0(7) + 0x1B);
                     }
-                    func_00282978((s32) (temp_s6 + 0x384));
+                    FastDecTimer((s32) (temp_s6 + 0x384));
                     if (M2C_FIELD(temp_s6, s16 *, 0x1D0) == 0) {
                         func_L11_003404E0(arg0);
                     }
@@ -1459,7 +1459,7 @@ block_184:
                         func_L22_003A45F0(arg0, 0, 0, 0x14, 3, 1.0f);
                         M2C_FIELD(temp_s6, s16 *, 0x384) = (s16) (func_002A77E0(7) + 0x1B);
                     }
-                    func_00282978((s32) (temp_s6 + 0x384));
+                    FastDecTimer((s32) (temp_s6 + 0x384));
                     if (M2C_FIELD(temp_s6, s16 *, 0x1D0) == 0) {
                         func_L11_003404E0(arg0);
                     }
@@ -1475,7 +1475,7 @@ block_184:
                         func_L22_003A45F0(arg0, 0, 0, 0x14, 3, 1.0f);
                         M2C_FIELD(temp_s6, s16 *, 0x384) = (s16) (func_002A77E0(7) + 0x1B);
                     }
-                    func_00282978((s32) (temp_s6 + 0x384));
+                    FastDecTimer((s32) (temp_s6 + 0x384));
                     if (M2C_FIELD(temp_s6, s16 *, 0x1D0) == 0) {
                         func_L11_003404E0(arg0);
                     }
@@ -1562,9 +1562,9 @@ block_184:
                     s128 *d;
                     do { d = &scratch[0].q; } while (0);
                     *d = *(s128 *)(arg0 + 0x10);
-                    func_00282F20(&scratch[1].q, temp_s6 + 0x200, 12.0f);
-                    func_00282CC0(&scratch[1].q, &scratch[1].q, d);
-                    if (func_002761F8(d, &scratch[1].q, 0x12, 0, 0) != 0) {
+                    vec_scale_to_length(&scratch[1].q, temp_s6 + 0x200, 12.0f);
+                    FastVecAdd(&scratch[1].q, &scratch[1].q, d);
+                    if (CollLine(d, &scratch[1].q, 0x12, 0, 0) != 0) {
                         *(s128 *)(arg0 + 0x10) = D_L22_001C00E0;
                     }
                 }

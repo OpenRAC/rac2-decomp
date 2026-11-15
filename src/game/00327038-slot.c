@@ -87,7 +87,7 @@ int func_0032D758(char *self, int index, int arg)
                 found = 1;
             }
         }
-        if (!found) func_002A04B8(slot->object, &r, &g, &b);
+        if (!found) get_moby_color(slot->object, &r, &g, &b);
         slot->phase.bits = 0;
         slot->flags = 0x8000;
         slot->color = (b << 16) + (g << 8) + r;

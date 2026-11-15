@@ -14,7 +14,7 @@ typedef struct {
     u32 colors[4];              /* 0x40: one per corner */
     float uv[4][2];             /* 0x50: u, v per corner */
     u64 f70;                    /* 0x70 */
-    u64 tex0;                   /* 0x78: from func_0027C878 */
+    u64 tex0;                   /* 0x78: from GetEffectTextureDescriptor */
     u64 tex1;                   /* 0x80 */
     u64 alpha;                  /* 0x88: GS ALPHA blend (0x48 additive, 0x44 normal) */
 } EffectQuad;
@@ -95,11 +95,11 @@ void func_L00_003B4198(Moby *moby)
     if (moby->state != 2) {
         age = vars->age;
         if (age >= D_L00_001AF8E0 - 30)
-            fade = func_00283CE0(D_L00_001AF8E0 - age) / func_00283CE0(30);
+            fade = IntToFloat(D_L00_001AF8E0 - age) / IntToFloat(30);
         else
             fade = 1.0f;
 
-        quad.tex0 = func_0027C878(8);
+        quad.tex0 = GetEffectTextureDescriptor(8);
         quad.alpha = 0x8000000048ULL;
         quad.tex1 = 0xFF9000000260ULL;
         quad.f70 = 0;
@@ -113,47 +113,47 @@ void func_L00_003B4198(Moby *moby)
         quad.uv[3][1] = 1.0f;
 
         /* A matrix facing D_L00_001B8DC0, placed at the moby. */
-        func_00282CF0(&billboard[0], &D_L00_001B8DC0, &moby->position);
-        func_00282F20(&billboard[0], &billboard[0], 1.0f);
+        FastVecSub(&billboard[0], &D_L00_001B8DC0, &moby->position);
+        vec_scale_to_length(&billboard[0], &billboard[0], 1.0f);
         billboard[3].q = moby->position.q;
-        func_00282D30(&billboard[2], -1.0f, &D_0018A0E0);
-        func_00282DD8(&billboard[1], &billboard[0], &billboard[2]);
-        func_00282F20(&billboard[1], &billboard[1], 1.0f);
-        func_00282DD8(&billboard[2], &billboard[1], &billboard[0]);
+        FastVecScale(&billboard[2], -1.0f, &D_0018A0E0);
+        FastVecCross(&billboard[1], &billboard[0], &billboard[2]);
+        vec_scale_to_length(&billboard[1], &billboard[1], 1.0f);
+        FastVecCross(&billboard[2], &billboard[1], &billboard[0]);
 
         for (i = 0; i < 10; ++i) {
             if (!D_L00_0023D960[i].active)
                 continue;
-            t = func_00283CE0(D_L00_0023D960[i].age) * D_L00_001B28AC[0];
+            t = IntToFloat(D_L00_0023D960[i].age) * D_L00_001B28AC[0];
             if (t > 1.0f)
                 t = 1.0f;
             size = D_L00_001AF980 + (D_L00_001AF984 - D_L00_001AF980) * t;
-            startAlpha = func_00283CE0(D_L00_001AF938);
-            fadeAlpha = func_00283CE0(D_L00_001AF938);
-            alpha = func_00283CF0(fade * (startAlpha + -fadeAlpha * t));
+            startAlpha = IntToFloat(D_L00_001AF938);
+            fadeAlpha = IntToFloat(D_L00_001AF938);
+            alpha = FloatToInt(fade * (startAlpha + -fadeAlpha * t));
             quad.colors[0] = quad.colors[1] = quad.colors[2] = quad.colors[3]
                 = (D_L00_001AF93C & 0xFFFFFF) | ((u32)alpha << 24);
             for (j = 0; j < 4; ++j) {
-                func_00282D30(&corner, size, &D_L00_001AF940[j]);
-                func_002830C0(&quad.corners[j], &corner, billboard);
+                FastVecScale(&corner, size, &D_L00_001AF940[j]);
+                transform_vector(&quad.corners[j], &corner, billboard);
             }
-            func_00280B90(&quad, 0, 0);
+            draw_world_quad(&quad, 0, 0);
         }
 
         /* The core, normally blended and a little nearer the viewer. */
-        quad.tex0 = func_0027C878(11);
+        quad.tex0 = GetEffectTextureDescriptor(11);
         quad.alpha = 0x8000000044ULL;
         quad.colors[0] = quad.colors[1] = quad.colors[2] = quad.colors[3]
             = (D_L00_001AF990 & 0xFFFFFF) | D_L00_001AF98C;
-        func_00282F20(&billboard[3], &billboard[0], D_L00_001AF994);
-        func_00282CC0(&billboard[3], &billboard[3], &moby->position);
+        vec_scale_to_length(&billboard[3], &billboard[0], D_L00_001AF994);
+        FastVecAdd(&billboard[3], &billboard[3], &moby->position);
         radius = D_L00_001AF988 + func_002A78D8(0.0f, 0.1f);
         for (k = 0; k < 4; ++k) {
-            func_00282D30(&corner, radius, &D_L00_001AF940[k]);
-            func_002830C0(&quad.corners[k], &corner, billboard);
+            FastVecScale(&corner, radius, &D_L00_001AF940[k]);
+            transform_vector(&quad.corners[k], &corner, billboard);
         }
-        func_00280B90(&quad, 0, 0);
-        func_L00_003B4560(moby, fade);
+        draw_world_quad(&quad, 0, 0);
+        MeshDrawFourSigns(moby, fade);
     }
     func_L00_003B5210();
 }

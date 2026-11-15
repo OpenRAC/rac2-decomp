@@ -27,8 +27,8 @@ void func_L15_004363C8(char *obj)
     dir.f[2] = 4.6f;
     dir.f[3] = 1.0f;
     drift.q = 0;
-    func_00283098(&tail, &dir, obj + 0xC0);
-    func_00282CC0(&tail, &tail, obj + 0x10);
+    matrix_mul_vec3(&tail, &dir, obj + 0xC0);
+    FastVecAdd(&tail, &tail, obj + 0x10);
     k = 0.4f;
     tail.w[3] = 0;
     qcopy(&mark1, &tail);
@@ -48,8 +48,8 @@ void func_L15_004363C8(char *obj)
     dir2.f[0] = -15.0f;
     dir2.f[2] = 2.0f;
     dir2.f[3] = 1.0f;
-    func_00283098(&tail, &dir2, obj + 0xC0);
-    func_00282CC0(&tail, &tail, obj + 0x10);
+    matrix_mul_vec3(&tail, &dir2, obj + 0xC0);
+    FastVecAdd(&tail, &tail, obj + 0x10);
     tail.w[3] = 0;
     qcopy(&mark1, &tail);
     qcopy(&mark2, &tail);
@@ -69,8 +69,8 @@ void func_L15_004363C8(char *obj)
     dir3.f[1] = 3.4f;
     dir3.f[2] = 1.05f;
     dir3.f[3] = 1.0f;
-    func_00283098(&tail, &dir3, obj + 0xC0);
-    func_00282CC0(&tail, &tail, obj + 0x10);
+    matrix_mul_vec3(&tail, &dir3, obj + 0xC0);
+    FastVecAdd(&tail, &tail, obj + 0x10);
     tail.w[3] = 0;
     qcopy(&mark1, &tail);
     qcopy(&mark2, &tail);
@@ -90,8 +90,8 @@ void func_L15_004363C8(char *obj)
     dir4.f[1] = -3.4f;
     dir4.f[2] = 1.05f;
     dir4.f[3] = 1.0f;
-    func_00283098(&tail, &dir4, obj + 0xC0);
-    func_00282CC0(&tail, &tail, obj + 0x10);
+    matrix_mul_vec3(&tail, &dir4, obj + 0xC0);
+    FastVecAdd(&tail, &tail, obj + 0x10);
     tail.w[3] = 0;
     qcopy(&mark1, &tail);
     qcopy(&mark2, &tail);

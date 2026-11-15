@@ -62,37 +62,37 @@ void func_L00_002EC970(Vector4 *start, Vector4 *points, unsigned int color, int 
         second.uv[0] = u0; second.uv[1] = 1; second.uv[2] = u0; second.uv[3] = 0;
         second.uv[4] = du + u0; second.uv[5] = 1; second.uv[6] = du + u0; second.uv[7] = 0;
     }
-    func_00282CF0(&basis[0], points, pos); func_00282F20(&basis[0], &basis[0], 1);
-    func_00282CF0(&basis[1], D_L00_001B8DC0, pos); func_00282DD8(&basis[2], &basis[1], &basis[0]);
-    func_00282F20(&basis[2], &basis[2], 1); func_00282DD8(&basis[1], &basis[0], &basis[2]);
+    FastVecSub(&basis[0], points, pos); vec_scale_to_length(&basis[0], &basis[0], 1);
+    FastVecSub(&basis[1], D_L00_001B8DC0, pos); FastVecCross(&basis[2], &basis[1], &basis[0]);
+    vec_scale_to_length(&basis[2], &basis[2], 1); FastVecCross(&basis[1], &basis[0], &basis[2]);
     qcopy(&basis[3], pos);
     qcopy(&first.point[0], &nearSize); qcopy(&second.point[0], &farSize);
-    func_00282D30(&first.point[1], &first, -1); func_00282D30(&second.point[1], &second, -1);
-    func_002830C0(&first, &first, basis); func_002830C0(&first.point[1], &first.point[1], basis);
-    func_002830C0(&second, &second, basis); func_002830C0(&second.point[1], &second.point[1], basis);
+    FastVecScale(&first.point[1], &first, -1); FastVecScale(&second.point[1], &second, -1);
+    transform_vector(&first, &first, basis); transform_vector(&first.point[1], &first.point[1], basis);
+    transform_vector(&second, &second, basis); transform_vector(&second.point[1], &second.point[1], basis);
     for (i = 0; i < count - 1; i++) {
         float u, v;
         Vector4 *to = &points[i + 1], *from = &points[i];
         Beam *b = &first, *c = &second;
-        func_00282CF0(&basis[0], to, from); func_00282F20(&basis[0], &basis[0], 1);
-        func_00282CF0(&basis[1], D_L00_001B8DC0, from); func_00282DD8(&basis[2], &basis[1], &basis[0]);
-        func_00282F20(&basis[2], &basis[2], 1); func_00282DD8(&basis[1], &basis[0], &basis[2]);
+        FastVecSub(&basis[0], to, from); vec_scale_to_length(&basis[0], &basis[0], 1);
+        FastVecSub(&basis[1], D_L00_001B8DC0, from); FastVecCross(&basis[2], &basis[1], &basis[0]);
+        vec_scale_to_length(&basis[2], &basis[2], 1); FastVecCross(&basis[1], &basis[0], &basis[2]);
         qcopy(&basis[3], from);
         nearSize.f[2] *= 0.75f; farSize.f[2] = nearSize.f[2] * 1.5f;
         qcopy(&b->point[2], &nearSize); qcopy(&c->point[2], &farSize);
-        func_00282D30(&b->point[3], &b->point[2], -1);
-        func_00282D30(&c->point[3], &c->point[2], -1);
-        func_002830C0(&b->point[2], &b->point[2], basis); func_002830C0(&b->point[3], &b->point[3], basis);
-        func_002830C0(&c->point[2], &c->point[2], basis); func_002830C0(&c->point[3], &c->point[3], basis);
+        FastVecScale(&b->point[3], &b->point[2], -1);
+        FastVecScale(&c->point[3], &c->point[2], -1);
+        transform_vector(&b->point[2], &b->point[2], basis); transform_vector(&b->point[3], &b->point[3], basis);
+        transform_vector(&c->point[2], &c->point[2], basis); transform_vector(&c->point[3], &c->point[3], basis);
         first.color[2] = first.color[3] = color | 0x7F000000;
         second.color[2] = second.color[3] = color | 0x3F000000;
-        u = du * func_00283CE0(i + 1);
+        u = du * IntToFloat(i + 1);
         v = u + du;
         if (u >= 1.0f) { u -= 1.0f; v -= 1.0f; }
         first.uv[0] = u + u0; first.uv[2] = u + u0; first.uv[4] = v + u0; first.uv[6] = v + u0;
         second.uv[0] = u + u0; second.uv[4] = v + u0;
         second.uv[2] = u + u0; second.uv[6] = v + u0;
-        func_00280B90(b, 0, 0); func_00280B90(c, 0, 0);
+        draw_world_quad(b, 0, 0); draw_world_quad(c, 0, 0);
         qcopy(&b->point[0], &b->point[2]); qcopy(&b->point[1], &b->point[3]);
         qcopy(&c->point[0], &c->point[2]); qcopy(&c->point[1], &c->point[3]);
     }
@@ -101,17 +101,17 @@ void func_L00_002EC970(Vector4 *start, Vector4 *points, unsigned int color, int 
         qcopy(&basis[3], &points[count - 1]);
         nearSize.f[2] *= 0.75f; farSize.f[2] = nearSize.f[2] * 1.5f;
         qcopy(&first.point[2], &nearSize); qcopy(&second.point[2], &farSize);
-        func_00282D30(&first.point[3], &first.point[2], -1); func_00282D30(&second.point[3], &second.point[2], -1);
-        func_002830C0(&first.point[2], &first.point[2], basis); func_002830C0(&first.point[3], &first.point[3], basis);
-        func_002830C0(&second.point[2], &second.point[2], basis); func_002830C0(&second.point[3], &second.point[3], basis);
+        FastVecScale(&first.point[3], &first.point[2], -1); FastVecScale(&second.point[3], &second.point[2], -1);
+        transform_vector(&first.point[2], &first.point[2], basis); transform_vector(&first.point[3], &first.point[3], basis);
+        transform_vector(&second.point[2], &second.point[2], basis); transform_vector(&second.point[3], &second.point[3], basis);
         second.color[2] = second.color[3] = first.color[2] = first.color[3] = color;
-        u = du * func_00283CE0(i + 1);
+        u = du * IntToFloat(i + 1);
         v = u + du;
         if (u >= 1.0f) { u -= 1.0f; v -= 1.0f; }
         first.uv[0] = u + u0; first.uv[2] = u + u0; first.uv[4] = v + u0; first.uv[6] = v + u0;
         second.uv[0] = u + u0; second.uv[4] = v + u0;
         second.uv[6] = v + u0; second.uv[2] = u + u0;
-        func_00280B90(&first, 0, 0); func_00280B90(&second, 0, 0);
+        draw_world_quad(&first, 0, 0); draw_world_quad(&second, 0, 0);
     }
 }
 

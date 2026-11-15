@@ -28,7 +28,7 @@ extern int func_L00_002FCF18(void *, float, float, float, float, float);
 /* colorReset mirrors the radius cycle's reset flag but no colour path sets it: retail keeps the
  * constant test (li v0,1; bnel v0,zero), so a nonzero interval never randomizes the channel. */
 #define UPDATE_COLOR(n, randomFlag, pairMask, pairValue, pauseFlag, downFlag, topFlag, bottomFlag) { int colorReset = 0; \
-    if (s->interval[n] && func_00282978(&s->timer[n])) { \
+    if (s->interval[n] && FastDecTimer(&s->timer[n])) { \
         s->timer[n] = s->interval[n]; \
         s->rgb[n] = (float)s->color[n].minimum; \
         s->flags &= ~(downFlag); \
@@ -37,15 +37,15 @@ extern int func_L00_002FCF18(void *, float, float, float, float, float);
         if ((*(u64 *)&s->lifetime & (pairMask)) == (pairValue)) s->flags ^= (pauseFlag); \
         if (!(s->flags & (pauseFlag))) { \
             if (s->flags & (downFlag)) { \
-                low = func_00283CE0(s->color[n].minimum) * 0.01f; \
-                s->rgb[n] -= func_00283CE0(s->color[n].fall) * 0.01f; \
+                low = IntToFloat(s->color[n].minimum) * 0.01f; \
+                s->rgb[n] -= IntToFloat(s->color[n].fall) * 0.01f; \
                 if (s->rgb[n] <= low) { \
                     s->rgb[n] = low; \
                     if ((s->flags & (bottomFlag)) && !s->interval[n]) s->flags ^= (downFlag); \
                 } \
             } else { \
-                high = func_00283CE0(s->color[n].maximum) * 0.01f; \
-                s->rgb[n] += func_00283CE0(s->color[n].rise) * 0.01f; \
+                high = IntToFloat(s->color[n].maximum) * 0.01f; \
+                s->rgb[n] += IntToFloat(s->color[n].rise) * 0.01f; \
                 if (high <= s->rgb[n]) { \
                     s->rgb[n] = high; \
                     if (!(s->flags & (topFlag))) s->flags ^= (downFlag); \
@@ -57,8 +57,8 @@ extern int func_L00_002FCF18(void *, float, float, float, float, float);
         } \
     } else { \
         if (!s->interval[n] || colorReset == 1) { \
-            s->rgb[n] = func_002A7878((float)func_00283CF0((float)s->color[n].minimum) * 0.01f, \
-                                      (float)func_00283CF0((float)s->color[n].maximum) * 0.01f); \
+            s->rgb[n] = func_002A7878((float)FloatToInt((float)s->color[n].minimum) * 0.01f, \
+                                      (float)FloatToInt((float)s->color[n].maximum) * 0.01f); \
         } \
     } }
 /* Updates a configured animated point light: radius, RGB cycles and attachment. */
@@ -83,9 +83,9 @@ void func_L00_0039D598(u8 *actor) {
         s->timer[1] = s->interval[1];
         s->timer[2] = s->interval[2];
         s->timer[3] = s->interval[3];
-        s->rgb[0] = func_00283CE0(s->color[0].initial) * 0.01f;
-        s->rgb[1] = func_00283CE0(s->color[1].initial) * 0.01f;
-        s->rgb[2] = func_00283CE0(s->color[2].initial) * 0.01f;
+        s->rgb[0] = IntToFloat(s->color[0].initial) * 0.01f;
+        s->rgb[1] = IntToFloat(s->color[1].initial) * 0.01f;
+        s->rgb[2] = IntToFloat(s->color[2].initial) * 0.01f;
         index = s->parentIndex;
         s->radius = s->initialRadius;
         if (index != -1) s->parent = D_L00_001B1E9C[0] + index * 0x100;
@@ -110,17 +110,17 @@ void func_L00_0039D598(u8 *actor) {
                 offset.f[2] = func_002A7878(-s->offset.f[2], s->offset.f[2]);
             } else {
                 u32 saved = *(u32 *)&s->offset.f[3]; s->offset.f[3] = 0;
-                func_00282D30(&offset, &s->offset, func_002A7878(s->offset.f[3], 1));
+                FastVecScale(&offset, &s->offset, func_002A7878(s->offset.f[3], 1));
                 *(u32 *)&s->offset.f[3] = saved;
             }
         } else {
             u32 saved = *(u32 *)&s->offset.f[3]; s->offset.f[3] = 0;
             qcopy(&offset, &s->offset); *(u32 *)&s->offset.f[3] = saved;
         }
-        if ((s->flags & 0x400000) && s->parent) func_00283098(&offset, &offset, s->parent + 0xC0);
-        func_00282CC0(actor + 0x10, &origin, &offset);
+        if ((s->flags & 0x400000) && s->parent) matrix_mul_vec3(&offset, &offset, s->parent + 0xC0);
+        FastVecAdd(actor + 0x10, &origin, &offset);
     } else qcopy((actor + 0x10), &origin);
-    if (s->interval[3] && func_00282978(&s->timer[3])) {
+    if (s->interval[3] && FastDecTimer(&s->timer[3])) {
         s->timer[3] = s->interval[3];
         if (s->flags & 4) { radiusReset = 1; s->radius = s->minimumRadius; s->flags &= ~8; }
     }
@@ -151,13 +151,13 @@ void func_L00_0039D598(u8 *actor) {
     UPDATE_COLOR(1, 0x20000, 0x30000000000ULL, 0x20000000000ULL, 0x200, 0x800, 0x100, 0x400);
     UPDATE_COLOR(2, 0x40000, 0x300000000000ULL, 0x200000000000ULL, 0x2000, 0x8000, 0x1000, 0x4000);
     if (s->light == -1) {
-        s->light = func_L00_002FCF18(actor + 0x10, s->radius * 0.8f, func_00283CE0(s->intensity) * 0.01f, s->rgb[0], s->rgb[1], s->rgb[2]);
+        s->light = func_L00_002FCF18(actor + 0x10, s->radius * 0.8f, IntToFloat(s->intensity) * 0.01f, s->rgb[0], s->rgb[1], s->rgb[2]);
     } else {
         Vector *entry = D_L00_001C6F40[s->light];
         qcopy(&entry[1], (actor + 0x10));
         entry[1].f[3] = s->radius * 0.8f;
         entry[0].f[0] = s->rgb[0]; entry[0].f[1] = s->rgb[1]; entry[0].f[2] = s->rgb[2];
-        entry[0].f[3] = func_00283CE0(s->intensity) * 0.01f;
+        entry[0].f[3] = IntToFloat(s->intensity) * 0.01f;
     }
     return;
 hidden:

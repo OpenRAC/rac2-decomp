@@ -25,7 +25,7 @@ u8 *func_L16_00405488(float speed, u8 *owner, float *velocity, TI128 *position)
     u8 *axis;
     float scale;
     float angle;
-    obj = func_0029EFD0(0xEBD);
+    obj = CreateMoby(0xEBD);
     if (obj) {
         obj[0x30] = 255;
         *(u16 *)(obj + 0x32) = 255;
@@ -42,12 +42,12 @@ u8 *func_L16_00405488(float speed, u8 *owner, float *velocity, TI128 *position)
         *(u16 *)(obj + 0x34) |= 0x208;
         rotation = obj + 0xC0;
         axis = obj + 0xD0;
-        *(float *)(obj + 0xF8) = func_00283B98(func_00283248(velocity[0], velocity[1]), 1.5707965f);
-        *(float *)(obj + 0xF0) = -func_00283248(func_00282E20(velocity), velocity[2]);
+        *(float *)(obj + 0xF8) = FastAddRotations(func_00283248(velocity[0], velocity[1]), 1.5707965f);
+        *(float *)(obj + 0xF0) = -func_00283248(vec_length_xy(velocity), velocity[2]);
         angle = func_002A7940();
         func_002ACEC0(obj + 0xE0, obj + 0xE0, axis, angle);
         func_002ACEC0(rotation, rotation, axis, angle);
-        func_002833F0(rotation, obj + 0xF0);
+        euler_rotation_basis(rotation, obj + 0xF0);
         obj[0x23] = 128;
         *(float *)(obj + 0x2C) = D_L16_001B1500;
         *(u16 *)(obj + 0x34) |= 0x100;

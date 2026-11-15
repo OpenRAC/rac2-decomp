@@ -48,28 +48,28 @@ void func_0031CB78(char *unused, char *pos, int color, int first, int second, fl
     *(int *)(pkt + 64) = color + first;
     quat[3] = 0;
     quat[2] = func_00283248(dx, dy);
-    quat[1] = -func_00283248(func_00282E80(pos, &D_001B5200.pos[0]),
+    quat[1] = -func_00283248(vec_distance_xy(pos, &D_001B5200.pos[0]),
                               D_001B5200.pos[2] - *(float *)(pos + 8));
     quat[0] = func_002A7940();
-    func_00283410(m, quat);
-    func_00282CF0(off, &D_001B5200.pos[0], pos);
-    func_00282F20(off, off, 0.5f);
+    euler_to_matrix(m, quat);
+    FastVecSub(off, &D_001B5200.pos[0], pos);
+    vec_scale_to_length(off, off, 0.5f);
     m[12] = *(float *)(pos) + off[0];
     m[13] = *(float *)(pos + 4) + off[1];
     m[14] = *(float *)(pos + 8) + off[2];
     m[15] = 1.0f;
-    func_00282D30(pkt, pkt, scale);
-    func_00282D30(pkt + 16, pkt + 16, scale);
-    func_00282D30(pkt + 32, pkt + 32, scale);
-    func_00282D30(pkt + 48, pkt + 48, scale);
-    func_00280B90(pkt, m, 0);
+    FastVecScale(pkt, pkt, scale);
+    FastVecScale(pkt + 16, pkt + 16, scale);
+    FastVecScale(pkt + 32, pkt + 32, scale);
+    FastVecScale(pkt + 48, pkt + 48, scale);
+    draw_world_quad(pkt, m, 0);
     *(int *)(pkt + 76) = color + second;
     *(int *)(pkt + 72) = color + second;
     *(int *)(pkt + 68) = color + second;
     *(int *)(pkt + 64) = color + second;
-    func_00282D30(pkt, pkt, 0.5f);
-    func_00282D30(pkt + 16, pkt + 16, 0.5f);
-    func_00282D30(pkt + 32, pkt + 32, 0.5f);
-    func_00282D30(pkt + 48, pkt + 48, 0.5f);
-    func_00280B90(pkt, m, 0);
+    FastVecScale(pkt, pkt, 0.5f);
+    FastVecScale(pkt + 16, pkt + 16, 0.5f);
+    FastVecScale(pkt + 32, pkt + 32, 0.5f);
+    FastVecScale(pkt + 48, pkt + 48, 0.5f);
+    draw_world_quad(pkt, m, 0);
 }

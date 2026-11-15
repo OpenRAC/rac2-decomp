@@ -51,10 +51,10 @@ void func_L18_0043FB08(Moby43FB08 *self) {
             *(TI *)ext = 0;
             ext[0] = 3.0f;
             ext[1] = 3.0f;
-            func_00282D30(lo, self->dir, -func_002A7878(6.0f, 8.0f));
+            FastVecScale(lo, self->dir, -func_002A7878(6.0f, 8.0f));
             qcopy(hi, lo);
-            func_00282CF0(lo, lo, ext);
-            func_00282CC0(hi, hi, ext);
+            FastVecSub(lo, lo, ext);
+            FastVecAdd(hi, hi, ext);
             func_L00_0032A258(self, lo, D_L18_001B1CB8, D_L18_001B1CB0, D_L18_001B1CE4, -1,
                               D_L18_001B1CE0, 9, D_L18_001B1CE8, 0xFF, 0);
             func_002E5DA0(0, 0, self, self->uid);

@@ -118,7 +118,7 @@ extern void *func_L00_003A98E8(char *a0, void *a1, char *a2, int a3, float f12, 
 
 /* Scales a direction by the current class record's speed (per frame at 60 Hz), negated from the
    object's own vector in player state 1, re-reads the record's second value, applies the
-   optional mode adjustment, then spawns through func_L00_003A98E8 and links the result back to
+   optional mode adjustment, then spawns through SpawnProjectile and links the result back to
    the object. The two record lookups use separate locals: one reused pointer becomes a global
    pseudo and loses the first lookup's tie to the multiply's register. */
 void func_L00_003C37C8(char *a0, char *a1)
@@ -139,9 +139,9 @@ void func_L00_003C37C8(char *a0, char *a1)
     f20 = f0 * 0.016666667f;
     mode = D_00189E20_13.state;
     if (mode == 1)
-        func_00282F20(scratch, a0 + 0xD0, -f20);
+        vec_scale_to_length(scratch, a0 + 0xD0, -f20);
     else
-        func_00282F20(scratch, D_00189E20_13.vector, f20);
+        vec_scale_to_length(scratch, D_00189E20_13.vector, f20);
 
     rec2 = D_L00_00262570 + (unsigned char)D_00139568[0x19] * 0xE0;
     f21 = *(float *)(rec2 + 0x70);
@@ -151,9 +151,9 @@ void func_L00_003C37C8(char *a0, char *a1)
     if (mode != 0)
         func_L00_0032A1A8(mode, a1, scratch, f20);
 
-    f0 = func_00282DF0(scratch);
+    f0 = FastVecLength(scratch);
     f14 = D_001AFF08;
-    v = func_L00_003A98E8(a1, scratch, a0, 0, f0, f21, f14);
+    v = SpawnProjectile(a1, scratch, a0, 0, f0, f21, f14);
     *(int *)ctx = (int)v;
     if (v != 0) {
         *(int *)((char *)v + 0xB8) = (int)a0;
@@ -219,23 +219,23 @@ void func_L00_003C4F78(char *owner)
             UiHistoryPoint *dst;
             do { dst = &D_L00_0023FB80[0][j]; dst += i * 20; } while (0);
             qcopy(dst, &D_L00_0023FB80[i][j - 1]);
-            func_00282CC0(&vertices[index], &origin, dst);
+            FastVecAdd(&vertices[index], &origin, dst);
             vertices[index].f[3] = 0.05f;
         }
         head = &D_L00_0023FB80[i][0];
         func_002AB668(&change, &D_L00_001B2900[i], 0.10471976548433304f);
         func_002ACDE8(head, head, &change);
         func_002ACB48(head->f, 0.025f);
-        length = func_00282DF0(head);
+        length = FastVecLength(head);
         limit = D_L00_001AFF4C * 1.1f;
         if (length > limit)
-            func_00282D30(head, head, limit / length);
+            FastVecScale(head, head, limit / length);
         else {
             limit = D_L00_001AFF4C * 0.9f;
             if (length < limit)
-                func_00282D30(head, head, limit / length);
+                FastVecScale(head, head, limit / length);
         }
-        func_00282CC0(&vertices[last], &origin, &D_L00_0023FB80[i][0]);
+        FastVecAdd(&vertices[last], &origin, &D_L00_0023FB80[i][0]);
         vertices[last].f[3] = 0.05f;
         {
             int endpoint = D_L00_001B2940[i] - 1;

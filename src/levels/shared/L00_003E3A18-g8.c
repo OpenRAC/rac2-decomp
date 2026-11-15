@@ -147,9 +147,9 @@ void func_L00_003E3A18(u8 *object)
         if (D_L00_001B19C8 & 4) {
             data->target = 0;
             data->targeting = 0;
-            func_00282F20(first, D_L00_001B8DC0.forward, 128.0f);
-            func_00282CC0(first, first, D_L00_001B8DC0.position);
-            if (func_002761F8(D_L00_001B8DC0.position, first, 16, D_00189E20.camera, 0)) {
+            vec_scale_to_length(first, D_L00_001B8DC0.forward, 128.0f);
+            FastVecAdd(first, first, D_L00_001B8DC0.position);
+            if (CollLine(D_L00_001B8DC0.position, first, 16, D_00189E20.camera, 0)) {
                 target = D_L00_001BF218;
                 if (target && (u8)target[0x31]) {
                     health = func_002AB1F0(target);
@@ -164,10 +164,10 @@ void func_L00_003E3A18(u8 *object)
         if (D_00189E20.delay == 0) {
             if (data->targeting) {
                 if (++data->targetFrames > 20) data->targetFrames = 0;
-                if (data->cooldown <= 0.0f && func_L00_002D4040(-1) && data->targetFrames >= 11)
+                if (data->cooldown <= 0.0f && get_ammo(-1) && data->targetFrames >= 11)
                     func_00273318(object, 0x400000FF, 0, 32, -1, 4, 1.5f, 0.0f, 90.0f);
             }
-            if (data->cooldown > 0.0f && func_L00_002D4040(-1)) color = 0x600000FF;
+            if (data->cooldown > 0.0f && get_ammo(-1)) color = 0x600000FF;
             else color = 0x600FFF0F;
             func_00273318(object, color, 0, 39, -1, 4, 2.0f, 0.0f, 90.0f);
         }
@@ -190,7 +190,7 @@ void func_L00_003E3A18(u8 *object)
         data->targetFrames = 0;
         data->target = 0;
         data->light = -1;
-        data->resource = func_L00_00329E90(object, 0, &loaded);
+        data->resource = AcquireEntitySlot(object, 0, &loaded);
         if (!loaded) {
             cursor = func_L00_0032A088(*(short *)(object + 0xAA), data->resource);
             data->resourceBase = cursor;
@@ -246,13 +246,13 @@ void func_L00_003E3A18(u8 *object)
         } else D_00189E20.delay = 40;
         if (D_00189E20.blocked == 0 && (D_00138180[0x1A4/4] & D_00189E20.input) && canFire) {
             if (func_L00_002D3F30(-1, 1)) {
-                func_L00_002AF568();
+                start_equipped_item_animation();
                 data->sound = func_L00_002D6998(D_L00_00296AA0);
                 data->firingDelay = 2;
                 object[0x20] = 2;
                 func_002A7470(object, 2, 0, 0);
-            } else func_002E5CF8(1, 0, object);
-            if ((D_00138180[0x1A0/4] & D_00189E20.input) && func_L00_002D4040(-1) && D_00189E20.active) break;
+            } else PlayMobySound(1, 0, object);
+            if ((D_00138180[0x1A0/4] & D_00189E20.input) && get_ammo(-1) && D_00189E20.active) break;
             if (data->sound >= 0) {
                 func_L00_002D6B70(data->sound);
                 data->sound = -1;
@@ -261,9 +261,9 @@ void func_L00_003E3A18(u8 *object)
         break;
     case 2:
         if (D_00189E20.controller) D_00189E20.saved = D_00189E20.controller;
-        if (func_00282978(&data->firingDelay) || data->scoped) {
-            func_002E5CF8(0, 0, object);
-            func_L00_003E4508(object);
+        if (FastDecTimer(&data->firingDelay) || data->scoped) {
+            PlayMobySound(0, 0, object);
+            AimAndSpawnBeamWithMuzzleFlashes(object);
             tuning = (UpdateTuning *)(D_0013957F * 224 + (char *)D_L00_00262570);
         data->cooldown = 1.0f / tuning->rate;
             object[0x20] = 3;
@@ -283,15 +283,15 @@ void func_L00_003E3A18(u8 *object)
             if (data->light >= 0) {
                 if (D_00189E20.alternate == 1) {
                     func_0029FCC0(object, 0, first);
-                    func_00282F20(second, object + 0xD0, -1.5f);
+                    vec_scale_to_length(second, object + 0xD0, -1.5f);
                 } else {
                     func_0029FCC0(object, 0, first);
-                    func_00282F20(second, D_00189E20.direction, 1.5f);
+                    vec_scale_to_length(second, D_00189E20.direction, 1.5f);
                 }
-                func_00282CC0(D_L00_001C6F40[data->light].position, first, second);
+                FastVecAdd(D_L00_001C6F40[data->light].position, first, second);
                 D_L00_001C6F40[data->light].position[3] = 10.0f;
-                intensity = func_00283CE0(data->flashTimer);
-                intensity /= func_00283CE0(30);
+                intensity = IntToFloat(data->flashTimer);
+                intensity /= IntToFloat(30);
                 D_L00_001C6F40[data->light].red = intensity;
                 intensity *= 0.7f;
                 D_L00_001C6F40[data->light].green = intensity;

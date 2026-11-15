@@ -98,15 +98,15 @@ void func_0032A140(Blast *self)
     case 1:
         self->mode = 2;
     case 2:
-        ratio = func_00283CE0(state->timer);
-        ratio /= func_00283CE0(60);
+        ratio = IntToFloat(state->timer);
+        ratio /= IntToFloat(60);
         state->radius = func_002A7790(1.0f - ratio) * 15.0f;
         if (state->timer % 3 == 0) {
             float a = func_002A7940();
             float b = func_002A7940();
             func_002AF000(v, state->radius, a, b);
-            func_00282CC0(v, v, &D_00189E20.pos);
-            if (func_002761F8(&D_00189E20.pos, v, 0, D_00189E20.object, 0))
+            FastVecAdd(v, v, &D_00189E20.pos);
+            if (CollLine(&D_00189E20.pos, v, 0, D_00189E20.object, 0))
                 qcopy(v, D_001BAFA0);
             func_0032B598(self, v, 10);
         }
@@ -124,17 +124,17 @@ void func_0032A140(Blast *self)
                     if ((*(unsigned long long *)((char *)list[i] + 0x30) & 0x500000000000ULL) &&
                         (char *)list[i] != D_00189E20.object &&
                         *(short *)((char *)list[i] + 0xAA) != 3303 && *(short *)((char *)list[i] + 0xAA) != 3000) {
-                        func_00282CF0(v, (char *)list[i] + 0x10, &D_00189E20.pos);
-                        func_00282F20(v, v, 1.0f);
-                        func_00282F20(info, info, 1.0f);
-                        func_002A8C00(info, self, 0x830000, v, 30.0f);
+                        FastVecSub(v, (char *)list[i] + 0x10, &D_00189E20.pos);
+                        vec_scale_to_length(v, v, 1.0f);
+                        vec_scale_to_length(info, info, 1.0f);
+                        make_hit_descriptor(info, self, 0x830000, v, 30.0f);
                         *(Quad *)hit.direction = *(Quad *)v;
                         hit.enabled = 1;
                         hit.direction[3] = 5627.925f;
                         hit.kind = 5;
                         hit.mode = 3;
                         hit.classid = *(short *)((char *)list[i] + 0xAA);
-                        func_002A8E20((char *)list[i], info);
+                        QueueMobyImpact((char *)list[i], info);
                     }
                 }
             }
@@ -163,36 +163,36 @@ void func_0032A140(Blast *self)
         }
         break;
     }
-    phase = func_00283CE0(state->timer);
-    phase /= func_00283CE0(120);
+    phase = IntToFloat(state->timer);
+    phase /= IntToFloat(120);
     phase = 1.0f - phase;
     phase *= 6.2831855f;
     t = (func_00283180(phase - 3.1415927f) + 1.0f) * 0.5f;
     if (state->first) {
-        i = func_00283CF0(t * 32.0f);
+        i = FloatToInt(t * 32.0f);
         **(int **)(state->first + 0x68) = i;
-        *(float *)(state->first + 0xF8) = func_00283B98(*(float *)(state->first + 0xF8), 0.05235988646745682f);
-        func_002833F0(state->first + 0xC0, state->first + 0xF0);
+        *(float *)(state->first + 0xF8) = FastAddRotations(*(float *)(state->first + 0xF8), 0.05235988646745682f);
+        euler_rotation_basis(state->first + 0xC0, state->first + 0xF0);
         *(float *)(state->first + 0xC0) *= 0.5f;
         *(float *)(state->first + 0xD4) *= 0.5f;
         *(float *)(state->first + 0xE8) = t * 1.5f;
         qcopy(state->first + 0x10, D_00189E20.object + 0x10);
     }
     if (state->second) {
-        i = func_00283CF0(t * 32.0f);
+        i = FloatToInt(t * 32.0f);
         **(int **)(state->second + 0x68) = i;
-        *(float *)(state->second + 0xF8) = func_00283BE0(*(float *)(state->second + 0xF8), 0.05235988646745682f);
-        func_002833F0(state->second + 0xC0, state->second + 0xF0);
+        *(float *)(state->second + 0xF8) = fast_subtract_rotations(*(float *)(state->second + 0xF8), 0.05235988646745682f);
+        euler_rotation_basis(state->second + 0xC0, state->second + 0xF0);
         *(float *)(state->second + 0xE8) = t;
         qcopy(state->second + 0x10, D_00189E20.object + 0x10);
     }
     if (state->light != -1) {
         light = &D_001C2B40[state->light];
-        func_00282F20(v, D_0018A0C0, 0.5f);
-        func_00282CC0(&light->pos, *(char **)(D_0018A0C0 + 0x1FF0) + 16, v);
-        func_00282CF0(v, D_001B5340, &light->pos);
-        func_00282F20(v, v, 0.15f);
-        func_00282CC0(&light->pos, &light->pos, v);
+        vec_scale_to_length(v, D_0018A0C0, 0.5f);
+        FastVecAdd(&light->pos, *(char **)(D_0018A0C0 + 0x1FF0) + 16, v);
+        FastVecSub(v, D_001B5340, &light->pos);
+        vec_scale_to_length(v, v, 0.15f);
+        FastVecAdd(&light->pos, &light->pos, v);
         light->scale = t;
         light->pos.w = 5.0f;
         light->zero = 0;

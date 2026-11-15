@@ -31,14 +31,14 @@ void func_L13_003E8850(u8 *self)
     h = *(s16 *)(state + 0xE);
     switch (h) {
     case 0:
-        if (func_002ACBC8(D_00189EA0, *(s32 *)(state + 4)) != 0 && *(s32 *)(D_00189EA0 + 0x221C) == 0xF)
+        if (IsPointInCuboid(D_00189EA0, *(s32 *)(state + 4)) != 0 && *(s32 *)(D_00189EA0 + 0x221C) == 0xF)
             *(s16 *)(state + 0xE) = 1;
         break;
     case 1:
         hero = D_00189E20;
         if (*(s32 *)(hero + 0x2294) == 0x3E) {
             *(s16 *)(state + 0xE) = 0;
-        } else if (func_002ACBC8(hero + 0x80, *(s32 *)(state + 8)) != 0 && D_001A7A60[4] == 0) {
+        } else if (IsPointInCuboid(hero + 0x80, *(s32 *)(state + 8)) != 0 && D_001A7A60[4] == 0) {
             D_001A7A60[4] = 1;
             func_002E5E58(1, 0, 0);
             func_002B0A18(0x1233, -1);
@@ -46,7 +46,7 @@ void func_L13_003E8850(u8 *self)
         }
         break;
     }
-    if (func_002ACBC8(D_00189EA0, *(s32 *)state) == 0)
+    if (IsPointInCuboid(D_00189EA0, *(s32 *)state) == 0)
         return;
     timers = D_0018C750;
     if (*(u16 *)(timers + 0x1BC) != 0 && !(D_001A7390[0] - *(u32 *)(timers + 0x1C0) > 0x69780))

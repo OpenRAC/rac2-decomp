@@ -41,7 +41,7 @@ void func_002ECB70(void *object)
  float (*points)[4] = D_002620A0;
  float (*normals)[4] = D_002625B0;
  short (*quads)[8] = D_00262350;
- quad.packet[1] = func_0027C878(21);
+ quad.packet[1] = GetEffectTextureDescriptor(21);
  quad.packet[0] = 0;
  color = D_001A8BB0 == 2 ? 0x28a5a281 : 0x3ca5a281;
  active = 0;
@@ -58,23 +58,23 @@ void func_002ECB70(void *object)
  if (active || D_001ABF00 == 1) {
   D_001ABF04 = 1;
   func_00282948(&D_001ABF08);
-  fraction = func_00283CE0(D_001ABF08) / func_00283CE0(60);
+  fraction = IntToFloat(D_001ABF08) / IntToFloat(60);
   {
   float *t = transform;
   float (*n)[4] = normals;
   float (*p)[4] = points;
   for (i = 0; i < 43; i++) {
    float divisor, x;
-   func_002830C0(D_00214A30[i], p[i], t);
-   func_00282CF0(ray, D_00214A30[i], &D_001B5200[0x50]);
-   func_00282F20(ray, ray, 1.0f);
-   func_002830C0(normal, n[i], t);
-   func_00282F20(normal, normal, 0.1f);
-   func_00282D30(reflected, normal, 2.0f * func_00282DB0(normal, ray));
-   func_00282CF0(reflected, ray, reflected);
-   func_00282F20(reflected, reflected, 1.0f);
+   transform_vector(D_00214A30[i], p[i], t);
+   FastVecSub(ray, D_00214A30[i], &D_001B5200[0x50]);
+   vec_scale_to_length(ray, ray, 1.0f);
+   transform_vector(normal, n[i], t);
+   vec_scale_to_length(normal, normal, 0.1f);
+   FastVecScale(reflected, normal, 2.0f * FastVecDot(normal, ray));
+   FastVecSub(reflected, ray, reflected);
+   vec_scale_to_length(reflected, reflected, 1.0f);
    reflected[2] += 1.0f;
-   divisor = func_00282C10(reflected[2] * 2.0f) * 2.0f;
+   divisor = square_root(reflected[2] * 2.0f) * 2.0f;
    if (D_001ABF00 == 1 || D_001ABF08 == 0) {
     D_00214CE0[i][0] = reflected[0] / divisor + 0.5f;
     D_00214CE0[i][1] = reflected[1] / divisor + 0.5f;
@@ -92,13 +92,13 @@ void func_002ECB70(void *object)
   for (i = 0; i < 43; i++) {
    D_00214E38[i][0] = D_00214CE0[i][0];
    D_00214E38[i][1] = D_00214CE0[i][1];
-   func_002830C0(D_00214A30[i], points[i], transform);
+   transform_vector(D_00214A30[i], points[i], transform);
   }
   D_001ABF08 = 60;
  } else {
   float (*dest)[4] = D_00214A30;
   float (*p)[4] = points;
-  for (i = 0; i < 43; i++) func_002830C0(dest[i], p[i], transform);
+  for (i = 0; i < 43; i++) transform_vector(dest[i], p[i], transform);
   D_001ABF08 = 60;
  }
  for (i = 0; i < 38; i = next) {
@@ -115,6 +115,6 @@ void func_002ECB70(void *object)
     quad_v[j*2] = y;
    }
   }
-  func_00280B90(&quad, 0, 0);
+  draw_world_quad(&quad, 0, 0);
  }
 }
